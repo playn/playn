@@ -1,0 +1,83 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  
+  <parent>
+    <groupId>forplay</groupId>
+    <artifactId>forplay-project</artifactId>
+    <version>1.0</version>
+  </parent>
+
+  <groupId>forplay</groupId>
+  <artifactId>core</artifactId>
+  <packaging>jar</packaging>
+  <name>Forplay Core</name>
+
+  <dependencies>
+
+    <dependency>
+      <groupId>com.google.gwt</groupId>
+      <artifactId>gwt-dev</artifactId>
+      <version>${gwtversion}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>forplay</groupId>
+      <artifactId>webgl</artifactId>
+      <version>1.0</version>
+    </dependency>
+
+    <dependency>
+      <groupId>forplay</groupId>
+      <artifactId>jbox2d</artifactId>
+      <version>1.0</version>
+    </dependency>
+
+    <dependency>
+      <groupId>forplay</groupId>
+      <artifactId>flash</artifactId>
+      <version>1.0</version>
+    </dependency>
+
+    <dependency>
+      <groupId>jlayer</groupId>
+      <artifactId>jlayer</artifactId>
+      <version>1.0.1</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/lib/JLayer1.0.1/jl1.0.1.jar</systemPath>
+    </dependency>
+
+
+    <dependency>
+      <groupId>allen_sauer</groupId>
+      <artifactId>gwt-log</artifactId>
+      <version>1.0</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/lib/gwt-log-r571.jar</systemPath>
+    </dependency>
+
+    <dependency>
+      <groupId>allen_sauer</groupId>
+      <artifactId>gwt-voices</artifactId>
+      <version>1.0</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/lib/gwt-voices-r401.jar</systemPath>
+    </dependency>
+
+  </dependencies>
+
+  <build>
+    <sourceDirectory>src</sourceDirectory>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+      </plugin>
+    </plugins>
+    <resources>
+      <resource>
+        <directory>${basedir}/src</directory>
+      </resource>
+    </resources>
+  </build>
+</project>

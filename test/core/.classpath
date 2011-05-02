@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="src" path="tests"/>
+	<classpathentry kind="src" path="gwtbox2d"/>
+	<classpathentry excluding="**" kind="src" path="gwtemul"/>
+	<classpathentry kind="src" path="webgl"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="lib/junit-4.8.1.jar"/>
+	<classpathentry kind="lib" path="lib/gwt-log-r589.jar"/>
+	<classpathentry kind="lib" path="lib/JLayer1.0.1/jl1.0.1.jar"/>
+	<classpathentry kind="lib" path="lib/gwt-voices-r401.jar"/>
+	<classpathentry kind="con" path="com.google.gwt.eclipse.core.GWT_CONTAINER"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
