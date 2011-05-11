@@ -22,9 +22,7 @@ import android.graphics.Paint.Style;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Xfermode;
-import forplay.core.Surface;
-import forplay.core.Surface.LineCap;
-import forplay.core.Surface.LineJoin;
+import forplay.core.Canvas;
 
 class AndroidSurfaceState {
 
@@ -60,11 +58,11 @@ class AndroidSurfaceState {
     this.pattern = pattern;
   }
 
-  void setLineCap(Surface.LineCap cap) {
+  void setLineCap(Canvas.LineCap cap) {
     paint.setStrokeCap(convertCap(cap));
   }
 
-  void setLineJoin(Surface.LineJoin join) {
+  void setLineJoin(Canvas.LineJoin join) {
     paint.setStrokeJoin(convertJoin(join));
   }
 
@@ -94,7 +92,7 @@ class AndroidSurfaceState {
     return paint;
   }
 
-  void setCompositeOperation(Surface.Composite composite) {
+  void setCompositeOperation(Canvas.Composite composite) {
     paint.setXfermode(convertComposite(composite));
   }
 
@@ -102,7 +100,7 @@ class AndroidSurfaceState {
     paint.setStrokeWidth(strokeWidth);
   }
 
-  private Cap convertCap(LineCap cap) {
+  private Cap convertCap(Canvas.LineCap cap) {
     switch (cap) {
       case BUTT: return Cap.BUTT;
       case ROUND: return Cap.ROUND;
@@ -111,7 +109,7 @@ class AndroidSurfaceState {
     return Cap.BUTT;
   }
 
-  private Xfermode convertComposite(Surface.Composite composite) {
+  private Xfermode convertComposite(Canvas.Composite composite) {
     switch (composite) {
       case DST_ATOP: return new PorterDuffXfermode(PorterDuff.Mode.DST_ATOP);
       case DST_IN: return new PorterDuffXfermode(PorterDuff.Mode.DST_IN);
@@ -127,7 +125,7 @@ class AndroidSurfaceState {
     return new PorterDuffXfermode(PorterDuff.Mode.SRC);
   }
 
-  private Join convertJoin(LineJoin join) {
+  private Join convertJoin(Canvas.LineJoin join) {
     switch (join) {
       case BEVEL: return Join.BEVEL;
       case MITER: return Join.MITER;

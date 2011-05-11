@@ -15,42 +15,68 @@
  */
 package forplay.java;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.util.Properties;
 
+import forplay.core.ForPlay;
 import forplay.core.Storage;
 
 /**
- * JavaStorage does not support persistent storage yet, so data is not persisted.
+ * JavaStorage is backed by a properties file stored in the temp directory.
  * 
- * TODO(pdr): add on-disk storage.
+ * TODO(pdr): probably want better handling on where the file is stored
  */
 class JavaStorage implements Storage {
-  private Map<String, String> storageMap;
-  private boolean isPersisted;
+  private static String tempFile = System.getProperty("java.io.tmpdir") + "forplay.tmp";
+  private boolean isPersisted = false; // false by default
+  private Properties properties;
 
   public JavaStorage() {
-    storageMap = new HashMap<String, String>();
-    isPersisted = false;
+    properties = maybeRetrieveProperties();
   }
 
   @Override
   public void setItem(String key, String value) throws RuntimeException {
-    storageMap.put(key, value);
+    properties.setProperty(key, value);
+    maybePersistProperties(properties);
   }
 
   @Override
   public void removeItem(String key) {
-    storageMap.remove(key);
+    properties.remove(key);
+    maybePersistProperties(properties);
   }
 
   @Override
   public String getItem(String key) {
-    return storageMap.get(key);
+    return properties.getProperty(key);
   }
 
   @Override
   public boolean isPersisted() {
     return isPersisted;
+  }
+
+  private void maybePersistProperties(Properties properties) {
+    try {
+      properties.store(new FileOutputStream(tempFile), null);
+      isPersisted = true;
+    } catch (Exception e) {
+      ForPlay.log().info("Error persisting properties: " + e.getMessage());
+      isPersisted = false;
+    }
+  }
+
+  private Properties maybeRetrieveProperties() {
+    Properties properties = new Properties();
+    try {
+      properties.load(new FileInputStream(tempFile));
+      isPersisted = true;
+    } catch(Exception e) {
+      ForPlay.log().info("Error retrieving file: " + e.getMessage());
+      isPersisted = false;
+    }
+    return properties;
   }
 }

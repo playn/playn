@@ -82,6 +82,12 @@ class HtmlImageLayerDom extends HtmlLayerDom implements ImageLayer {
   @Override
   public void setImage(final Image img) {
     assert img instanceof HtmlImage;
+
+    // Make sure redundant setImage() calls don't cost much.
+    if (htmlImage == img) {
+      return;
+    }
+
     htmlImage = (HtmlImage) img;
     ImageElement imgElem = htmlImage.img.cast();
     element().getStyle().setBackgroundImage("url(" + imgElem.getSrc() + ")");
@@ -125,6 +131,13 @@ class HtmlImageLayerDom extends HtmlLayerDom implements ImageLayer {
   public void setSourceRect(float sx, float sy, float sw, float sh) {
     assert !repeatX && !repeatY;
 
+    // Early out if there's no change. applyBackgroundSize() isn't free.
+    if (sourceRectSet &&
+        (this.sx == sx) && (this.sy == sy) &&
+        (this.sw == sw) && (this.sh == sh)) {
+      return;
+    }
+
     this.sourceRectSet = true;
     this.sx = sx;
     this.sy = sy;
@@ -152,8 +165,8 @@ class HtmlImageLayerDom extends HtmlLayerDom implements ImageLayer {
 
     // Set background-size to get the right pinning behavior.
     if (sourceRectSet) {
-      float wratio = image().width() / sw;
-      float hratio = image().height() / sh;
+      float wratio = widthSet ? (width / sw) : 1;
+      float hratio = heightSet ? (height / sh) : 1;
       float backWidth = image().width() * wratio;
       float backHeight = image().height() * hratio;
 

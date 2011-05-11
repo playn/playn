@@ -16,6 +16,7 @@
 package forplay.android;
 
 import android.app.Activity;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 
 /**
@@ -25,7 +26,6 @@ import android.os.Bundle;
 public class GameActivity extends Activity {
 
   private GameView gameView;
-  private GameThread gameThread;
 
   @Override
   public void onCreate(Bundle savedInstanceState) {
@@ -33,8 +33,8 @@ public class GameActivity extends Activity {
     setContentView(R.layout.main);
 
     gameView = (GameView) findViewById(R.id.game);
-    gameThread = gameView.getThread();
 
+    setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
     AndroidPlatform.register(this);
   }
 
@@ -58,5 +58,9 @@ public class GameActivity extends Activity {
 
   GameView gameView() {
     return gameView;
+  }
+  
+  GameThread getGameThread() {
+	  return gameView.getThread();
   }
 }

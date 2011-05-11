@@ -17,13 +17,50 @@ package forplay.android;
 
 import forplay.core.Net;
 
-public class AndroidNet implements Net {
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.util.EntityUtils;
+
+import java.io.UnsupportedEncodingException;
+
+class AndroidNet implements Net {
 
   public void get(String url, Callback callback) {
-    // TODO Auto-generated method stub
+    doHttp(false, url, null, callback);
   }
 
   public void post(String url, String data, Callback callback) {
-    // TODO Auto-generated method stub
+    doHttp(true, url, data, callback);
+  }
+
+  private void doHttp(boolean isPost, String url, String data, Callback callback) {
+    // TODO: use AsyncTask
+    HttpClient httpclient = new DefaultHttpClient();
+    HttpRequestBase req = null;
+    if (isPost) {
+      HttpPost httppost = new HttpPost(url);
+      if (data != null) {
+        try {
+          httppost.setEntity(new StringEntity(data));
+        } catch (UnsupportedEncodingException e) {
+          // TODO Auto-generated catch block
+          callback.failure(e);
+        }
+      }
+      req = httppost;
+    } else {
+      req = new HttpGet(url);
+    }
+    try {   
+        HttpResponse response = httpclient.execute(req);
+        callback.success(EntityUtils.toString(response.getEntity()));
+    } catch (Exception e) {
+        callback.failure(e);
+    }
   }
 }

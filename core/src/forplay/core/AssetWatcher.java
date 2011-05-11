@@ -54,7 +54,15 @@ public class AssetWatcher {
   };
 
   /**
-   * Creates a new watcher.
+   * Creates a new watcher. 
+   */
+  public AssetWatcher() {
+    this(null);
+    start();
+  }
+
+  /**
+   * Creates a new watcher with the given listener.
    */
   public AssetWatcher(Listener listener) {
     this.listener = listener;
@@ -65,15 +73,25 @@ public class AssetWatcher {
    */
   @SuppressWarnings("unchecked")
   public void add(Image image) {
-    assert !start;
+    assert !start || listener == null;
 
     image.addCallback(callback);
     ++total;
   }
 
   /**
+   * Whether all resources have completed loading, either successfully or in error.
+   */
+  public boolean isDone() {
+    return start && (loaded + errors == total);
+  }
+
+  /**
    * Done adding resources; {@link Listener#done()} will be called as soon as all assets are done
    * being loaded.
+   * 
+   * There is no need to call this method if there is no listener. {@link #isDone()} will return
+   * <code>true</code> as soon as all pending assets are loaded.
    */
   public void start() {
     start = true;
@@ -81,8 +99,10 @@ public class AssetWatcher {
   }
 
   private void maybeDone() {
-    if (start && (loaded + errors == total)) {
-      listener.done();
+    if (isDone()) {
+      if (listener != null) {
+        listener.done();
+      }
     }
   }
 }

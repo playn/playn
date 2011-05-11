@@ -110,7 +110,7 @@ public class HtmlAssetManager extends AbstractCachingAssetManager {
   }
 
   /**
-   * Determine the resource key from a giveb path.
+   * Determine the resource key from a given path.
    * 
    * @param fullPath full path, with or without a file extension
    * @return the key by which the resource can be looked up

@@ -31,8 +31,24 @@ class JavaLog implements Log {
   }
 
   @Override
+  public void debug(String msg) {
+    info(msg);
+  }
+
+  @Override
+  public void debug(String msg, Throwable e) {
+    info(msg, e);
+  }
+
+  @Override
   public void info(String msg) {
     System.out.println(msg);
+  }
+
+  @Override
+  public void info(String msg, Throwable e) {
+    System.out.println(msg);
+    e.printStackTrace(System.out);
   }
 
   @Override

@@ -26,7 +26,7 @@ import com.google.gwt.core.client.JavaScriptObject;
 public class WebGLContextAttributes extends JavaScriptObject {
 
   public static native WebGLContextAttributes create() /*-{
-    return {};
+    return { premultipliedAlpha:false };
   }-*/;
 
   protected WebGLContextAttributes() {
@@ -38,20 +38,38 @@ public class WebGLContextAttributes extends JavaScriptObject {
    * and compositing with the page. If the value is false, no alpha buffer is
    * available.
    */
-  // attribute boolean alpha;
+  public final native void setAlpha(boolean alpha) /*-{
+    this.alpha = alpha;
+  }-*/;
+
+  public final native void clearAlpha() /*-{
+    delete this.alpha;
+  }-*/;
 
   /**
    * Default: true. If the value is true, the drawing buffer has a depth buffer
    * of at least 16 bits. If the value is false, no depth buffer is available.
    */
-  // attribute boolean depth;
+  public final native void setDepth(boolean depth) /*-{
+    this.depth = depth;
+  }-*/;
+
+  public final native void clearDepth() /*-{
+    delete this.depth;
+  }-*/;
 
   /**
    * Default: false. If the value is true, the drawing buffer has a stencil
    * buffer of at least 8 bits. If the value is false, no stencil buffer is
    * available.
    */
-  // attribute boolean stencil;
+  public final native void setStencil(boolean stencil) /*-{
+    this.stencil = stencil;
+  }-*/;
+
+  public final native void clearStencil() /*-{
+    delete this.stencil;
+  }-*/;
 
   /**
    * Default: true. If the value is true and the implementation supports
@@ -60,7 +78,13 @@ public class WebGLContextAttributes extends JavaScriptObject {
    * or the implementation does not support antialiasing, no antialiasing is
    * performed.
    */
-  // attribute boolean antialias;
+  public final native void setAntialias(boolean antialias) /*-{
+    this.antialias = antialias;
+  }-*/;
+
+  public final native void clearAntialias() /*-{
+    delete this.antialias;
+  }-*/;
 
   /**
    * Default: true. If the value is true the page compositor will assume the
@@ -70,5 +94,11 @@ public class WebGLContextAttributes extends JavaScriptObject {
    * Premultiplied Alpha for more information on the effects of the
    * premultipliedAlpha flag.
    */
-  // attribute boolean premultipliedAlpha;
+  public final native void setPremultipliedAlpha(boolean premultipliedAlpha) /*-{
+    this.premultipliedAlpha = premultipliedAlpha;
+  }-*/;
+
+  public final native void clearPremultipliedAlpha() /*-{
+    delete this.premultipliedAlpha;
+  }-*/;
 }

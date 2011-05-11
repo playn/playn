@@ -8,7 +8,7 @@ import java.util.Comparator;
 
 public class FastSort {
   public static <T> void unstableSort(T[] array, Comparator<? super T> comparator) {
-    if (GWT.isProdMode()) {
+    if (false/*GWT.isProdMode()*/) {
       unstableSort(array, 0, array.length, getNativeComparator(comparator));
     } else {
       Arrays.sort(array, comparator);
@@ -16,7 +16,7 @@ public class FastSort {
   }
 
   public static <T> void unstableSort(T[] array, int fromIndex, int toIndex, Comparator<? super T> comparator) {
-    if (GWT.isProdMode()) {
+    if (false/*GWT.isProdMode()*/) {
       unstableSort(array, fromIndex, toIndex, getNativeComparator(comparator));
     } else {
       Arrays.sort(array, fromIndex, toIndex, comparator);

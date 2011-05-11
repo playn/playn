@@ -23,23 +23,22 @@ import forplay.core.Gradient;
 import forplay.core.Image;
 import forplay.core.Path;
 import forplay.core.Pattern;
-import forplay.core.Surface;
 
 import java.util.LinkedList;
 
-class AndroidSurface implements Surface {
+class AndroidCanvas implements forplay.core.Canvas {
 
   private final Canvas canvas;
   private LinkedList<AndroidSurfaceState> paintStack = new LinkedList<AndroidSurfaceState>();
 
-  AndroidSurface(Canvas canvas) {
+  AndroidCanvas(Canvas canvas) {
     this.canvas = canvas;
     paintStack.addFirst(new AndroidSurfaceState());
   }
 
   @Override
-  public void clear(int color) {
-    canvas.drawColor(color);
+  public void clear() {
+    canvas.drawColor(0);
   }
 
   @Override
@@ -52,23 +51,34 @@ class AndroidSurface implements Surface {
   public void drawImage(Image img, float x, float y) {
     assert img instanceof AndroidImage;
     AndroidImage aimg = (AndroidImage) img;
-    canvas.drawBitmap(aimg.getBitmap(), x, y, null);
+    if (aimg.getBitmap() != null) {
+      canvas.drawBitmap(aimg.getBitmap(), x, y, null);
+    }
   }
 
   @Override
   public void drawImage(Image img, float x, float y, float w, float h) {
     assert img instanceof AndroidImage;
     AndroidImage aimg = (AndroidImage) img;
-    canvas.drawBitmap(aimg.getBitmap(), null, new RectF(x, y, w, h), null);
+    if (aimg.getBitmap() != null) {
+      canvas.drawBitmap(aimg.getBitmap(), null, new RectF(x, y, w, h), null);
+    }
   }
 
   @Override
   public void drawImage(Image img, float dx, float dy, float dw, float dh, float sx, float sy, float sw, float sh) {
     assert img instanceof AndroidImage;
     AndroidImage aimg = (AndroidImage) img;
-    Rect src = new Rect((int)sx, (int)sy, (int)sw, (int)sh);
-    RectF dst = new RectF(dx, dy, dw, dh);
-    canvas.drawBitmap(aimg.getBitmap(), src, dst, null);
+    if (aimg.getBitmap() != null) {
+      Rect src = new Rect((int)sx, (int)sy, (int)sw, (int)sh);
+      RectF dst = new RectF(dx, dy, dw, dh);
+      canvas.drawBitmap(aimg.getBitmap(), src, dst, null);
+    }
+  }
+
+  @Override
+  public void drawImageCentered(Image image, float dx, float dy) {
+    drawImage(image, dx - image.width() / 2, dy - image.height() / 2);
   }
 
   @Override
@@ -180,6 +190,14 @@ class AndroidSurface implements Surface {
   @Override
   public void setStrokeWidth(float strokeWidth) {
     currentState().setStrokeWidth(strokeWidth);
+  }
+
+  @Override
+  public void setTransform(float m11, float m12, float m21, float m22, float dx, float dy) {
+    Matrix m = new Matrix();
+    // TODO(jgw): Is this the right order?
+    m.setValues(new float[] { m11, m12, 0, m21, 0, m22, dx, dy, 1 });
+    canvas.setMatrix(m);
   }
 
   @Override

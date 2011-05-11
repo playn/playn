@@ -48,7 +48,7 @@ class HtmlSurfaceLayerGL extends HtmlLayerGL implements SurfaceLayer {
     gl.framebufferTexture2D(FRAMEBUFFER, COLOR_ATTACHMENT0, TEXTURE_2D, tex, 0);
 
     gl.bindTexture(TEXTURE_2D, null);
-    gl.bindFramebuffer(FRAMEBUFFER, null);
+    gfx.bindFramebuffer();
 
     surface = new HtmlSurfaceGL(gfx, fbuf, width, height);
   }

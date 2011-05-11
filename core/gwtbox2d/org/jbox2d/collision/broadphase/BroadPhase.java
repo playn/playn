@@ -26,20 +26,17 @@
  ******************************************************************************/
 package org.jbox2d.collision.broadphase;
 
-import com.google.gwt.core.client.GWT;
-
-import java.util.Arrays;
-
 import org.jbox2d.callbacks.DebugDraw;
 import org.jbox2d.callbacks.PairCallback;
 import org.jbox2d.callbacks.TreeCallback;
 import org.jbox2d.callbacks.TreeRayCastCallback;
 import org.jbox2d.collision.AABB;
 import org.jbox2d.common.FastSort;
-import org.jbox2d.common.MathUtils;
 import org.jbox2d.common.Settings;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.structs.collision.RayCastInput;
+
+import java.util.Arrays;
 
 // updated to rev 100
 /**
@@ -182,7 +179,7 @@ public class BroadPhase implements TreeCallback {
 		m_moveCount = 0;
 		
 		// Sort the pair buffer to expose duplicates.
-		if (Settings.USE_NATIVE_SORT && GWT.isProdMode()) {
+		if (Settings.USE_NATIVE_SORT /*&& GWT.isProdMode()*/) {
 		  // need to set the stable ids to ensure a stable sort.
 		  for (int i = 0; i < m_pairCount; i++) {
 		    m_pairBuffer[i].stableIdx = i;

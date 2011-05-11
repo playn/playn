@@ -29,11 +29,11 @@ class HtmlGraphicsDom extends HtmlGraphics {
   private final HtmlGroupLayerDom rootLayer;
 
   public HtmlGraphicsDom() {
-    Element rootElem = Document.get().createDivElement();
-    rootElem.getStyle().setOverflow(Overflow.HIDDEN);
-    Document.get().getBody().appendChild(rootElem);
+    Element div = Document.get().createDivElement();
+    div.getStyle().setOverflow(Overflow.HIDDEN);
+    rootElement.appendChild(div);
 
-    rootLayer = new HtmlGroupLayerDom(rootElem);
+    rootLayer = new HtmlGroupLayerDom(div);
 
     setSize(HtmlPlatform.DEFAULT_WIDTH, HtmlPlatform.DEFAULT_HEIGHT);
   }
@@ -75,6 +75,8 @@ class HtmlGraphicsDom extends HtmlGraphics {
 
   @Override
   public void setSize(int width, int height) {
+    super.setSize(width, height);
+
     rootLayer.element().getStyle().setWidth(width, Unit.PX);
     rootLayer.element().getStyle().setHeight(height, Unit.PX);
   }

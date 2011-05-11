@@ -24,6 +24,8 @@
 
 
   <modules>
+    <module>core/maven/gwtbox2d</module>
+    <module>core/maven/webgl</module>
     <module>core</module>
     <module>sample</module>
   </modules>

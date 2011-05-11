@@ -40,10 +40,24 @@ class HtmlLog implements Log {
   public void error(String msg, Throwable e) {
     com.allen_sauer.gwt.log.client.Log.error(msg, e);
   }
+  
+  @Override
+  public void debug(String msg) {
+    com.allen_sauer.gwt.log.client.Log.debug(msg);
+  }
+  
+  @Override
+  public void debug(String msg, Throwable e) {
+    com.allen_sauer.gwt.log.client.Log.debug(msg, e);
+  }
 
   @Override
   public void info(String msg) {
     com.allen_sauer.gwt.log.client.Log.info(msg);
+  }
+
+  public void info(String msg, Throwable e) {
+    com.allen_sauer.gwt.log.client.Log.info(msg, e);
   }
 
   @Override

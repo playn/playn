@@ -18,6 +18,7 @@ package forplay.java;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.io.IOException;
 
 import javax.swing.JComponent;
 import javax.swing.JFrame;
@@ -192,5 +193,18 @@ public class JavaPlatform implements Platform {
   @Override
   public RegularExpression regularExpression() {
     return regularExpression;
+  }
+  
+  @Override
+  public void openURL(String url) {
+	System.out.println("Opening url: " + url);
+	String browser = "chrome ";
+	if (System.getProperty("os.name", "-").contains("indows"))
+		browser = "rundll32 url.dll,FileProtocolHandler ";
+	try {
+		Runtime.getRuntime().exec(browser + url);
+	}
+	catch (IOException e) {
+	}  
   }
 }

@@ -21,13 +21,24 @@
   <source path='box2d'/>
   <source path='html'/>
 
+  <!--
+    Using only the 'safari' user.agent will speed up compile time and
+    mostly work, except this will prevent Flash from being detected in IE:
   <set-property name='user.agent' value='safari'/>
+  <set-configuration-property name="user.agent.runtimeWarning" value="false" />
+  -->
 
   <!-- Flash/HTML5/Native audio support  -->
   <inherits name="com.allen_sauer.gwt.voices.gwt-voices" />
 
-  <!-- Logging to a variety of destinations -->
-  <inherits name="com.allen_sauer.gwt.log.gwt-log-DEBUG" />
+  <!--Set default / compile time log level to WARN -->
+  <inherits name="com.allen_sauer.gwt.log.gwt-log-WARN" />
+  <!--
+    Also compile DEBUG version, which can be enabled via
+    a URL query parameter (gwt_log=DEBUG) or a meta tag
+    (<meta name="gwt:property" content="log_level=DEBUG">):
+  <extend-property name="log_level" values="DEBUG" />
+  -->
 
   <!-- Log to Chrome Developer Tools, Firebug, etc. -->
   <set-property name="log_ConsoleLogger" value="ENABLED" />
@@ -45,6 +56,9 @@
   -->
   <set-property name="log_SystemLogger" value="ENABLED" />
 
+  <!-- Enable RemoteLogger for stack trace resymbolization -->
+  <inherits name="com.allen_sauer.gwt.log.gwt-log-RemoteLogger" />
+ 
   <!-- Auto ClientBundle -->
   <generate-with
     class="forplay.rebind.AutoClientBundleGenerator">
@@ -55,6 +69,5 @@
   <inherits name="com.google.gwt.webgl.WebGL" />
 
   <define-linker name="appcachelinker" class="forplay.appcachelinker.AppCacheLinker" />
-  <!-- don't add appcachelinker by default -->
-  <!-- <add-linker name="appcachelinker" /> -->
+  <add-linker name="appcachelinker" />
 </module>

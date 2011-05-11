@@ -83,6 +83,9 @@ public class HtmlPlatform implements Platform {
 
   // Non-instantiable.
   private HtmlPlatform() {
+    // setup logging early, instead of in run()
+    log = new HtmlLog();
+    audio = new HtmlAudio();
   }
 
   @Override
@@ -142,13 +145,18 @@ public class HtmlPlatform implements Platform {
 
   @Override
   public void run(final Game game) {
-    log = new HtmlLog();
     regularExpression = new HtmlRegularExpression();
     net = new HtmlNet();
-    audio = new HtmlAudio();
     keyboard = new HtmlKeyboard();
     json = new HtmlJson();
-    graphics = useGL ? new HtmlGraphicsGL() : new HtmlGraphicsDom();
+    try {
+      graphics = useGL ? new HtmlGraphicsGL() : new HtmlGraphicsDom();
+    } catch (RuntimeException e) {
+      // HtmlGraphicsGL ctor throws a runtime exception if the context creation fails.
+      log().info("Failed to create GL context. Falling back.");
+      graphics = new HtmlGraphicsDom();
+    }
+
     pointer = new HtmlPointer(graphics.getRootElement());
     storage = new HtmlStorage();
 
@@ -251,7 +259,9 @@ public class HtmlPlatform implements Platform {
    * @return true if the browser supports WebGL
    */
   private native boolean hasGLSupport() /*-{
-    return !!$wnd.WebGLRenderingContext;
+    return !!$wnd.WebGLRenderingContext &&
+      // WebGL is slow on Chrome OSX 10.5 
+      (!/Chrome/.test(navigator.userAgent) || !/OS X 10_5/.test(navigator.userAgent));
   }-*/;
 
   /**
@@ -264,5 +274,13 @@ public class HtmlPlatform implements Platform {
    */
   public String getUrlParameter(String name) {
     return Window.Location.getParameter(name);
+  }
+
+  /**
+   * @see forplay.core.Platform#openURL(java.lang.String)
+   */
+  @Override
+  public void openURL(String url) {
+	  Window.open(url, "_blank", "");
   }
 }

@@ -54,7 +54,7 @@ class HtmlSound implements Sound {
 
   @Override
   public void setLooping(boolean looping) {
-    sound.setLooping(true);
+    sound.setLooping(looping);
   }
 
   @Override

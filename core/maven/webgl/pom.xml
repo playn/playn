@@ -1,0 +1,41 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  
+  <parent>
+    <groupId>forplay</groupId>
+    <artifactId>forplay-project</artifactId>
+    <version>1.0</version>
+    <relativePath>../../../pom.xml</relativePath>
+  </parent>
+
+  <groupId>forplay</groupId>
+  <artifactId>webgl</artifactId>
+  <packaging>jar</packaging>
+  <name>Forplay WebGL</name>
+
+  <dependencies>
+
+    <dependency>
+      <groupId>com.google.gwt</groupId>
+      <artifactId>gwt-dev</artifactId>
+      <version>${gwtversion}</version>
+    </dependency>
+
+  </dependencies>
+
+  <build>
+    <sourceDirectory>../../webgl</sourceDirectory>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+      </plugin>
+    </plugins>
+    <resources>
+      <resource>
+        <directory>${basedir}/../../webgl</directory>
+      </resource>
+    </resources>
+  </build>
+</project>

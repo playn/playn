@@ -123,6 +123,14 @@ public class ForPlay {
   }
 
   /**
+   * Opens the given URL in the default browser.
+   * @param url URL
+   */
+  public static void openURL(String url) {
+    platform.openURL(url);
+  }
+
+  /**
    * Called in a {@link Platform}'s registration method. Do not call this
    * directly unless you're implementing a new platform.
    */

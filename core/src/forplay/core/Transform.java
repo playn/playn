@@ -205,12 +205,10 @@ public class Transform {
     float osy = len(m10, m11);
     m00 /= osx; m01 /= osx;
     m10 /= osy; m11 /= osy;
-    tx /= osx; ty /= osy;
 
     // Then re-apply.
     m00 *= sx; m01 *= sx;
     m10 *= sy; m11 *= sy;
-    tx *= sx; ty *= sy;
   }
 
   @Override

@@ -17,25 +17,64 @@ package forplay.android;
 
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
+import android.os.AsyncTask;
+import forplay.core.Canvas;
+import forplay.core.CanvasImage;
 import forplay.core.Image;
-import forplay.core.Surface;
-import forplay.core.SurfaceImage;
+import forplay.core.ResourceCallback;
 
-class AndroidImage implements SurfaceImage {
+import java.util.ArrayList;
+import java.util.List;
+
+class AndroidImage implements CanvasImage {
 
   private Bitmap bitmap;
-
-  public AndroidImage(int w, int h) {
-    // TODO(jgw): Is there a way to get the "native" bitmap config (i.e., whatever will be fastest)?
-    bitmap = Bitmap.createBitmap(w, h, Config.ARGB_4444);
-  }
+  private AndroidCanvas canvas;
+  private List<ResourceCallback<Image>> callbacks = new ArrayList<ResourceCallback<Image>>();
 
   public AndroidImage(Bitmap bitmap) {
     this.bitmap = bitmap;
   }
 
+  public AndroidImage(int w, int h) {
+    // TODO(jgw): Is there a way to get the "native" bitmap config (i.e., whatever will be fastest)?
+    bitmap = Bitmap.createBitmap(w, h, Config.ARGB_4444);
+    canvas = new AndroidCanvas(new android.graphics.Canvas(bitmap));
+  }
+
+  public AndroidImage(String url) {
+    AsyncTask<String,Void,Bitmap> execute = new AndroidAssetManager.DownloaderTask<Bitmap>() {
+      @Override
+      public Bitmap download(String url) {
+        return AndroidAssetManager.downloadBitmap(url);
+      }
+
+      @Override
+      protected void onPostExecute(Bitmap data) {
+        super.onPostExecute(data);
+        runCallbacks(data != null);
+      }
+    };
+    execute.execute(url);
+  }
+
+  public void addCallback(ResourceCallback<Image> callback) {
+    callbacks.add(callback);
+    if (isReady()) {
+      runCallbacks(true);
+    }
+  }
+
+  public Canvas canvas() {
+    return canvas;
+  }
+
   public int height() {
-    return bitmap.getHeight();
+    return bitmap == null ? 0 : bitmap.getHeight();
+  }
+
+  public boolean isReady() {
+    return bitmap != null;
   }
 
   public void replaceWith(Image image) {
@@ -44,15 +83,21 @@ class AndroidImage implements SurfaceImage {
   }
 
   public int width() {
-    return bitmap.getWidth();
-  }
-
-  public Surface surface() {
-    // TODO: Can we paint to any old bitmap, or not?
-    throw new UnsupportedOperationException();
+    return bitmap == null ? 0 : bitmap.getWidth();
   }
 
   Bitmap getBitmap() {
     return bitmap;
+  }
+
+  private void runCallbacks(boolean success) {
+    for (ResourceCallback<Image> cb : callbacks) {
+      if (success) {
+        cb.done(this);
+      } else {
+        cb.error(new Exception("Error loading image"));
+      }
+    }
+    callbacks.clear();
   }
 }

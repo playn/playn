@@ -18,16 +18,22 @@ package forplay.html;
 import com.allen_sauer.gwt.voices.client.FlashSound;
 import com.allen_sauer.gwt.voices.client.Html5Sound;
 import com.allen_sauer.gwt.voices.client.SoundController;
+import com.allen_sauer.gwt.voices.client.ui.FlashMovie;
 
 import forplay.core.Audio;
+import forplay.core.ForPlay;
 
-class HtmlAudio implements Audio {
+/**
+ * This class is temporarily public, in order to expose {@link #isFlash9Installed()}, to assist with
+ * in game Flash detection.
+ */
+public class HtmlAudio implements Audio {
 
   private SoundController soundController;
 
   private static final boolean PREFER_FLASH_AUDIO = true;
 
-
+  @SuppressWarnings("deprecation")
   public HtmlAudio() {
     soundController = new SoundController();
     soundController.setPreferredSoundType(PREFER_FLASH_AUDIO ? FlashSound.class : Html5Sound.class);
@@ -37,4 +43,9 @@ class HtmlAudio implements Audio {
     return new HtmlSound(soundController.createSound("audio/mpeg", url));
   }
 
+  public boolean isFlash9Installed() {
+    ForPlay.log().debug("FlashMovie.isExternalInterfaceSupported: " + FlashMovie.isExternalInterfaceSupported());
+    ForPlay.log().debug("FlashMovie.getMajorVersion: "+FlashMovie.getMajorVersion());
+    return FlashMovie.isExternalInterfaceSupported() && FlashMovie.getMajorVersion() >= 9;
+  }
 }

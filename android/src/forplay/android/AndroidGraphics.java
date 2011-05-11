@@ -16,28 +16,33 @@
 package forplay.android;
 
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.BitmapShader;
 import android.graphics.LinearGradient;
 import android.graphics.RadialGradient;
 import android.graphics.Shader.TileMode;
-import forplay.core.AbstractGraphics;
+import forplay.core.CanvasImage;
+import forplay.core.CanvasLayer;
 import forplay.core.Gradient;
+import forplay.core.Graphics;
+import forplay.core.GroupLayer;
 import forplay.core.Image;
+import forplay.core.ImageLayer;
 import forplay.core.Pattern;
-import forplay.core.ResourceCallback;
-import forplay.core.SurfaceImage;
+import forplay.core.SurfaceLayer;
 
-class AndroidGraphics extends AbstractGraphics {
+class AndroidGraphics implements Graphics {
 
+  final AndroidGroupLayer rootLayer;
   private final GameActivity activity;
+  private int width, height;
 
-  AndroidGraphics(GameActivity activity) {
+  public AndroidGraphics(GameActivity activity) {
     this.activity = activity;
+    this.rootLayer = new AndroidGroupLayer();
   }
 
   @Override
-  public SurfaceImage createImage(int w, int h) {
+  public CanvasImage createImage(int w, int h) {
     return new AndroidImage(w, h);
   }
 
@@ -66,23 +71,60 @@ class AndroidGraphics extends AbstractGraphics {
   }
 
   @Override
-  protected void doLoadImage(String name, ResourceCallback<Image> cb) {
-    // TODO(jgw): Total hack. Find some way to map cached files into resources.
-    Bitmap decodeFile = BitmapFactory.decodeFile("/sdcard/" + name);
-    if (decodeFile != null) {
-      cb.done(new AndroidImage(decodeFile));
-    } else {
-      cb.error(new RuntimeException("Unable to load " + name));
-    }
-  }
-
-  @Override
   public int screenHeight() {
-    return activity.gameView().getHeight();
+    // TODO(jgw):
+    return 480;//activity.gameView().getHeight();
   }
 
   @Override
   public int screenWidth() {
-    return activity.gameView().getWidth();
+    // TODO(jgw):
+    return 320;//activity.gameView().getWidth();
+  }
+
+  @Override
+  public CanvasLayer createCanvasLayer(int width, int height) {
+    return new AndroidCanvasLayer(width, height);
+  }
+
+  @Override
+  public GroupLayer createGroupLayer() {
+    return new AndroidGroupLayer();
+  }
+
+  @Override
+  public ImageLayer createImageLayer() {
+    return new AndroidImageLayer();
+  }
+
+  @Override
+  public ImageLayer createImageLayer(Image image) {
+    return new AndroidImageLayer((AndroidImage) image);
+  }
+
+  @Override
+  public SurfaceLayer createSurfaceLayer(int width, int height) {
+    return new AndroidSurfaceLayer(width, height);
+  }
+
+  @Override
+  public int height() {
+    return height;
+  }
+
+  @Override
+  public GroupLayer rootLayer() {
+    return rootLayer;
+  }
+
+  @Override
+  public void setSize(int width, int height) {
+    this.width = width;
+    this.height = height;
+  }
+
+  @Override
+  public int width() {
+    return width;
   }
 }

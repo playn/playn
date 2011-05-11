@@ -31,6 +31,7 @@ class HtmlLayerDom extends AbstractLayer {
 
   private static String transformName, transformOriginName;
   private static String translateSuffix;
+  private static boolean supports3d;
 
   static {
     int i = 0;
@@ -48,6 +49,9 @@ class HtmlLayerDom extends AbstractLayer {
       transformName = "transform";
       transformOriginName = "transformOrigin";
     }
+
+    // Hack: Only WebKit seems to support matrix3d
+    supports3d = "webkitTransform".equals(transformName);
 
     // Hack: FF4 appears to require a 'px' suffix on the translation components of the matrix.
     translateSuffix = ("MozTransform".equals(transformName)) ? "px" : "";
@@ -91,12 +95,21 @@ class HtmlLayerDom extends AbstractLayer {
     float m20 = transform.tx() - originX;
     float m21 = transform.ty() - originY;
 
-    String matrix = "matrix3d(" +
-      css(m00) + "," + css(m01) + ",0,0," +
-      css(m10) + "," + css(m11) + ",0,0," +
-      "0,0,1,0," +
-      xlate(m20) + "," + xlate(m21) + ",0,1" +
-    ")";
+    String matrix;
+    if (supports3d) {
+      matrix = "matrix3d(" +
+        css(m00) + "," + css(m01) + ",0,0," +
+        css(m10) + "," + css(m11) + ",0,0," +
+        "0,0,1,0," +
+        xlate(m20) + "," + xlate(m21) + ",0,1" +
+      ")";
+    } else {
+      matrix = "matrix(" +
+        css(m00) + "," + css(m01) + "," +
+        css(m10) + "," + css(m11) + ", " +
+        xlate(m20) + "," + xlate(m21) +
+      ")";
+    }
 
     elem.getStyle().setProperty(transformName, matrix);
   }

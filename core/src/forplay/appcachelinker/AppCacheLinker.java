@@ -33,9 +33,8 @@ import java.util.Date;
  * <li>Add {@code manifest="YOURMODULENAME/appcache.nocache.manifest"} to the
  * {@code <html>} tag in your base html file. E.g.,
  * {@code <html manifest="mymodule/appcache.nocache.manifest">}</li>
- * <li>Add a mime-mapping to your web.xml file (this is for AppEngine, adjust
- * accordingly):<br/>
- * 
+ * <li>Add a mime-mapping to your web.xml file:
+ * <p>
  * <pre>{@code <mime-mapping>
  * <extension>manifest</extension>
  * <mime-type>text/cache-manifest</mime-type>
@@ -43,9 +42,12 @@ import java.util.Date;
  * }</pre>
  * </li>
  * </ol>
- * 
+ * <p>
  * On every compile, this linker will regenerate the appcache.nocache.manifest
  * file with files from the public path of your module.
+ * <p>
+ * This linker contains a whitelist of acceptable file extensions. To include
+ * files with other extensions, override {@link #getCacheWhitelist()}.
  */
 public class AppCacheLinker extends IFrameLinker {
 
@@ -72,6 +74,18 @@ public class AppCacheLinker extends IFrameLinker {
   }
 
   /**
+   * Return a list of file extensions that are white-listed to be cached.
+   * 
+   * @return a list of file extensions that are white-listed to be cached.
+   */
+  protected String[] getCacheWhitelist() {
+    return new String[]{
+        // .wav files explicitly excluded, since HTML game uses .mp3
+        ".js", ".html", ".jpg", ".jpeg", ".png", ".gif", ".mp3", ".ogg", ".mov", ".avi",
+        ".wmv", ".webm", ".css", ".json", ".flv", ".swf", };
+  }
+
+  /**
    * Creates the cache-manifest resource specific for the landing page.
    */
   private Artifact<?> emitLandingPageCacheManifest(LinkerContext context, TreeLogger logger,
@@ -80,14 +94,16 @@ public class AppCacheLinker extends IFrameLinker {
     StringBuilder publicSourcesSb = new StringBuilder();
 
     // Iterate over all emitted artifacts, and collect all cacheable artifacts
-    for (Artifact<?> artifact : artifacts) {
+    String[] whiteList = getCacheWhitelist();
+    for (@SuppressWarnings("rawtypes") Artifact artifact : artifacts) {
       if (artifact instanceof EmittedArtifact) {
         EmittedArtifact ea = (EmittedArtifact) artifact;
         String pathName = /* context.getModuleFunctionName() + "/" + */ea.getPartialPath();
-        if (pathName.endsWith("symbolMap") || pathName.endsWith(".xml.gz")) {
-          // skip these resources
-        } else {
-          publicSourcesSb.append(pathName + "\n");
+        
+        for (String extension : whiteList) {
+          if (pathName.endsWith(extension)) {
+            publicSourcesSb.append(pathName + "\n");
+          }
         }
       }
     }

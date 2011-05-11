@@ -13,6 +13,8 @@
  */
 package forplay.html;
 
+import static forplay.core.ForPlay.log;
+
 import static com.google.gwt.webgl.client.WebGLRenderingContext.*;
 
 import com.google.gwt.dom.client.CanvasElement;
@@ -22,6 +24,7 @@ import com.google.gwt.dom.client.ImageElement;
 import com.google.gwt.typedarrays.client.Float32Array;
 import com.google.gwt.typedarrays.client.Uint16Array;
 import com.google.gwt.webgl.client.WebGLBuffer;
+import com.google.gwt.webgl.client.WebGLContextAttributes;
 import com.google.gwt.webgl.client.WebGLFramebuffer;
 import com.google.gwt.webgl.client.WebGLProgram;
 import com.google.gwt.webgl.client.WebGLRenderingContext;
@@ -39,8 +42,16 @@ import forplay.core.Transform;
 class HtmlGraphicsGL extends HtmlGraphics {
 
   private static final int VERTEX_SIZE = 10;              // 10 floats per vertex
-  private static final int MAX_VERTS = 400;               // 100 quads
-  private static final int MAX_ELEMS = MAX_VERTS * 6 / 4; // At most 6 verts per quad
+
+// TODO(jgw): Re-enable longer element buffers once we figure out why they're causing weird
+// performance degradation.
+//  private static final int MAX_VERTS = 400;               // 100 quads
+//  private static final int MAX_ELEMS = MAX_VERTS * 6 / 4; // At most 6 verts per quad
+
+// These values allow only one quad at a time (there's no generalized polygon rendering available
+// in Surface yet that would use more than 4 points / 2 triangles).
+  private static final int MAX_VERTS = 4;
+  private static final int MAX_ELEMS = 6;
 
   private class Shader {
     WebGLProgram program;
@@ -169,6 +180,7 @@ class HtmlGraphicsGL extends HtmlGraphics {
   private class ColorShader extends Shader {
     WebGLUniformLocation uColorLoc;
     Float32Array colors = Float32Array.create(4);
+    int lastColor;
 
     ColorShader() {
       super(Shaders.INSTANCE.colorFragmentShader().getText());
@@ -177,6 +189,12 @@ class HtmlGraphicsGL extends HtmlGraphics {
 
     void prepare(int color) {
       super.prepare();
+
+      if (color == lastColor) {
+        return;
+      }
+      flush();
+
       setColor(color);
     }
 
@@ -187,6 +205,8 @@ class HtmlGraphicsGL extends HtmlGraphics {
       colors.set(1, (float)((color >> 8) & 0xff) / 255);
       colors.set(2, (float)((color >> 0) & 0xff) / 255);
       gl.uniform4fv(uColorLoc, colors);
+
+      lastColor = color;
     }
   }
 
@@ -255,6 +275,8 @@ class HtmlGraphicsGL extends HtmlGraphics {
 
   @Override
   public void setSize(int width, int height) {
+    super.setSize(width, height);
+
     canvas.setWidth(width);
     canvas.setHeight(height);
     bindFramebuffer(null, width, height, true);
@@ -409,16 +431,42 @@ class HtmlGraphicsGL extends HtmlGraphics {
 
   private void createCanvas() {
     canvas = Document.get().createCanvasElement();
-    Document.get().getBody().appendChild(canvas);
+    rootElement.appendChild(canvas);
   }
 
   private void initGL() {
-    gl = WebGLRenderingContext.getContext(canvas);
-    gl.enable(TEXTURE_2D);
+    WebGLContextAttributes attrs = WebGLContextAttributes.create();
+    attrs.setAlpha(false);
+    attrs.setPremultipliedAlpha(false);
+    attrs.setAntialias(true);
+    if (!tryCreateContext(attrs)) {
+      giveUp();
+    }
+
     gl.disable(CULL_FACE);
     gl.enable(BLEND);
     gl.blendEquation(FUNC_ADD);
     gl.blendFunc(SRC_ALPHA, ONE_MINUS_SRC_ALPHA);
+  }
+
+  private boolean tryCreateContext(WebGLContextAttributes attrs) {
+    // Try to create a context. If this returns null, then the browser doesn't support WebGL
+    // on this machine.
+    gl = WebGLRenderingContext.getContext(canvas, attrs);
+    if (gl == null) {
+      return false;
+    }
+
+    // Some systems seem to have a problem where they return a valid context, but it's in an error
+    // static initially. We give up and fall back to dom/canvas in this case, because nothing seems
+    // to work properly.
+    return (gl.getError() == NO_ERROR);
+  }
+
+  private void giveUp() {
+    // Give up. HtmlPlatform will catch the exception and fall back to dom/canvas.
+    rootElement.removeChild(canvas);
+    throw new RuntimeException();
   }
 
   private boolean useShader(Shader shader) {

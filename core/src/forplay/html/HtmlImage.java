@@ -33,6 +33,10 @@ import forplay.core.Transform;
 
 class HtmlImage implements Image {
 
+  private static native boolean isComplete(ImageElement img) /*-{
+    return img.complete;
+  }-*/;
+
   ImageElement img;
 
   // only used in the WebGL renderer.
@@ -82,7 +86,7 @@ class HtmlImage implements Image {
   }
 
   public boolean isReady() {
-    return width() > 0;
+    return isComplete(this.img);
   }
 
   /*

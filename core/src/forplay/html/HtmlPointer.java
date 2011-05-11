@@ -1,16 +1,14 @@
 /**
  * Copyright 2010 The ForPlay Authors
  * 
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not
- * use this file except in compliance with the License. You may obtain a copy of
- * the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
  * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
- * License for the specific language governing permissions and limitations under
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
  * the License.
  */
 package forplay.html;
@@ -24,29 +22,34 @@ class HtmlPointer implements Pointer {
 
   private Listener listener;
   private boolean mouseDown;
+  private Element capturingElement;
 
   HtmlPointer(final Element rootElement) {
-    // Mouse handlers.
-    HtmlPlatform.captureEvent(rootElement, "mousedown", new EventHandler() {
+    captureEvent(rootElement, "mousedown", new EventHandler() {
+      @Override
       public void handleEvent(NativeEvent evt) {
         // We need to prevent the default so that the target element doesn't
         // highlight.
-    	  evt.preventDefault();
+        evt.preventDefault();
+        setCapture(rootElement);
         mouseDown = true;
         if (listener != null) {
           listener.onPointerStart(getRelativeX(evt, rootElement), getRelativeY(evt, rootElement));
         }
       }
     });
-    HtmlPlatform.captureEvent(rootElement, "mouseup", new EventHandler() {
+    captureEvent(rootElement, "mouseup", new EventHandler() {
+      @Override
       public void handleEvent(NativeEvent evt) {
+        releaseCapture(rootElement);
         mouseDown = false;
         if (listener != null) {
           listener.onPointerEnd(getRelativeX(evt, rootElement), getRelativeY(evt, rootElement));
         }
       }
     });
-    HtmlPlatform.captureEvent(rootElement, "mousemove", new EventHandler() {
+    captureEvent(rootElement, "mousemove", new EventHandler() {
+      @Override
       public void handleEvent(NativeEvent evt) {
         if (listener != null) {
           if (mouseDown) {
@@ -59,12 +62,14 @@ class HtmlPointer implements Pointer {
     });
 
     // Touch handlers.
-    HtmlPlatform.captureEvent(rootElement, "touchstart", new EventHandler() {
+    captureEvent(rootElement, "touchstart", new EventHandler() {
+      @Override
       public void handleEvent(NativeEvent evt) {
         if (listener != null) {
           if (evt.getTouches().length() == 0) {
             return;
           }
+          setCapture(rootElement);
           // TODO(pdr): these may need to call getRelativeX/getRelativeY.
           int x = evt.getTouches().get(0).getClientX();
           int y = evt.getTouches().get(0).getClientY();
@@ -72,12 +77,14 @@ class HtmlPointer implements Pointer {
         }
       }
     });
-    HtmlPlatform.captureEvent(rootElement, "touchend", new EventHandler() {
+    captureEvent(rootElement, "touchend", new EventHandler() {
+      @Override
       public void handleEvent(NativeEvent evt) {
         if (listener != null) {
           if (evt.getTouches().length() == 0) {
             return;
           }
+          releaseCapture(rootElement);
           // TODO(pdr): these may need to call getRelativeX/getRelativeY.
           int x = evt.getTouches().get(0).getClientX();
           int y = evt.getTouches().get(0).getClientY();
@@ -85,7 +92,8 @@ class HtmlPointer implements Pointer {
         }
       }
     });
-    HtmlPlatform.captureEvent(rootElement, "touchmove", new EventHandler() {
+    captureEvent(rootElement, "touchmove", new EventHandler() {
+      @Override
       public void handleEvent(NativeEvent evt) {
         if (listener != null) {
           if (evt.getTouches().length() == 0) {
@@ -100,7 +108,8 @@ class HtmlPointer implements Pointer {
     });
 
     // Scroll handlers
-    HtmlPlatform.captureEvent(rootElement, "mousewheel", new EventHandler() {
+    captureEvent(rootElement, "mousewheel", new EventHandler() {
+      @Override
       public void handleEvent(NativeEvent evt) {
         // We need to prevent the default so that the page doesn't scroll.
         // The user can still scroll if the mouse isn't over the root element.
@@ -110,6 +119,36 @@ class HtmlPointer implements Pointer {
         }
       }
     });
+  }
+
+  /**
+   * Helper method which allows element to 'capture' mouse/touch event which occur anywhere on the
+   * page.
+   */
+  private void captureEvent(final Element elem, String eventName, final EventHandler handler) {
+
+    // register regular event handler on the element
+    HtmlPlatform.captureEvent(elem, eventName, handler);
+
+    // register page level handler, which fires when the provided element is the capturing element
+    HtmlPlatform.captureEvent(eventName, new EventHandler() {
+      @Override
+      public void handleEvent(NativeEvent evt) {
+        if (elem == capturingElement) {
+          handler.handleEvent(evt);
+        }
+      }
+    });
+  }
+
+  protected void releaseCapture(Element capturingElement) {
+    if (this.capturingElement == capturingElement) {
+      this.capturingElement = null;
+    }
+  }
+
+  protected void setCapture(Element capturingElement) {
+    this.capturingElement = capturingElement;
   }
 
   @Override
@@ -125,8 +164,8 @@ class HtmlPointer implements Pointer {
    * @return the relative x-position
    */
   static int getRelativeX(NativeEvent e, Element target) {
-    return e.getClientX() - target.getAbsoluteLeft() + target.getScrollLeft() +
-      target.getOwnerDocument().getScrollLeft();
+    return e.getClientX() - target.getAbsoluteLeft() + target.getScrollLeft()
+        + target.getOwnerDocument().getScrollLeft();
   }
 
   /**
@@ -137,7 +176,8 @@ class HtmlPointer implements Pointer {
    * @return the relative y-position
    */
   static int getRelativeY(NativeEvent e, Element target) {
-    return e.getClientY() - target.getAbsoluteTop() + target.getScrollTop() +
-      target.getOwnerDocument().getScrollTop();
+    return e.getClientY() - target.getAbsoluteTop() + target.getScrollTop()
+        + target.getOwnerDocument().getScrollTop();
   }
+
 }

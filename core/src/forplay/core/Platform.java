@@ -45,4 +45,6 @@ public interface Platform {
   double time();
 
   RegularExpression regularExpression();
+
+  void openURL(String url);
 }

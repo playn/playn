@@ -1,0 +1,63 @@
+/**
+ * Copyright 2010 The ForPlay Authors
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ */
+package forplay.flash;
+
+import com.google.gwt.dom.client.NativeEvent;
+
+import forplay.core.Pointer;
+
+class FlashPointer implements Pointer {
+
+  private Listener listener;
+  private boolean mouseDown;
+
+  FlashPointer() {
+    // Mouse handlers.
+    FlashPlatform.captureEvent("mouseDown", new EventHandler() {
+      public void handleEvent(NativeFlashEvent evt) {
+    	evt.preventDefault();  
+        mouseDown = true;
+        if (listener != null) {
+          listener.onPointerStart(evt.getClientX(), evt.getClientY());
+        }
+      }
+    });
+    FlashPlatform.captureEvent("mouseUp", new EventHandler() {
+      public void handleEvent(NativeFlashEvent evt) {
+        mouseDown = false;
+        if (listener != null) {
+          listener.onPointerEnd(evt.getClientX(), evt.getClientY());
+        }
+      }
+    });
+    FlashPlatform.captureEvent("mouseMove", new EventHandler() {
+      public void handleEvent(NativeFlashEvent evt) {
+        if (listener != null) {
+          if (mouseDown) {
+            listener.onPointerDrag(evt.getClientX(), evt.getClientY());
+          } else {
+            listener.onPointerMove(evt.getClientX(), evt.getClientY());
+          }
+        }
+      }
+    });
+  }
+
+  @Override
+  public void setListener(Listener listener) {
+    this.listener = listener;
+  }
+}

@@ -59,9 +59,8 @@ public class AutoClientBundleGenerator extends Generator {
     EXTENSION_MAP.put(".jpg", "image/jpeg");
 
     /*
-     * Do not include WAV files, since HTML5 audio playback ended events are not
-     * yet a part of GWT 2.2.0, which means we won't know when these sounds stop
-     * playing.
+     * Do not include WAV files, since HTML5 audio playback ended events are not yet a part of GWT
+     * 2.2.0, which means we won't know when these sounds stop playing.
      * 
      * EXTENSION_MAP.put(".wav", "audio/wav");
      */
@@ -101,8 +100,7 @@ public class AutoClientBundleGenerator extends Generator {
   }
 
   /**
-   * Get the filename extension or return an empty string if there's no
-   * extension.
+   * Get the filename extension or return an empty string if there's no extension.
    */
   private static String getExtension(String filename) {
     return filename.replaceFirst(".*(\\.[^.]+)$", "$1");
@@ -117,27 +115,21 @@ public class AutoClientBundleGenerator extends Generator {
     try {
       userType = typeOracle.getType(typeName);
     } catch (NotFoundException e) {
-      logger.log(TreeLogger.ERROR, "OOPS", e);
+      logger.log(TreeLogger.ERROR, "Unable to find metadata for type: " + typeName, e);
       throw new UnableToCompleteException();
     }
     String packageName = userType.getPackage().getName();
     String className = userType.getName();
+    className = className.replace('.', '_');
 
-    JClassType remoteService = typeOracle.findType(typeName);
-    if (remoteService == null) {
-      logger.log(TreeLogger.ERROR, "Unable to find metadata for type '" + typeName + "'", null);
-      throw new UnableToCompleteException();
-    }
-
-    if (remoteService.isInterface() == null) {
-      logger.log(TreeLogger.ERROR, remoteService.getQualifiedSourceName() + " is not an interface",
-          null);
+    if (userType.isInterface() == null) {
+      logger.log(TreeLogger.ERROR, userType.getQualifiedSourceName() + " is not an interface", null);
       throw new UnableToCompleteException();
     }
 
     ClassSourceFileComposerFactory composerFactory = new ClassSourceFileComposerFactory(
         packageName, className + "Impl");
-    composerFactory.addImplementedInterface(remoteService.getQualifiedSourceName());
+    composerFactory.addImplementedInterface(userType.getQualifiedSourceName());
 
     composerFactory.addImport(ClientBundleWithLookup.class.getName());
     composerFactory.addImport(DataResource.class.getName());

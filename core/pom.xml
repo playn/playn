@@ -21,6 +21,7 @@
       <version>${gwtversion}</version>
     </dependency>
 
+
     <dependency>
       <groupId>forplay</groupId>
       <artifactId>webgl</artifactId>
@@ -30,12 +31,6 @@
     <dependency>
       <groupId>forplay</groupId>
       <artifactId>jbox2d</artifactId>
-      <version>1.0</version>
-    </dependency>
-
-    <dependency>
-      <groupId>forplay</groupId>
-      <artifactId>flash</artifactId>
       <version>1.0</version>
     </dependency>
 
@@ -53,7 +48,7 @@
       <artifactId>gwt-log</artifactId>
       <version>1.0</version>
       <scope>system</scope>
-      <systemPath>${basedir}/lib/gwt-log-r571.jar</systemPath>
+      <systemPath>${basedir}/lib/gwt-log-r589.jar</systemPath>
     </dependency>
 
     <dependency>
@@ -62,6 +57,14 @@
       <version>1.0</version>
       <scope>system</scope>
       <systemPath>${basedir}/lib/gwt-voices-r401.jar</systemPath>
+    </dependency>
+
+    <dependency>
+      <groupId>com.google.gwt</groupId>
+      <artifactId>gwt-flash</artifactId>
+      <version>1.0</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/lib/gwtflash.jar</systemPath>
     </dependency>
 
   </dependencies>

@@ -12,7 +12,7 @@ public abstract class HtmlGame implements EntryPoint {
     Log.setUncaughtExceptionHandler();
 
     // Need to do everything else in a deferred command, so that
-    // The uncaut exception handler has taken effect
+    // The uncaught exception handler has taken effect
     Scheduler.get().scheduleDeferred(new ScheduledCommand() {
 
       @Override

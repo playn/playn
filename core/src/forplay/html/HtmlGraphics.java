@@ -22,6 +22,7 @@ import com.google.gwt.dom.client.CanvasElement;
 import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.ImageElement;
+import com.google.gwt.dom.client.Style.Unit;
 
 import forplay.core.CanvasImage;
 import forplay.core.Gradient;
@@ -55,11 +56,19 @@ abstract class HtmlGraphics implements Graphics {
   }-*/;
 
   protected CanvasElement dummyCanvas;
+  protected Element rootElement;
   private final Context2d dummyCtx;
 
   protected HtmlGraphics() {
-    this.dummyCanvas = Document.get().createCanvasElement();
-    this.dummyCtx = dummyCanvas.getContext2d();
+    Document doc = Document.get();
+
+    dummyCanvas = doc.createCanvasElement();
+    dummyCtx = dummyCanvas.getContext2d();
+
+    rootElement = doc.getElementById("forplay-root");
+    if (rootElement == null) {
+      rootElement = doc.getBody();
+    }
   }
 
   @Override
@@ -114,6 +123,12 @@ abstract class HtmlGraphics implements Graphics {
   @Override
   public int screenWidth() {
     return Document.get().getDocumentElement().getClientWidth();
+  }
+
+  @Override
+  public void setSize(int width, int height) {
+    rootElement.getStyle().setWidth(width, Unit.PX);
+    rootElement.getStyle().setHeight(height, Unit.PX);
   }
 
   abstract void updateLayers();

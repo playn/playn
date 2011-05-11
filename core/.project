@@ -2,10 +2,6 @@
 <projectDescription>
 	<name>forplay</name>
 	<comment></comment>
-	<projects>
-		<project>gwtbox2d</project>
-		<project>webgl</project>
-	</projects>
 	<buildSpec>
 		<buildCommand>
 			<name>org.eclipse.jdt.core.javabuilder</name>

@@ -479,6 +479,7 @@ public class WebGLRenderingContext extends JavaScriptObject {
         if (ctx != null) {
           // Hook for the semi-standard WebGLDebugUtils script.
           if ($wnd.WebGLDebugUtils) {
+            console.log('WebGL debugging enabled');
             return $wnd.WebGLDebugUtils.makeDebugContext(ctx);
           }
           return ctx;
