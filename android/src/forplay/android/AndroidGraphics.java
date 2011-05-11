@@ -79,7 +79,7 @@ class AndroidGraphics implements Graphics {
   @Override
   public int screenWidth() {
     // TODO(jgw):
-    return 320;//activity.gameView().getWidth();
+    return 800;//activity.gameView().getWidth();
   }
 
   @Override
