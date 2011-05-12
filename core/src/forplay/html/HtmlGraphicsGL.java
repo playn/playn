@@ -13,8 +13,6 @@
  */
 package forplay.html;
 
-import static forplay.core.ForPlay.log;
-
 import static com.google.gwt.webgl.client.WebGLRenderingContext.*;
 
 import com.google.gwt.dom.client.CanvasElement;
@@ -108,8 +106,12 @@ class HtmlGraphicsGL extends HtmlGraphics {
         return;
       }
 
-      gl.bufferData(ARRAY_BUFFER, vertexData.subarray(0, vertexOffset), STREAM_DRAW);
-      gl.bufferData(ELEMENT_ARRAY_BUFFER, elementData.subarray(0, elementOffset), STREAM_DRAW);
+      // TODO(jgw): Change this back. It only works because we've limited MAX_VERTS, which only
+      // works because there are no >4 vertex draws happening.
+      // gl.bufferData(ARRAY_BUFFER, vertexData.subarray(0, vertexOffset), STREAM_DRAW);
+      // gl.bufferData(ELEMENT_ARRAY_BUFFER, elementData.subarray(0, elementOffset), STREAM_DRAW);
+      gl.bufferData(ARRAY_BUFFER, vertexData, STREAM_DRAW);
+      gl.bufferData(ELEMENT_ARRAY_BUFFER, elementData, STREAM_DRAW);
 
       gl.drawElements(TRIANGLES, elementOffset, UNSIGNED_SHORT, 0);
       vertexOffset = elementOffset = 0;
