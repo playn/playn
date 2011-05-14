@@ -23,6 +23,7 @@ import com.google.gwt.user.client.Window;
 
 import forplay.core.Storage;
 
+import forplay.core.Analytics;
 import forplay.core.Audio;
 import forplay.core.ForPlay;
 import forplay.core.Game;
@@ -34,6 +35,7 @@ import forplay.core.Net;
 import forplay.core.Platform;
 import forplay.core.Pointer;
 import forplay.core.RegularExpression;
+import forplay.html.HtmlGraphics.Renderer;
 
 public class HtmlPlatform implements Platform {
 
@@ -80,12 +82,15 @@ public class HtmlPlatform implements Platform {
 
   private TimerCallback paintCallback;
   private TimerCallback updateCallback;
+  private Analytics analytics;
 
   // Non-instantiable.
   private HtmlPlatform() {
-    // setup logging early, instead of in run()
+    // setup a few things early, instead of in run()
     log = new HtmlLog();
     audio = new HtmlAudio();
+    storage = new HtmlStorage();
+    analytics = new HtmlAnalytics();
   }
 
   @Override
@@ -134,6 +139,11 @@ public class HtmlPlatform implements Platform {
   }
 
   @Override
+  public Analytics analytics() {
+    return analytics;
+  }
+  
+  @Override
   public float random() {
     return (float) Math.random();
   }
@@ -158,7 +168,6 @@ public class HtmlPlatform implements Platform {
     }
 
     pointer = new HtmlPointer(graphics.getRootElement());
-    storage = new HtmlStorage();
 
     final int updateRate = game.updateRate();
 
@@ -241,13 +250,13 @@ public class HtmlPlatform implements Platform {
   }-*/;
 
   /**
-   * Return true if renderer parameter equals "gl" or is not set, and the browser supports WebGL
+   * Return true if renderer query parameter equals {@link Renderer#GL} or is not set, and the browser supports WebGL
    * 
-   * @return true if renderer parameter equals "gl" or is not set, and the browser supports WebGL
+   * @return true if renderer query parameter equals {@link Renderer#GL} or is not set, and the browser supports WebGL
    */
   private boolean shouldUseGL() {
-    String renderer = getUrlParameter("renderer");
-    boolean useGlFromFlag = (renderer == null || "gl".equals(renderer));
+    String renderer = getUrlParameter(Renderer.URL_QUERY_PARAMETER);
+    boolean useGlFromFlag = (renderer == null || Renderer.GL.equals(renderer));
     return (useGlFromFlag && hasGLSupport());
   }
 

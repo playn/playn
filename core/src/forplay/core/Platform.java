@@ -37,6 +37,8 @@ public interface Platform {
   Pointer pointer();
 
   Storage storage();
+  
+  Analytics analytics();
 
   float random();
 

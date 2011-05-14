@@ -15,20 +15,11 @@
  */
 package forplay.html;
 
-import com.allen_sauer.gwt.log.client.DivLogger;
-import com.google.gwt.user.client.ui.RootPanel;
-
 import forplay.core.Log;
 
 class HtmlLog implements Log {
 
   public HtmlLog() {
-    DivLogger logger = com.allen_sauer.gwt.log.client.Log.getLogger(DivLogger.class);
-    // Avoid NPE when DivLogger is disabled in the .gwt.xml module file
-    if (logger != null) {
-      // Reattach the DivLogger to the bottom of the page
-      RootPanel.get().add(logger.getWidget());
-    }
   }
 
   @Override

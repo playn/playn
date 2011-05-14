@@ -26,6 +26,7 @@ import flash.display.Sprite;
 
 import flash.events.EventType;
 
+import forplay.core.Analytics;
 import forplay.core.Audio;
 import forplay.core.ForPlay;
 import forplay.core.Game;
@@ -78,6 +79,7 @@ public class FlashPlatform implements Platform {
   private TimerCallback paintCallback;
   private TimerCallback updateCallback;
   private Storage storage;
+  private Analytics analytics;
 
   // Non-instantiable.
   public FlashPlatform() {
@@ -90,6 +92,7 @@ public class FlashPlatform implements Platform {
     json = new FlashJson();
     graphics = new FlashGraphics();
     storage = new FlashStorage();
+    analytics = new FlashAnalytics();
   }
 
   @Override
@@ -237,11 +240,13 @@ public class FlashPlatform implements Platform {
     });
   }-*/;
 
-  /* (non-Javadoc)
-   * @see forplay.core.Platform#storage()
-   */
   @Override
   public Storage storage() {
     return storage;
+  }
+  
+  @Override
+  public Analytics analytics() {
+    return analytics;
   }
 }

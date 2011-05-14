@@ -85,6 +85,7 @@ class HtmlImage implements Image {
     }
   }
 
+  @Override
   public boolean isReady() {
     return isComplete(this.img);
   }

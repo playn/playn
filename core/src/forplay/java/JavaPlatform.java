@@ -25,6 +25,7 @@ import javax.swing.JFrame;
 
 import forplay.core.Storage;
 
+import forplay.core.Analytics;
 import forplay.core.Audio;
 import forplay.core.ForPlay;
 import forplay.core.Game;
@@ -63,6 +64,7 @@ public class JavaPlatform implements Platform {
   private JavaAssetManager assetManager = new JavaAssetManager();
 
   private int updateRate = 0;
+  private Analytics analytics = new JavaAnalytics();
 
   private JavaPlatform() {
   }
@@ -107,6 +109,11 @@ public class JavaPlatform implements Platform {
     return storage;
   }
 
+  @Override
+  public Analytics analytics() {
+    return analytics;
+  }
+  
   @Override
   public JavaAssetManager assetManager() {
     return assetManager;

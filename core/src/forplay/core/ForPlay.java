@@ -107,6 +107,13 @@ public class ForPlay {
   }
 
   /**
+   * Gets the {@link Analytics} analytics interface.
+   */
+  public static Analytics analytics() {
+    return platform.analytics();
+  }
+
+  /**
    * Gets a random floating-point value in the range [0, 1).
    */
   public static float random() {
