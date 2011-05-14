@@ -16,14 +16,11 @@
 package forplay.android;
 
 import android.graphics.Canvas;
-
+import forplay.core.Analytics;
 import forplay.core.AssetManager;
-import forplay.core.RegularExpression;
-import forplay.core.Storage;
-
 import forplay.core.Audio;
-import forplay.core.Game;
 import forplay.core.ForPlay;
+import forplay.core.Game;
 import forplay.core.Graphics;
 import forplay.core.Json;
 import forplay.core.Keyboard;
@@ -31,6 +28,8 @@ import forplay.core.Log;
 import forplay.core.Net;
 import forplay.core.Platform;
 import forplay.core.Pointer;
+import forplay.core.RegularExpression;
+import forplay.core.Storage;
 import forplay.java.JavaJson;
 
 public class AndroidPlatform implements Platform {
@@ -52,6 +51,7 @@ public class AndroidPlatform implements Platform {
 	private AndroidPointer pointer;
 	private Canvas currentCanvas;
 	private AndroidAssetManager assetManager;
+	private AndroidAnalytics analytics;
 
 	private AndroidPlatform(GameActivity activity) {
 		this.activity = activity;
@@ -61,6 +61,11 @@ public class AndroidPlatform implements Platform {
 	public AssetManager assetManager() {
 		return assetManager;
 	}
+
+  @Override
+  public Analytics analytics() {
+    return analytics;
+  }
 
 	@Override
 	public Audio audio() {
@@ -122,6 +127,7 @@ public class AndroidPlatform implements Platform {
 		net = new AndroidNet();
 		pointer = new AndroidPointer();
 		assetManager = new AndroidAssetManager();
+		analytics = new AndroidAnalytics();
 
 		this.game = game;
 		game.init();
