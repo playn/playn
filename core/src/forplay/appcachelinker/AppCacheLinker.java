@@ -35,6 +35,7 @@ import java.util.Date;
  * {@code <html manifest="mymodule/appcache.nocache.manifest">}</li>
  * <li>Add a mime-mapping to your web.xml file:
  * <p>
+ * 
  * <pre>{@code <mime-mapping>
  * <extension>manifest</extension>
  * <mime-type>text/cache-manifest</mime-type>
@@ -48,6 +49,8 @@ import java.util.Date;
  * <p>
  * This linker contains a whitelist of acceptable file extensions. To include
  * files with other extensions, override {@link #getCacheWhitelist()}.
+ * <p>
+ * To add additional static files to the manifest, override {@link #staticCachedFiles()}.
  */
 public class AppCacheLinker extends IFrameLinker {
 
@@ -68,7 +71,7 @@ public class AppCacheLinker extends IFrameLinker {
     ArtifactSet toReturn = super.link(logger, context, artifacts);
 
     // Create the general cache-manifest resource for the landing page:
-    toReturn.add(emitLandingPageCacheManifest(context, logger, toReturn));
+    toReturn.add(emitLandingPageCacheManifest(context, logger, toReturn, staticCachedFiles()));
 
     return toReturn;
   }
@@ -80,29 +83,43 @@ public class AppCacheLinker extends IFrameLinker {
    */
   protected String[] getCacheWhitelist() {
     return new String[]{
-        // .wav files explicitly excluded, since HTML game uses .mp3
-        ".js", ".html", ".jpg", ".jpeg", ".png", ".gif", ".mp3", ".ogg", ".mov", ".avi",
-        ".wmv", ".webm", ".css", ".json", ".flv", ".swf", };
+        // .wav files explicitly excluded, since HTML games use .mp3
+        ".js", ".html", ".jpg", ".jpeg", ".png", ".gif", ".mp3", ".ogg", ".mov", ".avi", ".wmv",
+        ".webm", ".css", ".json", ".flv", ".swf",};
   }
 
   /**
    * Creates the cache-manifest resource specific for the landing page.
    */
   private Artifact<?> emitLandingPageCacheManifest(LinkerContext context, TreeLogger logger,
-      ArtifactSet artifacts) throws UnableToCompleteException {
+      ArtifactSet artifacts, String[] staticFiles) throws UnableToCompleteException {
     // Create a string of cacheable resources
     StringBuilder publicSourcesSb = new StringBuilder();
+    StringBuilder publicStaticSourcesSb = new StringBuilder();
+
+    String[] whiteList = getCacheWhitelist();
 
     // Iterate over all emitted artifacts, and collect all cacheable artifacts
-    String[] whiteList = getCacheWhitelist();
-    for (@SuppressWarnings("rawtypes") Artifact artifact : artifacts) {
+    for (@SuppressWarnings("rawtypes")
+    Artifact artifact : artifacts) {
       if (artifact instanceof EmittedArtifact) {
         EmittedArtifact ea = (EmittedArtifact) artifact;
         String pathName = /* context.getModuleFunctionName() + "/" + */ea.getPartialPath();
-        
+
         for (String extension : whiteList) {
           if (pathName.endsWith(extension)) {
             publicSourcesSb.append(pathName + "\n");
+          }
+        }
+      }
+    }
+
+    // Iterate over all static files
+    if (staticFiles != null) {
+      for (String staticFile : staticFiles) {
+        for (String extension : whiteList) {
+          if (staticFile.endsWith(extension)) {
+            publicStaticSourcesSb.append(staticFile + "\n");
           }
         }
       }
@@ -118,6 +135,8 @@ public class AppCacheLinker extends IFrameLinker {
     sb.append("\n");
     sb.append("CACHE:\n");
     sb.append(publicSourcesSb.toString());
+    sb.append("# Static cached files\n");
+    sb.append(publicStaticSourcesSb.toString());
     sb.append("\n\n");
     sb.append("# All other resources require the user to be online.\n");
     sb.append("NETWORK:\n");
@@ -129,5 +148,15 @@ public class AppCacheLinker extends IFrameLinker {
 
     // Create the manifest as a new artifact and return it:
     return emitString(logger, sb.toString(), MANIFEST);
+  }
+
+  /**
+   * Override this method to force the linker to include additional files in the
+   * manifest.
+   * 
+   * @return array of additional files to include in the manifest.
+   */
+  protected String[] staticCachedFiles() {
+    return null;
   }
 }
