@@ -214,7 +214,7 @@ public class JsonUtil {
   }
 
   public static <T extends JsonValue> T parse(String json) throws JsonException {
-    return Json.instance().parse(json);
+      return (T) Json.instance().parse(json);
   }
 
   /**
