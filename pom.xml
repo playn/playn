@@ -117,6 +117,10 @@
       <id>repo1</id>
       <url>http://repo1.maven.org/maven2/</url>
     </repository>
+    <repository>
+      <id>forplay</id>
+      <url>http://forplay.googlecode.com/svn/mavenrepo</url>
+    </repository>
   </repositories>
 
   <pluginRepositories>  
