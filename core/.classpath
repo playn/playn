@@ -7,7 +7,7 @@
 	<classpathentry kind="src" path="webgl"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="lib/junit-4.8.1.jar"/>
-	<classpathentry kind="lib" path="lib/gwt-log-r595.jar"/>
+	<classpathentry kind="lib" path="lib/gwt-log-r611.jar"/>
 	<classpathentry kind="lib" path="lib/JLayer1.0.1/jl1.0.1.jar"/>
 	<classpathentry kind="lib" path="lib/gwt-voices-r410.jar"/>
 	<classpathentry kind="con" path="com.google.gwt.eclipse.core.GWT_CONTAINER"/>
