@@ -31,7 +31,11 @@
   <!-- Flash/HTML5/Native audio support  -->
   <inherits name="com.allen_sauer.gwt.voices.gwt-voices" />
 
-  <!--Set default / compile time log level to WARN -->
+  <!--
+    Available log levels: TRACE, DEBUG, INFO, WARN, ERROR, FATAL, OFF
+    
+    Set default / compile time log level to WARN
+  -->
   <inherits name="com.allen_sauer.gwt.log.gwt-log-WARN" />
   <!--
     Also compile DEBUG version, which can be enabled via
@@ -56,8 +60,14 @@
   -->
   <set-property name="log_SystemLogger" value="ENABLED" />
 
-  <!-- Enable RemoteLogger for stack trace resymbolization -->
-  <inherits name="com.allen_sauer.gwt.log.gwt-log-RemoteLogger" />
+  <!--
+    For JavaScript stack trace deobfuscation and server side logging of
+    client log messages:
+      1. Add the RemoteLoggerServlet handler to your project's web.xml
+         http://code.google.com/p/gwt-log/wiki/GettingStarted
+      2. Enable the remote logger in your application's *.gwt.xml GWT module file
+         <inherits name="com.allen_sauer.gwt.log.gwt-log-RemoteLogger" />
+  -->
  
   <!-- Auto ClientBundle -->
   <generate-with
