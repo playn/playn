@@ -17,6 +17,7 @@
 <!DOCTYPE module PUBLIC "-//Google Inc.//DTD Google Web Toolkit trunk//EN" "http://google-web-toolkit.googlecode.com/svn/trunk/distro-source/core/src/gwt-module.dtd">
 <module>
   <inherits name='forplay.ForPlay'/>
+  <inherits name='com.google.gwt.jas.Jas' /> 
   <source path='flash'/>
   <public path='flash/as'/>
 </module>
