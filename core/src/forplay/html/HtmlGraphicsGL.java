@@ -13,14 +13,40 @@
  */
 package forplay.html;
 
-import static com.google.gwt.webgl.client.WebGLRenderingContext.*;
+import static com.google.gwt.webgl.client.WebGLRenderingContext.ARRAY_BUFFER;
+import static com.google.gwt.webgl.client.WebGLRenderingContext.BLEND;
+import static com.google.gwt.webgl.client.WebGLRenderingContext.CLAMP_TO_EDGE;
+import static com.google.gwt.webgl.client.WebGLRenderingContext.COLOR_BUFFER_BIT;
+import static com.google.gwt.webgl.client.WebGLRenderingContext.CULL_FACE;
+import static com.google.gwt.webgl.client.WebGLRenderingContext.ELEMENT_ARRAY_BUFFER;
+import static com.google.gwt.webgl.client.WebGLRenderingContext.FLOAT;
+import static com.google.gwt.webgl.client.WebGLRenderingContext.FRAMEBUFFER;
+import static com.google.gwt.webgl.client.WebGLRenderingContext.FUNC_ADD;
+import static com.google.gwt.webgl.client.WebGLRenderingContext.LINEAR;
+import static com.google.gwt.webgl.client.WebGLRenderingContext.NO_ERROR;
+import static com.google.gwt.webgl.client.WebGLRenderingContext.ONE_MINUS_SRC_ALPHA;
+import static com.google.gwt.webgl.client.WebGLRenderingContext.REPEAT;
+import static com.google.gwt.webgl.client.WebGLRenderingContext.RGBA;
+import static com.google.gwt.webgl.client.WebGLRenderingContext.SRC_ALPHA;
+import static com.google.gwt.webgl.client.WebGLRenderingContext.STREAM_DRAW;
+import static com.google.gwt.webgl.client.WebGLRenderingContext.TEXTURE0;
+import static com.google.gwt.webgl.client.WebGLRenderingContext.TEXTURE_2D;
+import static com.google.gwt.webgl.client.WebGLRenderingContext.TEXTURE_MAG_FILTER;
+import static com.google.gwt.webgl.client.WebGLRenderingContext.TEXTURE_MIN_FILTER;
+import static com.google.gwt.webgl.client.WebGLRenderingContext.TEXTURE_WRAP_S;
+import static com.google.gwt.webgl.client.WebGLRenderingContext.TEXTURE_WRAP_T;
+import static com.google.gwt.webgl.client.WebGLRenderingContext.TRIANGLES;
+import static com.google.gwt.webgl.client.WebGLRenderingContext.UNSIGNED_BYTE;
+import static com.google.gwt.webgl.client.WebGLRenderingContext.UNSIGNED_SHORT;
 
 import com.google.gwt.dom.client.CanvasElement;
 import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.ImageElement;
 import com.google.gwt.typedarrays.client.Float32Array;
+import com.google.gwt.typedarrays.client.Int32Array;
 import com.google.gwt.typedarrays.client.Uint16Array;
+import com.google.gwt.typedarrays.client.Uint8Array;
 import com.google.gwt.webgl.client.WebGLBuffer;
 import com.google.gwt.webgl.client.WebGLContextAttributes;
 import com.google.gwt.webgl.client.WebGLFramebuffer;
@@ -31,6 +57,7 @@ import com.google.gwt.webgl.client.WebGLUniformLocation;
 import com.google.gwt.webgl.client.WebGLUtil;
 
 import forplay.core.CanvasLayer;
+import forplay.core.ForPlay;
 import forplay.core.GroupLayer;
 import forplay.core.Image;
 import forplay.core.ImageLayer;
@@ -449,6 +476,10 @@ class HtmlGraphicsGL extends HtmlGraphics {
     gl.enable(BLEND);
     gl.blendEquation(FUNC_ADD);
     gl.blendFunc(SRC_ALPHA, ONE_MINUS_SRC_ALPHA);
+    
+    if (!tryBasicGlCalls()) {
+      giveUp();
+    }
   }
 
   private boolean tryCreateContext(WebGLContextAttributes attrs) {
@@ -463,6 +494,66 @@ class HtmlGraphicsGL extends HtmlGraphics {
     // static initially. We give up and fall back to dom/canvas in this case, because nothing seems
     // to work properly.
     return (gl.getError() == NO_ERROR);
+  }
+
+  /**
+   * Try basic GL operations to detect failure cases early.
+   * 
+   * @return true if calls succeed, false otherwise.
+   */
+  private boolean tryBasicGlCalls() {
+    int err;
+
+    try {
+      // test that our Float32 arrays work (a technique found in other WebGL
+      // checks)
+      Float32Array testFloat32Array = Float32Array.create(new float[]{0.0f, 1.0f, 2.0f});
+      if (testFloat32Array.get(0) != 0.0f || testFloat32Array.get(1) != 1.0f
+          || testFloat32Array.get(2) != 2.0f) {
+        throw new RuntimeException("Typed Float32Array check failed");
+      }
+
+      // test that our Int32 arrays work
+      Int32Array testInt32Array = Int32Array.create(new int[]{0, 1, 2});
+      if (testInt32Array.get(0) != 0 || testInt32Array.get(1) != 1 || testInt32Array.get(2) != 2) {
+        throw new RuntimeException("Typed Int32Array check failed");
+      }
+
+      // test that our Uint16 arrays work
+      Uint16Array testUint16Array = Uint16Array.create(new int[]{0, 1, 2});
+      if (testUint16Array.get(0) != 0 || testUint16Array.get(1) != 1 || testUint16Array.get(2) != 2) {
+        throw new RuntimeException("Typed Uint16Array check failed");
+      }
+
+      // test that our Uint8 arrays work
+      Uint8Array testUint8Array = Uint8Array.create(new int[]{0, 1, 2});
+      if (testUint8Array.get(0) != 0 || testUint8Array.get(1) != 1 || testUint8Array.get(2) != 2) {
+        throw new RuntimeException("Typed Uint8Array check failed");
+      }
+
+      // Perform GL read back test where we paint rgb(255, 0, 255) and then read
+      // back that data
+      bindFramebuffer();
+      gl.clearColor(255, 0, 255, 255);
+      err = gl.getError();
+      if (err != NO_ERROR) {
+        throw new RuntimeException("Read back GL test failed to clear color (error " + err + ")");
+      }
+      updateLayers();
+      Uint8Array pixelData = Uint8Array.create(4);
+      gl.readPixels(0, 0, 1, 1, RGBA, UNSIGNED_BYTE, pixelData);
+      if (pixelData.get(0) != 255 || pixelData.get(1) != 0 || pixelData.get(2) != 255) {
+        throw new RuntimeException("Read back GL test failed to read back correct color");
+      }
+    } catch (RuntimeException e) {
+      ForPlay.log().info("Basic GL check failed: " + e.getMessage());
+      return false;
+    } catch (Throwable t) {
+      ForPlay.log().info("Basic GL check failed with an unknown error: " + t.getMessage());
+      return false;
+    }
+
+    return true;
   }
 
   private void giveUp() {
