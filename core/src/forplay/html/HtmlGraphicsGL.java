@@ -507,10 +507,10 @@ class HtmlGraphicsGL extends HtmlGraphics {
         throw new RuntimeException("Typed Uint8Array check failed");
       }
 
-      // Perform GL read back test where we paint rgb(255, 0, 255) and then read
-      // back that data
+      // Perform GL read back test where we paint rgba(1, 1, 1, 1) and then read
+      // back that data. (should be 100% opaque white).
       bindFramebuffer();
-      gl.clearColor(255, 0, 255, 255);
+      gl.clearColor(1, 1, 1, 1);
       err = gl.getError();
       if (err != NO_ERROR) {
         throw new RuntimeException("Read back GL test failed to clear color (error " + err + ")");
@@ -518,7 +518,7 @@ class HtmlGraphicsGL extends HtmlGraphics {
       updateLayers();
       Uint8Array pixelData = Uint8Array.create(4);
       gl.readPixels(0, 0, 1, 1, RGBA, UNSIGNED_BYTE, pixelData);
-      if (pixelData.get(0) != 255 || pixelData.get(1) != 0 || pixelData.get(2) != 255) {
+      if (pixelData.get(0) != 255 || pixelData.get(1) != 255 || pixelData.get(2) != 255) {
         throw new RuntimeException("Read back GL test failed to read back correct color");
       }
     } catch (RuntimeException e) {
