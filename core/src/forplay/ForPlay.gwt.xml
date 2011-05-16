@@ -68,6 +68,11 @@
       2. Enable the remote logger in your application's *.gwt.xml GWT module file
          <inherits name="com.allen_sauer.gwt.log.gwt-log-RemoteLogger" />
   -->
+  <!-- 
+    Add line number information to deobfuscated stack traces:
+  <set-property name="compiler.emulatedStack" value="true" />
+  <set-configuration-property name="compiler.emulatedStack.recordLineNumbers" value="true"/>
+   -->
  
   <!-- Auto ClientBundle -->
   <generate-with
