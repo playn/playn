@@ -59,7 +59,7 @@
     <dependency>
       <groupId>allen_sauer</groupId>
       <artifactId>gwt-log</artifactId>
-      <version>1.0.r595</version>
+      <version>1.0.r611</version>
     </dependency>
 
     <dependency>
