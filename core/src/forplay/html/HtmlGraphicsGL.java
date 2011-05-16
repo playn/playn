@@ -13,31 +13,7 @@
  */
 package forplay.html;
 
-import static com.google.gwt.webgl.client.WebGLRenderingContext.ARRAY_BUFFER;
-import static com.google.gwt.webgl.client.WebGLRenderingContext.BLEND;
-import static com.google.gwt.webgl.client.WebGLRenderingContext.CLAMP_TO_EDGE;
-import static com.google.gwt.webgl.client.WebGLRenderingContext.COLOR_BUFFER_BIT;
-import static com.google.gwt.webgl.client.WebGLRenderingContext.CULL_FACE;
-import static com.google.gwt.webgl.client.WebGLRenderingContext.ELEMENT_ARRAY_BUFFER;
-import static com.google.gwt.webgl.client.WebGLRenderingContext.FLOAT;
-import static com.google.gwt.webgl.client.WebGLRenderingContext.FRAMEBUFFER;
-import static com.google.gwt.webgl.client.WebGLRenderingContext.FUNC_ADD;
-import static com.google.gwt.webgl.client.WebGLRenderingContext.LINEAR;
-import static com.google.gwt.webgl.client.WebGLRenderingContext.NO_ERROR;
-import static com.google.gwt.webgl.client.WebGLRenderingContext.ONE_MINUS_SRC_ALPHA;
-import static com.google.gwt.webgl.client.WebGLRenderingContext.REPEAT;
-import static com.google.gwt.webgl.client.WebGLRenderingContext.RGBA;
-import static com.google.gwt.webgl.client.WebGLRenderingContext.SRC_ALPHA;
-import static com.google.gwt.webgl.client.WebGLRenderingContext.STREAM_DRAW;
-import static com.google.gwt.webgl.client.WebGLRenderingContext.TEXTURE0;
-import static com.google.gwt.webgl.client.WebGLRenderingContext.TEXTURE_2D;
-import static com.google.gwt.webgl.client.WebGLRenderingContext.TEXTURE_MAG_FILTER;
-import static com.google.gwt.webgl.client.WebGLRenderingContext.TEXTURE_MIN_FILTER;
-import static com.google.gwt.webgl.client.WebGLRenderingContext.TEXTURE_WRAP_S;
-import static com.google.gwt.webgl.client.WebGLRenderingContext.TEXTURE_WRAP_T;
-import static com.google.gwt.webgl.client.WebGLRenderingContext.TRIANGLES;
-import static com.google.gwt.webgl.client.WebGLRenderingContext.UNSIGNED_BYTE;
-import static com.google.gwt.webgl.client.WebGLRenderingContext.UNSIGNED_SHORT;
+import static com.google.gwt.webgl.client.WebGLRenderingContext.*;
 
 import com.google.gwt.dom.client.CanvasElement;
 import com.google.gwt.dom.client.Document;
