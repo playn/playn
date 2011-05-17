@@ -84,5 +84,8 @@
   <inherits name="com.google.gwt.webgl.WebGL" />
 
   <define-linker name="appcachelinker" class="forplay.appcachelinker.AppCacheLinker" />
-  <add-linker name="appcachelinker" />
+  
+  <!-- By default, we don't use the appcachelinker. -->
+  <!-- If you would like to use it in your project, add the following line to your gwt.xml -->
+  <!-- <add-linker name="appcachelinker" /> -->
 </module>
