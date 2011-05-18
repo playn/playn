@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>${groupId}</groupId>
+  <artifactId>${artifactId}</artifactId>
+  <packaging>pom</packaging>
+  <version>${version}</version>
+  <name>Forplay ${ProjectName} Project</name>
+  <description>Forplay ${ProjectName} Project</description>
+
+  <build>
+    <!-- Common plugin configuration for all children -->
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>gwt-maven-plugin</artifactId>
+          <version>2.2.0</version>
+          <configuration>
+            <logLevel>INFO' -XdisableRunAsync -logLevel 'INFO</logLevel>
+            <style>PRETTY</style>
+            <runTarget>${gwt.module}${gwt.modulesuffix}/index.html</runTarget>
+            <hostedWebapp>${project.build.directory}/www</hostedWebapp>
+            <draftCompile>${gwt.draft}</draftCompile>
+            <disableCastChecking>${gwt.xdisable}</disableCastChecking>
+            <disableClassMetadata>${gwt.xdisable}</disableClassMetadata>
+            <soyc>${gwt.soyc}</soyc>
+            <localWorkers>${gwt.workers}</localWorkers>
+            <extraJvmArgs>-Xmx256m -Dgwt.args="-XdisableRunAsync"</extraJvmArgs>
+            <modules>
+              <module>${gwt.module}</module>
+            </modules>
+            <inplace>${gwt.inplace}</inplace>
+          </configuration>
+          <dependencies> 
+                    <dependency> 
+                        <groupId>com.google.gwt</groupId> 
+                            <artifactId>gwt-user</artifactId> 
+                            <version>2.3.0</version> 
+                        </dependency> 
+                        <dependency> 
+                            <groupId>com.google.gwt</groupId> 
+                            <artifactId>gwt-dev</artifactId> 
+                            <version>2.3.0</version> 
+                        </dependency> 
+          </dependencies> 
+          <executions>
+            <execution>
+              <phase>prepare-package</phase>
+              <goals>
+                <goal>compile</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+
+        <plugin>
+          <artifactId>maven-clean-plugin</artifactId>
+          <configuration>
+            <filesets>
+              <fileset><directory>src/main/webapp/${gwt.module}</directory></fileset>
+              <fileset><directory>src/main/webapp/${gwt.module}Dev</directory></fileset>
+              <fileset><directory>src/main/webapp/${gwt.name}</directory></fileset>
+              <fileset><directory>src/main/webapp/WEB-INF/classes</directory></fileset>
+              <fileset><directory>tomcat</directory></fileset>
+              <fileset><directory>www-test</directory></fileset>
+              <fileset><directory>.gwt-tmp</directory></fileset>
+            </filesets>
+          </configuration>
+        </plugin>
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-source-plugin</artifactId>
+          <executions>
+            <execution>
+              <phase>package</phase>
+              <goals>
+                <goal>jar</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+
+	<plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>1.6</source>
+          <target>1.6</target>
+        </configuration>
+      </plugin>
+        
+      </plugins>
+    </pluginManagement>
+
+  </build>
+  
+  <repositories>
+    <repository>
+      <id>repo1</id>
+      <url>http://repo1.maven.org/maven2/</url>
+    </repository>
+    <repository>
+      <id>forplay</id>
+      <url>http://forplay.googlecode.com/svn/mavenrepo</url>
+    </repository>
+  </repositories>
+
+  <pluginRepositories>  
+    <pluginRepository>  
+      <id>codehaus.snapshots</id>  
+      <url>http://snapshots.repository.codehaus.org/</url>  
+    </pluginRepository>  
+  </pluginRepositories> 
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <gwtversion>2.3.0</gwtversion>
+    <gwt.version>2.3.0</gwt.version>
+    <gwt.loglevel>INFO</gwt.loglevel>
+    <gwt.outputstyle>OBF</gwt.outputstyle>
+    <maven.test.skip>false</maven.test.skip> 
+    <gwt.inplace>false</gwt.inplace>
+    <gwt.soyc>false</gwt.soyc>
+    <gwt.xdisable>true</gwt.xdisable>
+    <gwt.draft>false</gwt.draft>
+  </properties>
+
+  <profiles>
+    <profile>
+      <id>prod</id>
+      <properties>
+        <gwtversion>2.3.0</gwtversion>
+        <gwt.version>2.3.0</gwt.version>
+        <gwt.loglevel>ERROR</gwt.loglevel>
+        <gwt.outputstyle>OBF</gwt.outputstyle>
+        <gwt.xdisable>true</gwt.xdisable>
+        <gwt.soyc>true</gwt.soyc>
+      </properties>
+    </profile>
+
+    <profile>
+      <id>tools.jar</id>
+      <activation>
+        <property>
+          <name>java.vendor</name>
+          <value>Sun Microsystems Inc.</value>
+       </property>
+      </activation>
+      <dependencies>
+        <dependency>
+          <groupId>com.sun</groupId>
+          <artifactId>tools</artifactId>
+          <version>1.6</version>
+          <scope>system</scope>
+          <optional>true</optional>
+          <systemPath>${java.home}/../lib/tools.jar</systemPath>
+        </dependency>
+      </dependencies>
+    </profile>
+
+  </profiles>
+
+  <!-- Common dependencies for all modules -->
+  <dependencies>
+    <dependency>
+      <groupId>com.google.gwt</groupId>
+      <artifactId>gwt-user</artifactId>
+      <version>${gwtversion}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.google.gwt</groupId>
+      <artifactId>gwt-servlet</artifactId>
+      <version>${gwtversion}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.1</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+</project>

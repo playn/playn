@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<archetype-descriptor xsi:schemaLocation="http://maven.apache.org/plugins/maven-archetype-plugin/archetype-descriptor/1.0.0 http://maven.apache.org/xsd/archetype-descriptor-1.0.0.xsd" name="forplay-sample-archetype"
+    xmlns="http://maven.apache.org/plugins/maven-archetype-plugin/archetype-descriptor/1.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <requiredProperties>
+    <requiredProperty key="ProjectName">
+    </requiredProperty>
+  </requiredProperties>
+  <fileSets>
+    <fileSet filtered="true" encoding="UTF-8">
+      <directory>android</directory>
+      <includes>
+        <include>**/*.project</include>
+        <include>**/*.xml</include>
+        <include>**/*.properties</include>
+        <include>**/*.classpath</include>
+      </includes>
+    </fileSet>
+    <fileSet filtered="true" encoding="UTF-8">
+      <directory>android/src</directory>
+      <includes>
+        <include>**/*.java</include>
+      </includes>
+    </fileSet>
+    <fileSet filtered="true" encoding="UTF-8">
+      <directory>android/res</directory>
+      <includes>
+        <include>**/*.xml</include>
+      </includes>
+    </fileSet>
+    <fileSet filtered="true" encoding="UTF-8">
+      <directory>android/gen</directory>
+      <includes>
+        <include>**/*.java</include>
+      </includes>
+    </fileSet>
+    <fileSet encoding="UTF-8">
+      <directory>android</directory>
+      <includes>
+        <include>**/*.launch</include>
+        <include>**/*.cfg</include>
+        <include>**/*.gitignore</include>
+      </includes>
+    </fileSet>
+    <fileSet encoding="UTF-8">
+      <directory>android/res</directory>
+      <includes>
+        <include>**/*.png</include>
+      </includes>
+    </fileSet>
+  </fileSets>
+  <modules>
+    <module id="forplay-hello-core" dir="core" name="forplay-hello-core">
+      <fileSets>
+        <fileSet filtered="true" encoding="UTF-8" packaged="false">
+          <directory>src/__packageInPathFormat__</directory>
+          <includes>
+            <include>**/*.xml</include>
+            <include>**/*.java</include>
+          </includes>
+	  <excludes>
+	     <exclude>**/*.png</exclude>
+          </excludes>
+        </fileSet>
+        <fileSet filtered="true" encoding="UTF-8">
+          <directory>war</directory>
+          <includes>
+            <include>**/*.html</include>
+          </includes>
+        </fileSet>
+        <fileSet filtered="true" encoding="UTF-8">
+          <directory>war/WEB-INF</directory>
+          <includes>
+            <include>**/*.xml</include>
+          </includes>
+        </fileSet>
+        <fileSet encoding="UTF-8">
+          <directory>src/__packageInPathFormat__</directory>
+          <includes>
+            <include>**/*.png</include>
+          </includes>
+        </fileSet>
+        <fileSet encoding="UTF-8">
+          <directory>war</directory>
+          <includes>
+            <include>**/*.gitignore</include>
+          </includes>
+        </fileSet>
+        <fileSet encoding="UTF-8">
+          <directory>war/WEB-INF</directory>
+          <includes>
+            <include>**/*.gitignore</include>
+          </includes>
+        </fileSet>
+        <fileSet filtered="true" encoding="UTF-8">
+          <directory></directory>
+          <includes>
+            <include>.classpath</include>
+            <include>.project</include>
+          </includes>
+        </fileSet>
+        <fileSet encoding="UTF-8">
+          <directory></directory>
+          <includes>
+            <include>.gitignore</include>
+            <include>hello-html.launch</include>
+            <include>hello-java.launch</include>
+          </includes>
+        </fileSet>
+      </fileSets>
+    </module>
+    <module id="forplay-hello-html" dir="html" name="forplay-hello-html" />
+    <module id="forplay-hello-flash" dir="flash" name="forplay-hello-flash" />
+  </modules>
+</archetype-descriptor>

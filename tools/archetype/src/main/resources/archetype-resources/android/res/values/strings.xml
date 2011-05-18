@@ -1,0 +1,7 @@
+#set( $symbol_pound = '#' )
+#set( $symbol_dollar = '$' )
+#set( $symbol_escape = '\' )
+<?xml version="${version}" encoding="utf-8"?>
+<resources>
+    <string name="app_name">${ProjectName}</string>
+</resources>
