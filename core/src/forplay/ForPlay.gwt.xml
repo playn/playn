@@ -34,14 +34,14 @@
   <!--
     Available log levels: TRACE, DEBUG, INFO, WARN, ERROR, FATAL, OFF
     
-    Set default / compile time log level to WARN
+    Set default / compile time log level to DEBUG
   -->
-  <inherits name="com.allen_sauer.gwt.log.gwt-log-WARN" />
+  <inherits name="com.allen_sauer.gwt.log.gwt-log-DEBUG" />
   <!--
-    Also compile DEBUG version, which can be enabled via
-    a URL query parameter (gwt_log=DEBUG) or a meta tag
-    (<meta name="gwt:property" content="log_level=DEBUG">):
-  <extend-property name="log_level" values="DEBUG" />
+    To compile a WARN version instead, either modify the above line
+    -or- add the following two lines in your game's .gwt.xml file:
+  <extend-property name="log_level" values="WARN"/>
+  <set-property name="log_level" value="WARN"/>
   -->
 
   <!-- Log to Chrome Developer Tools, Firebug, etc. -->
