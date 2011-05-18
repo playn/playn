@@ -4,6 +4,7 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <requiredProperties>
     <requiredProperty key="ProjectName">
+      <defaultValue>Hello</defaultValue>
     </requiredProperty>
   </requiredProperties>
   <fileSets>
