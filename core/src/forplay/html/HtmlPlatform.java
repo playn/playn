@@ -292,4 +292,16 @@ public class HtmlPlatform implements Platform {
   public void openURL(String url) {
 	  Window.open(url, "_blank", "");
   }
+
+  /**
+   * Disables the right-click context menu.
+   */
+  public void disableRightClick() {
+    Element rootElement = ((HtmlGraphics) graphics()).getRootElement();
+    disableRightClickImpl(rootElement);
+  }
+
+  private static native void disableRightClickImpl(JavaScriptObject target) /*-{
+    target.oncontextmenu = function() {return false;};
+  }-*/;
 }
