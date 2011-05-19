@@ -66,6 +66,10 @@
       1. Add the RemoteLoggerServlet handler to your project's web.xml
          http://code.google.com/p/gwt-log/wiki/GettingStarted
       2. Enable the remote logger in your application's *.gwt.xml GWT module file
+    
+    Note, you'll likely want to disable the SystemLogger above when enabling
+    the RemoteLogger, since both server side and client side log messages are sent
+    to the same Eclipse console view.
          <inherits name="com.allen_sauer.gwt.log.gwt-log-RemoteLogger" />
   -->
   <!-- 
