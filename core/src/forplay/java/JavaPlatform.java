@@ -45,6 +45,7 @@ public class JavaPlatform implements Platform {
   public static JavaPlatform register() {
     JavaPlatform platform = new JavaPlatform();
     ForPlay.setPlatform(platform);
+    platform.init();
     return platform;
   }
 
@@ -69,6 +70,10 @@ public class JavaPlatform implements Platform {
   private JavaPlatform() {
   }
 
+  @Override
+  public void init() {
+  }
+  
   @Override
   public Audio audio() {
     return audio;

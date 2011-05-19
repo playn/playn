@@ -51,10 +51,11 @@ public class FlashPlatform implements Platform {
  
   static {
     platform = new FlashPlatform();
- 
   }
+
   public static FlashPlatform register() {
     ForPlay.setPlatform(platform);
+    platform.init();
     return platform;
   }
 
@@ -83,6 +84,10 @@ public class FlashPlatform implements Platform {
 
   // Non-instantiable.
   public FlashPlatform() {
+  }
+
+  @Override
+  public void init() {
     log = new FlashLog();
     regularExpression = new HtmlRegularExpression();
     net = new FlashNet();

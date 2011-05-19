@@ -51,6 +51,7 @@ public class HtmlPlatform implements Platform {
   public static HtmlPlatform register() {
     HtmlPlatform platform = new HtmlPlatform();
     ForPlay.setPlatform(platform);
+    platform.init();
     return platform;
   }
 
@@ -86,6 +87,10 @@ public class HtmlPlatform implements Platform {
 
   // Non-instantiable.
   private HtmlPlatform() {
+  }
+  
+  @Override
+  public void init() {
     // setup a few things early, instead of in run()
     log = new HtmlLog();
     audio = new HtmlAudio();
