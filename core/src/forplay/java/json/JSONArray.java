@@ -20,6 +20,9 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+The original code has been modified by the additional of Java annotations,
+to reduce compile warnings.
 */
 package forplay.java.json;
 
@@ -79,6 +82,7 @@ import java.util.Map;
  * @author JSON.org
  * @version 2009-04-14
  */
+@SuppressWarnings("rawtypes")
 public class JSONArray {
 
 
