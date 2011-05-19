@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  
+  <parent>
+    <groupId>${groupId}</groupId>
+    <artifactId>${rootArtifactId}</artifactId>
+    <version>${version}</version>
+  </parent>
+
+  <groupId>${groupId}</groupId>
+  <artifactId>${artifactId}</artifactId>
+  <packaging>war</packaging>
+  <name>Forplay ${ProjectName} Flash</name>
+
+  <dependencies>
+    <dependency>
+      <groupId>com.google.gwt</groupId>
+      <artifactId>gwt-dev</artifactId>
+      <version>${gwtversion}</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>forplay</groupId>
+      <artifactId>core</artifactId>
+      <version>1.0</version>
+    </dependency>
+  </dependencies>
+
+  <properties>
+    <gwt.module>${package}.${ProjectName}Flash</gwt.module>
+    <gwt.name>${ProjectName}Flash</gwt.name>
+  </properties>
+
+  <build>
+    <sourceDirectory>../../core/src</sourceDirectory>
+
+    <plugins>
+    <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-war-plugin</artifactId>
+        <version>2.1.1</version>
+        <configuration>
+	  <warSourceDirectory>../../core/war</warSourceDirectory>
+        </configuration>
+      </plugin>
+
+
+      <!-- download and unpack flex4sdk -->
+      <plugin>
+         <groupId>org.apache.maven.plugins</groupId>
+         <artifactId>maven-dependency-plugin</artifactId>
+         <version>2.2</version>
+         <executions>
+           <execution>
+             <id>unpack</id>
+             <phase>validate</phase>
+             <goals>
+               <goal>unpack</goal>
+             </goals>
+             <configuration>
+               <artifactItems>
+                 <artifactItem>
+                   <groupId>com.adobe.flex</groupId>
+                   <artifactId>flex-sdk</artifactId>
+                   <version>4.1.0.16076_mpl</version>
+                   <type>zip</type>
+                   <overWrite>false</overWrite>
+                   <outputDirectory>${project.build.directory}/flex4sdk</outputDirectory>
+                 </artifactItem>
+               </artifactItems>
+             </configuration>
+           </execution>
+         </executions>
+       </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>validate</phase>
+            <goals>
+              <goal>run</goal>
+            </goals>
+            <configuration>
+              <tasks>
+                <!-- Dependency plugin discards file permissions so we need to set them back manually -->
+                <chmod file="${project.build.directory}/flex4sdk/bin/mxmlc" perm="ugo+rx"/>
+	     </tasks>
+            </configuration>
+          </execution> 
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>gwt-maven-plugin</artifactId>
+	<configuration>
+	  <extraJvmArgs>-Dflexsdk.home=${project.build.directory}/flex4sdk</extraJvmArgs>
+	</configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+      </plugin>
+    </plugins>
+    <resources>
+      <resource>
+        <directory>../../core/src</directory>
+      </resource>
+      <resource>
+        <directory>../../core/war/WEB-INF/classes</directory>
+      </resource>
+    </resources>
+  </build>
+</project>

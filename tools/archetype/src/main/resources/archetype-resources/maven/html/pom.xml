@@ -11,7 +11,7 @@
   <groupId>${groupId}</groupId>
   <artifactId>${artifactId}</artifactId>
   <packaging>war</packaging>
-  <name>Forplay ${ProjectName} Flash</name>
+  <name>Forplay ${ProjectName} Html</name>
 
   <dependencies>
     <dependency>
@@ -29,12 +29,12 @@
   </dependencies>
 
   <properties>
-    <gwt.module>${package}.${ProjectName}Flash</gwt.module>
-    <gwt.name>${ProjectName}Flash</gwt.name>
+    <gwt.module>${package}.${ProjectName}</gwt.module>
+    <gwt.name>${ProjectName}</gwt.name>
   </properties>
 
   <build>
-    <sourceDirectory>../core/src</sourceDirectory>
+    <sourceDirectory>../../core/src</sourceDirectory>
 
     <plugins>
     <plugin>
@@ -42,16 +42,13 @@
         <artifactId>maven-war-plugin</artifactId>
         <version>2.1.1</version>
         <configuration>
-	  <warSourceDirectory>../core/war</warSourceDirectory>
+	  <warSourceDirectory>../../core/war</warSourceDirectory>
         </configuration>
       </plugin>
 
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>gwt-maven-plugin</artifactId>
-	<configuration>
-	  <extraJvmArg>-Dflexsdk.home=${env.HOME}/flex4sdk</extraJvmArg>
-	</configuration>
       </plugin>
 
       <plugin>
@@ -61,10 +58,10 @@
     </plugins>
     <resources>
       <resource>
-        <directory>../core/src</directory>
+        <directory>../../core/src</directory>
       </resource>
       <resource>
-        <directory>../core/war/WEB-INF/classes</directory>
+        <directory>../../core/war/WEB-INF/classes</directory>
       </resource>
     </resources>
   </build>

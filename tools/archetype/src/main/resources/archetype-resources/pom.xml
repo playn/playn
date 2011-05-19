@@ -7,7 +7,11 @@
   <version>${version}</version>
   <name>Forplay ${ProjectName} Project</name>
   <description>Forplay ${ProjectName} Project</description>
-
+  <modules>
+    <module>core</module>
+    <module>maven/html</module>
+    <module>maven/flash</module>
+  </modules>
   <build>
     <!-- Common plugin configuration for all children -->
     <pluginManagement>
