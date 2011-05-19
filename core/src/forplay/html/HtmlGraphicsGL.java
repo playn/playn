@@ -440,19 +440,15 @@ class HtmlGraphicsGL extends HtmlGraphics {
   }
 
   private void initGL() {
-    WebGLContextAttributes attrs = WebGLContextAttributes.create();
-    attrs.setAlpha(false);
-    attrs.setPremultipliedAlpha(false);
-    attrs.setAntialias(true);
-    if (!tryCreateContext(attrs)) {
+    if (!tryCreateContext(null)) {
       giveUp();
     }
 
     gl.disable(CULL_FACE);
     gl.enable(BLEND);
     gl.blendEquation(FUNC_ADD);
-    gl.blendFunc(SRC_ALPHA, ONE_MINUS_SRC_ALPHA);
-    
+    gl.blendFuncSeparate(SRC_ALPHA, ONE_MINUS_SRC_ALPHA, SRC_ALPHA, DST_ALPHA);
+
     if (!tryBasicGlCalls()) {
       giveUp();
     }
