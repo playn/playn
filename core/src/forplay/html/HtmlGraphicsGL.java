@@ -92,12 +92,16 @@ class HtmlGraphicsGL extends HtmlGraphics {
         gl.enableVertexAttribArray(aMatrix);
         gl.enableVertexAttribArray(aTranslation);
         gl.enableVertexAttribArray(aPosition);
-        gl.enableVertexAttribArray(aTexture);
+        if (aTexture != -1) {
+          gl.enableVertexAttribArray(aTexture);
+        }
 
         gl.vertexAttribPointer(aMatrix, 4, FLOAT, false, 40, 0);
         gl.vertexAttribPointer(aTranslation, 2, FLOAT, false, 40, 16);
         gl.vertexAttribPointer(aPosition, 2, FLOAT, false, 40, 24);
-        gl.vertexAttribPointer(aTexture, 2, FLOAT, false, 40, 32);
+        if (aTexture != -1) {
+          gl.vertexAttribPointer(aTexture, 2, FLOAT, false, 40, 32);
+        }
 
         return true;
       }
