@@ -19,7 +19,7 @@ import forplay.core.ForPlay;
 public class JavaAnalytics implements Analytics {
 
   @Override
-  public void logEvent(String event) {
-    ForPlay.log().debug("Analytics Event : " + event);
+  public void logEvent(String event, float sampleRate) {
+    ForPlay.log().debug("Analytics#logEvent(" + event + ", " + sampleRate + ")");
   }
 }
