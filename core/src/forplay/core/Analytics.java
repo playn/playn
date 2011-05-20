@@ -15,13 +15,42 @@
 package forplay.core;
 
 public interface Analytics {
+  public abstract class AnalyticsImpl implements Analytics {
+    @Override
+    public void logEvent(float sampleRate, String category, String action) {
+      ForPlay.log().debug(
+          "Analytics#logEvent(" + sampleRate + ", " + category + ", " + action + ")");
+    }
+
+    @Override
+    public void logEvent(float sampleRate, String category, String action, String label, int value) {
+      ForPlay.log().debug(
+          "Analytics#logEvent(" + sampleRate + ", " + category + ", " + action + ", " + label
+              + ", " + value + ")");
+    }
+  }
 
   /**
    * Log an event with a given sampleRate, range {@literal [0.0 - 1.0)}.
    * 
-   * @param eventText the text of the event to send
-   * @param sampleRate likelihood that this event should be logged during this game session , range
+   * @param sampleRate likelihood that this event should be logged during this game session, range
    *          {@literal [0.0 - 1.0)}
+   * @param category the general event category, e.g. {@literal "Videos"}
+   * @param action the action for the event, e.g. {@literal "Play"}
    */
-  void logEvent(String eventText, float sampleRate);
+  void logEvent(float sampleRate, String category, String action);
+
+  /**
+   * Log an event with a given sampleRate, range {@literal [0.0 - 1.0)}.
+   * 
+   * @param sampleRate likelihood that this event should be logged during this game session, range
+   *          {@literal [0.0 - 1.0)}
+   * @param category the general event category, e.g. {@literal "Videos"}
+   * @param action the action for the event, e.g. {@literal "Play"}
+   * @param label descriptor for the event
+   * @param value value associated with the event. You can see your event values in the Overview,
+   *          Categories, and Actions reports, where they are listed by event or aggregated across
+   *          events, depending upon your report view
+   */
+  void logEvent(float sampleRate, String category, String action, String label, int value);
 }

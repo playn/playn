@@ -33,23 +33,40 @@ public class HtmlAnalytics implements Analytics {
   }
 
   @Override
-  public void logEvent(String event, float sampleRate) {
+  public void logEvent(float sampleRate, String category, String event) {
     boolean shouldLog = shouldLogEvent(sampleRate);
-    log().debug(
-        "Analytics#logEvent(" + event + ", " + sampleRate + ") => "
+    ForPlay.log().debug(
+        "Analytics#logEvent(" + sampleRate + ", " + category + ", " + event + ") => "
             + (shouldLog ? "Logging" : "NOT logging"));
     if (shouldLog) {
-      logEventImpl(event);
+      logEventImpl(category, event);
     }
   }
+
+  @Override
+  public void logEvent(float sampleRate, String category, String event, String label, int value) {
+    boolean shouldLog = shouldLogEvent(sampleRate);
+    ForPlay.log().debug(
+        "Analytics#logEvent(" + sampleRate + ", " + category + ", " + event + ", " + label + ", "
+            + value + ") => " + (shouldLog ? "Logging" : "NOT logging"));
+    if (shouldLog) {
+      logEventImpl(category, event, label, value);
+    }
+  }
+
+  public native void logEventImpl(String category, String event) /*-{
+    $wnd._gaq.push([
+        '_trackEvent', category, event
+    ]);
+  }-*/;
+
+  public native void logEventImpl(String category, String event, String label, int value) /*-{
+    $wnd._gaq.push([
+        '_trackEvent', category, event, label, value
+    ]);
+  }-*/;
 
   private boolean shouldLogEvent(float sampleRate) {
     return random <= sampleRate;
   }
-
-  public native void logEventImpl(String event) /*-{
-    $wnd._gaq.push([
-        '_trackPageview', event
-    ]);
-  }-*/;
 }

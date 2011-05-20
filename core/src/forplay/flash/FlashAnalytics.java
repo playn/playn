@@ -14,13 +14,6 @@
 package forplay.flash;
 
 import forplay.core.Analytics;
-import forplay.core.ForPlay;
 
-public class FlashAnalytics implements Analytics {
-
-  @Override
-  public void logEvent(String event, float sampleRate) {
-    ForPlay.log().debug("Analytics#logEvent(" + event + ", " + sampleRate + ")");
-  }
-
+public class FlashAnalytics extends Analytics.AnalyticsImpl {
 }
