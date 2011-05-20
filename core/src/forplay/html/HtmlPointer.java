@@ -108,7 +108,8 @@ class HtmlPointer implements Pointer {
     });
 
     // Scroll handlers
-    captureEvent(rootElement, "mousewheel", new EventHandler() {
+    String eventName = getMouseWheelEvent();
+    captureEvent(rootElement, eventName, new EventHandler() {
       @Override
       public void handleEvent(NativeEvent evt) {
         // We need to prevent the default so that the page doesn't scroll.
@@ -180,4 +181,16 @@ class HtmlPointer implements Pointer {
         + target.getOwnerDocument().getScrollTop();
   }
 
+  /**
+   * Return the appropriate mouse wheel event name for the current browser
+   * 
+   * @return return the mouse wheel event name for the current browser
+   */
+  static native String getMouseWheelEvent() /*-{
+    if (navigator.userAgent.toLowerCase().indexOf('firefox') != -1) {
+      return "DOMMouseScroll";
+    } else {
+      return "mousewheel";
+    }
+  }-*/;
 }
