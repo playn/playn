@@ -90,7 +90,6 @@ public class HtmlPlatform implements Platform {
   private HtmlPlatform() {
   }
   
-  @Override
   public void init() {
     // setup a few things early, instead of in run()
     log = new HtmlLog();

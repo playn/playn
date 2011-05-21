@@ -13,14 +13,8 @@
  */
 package forplay.android;
 
-import static forplay.core.ForPlay.log;
-
 import forplay.core.Analytics;
 
-class AndroidAnalytics implements Analytics {
+class AndroidAnalytics extends Analytics.AnalyticsImpl {
 
-  @Override
-  public void logEvent(String event) {
-    log().debug("Analytics Event : " + event);
-  }
 }

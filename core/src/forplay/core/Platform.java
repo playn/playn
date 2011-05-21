@@ -26,8 +26,6 @@ public interface Platform {
   
   AssetManager assetManager();
 
-  void init();
-
   Json json();
 
   Keyboard keyboard();

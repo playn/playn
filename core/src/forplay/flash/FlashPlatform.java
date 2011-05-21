@@ -88,7 +88,6 @@ public class FlashPlatform implements Platform {
   public FlashPlatform() {
   }
 
-  @Override
   public void init() {
     log = new FlashLog();
     regularExpression = new HtmlRegularExpression();

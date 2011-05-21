@@ -25,6 +25,7 @@ import forplay.core.Graphics;
 import forplay.core.Json;
 import forplay.core.Keyboard;
 import forplay.core.Log;
+import forplay.core.Mouse;
 import forplay.core.Net;
 import forplay.core.Platform;
 import forplay.core.Pointer;
@@ -101,6 +102,11 @@ public class AndroidPlatform implements Platform {
 	public void openURL(String url) {
 		// TODO(jgw): wtf is this doing here?
 	}
+
+  @Override
+  public Mouse mouse() {
+    return null;
+  }
 
 	@Override
 	public Pointer pointer() {
