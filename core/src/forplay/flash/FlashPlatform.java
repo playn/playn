@@ -37,6 +37,7 @@ import forplay.core.Log;
 import forplay.core.Net;
 import forplay.core.Platform;
 import forplay.core.Pointer;
+import forplay.core.Mouse;
 import forplay.core.RegularExpression;
 import forplay.html.HtmlRegularExpression;
 
@@ -76,6 +77,7 @@ public class FlashPlatform implements Platform {
   private FlashLog log;
   private FlashNet net;
   private FlashPointer pointer;
+  private FlashMouse mouse;
 
   private TimerCallback paintCallback;
   private TimerCallback updateCallback;
@@ -94,6 +96,7 @@ public class FlashPlatform implements Platform {
     audio = new FlashAudio();
     keyboard = new FlashKeyboard();
     pointer = new FlashPointer();
+    mouse = new FlashMouse();
     json = new FlashJson();
     graphics = new FlashGraphics();
     storage = new FlashStorage();
@@ -138,6 +141,11 @@ public class FlashPlatform implements Platform {
   @Override
   public Pointer pointer() {
     return pointer;
+  }
+
+  @Override
+  public Mouse mouse() {
+    return mouse;
   }
 
   @Override

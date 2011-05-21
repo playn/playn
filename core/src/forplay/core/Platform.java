@@ -38,6 +38,13 @@ public interface Platform {
 
   Pointer pointer();
 
+  /**
+   * Return the mouse if it is supported, or null otherwise.
+   * 
+   * @return the mouse if it is supported, or null otherwise.
+   */
+  Mouse mouse();
+
   Storage storage();
   
   Analytics analytics();

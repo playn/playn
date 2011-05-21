@@ -22,7 +22,6 @@ import com.google.gwt.dom.client.Element;
 import com.google.gwt.user.client.Window;
 
 import forplay.core.Storage;
-
 import forplay.core.Analytics;
 import forplay.core.Audio;
 import forplay.core.ForPlay;
@@ -34,6 +33,7 @@ import forplay.core.Log;
 import forplay.core.Net;
 import forplay.core.Platform;
 import forplay.core.Pointer;
+import forplay.core.Mouse;
 import forplay.core.RegularExpression;
 import forplay.html.HtmlGraphics.Renderer;
 
@@ -79,6 +79,7 @@ public class HtmlPlatform implements Platform {
   private HtmlLog log;
   private HtmlNet net;
   private HtmlPointer pointer;
+  private HtmlMouse mouse;
   private HtmlStorage storage;
 
   private TimerCallback paintCallback;
@@ -139,6 +140,11 @@ public class HtmlPlatform implements Platform {
   }
 
   @Override
+  public Mouse mouse() {
+    return mouse;
+  }
+
+  @Override
   public Storage storage() {
     return storage;
   }
@@ -173,6 +179,7 @@ public class HtmlPlatform implements Platform {
     }
 
     pointer = new HtmlPointer(graphics.getRootElement());
+    mouse = new HtmlMouse(graphics.getRootElement());
 
     final int updateRate = game.updateRate();
 
@@ -299,10 +306,10 @@ public class HtmlPlatform implements Platform {
   }
 
   /**
-   * Disables the right-click context menu.
+   * Disable the right-click context menu.
    */
-  public void disableRightClick() {
-    Element rootElement = ((HtmlGraphics) graphics()).getRootElement();
+  public static void disableRightClickContextMenu() {
+    Element rootElement = ((HtmlGraphics) ForPlay.graphics()).getRootElement();
     disableRightClickImpl(rootElement);
   }
 

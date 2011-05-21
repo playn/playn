@@ -23,6 +23,8 @@ import java.io.IOException;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 
+import forplay.core.Mouse;
+
 import forplay.core.Storage;
 
 import forplay.core.Analytics;
@@ -61,6 +63,7 @@ public class JavaPlatform implements Platform {
   private JavaLog log = new JavaLog();
   private JavaNet net = new JavaNet();
   private JavaPointer pointer;
+  private JavaMouse mouse;
   private JavaStorage storage;
   private JavaAssetManager assetManager = new JavaAssetManager();
 
@@ -110,6 +113,11 @@ public class JavaPlatform implements Platform {
   }
 
   @Override
+  public Mouse mouse() {
+    return mouse;
+  }
+
+  @Override
   public Storage storage() {
     return storage;
   }
@@ -138,6 +146,7 @@ public class JavaPlatform implements Platform {
     graphics = new JavaGraphics(frame, component);
     keyboard = new JavaKeyboard(frame);
     pointer = new JavaPointer(component);
+    mouse = new JavaMouse(component);
     storage = new JavaStorage();
 
     game.init();
@@ -206,17 +215,16 @@ public class JavaPlatform implements Platform {
   public RegularExpression regularExpression() {
     return regularExpression;
   }
-  
+
   @Override
   public void openURL(String url) {
-	System.out.println("Opening url: " + url);
-	String browser = "chrome ";
-	if (System.getProperty("os.name", "-").contains("indows"))
-		browser = "rundll32 url.dll,FileProtocolHandler ";
-	try {
-		Runtime.getRuntime().exec(browser + url);
-	}
-	catch (IOException e) {
-	}  
+    System.out.println("Opening url: " + url);
+    String browser = "chrome ";
+    if (System.getProperty("os.name", "-").contains("indows"))
+      browser = "rundll32 url.dll,FileProtocolHandler ";
+    try {
+      Runtime.getRuntime().exec(browser + url);
+    } catch (IOException e) {
+    }
   }
 }

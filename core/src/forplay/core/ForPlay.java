@@ -100,6 +100,13 @@ public class ForPlay {
   }
 
   /**
+   * Gets the {@link Mouse} input interface if supported, or null otherwise.
+   */
+  public static Mouse mouse() {
+    return platform.mouse();
+  }
+
+  /**
    * Gets the {@link Storage} storage interface.
    */
   public static Storage storage() {
