@@ -112,6 +112,17 @@ class HtmlImageLayerGL extends HtmlLayerGL implements ImageLayer {
   }
 
   @Override
+  public void setSize(float width, float height) {
+    assert width > 0;
+    assert height > 0;
+
+    widthSet = true;
+    this.width = width;
+    heightSet = true;
+    this.height = height;
+  }
+
+  @Override
   void paint(WebGLRenderingContext gl, Transform parentTransform) {
     // TODO(jgw): Assert exclusive source-rect vs. repeat.
 

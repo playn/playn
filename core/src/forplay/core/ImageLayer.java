@@ -75,4 +75,9 @@ public interface ImageLayer extends Layer {
    * TODO
    */
   void setWidth(float width);
+
+  /**
+   * TODO
+   */
+  void setSize(float width, float height);
 }

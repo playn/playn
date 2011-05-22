@@ -127,6 +127,23 @@ class JavaImageLayer extends JavaLayer implements ImageLayer {
   }
 
   @Override
+  public void setSize(float width, float height) {
+    assert width > 0;
+    assert height > 0;
+
+    widthSet = true;
+    if (this.width != width) {
+      this.width = width;
+      dirty = true;
+    }
+    heightSet = true;
+    if (this.height != height) {
+      this.height = height;
+      dirty = true;
+    }
+  }
+
+  @Override
   void paint(JavaCanvas canvas) {
     canvas.save();
     transform(canvas);

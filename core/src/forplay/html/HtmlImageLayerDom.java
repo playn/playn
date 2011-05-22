@@ -155,6 +155,19 @@ class HtmlImageLayerDom extends HtmlLayerDom implements ImageLayer {
     applySize();
   }
 
+  @Override
+  public void setSize(float width, float height) {
+    assert width > 0;
+    widthSet = true;
+
+    assert height > 0;
+    heightSet = true;
+
+    this.width = width;
+    this.height = height;
+    applySize();
+  }
+
   private void applyBackgroundSize() {
     Style style = element().getStyle();
 

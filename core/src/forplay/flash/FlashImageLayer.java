@@ -146,4 +146,13 @@ public class FlashImageLayer extends FlashLayer implements ImageLayer {
     // TODO Auto-generated method stub
 
   }
+
+  /* (non-Javadoc)
+   * @see forplay.core.ImageLayer#setSize(float, float)
+   */
+  @Override
+  public void setSize(float width, float height) {
+    // TODO Auto-generated method stub
+
+  }
 }
