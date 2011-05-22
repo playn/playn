@@ -23,12 +23,11 @@ import forplay.core.Touch;
 // so that we don't do a bunch of work copying all the native event
 // stuff into the TouchEvent[] array.
 class HtmlTouch extends HtmlInput implements Touch {
-
   private Listener listener;
   boolean inTouchSequence = false; // true when we are in a touch sequence (after touch start but before touch end)
 
-  // capture touch start on the root element, only.
   HtmlTouch(final Element rootElement) {
+    // capture touch start on the root element, only.
     captureEvent(rootElement, "touchstart", new EventHandler() {
       @Override
       public void handleEvent(NativeEvent evt) {

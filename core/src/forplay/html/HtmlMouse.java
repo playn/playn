@@ -18,53 +18,71 @@ import com.google.gwt.dom.client.NativeEvent;
 
 import forplay.core.Mouse;
 
-class HtmlMouse implements Mouse {
-
+class HtmlMouse extends HtmlInput implements Mouse {
   private Listener listener;
-  private Element capturingElement;
+  boolean inDragSequence = false; // true when we are in a drag sequence (after mouse down but before mouse up)
 
   HtmlMouse(final Element rootElement) {
+    // capture mouse down on the root element, only.
     captureEvent(rootElement, "mousedown", new EventHandler() {
       @Override
       public void handleEvent(NativeEvent evt) {
-        // Prevent the default so that the target element doesn't highlight.
-        evt.preventDefault();
-        // Set so we catch future events (mouse up) anywhere on the page
-        setCaptureAnywhere(rootElement);
         if (listener != null) {
+          // Prevent the default so that the target element doesn't highlight.
+          evt.preventDefault();
+
+          inDragSequence = true;
+
           listener.onMouseDown(getRelativeX(evt, rootElement), getRelativeY(evt, rootElement), getMouseButton(evt));
         }
       }
     });
-    captureEvent(rootElement, "mouseup", new EventHandler() {
+
+    // capture mouse up anywhere on the page as long as we are in a drag sequence
+    capturePageEvent("mouseup", new EventHandler() {
       @Override
       public void handleEvent(NativeEvent evt) {
-        // Prevent the default so that the target element doesn't highlight.
-        evt.preventDefault();
-        // Remove so we stop catching future events anywhere on the page
-        if (releaseCaptureAnywhere(rootElement)) {
-          if (listener != null) {
-            listener.onMouseUp(getRelativeX(evt, rootElement), getRelativeY(evt, rootElement), getMouseButton(evt));
-          }
+        if (listener != null && inDragSequence) {
+          // Prevent the default so that the target element doesn't highlight.
+          evt.preventDefault();
+
+          inDragSequence = false;
+
+          listener.onMouseUp(getRelativeX(evt, rootElement), getRelativeY(evt, rootElement), getMouseButton(evt));
         }
       }
     });
-    captureEvent(rootElement, "mousemove", new EventHandler() {
+
+    // capture mouse move anywhere on the page that fires only if we are in a drag sequence
+    capturePageEvent("mousemove", new EventHandler() {
       @Override
       public void handleEvent(NativeEvent evt) {
-        if (listener != null) {
+        if (listener != null && inDragSequence) {
+          evt.preventDefault();
           listener.onMouseMove(getRelativeX(evt, rootElement), getRelativeY(evt, rootElement));
         }
       }
     });
-    String eventName = getMouseWheelEvent();
-    captureEvent(rootElement, eventName, new EventHandler() {
+
+    // capture mouse move on the root element that fires only if we are not in a drag sequence
+    // (the page-level event listener will handle the firing when we are in a drag sequence)
+    captureEvent(rootElement, "mousemove", new EventHandler() {
       @Override
       public void handleEvent(NativeEvent evt) {
-        // We need to prevent the default so that the page doesn't scroll.
-        // The user can still scroll if the mouse isn't over the root element.
-        evt.preventDefault();
+        if (listener != null && !inDragSequence) {
+          listener.onMouseMove(getRelativeX(evt, rootElement), getRelativeY(evt, rootElement));
+        }
+      }
+    });
+
+    captureEvent(rootElement, getMouseWheelEvent(), new EventHandler() {
+      @Override
+      public void handleEvent(NativeEvent evt) {
         if (listener != null) {
+          // We need to prevent the default so that the page doesn't scroll.
+          // The user can still scroll if the mouse isn't over the root element.
+          evt.preventDefault();
+
           listener.onMouseWheelScroll(getMouseWheelVelocity(evt));
         }
       }
@@ -77,66 +95,10 @@ class HtmlMouse implements Mouse {
   }
 
   /**
-   * Helper method which allows element to 'capture' mouse/touch event which occur anywhere on the
-   * page.
-   */
-  protected void captureEvent(final Element elem, String eventName, final EventHandler handler) {
-    // register regular event handler on the element
-    HtmlPlatform.captureEvent(elem, eventName, handler);
-
-    // register page level handler, which fires when the provided element is the capturing element
-    HtmlPlatform.captureEvent(eventName, new EventHandler() {
-      @Override
-      public void handleEvent(NativeEvent evt) {
-        if (elem == capturingElement) {
-          handler.handleEvent(evt);
-        }
-      }
-    });
-  }
-
-  protected boolean releaseCaptureAnywhere(Element capturingElement) {
-    if (this.capturingElement == capturingElement) {
-      this.capturingElement = null;
-      return true;
-    } else {
-      return false;
-    }
-  }
-
-  protected void setCaptureAnywhere(Element capturingElement) {
-    this.capturingElement = capturingElement;
-  }
-
-  /**
-   * Gets the event's x-position relative to a given element.
-   * 
-   * @param e native event
-   * @param target the element whose coordinate system is to be used
-   * @return the relative x-position
-   */
-  protected static float getRelativeX(NativeEvent e, Element target) {
-    return e.getClientX() - target.getAbsoluteLeft() + target.getScrollLeft()
-        + target.getOwnerDocument().getScrollLeft();
-  }
-
-  /**
-   * Gets the event's y-position relative to a given element.
-   * 
-   * @param e native event
-   * @param target the element whose coordinate system is to be used
-   * @return the relative y-position
-   */
-  protected static float getRelativeY(NativeEvent e, Element target) {
-    return e.getClientY() - target.getAbsoluteTop() + target.getScrollTop()
-        + target.getOwnerDocument().getScrollTop();
-  }
-
-  /**
    * Return the mouse wheel velocity for the event
    */
   private static native float getMouseWheelVelocity(NativeEvent evt) /*-{
-    return -(evt.detail ? evt.detail * -1 : evt.wheelDelta / 40);
+    return evt.detail ? evt.detail : -1 * evt.wheelDelta / 40;
   }-*/;
 
   /**
