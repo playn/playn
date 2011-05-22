@@ -20,6 +20,7 @@ import forplay.core.Pointer;
 class AndroidPointer implements Pointer {
 
   private Listener listener;
+  private boolean inDragSequence = false; // true when we are in a drag sequence (after pointer start but before pointer end)
 
   @Override
   public void setListener(Listener listener) {
@@ -28,19 +29,23 @@ class AndroidPointer implements Pointer {
 
   void onPointerEnd(float x, float y) {
     if (listener != null) {
-      listener.onPointerEnd((int) x, (int) y);
+      inDragSequence = false;
+      listener.onPointerEnd(x, y);
     }
   }
 
   void onPointerMove(float x, float y) {
     if (listener != null) {
-      listener.onPointerMove((int) x, (int) y);
+      if (inDragSequence) {
+        listener.onPointerDrag(x, y);
+      }
     }
   }
 
   void onPointerStart(float x, float y) {
     if (listener != null) {
-      listener.onPointerStart((int) x, (int) y);
+      inDragSequence = true;
+      listener.onPointerStart(x, y);
     }
   }
 }

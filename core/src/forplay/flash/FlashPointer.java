@@ -52,8 +52,6 @@ class FlashPointer implements Pointer {
         if (listener != null) {
           if (mouseDown) {
             listener.onPointerDrag(evt.getStageX(), evt.getStageY());
-          } else {
-            listener.onPointerMove(evt.getStageX(), evt.getStageY());
           }
         }
       }

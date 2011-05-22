@@ -18,13 +18,12 @@ package forplay.java;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
-import java.awt.event.MouseWheelEvent;
-import java.awt.event.MouseWheelListener;
 
 import javax.swing.JComponent;
 
 import forplay.core.Pointer;
 
+// TODO(pdr): add touch support.
 class JavaPointer implements Pointer {
 
   private Listener listener;
@@ -38,9 +37,6 @@ class JavaPointer implements Pointer {
       }
 
       public void mouseMoved(MouseEvent e) {
-        if (listener != null) {
-          listener.onPointerMove(e.getX(), e.getY());
-        }
       }
     });
 
@@ -63,15 +59,6 @@ class JavaPointer implements Pointer {
       public void mouseReleased(MouseEvent e) {
         if (listener != null) {
           listener.onPointerEnd(e.getX(), e.getY());
-        }
-      }
-    });
-
-    frame.addMouseWheelListener(new MouseWheelListener() {
-      @Override
-      public void mouseWheelMoved(MouseWheelEvent e) {
-        if (listener != null) {
-          listener.onPointerScroll(e.getWheelRotation());
         }
       }
     });

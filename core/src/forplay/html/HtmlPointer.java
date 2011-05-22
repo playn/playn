@@ -18,179 +18,111 @@ import com.google.gwt.dom.client.NativeEvent;
 
 import forplay.core.Pointer;
 
-class HtmlPointer implements Pointer {
-
+class HtmlPointer extends HtmlInput implements Pointer {
   private Listener listener;
-  private boolean mouseDown;
-  private Element capturingElement;
+  boolean inDragSequence = false; // true when we are in a drag sequence (after pointer start but before pointer end)
 
   HtmlPointer(final Element rootElement) {
+    // capture mouse down on the root element, only.
     captureEvent(rootElement, "mousedown", new EventHandler() {
       @Override
       public void handleEvent(NativeEvent evt) {
-        // We need to prevent the default so that the target element doesn't
-        // highlight.
-        evt.preventDefault();
-        setCapture(rootElement);
-        mouseDown = true;
         if (listener != null) {
+          // Prevent the default so that the target element doesn't highlight.
+          evt.preventDefault();
+
+          inDragSequence = true;
+
           listener.onPointerStart(getRelativeX(evt, rootElement), getRelativeY(evt, rootElement));
         }
       }
     });
-    captureEvent(rootElement, "mouseup", new EventHandler() {
+
+    // capture mouse up anywhere on the page as long as we are in a drag sequence
+    capturePageEvent("mouseup", new EventHandler() {
       @Override
       public void handleEvent(NativeEvent evt) {
-        releaseCapture(rootElement);
-        mouseDown = false;
-        if (listener != null) {
+        if (listener != null && inDragSequence) {
+          // Prevent the default so that the target element doesn't highlight.
+          evt.preventDefault();
+
+          inDragSequence = false;
+
           listener.onPointerEnd(getRelativeX(evt, rootElement), getRelativeY(evt, rootElement));
         }
       }
     });
-    captureEvent(rootElement, "mousemove", new EventHandler() {
+
+    // capture mouse move anywhere on the page that fires only if we are in a drag sequence
+    capturePageEvent("mousemove", new EventHandler() {
       @Override
       public void handleEvent(NativeEvent evt) {
-        if (listener != null) {
-          if (mouseDown) {
-            listener.onPointerDrag(getRelativeX(evt, rootElement), getRelativeY(evt, rootElement));
-          } else {
-            listener.onPointerMove(getRelativeX(evt, rootElement), getRelativeY(evt, rootElement));
-          }
+        if (listener != null && inDragSequence) {
+          evt.preventDefault();
+          listener.onPointerDrag(getRelativeX(evt, rootElement), getRelativeY(evt, rootElement));
         }
       }
     });
 
-    // Touch handlers.
+    // capture touch start on the root element, only.
     captureEvent(rootElement, "touchstart", new EventHandler() {
       @Override
       public void handleEvent(NativeEvent evt) {
         if (listener != null) {
-          if (evt.getTouches().length() == 0) {
-            return;
+          // Prevent the default so that the target element doesn't highlight.
+          evt.preventDefault();
+
+          if (evt.getTouches().length() > 0) {
+            inDragSequence = true;
+            com.google.gwt.dom.client.Touch touch = evt.getTouches().get(0);
+            float x = touch.getRelativeX(rootElement);
+            float y = touch.getRelativeY(rootElement);
+            listener.onPointerStart(x, y);
           }
-          setCapture(rootElement);
-          // TODO(pdr): these may need to call getRelativeX/getRelativeY.
-          int x = evt.getTouches().get(0).getClientX();
-          int y = evt.getTouches().get(0).getClientY();
-          listener.onPointerStart(x, y);
         }
       }
     });
-    captureEvent(rootElement, "touchend", new EventHandler() {
+
+    // capture touch end anywhere on the page as long as we are in a drag sequence
+    capturePageEvent("touchend", new EventHandler() {
       @Override
       public void handleEvent(NativeEvent evt) {
-        if (listener != null) {
-          if (evt.getTouches().length() == 0) {
-            return;
+        if (listener != null && inDragSequence) {
+          // Prevent the default so that the target element doesn't highlight.
+          evt.preventDefault();
+
+          if (evt.getTouches().length() > 0) {
+            inDragSequence = false;
+            com.google.gwt.dom.client.Touch touch = evt.getTouches().get(0);
+            float x = touch.getRelativeX(rootElement);
+            float y = touch.getRelativeY(rootElement);
+            listener.onPointerEnd(x, y);
           }
-          releaseCapture(rootElement);
-          // TODO(pdr): these may need to call getRelativeX/getRelativeY.
-          int x = evt.getTouches().get(0).getClientX();
-          int y = evt.getTouches().get(0).getClientY();
-          listener.onPointerEnd(x, y);
         }
       }
     });
-    captureEvent(rootElement, "touchmove", new EventHandler() {
+
+    // capture touch move anywhere on the page as long as we are in a drag sequence
+    capturePageEvent("touchmove", new EventHandler() {
       @Override
       public void handleEvent(NativeEvent evt) {
-        if (listener != null) {
-          if (evt.getTouches().length() == 0) {
-            return;
+        if (listener != null && inDragSequence) {
+          // Prevent the default so that the target element doesn't highlight.
+          evt.preventDefault();
+
+          if (evt.getTouches().length() > 0) {
+            com.google.gwt.dom.client.Touch touch = evt.getTouches().get(0);
+            float x = touch.getRelativeX(rootElement);
+            float y = touch.getRelativeY(rootElement);
+            listener.onPointerDrag(x, y);
           }
-          // TODO(pdr): these may need to call getRelativeX/getRelativeY.
-          int x = evt.getTouches().get(0).getClientX();
-          int y = evt.getTouches().get(0).getClientY();
-          listener.onPointerDrag(x, y);
         }
       }
     });
-
-    // Scroll handlers
-    String eventName = getMouseWheelEvent();
-    captureEvent(rootElement, eventName, new EventHandler() {
-      @Override
-      public void handleEvent(NativeEvent evt) {
-        // We need to prevent the default so that the page doesn't scroll.
-        // The user can still scroll if the mouse isn't over the root element.
-        evt.preventDefault();
-        if (listener != null) {
-          listener.onPointerScroll(evt.getMouseWheelVelocityY());
-        }
-      }
-    });
-  }
-
-  /**
-   * Helper method which allows element to 'capture' mouse/touch event which occur anywhere on the
-   * page.
-   */
-  private void captureEvent(final Element elem, String eventName, final EventHandler handler) {
-
-    // register regular event handler on the element
-    HtmlPlatform.captureEvent(elem, eventName, handler);
-
-    // register page level handler, which fires when the provided element is the capturing element
-    HtmlPlatform.captureEvent(eventName, new EventHandler() {
-      @Override
-      public void handleEvent(NativeEvent evt) {
-        if (elem == capturingElement) {
-          handler.handleEvent(evt);
-        }
-      }
-    });
-  }
-
-  protected void releaseCapture(Element capturingElement) {
-    if (this.capturingElement == capturingElement) {
-      this.capturingElement = null;
-    }
-  }
-
-  protected void setCapture(Element capturingElement) {
-    this.capturingElement = capturingElement;
   }
 
   @Override
   public void setListener(Listener listener) {
     this.listener = listener;
   }
-
-  /**
-   * Gets the event's x-position relative to a given element.
-   * 
-   * @param e native event
-   * @param target the element whose coordinate system is to be used
-   * @return the relative x-position
-   */
-  static int getRelativeX(NativeEvent e, Element target) {
-    return e.getClientX() - target.getAbsoluteLeft() + target.getScrollLeft()
-        + target.getOwnerDocument().getScrollLeft();
-  }
-
-  /**
-   * Gets the event's y-position relative to a given element.
-   * 
-   * @param e native event
-   * @param target the element whose coordinate system is to be used
-   * @return the relative y-position
-   */
-  static int getRelativeY(NativeEvent e, Element target) {
-    return e.getClientY() - target.getAbsoluteTop() + target.getScrollTop()
-        + target.getOwnerDocument().getScrollTop();
-  }
-
-  /**
-   * Return the appropriate mouse wheel event name for the current browser
-   * 
-   * @return return the mouse wheel event name for the current browser
-   */
-  static native String getMouseWheelEvent() /*-{
-    if (navigator.userAgent.toLowerCase().indexOf('firefox') != -1) {
-      return "DOMMouseScroll";
-    } else {
-      return "mousewheel";
-    }
-  }-*/;
 }

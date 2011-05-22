@@ -26,32 +26,17 @@ public interface Pointer {
     /**
      * Called when the pointer event starts.
      */
-    void onPointerStart(int x, int y);
+    void onPointerStart(float x, float y);
 
     /**
      * Called when the pointer event ends.
      */
-    void onPointerEnd(int x, int y);
-
-    /**
-     * Called when the pointer moves (always between start/end events).
-     */
-    void onPointerMove(int x, int y);
+    void onPointerEnd(float x, float y);
 
     /**
      * Called when the pointer drags (always between start/end events).
-     * 
-     * Note: touch-based devices will call onPointerDrag() when the touch moves.
      */
-    void onPointerDrag(int x, int y);
-
-    /**
-     * Called when pointer scrolls occur.
-     * 
-     * On mouse devices, this will be the scroll wheel. Negative velocity
-     * corresponds to scrolling north/up. Each scroll 'click' is 1 velocity.
-     */
-    void onPointerScroll(int velocity);
+    void onPointerDrag(float x, float y);
   }
 
   /**
