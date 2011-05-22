@@ -15,6 +15,8 @@
  */
 package forplay.android;
 
+import forplay.core.Touch;
+
 import android.graphics.Canvas;
 import forplay.core.Analytics;
 import forplay.core.AssetManager;
@@ -29,6 +31,7 @@ import forplay.core.Mouse;
 import forplay.core.Net;
 import forplay.core.Platform;
 import forplay.core.Pointer;
+import forplay.core.Touch;
 import forplay.core.RegularExpression;
 import forplay.core.Storage;
 import forplay.java.JavaJson;
@@ -105,6 +108,12 @@ public class AndroidPlatform implements Platform {
 
   @Override
   public Mouse mouse() {
+    return null;
+  }
+
+  @Override
+  public Touch touch() {
+    // TODO(pdr): need to implement this.
     return null;
   }
 

@@ -23,10 +23,6 @@ import java.io.IOException;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 
-import forplay.core.Mouse;
-
-import forplay.core.Storage;
-
 import forplay.core.Analytics;
 import forplay.core.Audio;
 import forplay.core.ForPlay;
@@ -37,6 +33,9 @@ import forplay.core.Log;
 import forplay.core.Net;
 import forplay.core.Platform;
 import forplay.core.Pointer;
+import forplay.core.Mouse;
+import forplay.core.Touch;
+import forplay.core.Storage;
 import forplay.core.RegularExpression;
 
 public class JavaPlatform implements Platform {
@@ -110,6 +109,12 @@ public class JavaPlatform implements Platform {
   @Override
   public Mouse mouse() {
     return mouse;
+  }
+
+  @Override
+  public Touch touch() {
+    // TODO(pdr): need to implement this.
+    return null;
   }
 
   @Override

@@ -34,6 +34,7 @@ import forplay.core.Net;
 import forplay.core.Platform;
 import forplay.core.Pointer;
 import forplay.core.Mouse;
+import forplay.core.Touch;
 import forplay.core.RegularExpression;
 import forplay.html.HtmlGraphics.Renderer;
 
@@ -80,6 +81,7 @@ public class HtmlPlatform implements Platform {
   private HtmlNet net;
   private HtmlPointer pointer;
   private HtmlMouse mouse;
+  private HtmlTouch touch;
   private HtmlStorage storage;
 
   private TimerCallback paintCallback;
@@ -144,6 +146,11 @@ public class HtmlPlatform implements Platform {
   }
 
   @Override
+  public Touch touch() {
+    return touch;
+  }
+
+  @Override
   public Storage storage() {
     return storage;
   }
@@ -179,6 +186,7 @@ public class HtmlPlatform implements Platform {
 
     pointer = new HtmlPointer(graphics.getRootElement());
     mouse = new HtmlMouse(graphics.getRootElement());
+    touch = new HtmlTouch(graphics.getRootElement());
 
     final int updateRate = game.updateRate();
 

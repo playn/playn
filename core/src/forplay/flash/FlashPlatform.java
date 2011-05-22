@@ -18,6 +18,8 @@ package forplay.flash;
 import com.google.gwt.core.client.Duration;
 import com.google.gwt.core.client.JavaScriptObject;
 
+import forplay.core.Touch;
+
 import flash.events.Event;
 
 import forplay.core.Storage;
@@ -145,6 +147,12 @@ public class FlashPlatform implements Platform {
   @Override
   public Mouse mouse() {
     return mouse;
+  }
+
+  @Override
+  public Touch touch() {
+    // TODO(pdr): need to implement this.
+    return null;
   }
 
   @Override

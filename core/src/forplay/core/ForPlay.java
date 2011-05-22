@@ -107,6 +107,13 @@ public class ForPlay {
   }
 
   /**
+   * Gets the {@link Touch} input interface if supported, or null otherwise.
+   */
+  public static Touch touch() {
+    return platform.touch();
+  }
+
+  /**
    * Gets the {@link Storage} storage interface.
    */
   public static Storage storage() {

@@ -38,8 +38,10 @@ public interface Platform {
 
   Mouse mouse();
 
+  Touch touch();
+
   Storage storage();
-  
+
   Analytics analytics();
 
   float random();

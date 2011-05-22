@@ -93,8 +93,8 @@ public interface Mouse {
   }
 
   /**
-   * Sets the listener that will receive pointer events. Setting the listener to
-   * <code>null</code> will cause pointer events to stop being fired.
+   * Sets the listener that will receive mouse events. Setting the listener to
+   * <code>null</code> will cause mouse events to stop being fired.
    */
   void setListener(Listener listener);
 }
