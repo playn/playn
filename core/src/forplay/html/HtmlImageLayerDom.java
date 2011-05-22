@@ -184,5 +184,8 @@ class HtmlImageLayerDom extends HtmlLayerDom implements ImageLayer {
     Style style = element().getStyle();
     style.setWidth(widthSet ? width : htmlImage.img.getWidth(), Unit.PX);
     style.setHeight(heightSet ? height : htmlImage.img.getHeight(), Unit.PX);
+    if (sourceRectSet) {
+      applyBackgroundSize();
+    }
   }
 }
