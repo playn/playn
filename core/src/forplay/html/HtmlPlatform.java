@@ -36,7 +36,7 @@ import forplay.core.Pointer;
 import forplay.core.Mouse;
 import forplay.core.Touch;
 import forplay.core.RegularExpression;
-import forplay.html.HtmlGraphics.Renderer;
+import forplay.html.HtmlUrlParameters.Renderer;
 
 public class HtmlPlatform implements Platform {
 
@@ -274,8 +274,7 @@ public class HtmlPlatform implements Platform {
    * @return true if renderer query parameter equals {@link Renderer#GL} or is not set, and the browser supports WebGL
    */
   private boolean shouldUseGL() {
-    String renderer = getUrlParameter(Renderer.URL_QUERY_PARAMETER);
-    boolean useGlFromFlag = (renderer == null || Renderer.GL.equals(renderer));
+    boolean useGlFromFlag = Renderer.shouldUseGL();
     return (useGlFromFlag && hasGLSupport());
   }
 

@@ -33,12 +33,6 @@ import forplay.core.Pattern;
 
 public abstract class HtmlGraphics implements Graphics {
   
-  public static interface Renderer {
-    static final String URL_QUERY_PARAMETER = "renderer";
-    static final String CANVAS = "canvas";
-    static final String GL = "gl";
-  }
-
   static CssColor cssColor(int color) {
     return CssColor.make(cssColorString(color));
   }
