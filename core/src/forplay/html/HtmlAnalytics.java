@@ -60,7 +60,7 @@ public class HtmlAnalytics implements Analytics {
 
   public native void logEventImpl(String category, String action) /*-{
     $wnd._gaq.push([
-        '_trackEvent', category, event
+        '_trackEvent', category, action
     ]);
   }-*/;
 
