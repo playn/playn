@@ -131,6 +131,9 @@ class HtmlImageLayerDom extends HtmlLayerDom implements ImageLayer {
   public void setSourceRect(float sx, float sy, float sw, float sh) {
     assert !repeatX && !repeatY;
 
+    // Will cause div-by-zero
+    assert sw != 0 && sh != 0;
+
     // Early out if there's no change. applyBackgroundSize() isn't free.
     if (sourceRectSet &&
         (this.sx == sx) && (this.sy == sy) &&
@@ -178,8 +181,14 @@ class HtmlImageLayerDom extends HtmlLayerDom implements ImageLayer {
 
     // Set background-size to get the right pinning behavior.
     if (sourceRectSet) {
-      float wratio = widthSet ? (width / sw) : 1;
-      float hratio = heightSet ? (height / sh) : 1;
+      float wratio = widthSet ? (width / sw) : (image().width() / sw);
+      float hratio = heightSet ? (height / sh) : (image().height() / sh);
+      if (wratio == 0) {
+        wratio = 1;
+      }
+      if (hratio == 0) {
+        hratio = 1;
+      }
       float backWidth = image().width() * wratio;
       float backHeight = image().height() * hratio;
 
