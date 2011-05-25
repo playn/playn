@@ -94,6 +94,12 @@ class AndroidImageLayer extends AndroidLayer implements ImageLayer {
   }
 
   @Override
+  public void setSize(float width, float height) {
+    setWidth(width);
+    setHeight(height);
+  }
+
+  @Override
   public void setSourceRect(float sx, float sy, float sw, float sh) {
     assert !repeatX && !repeatY;
 
