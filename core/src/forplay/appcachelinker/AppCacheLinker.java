@@ -85,7 +85,7 @@ public class AppCacheLinker extends IFrameLinker {
     return new String[]{
         // .wav files explicitly excluded, since HTML games use .mp3
         ".js", ".html", ".jpg", ".jpeg", ".png", ".gif", ".mp3", ".ogg", ".mov", ".avi", ".wmv",
-        ".webm", ".css", ".json", ".flv", ".swf",};
+        ".webm", ".css", ".json", ".flv", ".swf", "/", };
   }
 
   /**
