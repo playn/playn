@@ -1,16 +1,14 @@
 /**
  * Copyright 2010 The ForPlay Authors
  * 
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not
- * use this file except in compliance with the License. You may obtain a copy of
- * the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
  * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
- * License for the specific language governing permissions and limitations under
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
  * the License.
  */
 package forplay.html;
@@ -56,11 +54,12 @@ public class HtmlPlatform implements Platform {
     return platform;
   }
 
-  static native void addEventListener(JavaScriptObject target, String name, EventHandler handler, boolean capture) /*-{
-  	target.addEventListener(name, function(e) {
-      handler.@forplay.html.EventHandler::handleEvent(Lcom/google/gwt/dom/client/NativeEvent;)(e);
-    }, capture);
-  }-*/;
+  static native void addEventListener(JavaScriptObject target, String name, EventHandler handler,
+      boolean capture) /*-{
+                       target.addEventListener(name, function(e) {
+                       handler.@forplay.html.EventHandler::handleEvent(Lcom/google/gwt/dom/client/NativeEvent;)(e);
+                       }, capture);
+                       }-*/;
 
   static void captureEvent(String name, EventHandler handler) {
     captureEvent(null, name, handler);
@@ -91,13 +90,24 @@ public class HtmlPlatform implements Platform {
   // Non-instantiable.
   private HtmlPlatform() {
   }
-  
+
   public void init() {
-    // setup a few things early, instead of in run()
+    // Setup logging first, so it can be used by other subsystems
     log = new HtmlLog();
-    audio = new HtmlAudio();
-    storage = new HtmlStorage();
-    analytics = new HtmlAnalytics();
+
+    /*
+     * Wrap remaining calls in try-catch, since the UncaughtExceptionHandler installed by HtmlLog
+     * above won't take effect until we yield to the browser event loop. That means we have to catch
+     * our own exceptions here.
+     */
+    try {
+      audio = new HtmlAudio();
+      storage = new HtmlStorage();
+      analytics = new HtmlAnalytics();
+    } catch (Throwable e) {
+      log.error("init()", e);
+      Window.alert("failed to init(): " + e.getMessage());
+    }
   }
 
   @Override
@@ -159,7 +169,7 @@ public class HtmlPlatform implements Platform {
   public Analytics analytics() {
     return analytics;
   }
-  
+
   @Override
   public float random() {
     return (float) Math.random();
@@ -202,7 +212,7 @@ public class HtmlPlatform implements Platform {
       public void fire() {
         requestAnimationFrame(paintCallback);
         double now = time();
-        float delta = (float)(now - lastTime);
+        float delta = (float) (now - lastTime);
         if (delta > MAX_DELTA) {
           delta = MAX_DELTA;
         }
@@ -243,35 +253,43 @@ public class HtmlPlatform implements Platform {
   }
 
   private native JavaScriptObject getWindow() /*-{
-    return $wnd;
-  }-*/;
+                                              return $wnd;
+                                              }-*/;
 
   private native void requestAnimationFrame(TimerCallback callback) /*-{
-    var fn = function() { callback.@forplay.html.TimerCallback::fire()(); };
-    if ($wnd.requestAnimationFrame) {
-      $wnd.requestAnimationFrame(fn);
-    } else if ($wnd.mozRequestAnimationFrame) {
-      $wnd.mozRequestAnimationFrame(fn);
-    } else if ($wnd.webkitRequestAnimationFrame) {
-      $wnd.webkitRequestAnimationFrame(fn);
-    } else {
-      // 20ms => 50fps
-      $wnd.setTimeout(fn, 20);
-    }
-  }-*/;
+                                                                    var fn = function() {
+                                                                    callback.@forplay.html.TimerCallback::fire()();
+                                                                    };
+                                                                    if ($wnd.requestAnimationFrame) {
+                                                                    $wnd.requestAnimationFrame(fn);
+                                                                    } else if ($wnd.mozRequestAnimationFrame) {
+                                                                    $wnd.mozRequestAnimationFrame(fn);
+                                                                    } else if ($wnd.webkitRequestAnimationFrame) {
+                                                                    $wnd.webkitRequestAnimationFrame(fn);
+                                                                    } else {
+                                                                    // 20ms => 50fps
+                                                                    $wnd.setTimeout(fn, 20);
+                                                                    }
+                                                                    }-*/;
 
   private native int setInterval(TimerCallback callback, int ms) /*-{
-    return $wnd.setInterval(function() { callback.@forplay.html.TimerCallback::fire()(); }, ms);
-  }-*/;
+                                                                 return $wnd.setInterval(function() {
+                                                                 callback.@forplay.html.TimerCallback::fire()();
+                                                                 }, ms);
+                                                                 }-*/;
 
   private native int setTimeout(TimerCallback callback, int ms) /*-{
-    return $wnd.setTimeout(function() { callback.@forplay.html.TimerCallback::fire()(); }, ms);
-  }-*/;
+                                                                return $wnd.setTimeout(function() {
+                                                                callback.@forplay.html.TimerCallback::fire()();
+                                                                }, ms);
+                                                                }-*/;
 
   /**
-   * Return true if renderer query parameter equals {@link Renderer#GL} or is not set, and the browser supports WebGL
+   * Return true if renderer query parameter equals {@link Renderer#GL} or is not set, and the
+   * browser supports WebGL
    * 
-   * @return true if renderer query parameter equals {@link Renderer#GL} or is not set, and the browser supports WebGL
+   * @return true if renderer query parameter equals {@link Renderer#GL} or is not set, and the
+   *         browser supports WebGL
    */
   private boolean shouldUseGL() {
     boolean useGlFromFlag = Renderer.shouldUseGL();
@@ -286,15 +304,14 @@ public class HtmlPlatform implements Platform {
    * @return true if the browser supports WebGL
    */
   private native boolean hasGLSupport() /*-{
-    return !!$wnd.WebGLRenderingContext &&
-      // WebGL is slow on Chrome OSX 10.5 
-      (!/Chrome/.test(navigator.userAgent) || !/OS X 10_5/.test(navigator.userAgent));
-  }-*/;
+                                        return !!$wnd.WebGLRenderingContext &&
+                                        // WebGL is slow on Chrome OSX 10.5 
+                                        (!/Chrome/.test(navigator.userAgent) || !/OS X 10_5/.test(navigator.userAgent));
+                                        }-*/;
 
   /**
-   * Gets the URL's parameter of the specified name. Note that if multiple
-   * parameters have been specified with the same name, the last one will be
-   * returned.
+   * Gets the URL's parameter of the specified name. Note that if multiple parameters have been
+   * specified with the same name, the last one will be returned.
    * 
    * @param name the name of the URL's parameter
    * @return the value of the URL's parameter
@@ -308,7 +325,7 @@ public class HtmlPlatform implements Platform {
    */
   @Override
   public void openURL(String url) {
-	  Window.open(url, "_blank", "");
+    Window.open(url, "_blank", "");
   }
 
   /**
@@ -320,6 +337,8 @@ public class HtmlPlatform implements Platform {
   }
 
   private static native void disableRightClickImpl(JavaScriptObject target) /*-{
-    target.oncontextmenu = function() {return false;};
-  }-*/;
+                                                                            target.oncontextmenu = function() {
+                                                                            return false;
+                                                                            };
+                                                                            }-*/;
 }
