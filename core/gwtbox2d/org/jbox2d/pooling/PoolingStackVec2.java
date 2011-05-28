@@ -25,7 +25,7 @@ public class PoolingStackVec2 extends PoolingStack<Vec2>{
     return pool[index++];
   }
 
-  @Override
+  @Override @SuppressWarnings("fallthrough")
   public org.jbox2d.pooling.PoolingStack.PoolContainer<Vec2> pop(int argNum) {
     assert(index + argNum < size) : "End of stack reached, there is probably a leak somewhere";
     

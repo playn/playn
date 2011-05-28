@@ -39,7 +39,8 @@ public class JreJsonArray extends JreJsonValue implements JsonArray {
   }
 
   public <T extends JsonValue> T get(int index) {
-    return (T) arrayValues.get(index);
+    @SuppressWarnings("unchecked") T value = (T) arrayValues.get(index);
+    return value;
   }
 
   public Object getObject() {

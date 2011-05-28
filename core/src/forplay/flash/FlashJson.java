@@ -96,7 +96,7 @@ class FlashJson  implements Json {
      */
     @Override
     public double getNumber(int index) {
-      JsonValue n = (JsonValue) arr.get(index);
+      JsonValue n = arr.get(index);
       return n != null ? ((JsonNumber) n).getNumber() : 0;
     }
 
@@ -113,7 +113,7 @@ class FlashJson  implements Json {
      */
     @Override
     public String getString(int index) {
-      JsonValue s = (JsonValue) arr.get(index);
+      JsonValue s = arr.get(index);
       return s != null ? ((JsonString)s).getString() : "";
     }
 

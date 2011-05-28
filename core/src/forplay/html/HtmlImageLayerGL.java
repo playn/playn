@@ -128,7 +128,7 @@ class HtmlImageLayerGL extends HtmlLayerGL implements ImageLayer {
 
     WebGLTexture tex = img.ensureTexture(gfx, repeatX, repeatY);
     if (tex != null) {
-      ImageElement elem = (ImageElement) img.img;
+      ImageElement elem = img.img;
 
       Transform xform = localTransform(parentTransform);
 

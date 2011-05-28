@@ -52,7 +52,7 @@ class HtmlImage implements Image {
 
   @Override
   public int height() {
-    return img == null ? 0 : ((ImageElement)img).getHeight();
+    return img == null ? 0 : img.getHeight();
   }
 
   @Override
@@ -63,7 +63,7 @@ class HtmlImage implements Image {
 
   @Override
   public int width() {
-    return img == null ? 0 : ((ImageElement)img).getWidth();
+    return img == null ? 0 : img.getWidth();
   }
 
   public void addCallback(final ResourceCallback<Image> callback) {

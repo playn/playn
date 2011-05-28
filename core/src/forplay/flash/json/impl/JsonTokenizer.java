@@ -94,7 +94,7 @@ class JsonTokenizer {
   int nextNonWhitespace() {
     while (true) {
       final int c = next();
-      if (!Character.isSpace((char) c)) {
+      if (!isSpace((char) c)) {
         return c;
       }
     }
@@ -150,7 +150,7 @@ class JsonTokenizer {
     final StringBuffer buffer = new StringBuffer();
     int c = next();
     while (c != INVALID_CHAR) {
-      if (Character.isSpace((char) c) || chars.indexOf((char) c) >= 0) {
+      if (isSpace((char) c) || chars.indexOf((char) c) >= 0) {
         back(c);
         break;
       }
@@ -163,17 +163,24 @@ class JsonTokenizer {
   <T extends JsonValue> T nextValue() throws JsonException {
     final int c = nextNonWhitespace();
     back(c);
+    JsonValue result;
     switch (c) {
       case '"':
       case '\'':
-        return (T) jsonFactory.create(nextString(c));
+        result = jsonFactory.create(nextString(c));
+        break;
       case '{':
-        return (T) parseObject();
+        result = parseObject();
+        break;
       case '[':
-        return (T) parseArray();
+        result = parseArray();
+        break;
       default:
-        return (T) getValueForLiteral(nextUntilOneOf(STOPCHARS));
+        result = getValueForLiteral(nextUntilOneOf(STOPCHARS));
+        break;
     }
+    @SuppressWarnings("unchecked") T value = (T) result;
+    return value;
   }
 
   JsonArray parseArray() throws JsonException {
@@ -317,5 +324,11 @@ class JsonTokenizer {
     System.arraycopy(result, 0, buffer, pos, maxLen);
     position += maxLen;
     return maxLen;
+  }
+
+  // TODO: switch to Character.isWhitespace if GWT ever implements it
+  @SuppressWarnings("deprecation")
+  private static boolean isSpace (char c) {
+      return Character.isSpace(c);
   }
 }

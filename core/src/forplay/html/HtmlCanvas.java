@@ -74,14 +74,14 @@ class HtmlCanvas implements Canvas {
   @Override
   public void drawImage(Image img, float x, float y) {
     assert img instanceof HtmlImage;
-    ctx.drawImage((ImageElement) (((HtmlImage) img).img), x, y);
+    ctx.drawImage(((HtmlImage) img).img, x, y);
     dirty = true;
   }
 
   @Override
   public void drawImage(Image img, float x, float y, float w, float h) {
     assert img instanceof HtmlImage;
-    ctx.drawImage((ImageElement) (((HtmlImage) img).img), x, y, w, h);
+    ctx.drawImage(((HtmlImage) img).img, x, y, w, h);
     dirty = true;
   }
 
@@ -89,7 +89,7 @@ class HtmlCanvas implements Canvas {
   public void drawImage(Image img, float dx, float dy, float dw, float dh,
       float sx, float sy, float sw, float sh) {
     assert img instanceof HtmlImage;
-    ctx.drawImage((ImageElement) (((HtmlImage) img).img), sx, sy, sw, sh, dx,
+    ctx.drawImage(((HtmlImage) img).img, sx, sy, sw, sh, dx,
         dy, dw, dh);
     dirty = true;
   }

@@ -61,6 +61,7 @@ public class JreJsonFactory implements JsonFactory {
        // some clients send in (json) expecting an eval is required
        jsonString = jsonString.substring(1, jsonString.length() - 1);
     }
-    return (T) new JsonTokenizer(this, jsonString).nextValue();
+    @SuppressWarnings("unchecked") T value = (T) new JsonTokenizer(this, jsonString).nextValue();
+    return value;
   }
 }

@@ -214,7 +214,8 @@ public class JsonUtil {
   }
 
   public static <T extends JsonValue> T parse(String json) throws JsonException {
-      return (T) Json.instance().parse(json);
+      @SuppressWarnings("unchecked") T value = (T) Json.instance().parse(json);
+      return value;
   }
 
   /**
