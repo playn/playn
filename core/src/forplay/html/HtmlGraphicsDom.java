@@ -31,6 +31,7 @@ class HtmlGraphicsDom extends HtmlGraphics {
   public HtmlGraphicsDom() {
     Element div = Document.get().createDivElement();
     div.getStyle().setOverflow(Overflow.HIDDEN);
+    rootElement.setInnerHTML(""); // clear
     rootElement.appendChild(div);
 
     rootLayer = new HtmlGroupLayerDom(div);
