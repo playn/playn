@@ -519,7 +519,7 @@ group.add_option("-r", "--reviewers", action="store", dest="reviewers",
                  metavar="REVIEWERS", default=None,
                  help="Add reviewers (comma separated email addresses).")
 group.add_option("--cc", action="store", dest="cc",
-                 metavar="CC", default="gwt-forplay+reviews@appspot.com",
+                 metavar="CC", default="gwt-forplay+reviews@googlegroups.com",
                  help="Add CC (comma separated email addresses).")
 group.add_option("--private", action="store_true", dest="private",
                  default=False,
