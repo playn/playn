@@ -16,10 +16,18 @@
 package forplay.core;
 
 /**
- * TODO
- * 
- * TODO: alpha, z-index, clipping (?), visibility
- * transform-origin: allow explicit "center, top-left, bottom-right" like CSS transform-origin?
+ * Layer is the base element for all rendering in ForPlay
+ * <p>
+ * Each layer has a transformation matrix {@link #transform()} and several other associated
+ * properties which can be manipulated directly (changes take effect automatically on the next
+ * rendered frame).
+ * <p>
+ * The root of the layer hierarchy is the {@link Graphics#rootLayer() rootLayer} . All coordinates
+ * in a layer are transformed by the layer's transformation matrix, and each child layer is
+ * positioned by the transformation matrix of it's parent.
+ * <p>
+ * TODO: alpha, z-index, clipping (?), visibility TODO: transform-origin: allow explicit
+ * "center, top-left, bottom-right" like CSS transform-origin?
  */
 public interface Layer {
 
@@ -31,42 +39,74 @@ public interface Layer {
   void destroy();
 
   /**
-   * Whether this layer has been destroyed. If so, it can no longer be used.
+   * Whether this layer has been destroyed. If true, the layer can no longer be used.
    */
   boolean isDestroyed();
 
   /**
-   * TODO
+   * Returns the parent that contains this layer, or {@code null}.
    */
   GroupLayer parent();
 
   /**
-   * TODO
+   * Returns the layer's transformation matrix.
    */
   Transform transform();
 
   /**
-   * TODO
+   * Sets the origin of the layer.
+   * <p>
+   * This sets the origin of the layer's transformation matrix.
+   * 
+   * @param x origin on x axis
+   * @param y origin on y axis
    */
   void setOrigin(float x, float y);
 
   /**
-   * TODO
+   * Sets the translation of the layer.
+   * <p>
+   * This sets the translation of the layer's transformation matrix so coordinates in the layer will
+   * be translated by this amount.
+   * 
+   * @param x translation on x axis
+   * @param y translation on y axis
    */
   void setTranslation(float x, float y);
 
   /**
-   * TODO
+   * Sets the scale of the layer.
+   * <p>
+   * This sets the scale of the layer's transformation matrix so coordinates in the layer will be
+   * multiplied by this scale.
+   * <p>
+   * Note that a scale of {@code 1} is equivalent to no scale.
+   * 
+   * @param x non-zero scale value
    */
   void setScale(float x);
 
   /**
-   * TODO
+   * Sets the scale of the layer.
+   * <p>
+   * This sets the scale of the layer's transformation matrix so coordinates in the layer will be
+   * multiplied by this scale.
+   * <p>
+   * Note that a scale of {@code 1} is equivalent to no scale.
+   * 
+   * @param x non-zero scale value on the x axis
+   * @param y non-zero scale value on the y axis
    */
   void setScale(float x, float y);
 
   /**
-   * TODO
+   * Sets the rotation of the layer.
+   * <p>
+   * This sets the rotation of the layer's transformation matrix so coordinates in the layer will be
+   * rotated by this angle.
+   * <p>
+   * 
+   * @param angle angle to rotate, in radians
    */
   void setRotation(float angle);
 }

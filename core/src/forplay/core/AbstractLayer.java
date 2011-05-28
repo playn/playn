@@ -56,11 +56,13 @@ public abstract class AbstractLayer implements Layer {
 
   @Override
   public void setScale(float s) {
+    assert s != 0;
     transform.setScale(s);
   }
 
   @Override
   public void setScale(float x, float y) {
+    assert x != 0 && y != 0;
     transform.setScale(x, y);
   }
 
