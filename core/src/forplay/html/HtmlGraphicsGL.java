@@ -440,7 +440,6 @@ class HtmlGraphicsGL extends HtmlGraphics {
 
   private void createCanvas() {
     canvas = Document.get().createCanvasElement();
-    rootElement.setInnerHTML(""); // clear contents
     rootElement.appendChild(canvas);
   }
 

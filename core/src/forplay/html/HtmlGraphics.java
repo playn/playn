@@ -68,6 +68,9 @@ public abstract class HtmlGraphics implements Graphics {
     rootElement = doc.getElementById("forplay-root");
     if (rootElement == null) {
       rootElement = doc.getBody();
+    } else {
+      // clear the contents of the "forplay-root" element, if present
+      rootElement.setInnerHTML("");
     }
   }
 
