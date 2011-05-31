@@ -52,7 +52,7 @@
   -->
 
   <!-- Log to Chrome Developer Tools, Firebug, etc. -->
-  <set-property name="log_ConsoleLogger" value="ENABLED" />
+  <set-property name="log_ConsoleLogger" value="DISABLED" />
 
   <!-- Log to a floating/draggable DIV -->
   <set-property name="log_DivLogger" value="DISABLED" />
