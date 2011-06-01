@@ -56,10 +56,10 @@ public class HtmlPlatform implements Platform {
 
   static native void addEventListener(JavaScriptObject target, String name, EventHandler handler,
       boolean capture) /*-{
-                       target.addEventListener(name, function(e) {
-                       handler.@forplay.html.EventHandler::handleEvent(Lcom/google/gwt/dom/client/NativeEvent;)(e);
-                       }, capture);
-                       }-*/;
+    target.addEventListener(name, function(e) {
+    handler.@forplay.html.EventHandler::handleEvent(Lcom/google/gwt/dom/client/NativeEvent;)(e);
+    }, capture);
+  }-*/;
 
   static void captureEvent(String name, EventHandler handler) {
     captureEvent(null, name, handler);
@@ -253,36 +253,36 @@ public class HtmlPlatform implements Platform {
   }
 
   private native JavaScriptObject getWindow() /*-{
-                                              return $wnd;
-                                              }-*/;
+    return $wnd;
+  }-*/;
 
   private native void requestAnimationFrame(TimerCallback callback) /*-{
-                                                                    var fn = function() {
-                                                                    callback.@forplay.html.TimerCallback::fire()();
-                                                                    };
-                                                                    if ($wnd.requestAnimationFrame) {
-                                                                    $wnd.requestAnimationFrame(fn);
-                                                                    } else if ($wnd.mozRequestAnimationFrame) {
-                                                                    $wnd.mozRequestAnimationFrame(fn);
-                                                                    } else if ($wnd.webkitRequestAnimationFrame) {
-                                                                    $wnd.webkitRequestAnimationFrame(fn);
-                                                                    } else {
-                                                                    // 20ms => 50fps
-                                                                    $wnd.setTimeout(fn, 20);
-                                                                    }
-                                                                    }-*/;
+    var fn = function() {
+      callback.@forplay.html.TimerCallback::fire()();
+    };
+    if ($wnd.requestAnimationFrame) {
+      $wnd.requestAnimationFrame(fn);
+    } else if ($wnd.mozRequestAnimationFrame) {
+      $wnd.mozRequestAnimationFrame(fn);
+    } else if ($wnd.webkitRequestAnimationFrame) {
+      $wnd.webkitRequestAnimationFrame(fn);
+    } else {
+      // 20ms => 50fps
+      $wnd.setTimeout(fn, 20);
+    }
+  }-*/;
 
   private native int setInterval(TimerCallback callback, int ms) /*-{
-                                                                 return $wnd.setInterval(function() {
-                                                                 callback.@forplay.html.TimerCallback::fire()();
-                                                                 }, ms);
-                                                                 }-*/;
+    return $wnd.setInterval(function() {
+      callback.@forplay.html.TimerCallback::fire()();
+    }, ms);
+  }-*/;
 
   private native int setTimeout(TimerCallback callback, int ms) /*-{
-                                                                return $wnd.setTimeout(function() {
-                                                                callback.@forplay.html.TimerCallback::fire()();
-                                                                }, ms);
-                                                                }-*/;
+    return $wnd.setTimeout(function() {
+      callback.@forplay.html.TimerCallback::fire()();
+    }, ms);
+  }-*/;
 
   /**
    * Return true if renderer query parameter equals {@link Renderer#GL} or is not set, and the
@@ -304,10 +304,10 @@ public class HtmlPlatform implements Platform {
    * @return true if the browser supports WebGL
    */
   private native boolean hasGLSupport() /*-{
-                                        return !!$wnd.WebGLRenderingContext &&
-                                        // WebGL is slow on Chrome OSX 10.5 
-                                        (!/Chrome/.test(navigator.userAgent) || !/OS X 10_5/.test(navigator.userAgent));
-                                        }-*/;
+    return !!$wnd.WebGLRenderingContext &&
+      // WebGL is slow on Chrome OSX 10.5 
+      (!/Chrome/.test(navigator.userAgent) || !/OS X 10_5/.test(navigator.userAgent));
+  }-*/;
 
   /**
    * Gets the URL's parameter of the specified name. Note that if multiple parameters have been
@@ -337,8 +337,8 @@ public class HtmlPlatform implements Platform {
   }
 
   private static native void disableRightClickImpl(JavaScriptObject target) /*-{
-                                                                            target.oncontextmenu = function() {
-                                                                            return false;
-                                                                            };
-                                                                            }-*/;
+    target.oncontextmenu = function() {
+    return false;
+    };
+  }-*/;
 }
