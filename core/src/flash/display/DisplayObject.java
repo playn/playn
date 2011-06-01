@@ -4,18 +4,11 @@ package flash.display;
 
 import com.google.gwt.core.client.JsArray;
 
-import flash.gwt.FlashImport;
-
 import flash.events.EventType;
-
 import flash.geom.Point;
-
 import flash.geom.Transform;
-
 import flash.geom.Rectangle;
-
 import flash.filters.BitmapFilter;
-
 import flash.events.EventDispatcher;
 
 /**

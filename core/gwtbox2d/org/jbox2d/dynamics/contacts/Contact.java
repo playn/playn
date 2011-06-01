@@ -26,20 +26,15 @@
  ******************************************************************************/
 package org.jbox2d.dynamics.contacts;
 
-import java.util.Stack;
-
 import org.jbox2d.callbacks.ContactListener;
 import org.jbox2d.collision.Manifold;
 import org.jbox2d.collision.WorldManifold;
 import org.jbox2d.collision.shapes.Shape;
-import org.jbox2d.collision.shapes.ShapeType;
 import org.jbox2d.common.Transform;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.Fixture;
-import org.jbox2d.pooling.MutableStack;
 import org.jbox2d.pooling.TLManifold;
 import org.jbox2d.pooling.WorldPool;
-import org.jbox2d.pooling.stacks.TLStack;
 import org.jbox2d.structs.collision.ContactID;
 import org.jbox2d.structs.collision.ManifoldPoint;
 

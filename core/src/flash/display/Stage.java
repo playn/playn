@@ -15,8 +15,6 @@
  */
 package flash.display;
 
-import com.google.gwt.core.client.JavaScriptObject;
-
 /**
  */
 final public class Stage extends DisplayObjectContainer {

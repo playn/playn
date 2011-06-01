@@ -16,9 +16,6 @@
 package forplay.flash;
 
 import flash.events.MouseEvent;
-
-import flash.events.Event;
-
 import flash.display.Sprite;
 
 import forplay.core.Pointer;

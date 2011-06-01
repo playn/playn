@@ -42,7 +42,6 @@ public interface HtmlUrlParameters {
   /**
    * This interface serves solely as documentation for the URL parameter implemented by gwt-log.
    */
-  @SuppressWarnings("unused")
   public static interface Log {
     static final String DEBUG = "DEBUG";
     static final String ERROR = "ERROR";
@@ -67,7 +66,6 @@ public interface HtmlUrlParameters {
   /**
    * This interface serves solely as documentation for the URL parameter implemented by gwt-voices.
    */
-  @SuppressWarnings("unused")
   public static interface Sound {
     static final String FLASH = "flash";
     static final String HTML5 = "html5";

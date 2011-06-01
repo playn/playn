@@ -2,22 +2,12 @@
 
 package forplay.flash;
 
-import forplay.core.ForPlay;
-
-import forplay.core.ResourceCallback;
-
-import forplay.core.ResourceCallback;
-
 import flash.display.Bitmap;
-
 import flash.display.Sprite;
 
-import forplay.core.AbstractLayer;
-
-import forplay.core.GroupLayer;
+import forplay.core.ForPlay;
+import forplay.core.ResourceCallback;
 import forplay.core.Image;
-import forplay.core.Transform;
-
 import forplay.core.ImageLayer;
 
 /**

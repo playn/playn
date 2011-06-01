@@ -15,12 +15,7 @@
  */
 package forplay.flash;
 
-import com.google.gwt.dom.client.NativeEvent;
-
 import flash.events.KeyboardEvent;
-
-import flash.events.Event;
-
 import flash.display.InteractiveObject;
 
 import forplay.core.Keyboard;

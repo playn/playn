@@ -15,12 +15,6 @@
  */
 package forplay.flash;
 
-import com.google.gwt.dom.client.CanvasElement;
-import com.google.gwt.dom.client.Element;
-import com.google.gwt.dom.client.ImageElement;
-import com.google.gwt.webgl.client.WebGLTexture;
-
-
 import flash.gwt.FlashImport;
 
 import java.util.ArrayList;

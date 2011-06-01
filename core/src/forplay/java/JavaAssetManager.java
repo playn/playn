@@ -16,7 +16,6 @@ package forplay.java;
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 
@@ -24,7 +23,6 @@ import javax.imageio.ImageIO;
 
 import forplay.core.AbstractAssetManager;
 import forplay.core.AssetLoadException;
-import forplay.core.AssetManager;
 import forplay.core.ForPlay;
 import forplay.core.Image;
 import forplay.core.ResourceCallback;

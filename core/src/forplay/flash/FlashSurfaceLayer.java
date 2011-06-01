@@ -18,9 +18,6 @@ package forplay.flash;
 import flash.display.Sprite;
 import forplay.flash.FlashCanvasLayer.CanvasElement;
 
-import forplay.core.GroupLayer;
-import forplay.core.Transform;
-
 import forplay.core.Surface;
 import forplay.core.SurfaceLayer;
 

@@ -4,8 +4,6 @@ package flash.display;
 
 import static flash.events.EventType.make;
 
-import flash.gwt.FlashImport;
-
 import flash.events.EventType;
 
 /**

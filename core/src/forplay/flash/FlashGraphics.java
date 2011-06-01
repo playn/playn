@@ -15,15 +15,10 @@ package forplay.flash;
 
 import com.google.gwt.canvas.dom.client.CssColor;
 
-import sun.reflect.ReflectionFactory.GetReflectionFactoryAction;
-
-import forplay.core.ForPlay;
-
 import flash.display.StageScaleMode;
-
 import flash.display.Sprite;
 
-
+import forplay.core.ForPlay;
 import forplay.core.CanvasImage;
 import forplay.core.CanvasLayer;
 import forplay.core.Gradient;
@@ -34,7 +29,6 @@ import forplay.core.ImageLayer;
 import forplay.core.Path;
 import forplay.core.Pattern;
 import forplay.core.SurfaceLayer;
-import flash.display.Stage;
 
 class FlashGraphics implements Graphics {
 

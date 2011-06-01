@@ -18,15 +18,8 @@ package forplay.flash;
 import com.google.gwt.core.client.JavaScriptObject;
 
 import flash.display.BitmapData;
-
 import flash.gwt.FlashImport;
-
 import flash.display.Sprite;
-
-import forplay.core.AbstractLayer;
-
-import forplay.core.GroupLayer;
-import forplay.core.Transform;
 
 import forplay.core.Canvas;
 import forplay.core.CanvasLayer;

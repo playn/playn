@@ -15,9 +15,6 @@
  */
 package forplay.flash;
 
-import com.google.gwt.xhr.client.ReadyStateChangeHandler;
-import com.google.gwt.xhr.client.XMLHttpRequest;
-
 import forplay.core.Net;
 
 public class FlashNet implements Net {

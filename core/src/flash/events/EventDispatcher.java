@@ -15,9 +15,6 @@ package flash.events;
 
 import com.google.gwt.core.client.JavaScriptObject;
 
-import flash.gwt.FlashImport;
-
-
 import forplay.flash.EventHandler;
 
 /**
@@ -48,7 +45,7 @@ public class EventDispatcher extends JavaScriptObject {
   /**
    * Registers an event listener object with an EventDispatcher object so that the listener receives notification of an event.
    */
-  final public native void addEventListener(EventType type, EventHandler listener,  boolean useCapture, int priority, boolean useWeakReference) /*-{
+  final public native void addEventListener(EventType type, EventHandler<?> listener,  boolean useCapture, int priority, boolean useWeakReference) /*-{
     this.addEventListener(type, function(evt) {
       return listener.@forplay.flash.EventHandler::handleEvent(Lflash/events/Event;)(evt);
     }, useCapture, priority, useWeakReference);
@@ -74,7 +71,7 @@ public class EventDispatcher extends JavaScriptObject {
    * Removes a listener from the EventDispatcher object.
    * @param type
    */
-  final public native void removeEventListener(EventType type, EventHandler listener, boolean useCapture) /*-{
+  final public native void removeEventListener(EventType type, EventHandler<?> listener, boolean useCapture) /*-{
     this.removeEventListener(type, listener, useCapture);
   }-*/;
           

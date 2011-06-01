@@ -3,14 +3,7 @@
 package forplay.flash;
 
 import forplay.core.Surface;
-
-import forplay.core.Canvas.Composite;
-import forplay.core.Canvas.LineCap;
-import forplay.core.Canvas.LineJoin;
-import forplay.core.ForPlay;
-import forplay.core.Gradient;
 import forplay.core.Image;
-import forplay.core.Path;
 import forplay.core.Pattern;
 import forplay.flash.FlashCanvasLayer.Context2d;
 

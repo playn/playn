@@ -49,9 +49,6 @@
 
 package org.jbox2d.common;
 
-import com.google.gwt.core.client.JavaScriptObject;
-
-import java.util.Comparator;
 import java.util.Random;
 
 /**
@@ -75,8 +72,8 @@ public class MathUtils {
 	 */
 	public static final float RAD2DEG = 180 / PI;
 	
-	private static final float SHIFT23 = 1 << 23;
-	private static final float INV_SHIFT23 = 1.0f / SHIFT23;
+	// private static final float SHIFT23 = 1 << 23;
+	// private static final float INV_SHIFT23 = 1.0f / SHIFT23;
 	
 	public static final float[] sinLUT = new float[Settings.SINCOS_LUT_LENGTH];
 	public static final float[] cosLUT = new float[Settings.SINCOS_LUT_LENGTH];

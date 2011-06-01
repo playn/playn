@@ -17,8 +17,6 @@ package forplay.flash;
 
 import com.google.gwt.core.client.JavaScriptObject;
 
-import forplay.flash.FlashSound.SoundChannel;
-
 import flash.gwt.FlashImport;
 
 import forplay.core.Sound;

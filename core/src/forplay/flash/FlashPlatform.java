@@ -62,7 +62,7 @@ public class FlashPlatform implements Platform {
     return platform;
   }
 
-  static native void addEventListener(JavaScriptObject target, String name, EventHandler handler, boolean capture) /*-{
+  static native void addEventListener(JavaScriptObject target, String name, EventHandler<?> handler, boolean capture) /*-{
   	target.addEventListener(name, function(e) {
       handler.@forplay.flash.EventHandler::handleEvent(Lflash/events/Event;)(e);
     }, capture);
@@ -237,7 +237,7 @@ public class FlashPlatform implements Platform {
 
     private void requestAnimationFrame(final TimerCallback callback) {
 	//	http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/flash/display/DisplayObject.html#event:enterFrame
-    FlashPlatform.captureEvent(Sprite.ENTERFRAME, new EventHandler() {
+    FlashPlatform.captureEvent(Sprite.ENTERFRAME, new EventHandler<Event>() {
       public void handleEvent(Event evt) {
     	evt.preventDefault();  
         callback.fire();
@@ -254,7 +254,7 @@ public class FlashPlatform implements Platform {
     return $wnd.setTimeout(function() { callback.@forplay.flash.TimerCallback::fire()(); }, ms);
   }-*/;
 
-  public static native void captureEvent(EventType eventType, EventHandler eventHandler) /*-{
+  public static native void captureEvent(EventType eventType, EventHandler<?> eventHandler) /*-{
     $root.addEventListener(eventType, function(arg) {
       eventHandler.@forplay.flash.EventHandler::handleEvent(Lflash/events/Event;)(arg);
     });

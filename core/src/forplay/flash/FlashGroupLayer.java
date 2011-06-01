@@ -16,17 +16,11 @@
 package forplay.flash;
 
 import flash.display.DisplayObject;
-
 import flash.display.DisplayObjectContainer;
-
 import flash.display.Sprite;
-
-import forplay.core.AbstractLayer;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import forplay.core.Transform;
 
 import forplay.core.GroupLayer;
 import forplay.core.Layer;

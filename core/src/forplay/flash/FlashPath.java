@@ -15,8 +15,6 @@
  */
 package forplay.flash;
 
-import com.google.gwt.canvas.dom.client.Context2d;
-
 import forplay.core.Path;
 
 /**

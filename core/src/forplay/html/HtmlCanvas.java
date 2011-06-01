@@ -18,7 +18,6 @@ package forplay.html;
 import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.dom.client.CanvasElement;
 import com.google.gwt.dom.client.Document;
-import com.google.gwt.dom.client.ImageElement;
 
 import forplay.core.Gradient;
 import forplay.core.Image;

@@ -26,8 +26,6 @@
  ******************************************************************************/
 package org.jbox2d.dynamics;
 
-import java.util.Stack;
-
 import org.jbox2d.callbacks.ContactFilter;
 import org.jbox2d.callbacks.ContactListener;
 import org.jbox2d.callbacks.DebugDraw;
@@ -47,23 +45,17 @@ import org.jbox2d.common.Settings;
 import org.jbox2d.common.Sweep;
 import org.jbox2d.common.Transform;
 import org.jbox2d.common.Vec2;
-import org.jbox2d.dynamics.contacts.CircleContact;
 import org.jbox2d.dynamics.contacts.Contact;
-import org.jbox2d.dynamics.contacts.ContactCreator;
 import org.jbox2d.dynamics.contacts.ContactEdge;
 import org.jbox2d.dynamics.contacts.ContactRegister;
-import org.jbox2d.dynamics.contacts.PolygonAndCircleContact;
-import org.jbox2d.dynamics.contacts.PolygonContact;
 import org.jbox2d.dynamics.contacts.TOISolver;
 import org.jbox2d.dynamics.joints.Joint;
 import org.jbox2d.dynamics.joints.JointDef;
 import org.jbox2d.dynamics.joints.JointEdge;
 import org.jbox2d.dynamics.joints.PulleyJoint;
 import org.jbox2d.pooling.MutableStack;
-import org.jbox2d.pooling.PolygonContactStack;
 import org.jbox2d.pooling.WorldPool;
 import org.jbox2d.pooling.arrays.Vec2Array;
-import org.jbox2d.pooling.stacks.TLStack;
 import org.jbox2d.structs.collision.RayCastInput;
 import org.jbox2d.structs.collision.RayCastOutput;
 import org.jbox2d.structs.collision.TOIInput;
@@ -126,7 +118,7 @@ public class World {
 	private boolean m_continuousPhysics;
 	
 	private ContactRegister[][] contactStacks = new ContactRegister[ShapeType.TYPE_COUNT][ShapeType.TYPE_COUNT];
-	private boolean c_initialized = false;
+	// private boolean c_initialized = false;
 	
 	/**
 	 * Construct a world object.

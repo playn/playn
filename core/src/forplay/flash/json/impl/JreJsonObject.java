@@ -15,8 +15,6 @@
  */
 package forplay.flash.json.impl;
 
-import com.google.gwt.core.client.JsonUtils;
-
 import forplay.flash.json.JsonFactory;
 import forplay.flash.json.JsonObject;
 import forplay.flash.json.JsonType;
@@ -25,7 +23,6 @@ import forplay.flash.json.JsonValue;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;

@@ -2,8 +2,6 @@
 
 package flash.display;
 
-import com.google.gwt.core.client.JavaScriptObject;
-
 import flash.geom.Rectangle;
 
 import flash.gwt.FlashImport;

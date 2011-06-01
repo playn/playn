@@ -3,10 +3,6 @@ package forplay.flash;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.GWT.UncaughtExceptionHandler;
-import com.google.gwt.core.client.Scheduler;
-import com.google.gwt.core.client.Scheduler.ScheduledCommand;
-
-import com.allen_sauer.gwt.log.client.Log;
 
 public abstract class FlashGame implements EntryPoint {
 

@@ -20,7 +20,6 @@
 package flash.external;
 
 import com.google.gwt.core.client.JavaScriptObject;
-import com.google.gwt.core.client.JavaScriptException;
 
 /**
  * @see <a href="http://livedocs.adobe.com/flash/8/main/00002200.html#wp232104">ActionScript 2.0 Language Reference</a>

@@ -2,18 +2,11 @@
 
 package forplay.flash;
 
+import flash.display.DisplayObject;
+import flash.gwt.FlashImport;
 
 import forplay.core.Transform;
-
-import flash.display.DisplayObject;
-
-import forplay.core.ForPlay;
-
 import forplay.core.AbstractLayer;
-
-import flash.display.Sprite;
-
-import flash.gwt.FlashImport;
 
 /**
  * @author cromwellian@google.com (Your Name Here)
