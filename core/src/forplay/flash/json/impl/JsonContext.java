@@ -28,7 +28,7 @@ abstract class JsonContext {
   private boolean isFirst = true;
 
   JsonContext(JsonValue value) {
-    this.value = this.value;
+    this.value = value;
   }
 
   /**
