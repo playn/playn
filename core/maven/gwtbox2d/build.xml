@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<project name="jbox2d" default="compile">
+  <property name="src.dir" value="../../gwtbox2d"/>
+  <property name="aux.src.dir" value="../../gwtemul"/>
+  <import file="../../../build-common.xml"/>
+</project>

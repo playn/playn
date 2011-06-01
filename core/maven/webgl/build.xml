@@ -1,0 +1,5 @@
+<?xml version="1.0"?>
+<project name="webgl" default="compile">
+  <property name="src.dir" value="../../webgl"/>
+  <import file="../../../build-common.xml"/>
+</project>

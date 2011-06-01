@@ -1,0 +1,4 @@
+<?xml version="1.0"?>
+<project name="core" default="compile">
+  <import file="../build-common.xml"/>
+</project>
