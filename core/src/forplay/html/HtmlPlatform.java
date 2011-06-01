@@ -14,6 +14,7 @@
 package forplay.html;
 
 import com.google.gwt.core.client.Duration;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.Element;
@@ -93,7 +94,7 @@ public class HtmlPlatform implements Platform {
 
   public void init() {
     // Setup logging first, so it can be used by other subsystems
-    log = new HtmlLog();
+    log = GWT.create(HtmlLog.class);
 
     /*
      * Wrap remaining calls in try-catch, since the UncaughtExceptionHandler installed by HtmlLog

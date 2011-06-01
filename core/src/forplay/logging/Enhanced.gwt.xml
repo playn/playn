@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * Copyright 2011 The ForPlay Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License. 
+-->
+<!DOCTYPE module PUBLIC "-//Google Inc.//DTD Google Web Toolkit trunk//EN" "http://google-web-toolkit.googlecode.com/svn/trunk/distro-source/core/src/gwt-module.dtd">
+<module>
+  <inherits name="com.google.gwt.user.User" />
+  <source path="enhanced" />
+
+  <!--
+    Use our enhanced HtmlLog implementation,
+    rather than the default simple one:
+  -->
+  <replace-with class="forplay.logging.enhanced.HtmlLogEnhanced">
+    <when-type-assignable class="forplay.html.HtmlLog" />
+  </replace-with>
+
+  <!--
+    Available log levels: TRACE, DEBUG, INFO, WARN, ERROR, FATAL, OFF
+    
+    Set default / compile time log level to DEBUG
+  -->
+  <inherits name="com.allen_sauer.gwt.log.gwt-log-DEBUG" />
+  <!--
+    To compile a WARN version instead, either modify the above line
+    -or- add the following two lines in your game's .gwt.xml file:
+    
+      <extend-property name="log_level" values="WARN"/>
+      <set-property name="log_level" value="WARN"/>
+  -->
+
+  <!-- Log to Chrome Developer Tools, Firebug, etc. -->
+  <set-property name="log_ConsoleLogger" value="ENABLED" />
+
+  <!-- Log to a floating/draggable DIV -->
+  <set-property name="log_DivLogger" value="DISABLED" />
+
+  <!-- Development Mode only:
+       Log to the GWT logging tree in the Development Mode view
+  -->
+  <set-property name="log_GWTLogger" value="DISABLED" />
+
+  <!-- Development Mode only:
+       System.out/System.err for clickable stack traces in Eclipse
+  -->
+  <set-property name="log_SystemLogger" value="ENABLED" />
+
+  <!--
+    For JavaScript stack trace deobfuscation and server side logging of
+    client log messages:
+      1. Add the RemoteLoggerServlet handler to your project's web.xml
+         http://code.google.com/p/gwt-log/wiki/GettingStarted
+      2. Enable the remote logger in your application's *.gwt.xml GWT module file
+    
+    Note, you'll likely want to disable the SystemLogger above when enabling
+    the RemoteLogger, since both server side and client side log messages are sent
+    to the same Eclipse console view.
+    
+      <inherits name="com.allen_sauer.gwt.log.gwt-log-RemoteLogger" />
+  -->
+  <!-- 
+    Add line number information to deobfuscated stack traces:
+    
+      <set-property name="compiler.emulatedStack" value="true" />
+      <set-configuration-property name="compiler.emulatedStack.recordLineNumbers" value="true"/>
+   -->
+ 
+</module>

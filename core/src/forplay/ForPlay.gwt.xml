@@ -25,10 +25,11 @@
     Note: Compiling only the 'safari' user.agent will currently
           prevent Flash from being detected in IE, which means
           gwt-voices will choose HTML5 audio in IE9.
+
     To compile separate permutations for IE9 and Firefox add this to
     your game's .gwt.xml module:
+
       <extend-property name="user.agent" values="ie9,gecko1_8"/>
-    
   -->
 
   <!-- Speed up compile time. Target only modern HTML5 browsers. -->
@@ -38,56 +39,20 @@
   <!-- Flash/HTML5/Native audio support -->
   <inherits name="com.allen_sauer.gwt.voices.gwt-voices" />
 
+  <!-- By default, we log to System.out in Development Mode -->
+  <replace-with class="forplay.html.HtmlLogSimple">
+    <when-type-assignable class="forplay.html.HtmlLog" />
+  </replace-with>
+  
   <!--
-    Available log levels: TRACE, DEBUG, INFO, WARN, ERROR, FATAL, OFF
+    Optionally, enable gwt-log's advanced logging features, add
+    this to your game's .gwt.xml module:
     
-    Set default / compile time log level to DEBUG
+      <inherits name="forplay.logging.Enhanced" />
   -->
-  <inherits name="com.allen_sauer.gwt.log.gwt-log-DEBUG" />
-  <!--
-    To compile a WARN version instead, either modify the above line
-    -or- add the following two lines in your game's .gwt.xml file:
-  <extend-property name="log_level" values="WARN"/>
-  <set-property name="log_level" value="WARN"/>
-  -->
-
-  <!-- Log to Chrome Developer Tools, Firebug, etc. -->
-  <set-property name="log_ConsoleLogger" value="DISABLED" />
-
-  <!-- Log to a floating/draggable DIV -->
-  <set-property name="log_DivLogger" value="DISABLED" />
-
-  <!-- Development Mode only:
-       Log to the GWT logging tree in the Development Mode view
-  -->
-  <set-property name="log_GWTLogger" value="DISABLED" />
-
-  <!-- Development Mode only:
-       System.out/System.err for clickable stack traces in Eclipse
-  -->
-  <set-property name="log_SystemLogger" value="ENABLED" />
-
-  <!--
-    For JavaScript stack trace deobfuscation and server side logging of
-    client log messages:
-      1. Add the RemoteLoggerServlet handler to your project's web.xml
-         http://code.google.com/p/gwt-log/wiki/GettingStarted
-      2. Enable the remote logger in your application's *.gwt.xml GWT module file
-    
-    Note, you'll likely want to disable the SystemLogger above when enabling
-    the RemoteLogger, since both server side and client side log messages are sent
-    to the same Eclipse console view.
-         <inherits name="com.allen_sauer.gwt.log.gwt-log-RemoteLogger" />
-  -->
-  <!-- 
-    Add line number information to deobfuscated stack traces:
-  <set-property name="compiler.emulatedStack" value="true" />
-  <set-configuration-property name="compiler.emulatedStack.recordLineNumbers" value="true"/>
-   -->
  
   <!-- Auto ClientBundle -->
-  <generate-with
-    class="forplay.rebind.AutoClientBundleGenerator">
+  <generate-with class="forplay.rebind.AutoClientBundleGenerator">
     <when-type-assignable class="forplay.core.AutoClientBundleWithLookup" />
   </generate-with>
 
@@ -95,10 +60,10 @@
   <inherits name="com.google.gwt.webgl.WebGL" />
 
   <define-linker name="appcachelinker" class="forplay.appcachelinker.AppCacheLinker" />
-  
   <!-- 
     By default, we don't use the appcachelinker. If you would like to use it in your project,
-    add the following line to your gwt.xml:
-  <add-linker name="appcachelinker" />
+    add the following line to your game's .gwt.xml module:
+
+      <add-linker name="appcachelinker" /> 
   -->
 </module>
