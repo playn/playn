@@ -1,8 +1,9 @@
 <?xml version="1.0"?>
-<project name="forplay" default="compile">
+<project name="forplay" default="compile" xmlns:artifact="urn:maven-artifact-ant">
+  <import file="build-maven.xml"/>
+
   <!-- TODO: find suitable way to factor out module list; ant doesn't have any
        stock iteration capabilities and depending on ant-contrib is annoying -->
-
   <target name="clean" description="Cleans out all submodule build results.">
     <ant dir="core/maven/gwtbox2d" target="clean"/>
     <ant dir="core/maven/webgl" target="clean"/>
@@ -17,10 +18,15 @@
     <ant dir="server" target="compile"/>
   </target>
 
-  <target name="install" description="Compiles and deploys all submodules to local Maven repository.">
+  <target name="install" depends="-init-maven-ant"
+          description="Compiles and deploys all submodules to local Maven repository.">
     <ant dir="core/maven/gwtbox2d" target="install"/>
     <ant dir="core/maven/webgl" target="install"/>
     <ant dir="core" target="install"/>
     <ant dir="server" target="install"/>
+    <!-- install the forplay-project artifact which is just a pom -->
+    <artifact:install file="pom.xml">
+      <pom file="pom.xml"/>
+    </artifact:install>
   </target>
 </project>
