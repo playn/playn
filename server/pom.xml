@@ -1,0 +1,41 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>forplay</groupId>
+    <artifactId>forplay-project</artifactId>
+    <version>1.0</version>
+  </parent>
+
+  <groupId>forplay</groupId>
+  <artifactId>server</artifactId>
+  <packaging>jar</packaging>
+  <name>Forplay Server</name>
+
+  <repositories>
+    <repository>
+      <id>jetty-repo</id>
+      <url>http://oss.sonatype.org/content/groups/jetty/</url>
+    </repository>
+  </repositories>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.eclipse.jetty</groupId>
+      <artifactId>jetty-servlet</artifactId>
+      <version>7.2.2.v20101205</version>
+    </dependency>
+
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.8.1</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <sourceDirectory>src</sourceDirectory>
+  </build>
+</project>

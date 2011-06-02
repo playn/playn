@@ -7,17 +7,20 @@
     <ant dir="core/maven/gwtbox2d" target="clean"/>
     <ant dir="core/maven/webgl" target="clean"/>
     <ant dir="core" target="clean"/>
+    <ant dir="server" target="clean"/>
   </target>
 
   <target name="compile" description="Compiles all submodules.">
     <ant dir="core/maven/gwtbox2d" target="compile"/>
     <ant dir="core/maven/webgl" target="compile"/>
     <ant dir="core" target="compile"/>
+    <ant dir="server" target="compile"/>
   </target>
 
   <target name="install" description="Compiles and deploys all submodules to local Maven repository.">
     <ant dir="core/maven/gwtbox2d" target="install"/>
     <ant dir="core/maven/webgl" target="install"/>
     <ant dir="core" target="install"/>
+    <ant dir="server" target="install"/>
   </target>
 </project>
