@@ -145,11 +145,13 @@ public class JavaJson implements Json {
     }
 
     public Json.Object getObject(String key) {
-      return new JavaObject(jso.optJSONObject(key));
+      JSONObject o = jso.optJSONObject(key);
+      return o == null ? null : new JavaObject(o);
     }
 
     public Json.Array getArray(String key) {
-      return new JavaArray(jso.optJSONArray(key));
+      JSONArray a = jso.optJSONArray(key);
+      return a == null ? null : new JavaArray(a);
     }
     
     public Json.Array getKeys() {
@@ -186,11 +188,13 @@ public class JavaJson implements Json {
     }
 
     public Json.Object getObject(int index) {
-      return new JavaObject(jsa.optJSONObject(index));
+      JSONObject o = jsa.optJSONObject(index);
+      return o == null ? null : new JavaObject(o);
     }
 
     public Json.Array getArray(int index) {
-      return new JavaArray(jsa.optJSONArray(index));
+      JSONArray a = jsa.optJSONArray(index);
+      return a == null ? null : new JavaArray(a);
     }
   }
 
