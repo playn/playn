@@ -18,8 +18,10 @@ package forplay.tests;
 import forplay.java.JavaPlatform;
 
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 
-public class AbstractForPlayTest {
+@Ignore("JUnit should ignore this by default, but it doesn't")
+public abstract class AbstractForPlayTest {
 
   @BeforeClass
   public static void initializePlatform() {

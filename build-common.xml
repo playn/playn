@@ -70,7 +70,7 @@
   </target>
 
   <property name="test" value=""/>
-  <target name="test" depends="compile-tests"
+  <target name="test" depends="compile-tests" if="have.tests"
           description="Runs unit tests. Use -Dtest=Foo to run only FooTest.">
     <taskdef name="unit" classpathref="test.classpath"
       classname="org.apache.tools.ant.taskdefs.optional.junit.JUnitTask"/>
@@ -88,8 +88,7 @@
     </unit>
   </target>
 
-  <!-- TODO: make this depend on 'test' when the tests exist/are working -->
-  <target name="package" depends="compile-tests" description="Builds jar files.">
+  <target name="package" depends="test" description="Builds jar files.">
     <jar destfile="${target.dir}/${ant.project.name}-${pom.version}.jar">
       <fileset dir="${classes.dir}" includes="**/*"/>
       <!-- we include the source in the main jar for use by GWT (.java, .xml, etc.) -->
