@@ -22,7 +22,6 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 
 import forplay.core.AbstractAssetManager;
-import forplay.core.AssetLoadException;
 import forplay.core.ForPlay;
 import forplay.core.Image;
 import forplay.core.ResourceCallback;
@@ -49,23 +48,18 @@ public class JavaAssetManager extends AbstractAssetManager {
     try {
       BufferedImage img = ImageIO.read(imgFile);
       return new JavaImage(img);
-    } catch (IOException e) {
+    } catch (Exception e) {
       ForPlay.log().warn("Could not load image at " + imgFile, e);
-      return new JavaImage(new AssetLoadException("Could not load image at " + imgFile, e));
+      return new JavaImage(e);
     }
   }
 
   @Override
-  protected Sound doGetSound(String path) throws AssetLoadException {
+  protected Sound doGetSound(String path) {
     // Java won't play *.mp3, so for now use *.wav exclusively
     path += ".wav";
     File file = new File(pathPrefix, path);
-    JavaAudio audio = (JavaAudio) ForPlay.audio();
-    try {
-      return audio.createSound(file);
-    } catch (Exception e) {
-      throw new AssetLoadException("Could not load sound at " + path, e);
-    }
+    return ((JavaAudio) ForPlay.audio()).createSound(file);
   }
 
   @Override
