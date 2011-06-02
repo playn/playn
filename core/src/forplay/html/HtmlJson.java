@@ -207,12 +207,12 @@ class HtmlJson implements Json {
     
     @Override
     public final native Array getKeys() /*-{
-    	if (Object.prototype.keys) { return this.keys(); }
-    	var keys = [];
-    	for (var key in this) if (this.hasOwnProperty(key)) {
-    		keys.push(key);
-    	}
-    	return keys;
+      if (Object.prototype.keys) { return this.keys(); }
+      var keys = [];
+      for (var key in this) if (this.hasOwnProperty(key)) {
+        keys.push(key);
+      }
+      return keys;
     }-*/;
     
   }

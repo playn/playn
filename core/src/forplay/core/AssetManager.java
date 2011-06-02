@@ -21,7 +21,7 @@ package forplay.core;
  */
 public interface AssetManager {
 
-	/**
+  /**
    * Return an Image, given a path to the image resource.
    * @param path a path to the resource
    * @return the image

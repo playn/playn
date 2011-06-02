@@ -16,7 +16,7 @@ class GameThread extends Thread {
 
   private static final float MAX_DELTA = 100;
   private static final float FRAME_TIME = 50;
-  
+
   GameThread(SurfaceHolder holder) {
     this.holder = holder;
   }
@@ -25,64 +25,63 @@ class GameThread extends Thread {
   private float accum = updateRate;
   private double lastTime;
   private Handler gameLoop;
-  
+
   @Override
   public void run() {
-	try {
-	  Looper.prepare();
-	  gameLoop = new Handler();
-	  gameLoop.post(mainLoop());
-	  Log.i("forplay", "Starting Game Loop");
-	  Looper.loop();
-	 } catch (Throwable t) {
-	   Log.e("forplay", "error in game loop", t);
-	 }
-		
+    try {
+      Looper.prepare();
+      gameLoop = new Handler();
+      gameLoop.post(mainLoop());
+      Log.i("forplay", "Starting Game Loop");
+      Looper.loop();
+    } catch (Throwable t) {
+      Log.e("forplay", "error in game loop", t);
+    }
   }
 
   private Runnable mainLoop() {
-	  return new Runnable() {
-		  public void run() {
-		    Canvas c = null;
-			  try {
-				  c = holder.lockCanvas(null);
-				  synchronized (holder) {
-					  AndroidPlatform.instance.setCurrentCanvas(c);
-					  double now = time();
-					  float delta = (float)(now - lastTime);
-					  if (delta > MAX_DELTA) {
-						  delta = MAX_DELTA;
-					  }
-					  lastTime = now;
+    return new Runnable() {
+      public void run() {
+        Canvas c = null;
+        try {
+          c = holder.lockCanvas(null);
+          synchronized (holder) {
+            AndroidPlatform.instance.setCurrentCanvas(c);
+            double now = time();
+            float delta = (float)(now - lastTime);
+            if (delta > MAX_DELTA) {
+              delta = MAX_DELTA;
+            }
+            lastTime = now;
 
-					  if (updateRate == 0) {
-						  AndroidPlatform.instance.update(delta);
-						  accum = 0;
-					  } else {
-						  accum += delta;
-						  while (accum > updateRate) {
-							  AndroidPlatform.instance.update(updateRate);
-							  accum -= updateRate;
-						  }
-					  }
+            if (updateRate == 0) {
+              AndroidPlatform.instance.update(delta);
+              accum = 0;
+            } else {
+              accum += delta;
+              while (accum > updateRate) {
+                AndroidPlatform.instance.update(updateRate);
+                accum -= updateRate;
+              }
+            }
 
-					  AndroidPlatform.instance.draw(accum / updateRate);
-				  }
-			  } finally {
-				  // do this in a finally so that if an exception is thrown
-				  // during the above, we don't leave the Surface in an
-				  // inconsistent state
-				  if (c != null) {
-					  AndroidPlatform.instance.setCurrentCanvas(null);
-					  holder.unlockCanvasAndPost(c);
-				  }
-				  if (running) {
-					  gameLoop.post(this);
-				  }
-			  }
-		  }
-	  };
-    }
+            AndroidPlatform.instance.draw(accum / updateRate);
+          }
+        } finally {
+          // do this in a finally so that if an exception is thrown
+          // during the above, we don't leave the Surface in an
+          // inconsistent state
+          if (c != null) {
+            AndroidPlatform.instance.setCurrentCanvas(null);
+            holder.unlockCanvasAndPost(c);
+          }
+          if (running) {
+            gameLoop.post(this);
+          }
+        }
+      }
+    };
+  }
 
 
   /**
@@ -101,6 +100,6 @@ class GameThread extends Thread {
   }
 
   public void post(Runnable r) {
-	gameLoop.post(r);
+    gameLoop.post(r);
   }
 }

@@ -61,7 +61,7 @@ public class ForPlay {
   }
   
   public static AssetManager assetManager() {
-	  return platform.assetManager();
+    return platform.assetManager();
   }
 
   /**

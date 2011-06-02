@@ -63,7 +63,7 @@ public class FlashPlatform implements Platform {
   }
 
   static native void addEventListener(JavaScriptObject target, String name, EventHandler<?> handler, boolean capture) /*-{
-  	target.addEventListener(name, function(e) {
+    target.addEventListener(name, function(e) {
       handler.@forplay.flash.EventHandler::handleEvent(Lflash/events/Event;)(e);
     }, capture);
   }-*/;
@@ -167,7 +167,7 @@ public class FlashPlatform implements Platform {
   
   @Override
   public void openURL(String url) {
-	  //TODO: implement
+      //TODO: implement
   }
 
   private static int FPS_COUNTER_MAX = 300;
@@ -236,10 +236,10 @@ public class FlashPlatform implements Platform {
   }
 
     private void requestAnimationFrame(final TimerCallback callback) {
-	//	http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/flash/display/DisplayObject.html#event:enterFrame
+    //  http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/flash/display/DisplayObject.html#event:enterFrame
     FlashPlatform.captureEvent(Sprite.ENTERFRAME, new EventHandler<Event>() {
       public void handleEvent(Event evt) {
-    	evt.preventDefault();  
+        evt.preventDefault();  
         callback.fire();
       }
     });

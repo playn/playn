@@ -47,12 +47,12 @@ public abstract class HtmlGraphics implements Graphics {
 
   private static native void setLoadHandlers(ImageElement img, EventHandler onload,
       EventHandler onerror) /*-{
-		img.onload = function(e) {
-			onload.@forplay.html.EventHandler::handleEvent(Lcom/google/gwt/dom/client/NativeEvent;)(e);
-		};
-		img.onerror = function(e) {
-			onerror.@forplay.html.EventHandler::handleEvent(Lcom/google/gwt/dom/client/NativeEvent;)(e);
-		};
+    img.onload = function(e) {
+      onload.@forplay.html.EventHandler::handleEvent(Lcom/google/gwt/dom/client/NativeEvent;)(e);
+    };
+    img.onerror = function(e) {
+      onerror.@forplay.html.EventHandler::handleEvent(Lcom/google/gwt/dom/client/NativeEvent;)(e);
+    };
   }-*/;
 
   protected CanvasElement dummyCanvas;
