@@ -95,6 +95,9 @@ public class HtmlPlatform implements Platform {
   public void init() {
     // Setup logging first, so it can be used by other subsystems
     log = GWT.create(HtmlLog.class);
+    if (!GWT.isProdMode()) {
+      log.warn("You are running in development mode. Expect severely degraded HTML platform performance.");
+    }
 
     /*
      * Wrap remaining calls in try-catch, since the UncaughtExceptionHandler installed by HtmlLog
