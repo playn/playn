@@ -27,18 +27,6 @@ import forplay.core.Canvas;
 
 class HtmlCanvas implements Canvas {
 
-  /**
-   * Must be kept in sync with ForPlay.gwt.xml's definition
-   * of the {@literal html.renderer} deferred binding property.
-   */
-  public static final String HTML_RENDERER_CANVAS2D = "canvas2d";
-
-  /**
-   * Must be kept in sync with ForPlay.gwt.xml's definition
-   * of the {@literal html.renderer} deferred binding property.
-   */
-  public static final String HTML_RENDERER_WEBGL = "webgl";
-
   private final CanvasElement canvas;
   private final Context2d ctx;
   private final int width, height;
