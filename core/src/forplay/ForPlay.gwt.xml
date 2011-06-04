@@ -32,7 +32,11 @@
       <extend-property name="user.agent" values="ie9,gecko1_8"/>
   -->
 
-  <!-- Speed up compile time. Target only modern HTML5 browsers. -->
+  <!--
+    Speed up compile time. Target only modern HTML5 browsers.
+    The value 'safari' exists solely for for historical reasons.
+    Your ForPlay game should work in Chrome, Firefox 3.6/4.0, Safari, IE9
+  -->
   <set-property name='user.agent' value='safari'/>
   <set-configuration-property name="user.agent.runtimeWarning" value="false" />
 
