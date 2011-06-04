@@ -15,6 +15,8 @@
  */
 package forplay.java;
 
+import com.google.gwt.user.client.Window;
+
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -226,5 +228,14 @@ public class JavaPlatform implements Platform {
       Runtime.getRuntime().exec(browser + url);
     } catch (IOException e) {
     }
+  }
+
+  /**
+   * Sets the title of the window.
+   * 
+   * @param title the window title
+   */
+  public void setTitle(String title) {
+    frame.setTitle(title);
   }
 }

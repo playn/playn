@@ -335,6 +335,15 @@ public class HtmlPlatform implements Platform {
   }
 
   /**
+   * Sets the title of the browser's window or tab.
+   * 
+   * @param title the window title
+   */
+  public void setTitle(String title) {
+    Window.setTitle(title);
+  }
+
+  /**
    * Disable the right-click context menu.
    */
   public static void disableRightClickContextMenu() {
