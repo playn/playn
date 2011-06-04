@@ -96,7 +96,9 @@ public class HtmlPlatform implements Platform {
     // Setup logging first, so it can be used by other subsystems
     log = GWT.create(HtmlLog.class);
     if (!GWT.isProdMode()) {
-      log.warn("You are running in development mode. Expect severely degraded HTML platform performance.");
+      log.warn("You are running in GWT Development Mode. "
+          + "For optimal performance you may want to use an alternative method. "
+          + "See http://code.google.com/p/forplay/wiki/GameDebuggingOptions");
     }
 
     /*
