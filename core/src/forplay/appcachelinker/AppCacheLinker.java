@@ -131,7 +131,7 @@ public class AppCacheLinker extends IFrameLinker {
     Artifact artifact : artifacts) {
       if (artifact instanceof EmittedArtifact) {
         EmittedArtifact ea = (EmittedArtifact) artifact;
-        String path = /* context.getModuleFunctionName() + "/" + */ea.getPartialPath();
+        String path = "/" + context.getModuleFunctionName() + "/" + ea.getPartialPath();
 
         if (accept(path)) {
           publicSourcesSb.append(path + "\n");
