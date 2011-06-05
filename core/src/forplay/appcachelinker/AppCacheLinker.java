@@ -59,8 +59,8 @@ public class AppCacheLinker extends IFrameLinker {
   private static final HashSet<String> DEFAULT_EXTENSION_WHITELIST = new HashSet<String>(
       Arrays.asList(new String[] {
           // .wav files explicitly excluded, since HTML games use .mp3
-          ".js", ".html", ".jpg", ".jpeg", ".png", ".gif", ".mp3", ".ogg", ".mov", ".avi", ".wmv",
-          ".webm", ".css", ".json", ".flv", ".swf",}));
+          "js", "html", "jpg", "jpeg", "png", "gif", "mp3", "ogg", "mov", "avi", "wmv",
+          "webm", "css", "json", "flv", "swf",}));
 
   private static final String MANIFEST = "appcache.nocache.manifest";
 
@@ -107,7 +107,7 @@ public class AppCacheLinker extends IFrameLinker {
     // Whitelisted file extension?
     int pos = path.lastIndexOf('.');
     if (pos != -1) {
-      String extension = path.substring(pos);
+      String extension = path.substring(pos + 1);
       if (DEFAULT_EXTENSION_WHITELIST.contains(extension)) {
         return true;
       }
