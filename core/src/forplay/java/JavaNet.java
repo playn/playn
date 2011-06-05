@@ -71,7 +71,7 @@ public class JavaNet implements Net {
 
   // Super-simple url-cleanup: assumes it either starts with "http", or that
   // it's an absolute path on the current server.
-  private String canonicalizeUrl(String url) throws MalformedURLException {
+  private String canonicalizeUrl(String url) {
     if (!url.startsWith("http")) {
       return "http://" + server() + url;
     }

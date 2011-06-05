@@ -286,7 +286,7 @@ public class MathUtils {
 	}
 	
 	public static final float fastPow(float a, float b) {
-	  return (float) Math.pow((double) a, (double) b);
+	  return (float) Math.pow(a, b);
 	  //TODO(pruggia): reenable fast pow ?
           //JBOX2DCODE:
 //		float x = Float.floatToRawIntBits(a);
@@ -357,7 +357,7 @@ public class MathUtils {
 	 */
 	// UNTESTED
 	public static final float pow(final float a, float b) {
-	  return (float) Math.pow((double) a, (double) b);
+	  return (float) Math.pow(a, b);
 	  //TODO(pruggia) reenable fast pow ?
           //JBOX2DCODE:
 //		// adapted from: http://www.dctsystems.co.uk/Software/power.html
