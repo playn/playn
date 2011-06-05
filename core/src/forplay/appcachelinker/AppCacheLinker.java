@@ -24,14 +24,16 @@ import com.google.gwt.core.ext.linker.ArtifactSet;
 import com.google.gwt.core.ext.linker.EmittedArtifact;
 import com.google.gwt.core.linker.IFrameLinker;
 
+import java.util.Arrays;
 import java.util.Date;
+import java.util.HashSet;
 
 /**
  * AppCacheLinker - linker for public path resources in the Application Cache. <br/>
  * To use:
  * <ol>
  * <li>Add {@code manifest="YOURMODULENAME/appcache.nocache.manifest"} to the
- * {@code <html>} tag in your base html file. E.g.,
+ * {@code <html>} tag in your main html file. E.g.,
  * {@code <html manifest="mymodule/appcache.nocache.manifest">}</li>
  * <li>Add a mime-mapping to your web.xml file:
  * <p>
@@ -47,12 +49,18 @@ import java.util.Date;
  * On every compile, this linker will regenerate the appcache.nocache.manifest
  * file with files from the public path of your module.
  * <p>
- * This linker contains a whitelist of acceptable file extensions. To include
- * files with other extensions, override {@link #getCacheWhitelist()}.
+ * This linker has some default behavior with respect to which files will be included in the manifest,
+ * which can be modified by overriding {@link #accept(String)}.
  * <p>
  * To add additional static files to the manifest, override {@link #staticCachedFiles()}.
  */
 public class AppCacheLinker extends IFrameLinker {
+
+  private static final HashSet<String> DEFAULT_EXTENSION_WHITELIST = new HashSet<String>(
+      Arrays.asList(new String[] {
+          // .wav files explicitly excluded, since HTML games use .mp3
+          ".js", ".html", ".jpg", ".jpeg", ".png", ".gif", ".mp3", ".ogg", ".mov", ".avi", ".wmv",
+          ".webm", ".css", ".json", ".flv", ".swf",}));
 
   private static final String MANIFEST = "appcache.nocache.manifest";
 
@@ -77,15 +85,36 @@ public class AppCacheLinker extends IFrameLinker {
   }
 
   /**
-   * Return a list of file extensions that are white-listed to be cached.
+   * Determines whether our not the given should be included in the app cache
+   * manifest. Subclasses may override this method in order to filter out
+   * specific file patterns.
    * 
-   * @return a list of file extensions that are white-listed to be cached.
+   * @param file the path of the resource being considered
+   * @return true if the file should be included in the manifest
    */
-  protected String[] getCacheWhitelist() {
-    return new String[]{
-        // .wav files explicitly excluded, since HTML games use .mp3
-        ".js", ".html", ".jpg", ".jpeg", ".png", ".gif", ".mp3", ".ogg", ".mov", ".avi", ".wmv",
-        ".webm", ".css", ".json", ".flv", ".swf", "/", };
+  protected boolean accept(String path) {
+
+    // GWT Developent Mode file?
+    if (path.equals("hosted.html")) {
+      return false;
+    }
+
+    // Default or welcome file?
+    if (path.equals("/")) {
+      return true;
+    }
+    
+    // Whitelisted file extension?
+    int pos = path.lastIndexOf('.');
+    if (pos != -1) {
+      String extension = path.substring(pos);
+      if (DEFAULT_EXTENSION_WHITELIST.contains(extension)) {
+        return true;
+      }
+    }
+    
+    // Not included by default
+    return false;
   }
 
   /**
@@ -97,19 +126,15 @@ public class AppCacheLinker extends IFrameLinker {
     StringBuilder publicSourcesSb = new StringBuilder();
     StringBuilder publicStaticSourcesSb = new StringBuilder();
 
-    String[] whiteList = getCacheWhitelist();
-
     // Iterate over all emitted artifacts, and collect all cacheable artifacts
     for (@SuppressWarnings("rawtypes")
     Artifact artifact : artifacts) {
       if (artifact instanceof EmittedArtifact) {
         EmittedArtifact ea = (EmittedArtifact) artifact;
-        String pathName = /* context.getModuleFunctionName() + "/" + */ea.getPartialPath();
+        String path = /* context.getModuleFunctionName() + "/" + */ea.getPartialPath();
 
-        for (String extension : whiteList) {
-          if (pathName.endsWith(extension)) {
-            publicSourcesSb.append(pathName + "\n");
-          }
+        if (accept(path)) {
+          publicSourcesSb.append(path + "\n");
         }
       }
     }
@@ -117,10 +142,8 @@ public class AppCacheLinker extends IFrameLinker {
     // Iterate over all static files
     if (staticFiles != null) {
       for (String staticFile : staticFiles) {
-        for (String extension : whiteList) {
-          if (staticFile.endsWith(extension)) {
-            publicStaticSourcesSb.append(staticFile + "\n");
-          }
+        if (accept(staticFile)) {
+          publicStaticSourcesSb.append(staticFile + "\n");
         }
       }
     }
