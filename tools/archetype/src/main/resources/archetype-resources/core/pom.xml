@@ -21,7 +21,7 @@
     </dependency>
 
     <dependency>
-      <groupId>forplay</groupId>
+      <groupId>com.googlecode.forplay</groupId>
       <artifactId>core</artifactId>
       <version>${coreversion}</version>
     </dependency>

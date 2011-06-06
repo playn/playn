@@ -3,13 +3,13 @@
   <modelVersion>4.0.0</modelVersion>
   
   <parent>
-    <groupId>forplay</groupId>
+    <groupId>com.googlecode.forplay</groupId>
     <artifactId>forplay-project</artifactId>
     <version>1.0-SNAPSHOT</version>
     <relativePath>../../../pom.xml</relativePath>
   </parent>
 
-  <groupId>forplay</groupId>
+  <groupId>com.googlecode.forplay</groupId>
   <artifactId>webgl</artifactId>
   <packaging>jar</packaging>
   <name>Forplay WebGL</name>

@@ -3,12 +3,12 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>forplay</groupId>
+    <groupId>com.googlecode.forplay</groupId>
     <artifactId>forplay-project</artifactId>
     <version>1.0-SNAPSHOT</version>
   </parent>
 
-  <groupId>forplay</groupId>
+  <groupId>com.googlecode.forplay</groupId>
   <artifactId>server</artifactId>
   <packaging>jar</packaging>
   <name>Forplay Server</name>
