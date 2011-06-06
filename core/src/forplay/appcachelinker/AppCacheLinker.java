@@ -16,17 +16,17 @@
 
 package forplay.appcachelinker;
 
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashSet;
+
 import com.google.gwt.core.ext.LinkerContext;
 import com.google.gwt.core.ext.TreeLogger;
 import com.google.gwt.core.ext.UnableToCompleteException;
 import com.google.gwt.core.ext.linker.Artifact;
 import com.google.gwt.core.ext.linker.ArtifactSet;
 import com.google.gwt.core.ext.linker.EmittedArtifact;
-import com.google.gwt.core.linker.IFrameLinker;
-
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashSet;
+import com.google.gwt.core.linker.XSLinker;
 
 /**
  * AppCacheLinker - linker for public path resources in the Application Cache. <br/>
@@ -54,7 +54,7 @@ import java.util.HashSet;
  * <p>
  * To add additional static files to the manifest, override {@link #staticCachedFiles()}.
  */
-public class AppCacheLinker extends IFrameLinker {
+public class AppCacheLinker extends XSLinker {
 
   private static final HashSet<String> DEFAULT_EXTENSION_WHITELIST = new HashSet<String>(
       Arrays.asList(new String[] {
