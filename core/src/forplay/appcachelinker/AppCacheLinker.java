@@ -26,7 +26,7 @@ import com.google.gwt.core.ext.UnableToCompleteException;
 import com.google.gwt.core.ext.linker.Artifact;
 import com.google.gwt.core.ext.linker.ArtifactSet;
 import com.google.gwt.core.ext.linker.EmittedArtifact;
-import com.google.gwt.core.linker.XSLinker;
+import com.google.gwt.core.linker.CrossSiteIframeLinker;
 
 /**
  * AppCacheLinker - linker for public path resources in the Application Cache. <br/>
@@ -54,7 +54,7 @@ import com.google.gwt.core.linker.XSLinker;
  * <p>
  * To add additional static files to the manifest, override {@link #staticCachedFiles()}.
  */
-public class AppCacheLinker extends XSLinker {
+public class AppCacheLinker extends CrossSiteIframeLinker {
 
   private static final HashSet<String> DEFAULT_EXTENSION_WHITELIST = new HashSet<String>(
       Arrays.asList(new String[] {
