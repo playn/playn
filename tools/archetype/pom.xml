@@ -4,7 +4,7 @@
 
   <groupId>forplay</groupId>
   <artifactId>forplay-sample-archetype</artifactId>
-  <version>1.0</version>
+  <version>1.0-SNAPSHOT</version>
   <packaging>maven-archetype</packaging>
 
   <name>forplay-sample-archetype</name>
