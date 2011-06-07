@@ -23,7 +23,7 @@ class HtmlKeyboard implements Keyboard {
 
   private Listener listener;
 
-  HtmlKeyboard() {
+  public void init() {
     // Key handlers.
     HtmlPlatform.captureEvent("keydown", new EventHandler() {
       public void handleEvent(NativeEvent evt) {

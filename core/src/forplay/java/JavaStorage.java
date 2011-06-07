@@ -32,7 +32,7 @@ class JavaStorage implements Storage {
   private boolean isPersisted = false; // false by default
   private Properties properties;
 
-  public JavaStorage() {
+  public void init() {
     properties = maybeRetrieveProperties();
   }
 

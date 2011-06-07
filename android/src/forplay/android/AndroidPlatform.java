@@ -59,6 +59,15 @@ public class AndroidPlatform implements Platform {
 
   private AndroidPlatform(GameActivity activity) {
     this.activity = activity;
+    audio = new AndroidAudio();
+    graphics = new AndroidGraphics(activity);
+    json = new JavaJson();
+    keyboard = new AndroidKeyboard();
+    log = new AndroidLog();
+    net = new AndroidNet();
+    pointer = new AndroidPointer();
+    assetManager = new AndroidAssetManager();
+    analytics = new AndroidAnalytics();
   }
 
   @Override
@@ -134,16 +143,6 @@ public class AndroidPlatform implements Platform {
 
   @Override
   public void run(Game game) {
-    audio = new AndroidAudio();
-    graphics = new AndroidGraphics(activity);
-    json = new JavaJson();
-    keyboard = new AndroidKeyboard();
-    log = new AndroidLog();
-    net = new AndroidNet();
-    pointer = new AndroidPointer();
-    assetManager = new AndroidAssetManager();
-    analytics = new AndroidAnalytics();
-
     this.game = game;
     game.init();
   }

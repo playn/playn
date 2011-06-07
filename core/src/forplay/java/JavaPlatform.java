@@ -46,6 +46,7 @@ public class JavaPlatform implements Platform {
   public static JavaPlatform register() {
     JavaPlatform platform = new JavaPlatform();
     ForPlay.setPlatform(platform);
+    platform.init();
     return platform;
   }
 
@@ -54,7 +55,7 @@ public class JavaPlatform implements Platform {
   private Game game;
 
   private JavaRegularExpression regularExpression = new JavaRegularExpression();
-  private JavaAudio audio;
+  private JavaAudio audio = new JavaAudio();
   private JavaGraphics graphics;
   private JavaJson json = new JavaJson();
   private JavaKeyboard keyboard;
@@ -62,13 +63,22 @@ public class JavaPlatform implements Platform {
   private JavaNet net = new JavaNet();
   private JavaPointer pointer;
   private JavaMouse mouse;
-  private JavaStorage storage;
+  private JavaStorage storage = new JavaStorage();
   private JavaAssetManager assetManager = new JavaAssetManager();
 
   private int updateRate = 0;
   private Analytics analytics = new JavaAnalytics();
 
   private JavaPlatform() {
+  }
+
+  private void init () {
+    ensureFrame();
+    graphics = new JavaGraphics(frame, component);
+    keyboard = new JavaKeyboard(frame);
+    pointer = new JavaPointer(component);
+    mouse = new JavaMouse(component);
+    storage.init();
   }
 
   @Override
@@ -140,20 +150,10 @@ public class JavaPlatform implements Platform {
   @Override
   public void run(final Game game) {
     this.updateRate = game.updateRate();
-    ensureFrame();
-
-    audio = new JavaAudio();
-    graphics = new JavaGraphics(frame, component);
-    keyboard = new JavaKeyboard(frame);
-    pointer = new JavaPointer(component);
-    mouse = new JavaMouse(component);
-    storage = new JavaStorage();
+    this.game = game;
 
     game.init();
-
-    // Don't set the game until after ensureFrame(). This keeps paint() from
-    // being called early.
-    this.game = game;
+    frame.setVisible(true);
   }
 
   @Override
@@ -163,7 +163,6 @@ public class JavaPlatform implements Platform {
 
   private void ensureFrame() {
     frame = new JFrame();
-
     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
     component = new JComponent() {
@@ -207,8 +206,6 @@ public class JavaPlatform implements Platform {
 
     component.setPreferredSize(new Dimension(640, 480));
     frame.pack();
-
-    frame.setVisible(true);
   }
 
   @Override

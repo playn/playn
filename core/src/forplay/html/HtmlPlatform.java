@@ -1,11 +1,11 @@
 /**
  * Copyright 2010 The ForPlay Authors
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  * in compliance with the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software distributed under the License
  * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
  * or implied. See the License for the specific language governing permissions and limitations under
@@ -39,19 +39,50 @@ import forplay.html.HtmlUrlParameters.Renderer;
 
 public class HtmlPlatform implements Platform {
 
+  /** Used by {@link #register(Mode)}. */
+  public static enum Mode {
+    WEBGL {
+      public boolean useGL() {
+        return true;
+      }
+    },
+    CANVAS {
+      public boolean useGL() {
+        return false;
+      }
+    },
+    AUTODETECT {
+      public boolean useGL() {
+        return shouldUseGL();
+      }
+    };
+
+    public abstract boolean useGL ();
+  };
+
   static final int DEFAULT_WIDTH = 640;
   static final int DEFAULT_HEIGHT = 480;
 
   private static final int LOG_FREQ = 2500;
   private static final float MAX_DELTA = 100;
 
-  // true for WebGL graphics
-  private boolean useGL = shouldUseGL();
-
+  /**
+   * Prepares the HTML platform for operation.
+   */
   public static HtmlPlatform register() {
+    return register(Mode.AUTODETECT);
+  }
+
+  /**
+   * Prepares the HTML platform for operation.
+   *
+   * @param mode indicates whether to force the use of WebGL, force the use of Canvas, or to
+   * autodetect whether the browser supports WebGL and use it if possible.
+   */
+  public static HtmlPlatform register(Mode mode) {
     HtmlPlatform platform = new HtmlPlatform();
     ForPlay.setPlatform(platform);
-    platform.init();
+    platform.init(mode);
     return platform;
   }
 
@@ -72,13 +103,13 @@ public class HtmlPlatform implements Platform {
 
   private HtmlAssetManager assetManager = new HtmlAssetManager();
   private HtmlAudio audio;
-  private HtmlRegularExpression regularExpression;
+  private HtmlRegularExpression regularExpression = new HtmlRegularExpression();
   private Game game;
   private HtmlGraphics graphics;
-  private HtmlJson json;
-  private HtmlKeyboard keyboard;
+  private HtmlJson json = new HtmlJson();
+  private HtmlKeyboard keyboard = new HtmlKeyboard();
   private HtmlLog log;
-  private HtmlNet net;
+  private HtmlNet net = new HtmlNet();
   private HtmlPointer pointer;
   private HtmlMouse mouse;
   private HtmlTouch touch;
@@ -92,7 +123,7 @@ public class HtmlPlatform implements Platform {
   private HtmlPlatform() {
   }
 
-  public void init() {
+  public void init(Mode mode) {
     // Setup logging first, so it can be used by other subsystems
     log = GWT.create(HtmlLog.class);
     if (!GWT.isProdMode()) {
@@ -107,6 +138,17 @@ public class HtmlPlatform implements Platform {
      * our own exceptions here.
      */
     try {
+      keyboard.init();
+      try {
+        graphics = mode.useGL() ? new HtmlGraphicsGL() : new HtmlGraphicsDom();
+      } catch (RuntimeException e) {
+        // HtmlGraphicsGL ctor throws a runtime exception if the context creation fails.
+        log().info("Failed to create GL context. Falling back.");
+        graphics = new HtmlGraphicsDom();
+      }
+      pointer = new HtmlPointer(graphics.getRootElement());
+      mouse = new HtmlMouse(graphics.getRootElement());
+      touch = new HtmlTouch(graphics.getRootElement());
       audio = new HtmlAudio();
       storage = new HtmlStorage();
       analytics = new HtmlAnalytics();
@@ -188,22 +230,6 @@ public class HtmlPlatform implements Platform {
 
   @Override
   public void run(final Game game) {
-    regularExpression = new HtmlRegularExpression();
-    net = new HtmlNet();
-    keyboard = new HtmlKeyboard();
-    json = new HtmlJson();
-    try {
-      graphics = useGL ? new HtmlGraphicsGL() : new HtmlGraphicsDom();
-    } catch (RuntimeException e) {
-      // HtmlGraphicsGL ctor throws a runtime exception if the context creation fails.
-      log().info("Failed to create GL context. Falling back.");
-      graphics = new HtmlGraphicsDom();
-    }
-
-    pointer = new HtmlPointer(graphics.getRootElement());
-    mouse = new HtmlMouse(graphics.getRootElement());
-    touch = new HtmlTouch(graphics.getRootElement());
-
     final int updateRate = game.updateRate();
 
     this.game = game;
@@ -240,17 +266,6 @@ public class HtmlPlatform implements Platform {
       }
     };
     requestAnimationFrame(paintCallback);
-  }
-
-  /**
-   * Sets a flag to force GL graphics.
-   * 
-   * This will only have an effect if called before {@link #run(Game)}
-   * 
-   * @param useGL true to force GL graphics
-   */
-  public void setUseGL(boolean useGL) {
-    this.useGL = useGL;
   }
 
   @Override
@@ -291,34 +306,9 @@ public class HtmlPlatform implements Platform {
   }-*/;
 
   /**
-   * Return true if renderer query parameter equals {@link Renderer#GL} or is not set, and the
-   * browser supports WebGL
-   * 
-   * @return true if renderer query parameter equals {@link Renderer#GL} or is not set, and the
-   *         browser supports WebGL
-   */
-  private boolean shouldUseGL() {
-    boolean useGlFromFlag = Renderer.shouldUseGL();
-    return (useGlFromFlag && hasGLSupport());
-  }
-
-  /**
-   * Return true if the browser supports WebGL
-   * 
-   * Note: This test can have false positives depending on the graphics hardware.
-   * 
-   * @return true if the browser supports WebGL
-   */
-  private native boolean hasGLSupport() /*-{
-    return !!$wnd.WebGLRenderingContext &&
-      // WebGL is slow on Chrome OSX 10.5 
-      (!/Chrome/.test(navigator.userAgent) || !/OS X 10_5/.test(navigator.userAgent));
-  }-*/;
-
-  /**
    * Gets the URL's parameter of the specified name. Note that if multiple parameters have been
    * specified with the same name, the last one will be returned.
-   * 
+   *
    * @param name the name of the URL's parameter
    * @return the value of the URL's parameter
    */
@@ -336,7 +326,7 @@ public class HtmlPlatform implements Platform {
 
   /**
    * Sets the title of the browser's window or tab.
-   * 
+   *
    * @param title the window title
    */
   public void setTitle(String title) {
@@ -350,6 +340,31 @@ public class HtmlPlatform implements Platform {
     Element rootElement = ((HtmlGraphics) ForPlay.graphics()).getRootElement();
     disableRightClickImpl(rootElement);
   }
+
+  /**
+   * Return true if renderer query parameter equals {@link Renderer#GL} or is not set, and the
+   * browser supports WebGL
+   *
+   * @return true if renderer query parameter equals {@link Renderer#GL} or is not set, and the
+   *         browser supports WebGL
+   */
+  private static boolean shouldUseGL() {
+    boolean useGlFromFlag = Renderer.shouldUseGL();
+    return (useGlFromFlag && hasGLSupport());
+  }
+
+  /**
+   * Return true if the browser supports WebGL
+   *
+   * Note: This test can have false positives depending on the graphics hardware.
+   *
+   * @return true if the browser supports WebGL
+   */
+  private static native boolean hasGLSupport() /*-{
+    return !!$wnd.WebGLRenderingContext &&
+      // WebGL is slow on Chrome OSX 10.5
+      (!/Chrome/.test(navigator.userAgent) || !/OS X 10_5/.test(navigator.userAgent));
+  }-*/;
 
   private static native void disableRightClickImpl(JavaScriptObject target) /*-{
     target.oncontextmenu = function() {
