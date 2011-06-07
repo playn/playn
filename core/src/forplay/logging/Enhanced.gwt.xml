@@ -70,11 +70,16 @@
     
       <inherits name="com.allen_sauer.gwt.log.gwt-log-RemoteLogger" />
   -->
-  <!-- 
-    Add line number information to deobfuscated stack traces:
+  <!--
+    Note: these options increased the compiled size of your application, yet often prove vitally
+    useful when trying to debug issues in the compiled version of your game.
     
+    If your exceptions have no stack traces (e.g. IE9), enable emulated stack traces:
       <set-property name="compiler.emulatedStack" value="true" />
+      
+    Add line number and filename information to (deobfuscated) stack traces:
       <set-configuration-property name="compiler.emulatedStack.recordLineNumbers" value="true"/>
+      <set-configuration-property name="compiler.emulatedStack.recordFileNames" value="true"/>
    -->
  
 </module>
