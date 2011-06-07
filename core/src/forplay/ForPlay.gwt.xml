@@ -22,26 +22,24 @@
   <source path='html'/>
 
   <!--
-    Note: Compiling only the 'safari' user.agent will currently
-          prevent Flash from being detected in IE, which means
-          gwt-voices will choose HTML5 audio in IE9.
-
-    To compile separate permutations for IE9 and Firefox add this to
-    your game's .gwt.xml module:
-
-      <extend-property name="user.agent" values="ie9,gecko1_8"/>
-  -->
-
-  <!--
     Speed up compile time. Target only modern HTML5 browsers.
     The value 'safari' exists solely for for historical reasons.
-    Your ForPlay game should work in Chrome, Firefox 3.6/4.0, Safari, IE9
+    Your ForPlay game should work in Chrome, Firefox 3.6/4.0, Safari, IE9.
   -->
   <set-property name='user.agent' value='safari'/>
   <set-configuration-property name="user.agent.runtimeWarning" value="false" />
 
   <!-- Flash/HTML5/Native audio support -->
   <inherits name="com.allen_sauer.gwt.voices.gwt-voices" />
+  <!-- 
+    This allows us to replace the normal compile time deferred binding implementation
+    decision, with a runtime decision, based on the runtime user agent. Doing so, allows us to use
+    'safari' as a single 'user.agent' permutation, which speeds up compile time,
+    but still provides Flash detection in IE.
+  -->
+  <replace-with class="com.allen_sauer.gwt.voices.client.ui.impl.FlashMovieImplForPlay">
+    <when-type-is class="com.allen_sauer.gwt.voices.client.ui.impl.FlashMovieImpl" />
+  </replace-with>
 
   <!-- By default, we log to System.out in Development Mode -->
   <replace-with class="forplay.html.HtmlLogSimple">
