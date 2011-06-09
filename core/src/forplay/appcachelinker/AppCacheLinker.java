@@ -95,7 +95,7 @@ public class AppCacheLinker extends DirectInstallLinker {
   protected boolean accept(String path) {
 
     // GWT Developent Mode file?
-    if (path.equals("hosted.html")) {
+    if (path.equals("hosted.html") || path.endsWith(".devmode.js")) {
       return false;
     }
 
