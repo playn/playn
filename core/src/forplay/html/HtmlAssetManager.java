@@ -84,8 +84,7 @@ public class HtmlAssetManager extends AbstractCachingAssetManager {
       @Override
       public void onTimeout(XDomainRequest xdr) {
         ForPlay.log().error("xdr::onTimeout[" + fullPath + "]()");
-        callback.error(new RuntimeException("Error getting " + fullPath + " : " + xdr.getStatus()
-            + " " + xdr.getResponseText()));
+        callback.error(new RuntimeException("Error getting " + fullPath + " : " + xdr.getStatus()));
       }
 
       @Override
@@ -106,8 +105,7 @@ public class HtmlAssetManager extends AbstractCachingAssetManager {
       @Override
       public void onError(XDomainRequest xdr) {
         ForPlay.log().error("xdr::onError[" + fullPath + "]()");
-        callback.error(new RuntimeException("Error getting " + fullPath + " : " + xdr.getStatus()
-            + " " + xdr.getResponseText()));
+        callback.error(new RuntimeException("Error getting " + fullPath + " : " + xdr.getStatus()));
       }
     });
 
@@ -136,7 +134,7 @@ public class HtmlAssetManager extends AbstractCachingAssetManager {
                 "xhr::onReadyStateChange[" + fullPath + "](readyState = " + readyState
                     + "; status = " + status + ")");
             callback.error(new RuntimeException("Error getting " + fullPath + " : "
-                + xhr.getStatusText() + " " + xhr.getResponseText()));
+                + xhr.getStatusText()));
           } else {
             if (LOG_XHR_SUCCESS) {
               ForPlay.log().debug(
