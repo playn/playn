@@ -20,6 +20,7 @@ import java.awt.geom.Rectangle2D;
 
 import static forplay.core.ForPlay.graphics;
 
+import forplay.core.Asserts;
 import forplay.core.Image;
 import forplay.core.ImageLayer;
 
@@ -64,7 +65,7 @@ class JavaImageLayer extends JavaLayer implements ImageLayer {
 
   @Override
   public void setHeight(float height) {
-    assert height > 0;
+    Asserts.checkArgument(height > 0, "Height must be > 0");
 
     heightSet = true;
     if (this.height != height) {
@@ -75,16 +76,14 @@ class JavaImageLayer extends JavaLayer implements ImageLayer {
 
   @Override
   public void setImage(Image image) {
-    assert image instanceof JavaImage;
+    Asserts.checkArgument(image instanceof JavaImage);
     this.image = (JavaImage) image;
     dirty = true;
   }
 
   @Override
   public void setRepeatX(boolean repeat) {
-    if (repeat) {
-      assert !sourceRectSet;
-    }
+    Asserts.checkArgument(!repeat || !sourceRectSet, "Cannot repeat when source rect is used");
 
     if (repeatX != repeat) {
       repeatX = repeat;
@@ -94,9 +93,7 @@ class JavaImageLayer extends JavaLayer implements ImageLayer {
 
   @Override
   public void setRepeatY(boolean repeat) {
-    if (repeat) {
-      assert !sourceRectSet;
-    }
+    Asserts.checkArgument(!repeat || !sourceRectSet, "Cannot repeat when source rect is used");
 
     if (repeatY != repeat) {
       repeatY = repeat;
@@ -106,7 +103,7 @@ class JavaImageLayer extends JavaLayer implements ImageLayer {
 
   @Override
   public void setSourceRect(float sx, float sy, float sw, float sh) {
-    assert !repeatX && !repeatY;
+    Asserts.checkState(!repeatX && !repeatY, "Cannot use source rect when repeating x or y");
 
     sourceRectSet = true;
     this.sx = sx;
@@ -117,7 +114,7 @@ class JavaImageLayer extends JavaLayer implements ImageLayer {
 
   @Override
   public void setWidth(float width) {
-    assert width > 0;
+    Asserts.checkArgument(width > 0, "Width must be > 0");
 
     widthSet = true;
     if (this.width != width) {
@@ -128,8 +125,8 @@ class JavaImageLayer extends JavaLayer implements ImageLayer {
 
   @Override
   public void setSize(float width, float height) {
-    assert width > 0;
-    assert height > 0;
+    Asserts.checkArgument(width > 0 && height > 0,
+                          "Width and height must be > 0 (got %dx%d)", width, height);
 
     widthSet = true;
     if (this.width != width) {

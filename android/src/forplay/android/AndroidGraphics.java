@@ -20,6 +20,8 @@ import android.graphics.BitmapShader;
 import android.graphics.LinearGradient;
 import android.graphics.RadialGradient;
 import android.graphics.Shader.TileMode;
+
+import forplay.core.Asserts;
 import forplay.core.CanvasImage;
 import forplay.core.CanvasLayer;
 import forplay.core.Gradient;
@@ -58,7 +60,7 @@ class AndroidGraphics implements Graphics {
 
   @Override
   public Pattern createPattern(Image img) {
-    assert img instanceof AndroidImage;
+    Asserts.checkArgument(img instanceof AndroidImage);
     Bitmap bitmap = ((AndroidImage) img).getBitmap();
     BitmapShader shader = new BitmapShader(bitmap, TileMode.REPEAT, TileMode.REPEAT);
     return new AndroidPattern(shader);

@@ -56,13 +56,13 @@ public abstract class AbstractLayer implements Layer {
 
   @Override
   public void setScale(float s) {
-    assert s != 0;
+    Asserts.checkArgument(s != 0, "Scale must be non-zero");
     transform.setScale(s);
   }
 
   @Override
   public void setScale(float x, float y) {
-    assert x != 0 && y != 0;
+    Asserts.checkArgument(x != 0 && y != 0, "Scale must be non-zero (got x=%s, y=%s)", x, y);
     transform.setScale(x, y);
   }
 
@@ -82,7 +82,7 @@ public abstract class AbstractLayer implements Layer {
   }
 
   public void onAdd() {
-    assert !isDestroyed : "Illegal to use destroyed layers";
+    Asserts.checkState(!isDestroyed, "Illegal to use destroyed layers");
   }
 
   public void onRemove() {

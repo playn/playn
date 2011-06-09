@@ -27,6 +27,7 @@ import com.google.gwt.dom.client.NativeEvent;
 import com.google.gwt.webgl.client.WebGLFramebuffer;
 import com.google.gwt.webgl.client.WebGLTexture;
 
+import forplay.core.Asserts;
 import forplay.core.Image;
 import forplay.core.ResourceCallback;
 import forplay.core.Transform;
@@ -57,7 +58,7 @@ class HtmlImage implements Image {
 
   @Override
   public void replaceWith(Image image) {
-    assert image instanceof HtmlImage;
+    Asserts.checkArgument(image instanceof HtmlImage);
     img = ((HtmlImage) image).img;
   }
 
@@ -184,7 +185,7 @@ class HtmlImage implements Image {
    * TODO(jgw): Is there no better way to do this than all this bit twiddling?
    */
   private int nextPowerOfTwo(int x) {
-    assert x < 0x10000;
+    Asserts.checkArgument(x < 0x10000);
 
     int bit = 0x8000, highest = -1, count = 0;
     for (int i = 15; i >= 0; --i, bit >>= 1) {

@@ -20,6 +20,7 @@ import static com.google.gwt.webgl.client.WebGLRenderingContext.COLOR_BUFFER_BIT
 import com.google.gwt.webgl.client.WebGLFramebuffer;
 import com.google.gwt.webgl.client.WebGLTexture;
 
+import forplay.core.Asserts;
 import forplay.core.Image;
 import forplay.core.Pattern;
 import forplay.core.Surface;
@@ -64,7 +65,7 @@ class HtmlSurfaceGL implements Surface {
   public void drawImage(Image image, float x, float y, float dw, float dh) {
     gfx.bindFramebuffer(fbuf, width, height);
 
-    assert image instanceof HtmlImage;
+    Asserts.checkArgument(image instanceof HtmlImage);
     HtmlImage himage = (HtmlImage) image;
 
     if (himage.isReady()) {
@@ -80,7 +81,7 @@ class HtmlSurfaceGL implements Surface {
       float sw, float sh) {
     gfx.bindFramebuffer(fbuf, width, height);
 
-    assert image instanceof HtmlImage;
+    Asserts.checkArgument(image instanceof HtmlImage);
     HtmlImage himage = (HtmlImage) image;
 
     if (himage.isReady()) {
@@ -132,7 +133,7 @@ class HtmlSurfaceGL implements Surface {
 
   @Override
   public void restore() {
-    assert transformStack.size() > 1 : "Unbalanced save/restore";
+    Asserts.checkState(transformStack.size() > 1, "Unbalanced save/restore");
     transformStack.remove(transformStack.size() - 1);
   }
 
@@ -167,7 +168,7 @@ class HtmlSurfaceGL implements Surface {
   @Override
   public void setFillPattern(Pattern pattern) {
     // TODO: Add it to the state stack.
-    assert pattern instanceof HtmlPattern;
+    Asserts.checkArgument(pattern instanceof HtmlPattern);
     this.fillPattern = (HtmlPattern) pattern;
   }
 

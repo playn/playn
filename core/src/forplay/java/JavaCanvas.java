@@ -15,11 +15,12 @@
  */
 package forplay.java;
 
+import forplay.core.Asserts;
+import forplay.core.Canvas;
 import forplay.core.Gradient;
 import forplay.core.Image;
 import forplay.core.Path;
 import forplay.core.Pattern;
-import forplay.core.Canvas;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -58,12 +59,12 @@ class JavaCanvas implements Canvas {
 
   @Override
   public void clip(Path path) {
-    assert path instanceof JavaPath;
+    Asserts.checkArgument(path instanceof JavaPath);
     currentState().clip = (JavaPath) path;
   }
 
   public void drawImage(Image img, float x, float y) {
-    assert img instanceof JavaImage;
+    Asserts.checkArgument(img instanceof JavaImage);
     JavaImage jimg = (JavaImage) img;
 
     currentState().prepareFill(gfx);
@@ -76,7 +77,7 @@ class JavaCanvas implements Canvas {
   }
 
   public void drawImage(Image img, float x, float y, float w, float h) {
-    assert img instanceof JavaImage;
+    Asserts.checkArgument(img instanceof JavaImage);
     JavaImage jimg = (JavaImage) img;
 
     // For non-integer scaling, we have to use AffineTransform.
@@ -87,14 +88,16 @@ class JavaCanvas implements Canvas {
   }
 
   @Override
-  public void drawImage(Image img, float dx, float dy, float dw, float dh, float sx, float sy, float sw, float sh) {
-    assert img instanceof JavaImage;
+  public void drawImage(Image img, float dx, float dy, float dw, float dh,
+                        float sx, float sy, float sw, float sh) {
+    Asserts.checkArgument(img instanceof JavaImage);
     JavaImage jimg = (JavaImage) img;
 
     // TODO: use AffineTransform here as well?
 
     currentState().prepareFill(gfx);
-    gfx.drawImage(jimg.img, (int)dx, (int)dy, (int)(dx + dw), (int)(dy + dh), (int)sx, (int)sy, (int)(sx + sw), (int)(sy + sh), null);
+    gfx.drawImage(jimg.img, (int)dx, (int)dy, (int)(dx + dw), (int)(dy + dh),
+                  (int)sx, (int)sy, (int)(sx + sw), (int)(sy + sh), null);
   }
 
   @Override
@@ -125,7 +128,7 @@ class JavaCanvas implements Canvas {
 
   @Override
   public void fillPath(Path path) {
-    assert path instanceof JavaPath;
+    Asserts.checkArgument(path instanceof JavaPath);
 
     currentState().prepareFill(gfx);
     gfx.fill(((JavaPath) path).path);
@@ -182,7 +185,7 @@ class JavaCanvas implements Canvas {
 
   @Override
   public void setFillGradient(Gradient gradient) {
-    assert gradient instanceof JavaGradient;
+    Asserts.checkArgument(gradient instanceof JavaGradient);
 
     currentState().fillGradient = (JavaGradient) gradient;
     currentState().fillPattern = null;
@@ -191,7 +194,7 @@ class JavaCanvas implements Canvas {
 
   @Override
   public void setFillPattern(Pattern pattern) {
-    assert pattern instanceof JavaPattern;
+    Asserts.checkArgument(pattern instanceof JavaPattern);
 
     currentState().fillPattern = (JavaPattern) pattern;
     currentState().fillGradient = null;

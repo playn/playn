@@ -18,6 +18,7 @@ package forplay.html;
 import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.core.client.JsArrayNumber;
 
+import forplay.core.Asserts;
 import forplay.core.Path;
 
 class HtmlPath implements Path {
@@ -112,21 +113,21 @@ class HtmlPath implements Path {
         }
 
         default:
-          assert false : "Corrupt command list";
+          throw new AssertionError("Corrupt command list");
       }
     }
   }
 
   float[] getVertices() {
     int len = list.length();
-    assert len % 2 == 0;
+    Asserts.check(len % 2 == 0);
     float[] vertices = new float[len];
     for (int v = 0; v < len;) {
       int cmd = (int) list.get(v);
       if (v == vertices.length -2) {
-        assert cmd == CMD_CLOSE;
+        Asserts.check(cmd == CMD_CLOSE);
       } else {
-        assert cmd == CMD_MOVE;
+        Asserts.check(cmd == CMD_MOVE);
       }
       vertices[v] = (float) list.get(v + 1);
       vertices[v+1] = (float) list.get(v + 2);
@@ -174,7 +175,7 @@ class HtmlPath implements Path {
         }
 
         default:
-          assert false : "Corrupt command list";
+          throw new AssertionError("Corrupt command list");
       }
     }
 

@@ -18,6 +18,8 @@ package forplay.android;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
 import android.os.AsyncTask;
+
+import forplay.core.Asserts;
 import forplay.core.Canvas;
 import forplay.core.CanvasImage;
 import forplay.core.Image;
@@ -78,7 +80,7 @@ class AndroidImage implements CanvasImage {
   }
 
   public void replaceWith(Image image) {
-    assert image instanceof AndroidImage;
+    Asserts.checkArgument(image instanceof AndroidImage);
     bitmap = ((AndroidImage) image).bitmap;
   }
 

@@ -15,6 +15,7 @@ package forplay.html;
 
 import com.google.gwt.webgl.client.WebGLRenderingContext;
 
+import forplay.core.Asserts;
 import forplay.core.GroupLayer;
 import forplay.core.Layer;
 import forplay.core.Transform;
@@ -32,7 +33,7 @@ class HtmlGroupLayerGL extends HtmlLayerGL implements GroupLayer {
 
   @Override
   public void add(Layer layer) {
-    assert layer instanceof HtmlLayerGL;
+    Asserts.checkArgument(layer instanceof HtmlLayerGL);
     HtmlLayerGL hlayer = (HtmlLayerGL) layer;
     children.add(hlayer);
     hlayer.setParent(this);
@@ -50,7 +51,7 @@ class HtmlGroupLayerGL extends HtmlLayerGL implements GroupLayer {
 
   @Override
   public void remove(Layer layer) {
-    assert layer instanceof HtmlLayerGL;
+    Asserts.checkArgument(layer instanceof HtmlLayerGL);
     HtmlLayerGL hlayer = (HtmlLayerGL) layer;
     children.remove(hlayer);
     hlayer.onRemove();
@@ -85,7 +86,7 @@ class HtmlGroupLayerGL extends HtmlLayerGL implements GroupLayer {
 
   @Override
   public void add(int index, Layer layer) {
-    assert layer instanceof HtmlLayerGL;
+    Asserts.checkArgument(layer instanceof HtmlLayerGL);
     HtmlLayerGL hlayer = (HtmlLayerGL) layer;
     children.add(index, hlayer);
     hlayer.setParent(this);

@@ -15,6 +15,7 @@
  */
 package forplay.android;
 
+import forplay.core.Asserts;
 import forplay.core.Image;
 import forplay.core.ImageLayer;
 
@@ -57,7 +58,7 @@ class AndroidImageLayer extends AndroidLayer implements ImageLayer {
 
   @Override
   public void setHeight(float height) {
-    assert height > 0;
+    Asserts.checkArgument(height > 0, "Height must be > 0");
 
     heightSet = true;
     if (this.height != height) {
@@ -67,15 +68,13 @@ class AndroidImageLayer extends AndroidLayer implements ImageLayer {
 
   @Override
   public void setImage(Image image) {
-    assert image instanceof AndroidImage;
+    Asserts.checkArgument(image instanceof AndroidImage);
     this.image = (AndroidImage) image;
   }
 
   @Override
   public void setRepeatX(boolean repeat) {
-    if (repeat) {
-      assert !sourceRectSet;
-    }
+    Asserts.checkArgument(!repeat || !sourceRectSet, "Cannot repeat when source rect is used");
 
     if (repeatX != repeat) {
       repeatX = repeat;
@@ -84,9 +83,7 @@ class AndroidImageLayer extends AndroidLayer implements ImageLayer {
 
   @Override
   public void setRepeatY(boolean repeat) {
-    if (repeat) {
-      assert !sourceRectSet;
-    }
+    Asserts.checkArgument(!repeat || !sourceRectSet, "Cannot repeat when source rect is used");
 
     if (repeatY != repeat) {
       repeatY = repeat;
@@ -101,7 +98,7 @@ class AndroidImageLayer extends AndroidLayer implements ImageLayer {
 
   @Override
   public void setSourceRect(float sx, float sy, float sw, float sh) {
-    assert !repeatX && !repeatY;
+    Asserts.checkState(!repeatX && !repeatY, "Cannot use source rect when repeating x or y");
 
     sourceRectSet = true;
     this.sx = sx;
@@ -112,7 +109,7 @@ class AndroidImageLayer extends AndroidLayer implements ImageLayer {
 
   @Override
   public void setWidth(float width) {
-    assert width > 0;
+    Asserts.checkArgument(width > 0, "Width must be > 0");
 
     widthSet = true;
     if (this.width != width) {

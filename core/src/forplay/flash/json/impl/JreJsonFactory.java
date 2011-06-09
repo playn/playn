@@ -15,6 +15,7 @@
  */
 package forplay.flash.json.impl;
 
+import forplay.core.Asserts;
 import forplay.flash.json.JsonArray;
 import forplay.flash.json.JsonBoolean;
 import forplay.flash.json.JsonException;
@@ -32,8 +33,7 @@ import forplay.flash.json.JsonValue;
 public class JreJsonFactory implements JsonFactory {
 
   public JsonString create(String string) {
-    assert string != null;
-    return new JreJsonString(string);
+    return new JreJsonString(Asserts.checkNotNull(string));
   }
 
   public JsonNumber create(double number) {

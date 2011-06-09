@@ -21,6 +21,7 @@ import com.google.gwt.dom.client.Style;
 import com.google.gwt.dom.client.Style.Overflow;
 import com.google.gwt.dom.client.Style.Unit;
 
+import forplay.core.Asserts;
 import forplay.core.Image;
 import forplay.core.ImageLayer;
 import forplay.core.ResourceCallback;
@@ -72,16 +73,16 @@ class HtmlImageLayerDom extends HtmlLayerDom implements ImageLayer {
 
   @Override
   public void setHeight(float height) {
-    assert height > 0;
-    heightSet = true;
+    Asserts.checkArgument(height > 0, "Height must be > 0");
 
+    heightSet = true;
     this.height = height;
     applySize();
   }
 
   @Override
   public void setImage(final Image img) {
-    assert img instanceof HtmlImage;
+    Asserts.checkArgument(img instanceof HtmlImage);
 
     // Make sure redundant setImage() calls don't cost much.
     if (htmlImage == img) {
@@ -109,9 +110,7 @@ class HtmlImageLayerDom extends HtmlLayerDom implements ImageLayer {
 
   @Override
   public void setRepeatX(boolean repeat) {
-    if (repeat) {
-      assert !sourceRectSet;
-    }
+    Asserts.checkArgument(!repeat || !sourceRectSet, "Cannot repeat when source rect is used");
 
     repeatX = repeat;
     applyBackgroundSize();
@@ -119,9 +118,7 @@ class HtmlImageLayerDom extends HtmlLayerDom implements ImageLayer {
 
   @Override
   public void setRepeatY(boolean repeat) {
-    if (repeat) {
-      assert !sourceRectSet;
-    }
+    Asserts.checkArgument(!repeat || !sourceRectSet, "Cannot repeat when source rect is used");
 
     repeatY = repeat;
     applyBackgroundSize();
@@ -129,10 +126,8 @@ class HtmlImageLayerDom extends HtmlLayerDom implements ImageLayer {
 
   @Override
   public void setSourceRect(float sx, float sy, float sw, float sh) {
-    assert !repeatX && !repeatY;
-
-    // Will cause div-by-zero
-    assert sw != 0 && sh != 0;
+    Asserts.checkState(!repeatX && !repeatY, "Cannot use source rect when repeating x or y");
+    Asserts.checkArgument(sw != 0 && sh != 0); // Will cause div-by-zero
 
     // Early out if there's no change. applyBackgroundSize() isn't free.
     if (sourceRectSet &&
@@ -151,22 +146,21 @@ class HtmlImageLayerDom extends HtmlLayerDom implements ImageLayer {
 
   @Override
   public void setWidth(float width) {
-    assert width > 0;
-    widthSet = true;
+    Asserts.checkArgument(width > 0, "Width must be > 0");
 
+    widthSet = true;
     this.width = width;
     applySize();
   }
 
   @Override
   public void setSize(float width, float height) {
-    assert width > 0;
+    Asserts.checkArgument(width > 0 && height > 0,
+                          "Width and height must be > 0 (got %dx%d)", width, height);
+
     widthSet = true;
-
-    assert height > 0;
-    heightSet = true;
-
     this.width = width;
+    heightSet = true;
     this.height = height;
     applySize();
   }

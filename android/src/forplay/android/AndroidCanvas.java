@@ -19,6 +19,8 @@ import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.Rect;
 import android.graphics.RectF;
+
+import forplay.core.Asserts;
 import forplay.core.Gradient;
 import forplay.core.Image;
 import forplay.core.Path;
@@ -43,13 +45,13 @@ class AndroidCanvas implements forplay.core.Canvas {
 
   @Override
   public void clip(Path clipPath) {
-    assert clipPath instanceof AndroidPath;
+    Asserts.checkArgument(clipPath instanceof AndroidPath);
     canvas.clipPath(((AndroidPath) clipPath).path);
   }
 
   @Override
   public void drawImage(Image img, float x, float y) {
-    assert img instanceof AndroidImage;
+    Asserts.checkArgument(img instanceof AndroidImage);
     AndroidImage aimg = (AndroidImage) img;
     if (aimg.getBitmap() != null) {
       canvas.drawBitmap(aimg.getBitmap(), x, y, null);
@@ -58,7 +60,7 @@ class AndroidCanvas implements forplay.core.Canvas {
 
   @Override
   public void drawImage(Image img, float x, float y, float w, float h) {
-    assert img instanceof AndroidImage;
+    Asserts.checkArgument(img instanceof AndroidImage);
     AndroidImage aimg = (AndroidImage) img;
     if (aimg.getBitmap() != null) {
       canvas.drawBitmap(aimg.getBitmap(), null, new RectF(x, y, w, h), null);
@@ -66,8 +68,9 @@ class AndroidCanvas implements forplay.core.Canvas {
   }
 
   @Override
-  public void drawImage(Image img, float dx, float dy, float dw, float dh, float sx, float sy, float sw, float sh) {
-    assert img instanceof AndroidImage;
+  public void drawImage(Image img, float dx, float dy, float dw, float dh,
+                        float sx, float sy, float sw, float sh) {
+    Asserts.checkArgument(img instanceof AndroidImage);
     AndroidImage aimg = (AndroidImage) img;
     if (aimg.getBitmap() != null) {
       Rect src = new Rect((int)sx, (int)sy, (int)sw, (int)sh);
@@ -103,7 +106,7 @@ class AndroidCanvas implements forplay.core.Canvas {
 
   @Override
   public void fillPath(Path path) {
-    assert path instanceof AndroidPath;
+    Asserts.checkArgument(path instanceof AndroidPath);
     canvas.drawPath(((AndroidPath) path).path, currentState().prepareFill());
   }
 
@@ -126,7 +129,7 @@ class AndroidCanvas implements forplay.core.Canvas {
     canvas.restore();
     paintStack.removeFirst();
 
-    assert paintStack.size() > 0 : "Unbalanced save/restore";
+    Asserts.check(paintStack.size() > 0, "Unbalanced save/restore");
   }
 
   @Override
@@ -157,13 +160,13 @@ class AndroidCanvas implements forplay.core.Canvas {
 
   @Override
   public void setFillGradient(Gradient gradient) {
-    assert gradient instanceof AndroidGradient;
+    Asserts.checkArgument(gradient instanceof AndroidGradient);
     currentState().setFillGradient((AndroidGradient) gradient);
   }
 
   @Override
   public void setFillPattern(Pattern pattern) {
-    assert pattern instanceof AndroidPattern;
+    Asserts.checkArgument(pattern instanceof AndroidPattern);
     currentState().setFillPattern((AndroidPattern) pattern);
   }
 
@@ -207,7 +210,7 @@ class AndroidCanvas implements forplay.core.Canvas {
 
   @Override
   public void strokePath(Path path) {
-    assert path instanceof AndroidPath;
+    Asserts.checkArgument(path instanceof AndroidPath);
     canvas.drawPath(((AndroidPath) path).path, currentState().prepareStroke());
   }
 

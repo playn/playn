@@ -38,6 +38,8 @@ import com.google.gwt.resources.client.TextResource;
 import com.google.gwt.user.rebind.ClassSourceFileComposerFactory;
 import com.google.gwt.user.rebind.SourceWriter;
 
+import forplay.core.Asserts;
+
 /**
  * Automatically generate a client bundle from the resources available in the provided interface's
  * package directory and below.
@@ -152,13 +154,13 @@ public class AutoClientBundleGenerator extends Generator {
     composerFactory.addImport(TextResource.class.getName());
 
     File warDirectory = getWarDirectory(logger);
-    assert warDirectory.isDirectory();
+    Asserts.check(warDirectory.isDirectory());
 
     File classesDirectory = new File(warDirectory, WEB_INF_CLASSES);
-    assert classesDirectory.isDirectory();
+    Asserts.check(classesDirectory.isDirectory());
 
     File resourcesDirectory = new File(classesDirectory, packageName.replace('.', '/'));
-    assert resourcesDirectory.isDirectory();
+    Asserts.check(resourcesDirectory.isDirectory());
 
     String baseClassesPath = classesDirectory.getPath();
     logger.log(TreeLogger.DEBUG, "baseClassesPath: " + baseClassesPath);
@@ -256,9 +258,9 @@ public class AutoClientBundleGenerator extends Generator {
    * Recursively get a list of files in the provided directory.
    */
   private HashSet<File> getFiles(File dir, FileFilter filter) {
-    assert dir != null;
-    assert filter != null;
-    assert dir.isDirectory();
+    Asserts.checkNotNull(dir);
+    Asserts.checkNotNull(filter);
+    Asserts.checkArgument(dir.isDirectory());
 
     HashSet<File> fileList = new HashSet<File>();
     File[] files = dir.listFiles(filter);

@@ -18,6 +18,7 @@ import com.google.gwt.canvas.dom.client.CssColor;
 import flash.display.StageScaleMode;
 import flash.display.Sprite;
 
+import forplay.core.Asserts;
 import forplay.core.ForPlay;
 import forplay.core.CanvasImage;
 import forplay.core.CanvasLayer;
@@ -88,7 +89,7 @@ class FlashGraphics implements Graphics {
   @Override
   public Gradient createLinearGradient(float x0, float y0, float x1, float y1,
       int[] colors, float[] positions) {
-    assert colors.length == positions.length;
+    Asserts.checkArgument(colors.length == positions.length);
     return new FlashGradient();
   }
 
@@ -99,14 +100,14 @@ class FlashGraphics implements Graphics {
 
   @Override
   public Pattern createPattern(Image img) {
-    assert img instanceof FlashImage;
+    Asserts.checkArgument(img instanceof FlashImage);
     return new FlashPattern(img);
   }
 
   @Override
   public Gradient createRadialGradient(float x, float y, float r, int[] colors,
       float[] positions) {
-    assert colors.length == positions.length;
+    Asserts.checkArgument(colors.length == positions.length);
 
     return new FlashGradient();
   }

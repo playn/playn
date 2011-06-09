@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import forplay.core.Asserts;
 import forplay.flash.json.Json;
 import forplay.flash.json.JsonArray;
 import forplay.flash.json.JsonException;
@@ -100,7 +101,7 @@ public class JsonUtil {
       }
       sb.append("}");
       visited.remove(object);
-      assert !visited.contains(object);
+      Asserts.check(!visited.contains(object));
     }
 
     @Override

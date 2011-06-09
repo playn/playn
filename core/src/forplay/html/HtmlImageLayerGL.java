@@ -17,6 +17,7 @@ import com.google.gwt.dom.client.ImageElement;
 import com.google.gwt.webgl.client.WebGLRenderingContext;
 import com.google.gwt.webgl.client.WebGLTexture;
 
+import forplay.core.Asserts;
 import forplay.core.Image;
 import forplay.core.ImageLayer;
 import forplay.core.Transform;
@@ -62,7 +63,7 @@ class HtmlImageLayerGL extends HtmlLayerGL implements ImageLayer {
 
   @Override
   public void setHeight(float height) {
-    assert height > 0;
+    Asserts.checkArgument(height > 0, "Height must be > 0");
 
     heightSet = true;
     this.height = height;
@@ -70,31 +71,28 @@ class HtmlImageLayerGL extends HtmlLayerGL implements ImageLayer {
 
   @Override
   public void setImage(Image img) {
-    assert img instanceof HtmlImage;
+    Asserts.checkArgument(img instanceof HtmlImage);
+
     this.img = (HtmlImage) img;
   }
 
   @Override
   public void setRepeatX(boolean repeat) {
-    if (repeat) {
-      assert !sourceRectSet;
-    }
+    Asserts.checkArgument(!repeat || !sourceRectSet, "Cannot repeat when source rect is used");
 
     repeatX = repeat;
   }
 
   @Override
   public void setRepeatY(boolean repeat) {
-    if (repeat) {
-      assert !sourceRectSet;
-    }
+    Asserts.checkArgument(!repeat || !sourceRectSet, "Cannot repeat when source rect is used");
 
     repeatY = repeat;
   }
 
   @Override
   public void setSourceRect(float sx, float sy, float sw, float sh) {
-    assert !repeatX && !repeatY;
+    Asserts.checkState(!repeatX && !repeatY, "Cannot use source rect when repeating x or y");
 
     sourceRectSet = true;
     this.sx = sx;
@@ -105,7 +103,7 @@ class HtmlImageLayerGL extends HtmlLayerGL implements ImageLayer {
 
   @Override
   public void setWidth(float width) {
-    assert width > 0;
+    Asserts.checkArgument(width > 0, "Width must be > 0");
 
     widthSet = true;
     this.width = width;
@@ -113,8 +111,8 @@ class HtmlImageLayerGL extends HtmlLayerGL implements ImageLayer {
 
   @Override
   public void setSize(float width, float height) {
-    assert width > 0;
-    assert height > 0;
+    Asserts.checkArgument(width > 0 && height > 0,
+                          "Width and height must be > 0 (got %dx%d)", width, height);
 
     widthSet = true;
     this.width = width;

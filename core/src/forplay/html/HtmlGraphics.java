@@ -24,6 +24,7 @@ import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.ImageElement;
 import com.google.gwt.dom.client.Style.Unit;
 
+import forplay.core.Asserts;
 import forplay.core.CanvasImage;
 import forplay.core.Gradient;
 import forplay.core.Graphics;
@@ -83,7 +84,7 @@ public abstract class HtmlGraphics implements Graphics {
   @Override
   public Gradient createLinearGradient(float x0, float y0, float x1, float y1,
       int[] colors, float[] positions) {
-    assert colors.length == positions.length;
+    Asserts.checkArgument(colors.length == positions.length);
 
     CanvasGradient gradient = dummyCtx.createLinearGradient(x0, y0, x1, y1);
     for (int i = 0; i < colors.length; ++i) {
@@ -99,7 +100,7 @@ public abstract class HtmlGraphics implements Graphics {
 
   @Override
   public Pattern createPattern(Image image) {
-    assert image instanceof HtmlImage;
+    Asserts.checkArgument(image instanceof HtmlImage);
     HtmlImage htmlImage = (HtmlImage) image;
     ImageElement elem = htmlImage.img.cast();
     CanvasPattern pattern = dummyCtx.createPattern(elem, Repetition.REPEAT);
@@ -109,7 +110,7 @@ public abstract class HtmlGraphics implements Graphics {
   @Override
   public Gradient createRadialGradient(float x, float y, float r, int[] colors,
       float[] positions) {
-    assert colors.length == positions.length;
+    Asserts.checkArgument(colors.length == positions.length);
 
     CanvasGradient gradient = dummyCtx.createRadialGradient(x, y, r, x, y, r);
     for (int i = 0; i < colors.length; ++i) {

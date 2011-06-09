@@ -15,6 +15,7 @@
  */
 package forplay.android;
 
+import forplay.core.Asserts;
 import forplay.core.GroupLayer;
 import forplay.core.Layer;
 
@@ -27,7 +28,7 @@ class AndroidGroupLayer extends AndroidLayer implements GroupLayer {
 
   @Override
   public void add(Layer layer) {
-    assert layer instanceof AndroidLayer;
+    Asserts.checkArgument(layer instanceof AndroidLayer);
     AndroidLayer jlayer = (AndroidLayer) layer;
     children.add(jlayer);
     jlayer.setParent(this);
@@ -45,7 +46,7 @@ class AndroidGroupLayer extends AndroidLayer implements GroupLayer {
 
   @Override
   public void remove(Layer layer) {
-    assert layer instanceof AndroidLayer;
+    Asserts.checkArgument(layer instanceof AndroidLayer);
     AndroidLayer jlayer = (AndroidLayer) layer;
     jlayer.onRemove();
     children.remove(jlayer);
@@ -71,7 +72,7 @@ class AndroidGroupLayer extends AndroidLayer implements GroupLayer {
 
   @Override
   public void add(int index, Layer layer) {
-    assert layer instanceof AndroidLayer;
+    Asserts.checkArgument(layer instanceof AndroidLayer);
     AndroidLayer jlayer = (AndroidLayer) layer;
     children.add(index, jlayer);
     jlayer.setParent(this);

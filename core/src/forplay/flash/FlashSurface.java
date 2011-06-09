@@ -16,6 +16,7 @@
 
 package forplay.flash;
 
+import forplay.core.Asserts;
 import forplay.core.Surface;
 import forplay.core.Image;
 import forplay.core.Pattern;
@@ -40,14 +41,14 @@ public class FlashSurface implements Surface {
 
   @Override
   public void drawImage(Image img, float x, float y) {
-    assert img instanceof FlashImage;
+    Asserts.checkArgument(img instanceof FlashImage);
     dirty = true;
     context2d.drawImage(((FlashImage) img).bitmapData(), x, y);
   }
 
   @Override
   public void drawImage(Image img, float x, float y, float w, float h) {
-    assert img instanceof FlashImage;
+    Asserts.checkArgument(img instanceof FlashImage);
     dirty = true;
     context2d.drawImage(((FlashImage) img).bitmapData(), x, y);
   }
@@ -55,7 +56,7 @@ public class FlashSurface implements Surface {
   @Override
   public void drawImage(Image img, float dx, float dy, float dw, float dh,
       float sx, float sy, float sw, float sh) {
-    assert img instanceof FlashImage;
+    Asserts.checkArgument(img instanceof FlashImage);
     dirty = true;
     context2d.drawImage(((FlashImage) img).bitmapData(), dx, dy, dw, dh, sx, sy, sw, sh);
   }

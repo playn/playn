@@ -22,6 +22,7 @@ import flash.display.Sprite;
 import java.util.ArrayList;
 import java.util.List;
 
+import forplay.core.Asserts;
 import forplay.core.GroupLayer;
 import forplay.core.Layer;
 
@@ -64,7 +65,7 @@ public class FlashGroupLayer extends FlashLayer implements GroupLayer {
    * @param layer
    */
   private FlashLayer flash(Layer layer) {
-    assert layer instanceof FlashLayer;
+    Asserts.checkArgument(layer instanceof FlashLayer);
     return (FlashLayer) layer;    
   }
 

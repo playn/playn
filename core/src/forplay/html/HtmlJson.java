@@ -19,6 +19,7 @@ import java.util.ArrayList;
 
 import com.google.gwt.core.client.JavaScriptObject;
 
+import forplay.core.Asserts;
 import forplay.core.Json;
 
 class HtmlJson implements Json {
@@ -49,7 +50,7 @@ class HtmlJson implements Json {
 
     @Override
     public void key(String key) {
-      assert this.key == null;
+      Asserts.checkState(this.key == null);
       this.key = key;
     }
 
@@ -104,9 +105,9 @@ class HtmlJson implements Json {
       }
 
       if (inArray()) {
-        assert this.key == null;
+        Asserts.checkState(this.key == null);
       } else {
-        assert this.key != null;
+        Asserts.checkState(this.key != null);
         sb.append("'");
         sb.append(key);
         sb.append("':");

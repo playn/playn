@@ -19,6 +19,7 @@ import com.allen_sauer.gwt.voices.client.handler.PlaybackCompleteEvent;
 import com.allen_sauer.gwt.voices.client.handler.SoundHandler;
 import com.allen_sauer.gwt.voices.client.handler.SoundLoadStateChangeEvent;
 
+import forplay.core.Asserts;
 import forplay.core.Sound;
 
 class HtmlSound implements Sound {
@@ -59,8 +60,7 @@ class HtmlSound implements Sound {
 
   @Override
   public void setVolume(float volume) {
-    assert volume >= 0f;
-    assert volume <= 1f;
+    Asserts.checkArgument(0f <= volume && volume <= 1f, "Must ensure 0f <= volume <= 1f");
     sound.setVolume((int) (volume * 100));
   }
 

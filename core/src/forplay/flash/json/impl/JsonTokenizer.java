@@ -15,6 +15,7 @@
  */
 package forplay.flash.json.impl;
 
+import forplay.core.Asserts;
 import forplay.flash.json.JsonArray;
 import forplay.flash.json.JsonException;
 import forplay.flash.json.JsonFactory;
@@ -47,7 +48,7 @@ class JsonTokenizer {
   }
 
   void back(char c) {
-    assert pushBackBuffer == INVALID_CHAR;
+    Asserts.checkState(pushBackBuffer == INVALID_CHAR);
     pushBackBuffer = c;
   }
 
@@ -103,7 +104,7 @@ class JsonTokenizer {
   String nextString(int startChar) throws JsonException {
     final StringBuffer buffer = new StringBuffer();
     int c = next();
-    assert c == '"' || (lenient && c == '\'');
+    Asserts.check(c == '"' || (lenient && c == '\''));
     while (true) {
       c = next();
       switch (c) {
@@ -186,7 +187,7 @@ class JsonTokenizer {
   JsonArray parseArray() throws JsonException {
      final JsonArray array = jsonFactory.createArray();
      int c = nextNonWhitespace();
-     assert c == '[';
+     Asserts.check(c == '[');
      while (true) {
        c = nextNonWhitespace();
        switch (c) {

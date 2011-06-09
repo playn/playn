@@ -15,6 +15,7 @@
  */
 package forplay.java;
 
+import forplay.core.Asserts;
 import forplay.core.CanvasLayer;
 import forplay.core.Gradient;
 import forplay.core.Graphics;
@@ -61,7 +62,7 @@ class JavaGraphics implements Graphics {
 
   @Override
   public ImageLayer createImageLayer(Image image) {
-    assert image instanceof JavaImage;
+    Asserts.checkArgument(image instanceof JavaImage);
     return new JavaImageLayer((JavaImage) image);
   }
 

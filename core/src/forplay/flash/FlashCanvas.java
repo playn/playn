@@ -15,11 +15,11 @@
  */
 package forplay.flash;
 
-import forplay.core.ForPlay;
-
 import forplay.flash.FlashCanvasLayer.Context2d;
 
+import forplay.core.Asserts;
 import forplay.core.Canvas;
+import forplay.core.ForPlay;
 import forplay.core.Gradient;
 import forplay.core.Image;
 import forplay.core.Path;
@@ -49,7 +49,7 @@ class FlashCanvas implements Canvas {
 
   @Override
   public void drawImage(Image img, float x, float y) {
-    assert img instanceof FlashImage;
+    Asserts.checkArgument(img instanceof FlashImage);
     dirty = true;
     ForPlay.log().info("Drawing image " + ((FlashImage) img).bitmapData());
     context2d.drawImage(((FlashImage) img).bitmapData(), x, y);
@@ -57,14 +57,14 @@ class FlashCanvas implements Canvas {
 
   @Override
   public void drawImage(Image img, float x, float y, float w, float h) {
-    assert img instanceof FlashImage;
+    Asserts.checkArgument(img instanceof FlashImage);
     dirty = true;
   }
 
   @Override
   public void drawImage(Image img, float dx, float dy, float dw, float dh,
       float sx, float sy, float sw, float sh) {
-    assert img instanceof FlashImage;
+    Asserts.checkArgument(img instanceof FlashImage);
     dirty = true;
   }
 

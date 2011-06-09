@@ -22,6 +22,7 @@ import com.google.gwt.dom.client.Node;
 import java.util.ArrayList;
 import java.util.List;
 
+import forplay.core.Asserts;
 import forplay.core.GroupLayer;
 import forplay.core.Layer;
 
@@ -39,7 +40,7 @@ class HtmlGroupLayerDom extends HtmlLayerDom implements GroupLayer {
 
   @Override
   public void add(Layer layer) {
-    assert layer instanceof HtmlLayerDom;
+    Asserts.checkArgument(layer instanceof HtmlLayerDom);
     HtmlLayerDom hlayer = (HtmlLayerDom) layer;
     children.add(hlayer);
     element().appendChild(hlayer.element());
@@ -58,7 +59,7 @@ class HtmlGroupLayerDom extends HtmlLayerDom implements GroupLayer {
 
   @Override
   public void remove(Layer layer) {
-    assert layer instanceof HtmlLayerDom;
+    Asserts.checkArgument(layer instanceof HtmlLayerDom);
     HtmlLayerDom hlayer = (HtmlLayerDom) layer;
     hlayer.onRemove();
     children.remove(hlayer);
@@ -80,7 +81,7 @@ class HtmlGroupLayerDom extends HtmlLayerDom implements GroupLayer {
 
   @Override
   public void add(int index, Layer layer) {
-    assert layer instanceof HtmlLayerDom;
+    Asserts.checkArgument(layer instanceof HtmlLayerDom);
     HtmlLayerDom hlayer = (HtmlLayerDom) layer;
 
     if (index == size()) {

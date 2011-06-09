@@ -19,6 +19,7 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 
+import forplay.core.Asserts;
 import forplay.core.Image;
 import forplay.core.Canvas;
 import forplay.core.CanvasImage;
@@ -53,7 +54,7 @@ class JavaImage implements CanvasImage {
 
   @Override
   public void replaceWith(Image img) {
-    assert img instanceof JavaImage;
+    Asserts.checkArgument(img instanceof JavaImage);
     this.img = ((JavaImage) img).img;
   }
 

@@ -19,6 +19,7 @@ import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.dom.client.CanvasElement;
 import com.google.gwt.dom.client.Document;
 
+import forplay.core.Asserts;
 import forplay.core.Gradient;
 import forplay.core.Image;
 import forplay.core.Path;
@@ -53,21 +54,21 @@ class HtmlCanvas implements Canvas {
 
   @Override
   public void clip(Path path) {
-    assert path instanceof HtmlPath;
+    Asserts.checkArgument(path instanceof HtmlPath);
     ((HtmlPath) path).replay(ctx);
     ctx.clip();
   }
 
   @Override
   public void drawImage(Image img, float x, float y) {
-    assert img instanceof HtmlImage;
+    Asserts.checkArgument(img instanceof HtmlImage);
     ctx.drawImage(((HtmlImage) img).img, x, y);
     dirty = true;
   }
 
   @Override
   public void drawImage(Image img, float x, float y, float w, float h) {
-    assert img instanceof HtmlImage;
+    Asserts.checkArgument(img instanceof HtmlImage);
     ctx.drawImage(((HtmlImage) img).img, x, y, w, h);
     dirty = true;
   }
@@ -75,7 +76,7 @@ class HtmlCanvas implements Canvas {
   @Override
   public void drawImage(Image img, float dx, float dy, float dw, float dh,
       float sx, float sy, float sw, float sh) {
-    assert img instanceof HtmlImage;
+    Asserts.checkArgument(img instanceof HtmlImage);
     ctx.drawImage(((HtmlImage) img).img, sx, sy, sw, sh, dx,
         dy, dw, dh);
     dirty = true;
@@ -121,7 +122,7 @@ class HtmlCanvas implements Canvas {
 
   @Override
   public void fillPath(Path path) {
-    assert path instanceof HtmlPath;
+    Asserts.checkArgument(path instanceof HtmlPath);
     ((HtmlPath) path).replay(ctx);
     ctx.fill();
     dirty = true;
@@ -170,13 +171,13 @@ class HtmlCanvas implements Canvas {
 
   @Override
   public void setFillGradient(Gradient gradient) {
-    assert gradient instanceof HtmlGradient;
+    Asserts.checkArgument(gradient instanceof HtmlGradient);
     ctx.setFillStyle(((HtmlGradient) gradient).gradient);
   }
 
   @Override
   public void setFillPattern(Pattern pattern) {
-    assert pattern instanceof HtmlPattern;
+    Asserts.checkArgument(pattern instanceof HtmlPattern);
     ctx.setFillStyle(((HtmlPattern) pattern).pattern);
   }
 
@@ -220,7 +221,7 @@ class HtmlCanvas implements Canvas {
 
   @Override
   public void strokePath(Path path) {
-    assert path instanceof HtmlPath;
+    Asserts.checkArgument(path instanceof HtmlPath);
     ((HtmlPath) path).replay(ctx);
     ctx.stroke();
     dirty = true;

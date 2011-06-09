@@ -73,7 +73,7 @@ public class AssetWatcher {
    */
   @SuppressWarnings("unchecked")
   public void add(Image image) {
-    assert !start || listener == null;
+    Asserts.checkState(!start || listener == null);
 
     image.addCallback(callback);
     ++total;

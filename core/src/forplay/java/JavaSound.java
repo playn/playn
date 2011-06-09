@@ -28,6 +28,7 @@ import javax.sound.sampled.LineListener;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
 
+import forplay.core.Asserts;
 import forplay.core.ForPlay;
 import forplay.core.Sound;
 
@@ -170,8 +171,7 @@ class JavaSound implements Sound {
 
   @Override
   public void setVolume(float volume) {
-    assert volume >= 0f;
-    assert volume <= 1f;
+    Asserts.checkArgument(0f <= volume && volume <= 1f, "Must ensure 0f <= volume <= 1f");
     // TODO implement
   }
 
