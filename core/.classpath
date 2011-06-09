@@ -9,7 +9,7 @@
 	<classpathentry kind="lib" path="lib/junit-4.8.1.jar"/>
 	<classpathentry kind="lib" path="lib/JLayer1.0.1/jl1.0.1.jar"/>
 	<classpathentry kind="lib" path="lib/gwt-voices-r421.jar"/>
-	<classpathentry kind="lib" path="lib/gwt-log-r613.jar"/>
+	<classpathentry kind="lib" path="lib/gwt-log-r635.jar"/>
 	<classpathentry kind="con" path="com.google.gwt.eclipse.core.GWT_CONTAINER"/>
 	<classpathentry kind="lib" path="lib/gwtflash.jar"/>
 	<classpathentry kind="output" path="bin"/>
