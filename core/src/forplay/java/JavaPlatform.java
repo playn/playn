@@ -39,9 +39,16 @@ import forplay.core.Storage;
 import forplay.core.RegularExpression;
 
 public class JavaPlatform implements Platform {
-
+  // Maximum delta time to consider between update() calls (in milliseconds). If the delta between
+  // two update()s is greater than MAX_DELTA, we clamp to MAX_DELTA.
   private static final float MAX_DELTA = 100;
-  private static final float FRAME_TIME = 50;
+
+  // Minimum time between any two paint() calls (in milliseconds). We will paint every
+  // FRAME_TIME ms, which is equivalent to (1000 * 1 / FRAME_TIME) frames per second.
+  // TODO(pdr): this is set ridiculously low because we're using Java's software renderer which
+  // causes the paint loop to be quite slow. Setting this to 10 prevents hitching that occurs when
+  // we try to squeeze a paint() near max bound of FRAME_TIME.
+  private static final float FRAME_TIME = 10;
 
   public static JavaPlatform register() {
     JavaPlatform platform = new JavaPlatform();
@@ -167,40 +174,61 @@ public class JavaPlatform implements Platform {
 
     component = new JComponent() {
       private float accum = updateRate;
-      private double lastTime;
+      private double lastUpdateTime;
+      private double lastPaintTime;
+      private boolean isPaintDirty;
 
       @Override
       public void paint(Graphics g) {
+        isPaintDirty = false; // clean by default
+
         if (game != null) {
           double now = time();
-          float delta = (float)(now - lastTime);
-          if (delta > MAX_DELTA) {
-            delta = MAX_DELTA;
-          }
-          lastTime = now;
+          float updateDelta = (float)(now - lastUpdateTime);
+          if (updateDelta > 1) {
+            updateDelta = updateDelta > MAX_DELTA ? MAX_DELTA : updateDelta;
+            lastUpdateTime = now;
 
-          if (updateRate == 0) {
-            game.update(delta);
-            accum = 0;
-          } else {
-            accum += delta;
-            while (accum > updateRate) {
-              game.update(updateRate);
-              accum -= updateRate;
+            if (updateRate == 0) {
+              game.update(updateDelta);
+              accum = 0;
+              isPaintDirty = true; // we made a mess
+            } else {
+              accum += updateDelta;
+              while (accum > updateRate) {
+                game.update(updateRate);
+                accum -= updateRate;
+                isPaintDirty = true; // we made a mess
+              }
             }
           }
 
-          game.paint(accum / updateRate);
+          float paintDelta = (float)(now - lastPaintTime);
+          if (isPaintDirty || paintDelta > FRAME_TIME) {
+            if (updateRate == 0) {
+              game.paint(0);
+            } else {
+              game.paint(accum / updateRate);
+            }
 
-          int width = component.getWidth();
-          int height = component.getHeight();
-          JavaCanvas canvas = new JavaCanvas((Graphics2D) g, width, height);
-          graphics.rootLayer().paint(canvas);
+            int width = component.getWidth();
+            int height = component.getHeight();
+            JavaCanvas canvas = new JavaCanvas((Graphics2D) g, width, height);
+            graphics.rootLayer().paint(canvas);
+
+            lastPaintTime = now;
+          }
         }
 
-        repaint((long) FRAME_TIME);
+        try {
+          Thread.sleep(1L);
+        } catch (InterruptedException e) {
+          // ignore
+        }
+        repaint();
       }
     };
+    component.setOpaque(true); // ensures graphics context is not cleared automatically
     frame.add(component);
     frame.setResizable(false);
 
