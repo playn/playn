@@ -145,7 +145,7 @@ class HtmlJson implements Json {
     // FIXME TODO XXX: remove this parseFloat once we fix all the JSON
     @Override
     public final native double getNumber(int index) /*-{
-      return parseFloat(this[key]);
+      return parseFloat(this[index]);
     }-*/;
 
     @Override
