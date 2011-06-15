@@ -121,7 +121,7 @@ class HtmlImageLayerGL extends HtmlLayerGL implements ImageLayer {
   }
 
   @Override
-  void paint(WebGLRenderingContext gl, Transform parentTransform) {
+  void paint(WebGLRenderingContext gl, Transform parentTransform, float parentAlpha) {
     // TODO(jgw): Assert exclusive source-rect vs. repeat.
 
     WebGLTexture tex = img.ensureTexture(gfx, repeatX, repeatY);
@@ -129,14 +129,17 @@ class HtmlImageLayerGL extends HtmlLayerGL implements ImageLayer {
       ImageElement elem = img.img;
 
       Transform xform = localTransform(parentTransform);
+      float childAlpha = parentAlpha * alpha;
 
       float width = widthSet ? this.width : elem.getWidth();
       float height = heightSet ? this.height : elem.getHeight();
 
       if (sourceRectSet) {
-        gfx.drawTexture(tex, img.width(), img.height(), xform, 0, 0, width, height, sx, sy, sw, sh);
+        gfx.drawTexture(tex, img.width(), img.height(), xform, 0, 0, width, height, sx, sy, sw, sh,
+            childAlpha);
       } else {
-        gfx.drawTexture(tex, img.width(), img.height(), xform, width, height, repeatX, repeatY);
+        gfx.drawTexture(tex, img.width(), img.height(), xform, width, height, repeatX, repeatY,
+            childAlpha);
       }
     }
   }

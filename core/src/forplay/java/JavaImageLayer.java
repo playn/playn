@@ -37,9 +37,11 @@ class JavaImageLayer extends JavaLayer implements ImageLayer {
   private boolean dirty = true;
 
   JavaImageLayer() {
+    super();
   }
 
   JavaImageLayer(JavaImage image) {
+    super();
     this.image = image;
   }
 
@@ -144,6 +146,7 @@ class JavaImageLayer extends JavaLayer implements ImageLayer {
   void paint(JavaCanvas canvas) {
     canvas.save();
     transform(canvas);
+    canvas.setAlpha(canvas.alpha() * alpha);
 
     float dw = widthSet ? width : image.width();
     float dh = heightSet ? height : image.height();

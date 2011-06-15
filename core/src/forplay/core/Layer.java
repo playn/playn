@@ -26,7 +26,7 @@ package forplay.core;
  * in a layer are transformed by the layer's transformation matrix, and each child layer is
  * positioned by the transformation matrix of it's parent.
  * <p>
- * TODO: alpha, z-index, clipping (?), visibility TODO: transform-origin: allow explicit
+ * TODO: z-index, clipping (?), visibility TODO: transform-origin: allow explicit
  * "center, top-left, bottom-right" like CSS transform-origin?
  */
 public interface Layer {
@@ -52,6 +52,32 @@ public interface Layer {
    * Returns the layer's transformation matrix.
    */
   Transform transform();
+
+  /**
+   * Return the global alpha value for this layer.
+   * <p>
+   * The global alpha value for a layer controls the opacity of the layer but does not affect the
+   * current drawing operation. I.e., when {@link Game#paint(float)} is called and the {@link Layer}
+   * is drawn, this alpha value is applied to the alpha channel of the Layer.
+   * <p>
+   * By default, the alpha for a Layer is 1.0 (not transparent).
+   * 
+   * @return alpha in range [0,1] where 0 is transparent and 1 is opaque
+   */
+  float alpha();
+
+  /**
+   * Set the global alpha value for this layer.
+   * <p>
+   * The global alpha value for a layer controls the opacity of the layer but does not affect the
+   * current drawing operation. I.e., when {@link Game#paint(float)} is called and the {@link Layer}
+   * is drawn, this alpha value is applied to the alpha channel of the Layer.
+   * <p>
+   * Values outside the range [0,1] will be clamped to the range [0,1].
+   * 
+   * @param alpha alpha value in range [0,1] where 0 is transparent and 1 is opaque
+   */
+  void setAlpha(float alpha);
 
   /**
    * Sets the origin of the layer.

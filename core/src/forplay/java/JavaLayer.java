@@ -20,6 +20,10 @@ import forplay.core.Canvas;
 
 abstract class JavaLayer extends AbstractLayer {
 
+  public JavaLayer() {
+    super();
+  }
+
   abstract void paint(JavaCanvas canvas);
 
   void transform(Canvas canvas) {

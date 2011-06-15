@@ -73,9 +73,9 @@ class HtmlGroupLayerGL extends HtmlLayerGL implements GroupLayer {
     }
   }
 
-  void paint(WebGLRenderingContext gl, Transform parentTransform) {
+  void paint(WebGLRenderingContext gl, Transform parentTransform, float parentAlpha) {
     for (HtmlLayerGL child : children) {
-      child.paint(gl, localTransform(parentTransform));
+      child.paint(gl, localTransform(parentTransform), parentAlpha * alpha);
     }
   }
 

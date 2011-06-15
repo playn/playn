@@ -53,6 +53,10 @@ class JavaCanvas implements Canvas {
     gfx.setBackground(new Color(0, true));
   }
 
+  public float alpha() {
+    return currentState().alpha;
+  }
+
   public void clear() {
     gfx.clearRect(0, 0, width, height);
   }
@@ -169,6 +173,10 @@ class JavaCanvas implements Canvas {
   @Override
   public void scale(float x, float y) {
     gfx.scale(x, y);
+  }
+
+  public void setAlpha(float alpha) {
+    currentState().alpha = alpha;
   }
 
   @Override

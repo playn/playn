@@ -57,6 +57,7 @@ class JavaGroupLayer extends JavaLayer implements GroupLayer {
   void paint(JavaCanvas surf) {
     surf.save();
     transform(surf);
+    surf.setAlpha(surf.alpha() * alpha);
 
     for (JavaLayer child : children) {
       child.paint(surf);

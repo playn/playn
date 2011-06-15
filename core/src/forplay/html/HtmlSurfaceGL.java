@@ -71,7 +71,8 @@ class HtmlSurfaceGL implements Surface {
     if (himage.isReady()) {
       WebGLTexture tex = himage.ensureTexture(gfx, false, false);
       if (tex != null) {
-        gfx.drawTexture(tex, image.width(), image.height(), topTransform(), x, y, dw, dh, false, false);
+        gfx.drawTexture(tex, image.width(), image.height(), topTransform(), x, y, dw, dh, false,
+            false, 1);
       }
     }
   }
@@ -87,7 +88,8 @@ class HtmlSurfaceGL implements Surface {
     if (himage.isReady()) {
       WebGLTexture tex = himage.ensureTexture(gfx, false, false);
       if (tex != null) {
-        gfx.drawTexture(tex, image.width(), image.height(), topTransform(), dx, dy, dw, dh, sx, sy, sw, sh);
+        gfx.drawTexture(tex, image.width(), image.height(), topTransform(), dx, dy, dw, dh, sx, sy,
+            sw, sh, 1);
       }
     }
   }
@@ -110,7 +112,7 @@ class HtmlSurfaceGL implements Surface {
     pos[2] = x1 - dy; pos[3] = y1 + dx;
     pos[4] = x1 + dy; pos[5] = y1 - dx;
     pos[6] = x0 + dy; pos[7] = y0 - dx;
-    gfx.fillPoly(topTransform(), pos, fillColor);
+    gfx.fillPoly(topTransform(), pos, fillColor, 1);
   }
 
   @Override
@@ -120,9 +122,9 @@ class HtmlSurfaceGL implements Surface {
     if (fillPattern != null) {
       HtmlImage image = fillPattern.image;
       WebGLTexture tex = image.ensureTexture(gfx, true, true);
-      gfx.fillRect(topTransform(), x, y, width, height, image.width(), image.height(), tex);
+      gfx.fillRect(topTransform(), x, y, width, height, image.width(), image.height(), tex, 1);
     } else {
-      gfx.fillRect(topTransform(), x, y, width, height, fillColor);
+      gfx.fillRect(topTransform(), x, y, width, height, fillColor, 1);
     }
   }
 

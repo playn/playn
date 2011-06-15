@@ -26,6 +26,7 @@ class JavaSurfaceLayer extends JavaLayer implements SurfaceLayer {
   private Surface surface;
 
   JavaSurfaceLayer(int width, int height) {
+    super();
     img = (JavaImage) graphics().createImage(width, height);
     surface = new CanvasSurface(img.canvas());
   }
@@ -46,6 +47,7 @@ class JavaSurfaceLayer extends JavaLayer implements SurfaceLayer {
   void paint(JavaCanvas canvas) {
     canvas.save();
     transform(canvas);
+    canvas.setAlpha(canvas.alpha() * alpha);
     canvas.drawImage(img, 0, 0);
     canvas.restore();
   }

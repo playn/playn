@@ -25,9 +25,16 @@ public abstract class AbstractLayer implements Layer {
   protected float originX, originY;
   private GroupLayer parent;
   private boolean isDestroyed;
+  protected float alpha;
 
   protected AbstractLayer() {
     transform = new Transform();
+    alpha = 1;
+  }
+
+  @Override
+  public float alpha() {
+    return alpha;
   }
 
   @Override
@@ -41,6 +48,17 @@ public abstract class AbstractLayer implements Layer {
   @Override
   public boolean isDestroyed() {
     return isDestroyed;
+  }
+
+  @Override
+  public void setAlpha(float alpha) {
+    if (alpha < 0) {
+      this.alpha = 0;
+    } else if (alpha > 1) {
+      this.alpha = 1;
+    } else {
+      this.alpha = alpha;
+    }
   }
 
   @Override

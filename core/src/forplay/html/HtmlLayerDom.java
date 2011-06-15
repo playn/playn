@@ -65,10 +65,19 @@ class HtmlLayerDom extends AbstractLayer {
   private boolean shown;
 
   HtmlLayerDom(Element elem) {
+    super();
     this.elem = elem;
     elem.getStyle().setPosition(Position.ABSOLUTE);
     elem.getStyle().setVisibility(Visibility.HIDDEN);
     elem.getStyle().setProperty(transformOriginName, "0 0");
+  }
+
+  @Override
+  public void setAlpha(float alpha) {
+    if (this.alpha != alpha) {
+      super.setAlpha(alpha);
+      elem.getStyle().setOpacity(this.alpha);
+    }
   }
 
   public void setOrigin(float x, float y) {

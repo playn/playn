@@ -39,21 +39,22 @@ class JavaCanvasState {
   float miterLimit;
   JavaPath clip;
   Composite composite;
+  float alpha;
 
   JavaCanvasState() {
     this(0xff000000, 0xffffffff, null, null, new AffineTransform(), 1.0f, LineCap.SQUARE,
-        LineJoin.MITER, 10.0f, null, Composite.SRC_OVER);
+        LineJoin.MITER, 10.0f, null, Composite.SRC_OVER, 1);
  }
 
   JavaCanvasState(JavaCanvasState toCopy) {
-    this(toCopy.fillColor, toCopy.strokeColor, toCopy.fillGradient, toCopy.fillPattern, toCopy.transform,
-        toCopy.strokeWidth, toCopy.lineCap, toCopy.lineJoin, toCopy.miterLimit, toCopy.clip,
-        toCopy.composite);
+    this(toCopy.fillColor, toCopy.strokeColor, toCopy.fillGradient, toCopy.fillPattern,
+        toCopy.transform, toCopy.strokeWidth, toCopy.lineCap, toCopy.lineJoin, toCopy.miterLimit,
+        toCopy.clip, toCopy.composite, toCopy.alpha);
   }
 
-  JavaCanvasState(int fillColor, int strokeColor, JavaGradient fillGradient, JavaPattern fillPattern,
-      AffineTransform transform, float strokeWidth, LineCap lineCap, LineJoin lineJoin,
-      float miterLimit, JavaPath clip, Composite composite) {
+  JavaCanvasState(int fillColor, int strokeColor, JavaGradient fillGradient,
+      JavaPattern fillPattern, AffineTransform transform, float strokeWidth, LineCap lineCap,
+      LineJoin lineJoin, float miterLimit, JavaPath clip, Composite composite, float alpha) {
     this.fillColor = fillColor;
     this.strokeColor = strokeColor;
     this.fillGradient = fillGradient;
@@ -64,6 +65,7 @@ class JavaCanvasState {
     this.lineJoin = lineJoin;
     this.miterLimit = miterLimit;
     this.composite = composite;
+    this.alpha = alpha;
   }
 
   // TODO: optimize this so we're not setting this stuff all the time.
@@ -71,7 +73,7 @@ class JavaCanvasState {
     gfx.setStroke(new BasicStroke(strokeWidth, convertLineCap(), convertLineJoin(), miterLimit));
     gfx.setColor(convertColor(strokeColor));
     gfx.setClip(clip != null ? clip.path : null);
-    gfx.setComposite(convertComposite(composite));
+    gfx.setComposite(convertComposite(composite, alpha));
   }
 
   // TODO: optimize this so we're not setting this stuff all the time.
@@ -85,7 +87,7 @@ class JavaCanvasState {
       gfx.setPaint(convertColor(fillColor));
     }
     gfx.setClip(clip != null ? clip.path : null);
-    gfx.setComposite(convertComposite(composite));
+    gfx.setComposite(convertComposite(composite, alpha));
   }
 
   private Color convertColor(int color) {
@@ -97,20 +99,26 @@ class JavaCanvasState {
     return new Color(r, g, b, a);
   }
 
-  private java.awt.Composite convertComposite(Canvas.Composite composite) {
+  private java.awt.Composite convertComposite(Canvas.Composite composite, float alpha) {
+    AlphaComposite ret;
     switch (composite) {
-      case DST_ATOP: return AlphaComposite.DstAtop;
-      case DST_IN: return AlphaComposite.DstIn;
-      case DST_OUT: return AlphaComposite.DstOut;
-      case DST_OVER: return AlphaComposite.DstOver;
-      case SRC: return AlphaComposite.Src;
-      case SRC_ATOP: return AlphaComposite.SrcAtop;
-      case SRC_IN: return AlphaComposite.SrcIn;
-      case SRC_OUT: return AlphaComposite.SrcOut;
-      case SRC_OVER: return AlphaComposite.SrcOver;
-      case XOR: return AlphaComposite.Xor;
+      case DST_ATOP: ret = AlphaComposite.DstAtop; break;
+      case DST_IN: ret = AlphaComposite.DstIn; break;
+      case DST_OUT: ret = AlphaComposite.DstOut; break;
+      case DST_OVER: ret = AlphaComposite.DstOver; break;
+      case SRC: ret = AlphaComposite.Src; break;
+      case SRC_ATOP: ret = AlphaComposite.SrcAtop; break;
+      case SRC_IN: ret = AlphaComposite.SrcIn; break;
+      case SRC_OUT: ret = AlphaComposite.SrcOut; break;
+      case SRC_OVER: ret = AlphaComposite.SrcOver; break;
+      case XOR: ret = AlphaComposite.Xor; break;
+      default: ret = AlphaComposite.Src; break;
     }
-    return AlphaComposite.Src;
+    if (alpha != 1) {
+      return ret.derive(alpha);
+    } else {
+      return ret;
+    }
   }
 
   private int convertLineCap() {

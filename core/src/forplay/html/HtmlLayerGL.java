@@ -24,6 +24,7 @@ abstract class HtmlLayerGL extends AbstractLayer {
   private final Transform savedLocal = new Transform();
 
   protected HtmlLayerGL(HtmlGraphicsGL gfx) {
+    super();
     this.gfx = gfx;
   }
 
@@ -36,5 +37,5 @@ abstract class HtmlLayerGL extends AbstractLayer {
     return savedLocal;
   }
 
-  abstract void paint(WebGLRenderingContext gl, Transform parentTransform);
+  abstract void paint(WebGLRenderingContext gl, Transform parentTransform, float parentAlpha);
 }

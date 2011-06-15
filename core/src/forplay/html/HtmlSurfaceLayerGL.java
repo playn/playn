@@ -71,10 +71,11 @@ class HtmlSurfaceLayerGL extends HtmlLayerGL implements SurfaceLayer {
   }
 
   @Override
-  void paint(WebGLRenderingContext gl, Transform parentTransform) {
+  void paint(WebGLRenderingContext gl, Transform parentTransform, float parentAlpha) {
     // Draw this layer to the screen upside-down, because its contents are flipped
     // (This happens because it uses the same vertex program as everything else,
     //  which flips vertically to put the origin at the top-left).
-    gfx.drawTexture(tex, width, height, localTransform(parentTransform), 0, height, width, -height, false, false);
+    gfx.drawTexture(tex, width, height, localTransform(parentTransform), 0, height, width, -height,
+        false, false, parentAlpha * alpha);
   }
 }

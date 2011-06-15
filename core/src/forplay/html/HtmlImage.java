@@ -172,7 +172,8 @@ class HtmlImage implements Image {
     // Render the scaled texture into the framebuffer.
     // (rebind the texture because gfx.bindFramebuffer() may have bound it when flushing)
     gfx.gl.bindTexture(TEXTURE_2D, pow2tex);
-    gfx.drawTexture(tex, width(), height(), Transform.IDENTITY, 0, height, width, -height, false, false);
+    gfx.drawTexture(tex, width(), height(), Transform.IDENTITY, 0, height, width, -height, false,
+        false, 1);
     gfx.flush();
     gfx.bindFramebuffer();
 

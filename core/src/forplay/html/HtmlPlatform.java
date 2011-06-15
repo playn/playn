@@ -368,7 +368,7 @@ public class HtmlPlatform implements Platform {
 
   private static native void disableRightClickImpl(JavaScriptObject target) /*-{
     target.oncontextmenu = function() {
-    return false;
+      return false;
     };
   }-*/;
 }

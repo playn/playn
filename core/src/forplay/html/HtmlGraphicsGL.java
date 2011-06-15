@@ -158,11 +158,14 @@ class HtmlGraphicsGL extends HtmlGraphics {
 
   private class TextureShader extends Shader {
     WebGLUniformLocation uTexture;
+    WebGLUniformLocation uAlpha;
     WebGLTexture lastTex;
+    float lastAlpha;
 
     TextureShader() {
       super(Shaders.INSTANCE.texFragmentShader().getText());
       uTexture = gl.getUniformLocation(program, "u_Texture");
+      uAlpha = gl.getUniformLocation(program, "u_Alpha");
     }
 
     @Override
@@ -171,39 +174,46 @@ class HtmlGraphicsGL extends HtmlGraphics {
       super.flush();
     }
 
-    void prepare(WebGLTexture tex) {
+    void prepare(WebGLTexture tex, float alpha) {
       if (super.prepare()) {
         gl.activeTexture(TEXTURE0);
         gl.uniform1i(uTexture, 0);
       }
 
-      if (tex == lastTex) {
+      if (tex == lastTex && alpha == lastAlpha) {
         return;
       }
       flush();
 
+      gl.uniform1f(uAlpha, alpha);
+      lastAlpha = alpha;
       lastTex = tex;
     }
   }
 
   private class ColorShader extends Shader {
-    WebGLUniformLocation uColorLoc;
+    WebGLUniformLocation uColor;
+    WebGLUniformLocation uAlpha;
     Float32Array colors = Float32Array.create(4);
     int lastColor;
+    float lastAlpha;
 
     ColorShader() {
       super(Shaders.INSTANCE.colorFragmentShader().getText());
-      uColorLoc = gl.getUniformLocation(program, "u_Color");
+      uColor = gl.getUniformLocation(program, "u_Color");
+      uAlpha = gl.getUniformLocation(program, "u_Alpha");
     }
 
-    void prepare(int color) {
+    void prepare(int color, float alpha) {
       super.prepare();
 
-      if (color == lastColor) {
+      if (color == lastColor && alpha == lastAlpha) {
         return;
       }
       flush();
 
+      gl.uniform1f(uAlpha, alpha);
+      lastAlpha = alpha;
       setColor(color);
     }
 
@@ -213,7 +223,7 @@ class HtmlGraphicsGL extends HtmlGraphics {
       colors.set(0, (float)((color >> 16) & 0xff) / 255);
       colors.set(1, (float)((color >> 8) & 0xff) / 255);
       colors.set(2, (float)((color >> 0) & 0xff) / 255);
-      gl.uniform4fv(uColorLoc, colors);
+      gl.uniform4fv(uColor, colors);
 
       lastColor = color;
     }
@@ -339,7 +349,7 @@ class HtmlGraphicsGL extends HtmlGraphics {
     gl.clear(COLOR_BUFFER_BIT);
 
     // Paint all the layers.
-    rootLayer.paint(gl, Transform.IDENTITY);
+    rootLayer.paint(gl, Transform.IDENTITY, 1);
 
     // Guarantee a flush.
     useShader(null);
@@ -350,18 +360,20 @@ class HtmlGraphicsGL extends HtmlGraphics {
     gl.texImage2D(TEXTURE_2D, 0, RGBA, RGBA, UNSIGNED_BYTE, img.<ImageElement>cast());
   }
 
-  void drawTexture(WebGLTexture tex, float texWidth, float texHeight, Transform local, float dw, float dh, boolean repeatX, boolean repeatY) {
-    drawTexture(tex, texWidth, texHeight, local, 0, 0, dw, dh, repeatX, repeatY);
+  void drawTexture(WebGLTexture tex, float texWidth, float texHeight, Transform local, float dw,
+      float dh, boolean repeatX, boolean repeatY, float alpha) {
+    drawTexture(tex, texWidth, texHeight, local, 0, 0, dw, dh, repeatX, repeatY, alpha);
   }
 
-  void drawTexture(WebGLTexture tex, float texWidth, float texHeight, Transform local, float dx, float dy, float dw, float dh, boolean repeatX, boolean repeatY) {
+  void drawTexture(WebGLTexture tex, float texWidth, float texHeight, Transform local, float dx,
+      float dy, float dw, float dh, boolean repeatX, boolean repeatY, float alpha) {
     float sw = repeatX ? dw : texWidth, sh = repeatY ? dh : texHeight;
-    drawTexture(tex, texWidth, texHeight, local, dx, dy, dw, dh, 0, 0, sw, sh);
+    drawTexture(tex, texWidth, texHeight, local, dx, dy, dw, dh, 0, 0, sw, sh, alpha);
   }
 
-  void drawTexture(WebGLTexture tex, float texWidth, float texHeight, Transform local,
-      float dx, float dy, float dw, float dh, float sx, float sy, float sw, float sh) {
-    texShader.prepare(tex);
+  void drawTexture(WebGLTexture tex, float texWidth, float texHeight, Transform local, float dx,
+      float dy, float dw, float dh, float sx, float sy, float sw, float sh, float alpha) {
+    texShader.prepare(tex, alpha);
 
     sx /= texWidth;  sw /= texWidth;
     sy /= texHeight; sh /= texHeight;
@@ -376,8 +388,9 @@ class HtmlGraphicsGL extends HtmlGraphics {
     texShader.addElement(idx + 1); texShader.addElement(idx + 3); texShader.addElement(idx + 2);
   }
 
-  void fillRect(Transform local, float dx, float dy, float dw, float dh, float texWidth, float texHeight, WebGLTexture tex) {
-    texShader.prepare(tex);
+  void fillRect(Transform local, float dx, float dy, float dw, float dh, float texWidth,
+      float texHeight, WebGLTexture tex, float alpha) {
+    texShader.prepare(tex, alpha);
 
     float sx = dx / texWidth, sy = dy / texHeight;
     float sw = dw / texWidth, sh = dh / texHeight;
@@ -392,8 +405,8 @@ class HtmlGraphicsGL extends HtmlGraphics {
     texShader.addElement(idx + 1); texShader.addElement(idx + 3); texShader.addElement(idx + 2);
   }
 
-  void fillRect(Transform local, float dx, float dy, float dw, float dh, int color) {
-    colorShader.prepare(color);
+  void fillRect(Transform local, float dx, float dy, float dw, float dh, int color, float alpha) {
+    colorShader.prepare(color, alpha);
 
     int idx = colorShader.beginPrimitive(4, 6);
     colorShader.buildVertex(local, dx,      dy);
@@ -401,12 +414,16 @@ class HtmlGraphicsGL extends HtmlGraphics {
     colorShader.buildVertex(local, dx,      dy + dh);
     colorShader.buildVertex(local, dx + dw, dy + dh);
 
-    colorShader.addElement(idx + 0); colorShader.addElement(idx + 1); colorShader.addElement(idx + 2);
-    colorShader.addElement(idx + 1); colorShader.addElement(idx + 3); colorShader.addElement(idx + 2);
+    colorShader.addElement(idx + 0);
+    colorShader.addElement(idx + 1);
+    colorShader.addElement(idx + 2);
+    colorShader.addElement(idx + 1);
+    colorShader.addElement(idx + 3);
+    colorShader.addElement(idx + 2);
   }
 
-  void fillPoly(Transform local, float[] positions, int color) {
-    colorShader.prepare(color);
+  void fillPoly(Transform local, float[] positions, int color, float alpha) {
+    colorShader.prepare(color, alpha);
 
     int idx = colorShader.beginPrimitive(4, 6);
     int points = positions.length / 2;
@@ -481,8 +498,7 @@ class HtmlGraphicsGL extends HtmlGraphics {
     int err;
 
     try {
-      // test that our Float32 arrays work (a technique found in other WebGL
-      // checks)
+      // test that our Float32 arrays work (a technique found in other WebGL checks)
       Float32Array testFloat32Array = Float32Array.create(new float[]{0.0f, 1.0f, 2.0f});
       if (testFloat32Array.get(0) != 0.0f || testFloat32Array.get(1) != 1.0f
           || testFloat32Array.get(2) != 2.0f) {
@@ -497,7 +513,8 @@ class HtmlGraphicsGL extends HtmlGraphics {
 
       // test that our Uint16 arrays work
       Uint16Array testUint16Array = Uint16Array.create(new int[]{0, 1, 2});
-      if (testUint16Array.get(0) != 0 || testUint16Array.get(1) != 1 || testUint16Array.get(2) != 2) {
+      if (testUint16Array.get(0) != 0 || testUint16Array.get(1) != 1 || 
+          testUint16Array.get(2) != 2) {
         throw new RuntimeException("Typed Uint16Array check failed");
       }
 
@@ -507,8 +524,8 @@ class HtmlGraphicsGL extends HtmlGraphics {
         throw new RuntimeException("Typed Uint8Array check failed");
       }
 
-      // Perform GL read back test where we paint rgba(1, 1, 1, 1) and then read
-      // back that data. (should be 100% opaque white).
+      // Perform GL read back test where we paint rgba(1, 1, 1, 1) and then read back that data.
+      // (should be 100% opaque white).
       bindFramebuffer();
       gl.clearColor(1, 1, 1, 1);
       err = gl.getError();

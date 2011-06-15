@@ -24,6 +24,7 @@ class JavaCanvasLayer extends JavaLayer implements CanvasLayer {
   private CanvasImage canvas;
 
   JavaCanvasLayer(int width, int height) {
+    super();
     canvas = graphics().createImage(width, height);
   }
 
@@ -42,6 +43,7 @@ class JavaCanvasLayer extends JavaLayer implements CanvasLayer {
   void paint(JavaCanvas surf) {
     surf.save();
     transform(surf);
+    surf.setAlpha(surf.alpha() * alpha);
     surf.drawImage(canvas, 0, 0);
     surf.restore();
   }
