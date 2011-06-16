@@ -28,7 +28,7 @@ public class HtmlAnalytics implements Analytics {
    */
   private float random;
 
-  public HtmlAnalytics() {
+  public void init() {
     random = HtmlUrlParameters.Analytics.getRandom();
     log().debug("Analytics random = " + random);
   }

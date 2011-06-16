@@ -80,9 +80,9 @@ public class HtmlPlatform implements Platform {
    * autodetect whether the browser supports WebGL and use it if possible.
    */
   public static HtmlPlatform register(Mode mode) {
-    HtmlPlatform platform = new HtmlPlatform();
+    HtmlPlatform platform = new HtmlPlatform(mode);
     ForPlay.setPlatform(platform);
-    platform.init(mode);
+    platform.init();
     return platform;
   }
 
@@ -102,7 +102,7 @@ public class HtmlPlatform implements Platform {
   }
 
   private HtmlAssetManager assetManager = new HtmlAssetManager();
-  private HtmlAudio audio;
+  private HtmlAudio audio = new HtmlAudio();
   private HtmlRegularExpression regularExpression = new HtmlRegularExpression();
   private Game game;
   private HtmlGraphics graphics;
@@ -113,17 +113,14 @@ public class HtmlPlatform implements Platform {
   private HtmlPointer pointer;
   private HtmlMouse mouse;
   private HtmlTouch touch;
-  private HtmlStorage storage;
+  private HtmlStorage storage = new HtmlStorage();
+  private HtmlAnalytics analytics = new HtmlAnalytics();
 
   private TimerCallback paintCallback;
   private TimerCallback updateCallback;
-  private Analytics analytics;
 
   // Non-instantiable.
-  private HtmlPlatform() {
-  }
-
-  public void init(Mode mode) {
+  private HtmlPlatform(Mode mode) {
     // Setup logging first, so it can be used by other subsystems
     log = GWT.create(HtmlLog.class);
     if (!GWT.isProdMode()) {
@@ -138,7 +135,6 @@ public class HtmlPlatform implements Platform {
      * our own exceptions here.
      */
     try {
-      keyboard.init();
       try {
         graphics = mode.useGL() ? new HtmlGraphicsGL() : new HtmlGraphicsDom();
       } catch (RuntimeException e) {
@@ -149,13 +145,16 @@ public class HtmlPlatform implements Platform {
       pointer = new HtmlPointer(graphics.getRootElement());
       mouse = new HtmlMouse(graphics.getRootElement());
       touch = new HtmlTouch(graphics.getRootElement());
-      audio = new HtmlAudio();
-      storage = new HtmlStorage();
-      analytics = new HtmlAnalytics();
     } catch (Throwable e) {
       log.error("init()", e);
       Window.alert("failed to init(): " + e.getMessage());
     }
+  }
+
+  public void init() {
+    analytics.init();
+    audio.init();
+    keyboard.init();
   }
 
   @Override

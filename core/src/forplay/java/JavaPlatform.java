@@ -77,14 +77,14 @@ public class JavaPlatform implements Platform {
   private Analytics analytics = new JavaAnalytics();
 
   private JavaPlatform() {
-  }
-
-  private void init () {
     ensureFrame();
     graphics = new JavaGraphics(frame, component);
     keyboard = new JavaKeyboard(frame);
     pointer = new JavaPointer(component);
     mouse = new JavaMouse(component);
+  }
+
+  private void init () {
     storage.init();
   }
 

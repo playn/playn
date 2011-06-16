@@ -27,11 +27,11 @@ import forplay.core.ForPlay;
  */
 public class HtmlAudio implements Audio {
 
-  private SoundController soundController;
+  @SuppressWarnings("deprecation")
+  private SoundController soundController = new SoundController();
 
   @SuppressWarnings("deprecation")
-  public HtmlAudio() {
-    soundController = new SoundController();
+  public void init () {
     ForPlay.log().debug(
         "Preferred sound type: " + soundController.getPreferredSoundType().getName());
   }
