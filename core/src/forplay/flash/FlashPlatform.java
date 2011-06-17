@@ -152,7 +152,7 @@ public class FlashPlatform implements Platform {
   @Override
   public Touch touch() {
     // TODO(pdr): need to implement this.
-    return null;
+    throw new UnsupportedOperationException("Touch is not yet supported on the Flash platform");
   }
 
   @Override
