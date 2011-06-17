@@ -165,7 +165,7 @@ public class AppCacheLinker extends DirectInstallLinker {
     sb.append("NETWORK:\n");
     sb.append("*\n");
 
-    logger.log(TreeLogger.INFO, "Make sure you have the following"
+    logger.log(TreeLogger.DEBUG, "Make sure you have the following"
         + " attribute added to your landing page's <html> tag: <html manifest=\""
         + context.getModuleFunctionName() + "/" + MANIFEST + "\">");
 
