@@ -19,7 +19,6 @@ package flash.display;
 public enum BlendMode {
   ADD, ALPHA, DARKEN, DIFFERENCE, ERASE, HARDLIGHT, INVERT, LAYER, 
   LIGHTEN, MULTIPLY, NORMAL, OVERLAY, SCREEN, SUBTRACT;
-  ;
 
   public String nativeEnum() {
     return name().toLowerCase();

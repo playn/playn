@@ -831,7 +831,7 @@ public class ContactSolver {
 				P.set(normal).mulLocal(impulse);
 
 				temp1.set(P).mulLocal(invMassA);
-				bodyA.m_sweep.c.subLocal(temp1);;
+				bodyA.m_sweep.c.subLocal(temp1);
 				bodyA.m_sweep.a -= invIA * Vec2.cross(rA, P);
 				bodyA.synchronizeTransform();
 

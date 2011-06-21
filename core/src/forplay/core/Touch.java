@@ -61,7 +61,7 @@ public interface Touch {
     public float id() {
       return id;
     }
-  };
+  }
 
   interface Listener {
     /**

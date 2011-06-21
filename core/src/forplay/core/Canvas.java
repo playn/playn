@@ -120,21 +120,21 @@ public interface Canvas {
      * [Sa + Da - 2 * Sa * Da, Sc * (1 - Da) + (1 - Sa) * Dc]
      */
     XOR,
-  };
+  }
 
   /**
    * Values that may be used with {@link Canvas#setLineCap(LineCap)}.
    */
   enum LineCap {
     BUTT, ROUND, SQUARE
-  };
+  }
 
   /**
    * Values that may be used with {@link Canvas#setLineJoin(LineJoin)}.
    */
   enum LineJoin {
     BEVEL, MITER, ROUND
-  };
+  }
 
   /**
    * Clears the entire canvas to rgba(0, 0, 0, 0).
