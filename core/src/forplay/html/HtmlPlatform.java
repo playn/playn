@@ -18,6 +18,7 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.Element;
+import com.google.gwt.dom.client.Style.Cursor;
 import com.google.gwt.user.client.Window;
 
 import forplay.core.Storage;
@@ -330,6 +331,20 @@ public class HtmlPlatform implements Platform {
    */
   public void setTitle(String title) {
     Window.setTitle(title);
+  }
+
+  /**
+   * Sets the {@code cursor} CSS property.
+   * 
+   * @param cursor the {@link Cursor} to use, or null to hide the cursor.
+   */
+  public static void setCursor(Cursor cursor) {
+    Element rootElement = ((HtmlGraphics) ForPlay.graphics()).getRootElement();
+    if (cursor == null) {
+      rootElement.getStyle().setProperty("cursor", "none");
+    } else {
+      rootElement.getStyle().setCursor(cursor);
+    }
   }
 
   /**
