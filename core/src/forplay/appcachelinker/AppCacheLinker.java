@@ -26,7 +26,7 @@ import com.google.gwt.core.ext.UnableToCompleteException;
 import com.google.gwt.core.ext.linker.Artifact;
 import com.google.gwt.core.ext.linker.ArtifactSet;
 import com.google.gwt.core.ext.linker.EmittedArtifact;
-import com.google.gwt.core.linker.DirectInstallLinker;
+import com.google.gwt.core.linker.CrossSiteIframeLinker;
 
 /**
  * AppCacheLinker - linker for public path resources in the Application Cache. <br/>
@@ -49,12 +49,19 @@ import com.google.gwt.core.linker.DirectInstallLinker;
  * On every compile, this linker will regenerate the appcache.nocache.manifest
  * file with files from the public path of your module.
  * <p>
- * This linker has some default behavior with respect to which files will be included in the manifest,
- * which can be modified by overriding {@link #accept(String)}.
+ * This linker has some default behavior with respect to which files will be
+ * included in the manifest, which can be modified by overriding
+ * {@link #accept(String)}.
  * <p>
- * To add additional static files to the manifest, override {@link #staticCachedFiles()}.
+ * To add additional static files to the manifest, override
+ * {@link #staticCachedFiles()}.
+ * <p>
+ * Note: This linker currently extends {@link CrossSiteIframeLinker}. For better
+ * JavaScript debugging, this should be changed to extend
+ * {@link com.google.gwt.core.linker.DirectInstallLinker} instead once
+ * http://code.google.com/p/chromium/issues/detail?id=87005 has been fixed.
  */
-public class AppCacheLinker extends DirectInstallLinker {
+public class AppCacheLinker extends CrossSiteIframeLinker {
 
   private static final HashSet<String> DEFAULT_EXTENSION_WHITELIST = new HashSet<String>(
       Arrays.asList(new String[] {
@@ -94,17 +101,17 @@ public class AppCacheLinker extends DirectInstallLinker {
    */
   protected boolean accept(String path) {
 
-    // GWT Developent Mode file?
+    // GWT Development Mode files
     if (path.equals("hosted.html") || path.endsWith(".devmode.js")) {
       return false;
     }
 
-    // Default or welcome file?
+    // Default or welcome file
     if (path.equals("/")) {
       return true;
     }
     
-    // Whitelisted file extension?
+    // Whitelisted file extension
     int pos = path.lastIndexOf('.');
     if (pos != -1) {
       String extension = path.substring(pos + 1);
