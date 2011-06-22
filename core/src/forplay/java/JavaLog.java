@@ -21,13 +21,15 @@ class JavaLog implements Log {
 
   @Override
   public void error(String msg) {
-    System.err.println(msg);
+    error(msg, null);
   }
 
   @Override
   public void error(String msg, Throwable e) {
     System.err.println(msg);
-    e.printStackTrace(System.err);
+    if (e != null) {
+      e.printStackTrace(System.err);
+    }
   }
 
   @Override
@@ -42,13 +44,15 @@ class JavaLog implements Log {
 
   @Override
   public void info(String msg) {
-    System.out.println(msg);
+    info(msg, null);
   }
 
   @Override
   public void info(String msg, Throwable e) {
     System.out.println(msg);
-    e.printStackTrace(System.out);
+    if (e != null) {
+      e.printStackTrace(System.out);
+    }
   }
 
   @Override

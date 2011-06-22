@@ -30,7 +30,7 @@ class HtmlLogSimple extends HtmlLog {
 
   @Override
   public void debug(String msg) {
-    sendToConsole("DEBUG: " + msg);
+    sendToConsole("DEBUG: " + msg, null);
   }
 
   @Override
@@ -40,7 +40,7 @@ class HtmlLogSimple extends HtmlLog {
 
   @Override
   public void error(String msg) {
-    sendToConsole("ERROR: " + msg);
+    sendToConsole("ERROR: " + msg, null);
   }
 
   @Override
@@ -50,7 +50,7 @@ class HtmlLogSimple extends HtmlLog {
 
   @Override
   public void info(String msg) {
-    sendToConsole("INFO: " + msg);
+    sendToConsole("INFO: " + msg, null);
   }
 
   @Override
@@ -60,7 +60,7 @@ class HtmlLogSimple extends HtmlLog {
 
   @Override
   public void warn(String msg) {
-    sendToConsole("WARN: " + msg);
+    sendToConsole("WARN: " + msg, null);
   }
 
   @Override
@@ -68,13 +68,11 @@ class HtmlLogSimple extends HtmlLog {
     sendToConsole("WARN: " + msg, e);
   }
 
-  private void sendToConsole(String msg) {
-    System.out.println(msg);
-  }
-
   private void sendToConsole(String msg, Throwable e) {
     // Keep console output intact by using System.out for both
     System.out.println(msg);
-    e.printStackTrace(System.out);
+    if (e != null) {
+      e.printStackTrace(System.out);
+    }
   }
 }
