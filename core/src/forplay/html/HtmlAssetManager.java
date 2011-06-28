@@ -60,7 +60,7 @@ public class HtmlAssetManager extends AbstractCachingAssetManager {
     final String fullPath = pathPrefix + path;
     /*
      * Except for IE, all browsers support on-domain and cross-domain XHR via {@code
-     * XMLHTTPRequest}. IE, on the hand, not only requires the use of a non-standard {@code
+     * XMLHTTPRequest}. IE, on the other hand, not only requires the use of a non-standard {@code
      * XDomainRequest} for cross-domain requests, but doesn't allow on-domain requests to be issued
      * via {@code XMLHTTPRequest}, even when {@code Access-Control-Allow-Origin} includes the
      * current document origin. Since we here don't always know if the current request will be cross
