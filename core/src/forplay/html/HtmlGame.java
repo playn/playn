@@ -19,7 +19,7 @@ public abstract class HtmlGame implements EntryPoint {
     GWT.setUncaughtExceptionHandler(new UncaughtExceptionHandler() {
       @Override
       public void onUncaughtException(Throwable e) {
-        ForPlay.log().error("Uncacught Exception: ", e);
+        ForPlay.log().error("Uncaught Exception: ", e);
       }
     });
 
