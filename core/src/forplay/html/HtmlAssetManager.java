@@ -1,14 +1,16 @@
 /**
  * Copyright 2010 The ForPlay Authors
  * 
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
- * in compliance with the License. You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
  * 
- * Unless required by applicable law or agreed to in writing, software distributed under the License
- * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- * or implied. See the License for the specific language governing permissions and limitations under
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
  * the License.
  */
 package forplay.html;
@@ -18,6 +20,7 @@ import java.util.Map;
 
 import com.google.gwt.core.client.JavaScriptException;
 import com.google.gwt.dom.client.Document;
+import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.ImageElement;
 import com.google.gwt.regexp.shared.RegExp;
 import com.google.gwt.resources.client.DataResource;
@@ -38,8 +41,8 @@ import forplay.html.XDomainRequest.Handler;
 public class HtmlAssetManager extends AbstractCachingAssetManager {
 
   /**
-   * Whether or not to log successful progress of {@code XMLHTTPRequest} and {@code XDomainRequest}
-   * requests.
+   * Whether or not to log successful progress of {@code XMLHTTPRequest} and
+   * {@code XDomainRequest} requests.
    */
   private static final boolean LOG_XHR_SUCCESS = false;
 
@@ -59,12 +62,14 @@ public class HtmlAssetManager extends AbstractCachingAssetManager {
   protected void doGetText(final String path, final ResourceCallback<String> callback) {
     final String fullPath = pathPrefix + path;
     /*
-     * Except for IE, all browsers support on-domain and cross-domain XHR via {@code
-     * XMLHTTPRequest}. IE, on the other hand, not only requires the use of a non-standard {@code
-     * XDomainRequest} for cross-domain requests, but doesn't allow on-domain requests to be issued
-     * via {@code XMLHTTPRequest}, even when {@code Access-Control-Allow-Origin} includes the
-     * current document origin. Since we here don't always know if the current request will be cross
-     * domain, we try XHR, and then fall back to XDR if the we're running on IE.
+     * Except for IE, all browsers support on-domain and cross-domain XHR via
+     * {@code XMLHTTPRequest}. IE, on the other hand, not only requires the use
+     * of a non-standard {@code XDomainRequest} for cross-domain requests, but
+     * doesn't allow on-domain requests to be issued via {@code XMLHTTPRequest},
+     * even when {@code Access-Control-Allow-Origin} includes the current
+     * document origin. Since we here don't always know if the current request
+     * will be cross domain, we try XHR, and then fall back to XDR if the we're
+     * running on IE.
      */
     try {
       doXhr(fullPath, callback);
@@ -128,7 +133,7 @@ public class HtmlAssetManager extends AbstractCachingAssetManager {
         int readyState = xhr.getReadyState();
         if (readyState == XMLHttpRequest.DONE) {
           int status = xhr.getStatus();
-          // status code of 0 will be returned for non-http requests (e.g., file://)
+          // status code 0 will be returned for non-http requests, e.g. file://
           if (status != 0 && (status < 200 || status >= 400)) {
             ForPlay.log().error(
                 "xhr::onReadyStateChange[" + fullPath + "](readyState = " + readyState
@@ -228,7 +233,26 @@ public class HtmlAssetManager extends AbstractCachingAssetManager {
 
   private Image adaptImage(String url) {
     ImageElement img = Document.get().createImageElement();
+    /*
+     * When the server provides an appropriate {@literal
+     * Access-Control-Allow-Origin} response header, allow images to be served
+     * cross origin on supported, CORS enabled, browsers.
+     */
+    setCrossOrigin(img, "anonymous");
     img.setSrc(url);
     return new HtmlImage(img);
   }
+
+  /**
+   * Set the state of the {@code crossOrigin} attribute for CORS.
+   * 
+   * @param elem the DOM element on which to set the {@code crossOrigin}
+   *          attribute
+   * @param state one of {@code "anonymous"} or {@code "use-credentials"}
+   */
+  private native void setCrossOrigin(Element elem, String state) /*-{
+    if ('crossOrigin' in elem) {
+      elem.setAttribute('crossOrigin', state);
+    }
+  }-*/;
 }
