@@ -29,6 +29,7 @@ class HtmlKeyboard implements Keyboard {
       public void handleEvent(NativeEvent evt) {
         if (listener != null) {
           listener.onKeyDown(evt.getKeyCode());
+          evt.preventDefault();
         }
       }
     });
@@ -37,6 +38,7 @@ class HtmlKeyboard implements Keyboard {
       public void handleEvent(NativeEvent evt) {
         if (listener != null) {
           listener.onKeyUp(evt.getKeyCode());
+          evt.preventDefault();
         }
       }
     });
