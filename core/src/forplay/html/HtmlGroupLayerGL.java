@@ -17,99 +17,77 @@ import com.google.gwt.webgl.client.WebGLRenderingContext;
 
 import forplay.core.Asserts;
 import forplay.core.GroupLayer;
+import forplay.core.GroupLayerImpl;
 import forplay.core.Layer;
 import forplay.core.Transform;
 
-import java.util.ArrayList;
-import java.util.List;
-
 class HtmlGroupLayerGL extends HtmlLayerGL implements GroupLayer {
 
-  private List<HtmlLayerGL> children = new ArrayList<HtmlLayerGL>();
+  private GroupLayerImpl<HtmlLayerGL> impl = new GroupLayerImpl<HtmlLayerGL>();
 
   public HtmlGroupLayerGL(HtmlGraphicsGL gfx) {
     super(gfx);
   }
 
   @Override
+  public Layer get(int index) {
+    return impl.children.get(index);
+  }
+
+  @Override
   public void add(Layer layer) {
     Asserts.checkArgument(layer instanceof HtmlLayerGL);
-    HtmlLayerGL hlayer = (HtmlLayerGL) layer;
-    children.add(hlayer);
-    hlayer.setParent(this);
-    hlayer.onAdd();
-  }
-
-  @Override
-  public void destroy() {
-    super.destroy();
-
-    for (HtmlLayerGL child : children) {
-      child.destroy();
-    }
-  }
-
-  @Override
-  public void remove(Layer layer) {
-    Asserts.checkArgument(layer instanceof HtmlLayerGL);
-    HtmlLayerGL hlayer = (HtmlLayerGL) layer;
-    children.remove(hlayer);
-    hlayer.onRemove();
-    hlayer.setParent(null);
-  }
-
-  @Override
-  public void onAdd() {
-    super.onAdd();
-    for (HtmlLayerGL child : children) {
-      child.onAdd();
-    }
-  }
-
-  @Override
-  public void onRemove() {
-    for (HtmlLayerGL child : children) {
-      child.onRemove();
-    }
-  }
-
-  void paint(WebGLRenderingContext gl, Transform parentTransform, float parentAlpha) {
-    for (HtmlLayerGL child : children) {
-      child.paint(gl, localTransform(parentTransform), parentAlpha * alpha);
-    }
-  }
-
-  @Override
-  public Layer get(int index) {
-    return children.get(index);
+    impl.add(this, (HtmlLayerGL) layer);
   }
 
   @Override
   public void add(int index, Layer layer) {
     Asserts.checkArgument(layer instanceof HtmlLayerGL);
-    HtmlLayerGL hlayer = (HtmlLayerGL) layer;
-    children.add(index, hlayer);
-    hlayer.setParent(this);
-    hlayer.onAdd();
+    impl.add(this, index, (HtmlLayerGL) layer);
+  }
+
+  @Override
+  public void remove(Layer layer) {
+    Asserts.checkArgument(layer instanceof HtmlLayerGL);
+    impl.remove(this, (HtmlLayerGL) layer);
   }
 
   @Override
   public void remove(int index) {
-    HtmlLayerGL hlayer = children.get(index);
-    hlayer.onRemove();
-    children.remove(index);
-    hlayer.setParent(null);
+    impl.remove(this, index);
   }
 
   @Override
   public void clear() {
-    while (!children.isEmpty()) {
-      remove(children.size() - 1);
-    }
+    impl.clear(this);
   }
 
   @Override
   public int size() {
-    return children.size();
+    return impl.children.size();
+  }
+
+  @Override
+  public void destroy() {
+    super.destroy();
+    impl.destroy(this);
+  }
+
+  @Override
+  public void onAdd() {
+    super.onAdd();
+    impl.onAdd(this);
+  }
+
+  @Override
+  public void onRemove() {
+    super.onRemove();
+    impl.onRemove(this);
+  }
+
+  void paint(WebGLRenderingContext gl, Transform parentTransform, float parentAlpha) {
+    for (HtmlLayerGL child : impl.children) {
+      child.paint(gl, localTransform(parentTransform), parentAlpha * alpha);
+    }
   }
 }

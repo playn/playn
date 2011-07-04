@@ -19,16 +19,14 @@ import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.Node;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import forplay.core.Asserts;
+import forplay.core.GroupLayerImpl;
 import forplay.core.GroupLayer;
 import forplay.core.Layer;
 
 class HtmlGroupLayerDom extends HtmlLayerDom implements GroupLayer {
 
-  private List<HtmlLayerDom> children = new ArrayList<HtmlLayerDom>();
+  private GroupLayerImpl<HtmlLayerDom> impl = new GroupLayerImpl<HtmlLayerDom>();
 
   HtmlGroupLayerDom() {
     super(Document.get().createDivElement());
@@ -39,81 +37,77 @@ class HtmlGroupLayerDom extends HtmlLayerDom implements GroupLayer {
   }
 
   @Override
+  public Layer get(int index) {
+    return impl.children.get(index);
+  }
+
+  @Override
   public void add(Layer layer) {
     Asserts.checkArgument(layer instanceof HtmlLayerDom);
     HtmlLayerDom hlayer = (HtmlLayerDom) layer;
-    children.add(hlayer);
+    impl.add(this, hlayer);
     element().appendChild(hlayer.element());
-    hlayer.setParent(this);
-    hlayer.onAdd();
-  }
-
-  @Override
-  public void destroy() {
-    super.destroy();
-
-    for (HtmlLayerDom child : children) {
-      child.destroy();
-    }
-  }
-
-  @Override
-  public void remove(Layer layer) {
-    Asserts.checkArgument(layer instanceof HtmlLayerDom);
-    HtmlLayerDom hlayer = (HtmlLayerDom) layer;
-    hlayer.onRemove();
-    children.remove(hlayer);
-    element().removeChild(hlayer.element());
-    hlayer.setParent(null);
-  }
-
-  void update() {
-    super.update();
-    for (HtmlLayerDom child : children) {
-      child.update();
-    }
-  }
-
-  @Override
-  public Layer get(int index) {
-    return children.get(index);
   }
 
   @Override
   public void add(int index, Layer layer) {
     Asserts.checkArgument(layer instanceof HtmlLayerDom);
     HtmlLayerDom hlayer = (HtmlLayerDom) layer;
-
     if (index == size()) {
       element().appendChild(hlayer.element());
     } else {
       Node refChild = element().getChild(index);
       element().insertBefore(hlayer.element(), refChild);
     }
-    children.add(index, hlayer);
+    impl.add(this, index, hlayer);
+  }
 
-    hlayer.setParent(this);
-    hlayer.onAdd();
+  @Override
+  public void remove(Layer layer) {
+    Asserts.checkArgument(layer instanceof HtmlLayerDom);
+    HtmlLayerDom hlayer = (HtmlLayerDom) layer;
+    impl.remove(this, hlayer);
+    element().removeChild(hlayer.element());
   }
 
   @Override
   public void remove(int index) {
-    HtmlLayerDom hlayer = children.get(index);
-    hlayer.onRemove();
-    children.remove(index);
+    impl.remove(this, index);
     element().removeChild(element().getChild(index));
-    hlayer.setParent(null);
   }
 
   @Override
   public void clear() {
-    while (!children.isEmpty()) {
-      remove(children.size() - 1);
-    }
+    impl.clear(this);
   }
 
   @Override
   public int size() {
-    return children.size();
+    return impl.children.size();
+  }
+
+  @Override
+  public void destroy() {
+    super.destroy();
+    impl.destroy(this);
+  }
+
+  @Override
+  public void onAdd() {
+    super.onAdd();
+    impl.onAdd(this);
+  }
+
+  @Override
+  public void onRemove() {
+    super.onRemove();
+    impl.onRemove(this);
+  }
+
+  void update() {
+    super.update();
+    for (HtmlLayerDom child : impl.children) {
+      child.update();
+    }
   }
 }
