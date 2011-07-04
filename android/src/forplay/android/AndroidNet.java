@@ -1,5 +1,5 @@
 /**
- * Copyright 2010 The ForPlay Authors
+ * Copyright 2011 The ForPlay Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  */
 package forplay.android;
 
-import forplay.core.Net;
+import java.io.UnsupportedEncodingException;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -26,7 +26,7 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 
-import java.io.UnsupportedEncodingException;
+import forplay.core.Net;
 
 class AndroidNet implements Net {
 

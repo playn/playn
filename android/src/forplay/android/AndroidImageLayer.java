@@ -121,6 +121,7 @@ class AndroidImageLayer extends AndroidLayer implements ImageLayer {
   void paint(AndroidCanvas canvas) {
     canvas.save();
     transform(canvas);
+    canvas.setAlpha(canvas.alpha() * alpha);
 
     float dw = widthSet ? width : image.width();
     float dh = heightSet ? height : image.height();
@@ -131,7 +132,7 @@ class AndroidImageLayer extends AndroidLayer implements ImageLayer {
     } else if (sourceRectSet) {
       canvas.drawImage(image, 0, 0, dw, dh, sx, sy, sw, sh);
     } else {
-      canvas.drawImage(image, 0, 0, dw, dh);
+      canvas.drawImage(image, 0, 0);
     }
 
     canvas.restore();

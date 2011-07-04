@@ -1,34 +1,37 @@
 /**
- * Copyright 2010 The ForPlay Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
+ * Copyright 2011 The ForPlay Authors
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License. 
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  */
 package forplay.android;
 
+import java.util.LinkedList;
+
 import android.graphics.Canvas;
 import android.graphics.Matrix;
+import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.graphics.RectF;
-
 import forplay.core.Asserts;
 import forplay.core.Gradient;
 import forplay.core.Image;
 import forplay.core.Path;
 import forplay.core.Pattern;
 
-import java.util.LinkedList;
-
 class AndroidCanvas implements forplay.core.Canvas {
+  private static Matrix m = new Matrix();
+  private static Rect rect = new Rect();
+  private static RectF rectf = new RectF();
 
   private final Canvas canvas;
   private LinkedList<AndroidSurfaceState> paintStack = new LinkedList<AndroidSurfaceState>();
@@ -40,7 +43,7 @@ class AndroidCanvas implements forplay.core.Canvas {
 
   @Override
   public void clear() {
-    canvas.drawColor(0);
+    canvas.drawColor(0, PorterDuff.Mode.SRC);
   }
 
   @Override
@@ -54,7 +57,7 @@ class AndroidCanvas implements forplay.core.Canvas {
     Asserts.checkArgument(img instanceof AndroidImage);
     AndroidImage aimg = (AndroidImage) img;
     if (aimg.getBitmap() != null) {
-      canvas.drawBitmap(aimg.getBitmap(), x, y, null);
+      canvas.drawBitmap(aimg.getBitmap(), x, y, currentState().prepareImage());
     }
   }
 
@@ -63,19 +66,20 @@ class AndroidCanvas implements forplay.core.Canvas {
     Asserts.checkArgument(img instanceof AndroidImage);
     AndroidImage aimg = (AndroidImage) img;
     if (aimg.getBitmap() != null) {
-      canvas.drawBitmap(aimg.getBitmap(), null, new RectF(x, y, w, h), null);
+      rectf.set(x, y, x + w, y + h);
+      canvas.drawBitmap(aimg.getBitmap(), null, rectf, currentState().prepareImage());
     }
   }
 
   @Override
-  public void drawImage(Image img, float dx, float dy, float dw, float dh,
-                        float sx, float sy, float sw, float sh) {
+  public void drawImage(Image img, float dx, float dy, float dw, float dh, float sx, float sy,
+      float sw, float sh) {
     Asserts.checkArgument(img instanceof AndroidImage);
     AndroidImage aimg = (AndroidImage) img;
     if (aimg.getBitmap() != null) {
-      Rect src = new Rect((int)sx, (int)sy, (int)sw, (int)sh);
-      RectF dst = new RectF(dx, dy, dw, dh);
-      canvas.drawBitmap(aimg.getBitmap(), src, dst, null);
+      rect.set((int) sx, (int) sy, (int) (sx + sw), (int) (sy + sh));
+      rectf.set(dx, dy, dx + dw, dy + dh);
+      canvas.drawBitmap(aimg.getBitmap(), rect, rectf, currentState().prepareImage());
     }
   }
 
@@ -148,6 +152,14 @@ class AndroidCanvas implements forplay.core.Canvas {
     canvas.scale(x, y);
   }
 
+  public void setAlpha(float alpha) {
+    currentState().setAlpha(alpha);
+  }
+
+  public float alpha() {
+    return currentState().alpha;
+  }
+
   @Override
   public void setCompositeOperation(Composite composite) {
     currentState().setCompositeOperation(composite);
@@ -199,7 +211,7 @@ class AndroidCanvas implements forplay.core.Canvas {
   public void setTransform(float m11, float m12, float m21, float m22, float dx, float dy) {
     Matrix m = new Matrix();
     // TODO(jgw): Is this the right order?
-    m.setValues(new float[] { m11, m12, 0, m21, 0, m22, dx, dy, 1 });
+    m.setValues(new float[] {m11, m12, 0, m21, 0, m22, dx, dy, 1});
     canvas.setMatrix(m);
   }
 
@@ -225,12 +237,7 @@ class AndroidCanvas implements forplay.core.Canvas {
 
   @Override
   public void transform(float m11, float m12, float m21, float m22, float dx, float dy) {
-    Matrix m = new Matrix();
-    m.setValues(new float[] {
-        m11, m21, dx,
-        m12, m22, dy,
-        0, 0, 1,
-    });
+    m.setValues(new float[] {m11, m21, dx, m12, m22, dy, 0, 0, 1});
     canvas.concat(m);
   }
 

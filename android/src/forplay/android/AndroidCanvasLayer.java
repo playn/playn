@@ -16,7 +16,6 @@
 package forplay.android;
 
 import static forplay.core.ForPlay.graphics;
-
 import forplay.core.Canvas;
 import forplay.core.CanvasImage;
 import forplay.core.CanvasLayer;
@@ -25,8 +24,8 @@ class AndroidCanvasLayer extends AndroidLayer implements CanvasLayer {
 
   private CanvasImage canvas;
 
-  AndroidCanvasLayer(int width, int height) {
-    canvas = graphics().createImage(width, height);
+  AndroidCanvasLayer(int width, int height, boolean alpha) {
+    canvas = ((AndroidGraphics)graphics()).createImage(width, height, alpha);
   }
 
   @Override
@@ -44,6 +43,7 @@ class AndroidCanvasLayer extends AndroidLayer implements CanvasLayer {
   void paint(AndroidCanvas surf) {
     surf.save();
     transform(surf);
+    surf.setAlpha(surf.alpha() * alpha);
     surf.drawImage(canvas, 0, 0);
     surf.restore();
   }

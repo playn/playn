@@ -1,5 +1,5 @@
 /**
- * Copyright 2010 The ForPlay Authors
+ * Copyright 2011 The ForPlay Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ import android.graphics.BitmapShader;
 import android.graphics.LinearGradient;
 import android.graphics.RadialGradient;
 import android.graphics.Shader.TileMode;
-
+import android.util.DisplayMetrics;
 import forplay.core.Asserts;
 import forplay.core.CanvasImage;
 import forplay.core.CanvasLayer;
@@ -35,17 +35,22 @@ import forplay.core.SurfaceLayer;
 class AndroidGraphics implements Graphics {
 
   final AndroidGroupLayer rootLayer;
-  private final GameActivity activity;
   private int width, height;
+  private DisplayMetrics displayMetrics;
 
   public AndroidGraphics(GameActivity activity) {
-    this.activity = activity;
-    this.rootLayer = new AndroidGroupLayer();
+    rootLayer = new AndroidGroupLayer();
+    displayMetrics = new DisplayMetrics();
+    activity.getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
   }
 
   @Override
   public CanvasImage createImage(int w, int h) {
-    return new AndroidImage(w, h);
+    return new AndroidImage(w, h, true);
+  }
+
+  public CanvasImage createImage(int w, int h, boolean alpha) {
+    return new AndroidImage(w, h, alpha);
   }
 
   @Override
@@ -74,19 +79,21 @@ class AndroidGraphics implements Graphics {
 
   @Override
   public int screenHeight() {
-    // TODO(jgw):
-    return 480;//activity.gameView().getHeight();
+    return displayMetrics.heightPixels;
   }
 
   @Override
   public int screenWidth() {
-    // TODO(jgw):
-    return 800;//activity.gameView().getWidth();
+    return displayMetrics.widthPixels;
   }
 
   @Override
   public CanvasLayer createCanvasLayer(int width, int height) {
-    return new AndroidCanvasLayer(width, height);
+    return new AndroidCanvasLayer(width, height, true);
+  }
+
+  public CanvasLayer createCanvasLayer(int width, int height, boolean alpha) {
+	return new AndroidCanvasLayer(width, height, alpha);
   }
 
   @Override

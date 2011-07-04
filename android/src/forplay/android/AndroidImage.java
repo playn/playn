@@ -1,51 +1,61 @@
 /**
- * Copyright 2010 The ForPlay Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
+ * Copyright 2011 The ForPlay Authors
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License. 
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  */
 package forplay.android;
 
-import android.graphics.Bitmap;
-import android.graphics.Bitmap.Config;
-import android.os.AsyncTask;
+import java.lang.ref.SoftReference;
+import java.util.ArrayList;
+import java.util.List;
 
+import android.graphics.Bitmap;
+import android.os.AsyncTask;
+import android.util.Log;
 import forplay.core.Asserts;
 import forplay.core.Canvas;
 import forplay.core.CanvasImage;
 import forplay.core.Image;
 import forplay.core.ResourceCallback;
 
-import java.util.ArrayList;
-import java.util.List;
-
 class AndroidImage implements CanvasImage {
-
+  
+  // TODO: Hack to deal with low memory devices
+  static List<Bitmap> mru = new ArrayList<Bitmap>();
+  static List<Bitmap> prevMru;
+  
   private Bitmap bitmap;
+  private SoftReference<Bitmap> bitmapRef;
   private AndroidCanvas canvas;
   private List<ResourceCallback<Image>> callbacks = new ArrayList<ResourceCallback<Image>>();
+  private int width, height;
+  private String path;
 
-  public AndroidImage(Bitmap bitmap) {
-    this.bitmap = bitmap;
+  public AndroidImage(String path, Bitmap bitmap) {
+    this.path = path;
+    bitmapRef = new SoftReference<Bitmap>(bitmap);
+    width = bitmap.getWidth();
+    height = bitmap.getHeight();
   }
 
-  public AndroidImage(int w, int h) {
-    // TODO(jgw): Is there a way to get the "native" bitmap config (i.e., whatever will be fastest)?
-    bitmap = Bitmap.createBitmap(w, h, Config.ARGB_4444);
+  public AndroidImage(int w, int h, boolean alpha) {
+    bitmap = Bitmap.createBitmap(w, h, alpha ? AndroidPlatform.instance.preferredBitmapConfig
+        : Bitmap.Config.RGB_565);
     canvas = new AndroidCanvas(new android.graphics.Canvas(bitmap));
   }
 
   public AndroidImage(String url) {
-    AsyncTask<String,Void,Bitmap> execute = new AndroidAssetManager.DownloaderTask<Bitmap>() {
+    AsyncTask<String, Void, Bitmap> execute = new AndroidAssetManager.DownloaderTask<Bitmap>() {
       @Override
       public Bitmap download(String url) {
         return AndroidAssetManager.downloadBitmap(url);
@@ -72,11 +82,11 @@ class AndroidImage implements CanvasImage {
   }
 
   public int height() {
-    return bitmap == null ? 0 : bitmap.getHeight();
+    return bitmap == null ? height : bitmap.getHeight();
   }
 
   public boolean isReady() {
-    return bitmap != null;
+    return bitmap != null || bitmapRef != null;
   }
 
   public void replaceWith(Image image) {
@@ -85,11 +95,24 @@ class AndroidImage implements CanvasImage {
   }
 
   public int width() {
-    return bitmap == null ? 0 : bitmap.getWidth();
+    return bitmap == null ? width : bitmap.getWidth();
   }
 
   Bitmap getBitmap() {
-    return bitmap;
+    if (bitmap != null)
+      return bitmap;
+    if (bitmapRef != null) {
+      Bitmap bm = bitmapRef.get();
+      if (bm == null) {
+        Log.i("forplay", "Bitmap " + path + " fell out of memory");
+        bitmapRef = new SoftReference<Bitmap>(
+            bm = ((AndroidAssetManager) AndroidPlatform.instance.assetManager()).doGetBitmap(path));
+      }
+      mru.add(bm);
+      return bm;
+    }
+
+    return null;
   }
 
   private void runCallbacks(boolean success) {

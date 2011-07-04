@@ -16,7 +16,6 @@
 package forplay.android;
 
 import static forplay.core.ForPlay.graphics;
-
 import forplay.core.CanvasSurface;
 import forplay.core.Surface;
 import forplay.core.SurfaceLayer;
@@ -47,6 +46,7 @@ class AndroidSurfaceLayer extends AndroidLayer implements SurfaceLayer {
   void paint(AndroidCanvas canvas) {
     canvas.save();
     transform(canvas);
+    canvas.setAlpha(canvas.alpha() * alpha);
     canvas.drawImage(img, 0, 0);
     canvas.restore();
   }

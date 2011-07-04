@@ -1,13 +1,13 @@
 /**
- * Copyright 2010 The ForPlay Authors
- *
- *  Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * Copyright 2011 The ForPlay Authors
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- *
- *  http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
  * License for the specific language governing permissions and limitations under
@@ -15,25 +15,22 @@
  */
 package forplay.android;
 
-import forplay.core.Touch;
+import java.util.ArrayList;
 
+import android.app.Activity;
+import android.app.ActivityManager;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.Bitmap.Config;
 import android.graphics.Canvas;
-import forplay.core.Analytics;
-import forplay.core.AssetManager;
-import forplay.core.Audio;
+import android.graphics.PixelFormat;
+import android.net.Uri;
 import forplay.core.ForPlay;
 import forplay.core.Game;
-import forplay.core.Graphics;
 import forplay.core.Json;
-import forplay.core.Keyboard;
-import forplay.core.Log;
 import forplay.core.Mouse;
-import forplay.core.Net;
 import forplay.core.Platform;
-import forplay.core.Pointer;
 import forplay.core.Touch;
-import forplay.core.RegularExpression;
-import forplay.core.Storage;
 import forplay.java.JavaJson;
 
 public class AndroidPlatform implements Platform {
@@ -44,8 +41,9 @@ public class AndroidPlatform implements Platform {
     ForPlay.setPlatform(instance = new AndroidPlatform(activity));
   }
 
-  private final GameActivity activity;
-  private Game game;
+  Game game;
+  GameActivity activity;
+
   private AndroidAudio audio;
   private AndroidGraphics graphics;
   private JavaJson json;
@@ -53,9 +51,11 @@ public class AndroidPlatform implements Platform {
   private AndroidLog log;
   private AndroidNet net;
   private AndroidPointer pointer;
-  private Canvas currentCanvas;
+  private AndroidStorage storage;
   private AndroidAssetManager assetManager;
   private AndroidAnalytics analytics;
+
+  public Bitmap.Config preferredBitmapConfig;
 
   private AndroidPlatform(GameActivity activity) {
     this.activity = activity;
@@ -68,25 +68,45 @@ public class AndroidPlatform implements Platform {
     pointer = new AndroidPointer();
     assetManager = new AndroidAssetManager();
     analytics = new AndroidAnalytics();
+    storage = new AndroidStorage(activity);
+
+    assetManager.assets = activity.getAssets();
+    ActivityManager activityManager = (ActivityManager) activity.getApplication().getSystemService(
+        Activity.ACTIVITY_SERVICE);
+    int memoryClass = activityManager.getMemoryClass();
+    
+    // For low memory devices (like the HTC Magic), prefer 16-bit bitmaps
+    preferredBitmapConfig = memoryClass <= 16 ? Bitmap.Config.ARGB_4444 : mapDisplayPixelFormat();
+  }
+
+  /**
+   * Determines the most performant pixel format for the active display.
+   */
+  private Config mapDisplayPixelFormat() {
+    int format = activity.getWindowManager().getDefaultDisplay().getPixelFormat();
+
+    if (format == PixelFormat.RGBA_8888 || format == PixelFormat.RGBX_8888)
+      return Bitmap.Config.ARGB_8888;
+    return Bitmap.Config.ARGB_4444;
   }
 
   @Override
-  public AssetManager assetManager() {
+  public AndroidAssetManager assetManager() {
     return assetManager;
   }
 
   @Override
-  public Analytics analytics() {
+  public AndroidAnalytics analytics() {
     return analytics;
   }
 
   @Override
-  public Audio audio() {
+  public AndroidAudio audio() {
     return audio;
   }
 
   @Override
-  public Graphics graphics() {
+  public AndroidGraphics graphics() {
     return graphics;
   }
 
@@ -96,23 +116,24 @@ public class AndroidPlatform implements Platform {
   }
 
   @Override
-  public Keyboard keyboard() {
+  public AndroidKeyboard keyboard() {
     return keyboard;
   }
 
   @Override
-  public Log log() {
+  public AndroidLog log() {
     return log;
   }
 
   @Override
-  public Net net() {
+  public AndroidNet net() {
     return net;
   }
 
   @Override
   public void openURL(String url) {
-    // TODO(jgw): wtf is this doing here?
+    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+    activity.startActivity(browserIntent);
   }
 
   @Override
@@ -127,7 +148,7 @@ public class AndroidPlatform implements Platform {
   }
 
   @Override
-  public Pointer pointer() {
+  public AndroidPointer pointer() {
     return pointer;
   }
 
@@ -137,7 +158,7 @@ public class AndroidPlatform implements Platform {
   }
 
   @Override
-  public RegularExpression regularExpression() {
+  public AndroidRegularExpression regularExpression() {
     return new AndroidRegularExpression();
   }
 
@@ -148,9 +169,8 @@ public class AndroidPlatform implements Platform {
   }
 
   @Override
-  public Storage storage() {
-    // TODO(jgw): Implement this on something android-ish.
-    return null;
+  public AndroidStorage storage() {
+    return storage;
   }
 
   @Override
@@ -158,66 +178,19 @@ public class AndroidPlatform implements Platform {
     return System.currentTimeMillis();
   }
 
-  void draw(float delta) {
-    // TODO(jgw): This isn't really the right form for the paint/update loop.
+  void draw(Canvas c, float delta) {
+    AndroidImage.prevMru = AndroidImage.mru;
+    AndroidImage.mru = new ArrayList<Bitmap>();
+
     if (game != null) {
       game.paint(delta);
-      graphics.rootLayer.paint(new AndroidCanvas(currentCanvas));
+
+      AndroidCanvas surf = new AndroidCanvas(c);
+      surf.clear();
+      graphics.rootLayer.paint(surf);
     }
-  }
 
-  void onKeyDown(final int keyCode) {
-    activity.getGameThread().post(new Runnable() {
-
-      @Override
-      public void run() {
-        keyboard.onKeyDown(keyCode);
-      }
-    });
-  }
-
-  void onKeyUp(final int keyCode) {
-    activity.getGameThread().post(new Runnable() {
-
-      @Override
-      public void run() {
-        keyboard.onKeyUp(keyCode);
-      }
-    });
-  }
-
-  void onPointerEnd(final float x, final float y) {
-    activity.getGameThread().post(new Runnable() {
-
-      @Override
-      public void run() {
-        pointer.onPointerEnd(x, y);
-      }
-    });
-  }
-
-  void onPointerMove(final float x, final float y) {
-    activity.getGameThread().post(new Runnable() {
-
-      @Override
-      public void run() {
-        pointer.onPointerMove(x, y);
-      }
-    });
-  }
-
-  void onPointerStart(final float x, final float y) {
-    activity.getGameThread().post(new Runnable() {
-
-      @Override
-      public void run() {
-        pointer.onPointerStart(x, y);
-      }
-    });
-  }
-
-  void setCurrentCanvas(Canvas c) {
-    this.currentCanvas = c;
+    AndroidImage.prevMru = null;
   }
 
   void update(float delta) {

@@ -15,12 +15,12 @@
  */
 package forplay.android;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import forplay.core.Asserts;
 import forplay.core.GroupLayer;
 import forplay.core.Layer;
-
-import java.util.ArrayList;
-import java.util.List;
 
 class AndroidGroupLayer extends AndroidLayer implements GroupLayer {
 
@@ -57,6 +57,7 @@ class AndroidGroupLayer extends AndroidLayer implements GroupLayer {
   void paint(AndroidCanvas surf) {
     surf.save();
     transform(surf);
+    surf.setAlpha(surf.alpha() * alpha);
 
     for (AndroidLayer child : children) {
       child.paint(surf);

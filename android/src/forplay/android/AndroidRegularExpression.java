@@ -15,9 +15,9 @@
  */
 package forplay.android;
 
-import forplay.core.RegularExpression;
-
 import java.util.regex.Pattern;
+
+import forplay.core.RegularExpression;
 
 class AndroidRegularExpression implements RegularExpression {
 

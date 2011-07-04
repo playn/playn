@@ -1,5 +1,5 @@
 /**
- * Copyright 2010 The ForPlay Authors
+ * Copyright 2011 The ForPlay Authors
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
@@ -23,27 +23,46 @@ import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Xfermode;
 import forplay.core.Canvas;
+import forplay.core.Canvas.Composite;
 
 class AndroidSurfaceState {
 
-  private Paint paint;
-  private int fillColor;
-  private int strokeColor;
-  private AndroidGradient gradient;
-  private AndroidPattern pattern;
+  // Cached xfer modes to avoid creating objects
+  static PorterDuffXfermode[] xfermodes; 
+  
+  Paint paint;
+  int fillColor;
+  int strokeColor;
+  AndroidGradient gradient;
+  AndroidPattern pattern;
+  float alpha;
+  Composite composite;
 
+  static {
+    xfermodes = new PorterDuffXfermode[Canvas.Composite.values().length];
+    for (Canvas.Composite composite : Canvas.Composite.values()) {
+      xfermodes[composite.ordinal()] = new PorterDuffXfermode(PorterDuff.Mode.valueOf(composite.name()));
+    }
+  }
+  
   AndroidSurfaceState() {
-    this(new Paint(), 0xff000000, 0xffffffff, null, null);
+    this(new Paint(), 0xff000000, 0xffffffff, null, null, Composite.SRC_OVER, 1f);
   }
 
   AndroidSurfaceState(AndroidSurfaceState toCopy) {
-    this(toCopy.paint, toCopy.fillColor, toCopy.strokeColor, toCopy.gradient, toCopy.pattern);
+    this(toCopy.paint, toCopy.fillColor, toCopy.strokeColor, toCopy.gradient, toCopy.pattern,
+        toCopy.composite, toCopy.alpha);
   }
 
-  AndroidSurfaceState(Paint paint, int fillColor, int strokeColor, AndroidGradient gradient, AndroidPattern pattern) {
+  AndroidSurfaceState(Paint paint, int fillColor, int strokeColor, AndroidGradient gradient,
+      AndroidPattern pattern, Composite composite, float alpha) {
     this.paint = paint;
     this.fillColor = fillColor;
     this.strokeColor = strokeColor;
+    this.gradient = gradient;
+    this.pattern = pattern;
+    this.composite = composite;
+    this.alpha = alpha;
   }
 
   void setFillColor(int color) {
@@ -76,12 +95,16 @@ class AndroidSurfaceState {
 
   Paint prepareFill() {
     paint.setStyle(Style.FILL);
+    paint.setXfermode(convertComposite(composite));
     if (gradient != null) {
       paint.setShader(gradient.shader);
     } else if (pattern != null) {
       paint.setShader(pattern.shader);
     } else {
       paint.setColor(fillColor);
+      // Android reuses the A bits of color for alpha so we have to compute the real alpha here 
+      if (alpha != 1f)
+        paint.setAlpha((int) (alpha * (fillColor >>> 24)));
     }
     return paint;
   }
@@ -89,11 +112,25 @@ class AndroidSurfaceState {
   Paint prepareStroke() {
     paint.setStyle(Style.STROKE);
     paint.setColor(strokeColor);
+    // Android reuses the A bits of color for alpha so we have to compute the real alpha here 
+    if (alpha != 1f)
+      paint.setAlpha((int) (alpha * (strokeColor >>> 24)));
+    paint.setXfermode(convertComposite(composite));
     return paint;
   }
 
-  void setCompositeOperation(Canvas.Composite composite) {
+  Paint prepareImage() {
+    paint.setAlpha((int) (alpha * 255));
     paint.setXfermode(convertComposite(composite));
+    return paint;
+  }
+
+  void setAlpha(float alpha) {
+    this.alpha = alpha;
+  }
+
+  void setCompositeOperation(Canvas.Composite composite) {
+    this.composite = composite;
   }
 
   void setStrokeWidth(float strokeWidth) {
@@ -102,34 +139,28 @@ class AndroidSurfaceState {
 
   private Cap convertCap(Canvas.LineCap cap) {
     switch (cap) {
-      case BUTT: return Cap.BUTT;
-      case ROUND: return Cap.ROUND;
-      case SQUARE: return Cap.SQUARE;
+      case BUTT:
+        return Cap.BUTT;
+      case ROUND:
+        return Cap.ROUND;
+      case SQUARE:
+        return Cap.SQUARE;
     }
     return Cap.BUTT;
   }
 
   private Xfermode convertComposite(Canvas.Composite composite) {
-    switch (composite) {
-      case DST_ATOP: return new PorterDuffXfermode(PorterDuff.Mode.DST_ATOP);
-      case DST_IN: return new PorterDuffXfermode(PorterDuff.Mode.DST_IN);
-      case DST_OUT: return new PorterDuffXfermode(PorterDuff.Mode.DST_OUT);
-      case DST_OVER: return new PorterDuffXfermode(PorterDuff.Mode.DST_OVER);
-      case SRC: return new PorterDuffXfermode(PorterDuff.Mode.SRC);
-      case SRC_ATOP: return new PorterDuffXfermode(PorterDuff.Mode.SRC_ATOP);
-      case SRC_IN: return new PorterDuffXfermode(PorterDuff.Mode.SRC_IN);
-      case SRC_OUT: return new PorterDuffXfermode(PorterDuff.Mode.SRC_OUT);
-      case SRC_OVER: return new PorterDuffXfermode(PorterDuff.Mode.SRC_OVER);
-      case XOR: return new PorterDuffXfermode(PorterDuff.Mode.XOR);
-    }
-    return new PorterDuffXfermode(PorterDuff.Mode.SRC);
+    return xfermodes[composite.ordinal()];
   }
 
   private Join convertJoin(Canvas.LineJoin join) {
     switch (join) {
-      case BEVEL: return Join.BEVEL;
-      case MITER: return Join.MITER;
-      case ROUND: return Join.ROUND;
+      case BEVEL:
+        return Join.BEVEL;
+      case MITER:
+        return Join.MITER;
+      case ROUND:
+        return Join.ROUND;
     }
     return Join.MITER;
   }

@@ -15,85 +15,149 @@
  */
 package forplay.android;
 
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.net.http.AndroidHttpClient;
-import android.os.AsyncTask;
-import android.util.Log;
-import forplay.core.AbstractAssetManager;
-import forplay.core.Image;
-import forplay.core.ResourceCallback;
-import forplay.core.Sound;
+import static forplay.core.ForPlay.log;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.HttpGet;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStream;
+import android.content.res.AssetManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
+import android.util.Log;
+import android.view.WindowManager.LayoutParams;
+import forplay.core.AbstractAssetManager;
+import forplay.core.Image;
+import forplay.core.ResourceCallback;
+import forplay.core.Sound;
 
-class AndroidAssetManager extends AbstractAssetManager {
+public class AndroidAssetManager extends AbstractAssetManager {
 
-  @Override
-  protected Image doGetImage(String path) {
-    // TODO(jgw): Temporary hack: Load everything from /sdcard.
-    return new AndroidImage(BitmapFactory.decodeFile("/sdcard/" + path));
-//    return new AndroidImage(path);
+  public String pathPrefix = null;
+  public AssetManager assets;
+  public static LayoutParams windowAttributes;
+
+  public void setPathPrefix(String prefix) {
+    pathPrefix = prefix;
+  }
+
+  private InputStream openResource(String path) throws IOException {
+    // Insert a slash to make this consistent with the Java asset manager
+    return getClass().getClassLoader().getResourceAsStream(pathPrefix + "/" + path);
   }
 
   @Override
+  protected Image doGetImage(String path) {
+    try {
+      InputStream is = openResource(path);
+      if (is == null) {
+        // TODO: This should return an error image like JavaAssetManager does
+        throw new RuntimeException("Unable to load image " + path);
+      }
+      try {
+        return new AndroidImage(path, BitmapFactory.decodeStream(is));
+      } finally {
+        is.close();
+      }
+    } catch (IOException e) {
+      // TODO: This should return an error image like JavaAssetManager does
+      throw new RuntimeException(e);
+    }
+  }
+
+  Bitmap doGetBitmap(String path) {
+    try {
+      InputStream is = openResource(path);
+      if (is == null) {
+        // TODO: This should return an error image like JavaAssetManager does
+        throw new RuntimeException("Unable to load image " + path);
+      }
+      try {
+        return BitmapFactory.decodeStream(is);
+      } finally {
+        is.close();
+      }
+    } catch (IOException e) {
+      // TODO: This should return an error image like JavaAssetManager does
+      throw new RuntimeException(e);
+    }
+  }
+
+  private class ErrorSound implements Sound {
+    @Override
+    public boolean play() {
+      return false;
+    }
+
+    @Override
+    public void stop() {
+    }
+
+    @Override
+    public void setLooping(boolean looping) {
+    }
+
+    @Override
+    public void setVolume(float volume) {
+    }
+
+    @Override
+    public boolean isPlaying() {
+      return false;
+    }    
+  }
+  
+  @Override
   protected Sound doGetSound(String path) {
-    // TODO(jgw): Implement me.
-    return null;
+    try {
+      InputStream in = openResource(path + ".wav");
+      
+      if (in == null) {
+        log().error("Unable to find sound resource: " + path);
+        return new ErrorSound();
+      }
+      
+      Sound sound = ((AndroidAudio) AndroidPlatform.instance.audio()).getSound(path + ".wav", in);
+      return sound == null ? new ErrorSound() : sound;
+    } catch (IOException e) {
+      log().error("Unable to load sound: " + path, e);
+      return new ErrorSound();
+    }
   }
 
   @Override
   protected void doGetText(final String path, final ResourceCallback<String> callback) {
-    File f = new File("/sdcard/" + path);
-    if (!f.exists()) {
-      callback.error(new FileNotFoundException(path));
-      return;
-    }
-
     try {
-      StringBuffer fileData = new StringBuffer(1000);
-      BufferedReader reader = new BufferedReader(new FileReader(f));
-      char[] buf = new char[1024];
-      int numRead = 0;
-      while ((numRead = reader.read(buf)) != -1) {
-        String readData = String.valueOf(buf, 0, numRead);
-        fileData.append(readData);
-        buf = new char[1024];
+      InputStream is = openResource(path);
+      try {
+        StringBuffer fileData = new StringBuffer(1000);
+        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+        char[] buf = new char[1024];
+        int numRead = 0;
+        while ((numRead = reader.read(buf)) != -1) {
+          String readData = String.valueOf(buf, 0, numRead);
+          fileData.append(readData);
+          buf = new char[1024];
+        }
+        reader.close();
+        String text = fileData.toString();
+        callback.done(text);
+      } finally {
+        is.close();
       }
-      reader.close();
-      String text = fileData.toString();
-      callback.done(text);
     } catch (IOException e) {
       callback.error(e);
     }
-
-//    new DownloaderTask<String>(callback) {
-//      @Override
-//      public String download(String url) {
-//        try {
-//          HttpClient httpclient = new DefaultHttpClient();
-//          HttpResponse response = httpclient.execute(new HttpGet(path));
-//
-//          return EntityUtils.toString(response.getEntity());
-//        } catch (Exception e) {
-//          return null;
-//        }
-//      }
-//    }.execute(path);
   }
 
   public abstract static class DownloaderTask<T> extends AsyncTask<String, Void, T> {
-    private String url;
     private ResourceCallback<T> callback;
 
     public DownloaderTask() {
@@ -105,8 +169,7 @@ class AndroidAssetManager extends AbstractAssetManager {
 
     @Override
     // Actual download method, run in the task thread
-        protected
-        T doInBackground(String... params) {
+    protected T doInBackground(String... params) {
       // params comes from the execute() call: params[0] is the url.
       return download(params[0]);
     }
@@ -140,7 +203,11 @@ class AndroidAssetManager extends AbstractAssetManager {
         InputStream inputStream = null;
         try {
           inputStream = entity.getContent();
-          final Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+          BitmapFactory.Options options = new BitmapFactory.Options();
+          options.inDither = true;
+          options.inPreferredConfig = AndroidPlatform.instance.preferredBitmapConfig;
+          options.inScaled = false;
+          final Bitmap bitmap = BitmapFactory.decodeStream(inputStream, null, options);
           return bitmap;
         } finally {
           if (inputStream != null) {
