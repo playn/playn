@@ -41,6 +41,8 @@ class JavaCanvasLayer extends JavaLayer implements CanvasLayer {
 
   @Override
   void paint(JavaCanvas surf) {
+    if (!visible()) return;
+
     surf.save();
     transform(surf);
     surf.setAlpha(surf.alpha() * alpha);

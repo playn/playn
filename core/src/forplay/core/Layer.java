@@ -41,7 +41,7 @@ public interface Layer {
   /**
    * Whether this layer has been destroyed. If true, the layer can no longer be used.
    */
-  boolean isDestroyed();
+  boolean destroyed();
 
   /**
    * Returns the parent that contains this layer, or {@code null}.
@@ -52,6 +52,17 @@ public interface Layer {
    * Returns the layer's transformation matrix.
    */
   Transform transform();
+
+  /**
+   * Returns true if this layer is visible (i.e. it is being rendered).
+   */
+  boolean visible();
+
+  /**
+   * Configures this layer's visibility: if true, it will be rendered as normal, if false it and
+   * its children will not be rendered.
+   */
+  void setVisible(boolean visible);
 
   /**
    * Return the global alpha value for this layer.

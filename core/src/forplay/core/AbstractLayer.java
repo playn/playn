@@ -21,20 +21,29 @@ import forplay.core.Layer;
  */
 public abstract class AbstractLayer implements Layer {
 
+  protected static enum Flag {
+    DESTROYED(1 << 0),
+    VISIBLE(1 << 1),
+    SHOWN(1 << 2); // used by HtmlLayerDom
+
+    public final int bitmask;
+
+    Flag(int bitmask) {
+      this.bitmask = bitmask;
+    }
+  }
+
+  private GroupLayer parent;
+
   protected Transform transform;
   protected float originX, originY;
-  private GroupLayer parent;
-  private boolean isDestroyed;
   protected float alpha;
+  protected int flags;
 
   protected AbstractLayer() {
     transform = new Transform();
     alpha = 1;
-  }
-
-  @Override
-  public float alpha() {
-    return alpha;
+    setFlag(Flag.VISIBLE, true);
   }
 
   @Override
@@ -42,12 +51,27 @@ public abstract class AbstractLayer implements Layer {
     if (parent() != null) {
       parent().remove(this);
     }
-    isDestroyed = true;
+    setFlag(Flag.DESTROYED, true);
   }
 
   @Override
-  public boolean isDestroyed() {
-    return isDestroyed;
+  public boolean destroyed() {
+    return isSet(Flag.DESTROYED);
+  }
+
+  @Override
+  public boolean visible() {
+    return isSet(Flag.VISIBLE);
+  }
+
+  @Override
+  public void setVisible(boolean visible) {
+    setFlag(Flag.VISIBLE, visible);
+  }
+
+  @Override
+  public float alpha() {
+    return alpha;
   }
 
   @Override
@@ -100,7 +124,7 @@ public abstract class AbstractLayer implements Layer {
   }
 
   public void onAdd() {
-    Asserts.checkState(!isDestroyed, "Illegal to use destroyed layers");
+    Asserts.checkState(!destroyed(), "Illegal to use destroyed layers");
   }
 
   public void onRemove() {
@@ -108,5 +132,17 @@ public abstract class AbstractLayer implements Layer {
 
   public void setParent(GroupLayer parent) {
     this.parent = parent;
+  }
+
+  protected boolean isSet(Flag flag) {
+    return (flags & flag.bitmask) != 0;
+  }
+
+  protected void setFlag(Flag flag, boolean active) {
+    if (active) {
+      flags |= flag.bitmask;
+    } else {
+      flags &= ~flag.bitmask;
+    }
   }
 }

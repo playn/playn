@@ -122,6 +122,8 @@ class HtmlImageLayerGL extends HtmlLayerGL implements ImageLayer {
 
   @Override
   void paint(WebGLRenderingContext gl, Transform parentTransform, float parentAlpha) {
+    if (!visible()) return;
+
     // TODO(jgw): Assert exclusive source-rect vs. repeat.
 
     WebGLTexture tex = img.ensureTexture(gfx, repeatX, repeatY);

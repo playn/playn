@@ -35,6 +35,12 @@ public class FlashLayer extends AbstractLayer {
     this.displayObject = displayObject;
   }
 
+  @Override
+  public void setVisible(boolean visible) {
+    super.setVisible(visible);
+    display().setVisible(visible);
+  }
+
   DisplayObject display() {
     return displayObject;
   }

@@ -41,6 +41,8 @@ class AndroidCanvasLayer extends AndroidLayer implements CanvasLayer {
 
   @Override
   void paint(AndroidCanvas surf) {
+    if (!visible()) return;
+
     surf.save();
     transform(surf);
     surf.setAlpha(surf.alpha() * alpha);

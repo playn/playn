@@ -45,6 +45,8 @@ class JavaSurfaceLayer extends JavaLayer implements SurfaceLayer {
 
   @Override
   void paint(JavaCanvas canvas) {
+    if (!visible()) return;
+
     canvas.save();
     transform(canvas);
     canvas.setAlpha(canvas.alpha() * alpha);

@@ -44,6 +44,8 @@ class AndroidSurfaceLayer extends AndroidLayer implements SurfaceLayer {
 
   @Override
   void paint(AndroidCanvas canvas) {
+    if (!visible()) return;
+
     canvas.save();
     transform(canvas);
     canvas.setAlpha(canvas.alpha() * alpha);

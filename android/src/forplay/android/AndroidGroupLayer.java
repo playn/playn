@@ -82,6 +82,8 @@ class AndroidGroupLayer extends AndroidLayer implements GroupLayer {
 
   @Override
   void paint(AndroidCanvas surf) {
+    if (!visible()) return;
+
     surf.save();
     transform(surf);
     surf.setAlpha(surf.alpha() * alpha);

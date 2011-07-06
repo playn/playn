@@ -265,7 +265,7 @@ public class DisplayObject extends EventDispatcher {
    * Whether or not the display object is visible.
    * @return
    */
-  final public native boolean isVisible() /*-{
+  final public native boolean visible() /*-{
     return this.visible;
   }-*/;
   

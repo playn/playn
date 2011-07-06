@@ -16,6 +16,7 @@
 package forplay.html;
 
 import com.google.gwt.dom.client.Element;
+import com.google.gwt.dom.client.Style.Display;
 import com.google.gwt.dom.client.Style.Position;
 import com.google.gwt.dom.client.Style.Visibility;
 
@@ -62,7 +63,6 @@ class HtmlLayerDom extends AbstractLayer {
   }-*/;
 
   private final Element elem;
-  private boolean shown;
 
   HtmlLayerDom(Element elem) {
     super();
@@ -80,6 +80,12 @@ class HtmlLayerDom extends AbstractLayer {
     }
   }
 
+  @Override
+  public void setVisible(boolean visible) {
+    super.setVisible(visible);
+    elem.getStyle().setDisplay(visible ? Display.BLOCK : Display.NONE);
+  }
+
   public void setOrigin(float x, float y) {
     super.setOrigin(x, y);
 
@@ -92,8 +98,8 @@ class HtmlLayerDom extends AbstractLayer {
   }
 
   void update() {
-    if (!shown) {
-      shown = true;
+    if (!isSet(Flag.SHOWN)) {
+      setFlag(Flag.SHOWN, true);
       elem.getStyle().setVisibility(Visibility.VISIBLE);
     }
 
