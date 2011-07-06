@@ -27,11 +27,17 @@ public interface GroupLayer extends Layer {
 
   /**
    * Adds a layer to the bottom of the group.
+   * <p>
+   * Because the {@link Layer} hierarchy is a tree, if the {@link Layer} is already a child of
+   * another {@link GroupLayer}, it will be removed before being added to this {@link GroupLayer}.
    */
   void add(Layer layer);
 
   /**
    * Inserts a layer at a given position in the group.
+   * <p>
+   * Because the {@link Layer} hierarchy is a tree, if the {@link Layer} is already a child of
+   * another {@link GroupLayer}, it will be removed before being added to this {@link GroupLayer}.
    */
   void add(int index, Layer layer);
 
