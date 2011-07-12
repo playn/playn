@@ -18,6 +18,7 @@ package forplay.html;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptException;
 import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.Element;
@@ -146,7 +147,20 @@ public class HtmlAssetManager extends AbstractCachingAssetManager {
                   "xhr::onReadyStateChange[" + fullPath + "](readyState = " + readyState
                       + "; status = " + status + ")");
             }
-            callback.done(xhr.getResponseText());
+            // TODO(fredsa): Remove try-catch and materialized exception once issue 6562 is fixed
+            // http://code.google.com/p/google-web-toolkit/issues/detail?id=6562
+            try {
+              callback.done(xhr.getResponseText());
+            } catch(JavaScriptException e) {
+              if (GWT.isProdMode()) {
+                throw e;
+              } else {
+                JavaScriptException materialized = new JavaScriptException(e.getName(),
+                    e.getDescription());
+                materialized.setStackTrace(e.getStackTrace());
+                throw materialized;
+              }
+            }
           }
         }
       }
