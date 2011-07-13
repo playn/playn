@@ -28,24 +28,28 @@ class HtmlJson implements Json {
     private StringBuilder sb = new StringBuilder();
     private String key;
     private ArrayList<Boolean> inArrayStack = new ArrayList<Boolean>();
+    private ArrayList<Boolean> isFirstValueStack = new ArrayList<Boolean>();
 
     @Override
     public void array() {
       maybePrependKey();
       sb.append("[");
       pushInArray(true);
+      pushIsFirstValue(true);
     }
 
     @Override
     public void endArray() {
       sb.append("]");
       popInArray();
+      popIsFirstValue();
     }
 
     @Override
     public void endObject() {
       sb.append("}");
       popInArray();
+      popIsFirstValue();
     }
 
     @Override
@@ -59,34 +63,33 @@ class HtmlJson implements Json {
       maybePrependKey(true);
       sb.append("{");
       pushInArray(false);
+      pushIsFirstValue(true);
     }
 
     @Override
     public void value(boolean x) {
       maybePrependKey();
       sb.append(x);
-      sb.append(",");
     }
 
     @Override
     public void value(double x) {
       maybePrependKey();
       sb.append(x);
-      sb.append(",");
     }
 
     @Override
     public void value(int x) {
       maybePrependKey();
       sb.append(x);
-      sb.append(",");
     }
 
     @Override
     public void value(String x) {
       maybePrependKey();
+      sb.append("\"");
       sb.append(x);
-      sb.append(",");
+      sb.append("\"");
     }
 
     @Override
@@ -98,19 +101,31 @@ class HtmlJson implements Json {
       maybePrependKey(false);
     }
 
+    /**
+     * Prepend the key if not in an array.
+     * 
+     * Note: if this isn't the first key, we output a leading comma as well.
+     */
     private void maybePrependKey(boolean isObject) {
       // Special case for the opening object.
       if (isObject && inArrayStack.size() == 0) {
         return;
       }
 
+      if (isFirstValue()) {
+        popIsFirstValue();
+        pushIsFirstValue(false);
+      } else {
+        sb.append(",");
+      }
+
       if (inArray()) {
         Asserts.checkState(this.key == null);
       } else {
         Asserts.checkState(this.key != null);
-        sb.append("'");
+        sb.append("\"");
         sb.append(key);
-        sb.append("':");
+        sb.append("\":");
         key = null;
       }
     }
@@ -125,6 +140,18 @@ class HtmlJson implements Json {
 
     private boolean inArray() {
       return inArrayStack.get(inArrayStack.size() - 1);
+    }
+
+    private void pushIsFirstValue(boolean isFirstValue) {
+      isFirstValueStack.add(isFirstValue);
+    }
+
+    private boolean popIsFirstValue() {
+      return isFirstValueStack.remove(isFirstValueStack.size() - 1);
+    }
+
+    private boolean isFirstValue() {
+      return isFirstValueStack.get(isFirstValueStack.size() - 1);
     }
   }
 
