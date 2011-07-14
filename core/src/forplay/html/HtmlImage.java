@@ -38,12 +38,17 @@ class HtmlImage implements Image {
     return img.complete;
   }-*/;
 
+  private static native void fakeComplete(CanvasElement img) /*-{
+   img.complete = true; // CanvasElement doesn't provide a 'complete' property
+  }-*/;
+
   ImageElement img;
 
   // only used in the WebGL renderer.
   private WebGLTexture tex, pow2tex;
 
   HtmlImage(CanvasElement img) {
+    fakeComplete(img);
     this.img = img.cast();
   }
 
