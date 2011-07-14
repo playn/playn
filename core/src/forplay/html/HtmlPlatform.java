@@ -102,7 +102,7 @@ public class HtmlPlatform implements Platform {
     addEventListener((target == null ? Document.get() : target), name, handler, true);
   }
 
-  private HtmlAssetManager assetManager = new HtmlAssetManager();
+  private HtmlAssetManager assetManager = GWT.create(HtmlAssetManager.class);
   private HtmlAudio audio = new HtmlAudio();
   private HtmlRegularExpression regularExpression = new HtmlRegularExpression();
   private Game game;
