@@ -86,6 +86,13 @@ public interface Touch {
     void onTouchEnd(TouchEvent[] touches);
   }
 
+  /** A {@link Listener} implementation with NOOP stubs provided for each method. */
+  public static class Adapter implements Listener {
+    public void onTouchStart(TouchEvent[] touches) { /* NOOP! */ }
+    public void onTouchMove(TouchEvent[] touches) { /* NOOP! */ }
+    public void onTouchEnd(TouchEvent[] touches) { /* NOOP! */ }
+  }
+
   /**
    * Sets the listener that will receive touch events. Setting the listener to
    * <code>null</code> will cause touch events to stop being fired.

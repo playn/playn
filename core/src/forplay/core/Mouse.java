@@ -92,6 +92,14 @@ public interface Mouse {
     void onMouseWheelScroll(float velocity);
   }
 
+  /** A {@link Listener} implementation with NOOP stubs provided for each method. */
+  public static class Adapter implements Listener {
+    public void onMouseDown(float x, float y, int button) { /* NOOP! */ }
+    public void onMouseUp(float x, float y, int button) { /* NOOP! */ }
+    public void onMouseMove(float x, float y) { /* NOOP! */ }
+    public void onMouseWheelScroll(float velocity) { /* NOOP! */ }
+  }
+
   /**
    * Sets the listener that will receive mouse events. Setting the listener to
    * <code>null</code> will cause mouse events to stop being fired.

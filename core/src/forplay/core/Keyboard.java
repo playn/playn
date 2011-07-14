@@ -32,6 +32,12 @@ public interface Keyboard {
     void onKeyUp(int keyCode);
   }
 
+  /** A {@link Listener} implementation with NOOP stubs provided for each method. */
+  public static class Adapter implements Listener {
+    public void onKeyDown(int keyCode) { /* NOOP! */ }
+    public void onKeyUp(int keyCode) { /* NOOP! */ }
+  }
+
   public static final int KEY_ESC = 27;
   public static final int KEY_SPACE = 32;
 

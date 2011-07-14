@@ -39,6 +39,13 @@ public interface Pointer {
     void onPointerDrag(float x, float y);
   }
 
+  /** A {@link Listener} implementation with NOOP stubs provided for each method. */
+  public static class Adapter implements Listener {
+    public void onPointerStart(float x, float y) { /* NOOP! */ }
+    public void onPointerEnd(float x, float y) { /* NOOP! */ }
+    public void onPointerDrag(float x, float y) { /* NOOP! */ }
+  }
+
   /**
    * Sets the listener that will receive pointer events. Setting the listener to
    * <code>null</code> will cause pointer events to stop being fired.
