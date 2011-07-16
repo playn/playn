@@ -85,7 +85,7 @@ class HtmlImage implements Image {
       HtmlPlatform.addEventListener(img, "error", new EventHandler() {
         @Override
         public void handleEvent(NativeEvent evt) {
-          callback.error(new RuntimeException());
+          callback.error(new RuntimeException("Error loading image"));
         }
       }, false);
     }

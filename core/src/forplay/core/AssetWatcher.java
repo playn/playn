@@ -50,6 +50,7 @@ public class AssetWatcher {
     public void error(Throwable e) {
       listener.error(e);
       ++errors;
+      maybeDone();
     }
   };
 

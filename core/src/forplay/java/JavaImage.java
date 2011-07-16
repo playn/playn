@@ -61,7 +61,7 @@ class JavaImage implements CanvasImage {
   @Override
   public void addCallback(ResourceCallback<Image> callback) {
     if (img == null) {
-      callback.error(exception != null ? exception : new RuntimeException());
+      callback.error(exception != null ? exception : new RuntimeException("Error loading image"));
     } else {
       callback.done(this);
     }
