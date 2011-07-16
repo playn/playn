@@ -91,6 +91,16 @@ public interface Layer {
   void setAlpha(float alpha);
 
   /**
+   * Returns the x-component of the layer's origin.
+   */
+  float originX ();
+
+  /**
+   * Returns the y-component of the layer's origin.
+   */
+  float originY ();
+
+  /**
    * Sets the origin of the layer.
    * <p>
    * This sets the origin of the layer's transformation matrix.

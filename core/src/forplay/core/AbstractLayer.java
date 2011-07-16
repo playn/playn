@@ -86,6 +86,16 @@ public abstract class AbstractLayer implements Layer {
   }
 
   @Override
+  public float originX () {
+    return originX;
+  }
+
+  @Override
+  public float originY () {
+    return originY;
+  }
+
+  @Override
   public void setOrigin(float x, float y) {
     this.originX = x;
     this.originY = y;
