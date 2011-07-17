@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<project name="manualtests" default="compile">
+  <property name="java.classname" value="forplay.test.manualtests.java.ManualTestsGameJava"/>
+  <property name="gwt.modulename" value="forplay.test.manualtests.ManualTestsGame"/>
+  <property name="html.index" value="ManualTestsGame.html"/>
+  <import file="../../../build-common.xml"/>
+</project>
