@@ -20,11 +20,12 @@ import flash.display.DisplayObjectContainer;
 import flash.display.Sprite;
 
 import forplay.core.Asserts;
-import forplay.core.GroupLayerImpl;
 import forplay.core.GroupLayer;
+import forplay.core.GroupLayerImpl;
 import forplay.core.Layer;
+import forplay.core.ParentLayer;
 
-public class FlashGroupLayer extends FlashLayer implements GroupLayer {
+public class FlashGroupLayer extends FlashLayer implements GroupLayer, ParentLayer {
 
   private GroupLayerImpl<FlashLayer> impl = new GroupLayerImpl<FlashLayer>();
 
@@ -52,7 +53,7 @@ public class FlashGroupLayer extends FlashLayer implements GroupLayer {
     container().addChild(display(layer));
   }
 
-  @Override
+  @Override @Deprecated
   public void add(int index, Layer layer) {
     impl.add(this, index, (FlashLayer) layer);
     ((FlashLayer) layer).update();
@@ -65,7 +66,7 @@ public class FlashGroupLayer extends FlashLayer implements GroupLayer {
     container().removeChild(display(layer));
   }
 
-  @Override
+  @Override @Deprecated
   public void remove(int index) {
     impl.remove(this, index);
     container().removeChildAt(index);
@@ -97,6 +98,11 @@ public class FlashGroupLayer extends FlashLayer implements GroupLayer {
   public void onRemove() {
     super.onRemove();
     impl.onRemove(this);
+  }
+
+  @Override
+  public void depthChanged(Layer layer, float oldDepth) {
+    impl.depthChanged(this, layer, oldDepth);
   }
 
   protected void updateChildren() {

@@ -38,6 +38,7 @@ public abstract class AbstractLayer implements Layer {
   protected Transform transform;
   protected float originX, originY;
   protected float alpha;
+  protected float depth;
   protected int flags;
 
   protected AbstractLayer() {
@@ -99,6 +100,22 @@ public abstract class AbstractLayer implements Layer {
   public void setOrigin(float x, float y) {
     this.originX = x;
     this.originY = y;
+  }
+
+  @Override
+  public float depth() {
+    return depth;
+  }
+
+  @Override
+  public void setDepth(float depth) {
+    float oldDepth = this.depth;
+    if (depth != oldDepth) {
+      this.depth = depth;
+      if (parent != null) {
+        ((ParentLayer)parent).depthChanged(this, oldDepth);
+      }
+    }
   }
 
   @Override

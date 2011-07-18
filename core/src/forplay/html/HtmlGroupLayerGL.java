@@ -19,9 +19,10 @@ import forplay.core.Asserts;
 import forplay.core.GroupLayer;
 import forplay.core.GroupLayerImpl;
 import forplay.core.Layer;
+import forplay.core.ParentLayer;
 import forplay.core.Transform;
 
-class HtmlGroupLayerGL extends HtmlLayerGL implements GroupLayer {
+class HtmlGroupLayerGL extends HtmlLayerGL implements GroupLayer, ParentLayer {
 
   private GroupLayerImpl<HtmlLayerGL> impl = new GroupLayerImpl<HtmlLayerGL>();
 
@@ -40,7 +41,7 @@ class HtmlGroupLayerGL extends HtmlLayerGL implements GroupLayer {
     impl.add(this, (HtmlLayerGL) layer);
   }
 
-  @Override
+  @Override @Deprecated
   public void add(int index, Layer layer) {
     Asserts.checkArgument(layer instanceof HtmlLayerGL);
     impl.add(this, index, (HtmlLayerGL) layer);
@@ -52,7 +53,7 @@ class HtmlGroupLayerGL extends HtmlLayerGL implements GroupLayer {
     impl.remove(this, (HtmlLayerGL) layer);
   }
 
-  @Override
+  @Override @Deprecated
   public void remove(int index) {
     impl.remove(this, index);
   }
@@ -83,6 +84,11 @@ class HtmlGroupLayerGL extends HtmlLayerGL implements GroupLayer {
   public void onRemove() {
     super.onRemove();
     impl.onRemove(this);
+  }
+
+  @Override
+  public void depthChanged(Layer layer, float oldDepth) {
+    impl.depthChanged(this, layer, oldDepth);
   }
 
   void paint(WebGLRenderingContext gl, Transform parentTransform, float parentAlpha) {

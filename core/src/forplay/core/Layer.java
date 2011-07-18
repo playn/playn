@@ -111,6 +111,17 @@ public interface Layer {
   void setOrigin(float x, float y);
 
   /**
+   * Sets the depth of this layer. Within a single {@link GroupLayer}, layers are rendered from
+   * lowest depth to highest depth.
+   */
+  float depth ();
+
+  /**
+   * Updates this layer's depth.
+   */
+  void setDepth (float depth);
+
+  /**
    * Sets the translation of the layer.
    * <p>
    * This sets the translation of the layer's transformation matrix so coordinates in the layer will

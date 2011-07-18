@@ -34,11 +34,9 @@ public interface GroupLayer extends Layer {
   void add(Layer layer);
 
   /**
-   * Inserts a layer at a given position in the group.
-   * <p>
-   * Because the {@link Layer} hierarchy is a tree, if the {@link Layer} is already a child of
-   * another {@link GroupLayer}, it will be removed before being added to this {@link GroupLayer}.
+   * @deprecated Use {@link Layer#setDepth} to manage render order.
    */
+  @Deprecated
   void add(int index, Layer layer);
 
   /**
@@ -47,9 +45,10 @@ public interface GroupLayer extends Layer {
   void remove(Layer layer);
 
   /**
-   * Removes the layer at the specified location in the group. Any subsequent
-   * elements are shifted to fill the removed layer's place.
+   * @deprecated Manual index management has been deprecated in favor of {@link Layer#setDepth}.
+   * Use {@link #remove(Layer)} to remove layers.
    */
+  @Deprecated
   void remove(int index);
 
   /**

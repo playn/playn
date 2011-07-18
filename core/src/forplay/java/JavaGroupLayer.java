@@ -16,11 +16,12 @@
 package forplay.java;
 
 import forplay.core.Asserts;
-import forplay.core.GroupLayerImpl;
 import forplay.core.GroupLayer;
+import forplay.core.GroupLayerImpl;
 import forplay.core.Layer;
+import forplay.core.ParentLayer;
 
-class JavaGroupLayer extends JavaLayer implements GroupLayer {
+class JavaGroupLayer extends JavaLayer implements GroupLayer, ParentLayer {
 
   private GroupLayerImpl<JavaLayer> impl = new GroupLayerImpl<JavaLayer>();
 
@@ -35,7 +36,7 @@ class JavaGroupLayer extends JavaLayer implements GroupLayer {
     impl.add(this, (JavaLayer) layer);
   }
 
-  @Override
+  @Override @Deprecated
   public void add(int index, Layer layer) {
     Asserts.checkArgument(layer instanceof JavaLayer);
     impl.add(this, index, (JavaLayer) layer);
@@ -47,7 +48,7 @@ class JavaGroupLayer extends JavaLayer implements GroupLayer {
     impl.remove(this, (JavaLayer) layer);
   }
 
-  @Override
+  @Override @Deprecated
   public void remove(int index) {
     impl.remove(this, index);
   }
@@ -78,6 +79,11 @@ class JavaGroupLayer extends JavaLayer implements GroupLayer {
   public void onRemove() {
     super.onRemove();
     impl.onRemove(this);
+  }
+
+  @Override
+  public void depthChanged(Layer layer, float oldDepth) {
+    impl.depthChanged(this, layer, oldDepth);
   }
 
   @Override

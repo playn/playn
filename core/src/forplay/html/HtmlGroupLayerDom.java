@@ -20,11 +20,12 @@ import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.Node;
 
 import forplay.core.Asserts;
-import forplay.core.GroupLayerImpl;
 import forplay.core.GroupLayer;
+import forplay.core.GroupLayerImpl;
 import forplay.core.Layer;
+import forplay.core.ParentLayer;
 
-class HtmlGroupLayerDom extends HtmlLayerDom implements GroupLayer {
+class HtmlGroupLayerDom extends HtmlLayerDom implements GroupLayer, ParentLayer {
 
   private GroupLayerImpl<HtmlLayerDom> impl = new GroupLayerImpl<HtmlLayerDom>();
 
@@ -49,7 +50,7 @@ class HtmlGroupLayerDom extends HtmlLayerDom implements GroupLayer {
     element().appendChild(hlayer.element());
   }
 
-  @Override
+  @Override @Deprecated
   public void add(int index, Layer layer) {
     Asserts.checkArgument(layer instanceof HtmlLayerDom);
     HtmlLayerDom hlayer = (HtmlLayerDom) layer;
@@ -70,7 +71,7 @@ class HtmlGroupLayerDom extends HtmlLayerDom implements GroupLayer {
     element().removeChild(hlayer.element());
   }
 
-  @Override
+  @Override @Deprecated
   public void remove(int index) {
     impl.remove(this, index);
     element().removeChild(element().getChild(index));
@@ -102,6 +103,11 @@ class HtmlGroupLayerDom extends HtmlLayerDom implements GroupLayer {
   public void onRemove() {
     super.onRemove();
     impl.onRemove(this);
+  }
+
+  @Override
+  public void depthChanged(Layer layer, float oldDepth) {
+    impl.depthChanged(this, layer, oldDepth);
   }
 
   void update() {

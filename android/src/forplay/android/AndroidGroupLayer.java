@@ -19,8 +19,9 @@ import forplay.core.Asserts;
 import forplay.core.GroupLayer;
 import forplay.core.GroupLayerImpl;
 import forplay.core.Layer;
+import forplay.core.ParentLayer;
 
-class AndroidGroupLayer extends AndroidLayer implements GroupLayer {
+class AndroidGroupLayer extends AndroidLayer implements GroupLayer, ParentLayer {
 
   private GroupLayerImpl<AndroidLayer> impl = new GroupLayerImpl<AndroidLayer>();
 
@@ -78,6 +79,11 @@ class AndroidGroupLayer extends AndroidLayer implements GroupLayer {
   public void onRemove() {
     super.onRemove();
     impl.onRemove(this);
+  }
+
+  @Override
+  public void depthChanged(Layer layer, float oldDepth) {
+    impl.depthChanged(this, layer, oldDepth);
   }
 
   @Override
