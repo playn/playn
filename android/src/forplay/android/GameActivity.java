@@ -40,7 +40,6 @@ public class GameActivity extends Activity {
   @Override
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-
     if (supportsHardwareAcceleration()) {
       // Use the raw constant rather than the flag to avoid blowing up on
       // earlier Android
@@ -137,20 +136,15 @@ public class GameActivity extends Activity {
     return true;
   }
 
+  /**
+   *  Called automatically to handle touch events.
+   *  Automatically passes through the parsed MotionEvent
+   *  to AndroidTouch.Listener and AndroidPointer.Listener 
+   *  instances.
+   */
   @Override
   public boolean onTouchEvent(MotionEvent event) {
-    switch (event.getAction()) {
-      case MotionEvent.ACTION_DOWN:
-        platform().pointer().onPointerStart(event.getX(), event.getY());
-        break;
-      case MotionEvent.ACTION_UP:
-        platform().pointer().onPointerEnd(event.getX(), event.getY());
-        break;
-      case MotionEvent.ACTION_MOVE:
-        platform().pointer().onPointerMove(event.getX(), event.getY());
-        break;
-    }
-    return true;
+    return AndroidPlatform.instance.touchEventHandler().onMotionEvent(event);
   }
 
   public void onLayout(boolean changed, int left, int top, int right, int bottom) {

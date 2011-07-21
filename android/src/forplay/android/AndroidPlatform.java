@@ -38,7 +38,7 @@ public class AndroidPlatform implements Platform {
   static AndroidPlatform instance;
 
   public static void register(GameActivity activity) {
-    ForPlay.setPlatform(instance = new AndroidPlatform(activity));
+    ForPlay.setPlatform(new AndroidPlatform(activity));
   }
 
   Game game;
@@ -52,12 +52,15 @@ public class AndroidPlatform implements Platform {
   private AndroidNet net;
   private AndroidPointer pointer;
   private AndroidStorage storage;
+  private AndroidTouch touch;
+  private AndroidTouchEventHandler touchHandler;
   private AndroidAssetManager assetManager;
   private AndroidAnalytics analytics;
 
   public Bitmap.Config preferredBitmapConfig;
 
   private AndroidPlatform(GameActivity activity) {
+    instance = this;
     this.activity = activity;
     audio = new AndroidAudio();
     graphics = new AndroidGraphics(activity);
@@ -66,6 +69,8 @@ public class AndroidPlatform implements Platform {
     log = new AndroidLog();
     net = new AndroidNet();
     pointer = new AndroidPointer();
+    touch = new AndroidTouch();
+    touchHandler = new AndroidTouchEventHandler();
     assetManager = new AndroidAssetManager();
     analytics = new AndroidAnalytics();
     storage = new AndroidStorage(activity);
@@ -143,8 +148,11 @@ public class AndroidPlatform implements Platform {
 
   @Override
   public Touch touch() {
-    // TODO(pdr): need to implement this.
-    return null;
+    return touch;
+  }
+  
+  public AndroidTouchEventHandler touchEventHandler() {
+    return touchHandler;
   }
 
   @Override
@@ -182,6 +190,8 @@ public class AndroidPlatform implements Platform {
     AndroidImage.prevMru = AndroidImage.mru;
     AndroidImage.mru = new ArrayList<Bitmap>();
 
+    //Run the game's custom painting code.
+    //Separate from layers painting themselves.
     if (game != null) {
       game.paint(delta);
 

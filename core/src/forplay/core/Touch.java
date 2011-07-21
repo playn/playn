@@ -16,23 +16,35 @@
 package forplay.core;
 
 /**
- * Input-device interface for touch and multi-touch events if they are supported.
+ * Input-device interface for touch and multi-touch events if they are
+ * supported.
  */
 // TODO(pdr): make the (x,y) coordinates relative to a {@link Layer}, if
 // specified, or the {@link Graphics#rootLayer()} otherwise.
 public interface Touch {
   /**
-   * Class for a {@link Touch} that encapsulates the location of a touch (i.e., finger).
+   * Class for a {@link Touch} that encapsulates the location, pressure, and
+   * size of a touch (i.e., finger).
    */
   public class TouchEvent {
     private final float x;
     private final float y;
+    private final float pressure;
+    private final float size;
     private final int id;
 
-    public TouchEvent(float x, float y, int id) {
+    // TODO: Implement pressure and size across all platforms that support
+    // touch.
+    public TouchEvent(float x, float y, float pressure, float size, int id) {
       this.x = x;
       this.y = y;
+      this.pressure = pressure;
+      this.size = size;
       this.id = id;
+    }
+
+    public TouchEvent(float x, float y, int id) {
+      this(x, y, -1, -1, id);
     }
 
     /**
@@ -51,6 +63,24 @@ public interface Touch {
      */
     public float y() {
       return y;
+    }
+
+    /**
+     * Return the pressure.
+     * 
+     * @return the pressure
+     */
+    public float pressure() {
+      return pressure;
+    }
+
+    /**
+     * Return the size.
+     * 
+     * @return the size
+     */
+    public float size() {
+      return size;
     }
 
     /**
@@ -86,10 +116,14 @@ public interface Touch {
     void onTouchEnd(TouchEvent[] touches);
   }
 
-  /** A {@link Listener} implementation with NOOP stubs provided for each method. */
+  /**
+   * A {@link Listener} implementation with NOOP stubs provided for each method.
+   */
   public static class Adapter implements Listener {
     public void onTouchStart(TouchEvent[] touches) { /* NOOP! */ }
+
     public void onTouchMove(TouchEvent[] touches) { /* NOOP! */ }
+
     public void onTouchEnd(TouchEvent[] touches) { /* NOOP! */ }
   }
 
