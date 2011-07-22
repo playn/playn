@@ -38,7 +38,7 @@ public class HtmlAnalytics implements Analytics {
     float sampleRate = category.getSampleRate();
     boolean shouldLog = shouldLogEvent(sampleRate);
     ForPlay.log().debug(
-        "Analytics#logEvent(sampleRate=" + sampleRate + ", cagegory=" + category + ", action="
+        "Analytics#logEvent(sampleRate=" + sampleRate + ", category=" + category + ", action="
             + action + ") => " + (shouldLog ? "Logging" : "NOT logging"));
     if (shouldLog) {
       logEventImpl(category.getCategory(), action);
