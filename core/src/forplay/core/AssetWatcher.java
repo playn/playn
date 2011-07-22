@@ -14,15 +14,16 @@
 package forplay.core;
 
 /**
- * A utility class that helps keep track of resource loading.
+ * A utility class that helps keep track of image loading.
+ * <p>
+ * To use: create a new {@link AssetWatcher}, then add images using
+ * {@link AssetWatcher#add(Image)} and finally call {@link AssetWatcher#start()}.
  */
 public class AssetWatcher {
-
   /**
    * Listener interface for AssetWatcher.
    */
   public interface Listener {
-
     /**
      * Called when all assets are done loading (or had an error).
      */
@@ -48,14 +49,15 @@ public class AssetWatcher {
 
     @Override
     public void error(Throwable e) {
-      listener.error(e);
       ++errors;
+      if (listener != null)
+        listener.error(e);
       maybeDone();
     }
   };
 
   /**
-   * Creates a new watcher. 
+   * Creates a new watcher without a listener.
    */
   public AssetWatcher() {
     this(null);
@@ -64,6 +66,8 @@ public class AssetWatcher {
 
   /**
    * Creates a new watcher with the given listener.
+   * <p>
+   * Note: must call {@link AssetWatcher#start()} after adding your resources.
    */
   public AssetWatcher(Listener listener) {
     this.listener = listener;
@@ -75,9 +79,8 @@ public class AssetWatcher {
   @SuppressWarnings("unchecked")
   public void add(Image image) {
     Asserts.checkState(!start || listener == null);
-
-    image.addCallback(callback);
     ++total;
+    image.addCallback(callback);
   }
 
   /**
