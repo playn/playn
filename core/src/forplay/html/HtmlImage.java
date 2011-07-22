@@ -72,6 +72,7 @@ class HtmlImage implements Image {
     return img == null ? 0 : img.getWidth();
   }
 
+  @Override
   public void addCallback(final ResourceCallback<Image> callback) {
     if (isReady()) {
       callback.done(this);
@@ -85,7 +86,7 @@ class HtmlImage implements Image {
       HtmlPlatform.addEventListener(img, "error", new EventHandler() {
         @Override
         public void handleEvent(NativeEvent evt) {
-          callback.error(new RuntimeException("Error loading image"));
+          callback.error(new RuntimeException("Error loading image " + img.getSrc()));
         }
       }, false);
     }
