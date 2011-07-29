@@ -26,9 +26,7 @@ class HtmlLayerDom extends AbstractLayer {
 
   private static final float EPSILON = 0.001f;
 
-  private static final String[] PREFIXES = new String[] {
-    "Moz", "webkit", "ms", "O"
-  };
+  private static final String[] PREFIXES = new String[] {"Moz", "webkit", "ms", "O"};
 
   private static String transformName, transformOriginName;
   private static String translateSuffix;
@@ -54,7 +52,8 @@ class HtmlLayerDom extends AbstractLayer {
     // Hack: Only WebKit seems to support matrix3d
     supports3d = "webkitTransform".equals(transformName);
 
-    // Hack: FF4 appears to require a 'px' suffix on the translation components of the matrix.
+    // Hack: FF4 appears to require a 'px' suffix on the translation components
+    // of the matrix.
     translateSuffix = ("MozTransform".equals(transformName)) ? "px" : "";
   }
 
@@ -88,9 +87,6 @@ class HtmlLayerDom extends AbstractLayer {
 
   public void setOrigin(float x, float y) {
     super.setOrigin(x, y);
-
-    String origin = css(x) + "px " + css(y) + "px";
-    elem.getStyle().setProperty(transformOriginName, origin);
   }
 
   Element element() {
@@ -107,24 +103,26 @@ class HtmlLayerDom extends AbstractLayer {
     float m01 = transform.m01();
     float m10 = transform.m10();
     float m11 = transform.m11();
-    float m20 = transform.tx() - originX;
-    float m21 = transform.ty() - originY;
+    float m20 = transform.tx();
+    float m21 = transform.ty();
 
     String matrix;
     if (supports3d) {
-      matrix = "matrix3d(" +
-        css(m00) + "," + css(m01) + ",0,0," +
-        css(m10) + "," + css(m11) + ",0,0," +
-        "0,0,1,0," +
-        xlate(m20) + "," + xlate(m21) + ",0,1" +
-      ")";
+      matrix = "matrix3d(" + //
+          css(m00) + "," + css(m01) + ",0,0," + //
+          css(m10) + "," + css(m11) + ",0,0," + //
+          "0,0,1,0," + //
+          xlate(m20) + "," + xlate(m21) + ",0,1" + //
+          ")";
     } else {
-      matrix = "matrix(" +
-        css(m00) + "," + css(m01) + "," +
-        css(m10) + "," + css(m11) + ", " +
-        xlate(m20) + "," + xlate(m21) +
-      ")";
+      matrix = "matrix(" + //
+          css(m00) + "," + css(m01) + "," + //
+          css(m10) + "," + css(m11) + ", " + //
+          xlate(m20) + "," + xlate(m21) + //
+          ")";
     }
+
+    matrix += " translate(" + css(-originX) + "px," + css(-originY) + "px)";
 
     elem.getStyle().setProperty(transformName, matrix);
   }
@@ -134,8 +132,9 @@ class HtmlLayerDom extends AbstractLayer {
   }
 
   private String css(float x) {
-    // This is necessary because CSS transforms don't accept the floating point form 1.00e1,
-    // which is what you naturally get from very small (or large) floating point values.
+    // This is necessary because CSS transforms don't accept the floating point
+    // form 1.00e1, which is what you naturally get from very small (or large)
+    // floating point values.
     return (Math.abs(x) < EPSILON) ? "0" : Float.toString(x);
   }
 }
