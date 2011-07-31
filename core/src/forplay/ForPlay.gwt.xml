@@ -17,7 +17,10 @@
 <!DOCTYPE module PUBLIC "-//Google Inc.//DTD Google Web Toolkit trunk//EN" "http://google-web-toolkit.googlecode.com/svn/trunk/distro-source/core/src/gwt-module.dtd">
 <module>
   <inherits name='com.google.gwt.user.User'/>
-  <source path='core'/>
+  <source path='core'>
+    <!-- Exclude non-GWT-compatible classes -->
+    <exclude name='**/*Test.java' />
+  </source>
   <source path='box2d'/>
   <source path='html'/>
 
