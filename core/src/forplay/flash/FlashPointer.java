@@ -18,6 +18,7 @@ package forplay.flash;
 import flash.events.MouseEvent;
 import flash.display.Sprite;
 
+import forplay.core.ForPlay;
 import forplay.core.Pointer;
 
 class FlashPointer implements Pointer {
@@ -32,7 +33,8 @@ class FlashPointer implements Pointer {
         evt.preventDefault();  
         mouseDown = true;
         if (listener != null) {
-          listener.onPointerStart(evt.getStageX(), evt.getStageY());
+          listener.onPointerStart(
+            new Event.Impl(ForPlay.currentTime(), evt.getStageX(), evt.getStageY()));
         }
       }
     });
@@ -40,7 +42,8 @@ class FlashPointer implements Pointer {
       public void handleEvent(MouseEvent evt) {
         mouseDown = false;
         if (listener != null) {
-          listener.onPointerEnd(evt.getStageX(), evt.getStageY());
+          listener.onPointerEnd(
+            new Event.Impl(ForPlay.currentTime(), evt.getStageX(), evt.getStageY()));
         }
       }
     });
@@ -48,7 +51,8 @@ class FlashPointer implements Pointer {
       public void handleEvent(MouseEvent evt) {
         if (listener != null) {
           if (mouseDown) {
-            listener.onPointerDrag(evt.getStageX(), evt.getStageY());
+            listener.onPointerDrag(
+              new Event.Impl(ForPlay.currentTime(), evt.getStageX(), evt.getStageY()));
           }
         }
       }

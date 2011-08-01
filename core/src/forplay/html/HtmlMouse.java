@@ -16,6 +16,7 @@ package forplay.html;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.NativeEvent;
 
+import forplay.core.ForPlay;
 import forplay.core.Mouse;
 
 class HtmlMouse extends HtmlInput implements Mouse {
@@ -33,7 +34,9 @@ class HtmlMouse extends HtmlInput implements Mouse {
 
           inDragSequence = true;
 
-          listener.onMouseDown(getRelativeX(evt, rootElement), getRelativeY(evt, rootElement), getMouseButton(evt));
+          listener.onMouseDown(
+            new ButtonEvent.Impl(ForPlay.currentTime(), getRelativeX(evt, rootElement),
+                                 getRelativeY(evt, rootElement), getMouseButton(evt)));
         }
       }
     });
@@ -48,7 +51,9 @@ class HtmlMouse extends HtmlInput implements Mouse {
 
           inDragSequence = false;
 
-          listener.onMouseUp(getRelativeX(evt, rootElement), getRelativeY(evt, rootElement), getMouseButton(evt));
+          listener.onMouseUp(
+            new ButtonEvent.Impl(ForPlay.currentTime(), getRelativeX(evt, rootElement),
+                                 getRelativeY(evt, rootElement), getMouseButton(evt)));
         }
       }
     });
@@ -59,7 +64,9 @@ class HtmlMouse extends HtmlInput implements Mouse {
       public void handleEvent(NativeEvent evt) {
         if (listener != null && inDragSequence) {
           evt.preventDefault();
-          listener.onMouseMove(getRelativeX(evt, rootElement), getRelativeY(evt, rootElement));
+          listener.onMouseMove(
+            new MotionEvent.Impl(ForPlay.currentTime(), getRelativeX(evt, rootElement),
+                                 getRelativeY(evt, rootElement)));
         }
       }
     });
@@ -70,7 +77,9 @@ class HtmlMouse extends HtmlInput implements Mouse {
       @Override
       public void handleEvent(NativeEvent evt) {
         if (listener != null && !inDragSequence) {
-          listener.onMouseMove(getRelativeX(evt, rootElement), getRelativeY(evt, rootElement));
+          listener.onMouseMove(
+            new MotionEvent.Impl(ForPlay.currentTime(), getRelativeX(evt, rootElement),
+                                 getRelativeY(evt, rootElement)));
         }
       }
     });
@@ -83,7 +92,8 @@ class HtmlMouse extends HtmlInput implements Mouse {
           // The user can still scroll if the mouse isn't over the root element.
           evt.preventDefault();
 
-          listener.onMouseWheelScroll(getMouseWheelVelocity(evt));
+          listener.onMouseWheelScroll(
+            new WheelEvent.Impl(ForPlay.currentTime(), getMouseWheelVelocity(evt)));
         }
       }
     });

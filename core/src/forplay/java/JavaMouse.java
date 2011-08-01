@@ -34,13 +34,13 @@ class JavaMouse implements Mouse {
       public void mouseDragged(MouseEvent e) {
         // mouseMoved(MouseEvent) does not fire when dragged
         if (listener != null) {
-          listener.onMouseMove(e.getX(), e.getY());
+          listener.onMouseMove(new MotionEvent.Impl(e.getWhen(), e.getX(), e.getY()));
         }
       }
 
       public void mouseMoved(MouseEvent e) {
         if (listener != null) {
-          listener.onMouseMove(e.getX(), e.getY());
+          listener.onMouseMove(new MotionEvent.Impl(e.getWhen(), e.getX(), e.getY()));
         }
       }
     });
@@ -57,13 +57,15 @@ class JavaMouse implements Mouse {
 
       public void mousePressed(MouseEvent e) {
         if (listener != null) {
-          listener.onMouseDown(e.getX(), e.getY(), getMouseButton(e));
+          listener.onMouseDown(
+            new ButtonEvent.Impl(e.getWhen(), e.getX(), e.getY(), getMouseButton(e)));
         }
       }
 
       public void mouseReleased(MouseEvent e) {
         if (listener != null) {
-          listener.onMouseUp(e.getX(), e.getY(), getMouseButton(e));
+          listener.onMouseUp(
+            new ButtonEvent.Impl(e.getWhen(), e.getX(), e.getY(), getMouseButton(e)));
         }
       }
     });
@@ -72,7 +74,7 @@ class JavaMouse implements Mouse {
       @Override
       public void mouseWheelMoved(MouseWheelEvent e) {
         if (listener != null) {
-          listener.onMouseWheelScroll(e.getWheelRotation());
+          listener.onMouseWheelScroll(new WheelEvent.Impl(e.getWhen(), e.getWheelRotation()));
         }
       }
     });

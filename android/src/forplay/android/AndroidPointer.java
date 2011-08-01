@@ -19,33 +19,34 @@ import forplay.core.Pointer;
 
 class AndroidPointer implements Pointer {
 
+  // true when we are in a drag sequence (after pointer start but before pointer end)
+  private boolean inDragSequence = false;
   private Listener listener;
-  private boolean inDragSequence = false; // true when we are in a drag sequence (after pointer start but before pointer end)
 
   @Override
   public void setListener(Listener listener) {
     this.listener = listener;
   }
 
-  void onPointerEnd(float x, float y) {
+  void onPointerEnd(Event event) {
     if (listener != null) {
       inDragSequence = false;
-      listener.onPointerEnd(x, y);
+      listener.onPointerEnd(event);
     }
   }
 
-  void onPointerMove(float x, float y) {
+  void onPointerMove(Event event) {
     if (listener != null) {
       if (inDragSequence) {
-        listener.onPointerDrag(x, y);
+        listener.onPointerDrag(event);
       }
     }
   }
 
-  void onPointerStart(float x, float y) {
+  void onPointerStart(Event event) {
     if (listener != null) {
       inDragSequence = true;
-      listener.onPointerStart(x, y);
+      listener.onPointerStart(event);
     }
   }
 }

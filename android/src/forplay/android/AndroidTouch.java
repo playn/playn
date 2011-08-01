@@ -20,17 +20,17 @@ import forplay.core.Touch;
 public class AndroidTouch implements Touch {
   private Listener listener;
 
-  public void onTouchStart(TouchEvent[] touches) {
+  public void onTouchStart(Event[] touches) {
     if (listener != null)
       listener.onTouchStart(touches);
   }
 
-  public void onTouchMove(TouchEvent[] touches) {
+  public void onTouchMove(Event[] touches) {
     if (listener != null)
       listener.onTouchMove(touches);
   }
 
-  public void onTouchEnd(TouchEvent[] touches) {
+  public void onTouchEnd(Event[] touches) {
     if (listener != null)
       listener.onTouchEnd(touches);
   }

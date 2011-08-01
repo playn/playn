@@ -17,6 +17,7 @@ package forplay.html;
 
 import com.google.gwt.dom.client.NativeEvent;
 
+import forplay.core.ForPlay;
 import forplay.core.Keyboard;
 
 class HtmlKeyboard implements Keyboard {
@@ -28,7 +29,7 @@ class HtmlKeyboard implements Keyboard {
     HtmlPlatform.captureEvent("keydown", new EventHandler() {
       public void handleEvent(NativeEvent evt) {
         if (listener != null) {
-          listener.onKeyDown(evt.getKeyCode());
+          listener.onKeyDown(new Event.Impl(ForPlay.currentTime(), evt.getKeyCode()));
           evt.preventDefault();
         }
       }
@@ -37,7 +38,7 @@ class HtmlKeyboard implements Keyboard {
     HtmlPlatform.captureEvent("keyup", new EventHandler() {
       public void handleEvent(NativeEvent evt) {
         if (listener != null) {
-          listener.onKeyUp(evt.getKeyCode());
+          listener.onKeyUp(new Event.Impl(ForPlay.currentTime(), evt.getKeyCode()));
           evt.preventDefault();
         }
       }

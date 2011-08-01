@@ -32,7 +32,7 @@ class JavaPointer implements Pointer {
     frame.addMouseMotionListener(new MouseMotionListener() {
       public void mouseDragged(MouseEvent e) {
         if (listener != null) {
-          listener.onPointerDrag(e.getX(), e.getY());
+          listener.onPointerDrag(new Event.Impl(e.getWhen(), e.getX(), e.getY()));
         }
       }
 
@@ -52,13 +52,13 @@ class JavaPointer implements Pointer {
 
       public void mousePressed(MouseEvent e) {
         if (listener != null) {
-          listener.onPointerStart(e.getX(), e.getY());
+          listener.onPointerStart(new Event.Impl(e.getWhen(), e.getX(), e.getY()));
         }
       }
 
       public void mouseReleased(MouseEvent e) {
         if (listener != null) {
-          listener.onPointerEnd(e.getX(), e.getY());
+          listener.onPointerEnd(new Event.Impl(e.getWhen(), e.getX(), e.getY()));
         }
       }
     });

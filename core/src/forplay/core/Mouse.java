@@ -22,82 +22,120 @@ package forplay.core;
 // TODO(pdr): make the (x,y) coordinates relative to a {@link Layer}, if
 // specified, or the {@link Graphics#rootLayer()} otherwise.
 public interface Mouse {
-  public static final int BUTTON_LEFT = 0;
-  public static final int BUTTON_MIDDLE = 1;
-  public static final int BUTTON_RIGHT = 2;
+  /** Used by {@link ButtonEvent} to indicate that the left button is pressed. */
+  int BUTTON_LEFT = 0;
+  /** Used by {@link ButtonEvent} to indicate that the middle button is pressed. */
+  int BUTTON_MIDDLE = 1;
+  /** Used by {@link ButtonEvent} to indicate that the right button is pressed. */
+  int BUTTON_RIGHT = 2;
+
+  /** An event dispatched when a button is pressed. */
+  interface ButtonEvent extends Events.Position {
+    /**
+     * The id of the button associated with this event, one of {@link #BUTTON_LEFT}, {@link
+     * #BUTTON_MIDDLE}, or {@link #BUTTON_RIGHT}.
+     */
+    int button();
+
+    class Impl extends Events.Position.Impl implements ButtonEvent {
+      private int button;
+
+      @Override public int button() {
+        return button;
+      }
+
+      public Impl(double time, float x, float y, int button) {
+        super(time, x, y);
+        this.button = button;
+      }
+    }
+  }
+
+  /** An event dispatched when the mouse is moved. */
+  interface MotionEvent extends Events.Position {
+    // nothing currently here, for future compatibility
+
+    class Impl extends Events.Position.Impl implements MotionEvent {
+      public Impl(double time, float x, float y) {
+        super(time, x, y);
+      }
+    }
+  }
+
+  /** An event dispatched when the mouse wheel is scrolled. */
+  interface WheelEvent extends Events.Input {
+    /**
+     * The velocity of the scroll wheel. Negative velocity corresponds to scrolling north/up. Each
+     * scroll 'click' is 1 velocity.
+     */
+    float velocity();
+
+    class Impl extends Events.Input.Impl implements WheelEvent {
+      private float velocity;
+
+      @Override public float velocity() {
+        return velocity;
+      }
+
+      public Impl(double time, float velocity) {
+        super(time);
+        this.velocity = velocity;
+      }
+    }
+  }
 
   interface Listener {
     /**
      * Called when the mouse is pressed.
-     * <p>
-     * The button will be one of {@link Mouse#BUTTON_LEFT},
-     * {@link Mouse#BUTTON_MIDDLE}, or {@link Mouse#BUTTON_RIGHT}.
      * 
-     * @param x x location
-     * @param y y location
-     * @param button button that was pressed
+     * @param event provides mouse position, button and other metadata.
      */
-    void onMouseDown(float x, float y, int button);
+    void onMouseDown(ButtonEvent event);
 
     /**
      * Called when the mouse is released.
-     * <p>
-     * The button will be one of {@link Mouse#BUTTON_LEFT},
-     * {@link Mouse#BUTTON_MIDDLE}, or {@link Mouse#BUTTON_RIGHT}.
      * 
-     * @param x x location
-     * @param y y location
-     * @param button button that was pressed
+     * @param event provides mouse position, button and other metadata.
      */
-    void onMouseUp(float x, float y, int button);
+    void onMouseUp(ButtonEvent event);
 
     /**
      * Called when the mouse is dragged with a button pressed.
      * 
-     * @param x x location
-     * @param y y location
+     * @param event provides mouse position and other metadata.
      */
     // Commented out to avoid bloating this API with unused features
-    //void onMouseDrag(float x, float y);
+    //void onMouseDrag(MotionEvent event);
 
     /**
      * Called when the mouse is moved.
      * 
-     * @param x x location
-     * @param y y location
+     * @param event provides mouse position and other metadata.
      */
-    void onMouseMove(float x, float y);
+    void onMouseMove(MotionEvent event);
 
     /**
      * Called when the mouse is double clicked.
-     * <p>
-     * The button will be one of {@link Mouse#BUTTON_LEFT},
-     * {@link Mouse#BUTTON_MIDDLE}, or {@link Mouse#BUTTON_RIGHT}.
      * 
-     * @param x x location
-     * @param y y location
-     * @param button button that was pressed
+     * @param event provides mouse position, button and other metadata.
      */
     // Commented out to avoid bloating this API with unused features
-    //void onMouseDoubleClick(float x, float y, int button);
+    //void onMouseDoubleClick(ButtonEvent event);
 
     /**
      * Called when mouse wheel scroll occurs.
-     * <p>
-     * Negative velocity corresponds to scrolling north/up. Each scroll 'click'
-     * is 1 velocity.
      * 
-     * @param velocity velocity of the scroll wheel
+     * @param event provides wheel velocity and other metadata.
      */
-    void onMouseWheelScroll(float velocity);
+    void onMouseWheelScroll(WheelEvent event);
   }
 
   /** A {@link Listener} implementation with NOOP stubs provided for each method. */
-  public static class Adapter implements Listener {
-    public void onMouseDown(float x, float y, int button) { /* NOOP! */ }
-    public void onMouseUp(float x, float y, int button) { /* NOOP! */ }
-    public void onMouseMove(float x, float y) { /* NOOP! */ }
-    public void onMouseWheelScroll(float velocity) { /* NOOP! */ }
+  class Adapter implements Listener {
+    public void onMouseDown(ButtonEvent event) { /* NOOP! */ }
+    public void onMouseUp(ButtonEvent event) { /* NOOP! */ }
+    public void onMouseMove(MotionEvent event) { /* NOOP! */ }
+    public void onMouseWheelScroll(WheelEvent event) { /* NOOP! */ }
   }
 
   /**

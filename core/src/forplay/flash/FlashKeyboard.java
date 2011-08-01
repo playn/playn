@@ -18,6 +18,7 @@ package forplay.flash;
 import flash.events.KeyboardEvent;
 import flash.display.InteractiveObject;
 
+import forplay.core.ForPlay;
 import forplay.core.Keyboard;
 
 class FlashKeyboard implements Keyboard {
@@ -29,7 +30,7 @@ class FlashKeyboard implements Keyboard {
     FlashPlatform.captureEvent(InteractiveObject.KEYDOWN, new EventHandler<KeyboardEvent>() {
       public void handleEvent(KeyboardEvent evt) {
         if (listener != null) {
-          listener.onKeyDown(evt.keyCode());
+          listener.onKeyDown(new Event.Impl(ForPlay.currentTime(), evt.keyCode()));
         }
       }
     });
@@ -37,7 +38,7 @@ class FlashKeyboard implements Keyboard {
     FlashPlatform.captureEvent(InteractiveObject.KEYUP, new EventHandler<KeyboardEvent>() {
       public void handleEvent(KeyboardEvent evt) {
         if (listener != null) {
-          listener.onKeyUp(evt.keyCode());
+          listener.onKeyUp(new Event.Impl(ForPlay.currentTime(), evt.keyCode()));
         }
       }
     });

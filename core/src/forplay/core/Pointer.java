@@ -22,28 +22,39 @@ package forplay.core;
  */
 public interface Pointer {
 
+  /** The event dispatched to pointer listeners. */
+  interface Event extends Events.Position {
+    // nothing currently here, for future compatibility
+
+    class Impl extends Events.Position.Impl implements Event {
+      public Impl(double time, float x, float y) {
+        super(time, x, y);
+      }
+    }
+  }
+
   interface Listener {
     /**
      * Called when the pointer event starts.
      */
-    void onPointerStart(float x, float y);
+    void onPointerStart(Event event);
 
     /**
      * Called when the pointer event ends.
      */
-    void onPointerEnd(float x, float y);
+    void onPointerEnd(Event event);
 
     /**
      * Called when the pointer drags (always between start/end events).
      */
-    void onPointerDrag(float x, float y);
+    void onPointerDrag(Event event);
   }
 
   /** A {@link Listener} implementation with NOOP stubs provided for each method. */
-  public static class Adapter implements Listener {
-    public void onPointerStart(float x, float y) { /* NOOP! */ }
-    public void onPointerEnd(float x, float y) { /* NOOP! */ }
-    public void onPointerDrag(float x, float y) { /* NOOP! */ }
+  class Adapter implements Listener {
+    public void onPointerStart(Event event) { /* NOOP! */ }
+    public void onPointerEnd(Event event) { /* NOOP! */ }
+    public void onPointerDrag(Event event) { /* NOOP! */ }
   }
 
   /**

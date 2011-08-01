@@ -16,11 +16,12 @@
 package forplay.android;
 
 import android.view.MotionEvent;
-import forplay.core.Touch.TouchEvent;
+import forplay.core.Pointer;
+import forplay.core.Touch;
 
 /**
  * Class for taking MotionEvents from GameActivity.onMotionEvent() and parsing
- * them into an array of TouchEvents for the Listener.
+ * them into an array of Touch.Events for the Listener.
  */
 class AndroidTouchEventHandler {
   boolean inTouchSequence = false;
@@ -33,23 +34,24 @@ class AndroidTouchEventHandler {
   public boolean onMotionEvent(MotionEvent event) {
     AndroidPointer pointer = AndroidPlatform.instance.pointer();
     AndroidTouch touch = (AndroidTouch) AndroidPlatform.instance.touch();
+    double time = event.getEventTime();
     int action = event.getAction();
-    TouchEvent[] touches = parseMotionEvent(event);
-    TouchEvent pointerEvent = touches[0];
+    Touch.Event[] touches = parseMotionEvent(event);
+    Touch.Event pointerEvent = touches[0];
     switch (action) {
       case (MotionEvent.ACTION_DOWN):
         inTouchSequence = true;
         touch.onTouchStart(touches);
-        pointer.onPointerStart(pointerEvent.x(), pointerEvent.y());
+        pointer.onPointerStart(new Pointer.Event.Impl(time, pointerEvent.x(), pointerEvent.y()));
         break;
       case (MotionEvent.ACTION_UP):
         inTouchSequence = false;
         touch.onTouchEnd(touches);
-        pointer.onPointerEnd(pointerEvent.x(), pointerEvent.y());
+        pointer.onPointerEnd(new Pointer.Event.Impl(time, pointerEvent.x(), pointerEvent.y()));
         break;
       case (MotionEvent.ACTION_MOVE):
         touch.onTouchMove(touches);
-        pointer.onPointerMove(pointerEvent.x(), pointerEvent.y());
+        pointer.onPointerMove(new Pointer.Event.Impl(time, pointerEvent.x(), pointerEvent.y()));
         break;
       case (MotionEvent.ACTION_CANCEL):
         break;
@@ -68,9 +70,10 @@ class AndroidTouchEventHandler {
    *          this feature is ever added to other platforms)
    * @return The processed array of individual AndroidTouchEvents.
    */
-  private TouchEvent[] parseMotionEvent(MotionEvent event) {
+  private Touch.Event[] parseMotionEvent(MotionEvent event) {
     int eventPointerCount = event.getPointerCount();
-    TouchEvent[] touches = new TouchEvent[eventPointerCount];
+    Touch.Event[] touches = new Touch.Event[eventPointerCount];
+    double time = event.getEventTime();
     float x, y, pressure, size;
     int id;
     for (int t = 0; t < eventPointerCount; t++) {
@@ -80,7 +83,7 @@ class AndroidTouchEventHandler {
       pressure = event.getPressure(pointerIndex);
       size = event.getSize(pointerIndex);
       id = event.getPointerId(pointerIndex);
-      touches[t] = new TouchEvent(x, y, pressure, size, id);
+      touches[t] = new Touch.Event.Impl(time, x, y, id, pressure, size);
     }
     return touches;
   }

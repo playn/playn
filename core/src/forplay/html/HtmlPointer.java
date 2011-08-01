@@ -16,6 +16,7 @@ package forplay.html;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.NativeEvent;
 
+import forplay.core.ForPlay;
 import forplay.core.Pointer;
 
 class HtmlPointer extends HtmlInput implements Pointer {
@@ -33,7 +34,9 @@ class HtmlPointer extends HtmlInput implements Pointer {
 
           inDragSequence = true;
 
-          listener.onPointerStart(getRelativeX(evt, rootElement), getRelativeY(evt, rootElement));
+          listener.onPointerStart(
+            new Event.Impl(ForPlay.currentTime(), getRelativeX(evt, rootElement),
+                           getRelativeY(evt, rootElement)));
         }
       }
     });
@@ -48,7 +51,9 @@ class HtmlPointer extends HtmlInput implements Pointer {
 
           inDragSequence = false;
 
-          listener.onPointerEnd(getRelativeX(evt, rootElement), getRelativeY(evt, rootElement));
+          listener.onPointerEnd(
+            new Event.Impl(ForPlay.currentTime(), getRelativeX(evt, rootElement),
+                           getRelativeY(evt, rootElement)));
         }
       }
     });
@@ -59,7 +64,9 @@ class HtmlPointer extends HtmlInput implements Pointer {
       public void handleEvent(NativeEvent evt) {
         if (listener != null && inDragSequence) {
           evt.preventDefault();
-          listener.onPointerDrag(getRelativeX(evt, rootElement), getRelativeY(evt, rootElement));
+          listener.onPointerDrag(
+            new Event.Impl(ForPlay.currentTime(), getRelativeX(evt, rootElement),
+                           getRelativeY(evt, rootElement)));
         }
       }
     });
@@ -77,7 +84,7 @@ class HtmlPointer extends HtmlInput implements Pointer {
             com.google.gwt.dom.client.Touch touch = evt.getTouches().get(0);
             float x = touch.getRelativeX(rootElement);
             float y = touch.getRelativeY(rootElement);
-            listener.onPointerStart(x, y);
+            listener.onPointerStart(new Event.Impl(ForPlay.currentTime(), x, y));
           }
         }
       }
@@ -96,7 +103,7 @@ class HtmlPointer extends HtmlInput implements Pointer {
             com.google.gwt.dom.client.Touch touch = evt.getTouches().get(0);
             float x = touch.getRelativeX(rootElement);
             float y = touch.getRelativeY(rootElement);
-            listener.onPointerEnd(x, y);
+            listener.onPointerEnd(new Event.Impl(ForPlay.currentTime(), x, y));
           }
         }
       }
@@ -114,7 +121,7 @@ class HtmlPointer extends HtmlInput implements Pointer {
             com.google.gwt.dom.client.Touch touch = evt.getTouches().get(0);
             float x = touch.getRelativeX(rootElement);
             float y = touch.getRelativeY(rootElement);
-            listener.onPointerDrag(x, y);
+            listener.onPointerDrag(new Event.Impl(ForPlay.currentTime(), x, y));
           }
         }
       }

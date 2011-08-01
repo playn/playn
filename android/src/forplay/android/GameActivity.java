@@ -126,13 +126,13 @@ public class GameActivity extends Activity {
 
   @Override
   public boolean onKeyDown(int keyCode, KeyEvent event) {
-    platform().keyboard().onKeyDown(keyCode);
+    platform().keyboard().onKeyDown(event.getEventTime(), keyCode);
     return true;
   }
 
   @Override
   public boolean onKeyUp(int keyCode, KeyEvent event) {
-    platform().keyboard().onKeyUp(keyCode);
+    platform().keyboard().onKeyUp(event.getEventTime(), keyCode);
     return true;
   }
 

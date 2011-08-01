@@ -30,13 +30,13 @@ class JavaKeyboard implements Keyboard {
     frame.addKeyListener(new KeyListener() {
       public void keyPressed(KeyEvent e) {
         if (listener != null) {
-          listener.onKeyDown(e.getKeyCode());
+          listener.onKeyDown(new Event.Impl(e.getWhen(), e.getKeyCode()));
         }
       }
 
       public void keyReleased(KeyEvent e) {
         if (listener != null) {
-          listener.onKeyUp(e.getKeyCode());
+          listener.onKeyUp(new Event.Impl(e.getWhen(), e.getKeyCode()));
         }
       }
 

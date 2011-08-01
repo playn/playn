@@ -15,11 +15,11 @@
  */
 package forplay.flash;
 
-import forplay.core.Mouse;
-
 import flash.events.MouseEvent;
-
 import flash.display.Sprite;
+
+import forplay.core.ForPlay;
+import forplay.core.Mouse;
 
 class FlashMouse implements Mouse {
 
@@ -31,21 +31,26 @@ class FlashMouse implements Mouse {
       public void handleEvent(MouseEvent evt) {
         evt.preventDefault();
         if (listener != null) {
-          listener.onMouseDown(evt.getStageX(), evt.getStageY(), getMouseButton(evt));
+          listener.onMouseDown(
+            new ButtonEvent.Impl(ForPlay.currentTime(), evt.getStageX(), evt.getStageY(),
+                                 getMouseButton(evt)));
         }
       }
     });
     FlashPlatform.captureEvent(Sprite.MOUSEUP, new EventHandler<MouseEvent>() {
       public void handleEvent(MouseEvent evt) {
         if (listener != null) {
-          listener.onMouseUp(evt.getStageX(), evt.getStageY(), getMouseButton(evt));
+          listener.onMouseUp(
+            new ButtonEvent.Impl(ForPlay.currentTime(), evt.getStageX(), evt.getStageY(),
+                                 getMouseButton(evt)));
         }
       }
     });
     FlashPlatform.captureEvent(Sprite.MOUSEMOVE, new EventHandler<MouseEvent>() {
       public void handleEvent(MouseEvent evt) {
         if (listener != null) {
-          listener.onMouseMove(evt.getStageX(), evt.getStageY());
+          listener.onMouseMove(
+            new MotionEvent.Impl(ForPlay.currentTime(), evt.getStageX(), evt.getStageY()));
         }
       }
     });

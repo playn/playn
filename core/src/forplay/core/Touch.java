@@ -22,74 +22,55 @@ package forplay.core;
 // TODO(pdr): make the (x,y) coordinates relative to a {@link Layer}, if
 // specified, or the {@link Graphics#rootLayer()} otherwise.
 public interface Touch {
-  /**
-   * Class for a {@link Touch} that encapsulates the location, pressure, and
-   * size of a touch (i.e., finger).
-   */
-  public class TouchEvent {
-    private final float x;
-    private final float y;
-    private final float pressure;
-    private final float size;
-    private final int id;
 
-    // TODO: Implement pressure and size across all platforms that support
-    // touch.
-    public TouchEvent(float x, float y, float pressure, float size, int id) {
-      this.x = x;
-      this.y = y;
-      this.pressure = pressure;
-      this.size = size;
-      this.id = id;
-    }
-
-    public TouchEvent(float x, float y, int id) {
-      this(x, y, -1, -1, id);
-    }
+  /** An event dispatched to report touch information. */
+  interface Event extends Events.Position {
+    /**
+     * The id of the touch associated with this event.
+     */
+    int id();
 
     /**
-     * Return the x location.
-     * 
-     * @return the x location
+     * The pressure of the touch.
      */
-    public float x() {
-      return x;
-    }
+    // TODO(mdb): provide guidance as to range in the docs? 0 to 1?
+    float pressure();
 
     /**
-     * Return the y location.
-     * 
-     * @return the y location
+     * The size of the touch.
      */
-    public float y() {
-      return y;
-    }
+    // TODO(mdb): provide more details in the docs? size in pixels?
+    float size();
 
-    /**
-     * Return the pressure.
-     * 
-     * @return the pressure
-     */
-    public float pressure() {
-      return pressure;
-    }
+    static class Impl extends Events.Position.Impl implements Event {
+      private final int id;
+      private final float pressure;
+      private final float size;
 
-    /**
-     * Return the size.
-     * 
-     * @return the size
-     */
-    public float size() {
-      return size;
-    }
+      @Override
+      public int id() {
+        return id;
+      }
 
-    /**
-     * Return the touch's unique identifier.
-     * 
-     * @return the touch's unique identifier
-     */
-    public float id() {
-      return id;
+      @Override public float pressure() {
+        return pressure;
+      }
+
+      @Override public float size() {
+        return size;
+      }
+
+      public Impl(double time, float x, float y, int id, float pressure, float size) {
+        super(time, x, y);
+        this.id = id;
+        this.pressure = pressure;
+        this.size = size;
+      }
+
+      // TODO: Implement pressure and size across all platforms that support touch.
+      public Impl(double time, float x, float y, int id) {
+        this(time, x, y, id, -1, -1);
+      }
     }
   }
 
@@ -97,34 +78,32 @@ public interface Touch {
     /**
      * Called when a touch starts.
      * 
-     * @param touches the array of {@link Touch.TouchEvent}s.
+     * @param touches one or more {@link Event}s.
      */
-    void onTouchStart(TouchEvent[] touches);
+    void onTouchStart(Event[] touches);
 
     /**
      * Called when a touch moves (always between start/end events).
      * 
-     * @param touches the array of {@link Touch.TouchEvent}s.
+     * @param touches one or more {@link Event}s.
      */
-    void onTouchMove(TouchEvent[] touches);
+    void onTouchMove(Event[] touches);
 
     /**
      * Called when a touch ends.
      * 
-     * @param touches the array of {@link Touch.TouchEvent}s.
+     * @param touches one or more {@link Event}s.
      */
-    void onTouchEnd(TouchEvent[] touches);
+    void onTouchEnd(Event[] touches);
   }
 
   /**
    * A {@link Listener} implementation with NOOP stubs provided for each method.
    */
-  public static class Adapter implements Listener {
-    public void onTouchStart(TouchEvent[] touches) { /* NOOP! */ }
-
-    public void onTouchMove(TouchEvent[] touches) { /* NOOP! */ }
-
-    public void onTouchEnd(TouchEvent[] touches) { /* NOOP! */ }
+  class Adapter implements Listener {
+    public void onTouchStart(Event[] touches) { /* NOOP! */ }
+    public void onTouchMove(Event[] touches) { /* NOOP! */ }
+    public void onTouchEnd(Event[] touches) { /* NOOP! */ }
   }
 
   /**

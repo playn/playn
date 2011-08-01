@@ -17,11 +17,9 @@ import com.google.gwt.core.client.JsArray;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.NativeEvent;
 
+import forplay.core.ForPlay;
 import forplay.core.Touch;
 
-// TODO(pdr): Need to implement a JSO overlay type for TouchEvent
-// so that we don't do a bunch of work copying all the native event
-// stuff into the TouchEvent[] array.
 class HtmlTouch extends HtmlInput implements Touch {
   private Listener listener;
   boolean inTouchSequence = false; // true when we are in a touch sequence (after touch start but before touch end)
@@ -39,21 +37,20 @@ class HtmlTouch extends HtmlInput implements Touch {
           int nativeTouchesLen = nativeTouches.length();
 
           if (nativeTouchesLen == 0) {
-            listener.onTouchStart(new TouchEvent[0]);
+            listener.onTouchStart(new Event[0]);
             return;
           }
 
           inTouchSequence = true;
 
-          // Convert the JsArray<Native Touch> to an array of TouchEvents
-          // TODO(pdr): replace TouchEvent with a JSO overlay type to avoid so much work here
-          TouchEvent[] touches = new TouchEvent[nativeTouchesLen];
+          // Convert the JsArray<Native Touch> to an array of Touch.Events
+          Event[] touches = new Event[nativeTouchesLen];
           for (int t = 0; t < nativeTouchesLen; t++) {
             com.google.gwt.dom.client.Touch touch = nativeTouches.get(t);
             float x = touch.getRelativeX(rootElement);
             float y = touch.getRelativeY(rootElement);
             int id = getTouchIdentifier(evt, t);
-            touches[t] = new TouchEvent(x, y, id);
+            touches[t] = new Event.Impl(ForPlay.currentTime(), x, y, id);
           }
           listener.onTouchStart(touches);
         }
@@ -71,15 +68,14 @@ class HtmlTouch extends HtmlInput implements Touch {
           JsArray<com.google.gwt.dom.client.Touch> nativeTouches = evt.getTouches();
           int nativeTouchesLen = nativeTouches.length();
 
-          // Convert the JsArray<Native Touch> to an array of TouchEvents
-          // TODO(pdr): replace TouchEvent with a JSO overlay type to avoid so much work here
-          TouchEvent[] touches = new TouchEvent[nativeTouchesLen];
+          // Convert the JsArray<Native Touch> to an array of Touch.Events
+          Event[] touches = new Event[nativeTouchesLen];
           for (int t = 0; t < nativeTouchesLen; t++) {
             com.google.gwt.dom.client.Touch touch = nativeTouches.get(t);
             float x = touch.getRelativeX(rootElement);
             float y = touch.getRelativeY(rootElement);
             int id = getTouchIdentifier(evt, t);
-            touches[t] = new TouchEvent(x, y, id);
+            touches[t] = new Event.Impl(ForPlay.currentTime(), x, y, id);
           }
           listener.onTouchEnd(touches);
 
@@ -100,15 +96,14 @@ class HtmlTouch extends HtmlInput implements Touch {
           JsArray<com.google.gwt.dom.client.Touch> nativeTouches = evt.getTouches();
           int nativeTouchesLen = nativeTouches.length();
 
-          // Convert the JsArray<Native Touch> to an array of TouchEvents
-          // TODO(pdr): replace TouchEvent with a JSO overlay type to avoid so much work here
-          TouchEvent[] touches = new TouchEvent[nativeTouchesLen];
+          // Convert the JsArray<Native Touch> to an array of Touch.Events
+          Event[] touches = new Event[nativeTouchesLen];
           for (int t = 0; t < nativeTouchesLen; t++) {
             com.google.gwt.dom.client.Touch touch = nativeTouches.get(t);
             float x = touch.getRelativeX(rootElement);
             float y = touch.getRelativeY(rootElement);
             int id = getTouchIdentifier(evt, t);
-            touches[t] = new TouchEvent(x, y, id);
+            touches[t] = new Event.Impl(ForPlay.currentTime(), x, y, id);
           }
           listener.onTouchMove(touches);
         }

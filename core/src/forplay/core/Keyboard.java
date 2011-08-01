@@ -20,31 +20,52 @@ package forplay.core;
  */
 public interface Keyboard {
 
+  /** An event dispatched when a key is pressed or released. */
+  interface Event extends Events.Input {
+    /**
+     * The code of the key that triggered this event, e.g. {@link #KEY_ESC}, etc.
+     */
+    int keyCode();
+
+    class Impl extends Events.Input.Impl implements Event {
+      private int keyCode;
+
+      @Override public int keyCode() {
+        return keyCode;
+      }
+
+      public Impl(double time, int keyCode) {
+        super(time);
+        this.keyCode = keyCode;
+      }
+    }
+  }
+
   interface Listener {
     /**
      * Called when a key is depressed.
      */
-    void onKeyDown(int keyCode);
+    void onKeyDown(Event event);
 
     /**
      * Called when a key is released.
      */
-    void onKeyUp(int keyCode);
+    void onKeyUp(Event event);
   }
 
   /** A {@link Listener} implementation with NOOP stubs provided for each method. */
-  public static class Adapter implements Listener {
-    public void onKeyDown(int keyCode) { /* NOOP! */ }
-    public void onKeyUp(int keyCode) { /* NOOP! */ }
+  class Adapter implements Listener {
+    public void onKeyDown(Event event) { /* NOOP! */ }
+    public void onKeyUp(Event event) { /* NOOP! */ }
   }
 
-  public static final int KEY_ESC = 27;
-  public static final int KEY_SPACE = 32;
+  int KEY_ESC = 27;
+  int KEY_SPACE = 32;
 
-  public static final int KEY_LEFT = 37;
-  public static final int KEY_UP = 38;
-  public static final int KEY_RIGHT = 39;
-  public static final int KEY_DOWN = 40;
+  int KEY_LEFT = 37;
+  int KEY_UP = 38;
+  int KEY_RIGHT = 39;
+  int KEY_DOWN = 40;
 
   // TODO(jgw): Lots more keyboard definitions. These values only work on the desktop at the moment
   // and are completely untested on Android.
