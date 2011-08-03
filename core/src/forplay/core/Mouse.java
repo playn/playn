@@ -124,6 +124,10 @@ public interface Mouse {
 
     /**
      * Called when mouse wheel scroll occurs.
+     * <p>
+     * Negative velocity corresponds to scrolling north/up. 
+     * Positive velocity corresponds to scrolling south/down.
+     * Each scroll 'click' is 1 velocity.
      * 
      * @param event provides wheel velocity and other metadata.
      */

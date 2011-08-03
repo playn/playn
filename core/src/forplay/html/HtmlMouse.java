@@ -107,8 +107,37 @@ class HtmlMouse extends HtmlInput implements Mouse {
   /**
    * Return the mouse wheel velocity for the event
    */
+
   private static native float getMouseWheelVelocity(NativeEvent evt) /*-{
-    return evt.detail ? evt.detail : -1 * evt.wheelDelta / 40;
+    var delta = 0.0; 
+    var useragent = navigator.userAgent.toLowerCase(); 
+    
+    if (useragent.indexOf('firefox') != -1) {
+      if (useragent.indexOf('mac') != -1) {
+        delta = 1.0 * evt.detail;
+      } else {
+        delta = 1.0 * evt.detail/3;
+      }
+    } else if (useragent.indexOf('opera') != -1) {
+      if (useragent.indexOf('linux') != -1) {
+        delta = -1.0 * evt.wheelDelta/80;
+      } else {
+        // on mac
+        delta = -1.0 * evt.wheelDelta/40;
+      }
+    } else if (useragent.indexOf('chrome') != -1 || 
+        useragent.indexOf('safari') != -1) {
+      delta = -1.0 * evt.wheelDelta/120;
+      // handle touchpad for chrome
+      if (Math.abs(delta) < 1) {
+        if (useragent.indexOf('win') != -1) {
+          delta = -1.0 * evt.wheelDelta;
+        } else if (useragent.indexOf('mac') != -1) {
+          delta = -1.0 * evt.wheelDelta/3;
+        }
+      }
+    }
+    return delta;
   }-*/;
 
   /**
