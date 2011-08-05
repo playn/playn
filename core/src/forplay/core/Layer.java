@@ -26,7 +26,7 @@ package forplay.core;
  * in a layer are transformed by the layer's transformation matrix, and each child layer is
  * positioned by the transformation matrix of it's parent.
  * <p>
- * TODO: z-index, clipping (?), visibility TODO: transform-origin: allow explicit
+ * TODO: clipping (?), transform-origin: allow explicit
  * "center, top-left, bottom-right" like CSS transform-origin?
  */
 public interface Layer {
