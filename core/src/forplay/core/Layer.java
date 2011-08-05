@@ -167,4 +167,29 @@ public interface Layer {
    * @param angle angle to rotate, in radians
    */
   void setRotation(float angle);
+
+  /**
+   * Interface for {@link Layer}s containing explicit sizes.
+   */
+  public interface HasSize {
+    /**
+     * Return the width of the layer.
+     */
+    public float width();
+
+    /**
+     * Return the height of the layer.
+     */
+    public float height();
+
+    /**
+     * Return the width of the layer after applying scale.
+     */
+    public float scaledWidth();
+
+    /**
+     * Return the height of the layer after applying scale.
+     */
+    public float scaledHeight();
+  }
 }

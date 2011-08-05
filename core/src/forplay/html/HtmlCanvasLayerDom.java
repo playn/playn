@@ -18,6 +18,8 @@ package forplay.html;
 import com.google.gwt.dom.client.CanvasElement;
 import com.google.gwt.dom.client.Document;
 
+import forplay.core.Asserts;
+
 import forplay.core.Canvas;
 import forplay.core.CanvasLayer;
 
@@ -44,5 +46,27 @@ class HtmlCanvasLayerDom extends HtmlLayerDom implements CanvasLayer {
   @Override
   public Canvas canvas() {
     return canvas;
+  }
+
+  @Override
+  public float width() {
+    Asserts.checkNotNull(canvas, "Canvas must not be null");
+    return canvas.width();
+  }
+
+  @Override
+  public float height() {
+    Asserts.checkNotNull(canvas, "Canvas must not be null");
+    return canvas.height();
+  }
+
+  @Override
+  public float scaledWidth() {
+    return transform().scaleX() * width();
+  }
+
+  @Override
+  public float scaledHeight() {
+    return transform().scaleY() * height();
   }
 }

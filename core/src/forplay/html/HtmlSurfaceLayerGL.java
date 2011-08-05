@@ -19,6 +19,8 @@ import com.google.gwt.webgl.client.WebGLFramebuffer;
 import com.google.gwt.webgl.client.WebGLRenderingContext;
 import com.google.gwt.webgl.client.WebGLTexture;
 
+import forplay.core.Asserts;
+
 import forplay.core.Surface;
 import forplay.core.SurfaceLayer;
 import forplay.core.Transform;
@@ -78,5 +80,27 @@ class HtmlSurfaceLayerGL extends HtmlLayerGL implements SurfaceLayer {
     //  which flips vertically to put the origin at the top-left).
     gfx.drawTexture(tex, width, height, localTransform(parentTransform), 0, height, width, -height,
         false, false, parentAlpha * alpha);
+  }
+
+  @Override
+  public float width() {
+    Asserts.checkNotNull(surface, "Surface must not be null");
+    return surface.width();
+  }
+
+  @Override
+  public float height() {
+    Asserts.checkNotNull(surface, "Surface must not be null");
+    return surface.height();
+  }
+
+  @Override
+  public float scaledWidth() {
+    return transform().scaleX() * width();
+  }
+
+  @Override
+  public float scaledHeight() {
+    return transform().scaleY() * height();
   }
 }

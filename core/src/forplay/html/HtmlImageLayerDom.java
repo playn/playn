@@ -204,4 +204,34 @@ class HtmlImageLayerDom extends HtmlLayerDom implements ImageLayer {
       applyBackgroundSize();
     }
   }
+
+  @Override
+  public float width() {
+    Asserts.checkNotNull(htmlImage, "Image must not be null");
+    if (widthSet) {
+      return width;
+    } else {
+      return htmlImage.width();
+    }
+  }
+
+  @Override
+  public float height() {
+    Asserts.checkNotNull(htmlImage, "Image must not be null");
+    if (heightSet) {
+      return height;
+    } else {
+      return htmlImage.height();
+    }
+  }
+
+  @Override
+  public float scaledWidth() {
+    return transform().scaleX() * width();
+  }
+
+  @Override
+  public float scaledHeight() {
+    return transform().scaleY() * height();
+  }
 }

@@ -17,6 +17,8 @@ package forplay.flash;
 
 import com.google.gwt.core.client.JavaScriptObject;
 
+import forplay.core.Asserts;
+
 import flash.display.BitmapData;
 import flash.gwt.FlashImport;
 import flash.display.Sprite;
@@ -155,4 +157,25 @@ public class FlashCanvasLayer extends FlashLayer implements CanvasLayer {
     
   }
 
+  @Override
+  public float width() {
+    Asserts.checkNotNull(canvas, "Canvas must not be null");
+    return canvas.width();
+  }
+
+  @Override
+  public float height() {
+    Asserts.checkNotNull(canvas, "Canvas must not be null");
+    return canvas.height();
+  }
+
+  @Override
+  public float scaledWidth() {
+    return transform().scaleX() * width();
+  }
+
+  @Override
+  public float scaledHeight() {
+    return transform().scaleY() * height();
+  }
 }

@@ -13,6 +13,8 @@
  */
 package forplay.java;
 
+import forplay.core.Asserts;
+
 import static forplay.core.ForPlay.*;
 
 import forplay.core.Canvas;
@@ -48,5 +50,27 @@ class JavaCanvasLayer extends JavaLayer implements CanvasLayer {
     surf.setAlpha(surf.alpha() * alpha);
     surf.drawImage(canvas, 0, 0);
     surf.restore();
+  }
+
+  @Override
+  public float width() {
+    Asserts.checkNotNull(canvas, "Canvas must not be null");
+    return canvas.width();
+  }
+
+  @Override
+  public float height() {
+    Asserts.checkNotNull(canvas, "Canvas must not be null");
+    return canvas.height();
+  }
+
+  @Override
+  public float scaledWidth() {
+    return transform().scaleX() * width();
+  }
+
+  @Override
+  public float scaledHeight() {
+    return transform().scaleY() * height();
   }
 }

@@ -211,6 +211,30 @@ public class Transform {
     m10 *= sy; m11 *= sy;
   }
 
+  /**
+   * TODO
+   */
+  public void setScaleX(float sx) {
+    // Normalize to scale = 1.
+    float osx = len(m00, m01);
+    m00 /= osx; m01 /= osx;
+
+    // Then re-apply.
+    m00 *= sx; m01 *= sx;
+  }
+
+  /**
+   * TODO
+   */
+  public void setScaleY(float sy) {
+    // Normalize to scale = 1.
+    float osy = len(m10, m11);
+    m10 /= osy; m11 /= osy;
+
+    // Then re-apply.
+    m10 *= sy; m11 *= sy;
+  }
+
   @Override
   public String toString() {
     return "[" +
@@ -276,6 +300,20 @@ public class Transform {
    */
   public float ty() {
     return ty;
+  }
+
+  /**
+   * TODO
+   */
+  public float scaleX() {
+    return len(m00, m01);
+  }
+
+  /**
+   * TODO
+   */
+  public float scaleY() {
+    return len(m10, m11);
   }
 
   private float len(float x, float y) {

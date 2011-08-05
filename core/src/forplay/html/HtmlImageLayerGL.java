@@ -146,4 +146,33 @@ class HtmlImageLayerGL extends HtmlLayerGL implements ImageLayer {
     }
   }
 
+  @Override
+  public float width() {
+    Asserts.checkNotNull(img, "Image must not be null");
+    if (widthSet) {
+      return width;
+    } else {
+      return img.width();
+    }
+  }
+
+  @Override
+  public float height() {
+    Asserts.checkNotNull(img, "Image must not be null");
+    if (heightSet) {
+      return height;
+    } else {
+      return img.height();
+    }
+  }
+
+  @Override
+  public float scaledWidth() {
+    return transform.scaleX() * width();
+  }
+
+  @Override
+  public float scaledHeight() {
+    return transform().scaleY() * height();
+  }
 }

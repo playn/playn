@@ -15,6 +15,8 @@
  */
 package forplay.android;
 
+import forplay.core.Asserts;
+
 import static forplay.core.ForPlay.graphics;
 import forplay.core.CanvasSurface;
 import forplay.core.Surface;
@@ -51,6 +53,28 @@ class AndroidSurfaceLayer extends AndroidLayer implements SurfaceLayer {
     canvas.setAlpha(canvas.alpha() * alpha);
     canvas.drawImage(img, 0, 0);
     canvas.restore();
+  }
+
+  @Override
+  public float width() {
+    Asserts.checkNotNull(surface, "Surface must not be null");
+    return surface.width();
+  }
+
+  @Override
+  public float height() {
+    Asserts.checkNotNull(surface, "Surface must not be null");
+    return surface.height();
+  }
+
+  @Override
+  public float scaledWidth() {
+    return transform().scaleX() * width();
+  }
+
+  @Override
+  public float scaledHeight() {
+    return transform().scaleY() * height();
   }
 }
 

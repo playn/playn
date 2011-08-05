@@ -18,7 +18,7 @@ package forplay.core;
 /**
  * TODO
  */
-public interface ImageLayer extends Layer {
+public interface ImageLayer extends Layer, Layer.HasSize {
 
   /**
    * TODO

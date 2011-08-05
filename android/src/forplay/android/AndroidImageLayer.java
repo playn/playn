@@ -139,4 +139,34 @@ class AndroidImageLayer extends AndroidLayer implements ImageLayer {
 
     canvas.restore();
   }
+
+  @Override
+  public float width() {
+    Asserts.checkNotNull(image, "Image must not be null");
+    if (widthSet) {
+      return width;
+    } else {
+      return image.width();
+    }
+  }
+
+  @Override
+  public float height() {
+    Asserts.checkNotNull(image, "Image must not be null");
+    if (heightSet) {
+      return height;
+    } else {
+      return image.height();
+    }
+  }
+
+  @Override
+  public float scaledWidth() {
+    return transform.scaleX() * width();
+  }
+
+  @Override
+  public float scaledHeight() {
+    return transform().scaleY() * height();
+  }
 }

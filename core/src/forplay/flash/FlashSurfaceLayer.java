@@ -15,6 +15,8 @@
  */
 package forplay.flash;
 
+import forplay.core.Asserts;
+
 import flash.display.Sprite;
 import forplay.flash.FlashCanvasLayer.CanvasElement;
 
@@ -46,6 +48,25 @@ public class FlashSurfaceLayer extends FlashLayer implements SurfaceLayer {
     return surface;
   }
 
- 
+  @Override
+  public float width() {
+    Asserts.checkNotNull(surface, "Surface must not be null");
+    return surface.width();
+  }
 
+  @Override
+  public float height() {
+    Asserts.checkNotNull(surface, "Surface must not be null");
+    return surface.height();
+  }
+
+  @Override
+  public float scaledWidth() {
+    return transform().scaleX() * width();
+  }
+
+  @Override
+  public float scaledHeight() {
+    return transform().scaleY() * height();
+  }
 }

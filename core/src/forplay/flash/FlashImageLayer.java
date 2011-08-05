@@ -16,6 +16,8 @@
 
 package forplay.flash;
 
+import forplay.core.Asserts;
+
 import flash.display.Bitmap;
 import flash.display.Sprite;
 
@@ -24,6 +26,7 @@ import forplay.core.ResourceCallback;
 import forplay.core.Image;
 import forplay.core.ImageLayer;
 
+// TODO(pdr): fix setWidth, setHeight, setRepeat*, etc.
 public class FlashImageLayer extends FlashLayer implements ImageLayer {
 
   
@@ -155,5 +158,28 @@ public class FlashImageLayer extends FlashLayer implements ImageLayer {
   public void setSize(float width, float height) {
     // TODO Auto-generated method stub
 
+  }
+
+
+  @Override
+  public float width() {
+    Asserts.checkNotNull(image, "Image must not be null");
+    return image.width();
+  }
+
+  @Override
+  public float height() {
+    Asserts.checkNotNull(image, "Image must not be null");
+    return image.height();
+  }
+
+  @Override
+  public float scaledWidth() {
+    return transform().scaleX() * width();
+  }
+
+  @Override
+  public float scaledHeight() {
+    return transform().scaleY() * height();
   }
 }
