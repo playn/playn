@@ -1,2 +1,118 @@
 .DS_Store
 target
+
+# /android/
+/android/bin
+/android/gen
+
+# /core/
+/core/bin
+/core/.settings
+/core/.gwt
+
+# /sample/WebGLDemo/war/WEB-INF/
+/sample/WebGLDemo/war/WEB-INF/lib
+/sample/WebGLDemo/war/WEB-INF/classes
+/sample/WebGLDemo/war/WEB-INF/deploy
+
+# /sample/cute/android/
+/sample/cute/android/bin
+/sample/cute/android/gen
+
+# /sample/cute/core/
+/sample/cute/core/.settings
+
+# /sample/cute/core/war/WEB-INF/
+/sample/cute/core/war/WEB-INF/lib
+/sample/cute/core/war/WEB-INF/classes
+/sample/cute/core/war/WEB-INF/deploy
+
+# /sample/cute/html/war/WEB-INF/
+/sample/cute/html/war/WEB-INF/lib
+/sample/cute/html/war/WEB-INF/classes
+/sample/cute/html/war/WEB-INF/deploy
+
+# /sample/cute/server/
+/sample/cute/server/bin
+
+# /sample/hello/android/
+/sample/hello/android/bin
+/sample/hello/android/gen
+
+# /sample/hello/core/
+/sample/hello/core/.settings
+
+# /sample/hello/core/war/WEB-INF/
+/sample/hello/core/war/WEB-INF/lib
+/sample/hello/core/war/WEB-INF/classes
+/sample/hello/core/war/WEB-INF/deploy
+
+# /sample/m2/
+
+# /sample/m2/releases/
+
+# /sample/m2/snapshots/
+
+# /sample/m2/snapshots/META-INF/
+
+# /sample/m2/snapshots/com/
+
+# /sample/m2/snapshots/com/googlecode/
+
+# /sample/m2/snapshots/com/googlecode/forplay/
+
+# /sample/m2/snapshots/com/googlecode/forplay/forplay-hello-core-archetype/
+
+# /sample/m2/snapshots/com/googlecode/forplay/forplay-hello-core-archetype/1.0-SNAPSHOT/
+
+# /sample/noise/noise/war/WEB-INF/
+/sample/noise/noise/war/WEB-INF/lib
+/sample/noise/noise/war/WEB-INF/classes
+/sample/noise/noise/war/WEB-INF/deploy
+
+# /sample/noise/war/
+/sample/noise/war/noisegame
+
+# /sample/noise/war/WEB-INF/
+/sample/noise/war/WEB-INF/lib
+/sample/noise/war/WEB-INF/classes
+/sample/noise/war/WEB-INF/deploy
+
+# /sample/peas/android/
+/sample/peas/android/bin
+/sample/peas/android/gen
+
+# /sample/peas/core/
+/sample/peas/core/.settings
+
+# /sample/peas/core/war/
+/sample/peas/core/war/peas
+/sample/peas/core/war/peasflash
+
+# /sample/peas/core/war/WEB-INF/
+/sample/peas/core/war/WEB-INF/lib
+/sample/peas/core/war/WEB-INF/classes
+/sample/peas/core/war/WEB-INF/deploy
+
+# /sample/peas/html/war/WEB-INF/
+/sample/peas/html/war/WEB-INF/lib
+/sample/peas/html/war/WEB-INF/classes
+/sample/peas/html/war/WEB-INF/deploy
+
+# /sample/sprites/android/
+/sample/sprites/android/bin
+/sample/sprites/android/gen
+
+# /server/
+/server/bin
+
+# /test/core/
+/test/core/.settings
+
+# /test/core/war/WEB-INF/
+/test/core/war/WEB-INF/lib
+/test/core/war/WEB-INF/classes
+/test/core/war/WEB-INF/deploy
+
+# /test/manualtests/html/
+/test/manualtests/html/target
