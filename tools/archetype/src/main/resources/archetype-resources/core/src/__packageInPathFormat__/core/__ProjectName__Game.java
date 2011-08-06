@@ -2,7 +2,7 @@
 #set( $symbol_dollar = '$' )
 #set( $symbol_escape = '\' )
 /**
- * Copyright 2011 The ForPlay Authors
+ * Copyright 2011 The PlayN Authors
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
@@ -21,13 +21,13 @@ package ${package}.core;
 import java.util.ArrayList;
 import java.util.List;
 
-import static forplay.core.ForPlay.*;
+import static playn.core.PlayN.*;
 
-import forplay.core.Game;
-import forplay.core.GroupLayer;
-import forplay.core.Image;
-import forplay.core.ImageLayer;
-import forplay.core.Pointer;
+import playn.core.Game;
+import playn.core.GroupLayer;
+import playn.core.Image;
+import playn.core.ImageLayer;
+import playn.core.Pointer;
 
 public class ${ProjectName}Game implements Game, Pointer.Listener {
   GroupLayer peaLayer;

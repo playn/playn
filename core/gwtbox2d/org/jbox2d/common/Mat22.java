@@ -126,7 +126,7 @@ public class Mat22 {
   /**
    * Return a clone of this matrix. djm fixed double allocation
    */
-  // @Override // changed for forplay
+  // @Override // changed for playn
   public final Mat22 clone() {
     return new Mat22(m11, m21, m12, m22);
   }

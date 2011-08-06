@@ -5,8 +5,8 @@
   <artifactId>${artifactId}</artifactId>
   <packaging>pom</packaging>
   <version>${version}</version>
-  <name>Forplay ${ProjectName} Project</name>
-  <description>Forplay ${ProjectName} Project</description>
+  <name>Playn ${ProjectName} Project</name>
+  <description>Playn ${ProjectName} Project</description>
   <modules>
     <module>core</module>
     <module>maven/html</module>
@@ -106,8 +106,8 @@
       <url>http://repo1.maven.org/maven2/</url>
     </repository>
     <repository>
-      <id>forplay</id>
-      <url>http://forplay.googlecode.com/svn/mavenrepo</url>
+      <id>playn</id>
+      <url>http://playn.googlecode.com/svn/mavenrepo</url>
     </repository>
   </repositories>
 

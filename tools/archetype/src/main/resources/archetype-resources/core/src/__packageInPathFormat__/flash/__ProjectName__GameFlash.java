@@ -2,7 +2,7 @@
 #set( $symbol_dollar = '$' )
 #set( $symbol_escape = '\' )
 /**
- * Copyright 2010 The ForPlay Authors
+ * Copyright 2010 The PlayN Authors
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
@@ -18,10 +18,10 @@
  */
 package ${package}.flash;
 
-import forplay.core.ForPlay;
-import forplay.flash.FlashAssetManager;
-import forplay.flash.FlashGame;
-import forplay.flash.FlashPlatform;
+import playn.core.PlayN;
+import playn.flash.FlashAssetManager;
+import playn.flash.FlashGame;
+import playn.flash.FlashPlatform;
 
 import ${package}.core.${ProjectName}Game;
 
@@ -31,6 +31,6 @@ public class ${ProjectName}GameFlash extends FlashGame {
   public void start() {
     FlashAssetManager assets = FlashPlatform.register().assetManager();
     assets.setPathPrefix("${ProjectName}/");
-    ForPlay.run(new ${ProjectName}Game());
+    PlayN.run(new ${ProjectName}Game());
   }
 }

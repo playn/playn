@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<archetype-descriptor xsi:schemaLocation="http://maven.apache.org/plugins/maven-archetype-plugin/archetype-descriptor/1.0.0 http://maven.apache.org/xsd/archetype-descriptor-1.0.0.xsd" name="forplay-sample-archetype"
+<archetype-descriptor xsi:schemaLocation="http://maven.apache.org/plugins/maven-archetype-plugin/archetype-descriptor/1.0.0 http://maven.apache.org/xsd/archetype-descriptor-1.0.0.xsd" name="playn-sample-archetype"
     xmlns="http://maven.apache.org/plugins/maven-archetype-plugin/archetype-descriptor/1.0.0"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <requiredProperties>
@@ -51,7 +51,7 @@
     </fileSet>
   </fileSets>
   <modules>
-    <module id="forplay-hello-core" dir="core" name="forplay-hello-core">
+    <module id="playn-hello-core" dir="core" name="playn-hello-core">
       <fileSets>
         <fileSet filtered="true" encoding="UTF-8" packaged="false">
           <directory>src/__packageInPathFormat__</directory>
@@ -110,7 +110,7 @@
         </fileSet>
       </fileSets>
     </module>
-    <module id="forplay-hello-html" dir="html" name="forplay-hello-html" />
-    <module id="forplay-hello-flash" dir="flash" name="forplay-hello-flash" />
+    <module id="playn-hello-html" dir="html" name="playn-hello-html" />
+    <module id="playn-hello-flash" dir="flash" name="playn-hello-flash" />
   </modules>
 </archetype-descriptor>

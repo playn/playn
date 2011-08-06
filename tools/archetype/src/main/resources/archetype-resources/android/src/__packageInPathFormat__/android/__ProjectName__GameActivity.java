@@ -2,7 +2,7 @@
 #set( $symbol_dollar = '$' )
 #set( $symbol_escape = '\' )
 /**
- * Copyright 2010 The ForPlay Authors
+ * Copyright 2010 The PlayN Authors
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
@@ -19,8 +19,8 @@
 package ${package}.android;
 
 import android.os.Bundle;
-import forplay.android.GameActivity;
-import ${package}.core.ForPlay;
+import playn.android.GameActivity;
+import ${package}.core.PlayN;
 import ${package}.core.${ProjectName}Game;
 
 public class ${ProjectName}GameActivity extends GameActivity {
@@ -28,6 +28,6 @@ public class ${ProjectName}GameActivity extends GameActivity {
   @Override
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    ForPlay.run(new ${ProjectName}Game());
+    PlayN.run(new ${ProjectName}Game());
   }
 }

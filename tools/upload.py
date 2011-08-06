@@ -81,7 +81,7 @@ AUTH_ACCOUNT_TYPE = "GOOGLE"
 
 # URL of the default review server. As for AUTH_ACCOUNT_TYPE, this line could be
 # changed by the review server (see handler for upload.py).
-DEFAULT_REVIEW_SERVER = "forplay-code-reviews.appspot.com"
+DEFAULT_REVIEW_SERVER = "playn-code-reviews.appspot.com"
 
 # Max size of patch or base file.
 MAX_UPLOAD_SIZE = 900 * 1024
@@ -519,7 +519,7 @@ group.add_option("-r", "--reviewers", action="store", dest="reviewers",
                  metavar="REVIEWERS", default=None,
                  help="Add reviewers (comma separated email addresses).")
 group.add_option("--cc", action="store", dest="cc",
-                 metavar="CC", default="gwt-forplay+reviews@googlegroups.com",
+                 metavar="CC", default="gwt-playn+reviews@googlegroups.com",
                  help="Add CC (comma separated email addresses).")
 group.add_option("--private", action="store_true", dest="private",
                  default=False,

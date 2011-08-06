@@ -2,17 +2,17 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>com.googlecode.forplay</groupId>
-  <artifactId>forplay-project</artifactId>
+  <groupId>com.googlecode.playn</groupId>
+  <artifactId>playn-project</artifactId>
   <packaging>pom</packaging>
   <version>1.0-SNAPSHOT</version>
-  <name>Forplay Project</name>
-  <url>http://code.google.com/p/forplay</url>
-  <description>Project Forplay.</description>
+  <name>Playn Project</name>
+  <url>http://code.google.com/p/playn</url>
+  <description>Project Playn.</description>
 
   <issueManagement>
     <system>Google Code</system>
-    <url>http://code.google.com/p/forplay/issues/list</url>
+    <url>http://code.google.com/p/playn/issues/list</url>
   </issueManagement>
 
 
@@ -119,8 +119,8 @@
       <url>http://repo1.maven.org/maven2/</url>
     </repository>
     <repository>
-      <id>forplay</id>
-      <url>http://forplay.googlecode.com/svn/mavenrepo</url>
+      <id>playn</id>
+      <url>http://playn.googlecode.com/svn/mavenrepo</url>
     </repository>
   </repositories>
 

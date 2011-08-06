@@ -2,7 +2,7 @@
 #set( $symbol_dollar = '$' )
 #set( $symbol_escape = '\' )
 /**
- * Copyright 2010 The ForPlay Authors
+ * Copyright 2010 The PlayN Authors
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
@@ -18,9 +18,9 @@
  */
 package ${package}.java;
 
-import forplay.core.ForPlay;
-import forplay.java.JavaAssetManager;
-import forplay.java.JavaPlatform;
+import playn.core.PlayN;
+import playn.java.JavaAssetManager;
+import playn.java.JavaPlatform;
 
 import ${package}.core.${ProjectName}Game;
 
@@ -29,6 +29,6 @@ public class ${ProjectName}GameJava {
   public static void main(String[] args) {
     JavaAssetManager assets = JavaPlatform.register().assetManager();
     assets.setPathPrefix("src/${packageInPathFormat}/resources");
-    ForPlay.run(new ${ProjectName}Game());
+    PlayN.run(new ${ProjectName}Game());
   }
 }

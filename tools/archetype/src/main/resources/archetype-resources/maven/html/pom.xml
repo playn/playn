@@ -11,7 +11,7 @@
   <groupId>${groupId}</groupId>
   <artifactId>${artifactId}</artifactId>
   <packaging>war</packaging>
-  <name>Forplay ${ProjectName} Html</name>
+  <name>Playn ${ProjectName} Html</name>
 
   <dependencies>
     <dependency>
@@ -22,7 +22,7 @@
     </dependency>
 
     <dependency>
-      <groupId>com.googlecode.forplay</groupId>
+      <groupId>com.googlecode.playn</groupId>
       <artifactId>core</artifactId>
       <version>${coreversion}</version>
     </dependency>

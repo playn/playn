@@ -59,11 +59,11 @@ target
 
 # /sample/m2/snapshots/com/googlecode/
 
-# /sample/m2/snapshots/com/googlecode/forplay/
+# /sample/m2/snapshots/com/googlecode/playn/
 
-# /sample/m2/snapshots/com/googlecode/forplay/forplay-hello-core-archetype/
+# /sample/m2/snapshots/com/googlecode/playn/playn-hello-core-archetype/
 
-# /sample/m2/snapshots/com/googlecode/forplay/forplay-hello-core-archetype/1.0-SNAPSHOT/
+# /sample/m2/snapshots/com/googlecode/playn/playn-hello-core-archetype/1.0-SNAPSHOT/
 
 # /sample/noise/noise/war/WEB-INF/
 /sample/noise/noise/war/WEB-INF/lib

@@ -1,5 +1,5 @@
 /**
- * Copyright 2010 The ForPlay Authors
+ * Copyright 2010 The PlayN Authors
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  * in compliance with the License. You may obtain a copy of the License at
@@ -15,7 +15,7 @@ package flash.events;
 
 import com.google.gwt.core.client.JavaScriptObject;
 
-import forplay.flash.EventHandler;
+import playn.flash.EventHandler;
 
 /**
  * Implementation of 
@@ -47,7 +47,7 @@ public class EventDispatcher extends JavaScriptObject {
    */
   final public native void addEventListener(EventType type, EventHandler<?> listener,  boolean useCapture, int priority, boolean useWeakReference) /*-{
     this.addEventListener(type, function(evt) {
-      return listener.@forplay.flash.EventHandler::handleEvent(Lflash/events/Event;)(evt);
+      return listener.@playn.flash.EventHandler::handleEvent(Lflash/events/Event;)(evt);
     }, useCapture, priority, useWeakReference);
   }-*/;
           

@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<project name="forplay" default="compile" xmlns:artifact="urn:maven-artifact-ant">
+<project name="playn" default="compile" xmlns:artifact="urn:maven-artifact-ant">
   <import file="build-maven.xml"/>
 
   <!-- TODO: find suitable way to factor out module list; ant doesn't have any
@@ -24,7 +24,7 @@
     <ant dir="core/maven/webgl" target="install"/>
     <ant dir="core" target="install"/>
     <ant dir="server" target="install"/>
-    <!-- install the forplay-project artifact which is just a pom -->
+    <!-- install the playn-project artifact which is just a pom -->
     <artifact:install file="pom.xml">
       <pom file="pom.xml"/>
     </artifact:install>

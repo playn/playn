@@ -2,7 +2,7 @@
 #set( $symbol_dollar = '$' )
 #set( $symbol_escape = '\' )
 /**
- * Copyright 2010 The ForPlay Authors
+ * Copyright 2010 The PlayN Authors
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
@@ -18,11 +18,11 @@
  */
 package ${package}.html;
 
-import forplay.html.HtmlAssetManager;
+import playn.html.HtmlAssetManager;
 
-import forplay.core.ForPlay;
-import forplay.html.HtmlGame;
-import forplay.html.HtmlPlatform;
+import playn.core.PlayN;
+import playn.html.HtmlGame;
+import playn.html.HtmlPlatform;
 
 import ${package}.core.${ProjectName}Game;
 
@@ -32,6 +32,6 @@ public class ${ProjectName}GameHtml extends HtmlGame {
   public void start() {
     HtmlAssetManager assets = HtmlPlatform.register().assetManager();
     assets.setPathPrefix("${ProjectName}/");
-    ForPlay.run(new ${ProjectName}Game());
+    PlayN.run(new ${ProjectName}Game());
   }
 }

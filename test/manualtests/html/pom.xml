@@ -3,15 +3,15 @@
   <modelVersion>4.0.0</modelVersion>
   
   <parent>
-    <groupId>com.googlecode.forplay</groupId>
-    <artifactId>forplay-manualtests-project</artifactId>
+    <groupId>com.googlecode.playn</groupId>
+    <artifactId>playn-manualtests-project</artifactId>
     <version>1.0-SNAPSHOT</version>
   </parent>
 
-  <groupId>com.googlecode.forplay</groupId>
-  <artifactId>forplay-manualtests-html</artifactId>
+  <groupId>com.googlecode.playn</groupId>
+  <artifactId>playn-manualtests-html</artifactId>
   <packaging>war</packaging>
-  <name>Forplay ManualTests Html</name>
+  <name>Playn ManualTests Html</name>
 
   <dependencies>
     <dependency>
@@ -22,14 +22,14 @@
     </dependency>
 
     <dependency>
-      <groupId>com.googlecode.forplay</groupId>
+      <groupId>com.googlecode.playn</groupId>
       <artifactId>core</artifactId>
       <version>${coreversion}</version>
     </dependency>
   </dependencies>
 
   <properties>
-    <gwt.module>forplay.test.manualtests.ManualTestsGame</gwt.module>
+    <gwt.module>playn.test.manualtests.ManualTestsGame</gwt.module>
     <gwt.name>manualtests</gwt.name>
   </properties>
 
