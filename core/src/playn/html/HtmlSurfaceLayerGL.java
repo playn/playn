@@ -20,10 +20,9 @@ import com.google.gwt.webgl.client.WebGLRenderingContext;
 import com.google.gwt.webgl.client.WebGLTexture;
 
 import playn.core.Asserts;
-
+import playn.core.InternalTransform;
 import playn.core.Surface;
 import playn.core.SurfaceLayer;
-import playn.core.Transform;
 
 class HtmlSurfaceLayerGL extends HtmlLayerGL implements SurfaceLayer {
 
@@ -72,14 +71,14 @@ class HtmlSurfaceLayerGL extends HtmlLayerGL implements SurfaceLayer {
   }
 
   @Override
-  void paint(WebGLRenderingContext gl, Transform parentTransform, float parentAlpha) {
+  void paint(WebGLRenderingContext gl, InternalTransform parentTransform, float parentAlpha) {
     if (!visible()) return;
 
     // Draw this layer to the screen upside-down, because its contents are flipped
     // (This happens because it uses the same vertex program as everything else,
     //  which flips vertically to put the origin at the top-left).
-    gfx.drawTexture(tex, width, height, localTransform(parentTransform), 0, height, width, -height,
-        false, false, parentAlpha * alpha);
+    gfx.drawTexture(tex, width, height, localTransform(parentTransform),
+                    0, height, width, -height, false, false, parentAlpha * alpha);
   }
 
   @Override

@@ -37,8 +37,8 @@ import playn.core.PlayN;
 import playn.core.GroupLayer;
 import playn.core.Image;
 import playn.core.ImageLayer;
+import playn.core.InternalTransform;
 import playn.core.SurfaceLayer;
-import playn.core.Transform;
 
 class HtmlGraphicsGL extends HtmlGraphics {
 
@@ -133,17 +133,12 @@ class HtmlGraphicsGL extends HtmlGraphics {
       return vertIdx;
     }
 
-    void buildVertex(Transform local, float dx, float dy) {
+    void buildVertex(InternalTransform local, float dx, float dy) {
       buildVertex(local, dx, dy, 0, 0);
     }
 
-    void buildVertex(Transform local, float dx, float dy, float sx, float sy) {
-      vertexData.set(vertexOffset + 0, local.m00());
-      vertexData.set(vertexOffset + 1, local.m01());
-      vertexData.set(vertexOffset + 2, local.m10());
-      vertexData.set(vertexOffset + 3, local.m11());
-      vertexData.set(vertexOffset + 4, local.tx());
-      vertexData.set(vertexOffset + 5, local.ty());
+    void buildVertex(InternalTransform local, float dx, float dy, float sx, float sy) {
+      vertexData.set(((HtmlInternalTransform)local).matrix(), vertexOffset);
       vertexData.set(vertexOffset + 6, dx);
       vertexData.set(vertexOffset + 7, dy);
       vertexData.set(vertexOffset + 8, sx);
@@ -349,7 +344,7 @@ class HtmlGraphicsGL extends HtmlGraphics {
     gl.clear(COLOR_BUFFER_BIT);
 
     // Paint all the layers.
-    rootLayer.paint(gl, Transform.IDENTITY, 1);
+    rootLayer.paint(gl, HtmlInternalTransform.IDENTITY, 1);
 
     // Guarantee a flush.
     useShader(null);
@@ -360,19 +355,21 @@ class HtmlGraphicsGL extends HtmlGraphics {
     gl.texImage2D(TEXTURE_2D, 0, RGBA, RGBA, UNSIGNED_BYTE, img.<ImageElement>cast());
   }
 
-  void drawTexture(WebGLTexture tex, float texWidth, float texHeight, Transform local, float dw,
-      float dh, boolean repeatX, boolean repeatY, float alpha) {
+  void drawTexture(WebGLTexture tex, float texWidth, float texHeight, InternalTransform local,
+                   float dw, float dh, boolean repeatX, boolean repeatY, float alpha) {
     drawTexture(tex, texWidth, texHeight, local, 0, 0, dw, dh, repeatX, repeatY, alpha);
   }
 
-  void drawTexture(WebGLTexture tex, float texWidth, float texHeight, Transform local, float dx,
-      float dy, float dw, float dh, boolean repeatX, boolean repeatY, float alpha) {
+  void drawTexture(WebGLTexture tex, float texWidth, float texHeight, InternalTransform local,
+                   float dx, float dy, float dw, float dh, boolean repeatX, boolean repeatY,
+                   float alpha) {
     float sw = repeatX ? dw : texWidth, sh = repeatY ? dh : texHeight;
     drawTexture(tex, texWidth, texHeight, local, dx, dy, dw, dh, 0, 0, sw, sh, alpha);
   }
 
-  void drawTexture(WebGLTexture tex, float texWidth, float texHeight, Transform local, float dx,
-      float dy, float dw, float dh, float sx, float sy, float sw, float sh, float alpha) {
+  void drawTexture(WebGLTexture tex, float texWidth, float texHeight, InternalTransform local,
+                   float dx, float dy, float dw, float dh, float sx, float sy, float sw, float sh,
+                   float alpha) {
     texShader.prepare(tex, alpha);
 
     sx /= texWidth;  sw /= texWidth;
@@ -388,8 +385,8 @@ class HtmlGraphicsGL extends HtmlGraphics {
     texShader.addElement(idx + 1); texShader.addElement(idx + 3); texShader.addElement(idx + 2);
   }
 
-  void fillRect(Transform local, float dx, float dy, float dw, float dh, float texWidth,
-      float texHeight, WebGLTexture tex, float alpha) {
+  void fillRect(InternalTransform local, float dx, float dy, float dw, float dh,
+                float texWidth, float texHeight, WebGLTexture tex, float alpha) {
     texShader.prepare(tex, alpha);
 
     float sx = dx / texWidth, sy = dy / texHeight;
@@ -405,7 +402,8 @@ class HtmlGraphicsGL extends HtmlGraphics {
     texShader.addElement(idx + 1); texShader.addElement(idx + 3); texShader.addElement(idx + 2);
   }
 
-  void fillRect(Transform local, float dx, float dy, float dw, float dh, int color, float alpha) {
+  void fillRect(InternalTransform local, float dx, float dy, float dw, float dh, int color,
+                float alpha) {
     colorShader.prepare(color, alpha);
 
     int idx = colorShader.beginPrimitive(4, 6);
@@ -422,7 +420,7 @@ class HtmlGraphicsGL extends HtmlGraphics {
     colorShader.addElement(idx + 2);
   }
 
-  void fillPoly(Transform local, float[] positions, int color, float alpha) {
+  void fillPoly(InternalTransform local, float[] positions, int color, float alpha) {
     colorShader.prepare(color, alpha);
 
     int idx = colorShader.beginPrimitive(4, 6);

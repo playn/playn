@@ -13,6 +13,8 @@
  */
 package playn.core;
 
+import pythagoras.f.Transform;
+
 import playn.core.Layer;
 
 /**
@@ -35,14 +37,14 @@ public abstract class AbstractLayer implements Layer {
 
   private GroupLayer parent;
 
-  protected Transform transform;
+  protected InternalTransform transform;
   protected float originX, originY;
   protected float alpha;
   protected float depth;
   protected int flags;
 
   protected AbstractLayer() {
-    transform = new Transform();
+    transform = createTransform();
     alpha = 1;
     setFlag(Flag.VISIBLE, true);
   }
@@ -87,12 +89,12 @@ public abstract class AbstractLayer implements Layer {
   }
 
   @Override
-  public float originX () {
+  public float originX() {
     return originX;
   }
 
   @Override
-  public float originY () {
+  public float originY() {
     return originY;
   }
 
@@ -126,7 +128,7 @@ public abstract class AbstractLayer implements Layer {
   @Override
   public void setScale(float s) {
     Asserts.checkArgument(s != 0, "Scale must be non-zero");
-    transform.setScale(s);
+    transform.setUniformScale(s);
   }
 
   @Override
@@ -171,5 +173,9 @@ public abstract class AbstractLayer implements Layer {
     } else {
       flags &= ~flag.bitmask;
     }
+  }
+
+  protected InternalTransform createTransform() {
+    return new StockInternalTransform();
   }
 }

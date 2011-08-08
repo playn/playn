@@ -19,7 +19,6 @@ import com.google.gwt.dom.client.CanvasElement;
 import com.google.gwt.dom.client.Document;
 
 import playn.core.Asserts;
-
 import playn.core.CanvasSurface;
 import playn.core.Surface;
 import playn.core.SurfaceLayer;

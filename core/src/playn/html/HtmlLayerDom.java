@@ -21,6 +21,7 @@ import com.google.gwt.dom.client.Style.Position;
 import com.google.gwt.dom.client.Style.Visibility;
 
 import playn.core.AbstractLayer;
+import playn.core.InternalTransform;
 
 class HtmlLayerDom extends AbstractLayer {
 
@@ -125,6 +126,10 @@ class HtmlLayerDom extends AbstractLayer {
     matrix += " translate(" + css(-originX) + "px," + css(-originY) + "px)";
 
     elem.getStyle().setProperty(transformName, matrix);
+  }
+
+  @Override protected InternalTransform createTransform() {
+    return new HtmlInternalTransform();
   }
 
   private String xlate(float x) {

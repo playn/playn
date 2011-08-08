@@ -18,9 +18,9 @@ import com.google.gwt.webgl.client.WebGLRenderingContext;
 import playn.core.Asserts;
 import playn.core.GroupLayer;
 import playn.core.GroupLayerImpl;
+import playn.core.InternalTransform;
 import playn.core.Layer;
 import playn.core.ParentLayer;
-import playn.core.Transform;
 
 class HtmlGroupLayerGL extends HtmlLayerGL implements GroupLayer, ParentLayer {
 
@@ -91,7 +91,7 @@ class HtmlGroupLayerGL extends HtmlLayerGL implements GroupLayer, ParentLayer {
     impl.depthChanged(this, layer, oldDepth);
   }
 
-  void paint(WebGLRenderingContext gl, Transform parentTransform, float parentAlpha) {
+  void paint(WebGLRenderingContext gl, InternalTransform parentTransform, float parentAlpha) {
     if (!visible()) return;
 
     for (HtmlLayerGL child : impl.children) {

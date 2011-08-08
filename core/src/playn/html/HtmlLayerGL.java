@@ -16,26 +16,27 @@ package playn.html;
 import com.google.gwt.webgl.client.WebGLRenderingContext;
 
 import playn.core.AbstractLayer;
-import playn.core.Transform;
+import playn.core.InternalTransform;
 
 abstract class HtmlLayerGL extends AbstractLayer {
 
   protected final HtmlGraphicsGL gfx;
-  private final Transform savedLocal = new Transform();
+  private final InternalTransform savedLocal = createTransform();
 
   protected HtmlLayerGL(HtmlGraphicsGL gfx) {
     super();
     this.gfx = gfx;
   }
 
-  protected Transform localTransform(Transform parentTransform) {
-    savedLocal.copy(parentTransform);
-    savedLocal.translate(originX, originY);
-    savedLocal.transform(transform.m00(), transform.m01(), transform.m10(),
-        transform.m11(), transform.tx() - originX, transform.ty() - originY);
-    savedLocal.translate(-originX, -originY);
-    return savedLocal;
+  protected InternalTransform localTransform(InternalTransform parentTransform) {
+    savedLocal.set(parentTransform);
+    return savedLocal.concatenate(transform, originX, originY);
   }
 
-  abstract void paint(WebGLRenderingContext gl, Transform parentTransform, float parentAlpha);
+  abstract void paint(WebGLRenderingContext gl, InternalTransform parentTransform,
+                      float parentAlpha);
+
+  @Override protected InternalTransform createTransform() {
+    return new HtmlInternalTransform();
+  }
 }

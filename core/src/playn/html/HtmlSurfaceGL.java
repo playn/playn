@@ -15,19 +15,18 @@
  */
 package playn.html;
 
-import static com.google.gwt.webgl.client.WebGLRenderingContext.COLOR_BUFFER_BIT;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.google.gwt.webgl.client.WebGLFramebuffer;
 import com.google.gwt.webgl.client.WebGLTexture;
+import static com.google.gwt.webgl.client.WebGLRenderingContext.COLOR_BUFFER_BIT;
 
 import playn.core.Asserts;
 import playn.core.Image;
+import playn.core.InternalTransform;
 import playn.core.Pattern;
 import playn.core.Surface;
-import playn.core.Transform;
-
-import java.util.ArrayList;
-import java.util.List;
 
 class HtmlSurfaceGL implements Surface {
 
@@ -35,7 +34,7 @@ class HtmlSurfaceGL implements Surface {
   private final WebGLFramebuffer fbuf;
   private final int width;
   private final int height;
-  private final List<Transform> transformStack = new ArrayList<Transform>();
+  private final List<InternalTransform> transformStack = new ArrayList<InternalTransform>();
 
   private int fillColor;
   private HtmlPattern fillPattern;
@@ -45,7 +44,7 @@ class HtmlSurfaceGL implements Surface {
     this.fbuf = fbuf;
     this.width = width;
     this.height = height;
-    transformStack.add(new Transform(Transform.IDENTITY));
+    transformStack.add(new HtmlInternalTransform());
   }
 
   @Override
@@ -148,7 +147,7 @@ class HtmlSurfaceGL implements Surface {
 
   @Override
   public void save() {
-    transformStack.add(new Transform(topTransform()));
+    transformStack.add(new HtmlInternalTransform().set(topTransform()));
   }
 
   @Override
@@ -158,7 +157,7 @@ class HtmlSurfaceGL implements Surface {
 
   @Override
   public void setTransform(float m00, float m01, float m10, float m11, float tx, float ty) {
-    topTransform().set(m00, m01, m10, m11, tx, ty);
+    topTransform().setTransform(m00, m01, m10, m11, tx, ty);
   }
 
   public void setFillColor(int color) {
@@ -176,7 +175,7 @@ class HtmlSurfaceGL implements Surface {
 
   @Override
   public void transform(float m00, float m01, float m10, float m11, float tx, float ty) {
-    topTransform().transform(m00, m01, m10, m11, tx, ty);
+    topTransform().concatenate(m00, m01, m10, m11, tx, ty, 0, 0);
   }
 
   @Override
@@ -189,7 +188,7 @@ class HtmlSurfaceGL implements Surface {
     return width;
   }
 
-  private Transform topTransform() {
+  private InternalTransform topTransform() {
     return transformStack.get(transformStack.size() - 1);
   }
 }
