@@ -27,6 +27,7 @@ import playn.core.Gradient;
 import playn.core.Image;
 import playn.core.Path;
 import playn.core.Pattern;
+import playn.core.TextLayout;
 
 class AndroidCanvas implements playn.core.Canvas {
   private static Matrix m = new Matrix();
@@ -101,6 +102,11 @@ class AndroidCanvas implements playn.core.Canvas {
   @Override
   public void drawText(String text, float x, float y) {
     canvas.drawText(text, x, y, currentState().prepareFill());
+  }
+
+  @Override
+  public void drawText(TextLayout layout, float x, float y) {
+    throw new UnsupportedOperationException();
   }
 
   @Override

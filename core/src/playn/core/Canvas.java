@@ -208,6 +208,12 @@ public interface Canvas {
   void drawText(String text, float x, float y);
 
   /**
+   * Draws the supplied text layout at the specified location. The text will be drawn in the
+   * current fill color.
+   */
+  void drawText(TextLayout layout, float x, float y);
+
+  /**
    * Fills a circle at the specified center and radius.
    */
   void fillCircle(float x, float y, float radius);

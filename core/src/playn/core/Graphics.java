@@ -85,6 +85,17 @@ public interface Graphics {
       float positions[]);
 
   /**
+   * Creates a font with the specified configuration.
+   */
+  Font createFont(String name, Font.Style style, float size);
+
+  /**
+   * Lays out the supplied text using the specified format. The text may subsequently be rendered
+   * on a canvas via {@link Canvas#drawText(TextLayout)}.
+   */
+  TextLayout layoutText(String text, TextFormat format);
+
+  /**
    * Gets the height of the available screen real-estate, in pixels.
    */
   int screenHeight();

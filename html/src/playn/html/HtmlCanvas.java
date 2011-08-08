@@ -20,11 +20,12 @@ import com.google.gwt.dom.client.CanvasElement;
 import com.google.gwt.dom.client.Document;
 
 import playn.core.Asserts;
+import playn.core.Canvas;
 import playn.core.Gradient;
 import playn.core.Image;
 import playn.core.Path;
 import playn.core.Pattern;
-import playn.core.Canvas;
+import playn.core.TextLayout;
 
 class HtmlCanvas implements Canvas {
 
@@ -109,6 +110,12 @@ class HtmlCanvas implements Canvas {
   @Override
   public void drawText(String text, float x, float y) {
     ctx.fillText(text, x, y);
+    dirty = true;
+  }
+
+  @Override
+  public void drawText(TextLayout layout, float x, float y) {
+    ((HtmlTextLayout)layout).draw(ctx, x, y);
     dirty = true;
   }
 

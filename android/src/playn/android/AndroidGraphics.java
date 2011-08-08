@@ -24,6 +24,7 @@ import android.util.DisplayMetrics;
 import playn.core.Asserts;
 import playn.core.CanvasImage;
 import playn.core.CanvasLayer;
+import playn.core.Font;
 import playn.core.Gradient;
 import playn.core.Graphics;
 import playn.core.GroupLayer;
@@ -32,6 +33,8 @@ import playn.core.ImageLayer;
 import playn.core.Path;
 import playn.core.Pattern;
 import playn.core.SurfaceLayer;
+import playn.core.TextFormat;
+import playn.core.TextLayout;
 
 class AndroidGraphics implements Graphics {
 
@@ -85,6 +88,16 @@ class AndroidGraphics implements Graphics {
     //Here in case we implement the ability to change orientation .
     AndroidPlatform.instance.activity.getWindowManager().getDefaultDisplay().getMetrics(
         displayMetrics);
+  }
+
+  @Override
+  public Font createFont(String name, Font.Style style, float size) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public TextLayout layoutText(String text, TextFormat format) {
+    throw new UnsupportedOperationException();
   }
 
   @Override

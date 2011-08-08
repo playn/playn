@@ -90,7 +90,7 @@ class JavaCanvasState {
     gfx.setComposite(convertComposite(composite, alpha));
   }
 
-  private Color convertColor(int color) {
+  static Color convertColor(int color) {
     float a = (color >>> 24) / 255.0f;
     float r = ((color >>> 16) & 0xff) / 255.0f;
     float g = ((color >>> 8) & 0xff) / 255.0f;

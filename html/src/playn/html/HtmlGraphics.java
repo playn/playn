@@ -13,6 +13,9 @@
  */
 package playn.html;
 
+import java.util.Map;
+import java.util.HashMap;
+
 import com.google.gwt.canvas.dom.client.CanvasGradient;
 import com.google.gwt.canvas.dom.client.CanvasPattern;
 import com.google.gwt.canvas.dom.client.Context2d;
@@ -22,15 +25,19 @@ import com.google.gwt.dom.client.CanvasElement;
 import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.ImageElement;
+import com.google.gwt.dom.client.Style;
 import com.google.gwt.dom.client.Style.Unit;
 
 import playn.core.Asserts;
 import playn.core.CanvasImage;
+import playn.core.Font;
 import playn.core.Gradient;
 import playn.core.Graphics;
 import playn.core.Image;
 import playn.core.Path;
 import playn.core.Pattern;
+import playn.core.TextFormat;
+import playn.core.TextLayout;
 
 public abstract class HtmlGraphics implements Graphics {
   
@@ -56,9 +63,16 @@ public abstract class HtmlGraphics implements Graphics {
     };
   }-*/;
 
-  protected CanvasElement dummyCanvas;
+  protected final CanvasElement dummyCanvas;
   protected Element rootElement;
   private final Context2d dummyCtx;
+
+  private final Element measureElement;
+  private final Map<Font,HtmlFontMetrics> fontMetrics = new HashMap<Font,HtmlFontMetrics>();
+
+  private static final String HEIGHT_TEXT =
+    "THEQUICKBROWNFOXJUMPEDOVERTHELAZYDOGthequickbrownfoxjumpedoverthelazydog";
+  private static final String EMWIDTH_TEXT = "m";
 
   protected HtmlGraphics() {
     Document doc = Document.get();
@@ -73,6 +87,14 @@ public abstract class HtmlGraphics implements Graphics {
       // clear the contents of the "playn-root" element, if present
       rootElement.setInnerHTML("");
     }
+
+    // create a hidden element used to measure font heights
+    measureElement = doc.createDivElement();
+    measureElement.getStyle().setVisibility(Style.Visibility.HIDDEN);
+    measureElement.getStyle().setPosition(Style.Position.ABSOLUTE);
+    measureElement.getStyle().setTop(-500, Unit.PX);
+    measureElement.getStyle().setOverflow(Style.Overflow.VISIBLE);
+    rootElement.appendChild(measureElement);
   }
 
   @Override
@@ -120,6 +142,16 @@ public abstract class HtmlGraphics implements Graphics {
   }
 
   @Override
+  public Font createFont(String name, Font.Style style, float size) {
+    return new HtmlFont(name, style, size);
+  }
+
+  @Override
+  public TextLayout layoutText(String text, TextFormat format) {
+    return new HtmlTextLayout(dummyCtx, text, format);
+  }
+
+  @Override
   public int screenHeight() {
     return Document.get().getDocumentElement().getClientHeight();
   }
@@ -133,6 +165,31 @@ public abstract class HtmlGraphics implements Graphics {
   public void setSize(int width, int height) {
     rootElement.getStyle().setWidth(width, Unit.PX);
     rootElement.getStyle().setHeight(height, Unit.PX);
+  }
+
+  HtmlFontMetrics getFontMetrics(Font font) {
+    HtmlFontMetrics metrics = fontMetrics.get(font);
+    if (metrics == null) {
+      // TODO: when Context2d.measureText some day returns a height, nix this hackery
+      measureElement.getStyle().setFontSize(font.size(), Unit.PX);
+      measureElement.getStyle().setFontWeight(Style.FontWeight.NORMAL);
+      measureElement.getStyle().setFontStyle(Style.FontStyle.NORMAL);
+      measureElement.setInnerText(HEIGHT_TEXT);
+      switch (font.style()) {
+      case BOLD:
+        measureElement.getStyle().setFontWeight(Style.FontWeight.BOLD);
+        break;
+      case ITALIC:
+        measureElement.getStyle().setFontStyle(Style.FontStyle.ITALIC);
+        break;
+      }
+      float height = (float)measureElement.getOffsetHeight();
+      measureElement.setInnerText(EMWIDTH_TEXT);
+      float emwidth = (float)measureElement.getOffsetWidth();
+      metrics = new HtmlFontMetrics(height, emwidth);
+      fontMetrics.put(font, metrics);
+    }
+    return metrics;
   }
 
   abstract void updateLayers();

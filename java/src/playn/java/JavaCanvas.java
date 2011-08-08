@@ -17,10 +17,12 @@ package playn.java;
 
 import playn.core.Asserts;
 import playn.core.Canvas;
+import playn.core.Font;
 import playn.core.Gradient;
 import playn.core.Image;
 import playn.core.Path;
 import playn.core.Pattern;
+import playn.core.TextLayout;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -121,6 +123,12 @@ class JavaCanvas implements Canvas {
   public void drawText(String text, float x, float y) {
     currentState().prepareFill(gfx);
     gfx.drawString(text, x, y);
+  }
+
+  @Override
+  public void drawText(TextLayout layout, float x, float y) {
+    currentState().prepareFill(gfx);
+    ((JavaTextLayout)layout).paint(gfx, x, y);
   }
 
   @Override
