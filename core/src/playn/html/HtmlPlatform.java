@@ -102,6 +102,12 @@ public class HtmlPlatform implements Platform {
     addEventListener((target == null ? Document.get() : target), name, handler, true);
   }
 
+  /** Contains precomputed information on the user-agent. Useful for dealing with browser and OS
+   * behavioral differences. */
+  static JavaScriptObject agentInfo() {
+    return agentInfo;
+  }
+
   private HtmlAssetManager assetManager = GWT.create(HtmlAssetManager.class);
   private HtmlAudio audio = new HtmlAudio();
   private HtmlRegularExpression regularExpression = new HtmlRegularExpression();
@@ -119,6 +125,8 @@ public class HtmlPlatform implements Platform {
 
   private TimerCallback paintCallback;
   private TimerCallback updateCallback;
+
+  private static JavaScriptObject agentInfo = computeAgentInfo();
 
   // Non-instantiable.
   private HtmlPlatform(Mode mode) {
@@ -305,6 +313,21 @@ public class HtmlPlatform implements Platform {
     }, ms);
   }-*/;
 
+  private static native JavaScriptObject computeAgentInfo() /*-{
+    var userAgent = navigator.userAgent.toLowerCase();
+    return {
+      // browser type flags
+      isFirefox: userAgent.indexOf("firefox") != -1,
+      isChrome: userAgent.indexOf("chrome") != -1,
+      isSafari: userAgent.indexOf("safari") != -1,
+      isOpera: userAgent.indexOf("opera") != -1,
+      // OS type flags
+      isMacOS: userAgent.indexOf("mac") != -1,
+      isLinux: userAgent.indexOf("linux") != -1,
+      isWindows: userAgent.indexOf("win") != -1
+    };
+  }-*/;
+
   /**
    * Gets the URL's parameter of the specified name. Note that if multiple parameters have been
    * specified with the same name, the last one will be returned.
@@ -335,7 +358,7 @@ public class HtmlPlatform implements Platform {
 
   /**
    * Sets the {@code cursor} CSS property.
-   * 
+   *
    * @param cursor the {@link Cursor} to use, or null to hide the cursor.
    */
   public static void setCursor(Cursor cursor) {
