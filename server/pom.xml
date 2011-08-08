@@ -8,7 +8,6 @@
     <version>1.0-SNAPSHOT</version>
   </parent>
 
-  <groupId>com.googlecode.playn</groupId>
   <artifactId>server</artifactId>
   <packaging>jar</packaging>
   <name>Playn Server</name>

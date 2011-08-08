@@ -10,6 +10,11 @@
   <!-- pesky hack needed by gwtbox2d -->
   <property name="aux.src.dir"  value="notused"/>
 
+  <!-- used to include generated android source code; this is set to the same directory as -->
+  <!-- src.dir by default because Ant has no way to specify an optional source directory to -->
+  <!-- the javac task, sigh -->
+  <property name="gen.src.dir"  value="${src.dir}"/>
+
   <import file="build-maven.xml"/>
 
   <target name="-prepare" depends="-init-maven-ant">
@@ -40,6 +45,7 @@
     <mkdir dir="${classes.dir}"/>
     <javac srcdir="${src.dir}" destdir="${classes.dir}" includeAntRuntime="false"
            debug="on" deprecation="on" source="1.6" target="1.6">
+      <src path="${gen.src.dir}"/>
       <classpath refid="classpath"/>
       <compilerarg value="-Xlint"/>
       <compilerarg value="-Xlint:-serial"/>
