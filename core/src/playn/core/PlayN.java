@@ -105,6 +105,13 @@ public class PlayN {
   public static Mouse mouse() {
     return platform.mouse();
   }
+  
+  /**
+   * Gets the {@Link Platform.Type} platform type enum.
+   */
+  public static Platform.Type platformType() {
+    return platform.type();
+  }
 
   /**
    * Gets the {@link Touch} input interface if supported, or null otherwise.

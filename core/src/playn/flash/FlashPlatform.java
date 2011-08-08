@@ -41,6 +41,7 @@ import playn.core.Platform;
 import playn.core.Pointer;
 import playn.core.Mouse;
 import playn.core.RegularExpression;
+import playn.core.Platform.Type;
 import playn.html.HtmlRegularExpression;
 
 public class FlashPlatform implements Platform {
@@ -233,6 +234,11 @@ public class FlashPlatform implements Platform {
   @Override
   public double time() {
     return Duration.currentTimeMillis();
+  }
+  
+  @Override
+  public Type type() {
+    return Type.FLASH;
   }
 
     private void requestAnimationFrame(final TimerCallback callback) {
