@@ -1,17 +1,17 @@
 /**
  * Copyright 2011 The PlayN Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License. 
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  */
 package playn.android;
 
@@ -29,6 +29,7 @@ import playn.core.Graphics;
 import playn.core.GroupLayer;
 import playn.core.Image;
 import playn.core.ImageLayer;
+import playn.core.Path;
 import playn.core.Pattern;
 import playn.core.SurfaceLayer;
 
@@ -38,10 +39,11 @@ class AndroidGraphics implements Graphics {
   private int width, height;
   private DisplayMetrics displayMetrics;
 
-  public AndroidGraphics(GameActivity activity) {
+  public AndroidGraphics() {
     rootLayer = new AndroidGroupLayer();
     displayMetrics = new DisplayMetrics();
-    activity.getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+    refreshScreenMetrics();
+    setSize(screenWidth(), screenHeight());
   }
 
   @Override
@@ -54,12 +56,14 @@ class AndroidGraphics implements Graphics {
   }
 
   @Override
-  public Gradient createLinearGradient(float x0, float y0, float x1, float y1, int[] colors, float[] positions) {
+  public Gradient createLinearGradient(float x0, float y0, float x1, float y1, int[] colors,
+      float[] positions) {
     LinearGradient gradient = new LinearGradient(x0, y0, x1, y1, colors, positions, TileMode.CLAMP);
     return new AndroidGradient(gradient);
   }
 
-  public playn.core.Path createPath() {
+  @Override
+  public Path createPath() {
     return new AndroidPath();
   }
 
@@ -75,6 +79,12 @@ class AndroidGraphics implements Graphics {
   public Gradient createRadialGradient(float x, float y, float r, int[] colors, float[] positions) {
     RadialGradient gradient = new RadialGradient(x, y, r, colors, positions, TileMode.CLAMP);
     return new AndroidGradient(gradient);
+  }
+
+  public void refreshScreenMetrics() {
+    //Here in case we implement the ability to change orientation .
+    AndroidPlatform.instance.activity.getWindowManager().getDefaultDisplay().getMetrics(
+        displayMetrics);
   }
 
   @Override
@@ -93,7 +103,7 @@ class AndroidGraphics implements Graphics {
   }
 
   public CanvasLayer createCanvasLayer(int width, int height, boolean alpha) {
-	return new AndroidCanvasLayer(width, height, alpha);
+    return new AndroidCanvasLayer(width, height, alpha);
   }
 
   @Override

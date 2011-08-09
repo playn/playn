@@ -17,8 +17,10 @@ package playn.android;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.pm.ActivityInfo;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.PowerManager;
@@ -29,27 +31,38 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
 import android.view.WindowManager;
+import playn.core.PlayN;
+import playn.core.Game;
 
 /**
  * TODO: pause/unpause TODO: save/restore state
  */
-public class GameActivity extends Activity {
+public abstract class GameActivity extends Activity {
+  private final int REQUIRED_CONFIG_CHANGES = ActivityInfo.CONFIG_ORIENTATION
+      | ActivityInfo.CONFIG_KEYBOARD_HIDDEN;
+
   private GameView gameView;
   private WakeLock wakeLock;
+  private Context context;
+
+  public abstract void main();
 
   @Override
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
+
+    context = getApplicationContext();
+
     if (supportsHardwareAcceleration()) {
       // Use the raw constant rather than the flag to avoid blowing up on
       // earlier Android
       int flagHardwareAccelerated = 0x1000000;
 
       getWindow().setFlags(flagHardwareAccelerated, flagHardwareAccelerated);
-      gameView = new GameViewDraw(this, getApplicationContext(), null);
+      gameView = new GameViewDraw(this, context);
       Log.i("playn", "Using hardware-acceleration-friendly game loop");
     } else {
-      gameView = new GameViewSurface(this, getApplicationContext(), null);
+      gameView = new GameViewSurface(this, context);
       Log.i("playn", "Using software-acceleration-friendly game loop");
     }
 
@@ -59,7 +72,6 @@ public class GameActivity extends Activity {
     LayoutParams params = new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT);
     getWindow().setContentView((View) gameView, params);
     setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-    AndroidPlatform.register(this);
 
     try {
       PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
@@ -70,12 +82,32 @@ public class GameActivity extends Activity {
       // Warn the developer of a missing permission. The other calls to
       // wakeLock.acquire/release will throw.
       new AlertDialog.Builder(this).setMessage(
-          "Unable to acquire wake lock. Please add <uses-permission android:name=\"android.permission.WAKE_LOCK\" /> to the manifest.").show();
+          "Unable to acquire wake lock. Please add <uses-permission " +
+          "android:name=\"android.permission.WAKE_LOCK\" /> to the manifest.").show();
     }
+
+    try {
+      ActivityInfo info = this.getPackageManager().getActivityInfo(
+          new ComponentName(context, this.getPackageName() + "." + this.getLocalClassName()), 0);
+      if ((info.configChanges & REQUIRED_CONFIG_CHANGES) != REQUIRED_CONFIG_CHANGES) {
+        new AlertDialog.Builder(this).setMessage(
+            "Unable to guarantee application will handle configuration changes. "
+                + "Please add the following line to the Activity manifest: "
+                + "      android:configChanges=\"keyboardHidden|orientation\"").show();
+      }
+
+    } catch (NameNotFoundException e) {
+      Log.w("GameActivity", "Cannot access game AndroidManifest.xml file.");
+    }
+
   }
 
   protected AndroidPlatform platform() {
     return AndroidPlatform.instance;
+  }
+
+  protected Context context() {
+    return context;
   }
 
   private boolean supportsHardwareAcceleration() {
@@ -92,8 +124,9 @@ public class GameActivity extends Activity {
   @Override
   public void onConfigurationChanged(Configuration newConfig) {
     super.onConfigurationChanged(newConfig);
-
-    // TODO: check for display size changes.
+    AndroidGraphics graphics = (AndroidGraphics) PlayN.graphics();
+    if (graphics != null)
+      graphics.refreshScreenMetrics();
   }
 
   @Override
@@ -137,10 +170,9 @@ public class GameActivity extends Activity {
   }
 
   /**
-   *  Called automatically to handle touch events.
-   *  Automatically passes through the parsed MotionEvent
-   *  to AndroidTouch.Listener and AndroidPointer.Listener 
-   *  instances.
+   * Called automatically to handle touch events. Automatically passes through
+   * the parsed MotionEvent to AndroidTouch.Listener and AndroidPointer.Listener
+   * instances.
    */
   @Override
   public boolean onTouchEvent(MotionEvent event) {
@@ -150,7 +182,7 @@ public class GameActivity extends Activity {
   public void onLayout(boolean changed, int left, int top, int right, int bottom) {
     int displayWidth = right - left;
     int displayHeight = bottom - top;
-    
+
     /*
      * TODO: Pass the width and height here into AndroidGraphics as the display
      * width/height (this is the only way to take into account the size of the

@@ -25,7 +25,7 @@ import android.graphics.Xfermode;
 import playn.core.Canvas;
 import playn.core.Canvas.Composite;
 
-class AndroidSurfaceState {
+class AndroidCanvasState {
 
   // Cached xfer modes to avoid creating objects
   static PorterDuffXfermode[] xfermodes; 
@@ -45,16 +45,16 @@ class AndroidSurfaceState {
     }
   }
   
-  AndroidSurfaceState() {
-    this(new Paint(), 0xff000000, 0xffffffff, null, null, Composite.SRC_OVER, 1f);
+  AndroidCanvasState() {
+    this(new Paint(Paint.ANTI_ALIAS_FLAG), 0xff000000, 0xffffffff, null, null, Composite.SRC_OVER, 1f);
   }
 
-  AndroidSurfaceState(AndroidSurfaceState toCopy) {
+  AndroidCanvasState(AndroidCanvasState toCopy) {
     this(toCopy.paint, toCopy.fillColor, toCopy.strokeColor, toCopy.gradient, toCopy.pattern,
         toCopy.composite, toCopy.alpha);
   }
 
-  AndroidSurfaceState(Paint paint, int fillColor, int strokeColor, AndroidGradient gradient,
+  AndroidCanvasState(Paint paint, int fillColor, int strokeColor, AndroidGradient gradient,
       AndroidPattern pattern, Composite composite, float alpha) {
     this.paint = paint;
     this.fillColor = fillColor;
@@ -103,7 +103,7 @@ class AndroidSurfaceState {
     } else {
       paint.setColor(fillColor);
       // Android reuses the A bits of color for alpha so we have to compute the real alpha here 
-      if (alpha != 1f)
+      if (alpha < 1)
         paint.setAlpha((int) (alpha * (fillColor >>> 24)));
     }
     return paint;
@@ -113,7 +113,7 @@ class AndroidSurfaceState {
     paint.setStyle(Style.STROKE);
     paint.setColor(strokeColor);
     // Android reuses the A bits of color for alpha so we have to compute the real alpha here 
-    if (alpha != 1f)
+    if (alpha < 1)
       paint.setAlpha((int) (alpha * (strokeColor >>> 24)));
     paint.setXfermode(convertComposite(composite));
     return paint;
