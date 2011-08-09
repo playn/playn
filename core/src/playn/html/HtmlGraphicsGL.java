@@ -69,6 +69,7 @@ class HtmlGraphicsGL extends HtmlGraphics {
       // Compile the shader.
       String vertexShader = Shaders.INSTANCE.vertexShader().getText();
       program = WebGLUtil.createShaderProgram(gl, vertexShader, fragmentShader);
+      
 
       // glGet*() calls are slow; determine locations once.
       uScreenSizeLoc = gl.getUniformLocation(program, "u_ScreenSize");
@@ -349,7 +350,7 @@ class HtmlGraphicsGL extends HtmlGraphics {
     gl.clear(COLOR_BUFFER_BIT);
 
     // Paint all the layers.
-    rootLayer.paint(gl, Transform.IDENTITY, 1);
+    rootLayer.paint(Transform.IDENTITY, 1);
 
     // Guarantee a flush.
     useShader(null);

@@ -1,5 +1,5 @@
 /**
- * Copyright 2010 The PlayN Authors
+ * Copyright 2010 The ForPlay Authors
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  * in compliance with the License. You may obtain a copy of the License at
@@ -21,12 +21,12 @@ interface Shaders extends ClientBundle {
 
   static Shaders INSTANCE = GWT.create(Shaders.class);
 
-  @Source(value = {"vertex-shader.txt"})
+  @Source(value = {"playn/core/gl/vertex-shader.txt"})
   TextResource vertexShader();
 
-  @Source(value = {"color-fragment-shader.txt"})
+  @Source(value = {"playn/core/gl/color-fragment-shader.txt"})
   TextResource colorFragmentShader();
 
-  @Source(value = {"tex-fragment-shader.txt"})
+  @Source(value = {"playn/core/gl/tex-fragment-shader.txt"})
   TextResource texFragmentShader();
 }

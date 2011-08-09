@@ -91,11 +91,12 @@ class HtmlGroupLayerGL extends HtmlLayerGL implements GroupLayer, ParentLayer {
     impl.depthChanged(this, layer, oldDepth);
   }
 
-  void paint(WebGLRenderingContext gl, Transform parentTransform, float parentAlpha) {
+  @Override
+  public void paint(Transform parentTransform, float parentAlpha) {
     if (!visible()) return;
 
     for (HtmlLayerGL child : impl.children) {
-      child.paint(gl, localTransform(parentTransform), parentAlpha * alpha);
+      child.paint(localTransform(parentTransform), parentAlpha * alpha);
     }
   }
 }
