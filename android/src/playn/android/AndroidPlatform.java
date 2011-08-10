@@ -31,6 +31,7 @@ import playn.core.Json;
 import playn.core.Mouse;
 import playn.core.Platform;
 import playn.core.Touch;
+import playn.core.Platform.Type;
 import playn.java.JavaJson;
 
 public class AndroidPlatform implements Platform {
@@ -184,6 +185,11 @@ public class AndroidPlatform implements Platform {
   @Override
   public double time() {
     return System.currentTimeMillis();
+  }
+  
+  @Override
+  public Type type() {
+    return Type.ANDROID;
   }
 
   void draw(Canvas c, float delta) {
