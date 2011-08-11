@@ -1,7 +1,4 @@
 <?xml version="1.0"?>
 <project name="android" default="compile">
-  <!-- specify the directory for our generated source -->
-  <property name="gen.src.dir" value="gen"/>
-
   <import file="../build-common.xml"/>
 </project>
