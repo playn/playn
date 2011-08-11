@@ -10,7 +10,7 @@
 
   <artifactId>core</artifactId>
   <packaging>jar</packaging>
-  <name>Playn Core</name>
+  <name>PlayN Core</name>
 
   <dependencies>
 

@@ -11,7 +11,7 @@
 
   <artifactId>jbox2d</artifactId>
   <packaging>jar</packaging>
-  <name>Playn GwtBox2D</name>
+  <name>PlayN GwtBox2D</name>
 
   <dependencies>
     <dependency>

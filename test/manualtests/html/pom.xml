@@ -11,7 +11,7 @@
   <groupId>com.googlecode.playn</groupId>
   <artifactId>playn-manualtests-html</artifactId>
   <packaging>war</packaging>
-  <name>Playn ManualTests Html</name>
+  <name>PlayN ManualTests Html</name>
 
   <dependencies>
     <dependency>

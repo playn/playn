@@ -6,7 +6,7 @@
   <artifactId>playn-project</artifactId>
   <packaging>pom</packaging>
   <version>1.0-SNAPSHOT</version>
-  <name>Playn Project</name>
+  <name>PlayN Project</name>
   <url>http://code.google.com/p/playn</url>
   <description>Cross platform game library for N≥4 platforms.</description>
 

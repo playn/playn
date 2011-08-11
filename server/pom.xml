@@ -10,7 +10,7 @@
 
   <artifactId>server</artifactId>
   <packaging>jar</packaging>
-  <name>Playn Server</name>
+  <name>PlayN Server</name>
 
   <repositories>
     <repository>

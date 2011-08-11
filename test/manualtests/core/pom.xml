@@ -10,7 +10,7 @@
 
   <groupId>com.googlecode.playn</groupId>
   <artifactId>playn-manualtests-core</artifactId>
-  <name>Playn ManualTests Core</name>
+  <name>PlayN ManualTests Core</name>
 
   <dependencies>
     <dependency>

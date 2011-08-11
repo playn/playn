@@ -13,7 +13,7 @@
 <!-- TODO: when this is all wired up properly, we'll be generating an apklib
   <packaging>apklib</packaging>
 -->
-  <name>Playn Android</name>
+  <name>PlayN Android</name>
 
   <repositories>
   </repositories>
