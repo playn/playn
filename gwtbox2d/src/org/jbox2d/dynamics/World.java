@@ -35,6 +35,11 @@ import org.jbox2d.callbacks.RayCastCallback;
 import org.jbox2d.callbacks.TreeCallback;
 import org.jbox2d.callbacks.TreeRayCastCallback;
 import org.jbox2d.collision.AABB;
+import org.jbox2d.collision.RayCastInput;
+import org.jbox2d.collision.RayCastOutput;
+import org.jbox2d.collision.TimeOfImpact.TOIInput;
+import org.jbox2d.collision.TimeOfImpact.TOIOutput;
+import org.jbox2d.collision.TimeOfImpact.TOIOutputState;
 import org.jbox2d.collision.broadphase.BroadPhase;
 import org.jbox2d.collision.broadphase.DynamicTreeNode;
 import org.jbox2d.collision.shapes.CircleShape;
@@ -53,14 +58,10 @@ import org.jbox2d.dynamics.joints.Joint;
 import org.jbox2d.dynamics.joints.JointDef;
 import org.jbox2d.dynamics.joints.JointEdge;
 import org.jbox2d.dynamics.joints.PulleyJoint;
-import org.jbox2d.pooling.MutableStack;
+import org.jbox2d.pooling.IDynamicStack;
+import org.jbox2d.pooling.IWorldPool;
 import org.jbox2d.pooling.WorldPool;
 import org.jbox2d.pooling.arrays.Vec2Array;
-import org.jbox2d.structs.collision.RayCastInput;
-import org.jbox2d.structs.collision.RayCastOutput;
-import org.jbox2d.structs.collision.TOIInput;
-import org.jbox2d.structs.collision.TOIOutput;
-import org.jbox2d.structs.collision.TOIOutput.TOIOutputState;
 
 /**
  * The world class manages all physics entities, dynamic simulation,
@@ -71,7 +72,8 @@ import org.jbox2d.structs.collision.TOIOutput.TOIOutputState;
  */
 public class World {
 	public static final int WORLD_POOL_SIZE = 100;
-		
+	public static final int WORLD_POOL_CONTAINER_SIZE = 10;
+	
 	public static final int NEW_FIXTURE = 0x0001;
 	public static final int LOCKED = 0x0002;
 	public static final int CLEAR_FORCES = 0x0004;
@@ -99,7 +101,7 @@ public class World {
 	private DestructionListener m_destructionListener;
 	private DebugDraw m_debugDraw;
 	
-	private final WorldPool pool;
+	private final IWorldPool pool;
 	
 	/**
 	 * This is used to compute the time step ratio to
@@ -118,7 +120,11 @@ public class World {
 	private boolean m_continuousPhysics;
 	
 	private ContactRegister[][] contactStacks = new ContactRegister[ShapeType.TYPE_COUNT][ShapeType.TYPE_COUNT];
-	// private boolean c_initialized = false;
+	
+	public World(Vec2 gravity, boolean doSleep){
+		this(gravity, doSleep,
+				new WorldPool(WORLD_POOL_SIZE, WORLD_POOL_CONTAINER_SIZE));
+	}
 	
 	/**
 	 * Construct a world object.
@@ -128,8 +134,8 @@ public class World {
 	 * @param doSleep
 	 *            improve performance by not simulating inactive bodies.
 	 */
-	public World(Vec2 gravity, boolean doSleep) {
-		pool = new WorldPool(WORLD_POOL_SIZE);
+	public World(Vec2 gravity, boolean doSleep, IWorldPool argPool) {
+		pool = argPool;
 		m_destructionListener = null;
 		m_debugDraw = null;
 		
@@ -154,7 +160,7 @@ public class World {
 		initializeRegisters();
 	}
 	
-	private void addType(MutableStack<Contact> creator, ShapeType type1,
+	private void addType(IDynamicStack<Contact> creator, ShapeType type1,
 			ShapeType type2) {
 		ContactRegister register = new ContactRegister();
 		register.creator = creator;
@@ -180,7 +186,7 @@ public class World {
 		final ShapeType type2 = fixtureB.getType();
 
 		final ContactRegister reg = contactStacks[type1.intValue][type2.intValue];
-		final MutableStack<Contact> creator = reg.creator;
+		final IDynamicStack<Contact> creator = reg.creator;
 		if (creator != null) {
 			if (reg.primary) {
 				Contact c = creator.pop();
@@ -206,11 +212,11 @@ public class World {
 		ShapeType type1 = contact.getFixtureA().getType();
 		ShapeType type2 = contact.getFixtureB().getType();
 
-		MutableStack<Contact> creator = contactStacks[type1.intValue][type2.intValue].creator;
+		IDynamicStack<Contact> creator = contactStacks[type1.intValue][type2.intValue].creator;
 		creator.push(contact);
 	}
 	
-	public WorldPool getPool() {
+	public IWorldPool getPool() {
 		return pool;
 	}
 	
@@ -1070,6 +1076,9 @@ public class World {
 	private final Sweep backup = new Sweep();
 	private final TOISolver toiSolver = new TOISolver();
 	
+
+	private Contact[] m_contacts = new Contact[Settings.maxTOIContacts];
+	
 	private void solveTOI(Body body) {
 		// Find the minimum contact.
 		Contact toiContact = null;
@@ -1173,7 +1182,10 @@ public class World {
 		++toiContact.m_toiCount;
 		
 		// Update all the valid contacts on this body and build a contact island.
-		final Contact[] contacts = new Contact[Settings.maxTOIContacts];
+		if (m_contacts == null || m_contacts.length < Settings.maxTOIContacts){
+			m_contacts = new Contact[Settings.maxTOIContacts];
+		}
+		
 		count = 0;
 		for (ContactEdge ce = body.m_contactList; ce != null && count < Settings.maxTOIContacts; ce = ce.next) {
 			Body other = ce.other;
@@ -1215,12 +1227,12 @@ public class World {
 				continue;
 			}
 			
-			contacts[count] = contact;
+			m_contacts[count] = contact;
 			++count;
 		}
 		
 		// Reduce the TOI body's overlap with the contact island.
-		toiSolver.initialize(contacts, count, body);
+		toiSolver.initialize(m_contacts, count, body);
 		
 		float k_toiBaumgarte = 0.75f;
 		// boolean solved = false;
@@ -1278,6 +1290,15 @@ public class World {
 		pool.pushVec2(2);
 	}
 	
+	// NOTE this corresponds to the liquid test, so the debugdraw can draw
+	// the liquid particles correctly.  They should be the same.
+	private static Integer LIQUID_INT = new Integer(1234598372);
+	private float liquidLength = .12f;
+	private float averageLinearVel = -1;
+	private final Vec2 liquidOffset = new Vec2();
+	private final Vec2 circCenterMoved = new Vec2();
+	private final Color3f liquidColor = new Color3f(.4f,.4f,1f);
+	
 	private final Vec2 center = new Vec2();
 	private final Vec2 axis = new Vec2();
 	private final Vec2Array tlvertices = new Vec2Array();
@@ -1292,6 +1313,22 @@ public class World {
 				float radius = circle.m_radius;
         axis.x = xf.R.m11;
         axis.y = xf.R.m12;
+				
+				if (fixture.getUserData() != null && fixture.getUserData().equals(LIQUID_INT)) {
+					Body b = fixture.getBody();
+					liquidOffset.set(b.m_linearVelocity);
+					float linVelLength = b.m_linearVelocity.length();
+					if(averageLinearVel == -1){
+						averageLinearVel = linVelLength;
+					}else{
+						averageLinearVel = .98f * averageLinearVel + .02f * linVelLength;
+					}
+					liquidOffset.mulLocal( liquidLength/averageLinearVel/2);
+					circCenterMoved.set(center).addLocal( liquidOffset);
+					center.subLocal(liquidOffset);
+					m_debugDraw.drawSegment(center, circCenterMoved, liquidColor);
+					return;
+				}
 				
 				m_debugDraw.drawSolidCircle(center, radius, axis, color);
 			}

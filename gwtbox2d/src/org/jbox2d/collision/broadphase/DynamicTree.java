@@ -26,20 +26,20 @@
  ******************************************************************************/
 package org.jbox2d.collision.broadphase;
 
+import java.util.Stack;
+
 import org.jbox2d.callbacks.DebugDraw;
 import org.jbox2d.callbacks.TreeCallback;
 import org.jbox2d.callbacks.TreeRayCastCallback;
 import org.jbox2d.collision.AABB;
+import org.jbox2d.collision.RayCastInput;
 import org.jbox2d.common.Color3f;
 import org.jbox2d.common.MathUtils;
 import org.jbox2d.common.Settings;
 import org.jbox2d.common.Vec2;
-import org.jbox2d.pooling.PoolingStack;
-import org.jbox2d.pooling.PoolingStackVec2;
-import org.jbox2d.structs.collision.RayCastInput;
-
-import java.util.Random;
-import java.util.Stack;
+import org.jbox2d.pooling.IOrderedStack;
+import org.jbox2d.pooling.OrderedStack;
+import org.jbox2d.pooling.OrderedStackVec2;
 
 // updated to rev 100
 /**
@@ -66,10 +66,9 @@ public class DynamicTree {
 	
 	private final Stack<DynamicTreeNode> nodeStack = new Stack<DynamicTreeNode>();
 	private final Vec2[] drawVecs = new Vec2[4];
-	private final Random rand = Settings.getRandom();
+	private int nodeCounter = 0;
 	
 	public DynamicTree() {
-	  vec2s = new PoolingStackVec2(MAX_STACK_SIZE * 3 + 4);
 		m_root = null;
 		m_nodeCount = 0;
 		m_insertionCount = 0;
@@ -252,7 +251,7 @@ public class DynamicTree {
 	}
 	
 	// stacks because it's recursive
-	private final PoolingStack<Vec2> vec2s;
+	private final IOrderedStack<Vec2> vec2s = new OrderedStackVec2(MAX_STACK_SIZE * 3 + 4, 10);
 	private final AABB aabb = new AABB();
 	private final RayCastInput subInput = new RayCastInput();
 	/**
@@ -400,7 +399,7 @@ public class DynamicTree {
 		node.child1 = null;
 		node.child2 = null;
 		node.userData = null;
-		node.key = rand.nextInt();
+		node.key = nodeCounter++;
 		m_nodeCount++;
 		return node;
 	}

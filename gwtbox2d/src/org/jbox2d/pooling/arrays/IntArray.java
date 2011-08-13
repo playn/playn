@@ -31,14 +31,12 @@ package org.jbox2d.pooling.arrays;
 
 import java.util.HashMap;
 
-import org.jbox2d.pooling.CustThreadLocal;
-
 /**
  * @author Daniel Murphy
  */
 public class IntArray {
 
-	private static class TLHashMap<K, V> extends CustThreadLocal<HashMap<K, V>>{
+	private static class TLHashMap<K, V> extends ThreadLocal<HashMap<K, V>>{
 		protected HashMap<K, V> initialValue(){
 			return new HashMap<K, V>();
 		}

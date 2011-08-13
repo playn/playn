@@ -46,99 +46,62 @@
  * misrepresented as being the original software.
  * 3. This notice may not be removed or altered from any source distribution.
  */
-package org.jbox2d.structs.collision;
 
+package org.jbox2d.collision;
 
-//FIXME: In the C++ version, this class is a union of
-//the key and the features, meaning not that it contains
-//both separately, but that the same data can be accessed
-//as either.  The key there is 32 bit, and each member of
-//features is 8 bits.
-//
-//We need to figure out if this is a problem or not, because
-//I have a feeling that as of right now, key is never being
-//set anyways.  Initial examination seems to show that key is
-//always zero. [hacked around for the moment]
-//
-//Also, it might be better performance-wise to pull features
-//to a top level class if inner classes have more overhead (check this).
+import org.jbox2d.common.Vec2;
 
 // updated to rev 100
+/**
+ * A manifold point is a contact point belonging to a contact
+ * manifold. It holds details related to the geometry and dynamics
+ * of the contact points.
+ * The local point usage depends on the manifold type:
+ * <ul><li>e_circles: the local center of circleB</li>
+ * <li>e_faceA: the local center of cirlceB or the clip point of polygonB</li>
+ * <li>e_faceB: the clip point of polygonA</li></ul>
+ * This structure is stored across time steps, so we keep it small.<br/>
+ * Note: the impulses are used for internal caching and may not
+ * provide reliable contact forces, especially for high speed collisions.
+ */
+public class ManifoldPoint {
+	/** usage depends on manifold type */
+	public final Vec2 localPoint;
+	/** the non-penetration impulse */
+	public float normalImpulse;
+	/** the friction impulse */
+	public float tangentImpulse;
+	/** uniquely identifies a contact point between two shapes */
+	public final ContactID id;
 
-/** Contact ids to facilitate warm starting.*/
-public class ContactID {
-
-	/** The features that intersect to form the contact point */
-	public final Features features;
-
-	/** The features that intersect to form the contact point */
-	public static class Features {
-		/** The edge that defines the outward contact normal. */
-		public int referenceEdge;
-		/** The edge most anti-parallel to the reference edge. */
-		public int incidentEdge;
-		/** The vertex (0 or 1) on the incident edge that was clipped. */
-		public int incidentVertex;
-		/** A value of 1 indicates that the reference edge is on shape2. */
-		public int flip;
-
-		public Features() {
-			referenceEdge = incidentEdge = incidentVertex = flip = 0;
-		}
-
-		private Features(final Features f) {
-			referenceEdge = f.referenceEdge;
-			incidentEdge = f.incidentEdge;
-			incidentVertex = f.incidentVertex;
-			flip = f.flip;
-		}
-
-		private void set(final Features f){
-			referenceEdge = f.referenceEdge;
-			incidentEdge = f.incidentEdge;
-			incidentVertex = f.incidentVertex;
-			flip = f.flip;
-		}
-
-		private boolean isEqual(final Features f){
-			return (referenceEdge==f.referenceEdge &&
-					incidentEdge==f.incidentEdge &&
-					incidentVertex==f.incidentVertex &&
-					flip==f.flip);
-		}
-
-		@Override
-		public String toString() {
-			final String s = "Features: (" + this.flip + " ," + this.incidentEdge + " ," + this.incidentVertex + " ," + this.referenceEdge + ")";
-			return s;
-		}
-
-	}
-
-	public boolean isEqual(final ContactID cid) {
-		return cid.features.isEqual(this.features);
-	}
-
-	public ContactID() {
-		features = new Features();
-	}
-
-	public ContactID(final ContactID c) {
-		features = new Features(c.features);
-	}
-
-	public void set(final ContactID c){
-		features.set(c.features);
-	}
-	
 	/**
-	 * zeros out the data
+	 * Blank manifold point with everything zeroed out.
 	 */
-	public void zero() {
-		features.flip = 0;
-		features.incidentEdge = 0;
-		features.incidentVertex = 0;
-		features.referenceEdge = 0;
+	public ManifoldPoint() {
+		localPoint = new Vec2();
+		normalImpulse = tangentImpulse = 0f;
+		id = new ContactID();
 	}
 
+	/**
+	 * Creates a manifold point as a copy of the given point
+	 * @param cp point to copy from
+	 */
+	public ManifoldPoint(final ManifoldPoint cp) {
+		localPoint = cp.localPoint.clone();
+		normalImpulse = cp.normalImpulse;
+		tangentImpulse = cp.tangentImpulse;
+		id = new ContactID(cp.id);
+	}
+
+	/**
+	 * Sets this manifold point form the given one
+	 * @param cp the point to copy from
+	 */
+	public void set(final ManifoldPoint cp){
+		localPoint.set(cp.localPoint);
+		normalImpulse = cp.normalImpulse;
+		tangentImpulse = cp.tangentImpulse;
+		id.set(cp.id);
+	}
 }

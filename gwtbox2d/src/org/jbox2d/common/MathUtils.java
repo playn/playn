@@ -376,12 +376,9 @@ public class MathUtils {
 //		}
 	}
 	
-	private static Random sRandom;
 	public static final float randomFloat(float argLow, float argHigh) {
-	  if (sRandom == null) {
-	    sRandom = Settings.getRandom();
-	  }
-		return sRandom.nextFloat() * (argHigh - argLow) + argLow;
+		// TODO(pdr): This is an unseeded Random call. Need to check it!
+		return (float) Math.random() * (argHigh - argLow) + argLow;
 	}
 	
 	public static final float randomFloat(Random r, float argLow, float argHigh) {
