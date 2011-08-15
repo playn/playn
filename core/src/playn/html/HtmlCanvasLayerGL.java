@@ -61,7 +61,7 @@ class HtmlCanvasLayerGL extends HtmlLayerGL implements CanvasLayer {
   }
 
   @Override
-  void paint(WebGLRenderingContext gl, InternalTransform parentTransform, float parentAlpha) {
+  public  void paint(InternalTransform parentTransform, float parentAlpha) {
     if (!visible()) return;
 
     if (canvas.dirty()) {

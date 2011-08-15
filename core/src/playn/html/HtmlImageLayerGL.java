@@ -22,7 +22,7 @@ import playn.core.Image;
 import playn.core.ImageLayer;
 import playn.core.InternalTransform;
 
-class HtmlImageLayerGL extends HtmlLayerGL implements ImageLayer {
+public class HtmlImageLayerGL extends HtmlLayerGL implements ImageLayer {
 
   private float width, height;
   private boolean widthSet, heightSet;
@@ -121,7 +121,7 @@ class HtmlImageLayerGL extends HtmlLayerGL implements ImageLayer {
   }
 
   @Override
-  void paint(WebGLRenderingContext gl, InternalTransform parentTransform, float parentAlpha) {
+  public void paint(InternalTransform parentTransform, float parentAlpha) {
     if (!visible()) return;
 
     // TODO(jgw): Assert exclusive source-rect vs. repeat.

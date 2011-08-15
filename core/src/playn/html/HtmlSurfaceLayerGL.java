@@ -71,7 +71,7 @@ class HtmlSurfaceLayerGL extends HtmlLayerGL implements SurfaceLayer {
   }
 
   @Override
-  void paint(WebGLRenderingContext gl, InternalTransform parentTransform, float parentAlpha) {
+  public void paint(InternalTransform parentTransform, float parentAlpha) {
     if (!visible()) return;
 
     // Draw this layer to the screen upside-down, because its contents are flipped
