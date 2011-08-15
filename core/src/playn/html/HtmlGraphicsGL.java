@@ -69,7 +69,6 @@ class HtmlGraphicsGL extends HtmlGraphics {
       // Compile the shader.
       String vertexShader = Shaders.INSTANCE.vertexShader().getText();
       program = WebGLUtil.createShaderProgram(gl, vertexShader, fragmentShader);
-      
 
       // glGet*() calls are slow; determine locations once.
       uScreenSizeLoc = gl.getUniformLocation(program, "u_ScreenSize");

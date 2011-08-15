@@ -22,7 +22,7 @@ import playn.core.Image;
 import playn.core.ImageLayer;
 import playn.core.InternalTransform;
 
-public class HtmlImageLayerGL extends HtmlLayerGL implements ImageLayer {
+class HtmlImageLayerGL extends HtmlLayerGL implements ImageLayer {
 
   private float width, height;
   private boolean widthSet, heightSet;
