@@ -22,6 +22,8 @@
     <module>android</module>
     <module>server</module>
     <module>sample</module>
+    <module>test/core</module>
+    <module>test/manualtests</module>
   </modules>
 
   <properties>

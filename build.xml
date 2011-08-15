@@ -10,6 +10,8 @@
     <ant dir="core" target="clean"/>
     <ant dir="android" target="clean"/>
     <ant dir="server" target="clean"/>
+    <ant dir="test/core" target="clean"/>
+    <ant dir="test/manualtests" target="clean"/>
   </target>
 
   <target name="compile" description="Compiles all submodules.">
@@ -18,6 +20,8 @@
     <ant dir="core" target="compile"/>
     <ant dir="android" target="compile"/>
     <ant dir="server" target="compile"/>
+    <ant dir="test/core" target="compile"/>
+    <ant dir="test/manualtests" target="compile"/>
   </target>
 
   <target name="install" depends="-init-maven-ant"

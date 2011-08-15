@@ -22,7 +22,7 @@ import playn.core.GroupLayer;
 import playn.core.Keyboard;
 import playn.core.Pointer;
 
-public class Bench implements Game, Keyboard.Listener, Pointer.Listener {
+public class Bench implements Game {
 
   private static final TimeTest[] TESTS = new TimeTest[] {
     new SurfaceTimeTest(),
@@ -51,26 +51,6 @@ public class Bench implements Game, Keyboard.Listener, Pointer.Listener {
         nextTest();
       }
     }
-  }
-
-  @Override
-  public void onPointerStart(float x, float y) {
-  }
-
-  @Override
-  public void onPointerEnd(float x, float y) {
-  }
-
-  @Override
-  public void onPointerDrag(float x, float y) {
-  }
-
-  @Override
-  public void onKeyDown(int keyCode) {
-  }
-
-  @Override
-  public void onKeyUp(int keyCode) {
   }
 
   @Override

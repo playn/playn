@@ -1,17 +1,15 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  
   <parent>
     <groupId>com.googlecode.playn</groupId>
-    <artifactId>playn-manualtests-project</artifactId>
+    <artifactId>playn-project</artifactId>
     <version>1.0-SNAPSHOT</version>
   </parent>
 
   <groupId>com.googlecode.playn</groupId>
-  <artifactId>playn-manualtests-html</artifactId>
-  <packaging>war</packaging>
-  <name>PlayN ManualTests Html</name>
+  <artifactId>playn-test-core</artifactId>
+  <name>PlayN Tests Core</name>
 
   <dependencies>
     <dependency>
@@ -28,29 +26,10 @@
     </dependency>
   </dependencies>
 
-  <properties>
-    <gwt.module>playn.test.manualtests.ManualTestsGame</gwt.module>
-    <gwt.name>manualtests</gwt.name>
-  </properties>
-
   <build>
-    <sourceDirectory>../core/src</sourceDirectory>
+    <sourceDirectory>src</sourceDirectory>
 
     <plugins>
-    <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-war-plugin</artifactId>
-        <version>2.1.1</version>
-        <configuration>
-	  <warSourceDirectory>../core/war</warSourceDirectory>
-        </configuration>
-      </plugin>
-
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>gwt-maven-plugin</artifactId>
-      </plugin>
-
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-source-plugin</artifactId>
@@ -58,10 +37,10 @@
     </plugins>
     <resources>
       <resource>
-        <directory>../core/src</directory>
+        <directory>${basedir}/src</directory>
       </resource>
       <resource>
-        <directory>../core/war/WEB-INF/classes</directory>
+        <directory>${basedir}/war/WEB-INF/classes</directory>
       </resource>
     </resources>
   </build>
