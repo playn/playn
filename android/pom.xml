@@ -33,13 +33,6 @@
     </dependency>
 
     <dependency>
-      <groupId>allen_sauer</groupId>
-      <artifactId>gwt-log</artifactId>
-      <version>1.0.r613</version>
-      <optional>true</optional>
-    </dependency>
-
-    <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <version>4.8.1</version>
