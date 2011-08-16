@@ -43,10 +43,7 @@
   </properties>
 
   <repositories>
-    <repository>
-      <id>repo1</id>
-      <url>http://repo1.maven.org/maven2/</url>
-    </repository>
+    <!-- TODO: remove this once all of our artifacts are available elsewhere -->
     <repository>
       <id>playn</id>
       <url>http://playn.googlecode.com/svn/mavenrepo</url>
@@ -77,7 +74,7 @@
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>3.8.1</version>
+      <version>4.8.1</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
