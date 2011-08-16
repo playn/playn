@@ -24,15 +24,21 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  ******************************************************************************/
-package org.jbox2d.structs.dynamics.contacts;
+package org.jbox2d.collision;
 
-import org.jbox2d.dynamics.Fixture;
-import org.jbox2d.dynamics.contacts.Contact;
+import org.jbox2d.collision.Distance.DistanceProxy;
+import org.jbox2d.common.Transform;
 
-// updated to rev 100 - ec
-public interface ContactCreator {
-
-	public Contact contactCreateFcn(Fixture fixtureA, Fixture fixtureB);
-	
-	public void contactDestroyFcn(Contact contact);
+/**
+ * Input for Distance.
+ * You have to option to use the shape radii
+ * in the computation.
+ *
+ */
+public class DistanceInput {
+	public DistanceProxy proxyA = new DistanceProxy();
+	public DistanceProxy proxyB = new DistanceProxy();
+	public Transform transformA = new Transform();
+	public Transform transformB = new Transform();
+	public boolean useRadii;
 }

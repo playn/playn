@@ -49,8 +49,6 @@
 
 package org.jbox2d.common;
 
-import java.util.Random;
-
 //Updated to rev. 142 of b2Settings.cpp/.h
 
 /**
@@ -107,6 +105,8 @@ public class Settings {
 	 * lerp. Or, run the tests yourself in {@link SinCosTest}.
 	 */
 	public static final boolean SINCOS_LUT_LERP = false;
+	
+	public static final int TREE_REBALANCE_STEPS = 4;
 	
 	// Collision
 	
@@ -242,20 +242,6 @@ public class Settings {
 		return restitution1 > restitution2 ? restitution1 : restitution2;
 	}
 
-	 /**
-    * True if you want to use a static seed for the RNG.
-    * By default, this is false.
-    */
-	public static boolean useSeedForRNG = false;
-	
-	/**
-	 * Returns a new Random() object that is seeded with a static value 
-	 * if useSeedForRNG is true, otherwise the current time will be used.
-	 */
-	public static Random getRandom() {
-	  return useSeedForRNG ? new Random(0) : new Random();
-	}
-	
 	/**
 	 * True to use the browser's native sort.
 	 */

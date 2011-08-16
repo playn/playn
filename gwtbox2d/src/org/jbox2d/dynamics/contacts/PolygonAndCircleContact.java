@@ -32,7 +32,7 @@ import org.jbox2d.collision.shapes.PolygonShape;
 import org.jbox2d.collision.shapes.ShapeType;
 import org.jbox2d.common.Transform;
 import org.jbox2d.dynamics.Fixture;
-import org.jbox2d.pooling.WorldPool;
+import org.jbox2d.pooling.IWorldPool;
 
 // updated to rev 100
 
@@ -41,7 +41,7 @@ public class PolygonAndCircleContact extends Contact {
 	/**
 	 * @param argPool
 	 */
-	public PolygonAndCircleContact(WorldPool argPool) {
+	public PolygonAndCircleContact(IWorldPool argPool) {
 		super(argPool);
 	}
 

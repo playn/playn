@@ -24,47 +24,57 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  ******************************************************************************/
-package org.jbox2d.structs.collision.distance;
-
+/**
+ * Created at 12:52:04 AM Jan 20, 2011
+ */
+package org.jbox2d.pooling;
 
 /**
- *  Used to warm start b2Distance.
- *  Set count to zero on first call.
- * @author daniel
+ * @author Daniel Murphy
  */
-public class SimplexCache {
-	/**
-	 * length or area
-	 */
-	public float metric;
+public abstract class OrderedStack<E> implements IOrderedStack<E> {
+
+  protected E[] pool;
+	private int index;
+	private final int size;
+	protected E[] container;
 	
-	public int count;
-	
-	/**
-	 * vertices on shape A
-	 */
-	public final int indexA[] = new int[3];
-	
-	/**
-	 * vertices on shape B
-	 */
-	public final int indexB[] = new int[3];
-	
-	public SimplexCache(){
-		metric = 0;
-		count = 0;
-		indexA[0] = Integer.MAX_VALUE;
-		indexA[1] = Integer.MAX_VALUE;
-		indexA[2] = Integer.MAX_VALUE;
-		indexB[0] = Integer.MAX_VALUE;
-		indexB[1] = Integer.MAX_VALUE;
-		indexB[2] = Integer.MAX_VALUE;
+	public OrderedStack(int argStackSize, int argContainerSize){
+	  index = 0;
+		size = argStackSize;
+		//pool = (E[]) Array.newInstance(argClass, argStackSize);
+		//container = (E[]) Array.newInstance(argClass, argContainerSize);
 	}
 
-	public void set(SimplexCache sc){
-		System.arraycopy(sc.indexA, 0, indexA, 0, indexA.length);
-		System.arraycopy(sc.indexB, 0, indexB, 0, indexB.length);
-		metric = sc.metric;
-		count = sc.count;
+	 protected abstract E[] createArray(int argSize, E[] argOld);
+
+	/* (non-Javadoc)
+	 * @see org.jbox2d.pooling.IPoolingStack#pop()
+	 */
+	public final E pop(){
+		assert(index < size) : "End of stack reached, there is probably a leak somewhere";
+		return pool[index++];
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.jbox2d.pooling.IPoolingStack#pop(int)
+	 */
+	public final E[] pop(int argNum){
+		assert(index + argNum < size) : "End of stack reached, there is probably a leak somewhere";
+		assert(argNum <= container.length) : "Container array is too small";
+		// System.arraycopy(pool, index, container, 0, argNum);
+		for (int i = 0; i < argNum; i++) {
+		  container[i] = pool[index + i];
+		}
+		index += argNum;
+		return container;
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.jbox2d.pooling.IPoolingStack#push(int)
+	 */
+	public final void push(int argNum){
+		index -= argNum;
+		assert (index >= 0) : "Beginning of stack reached, push/pops are unmatched";
 	}
 }

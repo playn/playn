@@ -24,22 +24,27 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  ******************************************************************************/
-package org.jbox2d.structs.collision;
+package org.jbox2d.collision;
 
-import org.jbox2d.common.Sweep;
-import org.jbox2d.structs.collision.distance.DistanceProxy;
+import org.jbox2d.common.Vec2;
 
+// updated to rev 100
 /**
- * Input parameters for TOI
- * @author Daniel Murphy
+ * Ray-cast input data. The ray extends from p1 to p1 + maxFraction * (p2 - p1).
  */
-public class TOIInput {
-	public final DistanceProxy proxyA = new DistanceProxy();
-	public final DistanceProxy proxyB = new DistanceProxy();
-	public final Sweep sweepA = new Sweep();
-	public final Sweep sweepB = new Sweep();
-	/**
-	 * defines sweep interval [0, tMax]
-	 */
-	public float tMax;
+public class RayCastInput{
+	public final Vec2 p1, p2;
+	public float maxFraction;
+
+	public RayCastInput(){
+		p1 = new Vec2();
+		p2 = new Vec2();
+		maxFraction = 0;
+	}
+
+	public void set(final RayCastInput rci){
+		p1.set(rci.p1);
+		p2.set(rci.p2);
+		maxFraction = rci.maxFraction;
+	}
 }

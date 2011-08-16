@@ -24,26 +24,27 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  ******************************************************************************/
-package org.jbox2d.structs.collision;
+package org.jbox2d.pooling;
 
-import org.jbox2d.common.Vec2;
-
-// updated to rev 100
 /**
- * Ray-cast output data. The ray hits at p1 + fraction * (p2 - p1), where p1 and p2
- * come from b2RayCastInput.
+ * Same functionality of a regular java.util stack.  Object
+ * return order does not matter.
+ * @author Daniel
+ *
+ * @param <E>
  */
-public class RayCastOutput{
-	public final Vec2 normal;
-	public float fraction;
+public interface IDynamicStack<E> {
 
-	public RayCastOutput(){
-		normal = new Vec2();
-		fraction = 0;
-	}
+	/**
+	 * Pops an item off the stack
+	 * @return
+	 */
+	public E pop();
 
-	public void set(final RayCastOutput rco){
-		normal.set(rco.normal);
-		fraction = rco.fraction;
-	}
+	/**
+	 * Pushes an item back on the stack
+	 * @param argObject
+	 */
+	public void push(E argObject);
+
 }
