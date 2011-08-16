@@ -15,7 +15,8 @@ package playn.html;
 
 import com.google.gwt.webgl.client.WebGLRenderingContext;
 
-import playn.core.Transform;
+import playn.core.AbstractLayer;
+import playn.core.InternalTransform;
 import playn.core.gl.LayerGL;
 
 abstract class HtmlLayerGL extends LayerGL {
@@ -27,4 +28,7 @@ abstract class HtmlLayerGL extends LayerGL {
     this.gfx = gfx;
   }
 
+  @Override protected InternalTransform createTransform() {
+    return new HtmlInternalTransform();
+  }
 }

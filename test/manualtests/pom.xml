@@ -12,8 +12,8 @@
   <artifactId>playn-manualtests-project</artifactId>
   <packaging>pom</packaging>
   <version>1.0-SNAPSHOT</version>
-  <name>Playn ManualTests Project</name>
-  <description>Playn ManualTests Project</description>
+  <name>PlayN ManualTests Project</name>
+  <description>PlayN ManualTests Project</description>
 
   <modules>
     <module>core</module> 

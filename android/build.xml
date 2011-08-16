@@ -1,0 +1,4 @@
+<?xml version="1.0"?>
+<project name="android" default="compile">
+  <import file="../build-common.xml"/>
+</project>

@@ -20,9 +20,9 @@ import com.google.gwt.webgl.client.WebGLTexture;
 import playn.core.Asserts;
 import playn.core.Image;
 import playn.core.ImageLayer;
-import playn.core.Transform;
+import playn.core.InternalTransform;
 
-public class HtmlImageLayerGL extends HtmlLayerGL implements ImageLayer {
+class HtmlImageLayerGL extends HtmlLayerGL implements ImageLayer {
 
   private float width, height;
   private boolean widthSet, heightSet;
@@ -121,7 +121,7 @@ public class HtmlImageLayerGL extends HtmlLayerGL implements ImageLayer {
   }
 
   @Override
-  public void paint(Transform parentTransform, float parentAlpha) {
+  public void paint(InternalTransform parentTransform, float parentAlpha) {
     if (!visible()) return;
 
     // TODO(jgw): Assert exclusive source-rect vs. repeat.
@@ -130,7 +130,7 @@ public class HtmlImageLayerGL extends HtmlLayerGL implements ImageLayer {
     if (tex != null) {
       ImageElement elem = img.img;
 
-      Transform xform = localTransform(parentTransform);
+      InternalTransform xform = localTransform(parentTransform);
       float childAlpha = parentAlpha * alpha;
 
       float width = widthSet ? this.width : elem.getWidth();

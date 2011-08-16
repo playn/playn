@@ -10,7 +10,7 @@
 
   <groupId>${groupId}</groupId>
   <artifactId>${artifactId}</artifactId>
-  <name>Playn ${ProjectName} Core</name>
+  <name>PlayN ${ProjectName} Core</name>
 
   <dependencies>
     <dependency>

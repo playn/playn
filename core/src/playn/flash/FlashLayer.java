@@ -19,8 +19,8 @@ package playn.flash;
 import flash.display.DisplayObject;
 import flash.gwt.FlashImport;
 
-import playn.core.Transform;
 import playn.core.AbstractLayer;
+import playn.core.InternalTransform;
 
 @FlashImport({"flash.display.Sprite"})
 public class FlashLayer extends AbstractLayer {
@@ -64,14 +64,8 @@ public class FlashLayer extends AbstractLayer {
   private void updateDisplay() {
 //    display().setX((int) originX);
 //    display().setY((int) originY);
-    Transform x = new Transform(Transform.IDENTITY);
-    x.setTranslation(originX, originY);
-    x.transform(transform.m00(), transform.m01(), transform.m10(), 
-        transform.m11(), transform.tx() - originX, transform.ty() - originY);
-    x.translate(-originX, -originY);
-    display().setTransform(x.m00(), x.m01(), x.m10(),
-        x.m11(), x.tx(), x.ty());
+    InternalTransform x = createTransform();
+    x.concatenate(transform, originX, originY);
+    display().setTransform(x.m00(), x.m01(), x.m10(), x.m11(), x.tx(), x.ty());
   }
-  
-  
 }
