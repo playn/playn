@@ -1,11 +1,11 @@
 /**
  * Copyright 2010 The PlayN Authors
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  * in compliance with the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software distributed under the License
  * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
  * or implied. See the License for the specific language governing permissions and limitations under
@@ -69,7 +69,6 @@ class HtmlGraphicsGL extends HtmlGraphics {
       // Compile the shader.
       String vertexShader = Shaders.INSTANCE.vertexShader().getText();
       program = WebGLUtil.createShaderProgram(gl, vertexShader, fragmentShader);
-      
 
       // glGet*() calls are slow; determine locations once.
       uScreenSizeLoc = gl.getUniformLocation(program, "u_ScreenSize");
@@ -490,7 +489,7 @@ class HtmlGraphicsGL extends HtmlGraphics {
 
   /**
    * Try basic GL operations to detect failure cases early.
-   * 
+   *
    * @return true if calls succeed, false otherwise.
    */
   private boolean tryBasicGlCalls() {
@@ -512,7 +511,7 @@ class HtmlGraphicsGL extends HtmlGraphics {
 
       // test that our Uint16 arrays work
       Uint16Array testUint16Array = Uint16Array.create(new int[]{0, 1, 2});
-      if (testUint16Array.get(0) != 0 || testUint16Array.get(1) != 1 || 
+      if (testUint16Array.get(0) != 0 || testUint16Array.get(1) != 1 ||
           testUint16Array.get(2) != 2) {
         throw new RuntimeException("Typed Uint16Array check failed");
       }
