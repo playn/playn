@@ -64,7 +64,7 @@ public class AndroidPlatform implements Platform {
     instance = this;
     this.activity = activity;
     audio = new AndroidAudio();
-    graphics = new AndroidGraphics(activity);
+    graphics = new AndroidGraphics();
     json = new JavaJson();
     keyboard = new AndroidKeyboard();
     log = new AndroidLog();
@@ -193,9 +193,6 @@ public class AndroidPlatform implements Platform {
   }
 
   void draw(Canvas c, float delta) {
-    AndroidImage.prevMru = AndroidImage.mru;
-    AndroidImage.mru = new ArrayList<Bitmap>();
-
     //Run the game's custom painting code.
     //Separate from layers painting themselves.
     if (game != null) {
@@ -205,8 +202,6 @@ public class AndroidPlatform implements Platform {
       surf.clear();
       graphics.rootLayer.paint(surf);
     }
-
-    AndroidImage.prevMru = null;
   }
 
   void update(float delta) {

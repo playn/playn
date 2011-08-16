@@ -17,30 +17,40 @@ package playn.android;
 
 import android.content.Context;
 import android.graphics.Canvas;
-import android.util.AttributeSet;
+import android.opengl.GLSurfaceView;
 import android.util.Log;
 import android.view.SurfaceHolder;
-import android.view.SurfaceView;
 
-public class GameViewSurface extends SurfaceView implements SurfaceHolder.Callback, GameView {
+public class GameViewSurface extends GLSurfaceView implements SurfaceHolder.Callback, GameView {
 
   private final SurfaceHolder holder;
   private final GameLoop loop;
   private final GameActivity activity;
+  
+  private boolean loopStarted;
 
-  public GameViewSurface(GameActivity activity, Context context, AttributeSet attrs) {
-    super(context, attrs);
+  /**
+   * Software-acceleration friendly game loop class
+   * @param activity
+   * @param context
+   */
+  public GameViewSurface(GameActivity activity, Context context) {
+    super(context);
     this.activity = activity;
     holder = getHolder();
     holder.addCallback(this);
     setFocusable(true);
-
+    
+    AndroidPlatform.register(activity);
+    activity.main();
+    
     loop = new GameLoop(this) {
       @Override
       protected void paint() {
         Canvas c = null;
         try {
-          c = holder.lockCanvas();
+          //Get the Canvas of this Surface so that we can draw directly into it.
+          c = holder.lockCanvas();  
           synchronized (holder) {
             loop.paint(c);
           }
@@ -59,18 +69,20 @@ public class GameViewSurface extends SurfaceView implements SurfaceHolder.Callba
   public void notifyVisibilityChanged(int visibility) {
     Log.i("playn", "notifyVisibilityChanged: " + visibility);
     if (visibility == INVISIBLE)
-      loop.end();
+      loop.pause();
   }
 
+  //These aren't called from anywhere?  From SurfaceHolder.Callback
   public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
-  }
-
-  public void surfaceCreated(SurfaceHolder holder) {
     loop.start();
   }
 
+  public void surfaceCreated(SurfaceHolder holder) {
+    //Set rendering code here!
+  }
+
   public void surfaceDestroyed(SurfaceHolder holder) {
-    loop.end();
+   loop.pause();
   }
   
   @Override

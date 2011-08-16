@@ -15,25 +15,40 @@
  */
 package playn.android;
 
+import static playn.core.PlayN.graphics;
+
 import android.content.Context;
 import android.graphics.Canvas;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
+import playn.android.GameActivity;
+import playn.core.GroupLayer;
+import playn.core.PlayN;
 
 public class GameViewDraw extends View implements GameView {
 
   private GameLoop loop;
   private final GameActivity activity;
 
-  public GameViewDraw(GameActivity activity, Context context, AttributeSet attrs) {
-    super(context, attrs);
+  /**
+   * Hardware-acceleration friendly game loop class...
+   * but hardware-accelerated Canvas is still not
+   * as good as OpenGL it would seem.
+   * @param activity
+   * @param context
+   */
+  public GameViewDraw(GameActivity activity, Context context) {
+    super(context);
     this.activity = activity;
+    AndroidPlatform.register(activity);
+    activity.main();
 
     loop = new GameLoop(this) {
       @Override
-      protected void paint() {
-        invalidate();
+      protected void paint() {  //loop.paint without args called
+        invalidate();  //Makes it so onDraw(c) will be called, calling loop.paint(c)
+                      //onDraw(c) is hardware accelerated presumably?
       }
     };
   }
@@ -48,7 +63,7 @@ public class GameViewDraw extends View implements GameView {
     if (visibility == VISIBLE) {
       loop.start();
     } else if (visibility == INVISIBLE) {
-      loop.end();
+      loop.pause();
     }
   }
   
@@ -56,5 +71,9 @@ public class GameViewDraw extends View implements GameView {
   protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
     super.onLayout(changed, left, top, right, bottom);
     activity.onLayout(changed, left, top, right, bottom);
+    GroupLayer rootLayer = graphics().rootLayer();
+    int xOffset = (graphics().screenWidth() - graphics().width()) / 2;
+    int yOffset = (graphics().screenHeight() - graphics().height()) / 2;
+    rootLayer.setTranslation(xOffset > 0 ? xOffset : 0, yOffset > 0 ? yOffset : 0);
   }
 }

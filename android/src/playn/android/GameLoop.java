@@ -61,7 +61,7 @@ public abstract class GameLoop implements Runnable {
     }
   }
 
-  public void end() {
+  public void pause() {
     Log.i("playn", "Halting game loop");
     running.set(false);
   }
