@@ -18,7 +18,7 @@ package playn.core;
 /**
  * TODO
  */
-public interface ImageLayer extends Layer, Layer.HasSize {
+public interface ImageLayer extends Layer.HasSize {
 
   /**
    * TODO

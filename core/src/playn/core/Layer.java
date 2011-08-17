@@ -175,7 +175,7 @@ public interface Layer {
   /**
    * Interface for {@link Layer}s containing explicit sizes.
    */
-  public interface HasSize {
+  public interface HasSize extends Layer {
     /**
      * Return the width of the layer.
      */
@@ -198,7 +198,7 @@ public interface Layer {
   }
 
   /**
-   * TODO(pdr): doc dis
+   * Utility class for transforming coordinates between {@link Layer}s.
    */
   public static class Util {
     /**
@@ -212,11 +212,11 @@ public interface Layer {
 
     /**
      * Converts the supplied point from coordinates relative to the specified
-     * layer to screen coordinates. The results are stored into {@code into},
-     * which is returned for convenience.
+     * layer to screen coordinates.
      */
-    public static Point layerToScreen(Layer layer, float x, float y, Point into) {
-      return layerToScreen(layer, into.set(x, y), into);
+    public static Point layerToScreen(Layer layer, float x, float y) {
+      Point into = new Point(x, y);
+      return layerToScreen(layer, into, into);
     }
 
     /**
@@ -242,10 +242,10 @@ public interface Layer {
 
     /**
      * Converts the supplied point from coordinates relative to the specified
-     * child layer to coordinates relative to the specified parent layer. The
-     * results are stored into {@code into}, which is returned for convenience.
+     * child layer to coordinates relative to the specified parent layer.
      */
-    public static Point layerToParent(Layer layer, Layer parent, float x, float y, Point into) {
+    public static Point layerToParent(Layer layer, Layer parent, float x, float y) {
+      Point into = new Point(x, y);
       return layerToParent(layer, parent, into.set(x, y), into);
     }
 
@@ -265,11 +265,36 @@ public interface Layer {
 
     /**
      * Converts the supplied point from screen coordinates to coordinates
-     * relative to the specified layer. The results are stored into {@code into}
-     * , which is returned for convenience.
+     * relative to the specified layer.
      */
-    public static Point screenToLayer(Layer layer, float x, float y, Point into) {
+    public static Point screenToLayer(Layer layer, float x, float y) {
+      Point into = new Point(x, y);
       return screenToLayer(layer, into.set(x, y), into);
+    }
+
+    /**
+     * Returns true if a {@link IPoint} on the screen touches a {@link Layer.HasSize}.
+     */
+    public static boolean isOver(Layer.HasSize layer, IPoint point) {
+      return isOver(layer, point.x(), point.y());
+    }
+
+    /**
+     * Returns true if a {@link Events.Position} touches a {@link Layer.HasSize}.
+     */
+    public static boolean isOver(Layer.HasSize layer, Events.Position position) {
+      return isOver(layer, position.x(), position.y());
+    }
+
+    /**
+     * Returns true if a coordinate on the screen touches a {@link Layer.HasSize}.
+     */
+    public static boolean isOver(Layer.HasSize layer, float x, float y) {
+      Point point = new Point(x, y);
+      screenToLayer(layer, point, point);
+      return (
+          point.x() >= 0 &&  point.y() >= 0 && 
+          point.x() <= layer.width() && point.y() <= layer.height());
     }
   }
 }

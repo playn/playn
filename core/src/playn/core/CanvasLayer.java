@@ -18,7 +18,7 @@ package playn.core;
 /**
  * TODO
  */
-public interface CanvasLayer extends Layer, Layer.HasSize {
+public interface CanvasLayer extends Layer.HasSize {
 
   /**
    * TODO
