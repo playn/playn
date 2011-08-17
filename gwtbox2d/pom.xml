@@ -9,15 +9,35 @@
     <relativePath>../pom.xml</relativePath>
   </parent>
 
-  <artifactId>jbox2d</artifactId>
+  <artifactId>playn-jbox2d</artifactId>
   <packaging>jar</packaging>
-  <name>PlayN GwtBox2D</name>
+  <name>PlayN JBox2D</name>
+  <description>A GWT-compatible port of JBox2D, for use with PlayN games.</description>
 
   <dependencies>
+    <!-- this is needed for src/playn/core/DebugDrawBox2D -->
+    <dependency>
+      <groupId>com.googlecode.playn</groupId>
+      <artifactId>playn-core</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.google.gwt</groupId>
+      <artifactId>gwt-user</artifactId>
+      <version>${gwtversion}</version>
+      <!-- we don't export a gwt-user dependency here even though the GWT portions of jbox2d
+           require it, because we want, for example, an Android project to be able to depend on
+           playn-jbox2d without inheriting a GWT dependency; the HTML portion of said project will
+           necessarily also depend on playn-html which will bring in the gwt-user dependency -->
+      <optional>true</optional>
+    </dependency>
+
     <dependency>
       <groupId>com.google.gwt</groupId>
       <artifactId>gwt-dev</artifactId>
       <version>${gwtversion}</version>
+      <scope>provided</scope>
     </dependency>
   </dependencies>
 

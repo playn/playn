@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<project name="peas" default="compile">
+<project name="coretest" default="compile">
   <property name="java.classname" value="playn.test.java.TestJava"/>
   <property name="html.classname" value="playn.test.html.TestHtml"/>
   <property name="html.index" value="Test.html"/>

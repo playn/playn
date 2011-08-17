@@ -5,24 +5,30 @@
     <groupId>com.googlecode.playn</groupId>
     <artifactId>playn-project</artifactId>
     <version>1.0-SNAPSHOT</version>
+    <relativePath>../../pom.xml</relativePath>
   </parent>
 
-  <groupId>com.googlecode.playn</groupId>
   <artifactId>playn-test-core</artifactId>
   <name>PlayN Tests Core</name>
 
   <dependencies>
     <dependency>
-      <groupId>com.google.gwt</groupId>
-      <artifactId>gwt-dev</artifactId>
-      <version>${gwtversion}</version>
-      <scope>test</scope>
+      <groupId>com.googlecode.playn</groupId>
+      <artifactId>playn-java</artifactId>
+      <version>${coreversion}</version>
     </dependency>
 
     <dependency>
       <groupId>com.googlecode.playn</groupId>
-      <artifactId>core</artifactId>
+      <artifactId>playn-html</artifactId>
       <version>${coreversion}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.google.gwt</groupId>
+      <artifactId>gwt-dev</artifactId>
+      <version>${gwtversion}</version>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 

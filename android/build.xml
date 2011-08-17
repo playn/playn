@@ -1,4 +1,4 @@
 <?xml version="1.0"?>
-<project name="android" default="compile">
-  <import file="../build-common.xml"/>
+<project name="playn-android" default="compile">
+  <import file="../etc/build-common.xml"/>
 </project>

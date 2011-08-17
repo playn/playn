@@ -9,18 +9,23 @@
     <relativePath>../pom.xml</relativePath>
   </parent>
 
-  <artifactId>webgl</artifactId>
+  <artifactId>playn-webgl</artifactId>
   <packaging>jar</packaging>
   <name>Playn WebGL</name>
 
   <dependencies>
+    <dependency>
+      <groupId>com.google.gwt</groupId>
+      <artifactId>gwt-user</artifactId>
+      <version>${gwtversion}</version>
+    </dependency>
 
     <dependency>
       <groupId>com.google.gwt</groupId>
       <artifactId>gwt-dev</artifactId>
       <version>${gwtversion}</version>
+      <scope>provided</scope>
     </dependency>
-
   </dependencies>
 
   <build>

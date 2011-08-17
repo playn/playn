@@ -77,22 +77,22 @@
   </target>
 
   <target name="package" depends="test" description="Builds jar files.">
-    <jar destfile="${target.dir}/${ant.project.name}-${pom.version}.jar">
+    <jar destfile="${target.dir}/${pom.artifactId}-${pom.version}.jar">
       <fileset dir="${classes.dir}" includes="**/*"/>
       <!-- we include the source in the main jar for use by GWT (.java, .xml, etc.) -->
       <fileset dir="${src.dir}" includes="**/*"/>
       <fileset erroronmissingdir="false" dir="${aux.src.dir}" includes="**/*"/>
     </jar>
-    <jar destfile="${target.dir}/${ant.project.name}-${pom.version}-sources.jar">
+    <jar destfile="${target.dir}/${pom.artifactId}-${pom.version}-sources.jar">
       <fileset dir="${src.dir}" includes="**/*.java"/>
     </jar>
   </target>
 
   <target name="install" depends="package"
           description="Deploys build artifacts to local Maven repository.">
-    <artifact:install file="${target.dir}/${ant.project.name}-${pom.version}.jar">
+    <artifact:install file="${target.dir}/${pom.artifactId}-${pom.version}.jar">
       <pom refid="pom"/>
-      <attach file="${target.dir}/${ant.project.name}-${pom.version}-sources.jar"
+      <attach file="${target.dir}/${pom.artifactId}-${pom.version}-sources.jar"
               classifier="sources"/>
     </artifact:install>
   </target>

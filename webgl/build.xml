@@ -1,4 +1,4 @@
 <?xml version="1.0"?>
-<project name="webgl" default="compile">
-  <import file="../build-common.xml"/>
+<project name="playn-webgl" default="compile">
+  <import file="../etc/build-common.xml"/>
 </project>

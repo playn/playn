@@ -12,7 +12,7 @@
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
- * limitations under the License. 
+ * limitations under the License.
 -->
 <!DOCTYPE module PUBLIC "-//Google Inc.//DTD Google Web Toolkit trunk//EN" "http://google-web-toolkit.googlecode.com/svn/trunk/distro-source/core/src/gwt-module.dtd">
 <module>
@@ -21,7 +21,6 @@
     <!-- Exclude non-GWT-compatible classes -->
     <exclude name='**/*Test.java' />
   </source>
-  <source path='box2d'/>
   <source path='html'/>
 
   <!--
@@ -37,7 +36,7 @@
 
   <!-- Flash/HTML5/Native audio support -->
   <inherits name="com.allen_sauer.gwt.voices.gwt-voices" />
-  <!-- 
+  <!--
     This allows us to replace the normal compile time deferred binding implementation
     decision, with a runtime decision, based on the runtime user agent. Doing so, allows us to use
     'safari' as a single 'user.agent' permutation, which speeds up compile time,
@@ -51,27 +50,26 @@
   <replace-with class="playn.html.HtmlLogSimple">
     <when-type-assignable class="playn.html.HtmlLog" />
   </replace-with>
-  
+
   <!--
     Optionally, enable gwt-log's advanced logging features, add
     this to your game's .gwt.xml module:
-    
+
       <inherits name="playn.logging.Enhanced" />
   -->
- 
+
   <!-- Auto ClientBundle -->
   <generate-with class="playn.rebind.AutoClientBundleGenerator">
     <when-type-assignable class="playn.core.AutoClientBundleWithLookup" />
   </generate-with>
 
-  <inherits name="org.jbox2d.GwtBox2D" />
   <inherits name="com.google.gwt.webgl.WebGL" />
 
   <define-linker name="appcachelinker" class="playn.appcachelinker.AppCacheLinker" />
-  <!-- 
+  <!--
     By default, we don't use the appcachelinker. If you would like to use it in your project,
     add the following line to your game's .gwt.xml module:
 
-      <add-linker name="appcachelinker" /> 
+      <add-linker name="appcachelinker" />
   -->
 </module>
