@@ -21,7 +21,7 @@ or [Eclipse].
 The PlayN source code is available via Github. You will need to install a [Git]
 client. Check out the source code as follows:
 
-    git clone git://github.com/playn/playn.git
+    git clone https://code.google.com/p/playn/
 
 The subsequent build instructions will refer to the directory in which you
 checked out the PlayN source as `playn`.
