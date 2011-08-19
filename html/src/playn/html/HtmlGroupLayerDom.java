@@ -107,7 +107,15 @@ class HtmlGroupLayerDom extends HtmlLayerDom implements GroupLayer, ParentLayer 
 
   @Override
   public void depthChanged(Layer layer, float oldDepth) {
-    impl.depthChanged(this, layer, oldDepth);
+    Asserts.checkArgument(layer instanceof HtmlLayerDom);
+    HtmlLayerDom hlayer = (HtmlLayerDom) layer;
+    int index = impl.depthChanged(this, layer, oldDepth);
+    if (index == size()) {
+      element().appendChild(hlayer.element());
+    } else {
+      Node refChild = element().getChild(index);
+      element().insertBefore(hlayer.element(), refChild);
+    }
   }
 
   void update() {

@@ -102,15 +102,21 @@ public class GroupLayerImpl<L extends AbstractLayer>
     }
   }
 
-  public void depthChanged(GroupLayer self, Layer layer, float oldDepth) {
+  /**
+   * @return the new index of the depth-changed layer.
+   */
+  public int depthChanged(GroupLayer self, Layer layer, float oldDepth) {
     // structuring things such that Java's type system knew what was going on here would require
     // making AbstractLayer and ParentLayer more complex than is worth it
     @SuppressWarnings("unchecked") L child = (L)layer;
 
     // it would be great if we could move an element from one place in an ArrayList to another
     // (portably), but instead we have to remove and re-add
-    children.remove(findChild(child, oldDepth));
-    children.add(findInsertion(child.depth()), child);
+    int oldIndex = findChild(child, oldDepth);
+    children.remove(oldIndex);
+    int newIndex = findInsertion(child.depth());
+    children.add(newIndex, child);
+    return newIndex;
   }
 
   private void remove(int index) {
