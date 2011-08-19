@@ -21,6 +21,7 @@
     <module>webgl</module>
     <module>java</module>
     <module>html</module>
+    <module>flash</module>
     <module>android</module>
     <module>server</module>
     <module>sample</module>

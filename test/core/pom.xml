@@ -20,7 +20,7 @@
 
     <dependency>
       <groupId>com.googlecode.playn</groupId>
-      <artifactId>playn-html</artifactId>
+      <artifactId>playn-flash</artifactId>
       <version>${coreversion}</version>
     </dependency>
 
