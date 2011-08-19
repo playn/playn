@@ -275,21 +275,21 @@ public interface Layer {
     /**
      * Returns true if a {@link IPoint} on the screen touches a {@link Layer.HasSize}.
      */
-    public static boolean isOver(Layer.HasSize layer, IPoint point) {
-      return isOver(layer, point.x(), point.y());
+    public static boolean hitTest(Layer.HasSize layer, IPoint point) {
+      return hitTest(layer, point.x(), point.y());
     }
 
     /**
      * Returns true if a {@link Events.Position} touches a {@link Layer.HasSize}.
      */
-    public static boolean isOver(Layer.HasSize layer, Events.Position position) {
-      return isOver(layer, position.x(), position.y());
+    public static boolean hitTest(Layer.HasSize layer, Events.Position position) {
+      return hitTest(layer, position.x(), position.y());
     }
 
     /**
      * Returns true if a coordinate on the screen touches a {@link Layer.HasSize}.
      */
-    public static boolean isOver(Layer.HasSize layer, float x, float y) {
+    public static boolean hitTest(Layer.HasSize layer, float x, float y) {
       Point point = new Point(x, y);
       screenToLayer(layer, point, point);
       return (
