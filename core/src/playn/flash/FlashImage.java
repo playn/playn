@@ -18,6 +18,7 @@ package playn.flash;
 import flash.gwt.FlashImport;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import playn.core.Image;
@@ -58,7 +59,10 @@ class FlashImage implements Image {
   }
 
   private void runCallbacks(boolean success) {
-    for (ResourceCallback<Image> cb : callbacks) {
+    Iterator<ResourceCallback<Image>> it = callbacks.iterator();
+    while (it.hasNext()) {
+      ResourceCallback<Image> cb = it.next();
+      it.remove();
       if (success) {
         cb.done(this);
       } else {

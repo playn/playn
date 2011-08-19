@@ -137,8 +137,7 @@ public class FlashAssetManager extends AbstractCachingAssetManager {
    */
   @Override
   protected void doGetText(String path, ResourceCallback<String> callback) {
-    loadText(path, callback);
-    
+    loadText(pathPrefix + path, callback);
   }
   
   private static native void loadText(String path, ResourceCallback<String> callback) /*-{
