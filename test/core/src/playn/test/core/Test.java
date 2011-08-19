@@ -17,16 +17,14 @@ package playn.test.core;
 
 import static playn.core.PlayN.assetManager;
 import static playn.core.PlayN.graphics;
-import static playn.core.PlayN.keyboard;
 import static playn.core.PlayN.pointer;
 import playn.core.Game;
 import playn.core.GroupLayer;
 import playn.core.Image;
 import playn.core.ImageLayer;
-import playn.core.Keyboard;
 import playn.core.Pointer;
 
-public class Test implements Game, Keyboard.Listener, Pointer.Listener {
+public class Test implements Game {
 
   GroupLayer groupLayer;
   ImageLayer bgLayer;
@@ -34,8 +32,12 @@ public class Test implements Game, Keyboard.Listener, Pointer.Listener {
 
   @Override
   public void init() {
-    pointer().setListener(this);
-    keyboard().setListener(this);
+    pointer().setListener(new Pointer.Adapter() {
+      @Override
+      public void onPointerStart(Pointer.Event event) {
+        doStuff();
+      }
+    });
 
     Image background = assetManager().getImage("images/background.png");
     Image catgirl = assetManager().getImage("images/girlcat.png");
@@ -87,38 +89,17 @@ public class Test implements Game, Keyboard.Listener, Pointer.Listener {
     layer2.transform().setRotation(angle);
     layer3.transform().setRotation(angle);
 
-    layer0.transform().setScale(scale);
-    layer1.transform().setScale(scale);
-    layer2.transform().setScale(scale);
-    layer3.transform().setScale(scale);
+    layer0.transform().setUniformScale(scale);
+    layer1.transform().setUniformScale(scale);
+    layer2.transform().setUniformScale(scale);
+    layer3.transform().setUniformScale(scale);
 
     groupLayer.transform().setRotation(angle);
-    groupLayer.transform().setScale(scale);
+    groupLayer.transform().setUniformScale(scale);
   }
 
   @Override
   public void paint(float alpha) {
-  }
-
-  @Override
-  public void onPointerStart(float x, float y) {
-    doStuff();
-  }
-
-  @Override
-  public void onPointerEnd(float x, float y) {
-  }
-
-  @Override
-  public void onPointerDrag(float x, float y) {
-  }
-
-  @Override
-  public void onKeyDown(int keyCode) {
-  }
-
-  @Override
-  public void onKeyUp(int keyCode) {
   }
 
   @Override

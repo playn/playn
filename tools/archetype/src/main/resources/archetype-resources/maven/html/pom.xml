@@ -11,7 +11,7 @@
   <groupId>${groupId}</groupId>
   <artifactId>${artifactId}</artifactId>
   <packaging>war</packaging>
-  <name>Playn ${ProjectName} Html</name>
+  <name>PlayN ${ProjectName} Html</name>
 
   <dependencies>
     <dependency>

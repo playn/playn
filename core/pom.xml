@@ -1,41 +1,45 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  
+
   <parent>
     <groupId>com.googlecode.playn</groupId>
     <artifactId>playn-project</artifactId>
     <version>1.0-SNAPSHOT</version>
   </parent>
 
-  <groupId>com.googlecode.playn</groupId>
   <artifactId>core</artifactId>
   <packaging>jar</packaging>
-  <name>Playn Core</name>
+  <name>PlayN Core</name>
+
+  <repositories>
+    <repository>
+      <id>sonatype-snapshots</id>
+      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+    </repository>
+  </repositories>
 
   <dependencies>
-
     <dependency>
       <groupId>com.google.gwt</groupId>
       <artifactId>gwt-dev</artifactId>
       <version>${gwtversion}</version>
     </dependency>
 
-    
-     <!-- not really needed, but will suppress errors during GWT compilation -->
-     <dependency> 
-         <groupId>javax.validation</groupId> 
-         <artifactId>validation-api</artifactId> 
-         <version>1.0.0.GA</version> 
-         <scope>provided</scope> 
-     </dependency> 
-     <dependency> 
-         <groupId>javax.validation</groupId> 
-         <artifactId>validation-api</artifactId> 
-         <version>1.0.0.GA</version> 
-         <classifier>sources</classifier> 
-         <scope>provided</scope> 
-    </dependency> 
+    <!-- not really needed, but will suppress errors during GWT compilation -->
+    <dependency>
+      <groupId>javax.validation</groupId>
+      <artifactId>validation-api</artifactId>
+      <version>1.0.0.GA</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>javax.validation</groupId>
+      <artifactId>validation-api</artifactId>
+      <version>1.0.0.GA</version>
+      <classifier>sources</classifier>
+      <scope>provided</scope>
+    </dependency>
 
     <dependency>
       <groupId>com.googlecode.playn</groupId>
@@ -50,23 +54,28 @@
     </dependency>
 
     <dependency>
+      <groupId>com.samskivert</groupId>
+      <artifactId>pythagoras</artifactId>
+      <version>1.1-SNAPSHOT</version>
+    </dependency>
+
+    <dependency>
       <groupId>jlayer</groupId>
       <artifactId>jlayer</artifactId>
       <version>1.0.1</version>
     </dependency>
 
-
     <dependency>
       <groupId>allen_sauer</groupId>
       <artifactId>gwt-log</artifactId>
-      <version>1.0.r613</version>
+      <version>3.1.4</version>
       <optional>true</optional>
     </dependency>
 
     <dependency>
       <groupId>allen_sauer</groupId>
       <artifactId>gwt-voices</artifactId>
-      <version>1.0.r421</version>
+      <version>2.1.2</version>
     </dependency>
 
     <dependency>

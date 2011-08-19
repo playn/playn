@@ -15,6 +15,8 @@
  */
 package playn.core;
 
+import pythagoras.f.Transform;
+
 /**
  * Layer is the base element for all rendering in PlayN
  * <p>
@@ -93,12 +95,12 @@ public interface Layer {
   /**
    * Returns the x-component of the layer's origin.
    */
-  float originX ();
+  float originX();
 
   /**
    * Returns the y-component of the layer's origin.
    */
-  float originY ();
+  float originY();
 
   /**
    * Sets the origin of the layer.
@@ -114,12 +116,12 @@ public interface Layer {
    * Sets the depth of this layer. Within a single {@link GroupLayer}, layers are rendered from
    * lowest depth to highest depth.
    */
-  float depth ();
+  float depth();
 
   /**
    * Updates this layer's depth.
    */
-  void setDepth (float depth);
+  void setDepth(float depth);
 
   /**
    * Sets the translation of the layer.

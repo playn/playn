@@ -58,7 +58,7 @@ public class HtmlPlatform implements Platform {
       }
     };
 
-    public abstract boolean useGL ();
+    public abstract boolean useGL();
   }
 
   static final int DEFAULT_WIDTH = 640;

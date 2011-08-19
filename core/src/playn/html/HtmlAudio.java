@@ -31,7 +31,7 @@ public class HtmlAudio implements Audio {
   private SoundController soundController = new SoundController();
 
   @SuppressWarnings("deprecation")
-  public void init () {
+  public void init() {
     PlayN.log().debug(
         "Preferred sound type: " + soundController.getPreferredSoundType().getName());
   }

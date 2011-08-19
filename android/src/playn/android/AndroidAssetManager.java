@@ -32,7 +32,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.util.Log;
-import android.view.WindowManager.LayoutParams;
 import playn.core.AbstractAssetManager;
 import playn.core.Image;
 import playn.core.ResourceCallback;
@@ -42,57 +41,83 @@ public class AndroidAssetManager extends AbstractAssetManager {
 
   public String pathPrefix = null;
   public AssetManager assets;
-  public static LayoutParams windowAttributes;
 
   public void setPathPrefix(String prefix) {
     pathPrefix = prefix;
   }
 
-  private InputStream openResource(String path) throws IOException {
+  /**
+   * Attempts to open the asset with the given name, throwing an
+   * {@link IOException} in case of failure.
+   */
+  private InputStream openAsset(String path) throws IOException {
     // Insert a slash to make this consistent with the Java asset manager
-    return getClass().getClassLoader().getResourceAsStream(pathPrefix + "/" + path);
+    InputStream is = getClass().getClassLoader().getResourceAsStream(pathPrefix + "/" + path);
+    if (is == null)
+      throw new IOException("Unable to loader resource: " + path);
+    return is;
   }
 
   @Override
   protected Image doGetImage(String path) {
+    return new AndroidImage(path, doGetBitmap(path));
+  }
+
+  /**
+   * Decodes a resource to a bitmap. Always succeeds, returning an error
+   * placeholder if something goes wrong.
+   */
+  Bitmap doGetBitmap(String path) {
     try {
-      InputStream is = openResource(path);
-      if (is == null) {
-        // TODO: This should return an error image like JavaAssetManager does
-        throw new RuntimeException("Unable to load image " + path);
-      }
+      InputStream is = openAsset(path);
       try {
-        return new AndroidImage(path, BitmapFactory.decodeStream(is));
+        return decodeBitmap(is);
       } finally {
         is.close();
       }
     } catch (IOException e) {
-      // TODO: This should return an error image like JavaAssetManager does
-      throw new RuntimeException(e);
+      return createErrorBitmap(e);
     }
   }
 
-  Bitmap doGetBitmap(String path) {
-    try {
-      InputStream is = openResource(path);
-      if (is == null) {
-        // TODO: This should return an error image like JavaAssetManager does
-        throw new RuntimeException("Unable to load image " + path);
+  private Bitmap decodeBitmap(InputStream is) {
+    BitmapFactory.Options options = new BitmapFactory.Options();
+    // 
+    options.inDither = true;
+    // Prefer the bitmap config we computed from the window parameter
+    options.inPreferredConfig = AndroidPlatform.instance.preferredBitmapConfig;
+    // Never scale bitmaps based on device parameters
+    options.inScaled = false;
+    return BitmapFactory.decodeStream(is, null, options);
+  }
+
+  private Bitmap createErrorBitmap(Exception e) {
+    int height = 100, width = 100;
+
+    Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_4444);
+
+    android.graphics.Canvas c = new android.graphics.Canvas(bitmap);
+    android.graphics.Paint p = new android.graphics.Paint();
+    p.setColor(android.graphics.Color.RED);
+    for (int yy = 0; yy <= height / 15; yy++) {
+      for (int xx = 0; xx <= width / 45; xx++) {
+        c.drawText("ERROR", xx * 45, yy * 15, p);
       }
-      try {
-        return BitmapFactory.decodeStream(is);
-      } finally {
-        is.close();
-      }
-    } catch (IOException e) {
-      // TODO: This should return an error image like JavaAssetManager does
-      throw new RuntimeException(e);
     }
+
+    return bitmap;
   }
 
   private class ErrorSound implements Sound {
+    private final String path;
+
+    public ErrorSound(String path) {
+      this.path = path;
+    }
+
     @Override
     public boolean play() {
+      log().error("Attempted to play sound that was unable to load: " + path);
       return false;
     }
 
@@ -111,40 +136,32 @@ public class AndroidAssetManager extends AbstractAssetManager {
     @Override
     public boolean isPlaying() {
       return false;
-    }    
+    }
   }
-  
+
   @Override
   protected Sound doGetSound(String path) {
     try {
-      InputStream in = openResource(path + ".wav");
-      
-      if (in == null) {
-        log().error("Unable to find sound resource: " + path);
-        return new ErrorSound();
-      }
-      
-      Sound sound = ((AndroidAudio) AndroidPlatform.instance.audio()).getSound(path + ".wav", in);
-      return sound == null ? new ErrorSound() : sound;
+      InputStream in = openAsset(path + ".wav");
+      return AndroidPlatform.instance.audio().getSound(path + ".wav", in);
     } catch (IOException e) {
       log().error("Unable to load sound: " + path, e);
-      return new ErrorSound();
+      return new ErrorSound(path);
     }
   }
 
   @Override
   protected void doGetText(final String path, final ResourceCallback<String> callback) {
     try {
-      InputStream is = openResource(path);
+      InputStream is = openAsset(path);
       try {
-        StringBuffer fileData = new StringBuffer(1000);
+        StringBuilder fileData = new StringBuilder(1000);
         BufferedReader reader = new BufferedReader(new InputStreamReader(is));
         char[] buf = new char[1024];
         int numRead = 0;
         while ((numRead = reader.read(buf)) != -1) {
           String readData = String.valueOf(buf, 0, numRead);
           fileData.append(readData);
-          buf = new char[1024];
         }
         reader.close();
         String text = fileData.toString();
@@ -186,7 +203,7 @@ public class AndroidAssetManager extends AbstractAssetManager {
 
   // taken from
   // http://android-developers.blogspot.com/2010/07/multithreading-for-performance.html
-  public static Bitmap downloadBitmap(String url) {
+  public Bitmap downloadBitmap(String url) {
     final AndroidHttpClient client = AndroidHttpClient.newInstance("Android");
     final HttpGet getRequest = new HttpGet(url);
 
@@ -203,12 +220,7 @@ public class AndroidAssetManager extends AbstractAssetManager {
         InputStream inputStream = null;
         try {
           inputStream = entity.getContent();
-          BitmapFactory.Options options = new BitmapFactory.Options();
-          options.inDither = true;
-          options.inPreferredConfig = AndroidPlatform.instance.preferredBitmapConfig;
-          options.inScaled = false;
-          final Bitmap bitmap = BitmapFactory.decodeStream(inputStream, null, options);
-          return bitmap;
+          return decodeBitmap(inputStream);
         } finally {
           if (inputStream != null) {
             inputStream.close();

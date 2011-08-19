@@ -6,24 +6,78 @@
   <artifactId>playn-project</artifactId>
   <packaging>pom</packaging>
   <version>1.0-SNAPSHOT</version>
-  <name>Playn Project</name>
+  <name>PlayN Project</name>
   <url>http://code.google.com/p/playn</url>
-  <description>Project Playn.</description>
+  <description>Cross platform game library for N≥4 platforms.</description>
 
   <issueManagement>
     <system>Google Code</system>
     <url>http://code.google.com/p/playn/issues/list</url>
   </issueManagement>
 
-
-
   <modules>
-    <module>core/maven/gwtbox2d</module>
-    <module>core/maven/webgl</module>
+    <module>gwtbox2d</module>
+    <module>webgl</module>
     <module>core</module>
+    <module>android</module>
     <module>server</module>
     <module>sample</module>
+    <module>test/core</module>
+    <module>test/manualtests</module>
   </modules>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <gwtversion>2.3.0</gwtversion>
+    <gwt.version>2.3.0</gwt.version>
+    <gwt.loglevel>INFO</gwt.loglevel>
+    <gwt.outputstyle>OBF</gwt.outputstyle>
+    <gwt.modulesuffix />
+    <maven.test.skip>false</maven.test.skip>
+    <gwt.inplace>false</gwt.inplace>
+    <gwt.soyc>false</gwt.soyc>
+    <gwt.xdisable>true</gwt.xdisable>
+    <gwt.draft>false</gwt.draft>
+    <gwt.workers></gwt.workers>
+    <coreversion>${project.version}</coreversion>
+  </properties>
+
+  <repositories>
+    <!-- TODO: remove this once all of our artifacts are available elsewhere -->
+    <repository>
+      <id>playn</id>
+      <url>http://playn.googlecode.com/svn/mavenrepo</url>
+    </repository>
+  </repositories>
+
+  <pluginRepositories>
+    <pluginRepository>
+      <id>codehaus.snapshots</id>
+      <url>http://snapshots.repository.codehaus.org/</url>
+    </pluginRepository>
+  </pluginRepositories>
+
+  <!-- Common dependencies for all modules -->
+  <dependencies>
+    <dependency>
+      <groupId>com.google.gwt</groupId>
+      <artifactId>gwt-user</artifactId>
+      <version>${gwtversion}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.google.gwt</groupId>
+      <artifactId>gwt-servlet</artifactId>
+      <version>${gwtversion}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.8.1</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
 
   <build>
     <!-- Common plugin configuration for all children -->
@@ -32,7 +86,7 @@
         <plugin>
           <groupId>org.codehaus.mojo</groupId>
           <artifactId>gwt-maven-plugin</artifactId>
-          <version>2.2.0</version>
+          <version>2.3.0-1</version>
           <configuration>
             <logLevel>INFO' -XdisableRunAsync -logLevel 'INFO</logLevel>
             <style>PRETTY</style>
@@ -50,18 +104,18 @@
             </modules>
             <inplace>${gwt.inplace}</inplace>
           </configuration>
-          <dependencies> 
-                    <dependency> 
-                        <groupId>com.google.gwt</groupId> 
-                            <artifactId>gwt-user</artifactId> 
-                            <version>2.3.0</version> 
-                        </dependency> 
-                        <dependency> 
-                            <groupId>com.google.gwt</groupId> 
-                            <artifactId>gwt-dev</artifactId> 
-                            <version>2.3.0</version> 
-                        </dependency> 
-          </dependencies> 
+          <dependencies>
+            <dependency>
+              <groupId>com.google.gwt</groupId>
+              <artifactId>gwt-user</artifactId>
+              <version>${gwt.version}</version>
+            </dependency>
+            <dependency>
+              <groupId>com.google.gwt</groupId>
+              <artifactId>gwt-dev</artifactId>
+              <version>${gwt.version}</version>
+            </dependency>
+          </dependencies>
           <executions>
             <execution>
               <phase>prepare-package</phase>
@@ -74,6 +128,7 @@
 
         <plugin>
           <artifactId>maven-clean-plugin</artifactId>
+          <version>2.4.1</version>
           <configuration>
             <filesets>
               <fileset><directory>src/main/webapp/${gwt.module}</directory></fileset>
@@ -90,6 +145,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-source-plugin</artifactId>
+          <version>2.1.2</version>
           <executions>
             <execution>
               <phase>package</phase>
@@ -101,52 +157,17 @@
         </plugin>
 
 	<plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <configuration>
-          <source>1.6</source>
-          <target>1.6</target>
-        </configuration>
-      </plugin>
-        
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <version>2.3</version>
+          <configuration>
+            <source>1.6</source>
+            <target>1.6</target>
+          </configuration>
+        </plugin>
       </plugins>
     </pluginManagement>
-
   </build>
-  
-  <repositories>
-    <repository>
-      <id>repo1</id>
-      <url>http://repo1.maven.org/maven2/</url>
-    </repository>
-    <repository>
-      <id>playn</id>
-      <url>http://playn.googlecode.com/svn/mavenrepo</url>
-    </repository>
-  </repositories>
-
-  <pluginRepositories>  
-    <pluginRepository>  
-      <id>codehaus.snapshots</id>  
-      <url>http://snapshots.repository.codehaus.org/</url>  
-    </pluginRepository>  
-  </pluginRepositories> 
-
-  <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <gwtversion>2.3.0</gwtversion>
-    <gwt.version>2.3.0</gwt.version>
-    <gwt.loglevel>INFO</gwt.loglevel>
-    <gwt.outputstyle>OBF</gwt.outputstyle>
-    <gwt.modulesuffix />
-    <maven.test.skip>false</maven.test.skip> 
-    <gwt.inplace>false</gwt.inplace>
-    <gwt.soyc>false</gwt.soyc>
-    <gwt.xdisable>true</gwt.xdisable>
-    <gwt.draft>false</gwt.draft>
-    <gwt.workers></gwt.workers>
-    <coreversion>${version}</coreversion>
-  </properties>
 
   <profiles>
     <profile>
@@ -180,29 +201,6 @@
         </dependency>
       </dependencies>
     </profile>
-
   </profiles>
-
-  <!-- Common dependencies for all modules -->
-  <dependencies>
-    <dependency>
-      <groupId>com.google.gwt</groupId>
-      <artifactId>gwt-user</artifactId>
-      <version>${gwtversion}</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.google.gwt</groupId>
-      <artifactId>gwt-servlet</artifactId>
-      <version>${gwtversion}</version>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>3.8.1</version>
-      <scope>test</scope>
-    </dependency>
-  </dependencies>
 
 </project>

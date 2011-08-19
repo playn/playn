@@ -5,24 +5,31 @@
   <!-- TODO: find suitable way to factor out module list; ant doesn't have any
        stock iteration capabilities and depending on ant-contrib is annoying -->
   <target name="clean" description="Cleans out all submodule build results.">
-    <ant dir="core/maven/gwtbox2d" target="clean"/>
-    <ant dir="core/maven/webgl" target="clean"/>
+    <ant dir="gwtbox2d" target="clean"/>
+    <ant dir="webgl" target="clean"/>
     <ant dir="core" target="clean"/>
+    <ant dir="android" target="clean"/>
     <ant dir="server" target="clean"/>
+    <ant dir="test/core" target="clean"/>
+    <ant dir="test/manualtests" target="clean"/>
   </target>
 
   <target name="compile" description="Compiles all submodules.">
-    <ant dir="core/maven/gwtbox2d" target="compile"/>
-    <ant dir="core/maven/webgl" target="compile"/>
+    <ant dir="gwtbox2d" target="compile"/>
+    <ant dir="webgl" target="compile"/>
     <ant dir="core" target="compile"/>
+    <ant dir="android" target="compile"/>
     <ant dir="server" target="compile"/>
+    <ant dir="test/core" target="compile"/>
+    <ant dir="test/manualtests" target="compile"/>
   </target>
 
   <target name="install" depends="-init-maven-ant"
           description="Compiles and deploys all submodules to local Maven repository.">
-    <ant dir="core/maven/gwtbox2d" target="install"/>
-    <ant dir="core/maven/webgl" target="install"/>
+    <ant dir="gwtbox2d" target="install"/>
+    <ant dir="webgl" target="install"/>
     <ant dir="core" target="install"/>
+    <ant dir="android" target="install"/>
     <ant dir="server" target="install"/>
     <!-- install the playn-project artifact which is just a pom -->
     <artifact:install file="pom.xml">

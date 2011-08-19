@@ -21,10 +21,9 @@ import com.google.gwt.webgl.client.WebGLRenderingContext;
 import com.google.gwt.webgl.client.WebGLTexture;
 
 import playn.core.Asserts;
-
 import playn.core.Canvas;
 import playn.core.CanvasLayer;
-import playn.core.Transform;
+import playn.core.InternalTransform;
 
 class HtmlCanvasLayerGL extends HtmlLayerGL implements CanvasLayer {
 
@@ -62,7 +61,7 @@ class HtmlCanvasLayerGL extends HtmlLayerGL implements CanvasLayer {
   }
 
   @Override
-  void paint(WebGLRenderingContext gl, Transform parentTransform, float parentAlpha) {
+  public  void paint(InternalTransform parentTransform, float parentAlpha) {
     if (!visible()) return;
 
     if (canvas.dirty()) {

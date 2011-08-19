@@ -30,7 +30,6 @@ import com.google.gwt.webgl.client.WebGLTexture;
 import playn.core.Asserts;
 import playn.core.Image;
 import playn.core.ResourceCallback;
-import playn.core.Transform;
 
 class HtmlImage implements Image {
 
@@ -178,8 +177,8 @@ class HtmlImage implements Image {
     // Render the scaled texture into the framebuffer.
     // (rebind the texture because gfx.bindFramebuffer() may have bound it when flushing)
     gfx.gl.bindTexture(TEXTURE_2D, pow2tex);
-    gfx.drawTexture(tex, width(), height(), Transform.IDENTITY, 0, height, width, -height, false,
-        false, 1);
+    gfx.drawTexture(tex, width(), height(), HtmlInternalTransform.IDENTITY,
+                    0, height, width, -height, false, false, 1);
     gfx.flush();
     gfx.bindFramebuffer();
 

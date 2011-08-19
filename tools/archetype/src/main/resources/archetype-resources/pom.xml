@@ -5,8 +5,8 @@
   <artifactId>${artifactId}</artifactId>
   <packaging>pom</packaging>
   <version>${version}</version>
-  <name>Playn ${ProjectName} Project</name>
-  <description>Playn ${ProjectName} Project</description>
+  <name>PlayN ${ProjectName} Project</name>
+  <description>PlayN ${ProjectName} Project</description>
   <modules>
     <module>core</module>
     <module>maven/html</module>

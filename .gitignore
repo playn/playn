@@ -1,3 +1,6 @@
+.classpath
+.project
+.settings
 .DS_Store
 target
 
@@ -7,7 +10,6 @@ target
 
 # /core/
 /core/bin
-/core/.settings
 /core/.gwt
 
 # /sample/WebGLDemo/war/WEB-INF/
@@ -18,9 +20,6 @@ target
 # /sample/cute/android/
 /sample/cute/android/bin
 /sample/cute/android/gen
-
-# /sample/cute/core/
-/sample/cute/core/.settings
 
 # /sample/cute/core/war/WEB-INF/
 /sample/cute/core/war/WEB-INF/lib
@@ -39,31 +38,10 @@ target
 /sample/hello/android/bin
 /sample/hello/android/gen
 
-# /sample/hello/core/
-/sample/hello/core/.settings
-
 # /sample/hello/core/war/WEB-INF/
 /sample/hello/core/war/WEB-INF/lib
 /sample/hello/core/war/WEB-INF/classes
 /sample/hello/core/war/WEB-INF/deploy
-
-# /sample/m2/
-
-# /sample/m2/releases/
-
-# /sample/m2/snapshots/
-
-# /sample/m2/snapshots/META-INF/
-
-# /sample/m2/snapshots/com/
-
-# /sample/m2/snapshots/com/googlecode/
-
-# /sample/m2/snapshots/com/googlecode/playn/
-
-# /sample/m2/snapshots/com/googlecode/playn/playn-hello-core-archetype/
-
-# /sample/m2/snapshots/com/googlecode/playn/playn-hello-core-archetype/1.0-SNAPSHOT/
 
 # /sample/noise/noise/war/WEB-INF/
 /sample/noise/noise/war/WEB-INF/lib
@@ -81,9 +59,6 @@ target
 # /sample/peas/android/
 /sample/peas/android/bin
 /sample/peas/android/gen
-
-# /sample/peas/core/
-/sample/peas/core/.settings
 
 # /sample/peas/core/war/
 /sample/peas/core/war/peas
@@ -105,9 +80,6 @@ target
 
 # /server/
 /server/bin
-
-# /test/core/
-/test/core/.settings
 
 # /test/core/war/WEB-INF/
 /test/core/war/WEB-INF/lib

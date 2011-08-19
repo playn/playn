@@ -34,11 +34,11 @@ class AndroidCanvas implements playn.core.Canvas {
   private static RectF rectf = new RectF();
 
   private final Canvas canvas;
-  private LinkedList<AndroidSurfaceState> paintStack = new LinkedList<AndroidSurfaceState>();
+  private LinkedList<AndroidCanvasState> paintStack = new LinkedList<AndroidCanvasState>();
 
   AndroidCanvas(Canvas canvas) {
     this.canvas = canvas;
-    paintStack.addFirst(new AndroidSurfaceState());
+    paintStack.addFirst(new AndroidCanvasState());
   }
 
   @Override
@@ -144,7 +144,7 @@ class AndroidCanvas implements playn.core.Canvas {
   @Override
   public void save() {
     canvas.save();
-    paintStack.addFirst(new AndroidSurfaceState(currentState()));
+    paintStack.addFirst(new AndroidCanvasState(currentState()));
   }
 
   @Override
@@ -251,7 +251,7 @@ class AndroidCanvas implements playn.core.Canvas {
     return canvas.getWidth();
   }
 
-  private AndroidSurfaceState currentState() {
+  private AndroidCanvasState currentState() {
     return paintStack.peek();
   }
 

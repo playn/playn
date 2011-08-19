@@ -32,6 +32,9 @@
   <set-property name='user.agent' value='safari'/>
   <set-configuration-property name="user.agent.runtimeWarning" value="false" />
 
+  <!-- Geometry library -->
+  <inherits name='pythagoras.Pythagoras'/>
+
   <!-- Flash/HTML5/Native audio support -->
   <inherits name="com.allen_sauer.gwt.voices.gwt-voices" />
   <!-- 
