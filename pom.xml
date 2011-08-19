@@ -45,13 +45,11 @@
   </properties>
 
   <repositories>
-    <!-- TODO: remove this once all of our artifacts are available elsewhere -->
-<!--
+    <!-- TEMP: obtain some artifacts from legacy forplay maven repository -->
     <repository>
-      <id>playn</id>
-      <url>http://playn.googlecode.com/svn/mavenrepo</url>
+      <id>forplay-legacy</id>
+      <url>http://forplay.googlecode.com/svn/mavenrepo</url>
     </repository>
--->
   </repositories>
 
   <pluginRepositories>
