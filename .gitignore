@@ -21,15 +21,15 @@ target
 /sample/cute/android/bin
 /sample/cute/android/gen
 
-# /sample/cute/core/war/WEB-INF/
-/sample/cute/core/war/WEB-INF/lib
-/sample/cute/core/war/WEB-INF/classes
-/sample/cute/core/war/WEB-INF/deploy
-
 # /sample/cute/html/war/WEB-INF/
 /sample/cute/html/war/WEB-INF/lib
 /sample/cute/html/war/WEB-INF/classes
 /sample/cute/html/war/WEB-INF/deploy
+
+# /sample/cute/flash/war/WEB-INF/
+/sample/cute/flash/war/WEB-INF/lib
+/sample/cute/flash/war/WEB-INF/classes
+/sample/cute/flash/war/WEB-INF/deploy
 
 # /sample/cute/server/
 /sample/cute/server/bin
@@ -38,10 +38,15 @@ target
 /sample/hello/android/bin
 /sample/hello/android/gen
 
-# /sample/hello/core/war/WEB-INF/
-/sample/hello/core/war/WEB-INF/lib
-/sample/hello/core/war/WEB-INF/classes
-/sample/hello/core/war/WEB-INF/deploy
+# /sample/hello/html/war/WEB-INF/
+/sample/hello/html/war/WEB-INF/lib
+/sample/hello/html/war/WEB-INF/classes
+/sample/hello/html/war/WEB-INF/deploy
+
+# /sample/hello/flash/war/WEB-INF/
+/sample/hello/flash/war/WEB-INF/lib
+/sample/hello/flash/war/WEB-INF/classes
+/sample/hello/flash/war/WEB-INF/deploy
 
 # /sample/noise/noise/war/WEB-INF/
 /sample/noise/noise/war/WEB-INF/lib
