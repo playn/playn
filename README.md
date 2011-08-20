@@ -177,8 +177,7 @@ Code under `gwtbox2d`:
 Image resources under `sample/(cute|peas)`:
 
 * URL: http://www.lostgarden.com/2007/03/lost-garden-license.html
-* License: Creative Commons (CC BY 3.0) -
-* http://creativecommons.org/licenses/by/3.0/us/
+* License: Creative Commons (CC BY 3.0) - http://creativecommons.org/licenses/by/3.0/us/
 * Description: Game art resources created by Dan Cook.
 
 Audio resources under `sample/noise`:
