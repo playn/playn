@@ -16,12 +16,15 @@
 package playn.core;
 
 /**
- * TODO - Need to add javadoc
+ * GroupLayer creates a Layer hierarchy by maintaining an ordered group of child Layers.
  */
 public interface GroupLayer extends Layer {
 
   /**
-   * Returns the layer at the specified position.
+   * Returns the layer at the specified index.
+   * <p>
+   * Layers are ordered in terms of their depth and will be returned in this order, with 0 being the
+   * layer on bottom.
    */
   Layer get(int index);
 
