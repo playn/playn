@@ -13,16 +13,17 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package playn.test.java;
+package playn.bench.java;
 
+import playn.bench.core.Bench;
 import playn.core.PlayN;
 import playn.java.JavaPlatform;
-import playn.test.core.Test;
 
-public class TestJava {
+public class BenchJava {
 
   public static void main(String[] args) {
-    JavaPlatform.register();
-    PlayN.run(new Test());
+    JavaPlatform p = JavaPlatform.register();
+    p.assetManager().setPathPrefix("src/playn/bench/resources");
+    PlayN.run(new Bench());
   }
 }

@@ -1,26 +1,33 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>com.googlecode.playn</groupId>
-    <artifactId>playn-project</artifactId>
+    <artifactId>playn-benchmark</artifactId>
     <version>1.0-SNAPSHOT</version>
-    <relativePath>../../pom.xml</relativePath>
   </parent>
 
-  <artifactId>playn-test-core</artifactId>
-  <name>PlayN Tests Core</name>
+  <artifactId>playn-benchmark-html</artifactId>
+  <name>PlayN Benchmark HTML</name>
+  <packaging>war</packaging>
+
+  <properties>
+    <gwt.module>playn.bench.Bench</gwt.module>
+    <gwt.name>benchmark</gwt.name>
+  </properties>
 
   <dependencies>
     <dependency>
       <groupId>com.googlecode.playn</groupId>
-      <artifactId>playn-java</artifactId>
-      <version>${coreversion}</version>
+      <artifactId>playn-benchmark-core</artifactId>
+      <version>${project.version}</version>
     </dependency>
 
     <dependency>
       <groupId>com.googlecode.playn</groupId>
-      <artifactId>playn-flash</artifactId>
+      <artifactId>playn-html</artifactId>
       <version>${coreversion}</version>
     </dependency>
 
@@ -28,25 +35,32 @@
       <groupId>com.google.gwt</groupId>
       <artifactId>gwt-dev</artifactId>
       <version>${gwtversion}</version>
-      <scope>test</scope>
+      <scope>provided</scope>
     </dependency>
   </dependencies>
 
   <build>
     <sourceDirectory>src</sourceDirectory>
+    <outputDirectory>war/WEB-INF/classes</outputDirectory>
 
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-source-plugin</artifactId>
       </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-war-plugin</artifactId>
+        <version>2.1.1</version>
+        <configuration>
+          <webXml>war/WEB-INF/web.xml</webXml>
+        </configuration>
+      </plugin>
     </plugins>
+
     <resources>
       <resource>
         <directory>${basedir}/src</directory>
-      </resource>
-      <resource>
-        <directory>${basedir}/war/WEB-INF/classes</directory>
       </resource>
     </resources>
   </build>

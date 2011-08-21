@@ -12,7 +12,7 @@
     <ant dir="html" target="clean"/>
     <ant dir="android" target="clean"/>
     <ant dir="server" target="clean"/>
-    <ant dir="test/core" target="clean"/>
+    <ant dir="test/benchmark" target="clean"/>
     <ant dir="test/manualtests" target="clean"/>
   </target>
 
@@ -24,7 +24,7 @@
     <ant dir="html" target="compile"/>
     <ant dir="android" target="compile"/>
     <ant dir="server" target="compile"/>
-    <ant dir="test/core" target="compile"/>
+    <ant dir="test/benchmark" target="compile"/>
     <ant dir="test/manualtests" target="compile"/>
   </target>
 

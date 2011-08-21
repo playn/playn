@@ -13,12 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License. 
 -->
-<!DOCTYPE html>
-<html>
-  <head>
-    <title>PlayN Tests</title>
-    <script src="test/test.nocache.js"></script>
-  </head>
-  <body bgcolor="black">
-  </body>
-</html>
+<module rename-to='bench'>
+  <inherits name='playn.PlayN'/>
+
+  <source path='core'/>
+  <source path='html'/>
+
+  <public path="resources" />
+
+  <entry-point class='playn.bench.html.BenchHtml'/>
+</module>
