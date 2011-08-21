@@ -109,6 +109,7 @@ class HtmlGroupLayerDom extends HtmlLayerDom implements GroupLayer, ParentLayer 
   public void depthChanged(Layer layer, float oldDepth) {
     Asserts.checkArgument(layer instanceof HtmlLayerDom);
     HtmlLayerDom hlayer = (HtmlLayerDom) layer;
+    element().removeChild(hlayer.element());
     int index = impl.depthChanged(this, layer, oldDepth);
     if (index == size()) {
       element().appendChild(hlayer.element());
