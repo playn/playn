@@ -16,6 +16,7 @@
   </issueManagement>
 
   <modules>
+    <module>archetype</module>
     <module>core</module>
     <module>gwtbox2d</module>
     <module>webgl</module>
