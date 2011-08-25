@@ -829,8 +829,8 @@ package com.googlecode.flashcanvas
             var fontData:Array = state.font.split(" ");
 
             format.italic = fontData[0] == "italic";
-            format.size = parseFloat(fontData[2]);
-            format.font = fontData.slice(3).join(" ").replace(/["']/g, "");
+            format.size = 10;
+            format.font = "sans-serif"; // fontData.slice(3).join(" ").replace(/["']/g, "");
 
             var weight:Number = parseInt(fontData[1]);
             format.bold = (!isNaN(weight) && weight > 400 || fontData[1] == "bold");

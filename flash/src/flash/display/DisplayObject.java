@@ -287,7 +287,7 @@ public class DisplayObject extends EventDispatcher {
    * @param width
    */
   final public native void setWidth(int width) /*-{
-    this.width = width;;
+    this.width = width;
   }-*/;
   
   /**

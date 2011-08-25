@@ -74,7 +74,6 @@ public class InteractiveObject extends DisplayObject {
     this.tabEnabled = enabled;
   }-*/;
 
-
   final public native void setTabIndex(int tabIndex) /*-{
     this.tabIndex = tabIndex;
   }-*/;
@@ -84,10 +83,11 @@ public class InteractiveObject extends DisplayObject {
    *   user's pointing device over the same InteractiveObject. 
    */
   final static public EventType CLICK = make("click");
+  
   /**
-  Dispatched when a user presses and releases the main button of a pointing
-   device twice in rapid succession over the same InteractiveObject when that
-    object's doubleClickEnabled flag is set to true. 
+   * Dispatched when a user presses and releases the main button of a pointing
+   * device twice in rapid succession over the same InteractiveObject when that
+   * object's doubleClickEnabled flag is set to true. 
    */
   final static public EventType DOUBLECLICK = make("doubleClick");
   /**
@@ -155,7 +155,6 @@ public class InteractiveObject extends DisplayObject {
    * Dispatched when the value of the object's tabChildren flag changes. 
    */
   final static public EventType TABCHILDRENCHANGE = make("tabChildrenChange");
-
 
   /**
    * Dispatched when the object's tabEnabled flag changes.  

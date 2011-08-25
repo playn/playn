@@ -92,6 +92,11 @@ public class FlashCanvasLayer extends FlashLayer implements CanvasLayer {
      public native void setStrokeStyle(String color) /*-{
       this.strokeStyle = color;
     }-*/;
+    
+     public native void setFillStyle(String color) /*-{
+      this.fillStyle = color;
+    }-*/;
+    
     /**
      * @param bitmapData
      * @param x
@@ -153,8 +158,19 @@ public class FlashCanvasLayer extends FlashLayer implements CanvasLayer {
     public native void setTransform(float m11, float m12, float m21, float m22, float dx, float dy) /*-{
     // TODO Auto-generated method stub
       this.setTransform(m11, m12, m21, m22, dx, dy);
-    }-*/; 
+    }-*/;
+
+    public native void fillText(String text, float x, float y) /*-{
+      this.fillText(text, x, y);
+    }-*/;
     
+    public native void fillRect(float x, float y, float w, float h) /*-{
+      this.fillRect(x, y, w, h);
+    }-*/;
+    
+    public native void strokeText(String text, float x, float y) /*-{
+      this.strokeText(text, x, y);
+    }-*/;
   }
 
   @Override

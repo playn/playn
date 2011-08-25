@@ -18,6 +18,21 @@ package flash.geom;
 
 import com.google.gwt.core.client.JavaScriptObject;
 
-public class Rectangle extends JavaScriptObject {
+import flash.gwt.FlashImport;
+
+@FlashImport({"flash.geom.Rectangle"})
+final public class Rectangle extends JavaScriptObject {
   protected Rectangle() {}
+
+  public static native Rectangle create(float sx, float sy, float sw, float sh) /*-{
+    return new flash.geom.Rectangle(sx, sy, sw, sh);
+  }-*/;
+
+  public native int getWidth() /*-{
+    return this.width;
+  }-*/;
+  
+  public native int getHeight() /*-{
+    return this.height;
+  }-*/;
 }

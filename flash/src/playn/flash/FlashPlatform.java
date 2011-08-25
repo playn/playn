@@ -261,7 +261,7 @@ public class FlashPlatform implements Platform {
   }-*/;
 
   public static native void captureEvent(EventType eventType, EventHandler<?> eventHandler) /*-{
-    $root.addEventListener(eventType, function(arg) {
+    $root.stage.addEventListener(eventType, function(arg) {
       eventHandler.@playn.flash.EventHandler::handleEvent(Lflash/events/Event;)(arg);
     });
   }-*/;
