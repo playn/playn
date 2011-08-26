@@ -28,13 +28,13 @@
     <dependency>
       <groupId>com.googlecode.playn</groupId>
       <artifactId>playn-html</artifactId>
-      <version>${coreversion}</version>
+      <version>${project.version}</version>
     </dependency>
 
     <dependency>
       <groupId>com.google.gwt</groupId>
       <artifactId>gwt-dev</artifactId>
-      <version>${gwtversion}</version>
+      <version>${gwt.version}</version>
       <scope>provided</scope>
     </dependency>
   </dependencies>

@@ -16,7 +16,7 @@
     <dependency>
       <groupId>com.googlecode.playn</groupId>
       <artifactId>playn-java</artifactId>
-      <version>${coreversion}</version>
+      <version>${project.version}</version>
     </dependency>
   </dependencies>
 

@@ -25,7 +25,7 @@
     <dependency>
       <groupId>com.google.gwt</groupId>
       <artifactId>gwt-user</artifactId>
-      <version>${gwtversion}</version>
+      <version>${gwt.version}</version>
       <!-- we don't export a gwt-user dependency here even though the GWT portions of jbox2d
            require it, because we want, for example, an Android project to be able to depend on
            playn-jbox2d without inheriting a GWT dependency; the HTML portion of said project will
@@ -36,7 +36,7 @@
     <dependency>
       <groupId>com.google.gwt</groupId>
       <artifactId>gwt-dev</artifactId>
-      <version>${gwtversion}</version>
+      <version>${gwt.version}</version>
       <scope>provided</scope>
     </dependency>
   </dependencies>
