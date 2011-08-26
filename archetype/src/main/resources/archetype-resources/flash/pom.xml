@@ -16,7 +16,7 @@
   <properties>
     <gwt.module>${package}.${gameName}Flash</gwt.module>
     <gwt.name>${rootArtifactId}flash</gwt.name>
-    <flexsdk.dir>${project.build.directory}/flex4sdk</flexsdk.dir>
+    <flexsdk.dir>${project.build.directory}${file.separator}flex4sdk</flexsdk.dir>
   </properties>
 
   <dependencies>
