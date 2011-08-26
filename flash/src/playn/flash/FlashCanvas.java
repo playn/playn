@@ -77,11 +77,16 @@ class FlashCanvas implements Canvas {
 
   @Override
   public void drawLine(float x0, float y0, float x1, float y1) {
+    context2d.beginPath();
+    context2d.moveTo(y0, y1);
+    context2d.lineTo(x1, y1);
+    context2d.stroke();
     dirty = true;
   }
 
   @Override
   public void drawPoint(float x, float y) {
+    context2d.fillRect(x, y, 1, 1);
     dirty = true;
   }
 
@@ -104,6 +109,8 @@ class FlashCanvas implements Canvas {
 
   @Override
   public void fillPath(Path path) {
+    ((FlashPath) path).replay(context2d);
+    context2d.fill();
     dirty = true;
   }
 
@@ -197,11 +204,14 @@ class FlashCanvas implements Canvas {
 
   @Override
   public void strokePath(Path path) {
+    ((FlashPath) path).replay(context2d);
+    context2d.stroke();
     dirty = true;
   }
 
   @Override
   public void strokeRect(float x, float y, float w, float h) {
+    context2d.strokeRect(x, y, w, h);
     dirty = true;
   }
 
@@ -230,5 +240,19 @@ class FlashCanvas implements Canvas {
     return dirty;
   }
 
- 
+  public void quadraticCurveTo(float cpx, float cpy, float x, float y) {
+     context2d.quadraticCurveTo(cpx, cpy, x, y);
+  }
+
+  public void lineTo(float x, float y) {
+    context2d.lineTo(x, y);
+  }
+
+  public void moveTo(float x, float y) {
+    context2d.moveTo((int) x, (int) y);
+  }
+
+  public void close() {
+    context2d.close();
+  }
 }

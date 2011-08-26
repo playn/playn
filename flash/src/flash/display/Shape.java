@@ -16,26 +16,30 @@
 
 package flash.display;
 
-import com.google.gwt.core.client.JavaScriptObject;
+import flash.geom.Rectangle;
+import flash.gwt.FlashImport;
 
-import flash.geom.Matrix;
+@FlashImport({"flash.display.Shape", "flash.geom.Matrix"})
+final public class Shape extends DisplayObject {
+   protected Shape() {}
+   
 
-final public class Graphics extends JavaScriptObject {
-  protected Graphics() {}
+   public static native Shape create(int w, int h) /*-{
+      var shape =  new flash.display.Shape();
+      shape.width = w;
+      shape.height = h;
+      return shape;
+   }-*/;
 
-  public native void beginFill(int i) /*-{
-    this.beginFill(i);
-  }-*/;
 
-  public native void drawRect(float sx, float sy, float sw, float sh) /*-{
-    this.drawRect(sx, sy, sw, sh);    
-  }-*/;
+   /**
+    * Specifies the Graphics object that belongs to this sprite where vector 
+    * drawing commands can occur.
+    * @return
+    */
+   public native Graphics getGraphics() /*-{
+     return this.graphics;
+   }-*/;
+   
 
-  public native void endFill() /*-{
-    this.endFill();
-  }-*/;
-
-  public native void beginBitmapFill(BitmapData bitmapData, Matrix geom, boolean repeat, boolean smooth) /*-{
-      this.beginBitmapFill(bitmapData, geom, repeat, smooth);
-  }-*/;
 }

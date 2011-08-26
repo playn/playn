@@ -30,7 +30,7 @@ public class FlashLayer extends AbstractLayer {
   protected final DisplayObject displayObject;
 
   /**
-   * @param sprite
+   *
    */
   public FlashLayer(DisplayObject displayObject) {
     this.displayObject = displayObject;

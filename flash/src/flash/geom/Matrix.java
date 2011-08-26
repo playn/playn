@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Google Inc.
+ * Copyright 2010 Google Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
@@ -13,29 +13,13 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-
-package flash.display;
+package flash.geom;
 
 import com.google.gwt.core.client.JavaScriptObject;
 
-import flash.geom.Matrix;
-
-final public class Graphics extends JavaScriptObject {
-  protected Graphics() {}
-
-  public native void beginFill(int i) /*-{
-    this.beginFill(i);
-  }-*/;
-
-  public native void drawRect(float sx, float sy, float sw, float sh) /*-{
-    this.drawRect(sx, sy, sw, sh);    
-  }-*/;
-
-  public native void endFill() /*-{
-    this.endFill();
-  }-*/;
-
-  public native void beginBitmapFill(BitmapData bitmapData, Matrix geom, boolean repeat, boolean smooth) /*-{
-      this.beginBitmapFill(bitmapData, geom, repeat, smooth);
-  }-*/;
+/**
+ *  Placeholder.
+ */
+final public class Matrix extends JavaScriptObject {
+   protected Matrix() {}
 }

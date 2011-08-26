@@ -77,11 +77,11 @@ public class FlashCanvasLayer extends FlashLayer implements CanvasLayer {
       this.beginPath();
     }-*/;
 
-    public native void moveto(int x, int y) /*-{
+    public native void moveTo(double x, double y) /*-{
       this.moveTo(x, y);
     }-*/;
 
-    public native void lineto(int x, int y) /*-{
+    public native void lineTo(double x, double y) /*-{
       this.lineTo(x, y);
     }-*/;
 
@@ -170,6 +170,27 @@ public class FlashCanvasLayer extends FlashLayer implements CanvasLayer {
     
     public native void strokeText(String text, float x, float y) /*-{
       this.strokeText(text, x, y);
+    }-*/;
+
+    public native void arcTo(double curX, double curY, double x, double y, double radius)  /*-{
+      this.arcTo(curX, curY, x, y, radius);
+    }-*/;
+
+    public native void quadraticCurveTo(
+        double cpx, double cpy, double x, double y) /*-{
+      this.quadraticCurveTo(cpx, cpy, x, y);
+    }-*/;
+
+    public native void close() /*-{
+      this.close();
+    }-*/;
+
+    public native void fill() /*-{
+      this.fill();
+    }-*/;
+
+    public native void strokeRect(float x, float y, float w, float h) /*-{
+      this.strokeRect(x, y, w, h);
     }-*/;
   }
 
