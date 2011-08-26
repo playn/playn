@@ -10,7 +10,8 @@
 
   <!-- Everything below here shouldn't need to be modified -->
   <!-- run 'ant -p' to see available targets -->
-  <property name="src.dir"     value="src"/>
+  <property name="src.dir"     value="src/main/java"/>
+  <property name="war.dir"     value="src/main/webapp"/>
   <property name="target.dir"  value="target"/>
   <property name="classes.dir" value="${symbol_dollar}{target.dir}/classes"/>
   <property name="webapp.dir"  value="${symbol_dollar}{target.dir}/webapp"/>
@@ -42,9 +43,9 @@
   <target name="-prepare-html" depends="-prepare">
     <artifact:dependencies pathId="html-extras.classpath">
       <dependency groupId="com.googlecode.playn" artifactId="playn-html"
-                  version="${symbol_dollar}{pom.properties.coreversion}"/>
+                  version="${symbol_dollar}{pom.properties.playn.version}"/>
       <dependency groupId="com.google.gwt" artifactId="gwt-dev"
-                  version="${symbol_dollar}{pom.properties.gwtversion}"/>
+                  version="${symbol_dollar}{pom.properties.gwt.version}"/>
     </artifact:dependencies>
     <path id="html.classpath">
       <path refid="classpath"/>
@@ -60,7 +61,7 @@
   <target name="-prep-webapp" depends="-prepare-html">
     <mkdir dir="${symbol_dollar}{webapp.dir}"/>
     <copy todir="${symbol_dollar}{webapp.dir}">
-      <fileset dir="html/war" includes="**"/>
+      <fileset dir="html/${symbol_dollar}{war.dir}" includes="**"/>
     </copy>
     <!-- we need to resolve this for the GWT classpath to avoid a bunch of warnings -->
     <artifact:dependencies sourcesFileSetId="validation.sources.fileset">

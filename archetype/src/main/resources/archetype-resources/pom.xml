@@ -11,8 +11,12 @@
 
   <groupId>${groupId}</groupId>
   <artifactId>${artifactId}</artifactId>
-  <name>${gameName} Metaproject</name>
-  <packaging>pom</packaging>
-
   <version>${version}</version>
+  <packaging>pom</packaging>
+  <name>${gameName} Metaproject</name>
+
+  <properties>
+    <playn.version>1.0-SNAPSHOT</playn.version>
+  </properties>
+
 </project>

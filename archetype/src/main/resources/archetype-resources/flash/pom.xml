@@ -10,8 +10,8 @@
   </parent>
 
   <artifactId>${artifactId}</artifactId>
-  <name>${gameName} Flash</name>
   <packaging>war</packaging>
+  <name>${gameName} Flash</name>
 
   <properties>
     <gwt.module>${package}.${gameName}Flash</gwt.module>
@@ -23,13 +23,13 @@
     <dependency>
       <groupId>${groupId}</groupId>
       <artifactId>${rootArtifactId}-core</artifactId>
-      <version>${version}</version>
+      <version>${project.version}</version>
     </dependency>
 
     <dependency>
       <groupId>com.googlecode.playn</groupId>
       <artifactId>playn-flash</artifactId>
-      <version>${coreversion}</version>
+      <version>${playn.version}</version>
     </dependency>
   </dependencies>
 

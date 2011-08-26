@@ -10,14 +10,14 @@
   </parent>
 
   <artifactId>${artifactId}</artifactId>
-  <name>${gameName} Core</name>
   <packaging>jar</packaging>
+  <name>${gameName} Core</name>
 
   <dependencies>
     <dependency>
       <groupId>com.googlecode.playn</groupId>
       <artifactId>playn-java</artifactId>
-      <version>${coreversion}</version>
+      <version>${playn.version}</version>
     </dependency>
   </dependencies>
 
