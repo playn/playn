@@ -88,7 +88,6 @@
             <soyc>${gwt.soyc}</soyc>
             <localWorkers>${gwt.workers}</localWorkers>
             <extraJvmArgs>-Xmx256m -Dgwt.args="-XdisableRunAsync"</extraJvmArgs>
-	    <draftCompile>true</draftCompile>
             <modules>
               <module>${gwt.module}</module>
             </modules>
