@@ -75,6 +75,9 @@ public class FlashGroupLayer extends FlashLayer implements GroupLayer, ParentLay
   @Override
   public void clear() {
     impl.clear(this);
+    while (container().getNumChildren() > 0) {
+      container().removeChildAt(0);
+    }
   }
 
   @Override

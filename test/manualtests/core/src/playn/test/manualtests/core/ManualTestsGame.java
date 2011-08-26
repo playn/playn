@@ -24,7 +24,12 @@ import playn.core.SurfaceLayer;
 import playn.core.Mouse.ButtonEvent;
 
 public class ManualTestsGame implements Game {
-  ManualTest[] tests = new ManualTest[] {new ImageTypeTest(), new AlphaLayerTest(), /*, new YourTest()*/};
+  ManualTest[] tests = new ManualTest[] {
+    new ImageTypeTest(),
+    new AlphaLayerTest(),
+    new DepthTest(),
+    /*new YourTest(),*/
+  };
   int currentTest;
 
   @Override
@@ -58,6 +63,7 @@ public class ManualTestsGame implements Game {
     SurfaceLayer bg = graphics().createSurfaceLayer(graphics().width(), graphics().height());
     bg.surface().setFillColor(Color.rgb(255, 255, 255));
     bg.surface().fillRect(0, 0, bg.surface().width(), bg.surface().height());
+    bg.setDepth(Float.NEGATIVE_INFINITY); // render behind everything
     graphics().rootLayer().add(bg);
     
     log().info("Starting " + currentTest().getName());

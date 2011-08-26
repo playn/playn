@@ -46,8 +46,9 @@ class HtmlGroupLayerDom extends HtmlLayerDom implements GroupLayer, ParentLayer 
   public void add(Layer layer) {
     Asserts.checkArgument(layer instanceof HtmlLayerDom);
     HtmlLayerDom hlayer = (HtmlLayerDom) layer;
-    impl.add(this, hlayer);
-    element().appendChild(hlayer.element());
+    int index = impl.add(this, hlayer);
+    Node refChild = element().getChild(index);
+    element().insertBefore(hlayer.element(), refChild);
   }
 
   @Override @Deprecated
@@ -80,6 +81,9 @@ class HtmlGroupLayerDom extends HtmlLayerDom implements GroupLayer, ParentLayer 
   @Override
   public void clear() {
     impl.clear(this);
+    while (element().hasChildNodes()) {
+      element().removeChild(element().getFirstChild());
+    }
   }
 
   @Override

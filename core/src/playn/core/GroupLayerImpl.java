@@ -29,7 +29,10 @@ public class GroupLayerImpl<L extends AbstractLayer>
   /** This group's children. */
   public List<L> children = new ArrayList<L>();
 
-  public void add(GroupLayer self, L child) {
+  /**
+   * @return the index into the children array at which the layer was inserted (based on depth).
+   */
+  public int add(GroupLayer self, L child) {
     // check whether the last child has the same depth as this child, in which case append this
     // child to our list; this is a fast path for when all children have the same depth
     int count = children.size(), index;
@@ -47,6 +50,7 @@ public class GroupLayerImpl<L extends AbstractLayer>
     children.add(index, child);
     child.setParent(self);
     child.onAdd();
+    return index;
   }
 
   // TODO: remove this when GroupLayer.add(int,Layer) is removed
