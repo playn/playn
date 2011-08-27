@@ -48,9 +48,9 @@ public class FlashGroupLayer extends FlashLayer implements GroupLayer, ParentLay
 
   @Override
   public void add(Layer layer) {
-    impl.add(this, (FlashLayer) layer);
+    int index = impl.add(this, (FlashLayer) layer);
     ((FlashLayer) layer).update();
-    container().addChild(display(layer));
+    container().addChildAt(display(layer), index);
   }
 
   @Override @Deprecated
@@ -106,11 +106,9 @@ public class FlashGroupLayer extends FlashLayer implements GroupLayer, ParentLay
   @Override
   public void depthChanged(Layer layer, float oldDepth) {
     int index = impl.depthChanged(this, layer, oldDepth);
-    if (index == size()) {
-      container().addChild(((FlashLayer)layer).display());
-    } else {
-      container().addChildAt(((FlashLayer)layer).display(), index);
-    }
+    DisplayObject child = ((FlashLayer)layer).display();
+    container().removeChild(child);
+    container().addChildAt(child, index);
   }
 
   protected void updateChildren() {
