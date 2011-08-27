@@ -17,9 +17,16 @@ package flash.geom;
 
 import com.google.gwt.core.client.JavaScriptObject;
 
+import flash.gwt.FlashImport;
+
 /**
  *  Placeholder.
  */
+@FlashImport({"flash.geom.Matrix"})
 final public class Matrix extends JavaScriptObject {
    protected Matrix() {}
+
+  public native static Matrix create() /*-{
+    return new flash.geom.Matrix();
+  }-*/;
 }

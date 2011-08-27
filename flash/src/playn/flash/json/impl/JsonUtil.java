@@ -54,9 +54,6 @@ public class JsonUtil {
       Set<String> toSkip = new HashSet<String>();
       toSkip.add("$H");
       toSkip.add("__gwt_ObjectId");
-      if (GWT.isScript()) {
-        toSkip.add(Impl.getNameOf("@java/lang/Object::typeMarker"));
-      }
       skipKeys = Collections.unmodifiableSet(toSkip);
     }
 

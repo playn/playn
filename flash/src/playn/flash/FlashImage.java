@@ -34,6 +34,10 @@ class FlashImage implements Image {
     scheduleLoad(url);
   }
 
+  FlashImage(BitmapData data) {
+    this.imageData = data;
+  }
+  
   /**
    * @param url
    */

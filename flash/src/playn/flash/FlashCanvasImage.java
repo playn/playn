@@ -23,34 +23,39 @@ import playn.core.ResourceCallback;
 /**
  *
  */
-public class FlashCanvasImage implements CanvasImage {
+public class FlashCanvasImage extends FlashImage implements CanvasImage {
 
-  public FlashCanvasImage(FlashCanvas surface) {
+  private FlashCanvas canvas;
+
+  public FlashCanvasImage(FlashCanvas canvas) {
+    super(canvas.bitmapData());
+    this.canvas = canvas;
+    
   }
 
   @Override
   public Canvas canvas() {
-    return null;  //To change body of implemented methods use File | Settings | File Templates.
+    return canvas;
   }
 
   @Override
   public int height() {
-    return 0;  //To change body of implemented methods use File | Settings | File Templates.
+    return canvas().height();
   }
 
   @Override
   public void replaceWith(Image image) {
-    //To change body of implemented methods use File | Settings | File Templates.
+    throw new UnsupportedOperationException("Can't replace FlashCanvas with image");
   }
 
   @Override
   public int width() {
-    return 0;  //To change body of implemented methods use File | Settings | File Templates.
+    return canvas().height();
   }
 
   @Override
   public boolean isReady() {
-    return false;  //To change body of implemented methods use File | Settings | File Templates.
+    return true;
   }
 
   /* (non-Javadoc)
@@ -58,7 +63,6 @@ public class FlashCanvasImage implements CanvasImage {
    */
   @Override
   public void addCallback(ResourceCallback<Image> callback) {
-    // TODO Auto-generated method stub
-    
+    callback.done(this);
   }
 }

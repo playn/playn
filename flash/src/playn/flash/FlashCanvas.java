@@ -15,6 +15,7 @@
  */
 package playn.flash;
 
+import flash.display.BitmapData;
 import playn.flash.FlashCanvasLayer.Context2d;
 
 import playn.core.Asserts;
@@ -254,5 +255,9 @@ class FlashCanvas implements Canvas {
 
   public void close() {
     context2d.close();
+  }
+
+  public BitmapData bitmapData() {
+    return context2d.bitmapData();
   }
 }

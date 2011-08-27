@@ -85,7 +85,7 @@ class FlashGraphics implements Graphics {
 
   @Override
   public CanvasImage createImage(int w, int h) {
-    FlashCanvas surface = new FlashCanvas(w, h, null);
+    FlashCanvas surface = new FlashCanvas(w, h, FlashCanvasLayer.CanvasElement.create(w, h).getContext());
     return new FlashCanvasImage(surface);
   }
 

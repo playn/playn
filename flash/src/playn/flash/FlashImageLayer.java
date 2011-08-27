@@ -19,6 +19,7 @@ package playn.flash;
 import flash.display.BitmapData;
 import flash.display.Graphics;
 import flash.display.Shape;
+import flash.geom.Matrix;
 import flash.geom.Point;
 import flash.geom.Rectangle;
 import playn.core.Asserts;
@@ -26,6 +27,7 @@ import playn.core.Asserts;
 import flash.display.Bitmap;
 import flash.display.Sprite;
 
+import playn.core.CanvasImage;
 import playn.core.PlayN;
 import playn.core.ResourceCallback;
 import playn.core.Image;
@@ -48,10 +50,12 @@ public class FlashImageLayer extends FlashLayer implements ImageLayer {
   float height = NOT_SET;
 
   private boolean dirty = true;
-
+  
   private boolean repeatX;
 
   private boolean repeatY;
+
+  private BitmapData clippedSource;
 
   /**
    * @param image
@@ -81,17 +85,17 @@ public class FlashImageLayer extends FlashLayer implements ImageLayer {
   }
 
   private void applySourceRect() {
-    BitmapData clippedSource;
     if (sourceRect == null || bitmapData == null) {
       clippedSource = bitmapData;
     } else {
       clippedSource = BitmapData
           .create(sourceRect.getWidth(), sourceRect.getHeight(), true,
-              0x000000FF);
+              0x00000000);
       clippedSource
           .copyPixels(bitmapData, sourceRect, Point.create(0, 0), null, null,
-              false);
+              true);
     }
+    dirty = true;
     ((Bitmap) display()).setBitmapData(clippedSource);
   }
 
@@ -118,19 +122,22 @@ public class FlashImageLayer extends FlashLayer implements ImageLayer {
       float dh = height();
 
       if (repeatX || repeatY) {
-        float anchorWidth = repeatX ? dw : image.width();
-        float anchorHeight = repeatY ? dh : image.height();
+        float anchorWidth = repeatX ? dw : sourceRect != null ? sourceRect.getWidth() : image.width();
+        float anchorHeight = repeatY ? dh : sourceRect != null ? sourceRect.getHeight() : image.height();
 
         Shape shape = Shape.create((int) anchorWidth, (int) anchorHeight);
         Graphics g = shape.getGraphics();
-        g.beginBitmapFill(bitmapData, null, true, true);
-
-        BitmapData data = BitmapData.create((int) dw, (int) dh);
+        g.beginBitmapFill(clippedSource, Matrix.create(), true, true);
+        g.drawRect(0, 0, anchorWidth, anchorHeight);
+        g.endFill();
+        BitmapData data = BitmapData.create((int) dw, (int) dh, true, 0x00000000);
         data.draw(shape);
         ((Bitmap) display()).setBitmapData(data);
       } else {
-        ((Bitmap) display()).setBitmapData(bitmapData);
-      }
+        ((Bitmap) display()).setBitmapData(clippedSource);
+      } 
+      display().setWidth((int) dw);
+      display().setHeight((int) dh);
       dirty = false;
     }
   }
@@ -141,7 +148,9 @@ public class FlashImageLayer extends FlashLayer implements ImageLayer {
   @Override
   public void clearSourceRect() {
     sourceRect = null;
+    dirty = true;
     applySourceRect();
+    applySettingIfDirty();
   }
 
   /* (non-Javadoc)
@@ -202,8 +211,9 @@ public class FlashImageLayer extends FlashLayer implements ImageLayer {
   @Override
   public void setSourceRect(float sx, float sy, float sw, float sh) {
     sourceRect = Rectangle.create(sx, sy, sw, sh);
-    applySourceRect();
     dirty = true;
+    applySourceRect();
+    applySettingIfDirty();
   }
 
   /* (non-Javadoc)
@@ -228,13 +238,13 @@ public class FlashImageLayer extends FlashLayer implements ImageLayer {
   @Override
   public float width() {
     Asserts.checkNotNull(image, "Image must not be null");
-    return width != NOT_SET ? width : image.width();
+    return width != NOT_SET ? width : sourceRect != null ? sourceRect.getWidth() : image.width();
   }
 
   @Override
   public float height() {
     Asserts.checkNotNull(image, "Image must not be null");
-    return height != NOT_SET ? height : image.height();
+    return height != NOT_SET ? height : sourceRect != null ? sourceRect.getHeight() : image.height();
   }
 
   @Override

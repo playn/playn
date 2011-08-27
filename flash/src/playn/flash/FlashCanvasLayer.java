@@ -192,6 +192,10 @@ public class FlashCanvasLayer extends FlashLayer implements CanvasLayer {
     public native void strokeRect(float x, float y, float w, float h) /*-{
       this.strokeRect(x, y, w, h);
     }-*/;
+
+    public native BitmapData bitmapData() /*-{
+      return this.canvas.bitmapData;
+    }-*/;
   }
 
   @Override
