@@ -34,7 +34,7 @@
     <android.version>2.3.3</android.version>
     <gwt.version>2.3.0</gwt.version>
     <gwt.loglevel>INFO</gwt.loglevel>
-    <gwt.outputstyle>OBF</gwt.outputstyle>
+    <gwt.outputstyle>PRETTY</gwt.outputstyle>
     <gwt.modulesuffix />
     <gwt.inplace>false</gwt.inplace>
     <gwt.soyc>false</gwt.soyc>
@@ -78,8 +78,8 @@
           <artifactId>gwt-maven-plugin</artifactId>
           <version>2.3.0-1</version>
           <configuration>
-            <logLevel>INFO' -XdisableRunAsync -logLevel 'INFO</logLevel>
-            <style>PRETTY</style>
+            <logLevel>${gwt.loglevel}</logLevel>
+            <style>${gwt.outputstyle}</style>
             <runTarget>${gwt.module}${gwt.modulesuffix}/index.html</runTarget>
             <hostedWebapp>${project.build.directory}/www</hostedWebapp>
             <draftCompile>${gwt.draft}</draftCompile>
