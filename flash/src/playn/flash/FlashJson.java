@@ -15,25 +15,25 @@
  */
 package playn.flash;
 
-import playn.flash.json.JsonArray;
-import playn.flash.json.JsonNumber;
-import playn.flash.json.JsonBoolean;
-import playn.flash.json.JsonValue;
-import playn.flash.json.JsonString;
-import playn.flash.json.JsonObject;
+import java.util.ArrayList;
 
+import playn.core.Asserts;
 import playn.core.Json;
+import playn.flash.json.JsonArray;
+import playn.flash.json.JsonBoolean;
+import playn.flash.json.JsonNumber;
+import playn.flash.json.JsonObject;
+import playn.flash.json.JsonString;
+import playn.flash.json.JsonValue;
 
-class FlashJson  implements Json {
-
+class FlashJson implements Json {
 
   /* (non-Javadoc)
-   * @see playn.core.Json#parse(java.lang.String)
-   */
+  * @see playn.core.Json#parse(java.lang.String)
+  */
   @Override
   public Object parse(String json) {
     return new ObjectImpl((JsonObject) playn.flash.json.Json.instance().parse(json));
-   
   }
 
   static class ArrayImpl implements Array {
@@ -52,7 +52,7 @@ class FlashJson  implements Json {
      */
     @Override
     public Array getArray(int index) {
-     return new ArrayImpl((JsonArray) arr.get(index));
+      return new ArrayImpl((JsonArray) arr.get(index));
     }
 
     /* (non-Javadoc)
@@ -61,8 +61,8 @@ class FlashJson  implements Json {
     @Override
     public boolean getBoolean(int index) {
       // TODO Auto-generated method stub
-      JsonValue b =  arr.get(index);
-      return b != null ? ((JsonBoolean)b).getBoolean() : false;
+      JsonValue b = arr.get(index);
+      return b != null ? ((JsonBoolean) b).getBoolean() : false;
     }
 
     /* (non-Javadoc)
@@ -97,7 +97,7 @@ class FlashJson  implements Json {
     @Override
     public String getString(int index) {
       JsonValue s = arr.get(index);
-      return s != null ? ((JsonString)s).getString() : "";
+      return s != null ? ((JsonString) s).getString() : "";
     }
 
     /* (non-Javadoc)
@@ -107,9 +107,8 @@ class FlashJson  implements Json {
     public int length() {
       return arr.length();
     }
-    
   }
-  
+
   static class ObjectImpl implements Object {
 
     private final JsonObject obj;
@@ -135,7 +134,7 @@ class FlashJson  implements Json {
     @Override
     public boolean getBoolean(String key) {
       JsonValue o = obj.get(key);
-      return o != null ? ((JsonBoolean)o).getBoolean() : false;
+      return o != null ? ((JsonBoolean) o).getBoolean() : false;
     }
 
     /* (non-Javadoc)
@@ -193,7 +192,6 @@ class FlashJson  implements Json {
         public int length() {
           return obj.keys().length;
         }
-        
       };
     }
 
@@ -222,15 +220,149 @@ class FlashJson  implements Json {
       JsonValue s = obj.get(key);
       return s != null ? ((JsonString) s).getString() : "";
     }
-    
   }
+
   /* (non-Javadoc)
-   * @see playn.core.Json#newWriter()
-   */
+  * @see playn.core.Json#newWriter()
+  */
   @Override
   public Writer newWriter() {
     // TODO Auto-generated method stub
-    return null;
+    return new FlashWriter();
   }
 
+  static class FlashWriter implements Writer {
+
+    private StringBuilder sb = new StringBuilder();
+
+    private String key;
+
+    private ArrayList<Boolean> inArrayStack = new ArrayList<Boolean>();
+
+    private ArrayList<Boolean> isFirstValueStack = new ArrayList<Boolean>();
+
+    @Override
+    public void array() {
+      maybePrependKey();
+      sb.append("[");
+      pushInArray(true);
+      pushIsFirstValue(true);
+    }
+
+    @Override
+    public void endArray() {
+      sb.append("]");
+      popInArray();
+      popIsFirstValue();
+    }
+
+    @Override
+    public void endObject() {
+      sb.append("}");
+      popInArray();
+      popIsFirstValue();
+    }
+
+    @Override
+    public void key(String key) {
+      Asserts.checkState(this.key == null);
+      this.key = key;
+    }
+
+    @Override
+    public void object() {
+      maybePrependKey(true);
+      sb.append("{");
+      pushInArray(false);
+      pushIsFirstValue(true);
+    }
+
+    @Override
+    public void value(boolean x) {
+      maybePrependKey();
+      sb.append(x);
+    }
+
+    @Override
+    public void value(double x) {
+      maybePrependKey();
+      sb.append(x);
+    }
+
+    @Override
+    public void value(int x) {
+      maybePrependKey();
+      sb.append(x);
+    }
+
+    @Override
+    public void value(String x) {
+      maybePrependKey();
+      sb.append("\"");
+      sb.append(x);
+      sb.append("\"");
+    }
+
+    @Override
+    public String write() {
+      return sb.toString();
+    }
+
+    private void maybePrependKey() {
+      maybePrependKey(false);
+    }
+
+    /**
+     * Prepend the key if not in an array.
+     *
+     * Note: if this isn't the first key, we output a leading comma as well.
+     */
+    private void maybePrependKey(boolean isObject) {
+      // Special case for the opening object.
+      if (isObject && inArrayStack.size() == 0) {
+        return;
+      }
+
+      if (isFirstValue()) {
+        popIsFirstValue();
+        pushIsFirstValue(false);
+      } else {
+        sb.append(",");
+      }
+
+      if (inArray()) {
+        Asserts.checkState(this.key == null);
+      } else {
+        Asserts.checkState(this.key != null);
+        sb.append("\"");
+        sb.append(key);
+        sb.append("\":");
+        key = null;
+      }
+    }
+
+    private void pushInArray(boolean inArray) {
+      inArrayStack.add(inArray);
+    }
+
+    private boolean popInArray() {
+      return inArrayStack.remove(inArrayStack.size() - 1);
+    }
+
+    private boolean inArray() {
+      return inArrayStack.get(inArrayStack.size() - 1);
+    }
+
+    private void pushIsFirstValue(boolean isFirstValue) {
+      isFirstValueStack.add(isFirstValue);
+    }
+
+    private boolean popIsFirstValue() {
+      return isFirstValueStack.remove(isFirstValueStack.size() - 1);
+    }
+
+    private boolean isFirstValue() {
+      return isFirstValueStack.get(isFirstValueStack.size() - 1);
+    }
+  }
 }

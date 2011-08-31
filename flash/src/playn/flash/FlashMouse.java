@@ -42,7 +42,8 @@ class FlashMouse implements Mouse {
         if (listener != null) {
           listener.onMouseUp(
             new ButtonEvent.Impl(PlayN.currentTime(), evt.getStageX(), evt.getStageY(),
-                                 getMouseButton(evt)));
+                // TODO: fix to handle release of right button / middle button
+                                 Mouse.BUTTON_LEFT));
         }
       }
     });

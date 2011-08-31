@@ -196,6 +196,14 @@ public class FlashCanvasLayer extends FlashLayer implements CanvasLayer {
     public native BitmapData bitmapData() /*-{
       return this.canvas.bitmapData;
     }-*/;
+
+    public native void clearRect(int x, int y, int width, int height) /*-{
+      this.clearRect(x, y, width, height);      
+    }-*/;
+
+    public native void setLineWidth(float width) /*-{
+      this.lineWidth = width;
+    }-*/;
   }
 
   @Override

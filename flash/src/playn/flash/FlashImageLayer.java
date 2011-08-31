@@ -117,7 +117,7 @@ public class FlashImageLayer extends FlashLayer implements ImageLayer {
   }
 
   private void applySettingIfDirty() {
-    if (dirty) {
+    if (dirty && image != null) {
       float dw = width();
       float dh = height();
 

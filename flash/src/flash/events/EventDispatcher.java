@@ -45,7 +45,7 @@ public class EventDispatcher extends JavaScriptObject {
   /**
    * Registers an event listener object with an EventDispatcher object so that the listener receives notification of an event.
    */
-  final public native void addEventListener(EventType type, EventHandler<?> listener,  boolean useCapture, int priority, boolean useWeakReference) /*-{
+  final public native <T extends Event> void addEventListener(EventType type, EventHandler<T> listener,  boolean useCapture, int priority, boolean useWeakReference) /*-{
     this.addEventListener(type, function(evt) {
       return listener.@playn.flash.EventHandler::handleEvent(Lflash/events/Event;)(evt);
     }, useCapture, priority, useWeakReference);

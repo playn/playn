@@ -137,12 +137,12 @@ class FlashGraphics implements Graphics {
 
   @Override
   public int width() {
-    return screenWidth();
+    return Sprite.getRootSprite().getWidth();
   }
 
   @Override
   public int height() {
-    return screenHeight();
+    return Sprite.getRootSprite().getHeight();
   }
 
   @Override

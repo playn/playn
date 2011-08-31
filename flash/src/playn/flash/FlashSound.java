@@ -17,6 +17,9 @@ package playn.flash;
 
 import com.google.gwt.core.client.JavaScriptObject;
 
+import flash.events.Event;
+import flash.events.EventDispatcher;
+import flash.events.EventType;
 import flash.gwt.FlashImport;
 
 import playn.core.Sound;
@@ -32,7 +35,8 @@ class FlashSound implements Sound {
   private SoundChannel soundChannel;
 
   @FlashImport({"flash.media.SoundChannel"})
-  final static class SoundChannel extends JavaScriptObject {
+  final static class SoundChannel extends EventDispatcher {
+    public static final EventType SOUND_COMPLETE = EventType.make("soundComplete");
     protected SoundChannel() {}
     public native void stop() /*-{
       this.stop();
@@ -41,8 +45,7 @@ class FlashSound implements Sound {
      * @param volume
      */
     public native void setVolume(float volume) /*-{
-      this.soundTransform.volume = volume;
-      
+      this.soundTransform.volume = volume;     
     }-*/;  
   }
   
@@ -59,7 +62,7 @@ class FlashSound implements Sound {
     }-*/;
 
     public native SoundChannel play(boolean looping) /*-{
-      this.play(0, looping ? 99999999 : 0);
+      return this.play(0, looping ? 99999999 : 0);
     }-*/;
   }
 
@@ -89,7 +92,6 @@ class FlashSound implements Sound {
    */
   @Override
   public boolean isPlaying() {
-    // TODO Auto-generated method stub
     return isPlaying;
   }
 
@@ -111,6 +113,11 @@ class FlashSound implements Sound {
   public boolean play() {
     soundChannel = sound.play(looping);
     isPlaying = true;
+    soundChannel.addEventListener(SoundChannel.SOUND_COMPLETE, new EventHandler<Event>() {
+      public void handleEvent(Event evt) {
+        isPlaying = false;
+      }
+    }, false, 0, false);
     return true;
   }
 }

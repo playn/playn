@@ -38,7 +38,7 @@ public class MouseEvent extends Event {
    * @return
    */
   final public native boolean isButtonDown() /*-{
-   return this.isButtonDown;
+   return this.buttonDown;
   }-*/;
   
   /**

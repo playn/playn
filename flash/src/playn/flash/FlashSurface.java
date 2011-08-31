@@ -35,6 +35,7 @@ public class FlashSurface implements Surface {
 
   @Override
   public void clear() {
+    context2d.clearRect(0, 0, width, height);
     dirty = true;
   }
 
@@ -70,8 +71,8 @@ public class FlashSurface implements Surface {
  
   @Override
   public void fillRect(float x, float y, float w, float h) {
+    context2d.fillRect(x, y, w, h);
     dirty = true;
-  
   }
 
   @Override
@@ -102,8 +103,23 @@ public class FlashSurface implements Surface {
  
 
   @Override
-  public void setFillColor(int color) {
-  }
+   public void setFillColor(int color) {
+     context2d.setFillStyle("rgba(" 
+         + ((color >> 16) & 0xff) + "," 
+         + ((color >> 8) & 0xff) + ","
+         + (color & 0xff) + ","
+         + ((color >> 24) & 0xff) + ")");
+    
+   }
+
+   public void setStrokeColor(int color) { 
+     context2d.setStrokeStyle("rgba(" 
+         + ((color >> 16) & 0xff) + "," 
+         + ((color >> 8) & 0xff) + ","
+         + (color & 0xff) + ","
+         + ((color >> 24) & 0xff) + ")");
+   }
+  
 
 
   @Override
@@ -147,8 +163,11 @@ public class FlashSurface implements Surface {
    */
   @Override
   public void drawLine(float x0, float y0, float x1, float y1, float width) {
-    // TODO Auto-generated method stub
-    
+    context2d.setLineWidth(width);
+    context2d.beginPath();
+    context2d.moveTo(x0, y0);
+    context2d.lineTo(x1, y1);
+    context2d.stroke();
   }
 
  
