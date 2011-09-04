@@ -281,7 +281,7 @@ class HtmlCanvas implements Canvas {
       case SRC_IN:
         return "source-in";
       case DST_IN:
-        return "destionation-in";
+        return "destination-in";
       case SRC_OUT:
         return "source-out";
       case DST_OUT:
