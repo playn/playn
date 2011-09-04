@@ -29,30 +29,41 @@ class FlashPointer implements Pointer {
   FlashPointer() {
     // Mouse handlers.
     FlashPlatform.captureEvent(Sprite.MOUSEDOWN, new EventHandler<MouseEvent>() {
-      public void handleEvent(MouseEvent evt) {
-        evt.preventDefault();  
+      public void handleEvent(MouseEvent nativeEvent) {
         mouseDown = true;
         if (listener != null) {
-          listener.onPointerStart(
-            new Event.Impl(PlayN.currentTime(), evt.getStageX(), evt.getStageY()));
+          Event.Impl event = new Event.Impl(PlayN.currentTime(), nativeEvent.getStageX(),
+              nativeEvent.getStageY());
+          listener.onPointerStart(event);
+          if (event.getPreventDefault()) {
+            nativeEvent.preventDefault();
+          }
         }
       }
     });
     FlashPlatform.captureEvent(Sprite.MOUSEUP, new EventHandler<MouseEvent>() {
-      public void handleEvent(MouseEvent evt) {
+      public void handleEvent(MouseEvent nativeEvent) {
         mouseDown = false;
         if (listener != null) {
-          listener.onPointerEnd(
-            new Event.Impl(PlayN.currentTime(), evt.getStageX(), evt.getStageY()));
+          Event.Impl event = new Event.Impl(PlayN.currentTime(), nativeEvent.getStageX(),
+              nativeEvent.getStageY());
+          listener.onPointerEnd(event);
+          if (event.getPreventDefault()) {
+            nativeEvent.preventDefault();
+          }
         }
       }
     });
     FlashPlatform.captureEvent(Sprite.MOUSEMOVE, new EventHandler<MouseEvent>() {
-      public void handleEvent(MouseEvent evt) {
+      public void handleEvent(MouseEvent nativeEvent) {
         if (listener != null) {
           if (mouseDown) {
-            listener.onPointerDrag(
-              new Event.Impl(PlayN.currentTime(), evt.getStageX(), evt.getStageY()));
+            Event.Impl event = new Event.Impl(PlayN.currentTime(), nativeEvent.getStageX(),
+                nativeEvent.getStageY());
+            listener.onPointerDrag(event);
+            if (event.getPreventDefault()) {
+              nativeEvent.preventDefault();
+            }
           }
         }
       }

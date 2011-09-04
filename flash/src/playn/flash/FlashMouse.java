@@ -28,30 +28,38 @@ class FlashMouse implements Mouse {
   FlashMouse() {
     // Mouse handlers.
     FlashPlatform.captureEvent(Sprite.MOUSEDOWN, new EventHandler<MouseEvent>() {
-      public void handleEvent(MouseEvent evt) {
-        evt.preventDefault();
+      public void handleEvent(MouseEvent nativeEvent) {
         if (listener != null) {
-          listener.onMouseDown(
-            new ButtonEvent.Impl(PlayN.currentTime(), evt.getStageX(), evt.getStageY(),
-                                 getMouseButton(evt)));
+          ButtonEvent.Impl event = new ButtonEvent.Impl(PlayN.currentTime(),
+              nativeEvent.getStageX(), nativeEvent.getStageY(), getMouseButton(nativeEvent));
+          listener.onMouseDown(event);
+          if (event.getPreventDefault()) {
+            nativeEvent.preventDefault();
+          }
         }
       }
     });
     FlashPlatform.captureEvent(Sprite.MOUSEUP, new EventHandler<MouseEvent>() {
-      public void handleEvent(MouseEvent evt) {
+      public void handleEvent(MouseEvent nativeEvent) {
         if (listener != null) {
-          listener.onMouseUp(
-            new ButtonEvent.Impl(PlayN.currentTime(), evt.getStageX(), evt.getStageY(),
-                // TODO: fix to handle release of right button / middle button
-                                 Mouse.BUTTON_LEFT));
+          ButtonEvent.Impl event = new ButtonEvent.Impl(PlayN.currentTime(),
+              nativeEvent.getStageX(), nativeEvent.getStageY(), getMouseButton(nativeEvent));
+          listener.onMouseUp(event);
+          if (event.getPreventDefault()) {
+            nativeEvent.preventDefault();
+          }
         }
       }
     });
     FlashPlatform.captureEvent(Sprite.MOUSEMOVE, new EventHandler<MouseEvent>() {
-      public void handleEvent(MouseEvent evt) {
+      public void handleEvent(MouseEvent nativeEvent) {
         if (listener != null) {
-          listener.onMouseMove(
-            new MotionEvent.Impl(PlayN.currentTime(), evt.getStageX(), evt.getStageY()));
+          MotionEvent.Impl event = new MotionEvent.Impl(PlayN.currentTime(),
+              nativeEvent.getStageX(), nativeEvent.getStageY());
+          listener.onMouseMove(event);
+          if (event.getPreventDefault()) {
+            nativeEvent.preventDefault();
+          }
         }
       }
     });

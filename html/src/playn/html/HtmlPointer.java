@@ -27,16 +27,16 @@ class HtmlPointer extends HtmlInput implements Pointer {
     // capture mouse down on the root element, only.
     captureEvent(rootElement, "mousedown", new EventHandler() {
       @Override
-      public void handleEvent(NativeEvent evt) {
+      public void handleEvent(NativeEvent nativeEvent) {
         if (listener != null) {
-          // Prevent the default so that the target element doesn't highlight.
-          evt.preventDefault();
-
           inDragSequence = true;
 
-          listener.onPointerStart(
-            new Event.Impl(PlayN.currentTime(), getRelativeX(evt, rootElement),
-                           getRelativeY(evt, rootElement)));
+          Event.Impl event = new Event.Impl(PlayN.currentTime(), getRelativeX(nativeEvent,
+              rootElement), getRelativeY(nativeEvent, rootElement));
+          listener.onPointerStart(event);
+          if (event.getPreventDefault()) {
+            nativeEvent.preventDefault();
+          }
         }
       }
     });
@@ -44,16 +44,16 @@ class HtmlPointer extends HtmlInput implements Pointer {
     // capture mouse up anywhere on the page as long as we are in a drag sequence
     capturePageEvent("mouseup", new EventHandler() {
       @Override
-      public void handleEvent(NativeEvent evt) {
+      public void handleEvent(NativeEvent nativeEvent) {
         if (listener != null && inDragSequence) {
-          // Prevent the default so that the target element doesn't highlight.
-          evt.preventDefault();
-
           inDragSequence = false;
 
-          listener.onPointerEnd(
-            new Event.Impl(PlayN.currentTime(), getRelativeX(evt, rootElement),
-                           getRelativeY(evt, rootElement)));
+          Event.Impl event = new Event.Impl(PlayN.currentTime(), getRelativeX(nativeEvent,
+              rootElement), getRelativeY(nativeEvent, rootElement));
+          listener.onPointerEnd(event);
+          if (event.getPreventDefault()) {
+            nativeEvent.preventDefault();
+          }
         }
       }
     });
@@ -61,12 +61,14 @@ class HtmlPointer extends HtmlInput implements Pointer {
     // capture mouse move anywhere on the page that fires only if we are in a drag sequence
     capturePageEvent("mousemove", new EventHandler() {
       @Override
-      public void handleEvent(NativeEvent evt) {
+      public void handleEvent(NativeEvent nativeEvent) {
         if (listener != null && inDragSequence) {
-          evt.preventDefault();
-          listener.onPointerDrag(
-            new Event.Impl(PlayN.currentTime(), getRelativeX(evt, rootElement),
-                           getRelativeY(evt, rootElement)));
+          Event.Impl event = new Event.Impl(PlayN.currentTime(), getRelativeX(nativeEvent,
+              rootElement), getRelativeY(nativeEvent, rootElement));
+          listener.onPointerDrag(event);
+          if (event.getPreventDefault()) {
+            nativeEvent.preventDefault();
+          }
         }
       }
     });
@@ -74,17 +76,18 @@ class HtmlPointer extends HtmlInput implements Pointer {
     // capture touch start on the root element, only.
     captureEvent(rootElement, "touchstart", new EventHandler() {
       @Override
-      public void handleEvent(NativeEvent evt) {
+      public void handleEvent(NativeEvent nativeEvent) {
         if (listener != null) {
-          // Prevent the default so that the target element doesn't highlight.
-          evt.preventDefault();
-
-          if (evt.getTouches().length() > 0) {
+          if (nativeEvent.getTouches().length() > 0) {
             inDragSequence = true;
-            com.google.gwt.dom.client.Touch touch = evt.getTouches().get(0);
+            com.google.gwt.dom.client.Touch touch = nativeEvent.getTouches().get(0);
             float x = touch.getRelativeX(rootElement);
             float y = touch.getRelativeY(rootElement);
-            listener.onPointerStart(new Event.Impl(PlayN.currentTime(), x, y));
+            Event.Impl event = new Event.Impl(PlayN.currentTime(), x, y);
+            listener.onPointerStart(event);
+            if (event.getPreventDefault()) {
+              nativeEvent.preventDefault();
+            }
           }
         }
       }
@@ -93,17 +96,18 @@ class HtmlPointer extends HtmlInput implements Pointer {
     // capture touch end anywhere on the page as long as we are in a drag sequence
     capturePageEvent("touchend", new EventHandler() {
       @Override
-      public void handleEvent(NativeEvent evt) {
+      public void handleEvent(NativeEvent nativeEvent) {
         if (listener != null && inDragSequence) {
-          // Prevent the default so that the target element doesn't highlight.
-          evt.preventDefault();
-
-          if (evt.getTouches().length() > 0) {
+          if (nativeEvent.getTouches().length() > 0) {
             inDragSequence = false;
-            com.google.gwt.dom.client.Touch touch = evt.getTouches().get(0);
+            com.google.gwt.dom.client.Touch touch = nativeEvent.getTouches().get(0);
             float x = touch.getRelativeX(rootElement);
             float y = touch.getRelativeY(rootElement);
-            listener.onPointerEnd(new Event.Impl(PlayN.currentTime(), x, y));
+            Event.Impl event = new Event.Impl(PlayN.currentTime(), x, y);
+            listener.onPointerEnd(event);
+            if (event.getPreventDefault()) {
+              nativeEvent.preventDefault();
+            }
           }
         }
       }
@@ -112,16 +116,17 @@ class HtmlPointer extends HtmlInput implements Pointer {
     // capture touch move anywhere on the page as long as we are in a drag sequence
     capturePageEvent("touchmove", new EventHandler() {
       @Override
-      public void handleEvent(NativeEvent evt) {
+      public void handleEvent(NativeEvent nativeEvent) {
         if (listener != null && inDragSequence) {
-          // Prevent the default so that the target element doesn't highlight.
-          evt.preventDefault();
-
-          if (evt.getTouches().length() > 0) {
-            com.google.gwt.dom.client.Touch touch = evt.getTouches().get(0);
+          if (nativeEvent.getTouches().length() > 0) {
+            com.google.gwt.dom.client.Touch touch = nativeEvent.getTouches().get(0);
             float x = touch.getRelativeX(rootElement);
             float y = touch.getRelativeY(rootElement);
-            listener.onPointerDrag(new Event.Impl(PlayN.currentTime(), x, y));
+            Event.Impl event = new Event.Impl(PlayN.currentTime(), x, y);
+            listener.onPointerDrag(event);
+            if (event.getPreventDefault()) {
+              nativeEvent.preventDefault();
+            }
           }
         }
       }

@@ -195,22 +195,17 @@ public abstract class GameActivity extends Activity {
    * Listener instance on the render thread.
    */
   @Override
-  public boolean onKeyDown(int keyCode, KeyEvent event) {
-    gameView.onKeyDown(new Keyboard.Event.Impl(event.getEventTime(), keyCode));
-    // Don't prevent volume controls from propagating to the system.
-    if (keyCode == KeyEvent.KEYCODE_VOLUME_UP || keyCode == KeyEvent.KEYCODE_VOLUME_DOWN) {
-      return false;
-    }
-    return true;
+  public boolean onKeyDown(int keyCode, KeyEvent nativeEvent) {
+    Keyboard.Event event = new Keyboard.Event.Impl(nativeEvent.getEventTime(), keyCode);
+    gameView.onKeyDown(event);
+    return event.getPreventDefault();
   }
 
   @Override
-  public boolean onKeyUp(int keyCode, KeyEvent event) {
-    gameView.onKeyUp(new Keyboard.Event.Impl(event.getEventTime(), keyCode));
-    if (keyCode == KeyEvent.KEYCODE_VOLUME_UP || keyCode == KeyEvent.KEYCODE_VOLUME_DOWN) {
-      return false;
-    }
-    return true;
+  public boolean onKeyUp(int keyCode, KeyEvent nativeEvent) {
+    Keyboard.Event event = new Keyboard.Event.Impl(nativeEvent.getEventTime(), keyCode);
+    gameView.onKeyUp(event);
+    return event.getPreventDefault();
   }
 
   /**

@@ -24,16 +24,35 @@ class HtmlTouch extends HtmlInput implements Touch {
   private Listener listener;
   boolean inTouchSequence = false; // true when we are in a touch sequence (after touch start but before touch end)
 
+  /**
+   * Special implementation of Event.Impl for keeping track of changes to preventDefault
+   */
+  static class HtmlTouchEventImpl extends Event.Impl {
+    final boolean[] preventDefault;
+
+    public HtmlTouchEventImpl(double time, float x, float y, int id, boolean[] preventDefault) {
+      super(time, x, y, id);
+      this.preventDefault = preventDefault;
+    }
+
+    @Override
+    public void setPreventDefault(boolean preventDefault) {
+      this.preventDefault[0] = preventDefault;
+    }
+
+    @Override
+    public boolean getPreventDefault() {
+      return preventDefault[0];
+    }
+  }
+
   HtmlTouch(final Element rootElement) {
     // capture touch start on the root element, only.
     captureEvent(rootElement, "touchstart", new EventHandler() {
       @Override
-      public void handleEvent(NativeEvent evt) {
+      public void handleEvent(NativeEvent nativeEvent) {
         if (listener != null) {
-          // Prevent the default so that the target element doesn't highlight.
-          evt.preventDefault();
-
-          JsArray<com.google.gwt.dom.client.Touch> nativeTouches = evt.getTouches();
+          JsArray<com.google.gwt.dom.client.Touch> nativeTouches = nativeEvent.getTouches();
           int nativeTouchesLen = nativeTouches.length();
 
           if (nativeTouchesLen == 0) {
@@ -42,6 +61,7 @@ class HtmlTouch extends HtmlInput implements Touch {
           }
 
           inTouchSequence = true;
+          boolean[] preventDefault = {false};
 
           // Convert the JsArray<Native Touch> to an array of Touch.Events
           Event[] touches = new Event[nativeTouchesLen];
@@ -49,10 +69,13 @@ class HtmlTouch extends HtmlInput implements Touch {
             com.google.gwt.dom.client.Touch touch = nativeTouches.get(t);
             float x = touch.getRelativeX(rootElement);
             float y = touch.getRelativeY(rootElement);
-            int id = getTouchIdentifier(evt, t);
-            touches[t] = new Event.Impl(PlayN.currentTime(), x, y, id);
+            int id = getTouchIdentifier(nativeEvent, t);
+            touches[t] = new HtmlTouchEventImpl(PlayN.currentTime(), x, y, id, preventDefault);
           }
           listener.onTouchStart(touches);
+          if (preventDefault[0]) {
+            nativeEvent.preventDefault();
+          }
         }
       }
     });
@@ -60,13 +83,12 @@ class HtmlTouch extends HtmlInput implements Touch {
     // capture touch end anywhere on the page as long as we are in a touch sequence
     capturePageEvent("touchend", new EventHandler() {
       @Override
-      public void handleEvent(NativeEvent evt) {
+      public void handleEvent(NativeEvent nativeEvent) {
         if (listener != null && inTouchSequence) {
-          // Prevent the default so that the target element doesn't highlight.
-          evt.preventDefault();
-
-          JsArray<com.google.gwt.dom.client.Touch> nativeTouches = evt.getTouches();
+          JsArray<com.google.gwt.dom.client.Touch> nativeTouches = nativeEvent.getTouches();
           int nativeTouchesLen = nativeTouches.length();
+
+          boolean[] preventDefault = {false};
 
           // Convert the JsArray<Native Touch> to an array of Touch.Events
           Event[] touches = new Event[nativeTouchesLen];
@@ -74,10 +96,13 @@ class HtmlTouch extends HtmlInput implements Touch {
             com.google.gwt.dom.client.Touch touch = nativeTouches.get(t);
             float x = touch.getRelativeX(rootElement);
             float y = touch.getRelativeY(rootElement);
-            int id = getTouchIdentifier(evt, t);
-            touches[t] = new Event.Impl(PlayN.currentTime(), x, y, id);
+            int id = getTouchIdentifier(nativeEvent, t);
+            touches[t] = new HtmlTouchEventImpl(PlayN.currentTime(), x, y, id, preventDefault);
           }
           listener.onTouchEnd(touches);
+          if (preventDefault[0]) {
+            nativeEvent.preventDefault();
+          }
 
           // ending a touch sequence
           inTouchSequence = false;
@@ -88,13 +113,12 @@ class HtmlTouch extends HtmlInput implements Touch {
     // capture touch move anywhere on the page as long as we are in a touch sequence
     capturePageEvent("touchmove", new EventHandler() {
       @Override
-      public void handleEvent(NativeEvent evt) {
+      public void handleEvent(NativeEvent nativeEvent) {
         if (listener != null && inTouchSequence) {
-          // Prevent the default so that the target element doesn't highlight.
-          evt.preventDefault();
-
-          JsArray<com.google.gwt.dom.client.Touch> nativeTouches = evt.getTouches();
+          JsArray<com.google.gwt.dom.client.Touch> nativeTouches = nativeEvent.getTouches();
           int nativeTouchesLen = nativeTouches.length();
+
+          boolean[] preventDefault = {false};
 
           // Convert the JsArray<Native Touch> to an array of Touch.Events
           Event[] touches = new Event[nativeTouchesLen];
@@ -102,10 +126,13 @@ class HtmlTouch extends HtmlInput implements Touch {
             com.google.gwt.dom.client.Touch touch = nativeTouches.get(t);
             float x = touch.getRelativeX(rootElement);
             float y = touch.getRelativeY(rootElement);
-            int id = getTouchIdentifier(evt, t);
-            touches[t] = new Event.Impl(PlayN.currentTime(), x, y, id);
+            int id = getTouchIdentifier(nativeEvent, t);
+            touches[t] = new HtmlTouchEventImpl(PlayN.currentTime(), x, y, id, preventDefault);
           }
           listener.onTouchMove(touches);
+          if (preventDefault[0]) {
+            nativeEvent.preventDefault();
+          }
         }
       }
     });

@@ -28,16 +28,19 @@ public class AndroidKeyboard implements Keyboard {
   /*
    * The methods below are called from the GL render thread
    */
-
-  void onKeyDown(Event event) {
+  boolean onKeyDown(Event event) {
     if (listener != null) {
       listener.onKeyDown(event);
+      return event.getPreventDefault();
     }
+    return false;
   }
 
-  void onKeyUp(Event event) {
+  boolean onKeyUp(Event event) {
     if (listener != null) {
       listener.onKeyUp(event);
+      return event.getPreventDefault();
     }
+    return false;
   }
 }

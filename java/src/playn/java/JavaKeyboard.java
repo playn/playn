@@ -28,15 +28,23 @@ class JavaKeyboard implements Keyboard {
 
   JavaKeyboard(JFrame frame) {
     frame.addKeyListener(new KeyListener() {
-      public void keyPressed(KeyEvent e) {
+      public void keyPressed(KeyEvent nativeEvent) {
         if (listener != null) {
-          listener.onKeyDown(new Event.Impl(e.getWhen(), e.getKeyCode()));
+          Event.Impl event = new Event.Impl(nativeEvent.getWhen(), nativeEvent.getKeyCode());
+          listener.onKeyDown(event);
+          if (event.getPreventDefault()) {
+            nativeEvent.consume();
+          }
         }
       }
 
-      public void keyReleased(KeyEvent e) {
+      public void keyReleased(KeyEvent nativeEvent) {
         if (listener != null) {
-          listener.onKeyUp(new Event.Impl(e.getWhen(), e.getKeyCode()));
+          Event.Impl event = new Event.Impl(nativeEvent.getWhen(), nativeEvent.getKeyCode());
+          listener.onKeyUp(event);
+          if (event.getPreventDefault()) {
+            nativeEvent.consume();
+          }
         }
       }
 

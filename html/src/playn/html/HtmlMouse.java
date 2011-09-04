@@ -27,16 +27,17 @@ class HtmlMouse extends HtmlInput implements Mouse {
     // capture mouse down on the root element, only.
     captureEvent(rootElement, "mousedown", new EventHandler() {
       @Override
-      public void handleEvent(NativeEvent evt) {
+      public void handleEvent(NativeEvent nativeEvent) {
         if (listener != null) {
-          // Prevent the default so that the target element doesn't highlight.
-          evt.preventDefault();
-
           inDragSequence = true;
 
-          listener.onMouseDown(
-            new ButtonEvent.Impl(PlayN.currentTime(), getRelativeX(evt, rootElement),
-                                 getRelativeY(evt, rootElement), getMouseButton(evt)));
+          ButtonEvent.Impl event = new ButtonEvent.Impl(PlayN.currentTime(), getRelativeX(
+              nativeEvent, rootElement), getRelativeY(nativeEvent, rootElement),
+              getMouseButton(nativeEvent));
+          listener.onMouseDown(event);
+          if (event.getPreventDefault()) {
+            nativeEvent.preventDefault();
+          }
         }
       }
     });
@@ -44,16 +45,17 @@ class HtmlMouse extends HtmlInput implements Mouse {
     // capture mouse up anywhere on the page as long as we are in a drag sequence
     capturePageEvent("mouseup", new EventHandler() {
       @Override
-      public void handleEvent(NativeEvent evt) {
+      public void handleEvent(NativeEvent nativeEvent) {
         if (listener != null && inDragSequence) {
-          // Prevent the default so that the target element doesn't highlight.
-          evt.preventDefault();
-
           inDragSequence = false;
 
-          listener.onMouseUp(
-            new ButtonEvent.Impl(PlayN.currentTime(), getRelativeX(evt, rootElement),
-                                 getRelativeY(evt, rootElement), getMouseButton(evt)));
+          ButtonEvent.Impl event = new ButtonEvent.Impl(PlayN.currentTime(), getRelativeX(
+              nativeEvent, rootElement), getRelativeY(nativeEvent, rootElement),
+              getMouseButton(nativeEvent));
+          listener.onMouseUp(event);
+          if (event.getPreventDefault()) {
+            nativeEvent.preventDefault();
+          }
         }
       }
     });
@@ -61,12 +63,14 @@ class HtmlMouse extends HtmlInput implements Mouse {
     // capture mouse move anywhere on the page that fires only if we are in a drag sequence
     capturePageEvent("mousemove", new EventHandler() {
       @Override
-      public void handleEvent(NativeEvent evt) {
+      public void handleEvent(NativeEvent nativeEvent) {
         if (listener != null && inDragSequence) {
-          evt.preventDefault();
-          listener.onMouseMove(
-            new MotionEvent.Impl(PlayN.currentTime(), getRelativeX(evt, rootElement),
-                                 getRelativeY(evt, rootElement)));
+          MotionEvent.Impl event = new MotionEvent.Impl(PlayN.currentTime(), getRelativeX(
+              nativeEvent, rootElement), getRelativeY(nativeEvent, rootElement));
+          listener.onMouseMove(event);
+          if (event.getPreventDefault()) {
+            nativeEvent.preventDefault();
+          }
         }
       }
     });
@@ -75,25 +79,27 @@ class HtmlMouse extends HtmlInput implements Mouse {
     // (the page-level event listener will handle the firing when we are in a drag sequence)
     captureEvent(rootElement, "mousemove", new EventHandler() {
       @Override
-      public void handleEvent(NativeEvent evt) {
+      public void handleEvent(NativeEvent nativeEvent) {
         if (listener != null && !inDragSequence) {
-          listener.onMouseMove(
-            new MotionEvent.Impl(PlayN.currentTime(), getRelativeX(evt, rootElement),
-                                 getRelativeY(evt, rootElement)));
+          MotionEvent.Impl event = new MotionEvent.Impl(PlayN.currentTime(), getRelativeX(
+              nativeEvent, rootElement), getRelativeY(nativeEvent, rootElement));
+          listener.onMouseMove(event);
+          if (event.getPreventDefault()) {
+            nativeEvent.preventDefault();
+          }
         }
       }
     });
 
     captureEvent(rootElement, getMouseWheelEvent(), new EventHandler() {
       @Override
-      public void handleEvent(NativeEvent evt) {
+      public void handleEvent(NativeEvent nativeEvent) {
         if (listener != null) {
-          // We need to prevent the default so that the page doesn't scroll.
-          // The user can still scroll if the mouse isn't over the root element.
-          evt.preventDefault();
-
-          listener.onMouseWheelScroll(
-            new WheelEvent.Impl(PlayN.currentTime(), getMouseWheelVelocity(evt)));
+          WheelEvent.Impl event = new WheelEvent.Impl(PlayN.currentTime(), getMouseWheelVelocity(nativeEvent));
+          listener.onMouseWheelScroll(event);
+          if (event.getPreventDefault()) {
+            nativeEvent.preventDefault();
+          }
         }
       }
     });

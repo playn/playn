@@ -27,19 +27,25 @@ class HtmlKeyboard implements Keyboard {
   public void init() {
     // Key handlers.
     HtmlPlatform.captureEvent("keydown", new EventHandler() {
-      public void handleEvent(NativeEvent evt) {
+      public void handleEvent(NativeEvent nativeEvent) {
         if (listener != null) {
-          listener.onKeyDown(new Event.Impl(PlayN.currentTime(), evt.getKeyCode()));
-          evt.preventDefault();
+          Event.Impl event = new Event.Impl(PlayN.currentTime(), nativeEvent.getKeyCode());
+          listener.onKeyDown(event);
+          if (event.getPreventDefault()) {
+            nativeEvent.preventDefault();
+          }
         }
       }
     });
 
     HtmlPlatform.captureEvent("keyup", new EventHandler() {
-      public void handleEvent(NativeEvent evt) {
+      public void handleEvent(NativeEvent nativeEvent) {
         if (listener != null) {
-          listener.onKeyUp(new Event.Impl(PlayN.currentTime(), evt.getKeyCode()));
-          evt.preventDefault();
+          Event.Impl event = new Event.Impl(PlayN.currentTime(), nativeEvent.getKeyCode());
+          listener.onKeyUp(event);
+          if (event.getPreventDefault()) {
+            nativeEvent.preventDefault();
+          }
         }
       }
     });

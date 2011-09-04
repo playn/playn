@@ -30,9 +30,14 @@ class JavaPointer implements Pointer {
 
   JavaPointer(JComponent frame) {
     frame.addMouseMotionListener(new MouseMotionListener() {
-      public void mouseDragged(MouseEvent e) {
+      public void mouseDragged(MouseEvent nativeEvent) {
         if (listener != null) {
-          listener.onPointerDrag(new Event.Impl(e.getWhen(), e.getX(), e.getY()));
+          Event.Impl event = new Event.Impl(nativeEvent.getWhen(), nativeEvent.getX(),
+              nativeEvent.getY());
+          listener.onPointerDrag(event);
+          if (event.getPreventDefault()) {
+            nativeEvent.consume();
+          }
         }
       }
 
@@ -50,15 +55,25 @@ class JavaPointer implements Pointer {
       public void mouseExited(MouseEvent e) {
       }
 
-      public void mousePressed(MouseEvent e) {
+      public void mousePressed(MouseEvent nativeEvent) {
         if (listener != null) {
-          listener.onPointerStart(new Event.Impl(e.getWhen(), e.getX(), e.getY()));
+          Event.Impl event = new Event.Impl(nativeEvent.getWhen(), nativeEvent.getX(),
+              nativeEvent.getY());
+          listener.onPointerStart(event);
+          if (event.getPreventDefault()) {
+            nativeEvent.consume();
+          }
         }
       }
 
-      public void mouseReleased(MouseEvent e) {
+      public void mouseReleased(MouseEvent nativeEvent) {
         if (listener != null) {
-          listener.onPointerEnd(new Event.Impl(e.getWhen(), e.getX(), e.getY()));
+          Event.Impl event = new Event.Impl(nativeEvent.getWhen(), nativeEvent.getX(),
+              nativeEvent.getY());
+          listener.onPointerEnd(event);
+          if (event.getPreventDefault()) {
+            nativeEvent.consume();
+          }
         }
       }
     });

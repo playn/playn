@@ -28,17 +28,25 @@ class FlashKeyboard implements Keyboard {
   FlashKeyboard() {
     // Key handlers.
     FlashPlatform.captureEvent(InteractiveObject.KEYDOWN, new EventHandler<KeyboardEvent>() {
-      public void handleEvent(KeyboardEvent evt) {
+      public void handleEvent(KeyboardEvent nativeEvent) {
         if (listener != null) {
-          listener.onKeyDown(new Event.Impl(PlayN.currentTime(), evt.keyCode()));
+          Event.Impl event = new Event.Impl(PlayN.currentTime(), nativeEvent.keyCode());
+          listener.onKeyDown(event);
+          if (event.getPreventDefault()) {
+            nativeEvent.preventDefault();
+          }
         }
       }
     });
 
     FlashPlatform.captureEvent(InteractiveObject.KEYUP, new EventHandler<KeyboardEvent>() {
-      public void handleEvent(KeyboardEvent evt) {
+      public void handleEvent(KeyboardEvent nativeEvent) {
         if (listener != null) {
-          listener.onKeyUp(new Event.Impl(PlayN.currentTime(), evt.keyCode()));
+          Event.Impl event = new Event.Impl(PlayN.currentTime(), nativeEvent.keyCode());
+          listener.onKeyUp(event);
+          if (event.getPreventDefault()) {
+            nativeEvent.preventDefault();
+          }
         }
       }
     });

@@ -23,6 +23,23 @@ public class Events {
   /** The base for all input events. */
   public interface Input {
     /**
+     * Return whether the default action normally taken by the platform will be prevented.
+     */
+    boolean getPreventDefault();
+
+    /**
+     * Set whether the default action normally taken by the platform as a result of the event should
+     * be performed. By default, the default action is not prevented.
+     * <p>
+     * For example, pressing the down key in a browser typically scrolls the window. Calling
+     * {@link #setPreventDefault(true)} prevents this action.
+     * <p>
+     * Note: this must be set from inside the event handler callback (e.g., onKeyUp()). If it is
+     * called after the callback has returned, setPreventDefault will have no effect.
+     */
+    void setPreventDefault(boolean preventDefault);
+
+    /**
      * The time at which this event was generated, in milliseconds. This time's magnitude is not
      * portable (i.e. may not be the same across backends), clients must interpret it as only a
      * monotonically increasing value.
@@ -33,6 +50,7 @@ public class Events {
 
     abstract class Impl implements Input {
       private final double time;
+      private boolean preventDefault; // default false
 
       @Override
       public double time() {
@@ -41,6 +59,16 @@ public class Events {
 
       protected Impl(double time) {
         this.time = time;
+      }
+
+      @Override
+      public void setPreventDefault(boolean preventDefault) {
+        this.preventDefault = preventDefault;
+      }
+
+      @Override
+      public boolean getPreventDefault() {
+        return preventDefault;
       }
     }
   }

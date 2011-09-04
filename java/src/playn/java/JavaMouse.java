@@ -31,16 +31,26 @@ class JavaMouse implements Mouse {
 
   JavaMouse(JComponent frame) {
     frame.addMouseMotionListener(new MouseMotionListener() {
-      public void mouseDragged(MouseEvent e) {
+      public void mouseDragged(MouseEvent nativeEvent) {
         // mouseMoved(MouseEvent) does not fire when dragged
         if (listener != null) {
-          listener.onMouseMove(new MotionEvent.Impl(e.getWhen(), e.getX(), e.getY()));
+          MotionEvent.Impl event = new MotionEvent.Impl(nativeEvent.getWhen(), nativeEvent.getX(),
+              nativeEvent.getY());
+          listener.onMouseMove(event);
+          if (event.getPreventDefault()) {
+            nativeEvent.consume();
+          }
         }
       }
 
-      public void mouseMoved(MouseEvent e) {
+      public void mouseMoved(MouseEvent nativeEvent) {
         if (listener != null) {
-          listener.onMouseMove(new MotionEvent.Impl(e.getWhen(), e.getX(), e.getY()));
+          MotionEvent.Impl event = new MotionEvent.Impl(nativeEvent.getWhen(), nativeEvent.getX(),
+              nativeEvent.getY());
+          listener.onMouseMove(event);
+          if (event.getPreventDefault()) {
+            nativeEvent.consume();
+          }
         }
       }
     });
@@ -55,26 +65,39 @@ class JavaMouse implements Mouse {
       public void mouseExited(MouseEvent e) {
       }
 
-      public void mousePressed(MouseEvent e) {
+      public void mousePressed(MouseEvent nativeEvent) {
         if (listener != null) {
-          listener.onMouseDown(
-            new ButtonEvent.Impl(e.getWhen(), e.getX(), e.getY(), getMouseButton(e)));
+          ButtonEvent.Impl event = new ButtonEvent.Impl(nativeEvent.getWhen(), nativeEvent.getX(),
+              nativeEvent.getY(), getMouseButton(nativeEvent));
+          listener.onMouseDown(event);
+          if (event.getPreventDefault()) {
+            nativeEvent.consume();
+          }
         }
       }
 
-      public void mouseReleased(MouseEvent e) {
+      public void mouseReleased(MouseEvent nativeEvent) {
         if (listener != null) {
-          listener.onMouseUp(
-            new ButtonEvent.Impl(e.getWhen(), e.getX(), e.getY(), getMouseButton(e)));
+          ButtonEvent.Impl event = new ButtonEvent.Impl(nativeEvent.getWhen(), nativeEvent.getX(),
+              nativeEvent.getY(), getMouseButton(nativeEvent));
+          listener.onMouseUp(event);
+          if (event.getPreventDefault()) {
+            nativeEvent.consume();
+          }
         }
       }
     });
 
     frame.addMouseWheelListener(new MouseWheelListener() {
       @Override
-      public void mouseWheelMoved(MouseWheelEvent e) {
+      public void mouseWheelMoved(MouseWheelEvent nativeEvent) {
         if (listener != null) {
-          listener.onMouseWheelScroll(new WheelEvent.Impl(e.getWhen(), e.getWheelRotation()));
+          WheelEvent.Impl event = new WheelEvent.Impl(nativeEvent.getWhen(),
+              nativeEvent.getWheelRotation());
+          listener.onMouseWheelScroll(event);
+          if (event.getPreventDefault()) {
+            nativeEvent.consume();
+          }
         }
       }
     });
