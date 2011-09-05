@@ -13,9 +13,6 @@
  */
 package playn.html;
 
-import com.google.gwt.webgl.client.WebGLRenderingContext;
-
-import playn.core.AbstractLayer;
 import playn.core.InternalTransform;
 import playn.core.gl.LayerGL;
 

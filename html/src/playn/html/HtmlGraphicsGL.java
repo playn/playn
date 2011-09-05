@@ -13,7 +13,39 @@
  */
 package playn.html;
 
-import static com.google.gwt.webgl.client.WebGLRenderingContext.*;
+import static com.google.gwt.webgl.client.WebGLRenderingContext.ARRAY_BUFFER;
+import static com.google.gwt.webgl.client.WebGLRenderingContext.BLEND;
+import static com.google.gwt.webgl.client.WebGLRenderingContext.CLAMP_TO_EDGE;
+import static com.google.gwt.webgl.client.WebGLRenderingContext.COLOR_BUFFER_BIT;
+import static com.google.gwt.webgl.client.WebGLRenderingContext.CULL_FACE;
+import static com.google.gwt.webgl.client.WebGLRenderingContext.DST_ALPHA;
+import static com.google.gwt.webgl.client.WebGLRenderingContext.ELEMENT_ARRAY_BUFFER;
+import static com.google.gwt.webgl.client.WebGLRenderingContext.FLOAT;
+import static com.google.gwt.webgl.client.WebGLRenderingContext.FRAMEBUFFER;
+import static com.google.gwt.webgl.client.WebGLRenderingContext.FUNC_ADD;
+import static com.google.gwt.webgl.client.WebGLRenderingContext.LINEAR;
+import static com.google.gwt.webgl.client.WebGLRenderingContext.NO_ERROR;
+import static com.google.gwt.webgl.client.WebGLRenderingContext.ONE_MINUS_SRC_ALPHA;
+import static com.google.gwt.webgl.client.WebGLRenderingContext.REPEAT;
+import static com.google.gwt.webgl.client.WebGLRenderingContext.RGBA;
+import static com.google.gwt.webgl.client.WebGLRenderingContext.SRC_ALPHA;
+import static com.google.gwt.webgl.client.WebGLRenderingContext.STREAM_DRAW;
+import static com.google.gwt.webgl.client.WebGLRenderingContext.TEXTURE0;
+import static com.google.gwt.webgl.client.WebGLRenderingContext.TEXTURE_2D;
+import static com.google.gwt.webgl.client.WebGLRenderingContext.TEXTURE_MAG_FILTER;
+import static com.google.gwt.webgl.client.WebGLRenderingContext.TEXTURE_MIN_FILTER;
+import static com.google.gwt.webgl.client.WebGLRenderingContext.TEXTURE_WRAP_S;
+import static com.google.gwt.webgl.client.WebGLRenderingContext.TEXTURE_WRAP_T;
+import static com.google.gwt.webgl.client.WebGLRenderingContext.TRIANGLES;
+import static com.google.gwt.webgl.client.WebGLRenderingContext.UNSIGNED_BYTE;
+import static com.google.gwt.webgl.client.WebGLRenderingContext.UNSIGNED_SHORT;
+import playn.core.CanvasLayer;
+import playn.core.GroupLayer;
+import playn.core.Image;
+import playn.core.ImageLayer;
+import playn.core.InternalTransform;
+import playn.core.PlayN;
+import playn.core.SurfaceLayer;
 
 import com.google.gwt.dom.client.CanvasElement;
 import com.google.gwt.dom.client.Document;
@@ -31,14 +63,6 @@ import com.google.gwt.webgl.client.WebGLRenderingContext;
 import com.google.gwt.webgl.client.WebGLTexture;
 import com.google.gwt.webgl.client.WebGLUniformLocation;
 import com.google.gwt.webgl.client.WebGLUtil;
-
-import playn.core.CanvasLayer;
-import playn.core.PlayN;
-import playn.core.GroupLayer;
-import playn.core.Image;
-import playn.core.ImageLayer;
-import playn.core.InternalTransform;
-import playn.core.SurfaceLayer;
 
 class HtmlGraphicsGL extends HtmlGraphics {
 
@@ -59,7 +83,7 @@ class HtmlGraphicsGL extends HtmlGraphics {
     WebGLUniformLocation uScreenSizeLoc;
     int aMatrix, aTranslation, aPosition, aTexture;
 
-    WebGLBuffer buffer, indexBuffer;
+    WebGLBuffer vertexBuffer, elementBuffer;
 
     Float32Array vertexData = Float32Array.create(VERTEX_SIZE * MAX_VERTS);
     Uint16Array elementData = Uint16Array.create(MAX_ELEMS);
@@ -78,16 +102,16 @@ class HtmlGraphicsGL extends HtmlGraphics {
       aTexture = gl.getAttribLocation(program, "a_Texture");
 
       // Create the vertex and index buffers.
-      buffer = gl.createBuffer();
-      indexBuffer = gl.createBuffer();
+      vertexBuffer = gl.createBuffer();
+      elementBuffer = gl.createBuffer();
     }
 
     boolean prepare() {
       if (useShader(this)) {
         gl.useProgram(program);
         gl.uniform2fv(uScreenSizeLoc, new float[] { screenWidth, screenHeight });
-        gl.bindBuffer(ARRAY_BUFFER, buffer);
-        gl.bindBuffer(ELEMENT_ARRAY_BUFFER, indexBuffer);
+        gl.bindBuffer(ARRAY_BUFFER, vertexBuffer);
+        gl.bindBuffer(ELEMENT_ARRAY_BUFFER, elementBuffer);
 
         gl.enableVertexAttribArray(aMatrix);
         gl.enableVertexAttribArray(aTranslation);

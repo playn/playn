@@ -15,15 +15,14 @@
  */
 package playn.html;
 
-import com.google.gwt.dom.client.CanvasElement;
-import com.google.gwt.dom.client.Document;
-import com.google.gwt.webgl.client.WebGLRenderingContext;
-import com.google.gwt.webgl.client.WebGLTexture;
-
 import playn.core.Asserts;
 import playn.core.Canvas;
 import playn.core.CanvasLayer;
 import playn.core.InternalTransform;
+
+import com.google.gwt.dom.client.CanvasElement;
+import com.google.gwt.dom.client.Document;
+import com.google.gwt.webgl.client.WebGLTexture;
 
 class HtmlCanvasLayerGL extends HtmlLayerGL implements CanvasLayer {
 

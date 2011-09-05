@@ -13,8 +13,6 @@
  */
 package playn.html;
 
-import com.google.gwt.webgl.client.WebGLRenderingContext;
-
 import playn.core.Asserts;
 import playn.core.GroupLayer;
 import playn.core.GroupLayerImpl;

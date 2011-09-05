@@ -13,14 +13,13 @@
  */
 package playn.html;
 
-import com.google.gwt.dom.client.ImageElement;
-import com.google.gwt.webgl.client.WebGLRenderingContext;
-import com.google.gwt.webgl.client.WebGLTexture;
-
 import playn.core.Asserts;
 import playn.core.Image;
 import playn.core.ImageLayer;
 import playn.core.InternalTransform;
+
+import com.google.gwt.dom.client.ImageElement;
+import com.google.gwt.webgl.client.WebGLTexture;
 
 class HtmlImageLayerGL extends HtmlLayerGL implements ImageLayer {
 
@@ -173,6 +172,6 @@ class HtmlImageLayerGL extends HtmlLayerGL implements ImageLayer {
 
   @Override
   public float scaledHeight() {
-    return transform().scaleY() * height();
+    return transform.scaleY() * height();
   }
 }

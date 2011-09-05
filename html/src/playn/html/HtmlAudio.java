@@ -13,13 +13,13 @@
  */
 package playn.html;
 
+import playn.core.Audio;
+import playn.core.PlayN;
+
 import com.allen_sauer.gwt.voices.client.FlashSound;
 import com.allen_sauer.gwt.voices.client.Sound;
 import com.allen_sauer.gwt.voices.client.SoundController;
 import com.allen_sauer.gwt.voices.client.ui.FlashMovie;
-
-import playn.core.Audio;
-import playn.core.PlayN;
 
 /**
  * This class is temporarily public, in order to expose {@link #isFlash9AudioPluginMissing()}, to

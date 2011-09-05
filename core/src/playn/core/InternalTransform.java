@@ -19,6 +19,7 @@ import pythagoras.f.Transform;
  * Exposes internals of our transform to the graphics backends.
  */
 public interface InternalTransform extends Transform {
+
   /** Returns the m00 (x-scale) component of the affine transform matrix. */
   float m00();
 

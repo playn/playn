@@ -20,16 +20,16 @@ import static com.google.gwt.webgl.client.WebGLRenderingContext.FRAMEBUFFER;
 import static com.google.gwt.webgl.client.WebGLRenderingContext.RGBA;
 import static com.google.gwt.webgl.client.WebGLRenderingContext.TEXTURE_2D;
 import static com.google.gwt.webgl.client.WebGLRenderingContext.UNSIGNED_BYTE;
+import playn.core.Asserts;
+import playn.core.Image;
+import playn.core.ResourceCallback;
+import playn.core.gl.GLUtil;
 
 import com.google.gwt.dom.client.CanvasElement;
 import com.google.gwt.dom.client.ImageElement;
 import com.google.gwt.dom.client.NativeEvent;
 import com.google.gwt.webgl.client.WebGLFramebuffer;
 import com.google.gwt.webgl.client.WebGLTexture;
-
-import playn.core.Asserts;
-import playn.core.Image;
-import playn.core.ResourceCallback;
 
 class HtmlImage implements Image {
 
@@ -148,7 +148,7 @@ class HtmlImage implements Image {
     loadTexture(gfx);
 
     // GL requires pow2 on axes that repeat.
-    int width = nextPowerOfTwo(width()), height = nextPowerOfTwo(height());
+    int width = GLUtil.nextPowerOfTwo(width()), height = GLUtil.nextPowerOfTwo(height());
 
     // Don't scale if it's already a power of two.
     if ((width == 0) && (height == 0)) {
@@ -183,28 +183,5 @@ class HtmlImage implements Image {
     gfx.bindFramebuffer();
 
     gfx.gl.deleteFramebuffer(fbuf);
-  }
-
-  /**
-   * Returns the next largest power of two, or zero if x is already a power of two.
-   * 
-   * TODO(jgw): Is there no better way to do this than all this bit twiddling?
-   */
-  private int nextPowerOfTwo(int x) {
-    Asserts.checkArgument(x < 0x10000);
-
-    int bit = 0x8000, highest = -1, count = 0;
-    for (int i = 15; i >= 0; --i, bit >>= 1) {
-      if ((x & bit) != 0) {
-        ++count;
-        if (highest == -1) {
-          highest = i;
-        }
-      }
-    }
-    if (count <= 1) {
-      return 0;
-    }
-    return 1 << (highest + 1);
   }
 }

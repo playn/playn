@@ -21,6 +21,9 @@ import pythagoras.f.Transforms;
  * The default {@link InternalTransform} instance, used on non-JavaScript platforms.
  */
 public class StockInternalTransform extends AffineTransform implements InternalTransform {
+  /** The identity transform, don't modify it! */
+  public static final StockInternalTransform IDENTITY = new StockInternalTransform();
+
   @Override
   public float m00() {
     return m00;
