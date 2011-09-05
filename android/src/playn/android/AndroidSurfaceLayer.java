@@ -1,12 +1,12 @@
 /**
  * Copyright 2011 The PlayN Authors
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -16,27 +16,29 @@
 package playn.android;
 
 import playn.core.Asserts;
-
-import static playn.core.PlayN.graphics;
-import playn.core.CanvasSurface;
+import playn.core.InternalTransform;
 import playn.core.Surface;
 import playn.core.SurfaceLayer;
 
 class AndroidSurfaceLayer extends AndroidLayer implements SurfaceLayer {
 
-  private AndroidImage img;
-  private Surface surface;
+  private AndroidSurface surface;
 
-  AndroidSurfaceLayer(int width, int height) {
-    img = (AndroidImage) graphics().createImage(width, height);
-    surface = new CanvasSurface(img.canvas());
+  private final int width, height;
+
+  AndroidSurfaceLayer(AndroidGraphics gfx, int width, int height) {
+    super(gfx);
+    this.width = width;
+    this.height = height;
+    surface = new AndroidSurface(gfx, width, height);
+
   }
 
   @Override
   public void destroy() {
     super.destroy();
+    surface.destroy();
     surface = null;
-    img = null;
   }
 
   @Override
@@ -45,14 +47,16 @@ class AndroidSurfaceLayer extends AndroidLayer implements SurfaceLayer {
   }
 
   @Override
-  void paint(AndroidCanvas canvas) {
-    if (!visible()) return;
+  public void paint(InternalTransform parentTransform, float parentAlpha) {
+    if (!visible())
+      return;
 
-    canvas.save();
-    transform(canvas);
-    canvas.setAlpha(canvas.alpha() * alpha);
-    canvas.drawImage(img, 0, 0);
-    canvas.restore();
+    // Draw this layer to the screen upside-down, because its contents are
+    // flipped
+    // (This happens because it uses the same vertex program as everything else,
+    // which flips vertically to put the origin at the top-left).
+    gfx.drawTexture(surface.tex(), width, height, localTransform(parentTransform), 0, height, width, -height,
+        false, false, parentAlpha * alpha);
   }
 
   @Override
@@ -76,5 +80,5 @@ class AndroidSurfaceLayer extends AndroidLayer implements SurfaceLayer {
   public float scaledHeight() {
     return transform().scaleY() * height();
   }
-}
 
+}

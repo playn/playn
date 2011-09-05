@@ -18,6 +18,7 @@ package playn.android;
 import playn.core.Asserts;
 import playn.core.Image;
 import playn.core.ImageLayer;
+import playn.core.InternalTransform;
 
 class AndroidImageLayer extends AndroidLayer implements ImageLayer {
 
@@ -29,10 +30,12 @@ class AndroidImageLayer extends AndroidLayer implements ImageLayer {
 
   private AndroidImage image;
 
-  AndroidImageLayer() {
+  AndroidImageLayer(AndroidGraphics gfx) {
+    super(gfx);
   }
 
-  AndroidImageLayer(AndroidImage image) {
+  AndroidImageLayer(AndroidGraphics gfx, AndroidImage image) {
+    this(gfx);
     this.image = image;
   }
 
@@ -61,9 +64,7 @@ class AndroidImageLayer extends AndroidLayer implements ImageLayer {
     Asserts.checkArgument(height > 0, "Height must be > 0");
 
     heightSet = true;
-    if (this.height != height) {
-      this.height = height;
-    }
+    this.height = height;
   }
 
   @Override
@@ -112,32 +113,34 @@ class AndroidImageLayer extends AndroidLayer implements ImageLayer {
     Asserts.checkArgument(width > 0, "Width must be > 0");
 
     widthSet = true;
-    if (this.width != width) {
-      this.width = width;
-    }
+    this.width = width;
   }
 
   @Override
-  void paint(AndroidCanvas canvas) {
-    if (!visible()) return;
+  public void paint(InternalTransform parentTransform, float parentAlpha) {
+    if (!visible())
+      return;
+    
+    gfx.checkGlError("AndroidImageLayer.paint start");
+    if (sourceRectSet) Asserts.check(repeatX == false && repeatY == false);
 
-    canvas.save();
-    transform(canvas);
-    canvas.setAlpha(canvas.alpha() * alpha);
+    int tex = image.ensureTexture(gfx, repeatX, repeatY);
+    if (tex != -1) {
+      InternalTransform xform = localTransform(parentTransform);
+      float childAlpha = parentAlpha * alpha;
 
-    float dw = widthSet ? width : image.width();
-    float dh = heightSet ? height : image.height();
+      float width = widthSet ? this.width : image.width();
+      float height = heightSet ? this.height : image.height();
 
-    if (repeatX || repeatY) {
-      // TODO(jgw): something to make this repeat properly.
-      canvas.drawImage(image, 0, 0, dw, dh);
-    } else if (sourceRectSet) {
-      canvas.drawImage(image, 0, 0, dw, dh, sx, sy, sw, sh);
-    } else {
-      canvas.drawImage(image, 0, 0);
+      if (sourceRectSet) {
+        gfx.drawTexture(tex, image.width(), image.height(), xform, 0, 0, width, height, sx,
+            sy, sw, sh, childAlpha);
+      } else {
+        gfx.drawTexture(tex, image.width(), image.height(), xform, width, height, repeatX,
+            repeatY, childAlpha);
+      }
     }
-
-    canvas.restore();
+    gfx.checkGlError("AndroidImageLayer.paint end");
   }
 
   @Override
@@ -167,6 +170,6 @@ class AndroidImageLayer extends AndroidLayer implements ImageLayer {
 
   @Override
   public float scaledHeight() {
-    return transform().scaleY() * height();
+    return transform.scaleY() * height();
   }
 }

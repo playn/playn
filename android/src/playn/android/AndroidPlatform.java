@@ -15,30 +15,28 @@
  */
 package playn.android;
 
-import java.util.ArrayList;
-
-import android.app.Activity;
-import android.app.ActivityManager;
-import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.Bitmap.Config;
-import android.graphics.Canvas;
-import android.graphics.PixelFormat;
-import android.net.Uri;
-import playn.core.PlayN;
 import playn.core.Game;
 import playn.core.Json;
 import playn.core.Mouse;
 import playn.core.Platform;
-import playn.core.Touch;
-import playn.core.Platform.Type;
+import playn.core.PlayN;
 import playn.java.JavaJson;
+import android.app.ActivityManager;
+import android.content.Context;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.Bitmap.Config;
+import android.graphics.PixelFormat;
+import android.net.Uri;
 
 public class AndroidPlatform implements Platform {
+  public static final boolean DEBUG_LOGS = true;
 
   static AndroidPlatform instance;
+  private static AndroidGL20 gl20;
 
-  public static void register(GameActivity activity) {
+  public static void register(AndroidGL20 _gl20, GameActivity activity) {
+    gl20 = _gl20;
     PlayN.setPlatform(new AndroidPlatform(activity));
   }
 
@@ -64,36 +62,38 @@ public class AndroidPlatform implements Platform {
     instance = this;
     this.activity = activity;
     audio = new AndroidAudio();
-    graphics = new AndroidGraphics();
+    graphics = new AndroidGraphics(gl20);
     json = new JavaJson();
     keyboard = new AndroidKeyboard();
     log = new AndroidLog();
     net = new AndroidNet();
     pointer = new AndroidPointer();
     touch = new AndroidTouch();
-    touchHandler = new AndroidTouchEventHandler();
+    touchHandler = new AndroidTouchEventHandler(activity.gameView());
     assetManager = new AndroidAssetManager();
     analytics = new AndroidAnalytics();
     storage = new AndroidStorage(activity);
 
     assetManager.assets = activity.getAssets();
-    ActivityManager activityManager = (ActivityManager) activity.getApplication().getSystemService(
-        Activity.ACTIVITY_SERVICE);
-    int memoryClass = activityManager.getMemoryClass();
-    
-    // For low memory devices (like the HTC Magic), prefer 16-bit bitmaps
-    preferredBitmapConfig = memoryClass <= 16 ? Bitmap.Config.ARGB_4444 : mapDisplayPixelFormat();
+
+    preferredBitmapConfig = mapDisplayPixelFormat();
   }
 
   /**
    * Determines the most performant pixel format for the active display.
    */
+  // TODO:  This method will require testing over a variety of devices.
   private Config mapDisplayPixelFormat() {
     int format = activity.getWindowManager().getDefaultDisplay().getPixelFormat();
+    ActivityManager activityManager = (ActivityManager) activity.getApplication().getSystemService(
+        Context.ACTIVITY_SERVICE);
+    int memoryClass = activityManager.getMemoryClass();
 
-    if (format == PixelFormat.RGBA_8888 || format == PixelFormat.RGBX_8888)
-      return Bitmap.Config.ARGB_8888;
-    return Bitmap.Config.ARGB_4444;
+    // For low memory devices (like the HTC Magic), prefer 16-bit bitmaps
+    // FIXME: The memoryClass check is from the Canvas-only implementation and may function incorrectly with OpenGL
+    if (format == PixelFormat.RGBA_4444 ||  memoryClass <= 16)
+      return Bitmap.Config.ARGB_4444;
+    else return Bitmap.Config.ARGB_8888;
   }
 
   @Override
@@ -148,10 +148,10 @@ public class AndroidPlatform implements Platform {
   }
 
   @Override
-  public Touch touch() {
+  public AndroidTouch touch() {
     return touch;
   }
-  
+
   public AndroidTouchEventHandler touchEventHandler() {
     return touchHandler;
   }
@@ -186,22 +186,10 @@ public class AndroidPlatform implements Platform {
   public double time() {
     return System.currentTimeMillis();
   }
-  
+
   @Override
   public Type type() {
     return Type.ANDROID;
-  }
-
-  void draw(Canvas c, float delta) {
-    //Run the game's custom painting code.
-    //Separate from layers painting themselves.
-    if (game != null) {
-      game.paint(delta);
-
-      AndroidCanvas surf = new AndroidCanvas(c);
-      surf.clear();
-      graphics.rootLayer.paint(surf);
-    }
   }
 
   void update(float delta) {

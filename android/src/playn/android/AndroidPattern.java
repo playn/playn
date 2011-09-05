@@ -15,14 +15,19 @@
  */
 package playn.android;
 
-import android.graphics.BitmapShader;
+import playn.core.Image;
 import playn.core.Pattern;
+import android.graphics.BitmapShader;
+import android.graphics.Shader;
 
 class AndroidPattern implements Pattern {
 
   BitmapShader shader;
+  AndroidImage image;
 
-  AndroidPattern(BitmapShader shader) {
-    this.shader = shader;
+  AndroidPattern(Image image) {
+    this.image = (AndroidImage) image;
+    shader = new BitmapShader(this.image.getBitmap(), Shader.TileMode.REPEAT,
+        Shader.TileMode.REPEAT);
   }
 }

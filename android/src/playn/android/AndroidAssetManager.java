@@ -1,12 +1,12 @@
 /**
  * Copyright 2011 The PlayN Authors
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -27,15 +27,15 @@ import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.HttpGet;
 
+import playn.core.AbstractAssetManager;
+import playn.core.Image;
+import playn.core.ResourceCallback;
+import playn.core.Sound;
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.util.Log;
-import playn.core.AbstractAssetManager;
-import playn.core.Image;
-import playn.core.ResourceCallback;
-import playn.core.Sound;
 
 public class AndroidAssetManager extends AbstractAssetManager {
 
@@ -71,7 +71,8 @@ public class AndroidAssetManager extends AbstractAssetManager {
     try {
       InputStream is = openAsset(path);
       try {
-        return decodeBitmap(is);
+        Bitmap bitmap = decodeBitmap(is);
+        return bitmap;
       } finally {
         is.close();
       }
@@ -82,7 +83,7 @@ public class AndroidAssetManager extends AbstractAssetManager {
 
   private Bitmap decodeBitmap(InputStream is) {
     BitmapFactory.Options options = new BitmapFactory.Options();
-    // 
+    //
     options.inDither = true;
     // Prefer the bitmap config we computed from the window parameter
     options.inPreferredConfig = AndroidPlatform.instance.preferredBitmapConfig;
@@ -139,6 +140,9 @@ public class AndroidAssetManager extends AbstractAssetManager {
     }
   }
 
+  // FIXME: This should be much more intelligent than appending .wav to the path.
+  // The current AndroidSound implementation using MediaPlayer (AndroidCompressedSound)
+  // can already read many more formats than just .wav
   @Override
   protected Sound doGetSound(String path) {
     try {
@@ -201,7 +205,7 @@ public class AndroidAssetManager extends AbstractAssetManager {
     }
   }
 
-  // taken from
+  // Taken from
   // http://android-developers.blogspot.com/2010/07/multithreading-for-performance.html
   public Bitmap downloadBitmap(String url) {
     final AndroidHttpClient client = AndroidHttpClient.newInstance("Android");

@@ -1,0 +1,11 @@
+#ifdef GL_ES
+precision highp float;
+#endif
+
+uniform vec4 u_Color;
+
+uniform float u_Alpha;
+
+void main(void) {
+  gl_FragColor = vec4(u_Color.rgb, u_Color.a * u_Alpha);
+}

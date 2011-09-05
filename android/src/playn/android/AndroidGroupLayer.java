@@ -1,12 +1,12 @@
 /**
  * Copyright 2011 The PlayN Authors
- *
+ * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- *
+ * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -18,12 +18,17 @@ package playn.android;
 import playn.core.Asserts;
 import playn.core.GroupLayer;
 import playn.core.GroupLayerImpl;
+import playn.core.InternalTransform;
 import playn.core.Layer;
 import playn.core.ParentLayer;
 
 class AndroidGroupLayer extends AndroidLayer implements GroupLayer, ParentLayer {
 
   private GroupLayerImpl<AndroidLayer> impl = new GroupLayerImpl<AndroidLayer>();
+
+  public AndroidGroupLayer(AndroidGraphics gfx) {
+    super(gfx);
+  }
 
   @Override
   public Layer get(int index) {
@@ -87,15 +92,13 @@ class AndroidGroupLayer extends AndroidLayer implements GroupLayer, ParentLayer 
   }
 
   @Override
-  void paint(AndroidCanvas surf) {
-    if (!visible()) return;
+  public void paint(InternalTransform parentTransform, float parentAlpha) {
+    gfx.checkGlError("GroupLayer.paint");
+    if (!visible())
+      return;
 
-    surf.save();
-    transform(surf);
-    surf.setAlpha(surf.alpha() * alpha);
     for (AndroidLayer child : impl.children) {
-      child.paint(surf);
+      child.paint(localTransform(parentTransform), parentAlpha * alpha);
     }
-    surf.restore();
   }
 }

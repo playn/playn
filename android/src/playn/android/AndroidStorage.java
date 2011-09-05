@@ -15,9 +15,9 @@
  */
 package playn.android;
 
+import playn.core.Storage;
 import android.app.Activity;
 import android.content.SharedPreferences;
-import playn.core.Storage;
 
 public class AndroidStorage implements Storage {
   private static final String PREFS_NAME = "playn";

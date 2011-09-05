@@ -15,17 +15,22 @@
  */
 package playn.android;
 
-import playn.core.AbstractLayer;
 import playn.core.Canvas;
+import playn.core.gl.LayerGL;
 
-public abstract class AndroidLayer extends AbstractLayer {
+public abstract class AndroidLayer extends LayerGL {
 
-  abstract void paint(AndroidCanvas canvas);
+  protected final AndroidGraphics gfx;
+
+  protected AndroidLayer(AndroidGraphics gfx) {
+    super();
+    this.gfx = gfx;
+  }
 
   void transform(Canvas canvas) {
     canvas.translate(originX, originY);
-    canvas.transform(transform.m00(), transform.m01(), transform.m10(),
-        transform.m11(), transform.tx() - originX, transform.ty() - originY);
+    canvas.transform(transform.m00(), transform.m01(), transform.m10(), transform.m11(),
+        transform.tx() - originX, transform.ty() - originY);
     canvas.translate(-originX, -originY);
   }
 }

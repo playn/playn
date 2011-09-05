@@ -1,5 +1,5 @@
 /**
- * Copyright 2010 The PlayN Authors
+ * Copyright 2011 The PlayN Authors
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
@@ -15,14 +15,22 @@
  */
 package playn.android;
 
-import playn.core.Gradient;
-import android.graphics.Shader;
+/**
+ * Fix for the two missing function calls in SDK 2.2 Froyo's OpenGL API.
+ */
+public class AndroidGL20Native extends AndroidGL20 {
 
-class AndroidGradient implements Gradient {
+  @Override
+  native public void glDrawElements(int mode, int count, int type, int offset);
 
-  final Shader shader;
+  @Override
+  native public void glVertexAttribPointer(int indx, int size, int type, boolean normalized,
+      int stride, int ptr);
 
-  AndroidGradient(Shader shader) {
-    this.shader = shader;
+  AndroidGL20Native() {
+  }
+
+  static {
+    System.loadLibrary("playn-android");
   }
 }

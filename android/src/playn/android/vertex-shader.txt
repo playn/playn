@@ -1,0 +1,27 @@
+uniform vec2 u_ScreenSize;
+
+attribute vec4 a_Matrix;
+attribute vec2 a_Translation;
+attribute vec2 a_Position;
+attribute vec2 a_Texture;
+
+varying vec2 v_TexCoord;
+
+void main(void) {
+  // Transform the vertex.
+  mat3 transform = mat3(
+    a_Matrix[0], a_Matrix[1], 0,
+    a_Matrix[2], a_Matrix[3], 0,
+    a_Translation[0], a_Translation[1], 1);
+  gl_Position = vec4(transform * vec3(a_Position, 1.0), 1);
+
+  // Scale from screen coordinates to [0, 2].
+  gl_Position.x /= (u_ScreenSize.x / 2.0);
+  gl_Position.y /= (u_ScreenSize.y / 2.0);
+
+  // Offset to [-1, 1] and flip y axis to put origin at top-left.
+  gl_Position.x -= 1.0;
+  gl_Position.y = 1.0 - gl_Position.y;
+
+  v_TexCoord = a_Texture;
+}

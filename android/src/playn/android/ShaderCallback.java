@@ -1,5 +1,5 @@
 /**
- * Copyright 2010 The PlayN Authors
+ * Copyright 2011 The PlayN Authors
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
@@ -15,14 +15,22 @@
  */
 package playn.android;
 
-import playn.core.Gradient;
-import android.graphics.Shader;
+import playn.core.ResourceCallback;
 
-class AndroidGradient implements Gradient {
+class ShaderCallback implements ResourceCallback<String> {
+  private String shader;
 
-  final Shader shader;
-
-  AndroidGradient(Shader shader) {
+  @Override
+  public void done(String shader) {
     this.shader = shader;
+  }
+
+  @Override
+  public void error(Throwable err) {
+    throw new RuntimeException("Exception loading shader strings.", err);
+  }
+
+  public String shader() {
+    return shader;
   }
 }

@@ -1,12 +1,12 @@
 /**
  * Copyright 2011 The PlayN Authors
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -15,43 +15,46 @@
  */
 package playn.android;
 
-import android.view.MotionEvent;
+import playn.core.Graphics;
 import playn.core.Pointer;
 import playn.core.Touch;
+import android.view.MotionEvent;
 
 /**
  * Class for taking MotionEvents from GameActivity.onMotionEvent() and parsing
  * them into an array of Touch.Events for the Listener.
  */
 class AndroidTouchEventHandler {
-  boolean inTouchSequence = false;
+  private final GameViewGL gameView;
+  private float xScreenOffset = 0;
+  private float yScreenOffset = 0;
+
+  AndroidTouchEventHandler(GameViewGL gameView) {
+    this.gameView = gameView;
+  }
 
   /**
    * Default Android touch behavior. Parses the immediate MotionEvent and passes
-   * it to listener and the appropriate method in
-   * AndroidPlatform.instance().pointer(). Ignores historical values.
+   * it to the correct methods in {@GameViewGL} for processing
+   * on the GL render thread. Ignores historical values.
    */
   public boolean onMotionEvent(MotionEvent event) {
-    AndroidPointer pointer = AndroidPlatform.instance.pointer();
-    AndroidTouch touch = (AndroidTouch) AndroidPlatform.instance.touch();
     double time = event.getEventTime();
     int action = event.getAction();
     Touch.Event[] touches = parseMotionEvent(event);
     Touch.Event pointerEvent = touches[0];
     switch (action) {
       case (MotionEvent.ACTION_DOWN):
-        inTouchSequence = true;
-        touch.onTouchStart(touches);
-        pointer.onPointerStart(new Pointer.Event.Impl(time, pointerEvent.x(), pointerEvent.y()));
+        gameView.onTouchStart(touches);
+        gameView.onPointerStart(new Pointer.Event.Impl(time, pointerEvent.x(), pointerEvent.y()));
         break;
       case (MotionEvent.ACTION_UP):
-        inTouchSequence = false;
-        touch.onTouchEnd(touches);
-        pointer.onPointerEnd(new Pointer.Event.Impl(time, pointerEvent.x(), pointerEvent.y()));
+        gameView.onTouchEnd(touches);
+      gameView.onPointerEnd(new Pointer.Event.Impl(time, pointerEvent.x(), pointerEvent.y()));
         break;
       case (MotionEvent.ACTION_MOVE):
-        touch.onTouchMove(touches);
-        pointer.onPointerMove(new Pointer.Event.Impl(time, pointerEvent.x(), pointerEvent.y()));
+        gameView.onTouchMove(touches);
+        gameView.onPointerDrag(new Pointer.Event.Impl(time, pointerEvent.x(), pointerEvent.y()));
         break;
       case (MotionEvent.ACTION_CANCEL):
         break;
@@ -63,7 +66,7 @@ class AndroidTouchEventHandler {
 
   /**
    * Performs the actual parsing of the MotionEvent event.
-   * 
+   *
    * @param event The MotionEvent to process
    * @param historical Whether or not to parse historical touches (currently
    *          never called as true, but the functionality is still here in case
@@ -71,6 +74,7 @@ class AndroidTouchEventHandler {
    * @return The processed array of individual AndroidTouchEvents.
    */
   private Touch.Event[] parseMotionEvent(MotionEvent event) {
+    calculateOffsets();
     int eventPointerCount = event.getPointerCount();
     Touch.Event[] touches = new Touch.Event[eventPointerCount];
     double time = event.getEventTime();
@@ -78,8 +82,8 @@ class AndroidTouchEventHandler {
     int id;
     for (int t = 0; t < eventPointerCount; t++) {
       int pointerIndex = t;
-      x = event.getX(pointerIndex);
-      y = event.getY(pointerIndex);
+      x = event.getX(pointerIndex) + xScreenOffset;
+      y = event.getY(pointerIndex) + yScreenOffset;
       pressure = event.getPressure(pointerIndex);
       size = event.getSize(pointerIndex);
       id = event.getPointerId(pointerIndex);
@@ -87,4 +91,11 @@ class AndroidTouchEventHandler {
     }
     return touches;
   }
+
+  public void calculateOffsets() {
+    Graphics graphics = AndroidPlatform.instance.graphics();
+    xScreenOffset = -(graphics.screenWidth() - graphics.width()) / 2;
+    yScreenOffset = -(graphics.screenHeight() - graphics.height()) / 2;
+  }
+
 }

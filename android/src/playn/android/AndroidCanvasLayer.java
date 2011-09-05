@@ -16,52 +16,54 @@
 package playn.android;
 
 import playn.core.Asserts;
-
-import static playn.core.PlayN.graphics;
 import playn.core.Canvas;
-import playn.core.CanvasImage;
 import playn.core.CanvasLayer;
+import playn.core.InternalTransform;
 
 class AndroidCanvasLayer extends AndroidLayer implements CanvasLayer {
 
-  private CanvasImage canvas;
+  private AndroidImage image;
 
-  AndroidCanvasLayer(int width, int height, boolean alpha) {
-    canvas = ((AndroidGraphics)graphics()).createImage(width, height, alpha);
+  AndroidCanvasLayer(AndroidGraphics gfx, int width, int height, boolean alpha) {
+    super(gfx);
+    image = (AndroidImage) (AndroidPlatform.instance.graphics().createImage(width, height, alpha));
   }
 
   @Override
   public Canvas canvas() {
-    return canvas.canvas();
+    return image.canvas();
   }
 
   @Override
   public void destroy() {
     super.destroy();
-    canvas = null;
+    image = null;
   }
 
   @Override
-  void paint(AndroidCanvas surf) {
-    if (!visible()) return;
+  public void paint(InternalTransform parentTransform, float parentAlpha) {
+    if (!visible())
+      return;
 
-    surf.save();
-    transform(surf);
-    surf.setAlpha(surf.alpha() * alpha);
-    surf.drawImage(canvas, 0, 0);
-    surf.restore();
+    int tex = image.ensureTexture(gfx, false, false);
+    if (tex != -1) {
+      InternalTransform xform = localTransform(parentTransform);
+      float childAlpha = parentAlpha * alpha;
+      gfx.drawTexture(tex, image.width(), image.height(), xform, width(), height(), false,
+          false, childAlpha);
+    }
   }
 
   @Override
   public float width() {
-    Asserts.checkNotNull(canvas, "Canvas must not be null");
-    return canvas.width();
+    Asserts.checkNotNull(image, "Canvas must not be null");
+    return image.width();
   }
 
   @Override
   public float height() {
-    Asserts.checkNotNull(canvas, "Canvas must not be null");
-    return canvas.height();
+    Asserts.checkNotNull(image, "Canvas must not be null");
+    return image.height();
   }
 
   @Override

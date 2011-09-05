@@ -23,13 +23,13 @@ import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Xfermode;
 import playn.core.Canvas;
-import playn.core.Canvas.Composite;
+import playn.core.Canvas.*;
 
 class AndroidCanvasState {
 
   // Cached xfer modes to avoid creating objects
-  static PorterDuffXfermode[] xfermodes; 
-  
+  static PorterDuffXfermode[] xfermodes;
+
   Paint paint;
   int fillColor;
   int strokeColor;
@@ -41,12 +41,14 @@ class AndroidCanvasState {
   static {
     xfermodes = new PorterDuffXfermode[Canvas.Composite.values().length];
     for (Canvas.Composite composite : Canvas.Composite.values()) {
-      xfermodes[composite.ordinal()] = new PorterDuffXfermode(PorterDuff.Mode.valueOf(composite.name()));
+      xfermodes[composite.ordinal()] = new PorterDuffXfermode(
+          PorterDuff.Mode.valueOf(composite.name()));
     }
   }
-  
+
   AndroidCanvasState() {
-    this(new Paint(Paint.ANTI_ALIAS_FLAG), 0xff000000, 0xffffffff, null, null, Composite.SRC_OVER, 1f);
+    this(new Paint(Paint.ANTI_ALIAS_FLAG), 0xff000000, 0xffffffff, null, null, Composite.SRC_OVER,
+        1f);
   }
 
   AndroidCanvasState(AndroidCanvasState toCopy) {
@@ -102,7 +104,8 @@ class AndroidCanvasState {
       paint.setShader(pattern.shader);
     } else {
       paint.setColor(fillColor);
-      // Android reuses the A bits of color for alpha so we have to compute the real alpha here 
+      // Android reuses the A bits of color for alpha so we have to compute the
+      // real alpha here
       if (alpha < 1)
         paint.setAlpha((int) (alpha * (fillColor >>> 24)));
     }
@@ -112,7 +115,8 @@ class AndroidCanvasState {
   Paint prepareStroke() {
     paint.setStyle(Style.STROKE);
     paint.setColor(strokeColor);
-    // Android reuses the A bits of color for alpha so we have to compute the real alpha here 
+    // Android reuses the A bits of color for alpha so we have to compute the
+    // real alpha here
     if (alpha < 1)
       paint.setAlpha((int) (alpha * (strokeColor >>> 24)));
     paint.setXfermode(convertComposite(composite));
