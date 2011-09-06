@@ -17,7 +17,6 @@
 package playn.flash;
 
 import flash.display.DisplayObject;
-import flash.display.InteractiveObject;
 import flash.gwt.FlashImport;
 
 import playn.core.AbstractLayer;

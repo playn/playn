@@ -41,7 +41,6 @@ import playn.core.Platform;
 import playn.core.Pointer;
 import playn.core.Mouse;
 import playn.core.RegularExpression;
-import playn.core.Platform.Type;
 import playn.html.HtmlRegularExpression;
 
 public class FlashPlatform implements Platform {

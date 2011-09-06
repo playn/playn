@@ -18,12 +18,7 @@ package playn.test.manualtests.core;
 import static playn.core.PlayN.*;
 
 import playn.core.CanvasLayer;
-import playn.core.Color;
 import playn.core.GroupLayer;
-import playn.core.Image;
-import playn.core.ImageLayer;
-import playn.core.ResourceCallback;
-import playn.core.SurfaceLayer;
 
 public class DepthTest extends ManualTest {
   @Override

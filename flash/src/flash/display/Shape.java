@@ -16,7 +16,6 @@
 
 package flash.display;
 
-import flash.geom.Rectangle;
 import flash.gwt.FlashImport;
 
 @FlashImport({"flash.display.Shape", "flash.geom.Matrix"})

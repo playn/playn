@@ -27,7 +27,6 @@ import com.allen_sauer.gwt.voices.client.ui.FlashMovie;
  */
 public class HtmlAudio implements Audio {
 
-  @SuppressWarnings("deprecation")
   private SoundController soundController = new SoundController();
 
   @SuppressWarnings("deprecation")

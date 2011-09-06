@@ -27,7 +27,6 @@ import playn.core.Asserts;
 import flash.display.Bitmap;
 import flash.display.Sprite;
 
-import playn.core.CanvasImage;
 import playn.core.PlayN;
 import playn.core.ResourceCallback;
 import playn.core.Image;
@@ -35,7 +34,6 @@ import playn.core.ImageLayer;
 
 // TODO(pdr): fix setWidth, setHeight, setRepeat*, etc.
 public class FlashImageLayer extends FlashLayer implements ImageLayer {
-
 
   private final Image image;
 

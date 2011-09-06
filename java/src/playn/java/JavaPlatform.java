@@ -37,7 +37,6 @@ import playn.core.Mouse;
 import playn.core.Touch;
 import playn.core.Storage;
 import playn.core.RegularExpression;
-import playn.core.Platform.Type;
 
 public class JavaPlatform implements Platform {
   // Maximum delta time to consider between update() calls (in milliseconds). If the delta between

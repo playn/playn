@@ -15,8 +15,6 @@
  */
 package playn.flash.json.impl;
 
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.core.client.impl.Impl;
 import com.google.gwt.regexp.shared.MatchResult;
 import com.google.gwt.regexp.shared.RegExp;
 
@@ -288,7 +286,7 @@ public class JsonUtil {
    * Converts a Json object to Json formatted String.
    *
    * @param jsonValue    json object to stringify
-   * @param indent optional indention prefix for pretty printing
+   * @param indent optional indentation prefix for pretty printing
    * @return json formatted string
    */
   public static String stringify(JsonValue jsonValue, final String indent) {
@@ -323,12 +321,13 @@ public class JsonUtil {
 
   /**
    * Execute a regular expression and invoke a callback for each match
-   * occurance. The return value of the callback is substituted for the match.
+   * occurrence. The return value of the callback is substituted for the match.
    *
    * @param expression a compiled regular expression
    * @param text       a String on which to perform replacement
    * @param replacer   a callback that maps matched strings into new values
    */
+  @SuppressWarnings("unused")
   private static String replace(RegExp expression, String text,
       RegExpReplacer replacer) {
     expression.setLastIndex(0);

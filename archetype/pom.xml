@@ -10,7 +10,6 @@
   </parent>
 
   <artifactId>playn-archetype</artifactId>
-  <version>1.0-SNAPSHOT</version>
   <packaging>maven-archetype</packaging>
 
   <name>PlayN Project Archetype</name>

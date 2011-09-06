@@ -262,7 +262,7 @@ class HtmlGraphicsGL extends HtmlGraphics {
   private ColorShader colorShader;
 
   // Debug counters.
-  private int texCount;
+  // private int texCount;
 
   HtmlGraphicsGL() {
     rootLayer = new HtmlGroupLayerGL(this);
@@ -352,13 +352,13 @@ class HtmlGraphicsGL extends HtmlGraphics {
     gl.texParameteri(TEXTURE_2D, TEXTURE_MIN_FILTER, LINEAR);
     gl.texParameteri(TEXTURE_2D, TEXTURE_WRAP_S, repeatX ? REPEAT : CLAMP_TO_EDGE);
     gl.texParameteri(TEXTURE_2D, TEXTURE_WRAP_T, repeatY ? REPEAT : CLAMP_TO_EDGE);
-    ++texCount;
+    // ++texCount;
     return tex;
   }
 
   void destroyTexture(WebGLTexture tex) {
     gl.deleteTexture(tex);
-    --texCount;
+    // --texCount;
   }
 
   void updateLayers() {

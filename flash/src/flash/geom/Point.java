@@ -19,7 +19,6 @@ package flash.geom;
 import com.google.gwt.core.client.JavaScriptObject;
 
 import flash.gwt.FlashImport;
-import playn.flash.FlashImageLayer;
 
 @FlashImport({"flash.geom.Rectangle"})
 public class Point extends JavaScriptObject {

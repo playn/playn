@@ -19,8 +19,6 @@ import static playn.core.PlayN.*;
 
 import playn.core.Game;
 import playn.core.GroupLayer;
-import playn.core.Keyboard;
-import playn.core.Pointer;
 
 public class Bench implements Game {
 

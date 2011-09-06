@@ -17,9 +17,6 @@ package playn.flash;
 
 import com.google.gwt.core.client.JsArrayNumber;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import playn.core.Asserts;
 import playn.core.Path;
 

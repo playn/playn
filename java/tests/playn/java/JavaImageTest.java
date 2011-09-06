@@ -38,19 +38,16 @@ public class JavaImageTest extends AbstractPlayNTest {
 
   @Before
   public void captureStdOutErr() {
-    stockOut = System.out;
     stockErr = System.err;
-    System.setOut(new PrintStream(capOut = new ByteArrayOutputStream()));
     System.setErr(new PrintStream(capErr = new ByteArrayOutputStream()));
   }
 
   @After
   public void restoreStdOutErr() {
-    System.setOut(stockOut);
     System.setErr(stockErr);
-    capOut = capErr = null;
+    capErr = null;
   }
 
-  private PrintStream stockOut, stockErr;
-  private ByteArrayOutputStream capOut, capErr;
+  private PrintStream stockErr;
+  private ByteArrayOutputStream capErr;
 }
