@@ -17,7 +17,6 @@ package playn.java;
 
 import playn.core.Asserts;
 import playn.core.Canvas;
-import playn.core.Font;
 import playn.core.Gradient;
 import playn.core.Image;
 import playn.core.Path;
