@@ -1,9 +1,9 @@
 import sbt._
 import Keys._
 
-object ForPlayBuild extends Build {
+object PlayNBuild extends Build {
   val buildSettings = Defaults.defaultSettings ++ Seq(
-    organization    := "com.googlecode.forplay",
+    organization    := "com.googlecode.playn",
     version         := "1.0-SNAPSHOT",
     crossPaths      := false,
     javacOptions    ++= Seq("-Xlint", "-Xlint:-serial"),
@@ -98,7 +98,7 @@ object ForPlayBuild extends Build {
     )
   ) dependsOn(core, java)
 
-  lazy val forplay = Project("forplay", file(".")) aggregate(
+  lazy val playn = Project("playn", file(".")) aggregate(
     core, gwtbox2d, webgl, java, html, flash, android)
 
   //
