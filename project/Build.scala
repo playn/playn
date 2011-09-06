@@ -29,6 +29,8 @@ object PlayNBuild extends Build {
       name := "playn-core",
       unmanagedSourceDirectories in Compile <+= baseDirectory / "src",
       unmanagedSourceDirectories in Test <+= baseDirectory / "tests",
+      // adds source files to our jar file (needed by GWT)
+      unmanagedResourceDirectories in Compile <+= baseDirectory / "src",
       unmanagedBase <<= baseDirectory { base => base / "disabled" },
       libraryDependencies ++= testDeps ++ Seq(
         "com.samskivert" % "pythagoras" % "1.1-SNAPSHOT"
@@ -40,6 +42,8 @@ object PlayNBuild extends Build {
     "gwtbox2d", file("gwtbox2d"), settings = commonSettings ++ Seq(
       name := "playn-gwtbox2d",
       unmanagedSourceDirectories in Compile <+= baseDirectory / "src",
+      // adds source files to our jar file (needed by GWT)
+      unmanagedResourceDirectories in Compile <+= baseDirectory / "src",
       libraryDependencies ++= gwtDeps
     )
   ) dependsOn(core)
@@ -48,6 +52,8 @@ object PlayNBuild extends Build {
     "webgl", file("webgl"), settings = commonSettings ++ Seq(
       name := "playn-webgl",
       unmanagedSourceDirectories in Compile <+= baseDirectory / "src",
+      // adds source files to our jar file (needed by GWT)
+      unmanagedResourceDirectories in Compile <+= baseDirectory / "src",
       libraryDependencies ++= gwtDeps
     )
   )
@@ -57,6 +63,8 @@ object PlayNBuild extends Build {
       name := "playn-html",
       unmanagedSourceDirectories in Compile <+= baseDirectory / "src",
       unmanagedSourceDirectories in Test <+= baseDirectory / "tests",
+      // adds source files to our jar file (needed by GWT)
+      unmanagedResourceDirectories in Compile <+= baseDirectory / "src",
       libraryDependencies ++= gwtDeps ++ testDeps ++ Seq(
         "javax.validation" % "validation-api" % "1.0.0.GA", // TODO: sources also
         "allen_sauer" % "gwt-log" % "3.1.4",
