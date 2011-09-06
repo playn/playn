@@ -2,13 +2,13 @@ import sbt._
 import Keys._
 
 object PlayNBuild extends Build {
-  val buildSettings = Defaults.defaultSettings ++ Seq(
-    organization    := "com.googlecode.playn",
-    version         := "1.0-SNAPSHOT",
-    crossPaths      := false,
-    javacOptions    ++= Seq("-Xlint", "-Xlint:-serial"),
-    fork in Compile := true,
-    resolvers       += "Local Maven Repository" at Path.userHome.asURL + "/.m2/repository"
+  val commonSettings = Defaults.defaultSettings ++ Seq(
+    organization     := "com.googlecode.playn",
+    version          := "1.0-SNAPSHOT",
+    crossPaths       := false,
+    javacOptions     ++= Seq("-Xlint", "-Xlint:-serial"),
+    fork in Compile  := true,
+    autoScalaLibrary := false // no scala-library dependency
   )
 
   val gwtVer = "2.3.0"
@@ -25,10 +25,11 @@ object PlayNBuild extends Build {
   // Core projects
 
   lazy val core = Project(
-    "core", file("core"), settings = buildSettings ++ Seq(
+    "core", file("core"), settings = commonSettings ++ Seq(
       name := "playn-core",
       unmanagedSourceDirectories in Compile <+= baseDirectory / "src",
       unmanagedSourceDirectories in Test <+= baseDirectory / "tests",
+      unmanagedBase <<= baseDirectory { base => base / "disabled" },
       libraryDependencies ++= testDeps ++ Seq(
         "com.samskivert" % "pythagoras" % "1.1-SNAPSHOT"
       )
@@ -36,7 +37,7 @@ object PlayNBuild extends Build {
   )
 
   lazy val gwtbox2d = Project(
-    "gwtbox2d", file("gwtbox2d"), settings = buildSettings ++ Seq(
+    "gwtbox2d", file("gwtbox2d"), settings = commonSettings ++ Seq(
       name := "playn-gwtbox2d",
       unmanagedSourceDirectories in Compile <+= baseDirectory / "src",
       libraryDependencies ++= gwtDeps
@@ -44,7 +45,7 @@ object PlayNBuild extends Build {
   ) dependsOn(core)
 
   lazy val webgl = Project(
-    "webgl", file("webgl"), settings = buildSettings ++ Seq(
+    "webgl", file("webgl"), settings = commonSettings ++ Seq(
       name := "playn-webgl",
       unmanagedSourceDirectories in Compile <+= baseDirectory / "src",
       libraryDependencies ++= gwtDeps
@@ -52,20 +53,20 @@ object PlayNBuild extends Build {
   )
 
   lazy val html = Project(
-    "html", file("html"), settings = buildSettings ++ Seq(
+    "html", file("html"), settings = commonSettings ++ Seq(
       name := "playn-html",
       unmanagedSourceDirectories in Compile <+= baseDirectory / "src",
       unmanagedSourceDirectories in Test <+= baseDirectory / "tests",
       libraryDependencies ++= gwtDeps ++ testDeps ++ Seq(
         "javax.validation" % "validation-api" % "1.0.0.GA", // TODO: sources also
-        "allen_sauer" % "gwt-log" % "1.0.r613",
-        "allen_sauer" % "gwt-voices" % "1.0.r421"
+        "allen_sauer" % "gwt-log" % "3.1.4",
+        "allen_sauer" % "gwt-voices" % "2.1.2"
       )
     )
   ) dependsOn(core, webgl)
 
   lazy val flash = Project(
-    "flash", file("flash"), settings = buildSettings ++ Seq(
+    "flash", file("flash"), settings = commonSettings ++ Seq(
       name := "playn-flash",
       unmanagedSourceDirectories in Compile <+= baseDirectory / "src",
       unmanagedSourceDirectories in Test <+= baseDirectory / "tests",
@@ -77,7 +78,7 @@ object PlayNBuild extends Build {
   ) dependsOn(core, html)
 
   lazy val java = Project(
-    "java", file("java"), settings = buildSettings ++ Seq(
+    "java", file("java"), settings = commonSettings ++ Seq(
       name := "playn-java",
       unmanagedSourceDirectories in Compile <+= baseDirectory / "src",
       unmanagedSourceDirectories in Test <+= baseDirectory / "tests",
@@ -88,7 +89,7 @@ object PlayNBuild extends Build {
   ) dependsOn(core)
 
   lazy val android = Project(
-    "android", file("android"), settings = buildSettings ++ Seq(
+    "android", file("android"), settings = commonSettings ++ Seq(
       name := "playn-android",
       unmanagedSourceDirectories in Compile <+= baseDirectory / "src",
       unmanagedSourceDirectories in Test <+= baseDirectory / "tests",
@@ -105,7 +106,7 @@ object PlayNBuild extends Build {
   // Sample projects
 
   def sampleProject (id :String) = Project(
-    id + "-sample", file("sample/" + id), settings = buildSettings ++ Seq(
+    id + "-sample", file("sample/" + id), settings = commonSettings ++ Seq(
       name := ("playn-" + id + "-sample"),
       unmanagedSourceDirectories in Compile <+= baseDirectory / "core/src"
     )
