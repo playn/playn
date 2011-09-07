@@ -6,7 +6,7 @@ object PlayNBuild extends Build {
     organization     := "com.googlecode.playn",
     version          := "1.0-SNAPSHOT",
     crossPaths       := false,
-    javacOptions     ++= Seq("-Xlint", "-Xlint:-serial"),
+    javacOptions     ++= Seq("-Xlint", "-Xlint:-serial", "-source", "1.6", "-target", "1.6"),
     fork in Compile  := true,
     autoScalaLibrary := false // no scala-library dependency
   )
