@@ -13,6 +13,10 @@
   <packaging>jar</packaging>
   <name>${gameName} Core</name>
 
+  <properties>
+    <exec.mainClass>${package}.java.${gameName}Java</exec.mainClass>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>com.googlecode.playn</groupId>
