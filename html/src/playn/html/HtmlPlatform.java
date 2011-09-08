@@ -77,6 +77,9 @@ public class HtmlPlatform implements Platform {
   static final int DEFAULT_WIDTH = 640;
   static final int DEFAULT_HEIGHT = 480;
 
+  /** Indicates whether this browser supports JavaScript typed arrays. */
+  static final boolean hasTypedArraySupport = hasTypedArraySupport();
+
   private static final int LOG_FREQ = 2500;
   private static final float MAX_DELTA = 100;
 
@@ -420,6 +423,10 @@ public class HtmlPlatform implements Platform {
     return !!$wnd.WebGLRenderingContext &&
       // WebGL is slow on Chrome OSX 10.5
       (!/Chrome/.test(navigator.userAgent) || !/OS X 10_5/.test(navigator.userAgent));
+  }-*/;
+
+  private static native boolean hasTypedArraySupport() /*-{
+    return typeof(Float32Array) != 'undefined';
   }-*/;
 
   private static native void disableRightClickImpl(JavaScriptObject target) /*-{

@@ -129,8 +129,9 @@ class HtmlLayerDom extends AbstractLayer {
   }
 
   @Override protected InternalTransform createTransform() {
-    // IE does not support typed arrays, so we cannot use HtmlInternalTransform with it
-    return HtmlPlatform.agentInfo().isIE() ? super.createTransform() : new HtmlInternalTransform();
+    // only use HtmlInternalTransform on browsers that support typed arrays
+    return HtmlPlatform.hasTypedArraySupport ?
+      super.createTransform() : new HtmlInternalTransform();
   }
 
   private String xlate(float x) {
