@@ -65,7 +65,7 @@
     <dependency>
       <groupId>com.google.gwt</groupId>
       <artifactId>gwt-flash</artifactId>
-      <version>1.0</version>
+      <version>1.1</version>
     </dependency>
 
     <dependency>
