@@ -131,7 +131,7 @@ class HtmlLayerDom extends AbstractLayer {
   @Override protected InternalTransform createTransform() {
     // only use HtmlInternalTransform on browsers that support typed arrays
     return HtmlPlatform.hasTypedArraySupport ?
-      super.createTransform() : new HtmlInternalTransform();
+      new HtmlInternalTransform() : super.createTransform();
   }
 
   private String xlate(float x) {
