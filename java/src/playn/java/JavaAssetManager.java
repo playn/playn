@@ -14,15 +14,16 @@
 package playn.java;
 
 import java.awt.image.BufferedImage;
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 
 import javax.imageio.ImageIO;
 
+import com.google.common.base.Charsets;
+import com.google.common.io.Files;
+
 import playn.core.AbstractAssetManager;
-import playn.core.PlayN;
 import playn.core.Image;
+import playn.core.PlayN;
 import playn.core.ResourceCallback;
 import playn.core.Sound;
 
@@ -67,15 +68,8 @@ public class JavaAssetManager extends AbstractAssetManager {
 
   @Override
   protected void doGetText(String path, ResourceCallback<String> callback) {
-    File textFile = new File(pathPrefix, path);
     try {
-      BufferedReader reader = new BufferedReader(new FileReader(textFile));
-      StringBuilder sb = new StringBuilder();
-      String line = null;
-      while ((line = reader.readLine()) != null) {
-        sb.append(line);
-      }
-      callback.done(sb.toString());
+      callback.done(Files.toString(new File(pathPrefix, path), Charsets.UTF_8));
     } catch (Throwable e) {
       callback.error(e);
     }

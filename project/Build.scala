@@ -91,6 +91,7 @@ object PlayNBuild extends Build {
       unmanagedSourceDirectories in Compile <+= baseDirectory / "src",
       unmanagedSourceDirectories in Test <+= baseDirectory / "tests",
       libraryDependencies ++= testDeps ++ Seq(
+        "com.google.guava" % "guava" % "r09",
         "jlayer" % "jlayer" % "1.0.1" // TODO: optional
       )
     )
