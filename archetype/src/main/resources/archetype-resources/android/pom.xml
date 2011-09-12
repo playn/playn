@@ -49,6 +49,9 @@
           </sdk>
           <deleteConflictingFiles>true</deleteConflictingFiles>
           <undeployBeforeDeploy>true</undeployBeforeDeploy>
+          <jvmArguments>
+            <jvmArgument>-Xmx1024m</jvmArgument>
+          </jvmArguments>
         </configuration>
         <extensions>true</extensions>
       </plugin>
