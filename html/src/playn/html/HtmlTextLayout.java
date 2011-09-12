@@ -15,15 +15,15 @@
  */
 package playn.html;
 
-import java.util.List;
-import java.util.ArrayList;
-
 import com.google.gwt.canvas.dom.client.Context2d;
-
 import playn.core.Font;
 import playn.core.TextFormat;
 import playn.core.TextLayout;
-import static playn.core.PlayN.*;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static playn.core.PlayN.graphics;
 
 class HtmlTextLayout implements TextLayout {
 
@@ -97,11 +97,40 @@ class HtmlTextLayout implements TextLayout {
 
   void draw(Context2d ctx, float x, float y) {
     configContext(ctx);
-    float ypos = 0;
-    for (Line line : lines) {
-      ctx.fillText(line.text, x + format.align.getX(line.width, width), y + ypos);
-      ypos += metrics.height;
+
+    if (format.effect instanceof TextFormat.Effect.Shadow) {
+      TextFormat.Effect.Shadow seffect = (TextFormat.Effect.Shadow)format.effect;
+      ctx.setShadowColor(HtmlGraphics.cssColorString(seffect.shadowColor));
+      ctx.setShadowOffsetX(seffect.shadowOffsetX);
+      ctx.setShadowOffsetY(seffect.shadowOffsetY);
+      drawText(ctx, x, y);
+    } else if (format.effect instanceof TextFormat.Effect.Outline) {
+      TextFormat.Effect.Outline oeffect = (TextFormat.Effect.Outline)format.effect;
+      ctx.save();
+      ctx.setFillStyle(HtmlGraphics.cssColorString(oeffect.outlineColor));
+
+      drawText(ctx, x + 0, y + 0);
+      drawText(ctx, x + 0, y + 1);
+      drawText(ctx, x + 0, y + 2);
+      drawText(ctx, x + 1, y + 0);
+      drawText(ctx, x + 1, y + 2);
+      drawText(ctx, x + 2, y + 0);
+      drawText(ctx, x + 2, y + 1);
+      drawText(ctx, x + 2, y + 2);
+
+      ctx.restore();
+      drawText(ctx, x + 1, y + 1);
+    } else {
+      drawText(ctx, x, y);
     }
+  }
+
+  void drawText(Context2d ctx, float x, float y) {
+      float ypos = 0;
+      for (Line line : lines) {
+        ctx.fillText(line.text, x + format.align.getX(line.width, width), y + ypos);
+        ypos += metrics.height;
+      }
   }
 
   void configContext(Context2d ctx) {
@@ -112,6 +141,8 @@ class HtmlTextLayout implements TextLayout {
     case ITALIC:      style = "italic"; break;
     case BOLD_ITALIC: style = "bold italic"; break;
     }
+
+    ctx.setFillStyle(HtmlGraphics.cssColorString(format.textColor));
     ctx.setFont(style + " " + font.size() + "px " + font.name());
     ctx.setTextBaseline(Context2d.TextBaseline.TOP);
   }
