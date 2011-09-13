@@ -21,13 +21,15 @@ object PlayNBuild extends Build {
     crossPaths       := false,
     javacOptions     ++= Seq("-Xlint", "-Xlint:-serial", "-source", "1.6", "-target", "1.6"),
     fork in Compile  := true,
-    autoScalaLibrary := false // no scala-library dependency
+    autoScalaLibrary := false, // no scala-library dependency
+    publishArtifact in (Compile, packageDoc) := false // no scaladocs; it fails
   )
 
   val gwtVer = "2.3.0"
-  val gwtUser = "com.google.gwt" % "gwt-user" % gwtVer
-  val gwtDev = "com.google.gwt" % "gwt-dev" % gwtVer
-  val gwtDeps = Seq(gwtUser, gwtDev)
+  val gwtDeps = Seq(
+    "com.google.gwt" % "gwt-user" % gwtVer,
+    "com.google.gwt" % "gwt-dev" % gwtVer
+  )
 
   val testDeps = Seq(
     "junit" % "junit" % "4.+" % "test",
