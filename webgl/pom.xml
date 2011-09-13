@@ -11,7 +11,7 @@
 
   <artifactId>playn-webgl</artifactId>
   <packaging>jar</packaging>
-  <name>Playn WebGL</name>
+  <name>PlayN WebGL</name>
 
   <dependencies>
     <dependency>
