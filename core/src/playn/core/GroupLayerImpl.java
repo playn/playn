@@ -114,11 +114,22 @@ public class GroupLayerImpl<L extends AbstractLayer>
     // making AbstractLayer and ParentLayer more complex than is worth it
     @SuppressWarnings("unchecked") L child = (L)layer;
 
+    // locate the child whose depth changed
+    int oldIndex = findChild(child, oldDepth);
+
+    // fast path for depth changes that don't change ordering
+    float newDepth = child.depth();
+    boolean leftCorrect = (oldIndex == 0 || children.get(oldIndex-1).depth() < newDepth);
+    boolean rightCorrect = (oldIndex == children.size()-1 ||
+                            children.get(oldIndex+1).depth() > newDepth);
+    if (leftCorrect && rightCorrect) {
+      return oldIndex;
+    }
+
     // it would be great if we could move an element from one place in an ArrayList to another
     // (portably), but instead we have to remove and re-add
-    int oldIndex = findChild(child, oldDepth);
     children.remove(oldIndex);
-    int newIndex = findInsertion(child.depth());
+    int newIndex = findInsertion(newDepth);
     children.add(newIndex, child);
     return newIndex;
   }
