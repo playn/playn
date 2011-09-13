@@ -4,6 +4,9 @@
 .DS_Store
 target
 
+# Ignore pythagoras if it's symlinked here for sbt
+pythagoras
+
 # /android/
 /android/bin
 /android/gen

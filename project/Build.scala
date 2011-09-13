@@ -1,6 +1,19 @@
 import sbt._
 import Keys._
 
+// allows projects to be symlinked into the current directory for a direct dependency,
+// or fall back to obtaining the project from Maven otherwise
+class Locals (locals :(String, String, ModuleID)*) {
+  def addDeps (p :Project) = (locals collect {
+    case (id, subp, dep) if (file(id).exists) => symproj(file(id), subp)
+  }).foldLeft(p) { _ dependsOn _ }
+  def libDeps = locals collect {
+    case (id, subp, dep) if (!file(id).exists) => dep
+  }
+  private def symproj (dir :File, subproj :String = null) =
+    if (subproj == null) RootProject(dir) else ProjectRef(dir, subproj)
+}
+
 object PlayNBuild extends Build {
   val commonSettings = Defaults.defaultSettings ++ Seq(
     organization     := "com.googlecode.playn",
@@ -21,22 +34,23 @@ object PlayNBuild extends Build {
  	  "com.novocode" % "junit-interface" % "0.7" % "test->default"
   )
 
+  val locals = new Locals(
+    ("pythagoras", null, "com.samskivert" % "pythagoras" % "1.1-SNAPSHOT")
+  )
+
   //
   // Core projects
 
-  lazy val core = Project(
+  lazy val core = locals.addDeps(Project(
     "core", file("core"), settings = commonSettings ++ Seq(
       name := "playn-core",
       unmanagedSourceDirectories in Compile <+= baseDirectory / "src",
       unmanagedSourceDirectories in Test <+= baseDirectory / "tests",
       // adds source files to our jar file (needed by GWT)
       unmanagedResourceDirectories in Compile <+= baseDirectory / "src",
-      unmanagedBase <<= baseDirectory { base => base / "disabled" },
-      libraryDependencies ++= testDeps ++ Seq(
-        "com.samskivert" % "pythagoras" % "1.1-SNAPSHOT"
-      )
+      unmanagedBase <<= baseDirectory { base => base / "disabled" }
     )
-  )
+  ))
 
   lazy val gwtbox2d = Project(
     "gwtbox2d", file("gwtbox2d"), settings = commonSettings ++ Seq(
