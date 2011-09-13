@@ -26,6 +26,7 @@
     <module>android</module>
     <module>server</module>
     <module>sample</module>
+	<module>payments</module>
     <module>test</module>
   </modules>
 
@@ -50,6 +51,10 @@
       <id>forplay-legacy</id>
       <url>http://forplay.googlecode.com/svn/mavenrepo</url>
     </repository>
+    <repository>
+      <id>Central repository</id>
+      <url>http://repo1.maven.org/maven2</url>
+    </repository>	
   </repositories>
 
   <pluginRepositories>
