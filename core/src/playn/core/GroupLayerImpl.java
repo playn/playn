@@ -119,9 +119,9 @@ public class GroupLayerImpl<L extends AbstractLayer>
 
     // fast path for depth changes that don't change ordering
     float newDepth = child.depth();
-    boolean leftCorrect = (oldIndex == 0 || children.get(oldIndex-1).depth() < newDepth);
+    boolean leftCorrect = (oldIndex == 0 || children.get(oldIndex-1).depth() <= newDepth);
     boolean rightCorrect = (oldIndex == children.size()-1 ||
-                            children.get(oldIndex+1).depth() > newDepth);
+                            children.get(oldIndex+1).depth() >= newDepth);
     if (leftCorrect && rightCorrect) {
       return oldIndex;
     }
