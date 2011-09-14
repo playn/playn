@@ -11,7 +11,7 @@
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
- * limitations under the License. 
+ * limitations under the License.
  */
 package playn.core;
 
@@ -30,17 +30,16 @@ public interface AssetManager {
 
   /**
    * Return a Sound, given a path to the sound resource.
-   * 
+   *
    * @param path a path to the resource
    * @return the sound
    */
   Sound getSound(String path);
 
   /**
-   * Return a String, given a path to a text resource.
-   * 
+   * Calls back with String, given a path to a text resource encoded with UTF-8.
+   *
    * @param path a path to the resource
-   * @return the text
    */
   void getText(String path, ResourceCallback<String> callback);
 
