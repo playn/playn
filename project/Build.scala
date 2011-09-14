@@ -22,7 +22,8 @@ object PlayNBuild extends Build {
     javacOptions     ++= Seq("-Xlint", "-Xlint:-serial", "-source", "1.6", "-target", "1.6"),
     fork in Compile  := true,
     autoScalaLibrary := false, // no scala-library dependency
-    publishArtifact in (Compile, packageDoc) := false // no scaladocs; it fails
+    publishArtifact in (Compile, packageDoc) := false, // no scaladocs; it fails
+    resolvers        += "Forplay Legacy" at "http://forplay.googlecode.com/svn/mavenrepo"
   )
 
   val gwtVer = "2.3.0"
