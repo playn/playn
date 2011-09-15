@@ -15,6 +15,7 @@
  */
 package playn.java;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.util.Properties;
@@ -70,12 +71,17 @@ class JavaStorage implements Storage {
 
   private Properties maybeRetrieveProperties() {
     Properties properties = new Properties();
-    try {
-      properties.load(new FileInputStream(tempFile));
-      isPersisted = true;
-    } catch(Exception e) {
-      PlayN.log().info("Error retrieving file: " + e.getMessage());
-      isPersisted = false;
+    if (new File(tempFile).exists()) {
+      try {
+        properties.load(new FileInputStream(tempFile));
+        isPersisted = true;
+      } catch(Exception e) {
+        PlayN.log().info("Error retrieving file: " + e.getMessage());
+        isPersisted = false;
+      }
+    } else {
+      // Attempt to write newly created properties immediately to make the isPersisted valid
+      maybePersistProperties(properties);
     }
     return properties;
   }

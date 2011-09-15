@@ -49,9 +49,7 @@ public interface Storage {
   public String getItem(String key);
 
   /**
-   * Returns true if the Storage data is will be persistent across restarts.
-   *
-   * @return true if the Storage data is being stored persistently
+   * Returns true if the Storage data will be persistent across restarts.
    */
   public boolean isPersisted();
 }
