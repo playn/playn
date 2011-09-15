@@ -1,12 +1,12 @@
 /**
  * Copyright 2010 The PlayN Authors
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -18,7 +18,7 @@ package playn.core;
 /**
  * The main PlayN interface. The static methods in this class provide access to
  * the various available subsystems.
- * 
+ *
  * <p>
  * You must register a {@link Platform} before calling any of these methods. For
  * example, <code>JavaPlatform.register();</code>.
@@ -27,7 +27,7 @@ package playn.core;
 public class PlayN {
 
   private static Platform platform;
-  
+
   public static RegularExpression regularExpression() {
     return platform.regularExpression();
   }
@@ -42,7 +42,7 @@ public class PlayN {
   /**
    * Gets the current time, as a double value in milliseconds since January 1,
    * 1970, 00:00:00 GMT.
-   * 
+   *
    * <p>
    * This is equivalent to the standard JRE <code>new Date().getTime();</code>,
    * but it slightly more terse, and avoids the use of <code>long</code> values,
@@ -59,7 +59,7 @@ public class PlayN {
   public static Graphics graphics() {
     return platform.graphics();
   }
-  
+
   public static AssetManager assetManager() {
     return platform.assetManager();
   }
@@ -105,7 +105,7 @@ public class PlayN {
   public static Mouse mouse() {
     return platform.mouse();
   }
-  
+
   /**
    * Gets the {@Link Platform.Type} platform type enum.
    */

@@ -68,7 +68,7 @@ public class FlashSurface implements Surface {
     dirty = true;
   }
 
- 
+
   @Override
   public void fillRect(float x, float y, float w, float h) {
     context2d.fillRect(x, y, w, h);
@@ -100,33 +100,33 @@ public class FlashSurface implements Surface {
     context2d.scale(x,y);
   }
 
- 
+
 
   @Override
    public void setFillColor(int color) {
-     context2d.setFillStyle("rgba(" 
-         + ((color >> 16) & 0xff) + "," 
+     context2d.setFillStyle("rgba("
+         + ((color >> 16) & 0xff) + ","
          + ((color >> 8) & 0xff) + ","
          + (color & 0xff) + ","
          + ((color >> 24) & 0xff) + ")");
-    
+
    }
 
-   public void setStrokeColor(int color) { 
-     context2d.setStrokeStyle("rgba(" 
-         + ((color >> 16) & 0xff) + "," 
+   public void setStrokeColor(int color) {
+     context2d.setStrokeStyle("rgba("
+         + ((color >> 16) & 0xff) + ","
          + ((color >> 8) & 0xff) + ","
          + (color & 0xff) + ","
          + ((color >> 24) & 0xff) + ")");
    }
-  
+
 
 
   @Override
   public void setFillPattern(Pattern pattern) {
   }
 
- 
+
 
   @Override
   public void setTransform(float m11, float m12, float m21, float m22, float dx, float dy) {
@@ -170,5 +170,5 @@ public class FlashSurface implements Surface {
     context2d.stroke();
   }
 
- 
+
 }

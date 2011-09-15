@@ -1,12 +1,12 @@
 /**
  * Copyright 2010 The PlayN Authors
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -76,7 +76,7 @@ public interface Layer {
    * is drawn, this alpha value is applied to the alpha channel of the Layer.
    * <p>
    * By default, the alpha for a Layer is 1.0 (not transparent).
-   * 
+   *
    * @return alpha in range [0,1] where 0 is transparent and 1 is opaque
    */
   float alpha();
@@ -89,7 +89,7 @@ public interface Layer {
    * is drawn, this alpha value is applied to the alpha channel of the Layer.
    * <p>
    * Values outside the range [0,1] will be clamped to the range [0,1].
-   * 
+   *
    * @param alpha alpha value in range [0,1] where 0 is transparent and 1 is opaque
    */
   void setAlpha(float alpha);
@@ -108,7 +108,7 @@ public interface Layer {
    * Sets the origin of the layer.
    * <p>
    * This sets the origin of the layer's transformation matrix.
-   * 
+   *
    * @param x origin on x axis
    * @param y origin on y axis
    */
@@ -130,7 +130,7 @@ public interface Layer {
    * <p>
    * This sets the translation of the layer's transformation matrix so coordinates in the layer will
    * be translated by this amount.
-   * 
+   *
    * @param x translation on x axis
    * @param y translation on y axis
    */
@@ -143,7 +143,7 @@ public interface Layer {
    * multiplied by this scale.
    * <p>
    * Note that a scale of {@code 1} is equivalent to no scale.
-   * 
+   *
    * @param x non-zero scale value
    */
   void setScale(float x);
@@ -155,7 +155,7 @@ public interface Layer {
    * multiplied by this scale.
    * <p>
    * Note that a scale of {@code 1} is equivalent to no scale.
-   * 
+   *
    * @param x non-zero scale value on the x axis
    * @param y non-zero scale value on the y axis
    */
@@ -167,7 +167,7 @@ public interface Layer {
    * This sets the rotation of the layer's transformation matrix so coordinates in the layer will be
    * rotated by this angle.
    * <p>
-   * 
+   *
    * @param angle angle to rotate, in radians
    */
   void setRotation(float angle);
@@ -293,7 +293,7 @@ public interface Layer {
       Point point = new Point(x, y);
       screenToLayer(layer, point, point);
       return (
-          point.x() >= 0 &&  point.y() >= 0 && 
+          point.x() >= 0 &&  point.y() >= 0 &&
           point.x() <= layer.width() && point.y() <= layer.height());
     }
   }

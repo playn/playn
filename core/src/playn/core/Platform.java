@@ -11,7 +11,7 @@
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
- * limitations under the License. 
+ * limitations under the License.
  */
 package playn.core;
 
@@ -24,7 +24,7 @@ public interface Platform {
   Audio audio();
 
   Graphics graphics();
-  
+
   AssetManager assetManager();
 
   Json json();
@@ -50,7 +50,7 @@ public interface Platform {
   void run(Game game);
 
   double time();
-  
+
   Platform.Type type();
 
   RegularExpression regularExpression();

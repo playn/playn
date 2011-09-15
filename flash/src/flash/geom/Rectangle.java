@@ -31,7 +31,7 @@ final public class Rectangle extends JavaScriptObject {
   public native int getWidth() /*-{
     return this.width;
   }-*/;
-  
+
   public native int getHeight() /*-{
     return this.height;
   }-*/;

@@ -1,12 +1,12 @@
 /**
  * Copyright 2011 The PlayN Authors
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -37,7 +37,7 @@ import com.google.gwt.core.linker.CrossSiteIframeLinker;
  * {@code <html manifest="mymodule/appcache.nocache.manifest">}</li>
  * <li>Add a mime-mapping to your web.xml file:
  * <p>
- * 
+ *
  * <pre>{@code <mime-mapping>
  * <extension>manifest</extension>
  * <mime-type>text/cache-manifest</mime-type>
@@ -95,7 +95,7 @@ public class AppCacheLinker extends CrossSiteIframeLinker {
    * Determines whether our not the given should be included in the app cache
    * manifest. Subclasses may override this method in order to filter out
    * specific file patterns.
-   * 
+   *
    * @param file the path of the resource being considered
    * @return true if the file should be included in the manifest
    */
@@ -110,7 +110,7 @@ public class AppCacheLinker extends CrossSiteIframeLinker {
     if (path.equals("/")) {
       return true;
     }
-    
+
     // Whitelisted file extension
     int pos = path.lastIndexOf('.');
     if (pos != -1) {
@@ -119,7 +119,7 @@ public class AppCacheLinker extends CrossSiteIframeLinker {
         return true;
       }
     }
-    
+
     // Not included by default
     return false;
   }
@@ -183,7 +183,7 @@ public class AppCacheLinker extends CrossSiteIframeLinker {
   /**
    * Override this method to force the linker to include additional files in the
    * manifest.
-   * 
+   *
    * @return array of additional files to include in the manifest.
    */
   protected String[] staticCachedFiles() {

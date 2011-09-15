@@ -39,7 +39,7 @@ class JsonArrayContext extends JsonContext {
   public void removeMe() {
     array().remove(getCurrentIndex());
   }
-  
+
   @Override
   public void replaceMe(double d) {
     array().set(getCurrentIndex(), d);
@@ -54,7 +54,7 @@ class JsonArrayContext extends JsonContext {
   public void replaceMe(boolean d) {
     array().set(getCurrentIndex(), d);
   }
-  
+
   @Override
   public void replaceMe(JsonValue value) {
     array().set(getCurrentIndex(), value);

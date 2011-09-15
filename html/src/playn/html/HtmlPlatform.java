@@ -296,7 +296,7 @@ public class HtmlPlatform implements Platform {
   public double time() {
     return Duration.currentTimeMillis();
   }
-  
+
   @Override
   public Type type() {
     return Type.HTML;

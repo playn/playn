@@ -143,7 +143,7 @@ public class JavaPlatform implements Platform {
   public Analytics analytics() {
     return analytics;
   }
-  
+
   @Override
   public JavaAssetManager assetManager() {
     return assetManager;
@@ -167,7 +167,7 @@ public class JavaPlatform implements Platform {
   public double time() {
     return System.currentTimeMillis();
   }
-  
+
   @Override
   public Type type() {
     return Type.JAVA;
@@ -260,7 +260,7 @@ public class JavaPlatform implements Platform {
 
   /**
    * Sets the title of the window.
-   * 
+   *
    * @param title the window title
    */
   public void setTitle(String title) {

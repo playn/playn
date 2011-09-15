@@ -30,7 +30,8 @@ public interface Keyboard {
     class Impl extends Events.Input.Impl implements Event {
       private int keyCode;
 
-      @Override public int keyCode() {
+      @Override
+      public int keyCode() {
         return keyCode;
       }
 

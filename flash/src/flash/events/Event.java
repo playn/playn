@@ -1,12 +1,12 @@
 /*
  * Copyright 2010 Google Inc.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -24,15 +24,15 @@ import com.google.gwt.core.client.JavaScriptObject;
 public class Event extends JavaScriptObject {
 
   protected Event() {}
-  
+
   /**
    * Indicates whether an event is a bubbling event.
    * @return
    */
   final public native boolean getBubbles() /*-{
-    return this.bubbles;  
+    return this.bubbles;
   }-*/;
-  
+
   /**
    * Indicates whether an event is a bubbling event.
    * @return
@@ -40,7 +40,7 @@ public class Event extends JavaScriptObject {
   final public native boolean getCancelable() /*-{
     return this.cancelable;
   }-*/;
-  
+
   /**
    * The object that is actively processing the Event object with an event listener.
    * @return
@@ -48,7 +48,7 @@ public class Event extends JavaScriptObject {
   final public native JavaScriptObject getCurrentTarget() /*-{
     return this.currentTarget;
   }-*/;
-  
+
   /**
    * The current phase in the event flow.
    * @return
@@ -56,30 +56,30 @@ public class Event extends JavaScriptObject {
   final public native int getEventPhase() /*-{
     return this.eventPhase;
   }-*/;
-  
+
   /**
    * The event target.
    * @return
    */
   final public native JavaScriptObject getTarget() /*-{
-    return this.target;  
+    return this.target;
   }-*/;
-  
+
   /**
-   * The type of event. 
+   * The type of event.
    * @return
    */
   final public native EventType getType() /*-{
     return this.type;
   }-*/;
-  
+
   /**
    * Checks whether the preventDefault() method has been called on the event.
    */
   final public native boolean isDefaultPrevented() /*-{
     return this.isDefaultPrevented();
   }-*/;
-  
+
   /**
    * Cancels an event's default behavior if that behavior can be canceled.
    */
@@ -91,13 +91,13 @@ public class Event extends JavaScriptObject {
    * Prevents processing of any event listeners in the current node and any subsequent nodes in the event flow.
    */
   final public native void stopImmediatePropagation() /*-{
-    this.stopImmediatePropagation();  
+    this.stopImmediatePropagation();
   }-*/;
-  
+
   /**
    * Prevents processing of any event listeners in nodes subsequent to the current node in the event flow.
    */
   final public native void stopPropagation() /*-{
-    this.stopPropagation();  
+    this.stopPropagation();
   }-*/;
 }

@@ -1,12 +1,12 @@
 /**
  * Copyright 2011 The PlayN Authors
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -27,7 +27,7 @@ public interface Surface {
 
   /**
    * Draws an image at the specified location.
-   * 
+   *
    * @param dx the destination x
    * @param dy the destination y
    */
@@ -35,7 +35,7 @@ public interface Surface {
 
   /**
    * Draws a scaled image at the specified location.
-   * 
+   *
    * @param dx the destination x
    * @param dy the destination y
    * @param dw the destination width
@@ -45,10 +45,10 @@ public interface Surface {
 
   /**
    * Draws a scaled subset of an image at the specified location.
-   * 
+   *
    * TODO(jgw): Document whether out-of-bounds source coordinates clamp, repeat,
    * or do nothing.
-   * 
+   *
    * @param dx the destination x
    * @param dy the destination y
    * @param dw the destination width
@@ -64,7 +64,7 @@ public interface Surface {
   /**
    * Draws an image, centered at the specified location.  Simply
    * subtracts image.width/2 from dx and image.height/2 from dy.
-   * 
+   *
    * @param image the image to draw
    * @param dx destination x
    * @param dy destination y

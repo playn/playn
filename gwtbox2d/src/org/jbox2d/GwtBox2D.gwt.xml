@@ -8,7 +8,7 @@
   <source path="dynamics"/>
   <source path="pooling"/>
   <source path="structs"/>
-  
+
   <super-source path="emul" />
-  
+
 </module>

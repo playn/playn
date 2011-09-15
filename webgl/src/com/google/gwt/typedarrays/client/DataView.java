@@ -1,12 +1,12 @@
 /*
  * Copyright 2010 Google Inc.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -23,7 +23,7 @@ package com.google.gwt.typedarrays.client;
  * heterogeneous in nature and have a defined byte order. The DataView view
  * provides a low-level interface for reading such data from and writing it to
  * an ArrayBuffer.
- * 
+ *
  * Taken from the Khronos TypedArrays Draft Spec as of Aug 30, 2010.
  */
 public class DataView extends ArrayBufferView {
@@ -63,11 +63,11 @@ public class DataView extends ArrayBufferView {
    * Gets the value of the given type at the specified byte offset from the
    * start of the view. There is no alignment constraint; multi-byte values may
    * be fetched from any offset.
-   * 
+   *
    * For multi-byte values, the optional littleEndian argument indicates whether
    * a big-endian or little-endian value should be read. If false or undefined,
    * a big-endian value is read.
-   * 
+   *
    * These methods raise an INDEX_SIZE_ERR exception if they would read beyond
    * the end of the view.
    */
@@ -132,11 +132,11 @@ public class DataView extends ArrayBufferView {
    * Stores a value of the given type at the specified byte offset from the
    * start of the view. There is no alignment constraint; multi-byte values may
    * be stored at any offset.
-   * 
+   *
    * For multi-byte values, the littleEndian argument indicates whether the
    * value should be stored in big-endian or little-endian byte order. If false
    * or undefined, the value is stored in big-endian byte order.
-   * 
+   *
    * These methods throw exceptions if they would write beyond the end of the
    * view.
    */

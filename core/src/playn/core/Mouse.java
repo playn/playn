@@ -40,7 +40,8 @@ public interface Mouse {
     class Impl extends Events.Position.Impl implements ButtonEvent {
       private int button;
 
-      @Override public int button() {
+      @Override
+      public int button() {
         return button;
       }
 

@@ -1,12 +1,12 @@
 /**
  * Copyright 2010 The PlayN Authors
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -29,7 +29,7 @@ import playn.core.TextLayout;
 
 class FlashCanvas implements Canvas {
 
- 
+
   private final int width, height;
   private boolean dirty = true;
   private final Context2d context2d;
@@ -152,12 +152,12 @@ class FlashCanvas implements Canvas {
 
   @Override
   public void setFillColor(int color) {
-    context2d.setFillStyle("rgba(" 
-        + ((color >> 16) & 0xff) + "," 
+    context2d.setFillStyle("rgba("
+        + ((color >> 16) & 0xff) + ","
         + ((color >> 8) & 0xff) + ","
         + (color & 0xff) + ","
         + ((color >> 24) & 0xff) + ")");
-    
+
   }
 
   @Override
@@ -181,9 +181,9 @@ class FlashCanvas implements Canvas {
   }
 
   @Override
-  public void setStrokeColor(int color) { 
-    context2d.setStrokeStyle("rgba(" 
-        + ((color >> 16) & 0xff) + "," 
+  public void setStrokeColor(int color) {
+    context2d.setStrokeStyle("rgba("
+        + ((color >> 16) & 0xff) + ","
         + ((color >> 8) & 0xff) + ","
         + (color & 0xff) + ","
         + ((color >> 24) & 0xff) + ")");

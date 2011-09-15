@@ -1,12 +1,12 @@
 /*
  * Copyright 2010 Google Inc.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -30,7 +30,7 @@ import com.google.gwt.typedarrays.client.Int32Array;
 
 /**
  * TODO: Lots more documentation needed here.
- * 
+ *
  * Taken from the WebGL Draft Spec as of Aug 30, 2010:
  * https://cvs.khronos.org/svn/repos/registry/trunk/public/webgl/doc/spec/WebGL-spec.html
  * TODO: Update this to the Feb 11 version.
@@ -1159,7 +1159,7 @@ public class WebGLRenderingContext extends JavaScriptObject {
 
   /**
    * Return the value for the passed pname.
-   * 
+   *
    * @param pname one of RENDERER, SHADING_LANGUAGE_VERSION, VENDOR, VERSION
    */
   public final native String getParameterString(int pname) /*-{
@@ -1168,7 +1168,7 @@ public class WebGLRenderingContext extends JavaScriptObject {
 
   /**
    * Return the value for the passed pname.
-   * 
+   *
    * @param pname one of ACTIVE_TEXTURE, ALPHA_BITS, BLEND_DST_ALPHA, BLEND_DST_RGB, BLEND_EQUATION_ALPHA, BLEND_EQUATION_RGB, BLEND_SRC_ALPHA, BLEND_SRC_RGB, BLUE_BITS, CULL_FACE_MODE, DEPTH_BITS, DEPTH_FUNC, FRONT_FACE, GENERATE_MIPMAP_HINT, GREEN_BITS, IMPLEMENTATION_COLOR_READ_FORMAT, IMPLEMENTATION_COLOR_READ_TYPE, MAX_COMBINED_TEXTURE_IMAGE_UNITS, MAX_CUBE_MAP_TEXTURE_SIZE, MAX_FRAGMENT_UNIFORM_VECTORS, MAX_RENDERBUFFER_SIZE, MAX_TEXTURE_IMAGE_UNITS, MAX_TEXTURE_SIZE, MAX_VARYING_VECTORS, MAX_VERTEX_ATTRIBS, MAX_VERTEX_TEXTURE_IMAGE_UNITS, MAX_VERTEX_UNIFORM_VECTORS, NUM_COMPRESSED_TEXTURE_FORMATS, PACK_ALIGNMENT, RED_BITS, SAMPLE_BUFFERS, SAMPLES, STENCIL_BACK_FAIL, STENCIL_BACK_FUNC, STENCIL_BACK_PASS_DEPTH_FAIL, STENCIL_BACK_PASS_DEPTH_PASS, STENCIL_BACK_REF, STENCIL_BACK_VALUE_MASK, STENCIL_BACK_WRITEMASK, STENCIL_BITS, STENCIL_CLEAR_VALUE, STENCIL_FAIL, STENCIL_FUNC, STENCIL_PASS_DEPTH_FAIL, STENCIL_PASS_DEPTH_PASS, STENCIL_REF, STENCIL_VALUE_MASK, STENCIL_WRITEMASK, SUBPIXEL_BITS, UNPACK_ALIGNMENT
    */
   public final native int getParameteri(int pname) /*-{
@@ -1177,7 +1177,7 @@ public class WebGLRenderingContext extends JavaScriptObject {
 
   /**
    * Return the value for the passed pname.
-   * 
+   *
    * @param pname one of BLEND, CULL_FACE, DEPTH_TEST, DEPTH_WRITEMASK, DITHER, POLYGON_OFFSET_FILL, SAMPLE_COVERAGE_INVERT, SCISSOR_TEST, STENCIL_TEST, UNPACK_FLIP_Y_WEBGL, UNPACK_PREMULTIPLY_ALPHA_WEBGL
    */
   public final native boolean getParameterb(int pname) /*-{
@@ -1186,7 +1186,7 @@ public class WebGLRenderingContext extends JavaScriptObject {
 
   /**
    * Return the value for the passed pname.
-   * 
+   *
    * @param pname one of DEPTH_CLEAR_VALUE, LINE_WIDTH, POLYGON_OFFSET_FACTOR, POLYGON_OFFSET_UNITS, SAMPLE_COVERAGE_VALUE
    */
   public final native float getParameterf(int pname) /*-{
@@ -1195,7 +1195,7 @@ public class WebGLRenderingContext extends JavaScriptObject {
 
   /**
    * Return the value for the passed pname.
-   * 
+   *
    * @param pname one of ARRAY_BUFFER_BINDING, COMPRESSED_TEXTURE_FORMATS, CURRENT_PROGRAM, ELEMENT_ARRAY_BUFFER_BINDING, FRAMEBUFFER_BINDING, RENDERBUFFER_BINDING, TEXTURE_BINDING_2D, TEXTURE_BINDING_CUBE_MAP
    */
   public final native <T extends WebGLObject> T getParametero(int pname) /*-{
@@ -1204,7 +1204,7 @@ public class WebGLRenderingContext extends JavaScriptObject {
 
   /**
    * Return the value for the passed pname.
-   * 
+   *
    * @param pname one of ALIASED_LINE_WIDTH_RANGE, ALIASED_POINT_SIZE_RANGE, BLEND_COLOR, COLOR_CLEAR_VALUE, COLOR_WRITEMASK, DEPTH_RANGE, MAX_VIEWPORT_DIMS, SCISSOR_BOX, VIEWPORT
    */
   public final native <T extends ArrayBufferView> T getParameterv(int pname) /*-{
@@ -1241,7 +1241,7 @@ public class WebGLRenderingContext extends JavaScriptObject {
 
   /**
    * Return the information requested in pname about the vertex attribute at the passed index.
-   * 
+   *
    * @param pname one of VERTEX_ATTRIB_ARRAY_SIZE, VERTEX_ATTRIB_ARRAY_STRIDE, VERTEX_ATTRIB_ARRAY_TYPE
    */
   public final native int getVertexAttribi(int index, int pname) /*-{
@@ -1250,7 +1250,7 @@ public class WebGLRenderingContext extends JavaScriptObject {
 
   /**
    * Return the information requested in pname about the vertex attribute at the passed index.
-   * 
+   *
    * @param pname one of VERTEX_ATTRIB_ARRAY_ENABLED, VERTEX_ATTRIB_ARRAY_NORMALIZED
    */
   public final native boolean getVertexAttribb(int index, int pname) /*-{
@@ -1259,7 +1259,7 @@ public class WebGLRenderingContext extends JavaScriptObject {
 
   /**
    * Return the information requested in pname about the vertex attribute at the passed index.
-   * 
+   *
    * @param pname VERTEX_ATTRIB_ARRAY_BUFFER_BINDING
    * @return {@link WebGLBuffer}
    */
@@ -1269,7 +1269,7 @@ public class WebGLRenderingContext extends JavaScriptObject {
 
   /**
    * Return the information requested in pname about the vertex attribute at the passed index.
-   * 
+   *
    * @param pname CURRENT_VERTEX_ATTRIB
    * @return a {@link Float32Array} with 4 elements
    */
@@ -1279,7 +1279,7 @@ public class WebGLRenderingContext extends JavaScriptObject {
 
   /**
    * Return the value for the passed pname given the passed target. The type returned is the natural type for the requested pname, as given in the following table: If an attempt is made to call this function with no WebGLTexture bound (see above), an INVALID_OPERATION error is generated.
-   * 
+   *
    * @param pname one of TEXTURE_MAG_FILTER, TEXTURE_MIN_FILTER, TEXTURE_WRAP_S, TEXTURE_WRAP_T
    */
   public final native int getTexParameter(int target, int pname) /*-{
@@ -1288,7 +1288,7 @@ public class WebGLRenderingContext extends JavaScriptObject {
 
   /**
    * Return the value for the passed pname given the passed shader.
-   * 
+   *
    * @param pname one of DELETE_STATUS, COMPILE_STATUS
    */
   public final native boolean getShaderParameterb(WebGLShader shader, int pname) /*-{
@@ -1297,7 +1297,7 @@ public class WebGLRenderingContext extends JavaScriptObject {
 
   /**
    * Return the value for the passed pname given the passed shader.
-   * 
+   *
    * @param pname one of SHADER_TYPE, INFO_LOG_LENGTH, SHADER_SOURCE_LENGTH
    */
   public final native int getShaderParameteri(WebGLShader shader, int pname) /*-{
@@ -1306,7 +1306,7 @@ public class WebGLRenderingContext extends JavaScriptObject {
 
   /**
    * Return the value for the passed pname given the passed target.
-   * 
+   *
    * @param pname one of RENDERBUFFER_WIDTH, RENDERBUFFER_HEIGHT, RENDERBUFFER_INTERNAL_FORMAT, RENDERBUFFER_RED_SIZE, RENDERBUFFER_GREEN_SIZE, RENDERBUFFER_BLUE_SIZE, RENDERBUFFER_ALPHA_SIZE, RENDERBUFFER_DEPTH_SIZE, RENDERBUFFER_STENCIL_SIZE
    */
   public final native int getRenderbufferParameter(int target, int pname) /*-{
@@ -1315,7 +1315,7 @@ public class WebGLRenderingContext extends JavaScriptObject {
 
   /**
    * Return the value for the passed pname given the passed program.
-   * 
+   *
    * @param pname one of DELETE_STATUS, LINK_STATUS, VALIDATE_STATUS
    */
   public final native boolean getProgramParameterb(WebGLProgram program, int pname) /*-{
@@ -1324,7 +1324,7 @@ public class WebGLRenderingContext extends JavaScriptObject {
 
   /**
    * Return the value for the passed pname given the passed program.
-   * 
+   *
    * @param pname one of INFO_LOG_LENGTH, ATTACHED_SHADERS, ACTIVE_ATTRIBUTES, ACTIVE_ATTRIBUTE_MAX_LENGTH, ACTIVE_UNIFORMS, ACTIVE_UNIFORM_MAX_LENGTH
    */
   public final native int getProgramParameteri(WebGLProgram program, int pname) /*-{
@@ -1333,7 +1333,7 @@ public class WebGLRenderingContext extends JavaScriptObject {
 
   /**
    * Return the value for the passed pname.
-   * 
+   *
    * @param pname one of BUFFER_SIZE, BUFFER_USAGE
    */
   public final native int getBufferParameter(int target, int pname) /*-{
@@ -1342,7 +1342,7 @@ public class WebGLRenderingContext extends JavaScriptObject {
 
   /**
    * Return the value for the passed pname given the passed target and attachment.
-   * 
+   *
    * @param pname one of FRAMEBUFFER_ATTACHMENT_OBJECT_TYPE, FRAMEBUFFER_ATTACHMENT_TEXTURE_LEVEL, FRAMEBUFFER_ATTACHMENT_TEXTURE_CUBE_MAP_FACE
    */
   public final native int getFramebufferAttachmentParameteri(int target,
@@ -1352,7 +1352,7 @@ public class WebGLRenderingContext extends JavaScriptObject {
 
   /**
    * Return the value for the passed pname given the passed target and attachment.
-   * 
+   *
    * @param pname FRAMEBUFFER_ATTACHMENT_OBJECT_NAME
    * @return {@link WebGLRenderbuffer} or {@link WebGLTexture}
    */

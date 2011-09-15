@@ -1,11 +1,11 @@
 package playn.core;
 
 public abstract class AbstractAssetManager implements AssetManager {
-  
+
   private int totalRequestsCount = 0;
   private int successCount = 0;
   private int errorsCount = 0;
-  
+
   @SuppressWarnings("rawtypes")
   private ResourceCallback callback = new ResourceCallback() {
     @Override

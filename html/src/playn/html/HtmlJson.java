@@ -11,7 +11,7 @@
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
- * limitations under the License. 
+ * limitations under the License.
  */
 package playn.html;
 
@@ -103,7 +103,7 @@ class HtmlJson implements Json {
 
     /**
      * Prepend the key if not in an array.
-     * 
+     *
      * Note: if this isn't the first key, we output a leading comma as well.
      */
     private void maybePrependKey(boolean isObject) {
@@ -232,7 +232,7 @@ class HtmlJson implements Json {
     public final native String getString(String key) /*-{
       return this[key];
     }-*/;
-    
+
     @Override
     public final native Array getKeys() /*-{
       if (Object.prototype.keys) { return this.keys(); }
@@ -242,7 +242,7 @@ class HtmlJson implements Json {
       }
       return keys;
     }-*/;
-    
+
   }
 
   private static native JavaScriptObject jsonParse(String json) /*-{

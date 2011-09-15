@@ -23,11 +23,11 @@ import flash.gwt.FlashImport;
 @FlashImport({"flash.display.Sprite", "flash.geom.Matrix"})
 final public class Sprite extends DisplayObjectContainer {
    protected Sprite() {}
-   
+
    public static native Sprite getRootSprite() /*-{
-      return $root; 
+      return $root;
    }-*/;
-   
+
    public static native Sprite create() /*-{
      return new flash.display.Sprite();
    }-*/;
@@ -39,29 +39,29 @@ final public class Sprite extends DisplayObjectContainer {
    public native boolean isButtonMode() /*-{
      return this.buttonMode;
    }-*/;
-   
+
    public native void setButtonMode(boolean mode) /*-{
       this.buttonMode = mode;
    }-*/;
-   
+
    /**
-    * Specifies the display object over which the sprite is being dragged, or 
+    * Specifies the display object over which the sprite is being dragged, or
     * on which the sprite was dropped.
     * @return
     */
    public native DisplayObject getDropTarget() /*-{
      return this.dropTarget;
    }-*/;
-   
+
    /**
-    * Specifies the Graphics object that belongs to this sprite where vector 
+    * Specifies the Graphics object that belongs to this sprite where vector
     * drawing commands can occur.
     * @return
     */
    public native Graphics getGraphics() /*-{
      return this.graphics;
    }-*/;
-   
+
    /**
     * Designates another sprite to serve as the hit area for a sprite.
     * @return
@@ -69,31 +69,31 @@ final public class Sprite extends DisplayObjectContainer {
    public native Sprite getHitArea() /*-{
      return this.hitArea;
    }-*/;
-   
+
    public native void setHitArea(Sprite hitArea) /*-{
      this.hitArea = hitArea;
    }-*/;
-   
-   
+
+
 //   /**
 //    * Controls sound within this sprite.
 //    */
 //   public native SoundTransform getSoundTransform() /*-{
 //     return this.soundTransform;
 //   }-*/;
-   
+
 //   public native void setSoundTransform(SoundTransform transform) /*-{
 //     this.soundTransform = transform;
 //   }-*/;
-   
+
    public native boolean isUseHandCursor() /*-{
      return this.useHandCursor;
    }-*/;
-   
+
    public native void setUseHandCursor(boolean b) /*-{
      this.useHandCursor = b;
    }-*/;
-  
+
   /**
    * Lets the user drag the specified sprite.
    * @param lockCenter
@@ -102,8 +102,8 @@ final public class Sprite extends DisplayObjectContainer {
   public native void startDrag(boolean lockCenter, Rectangle bounds) /*-{
     this.startDrag(lockCenter, bounds);
   }-*/;
-  
-    
+
+
   /**
    * Ends the startDrag() method.
    */

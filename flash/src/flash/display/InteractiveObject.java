@@ -79,23 +79,23 @@ public class InteractiveObject extends DisplayObject {
   }-*/;
 
   /**
-   *   Dispatched when a user presses and releases the main button of the 
-   *   user's pointing device over the same InteractiveObject. 
+   *   Dispatched when a user presses and releases the main button of the
+   *   user's pointing device over the same InteractiveObject.
    */
   final static public EventType CLICK = make("click");
-  
+
   /**
    * Dispatched when a user presses and releases the main button of a pointing
    * device twice in rapid succession over the same InteractiveObject when that
-   * object's doubleClickEnabled flag is set to true. 
+   * object's doubleClickEnabled flag is set to true.
    */
   final static public EventType DOUBLECLICK = make("doubleClick");
   /**
-   * Dispatched after a display object gains focus. 
+   * Dispatched after a display object gains focus.
    */
   final static public EventType FOCUSIN = make("focusIn");
   /**
-   * Dispatched after a display object loses focus.  
+   * Dispatched after a display object loses focus.
    */
   final static public EventType FOCUSOUT = make("focusOut");
   /**
@@ -109,40 +109,40 @@ public class InteractiveObject extends DisplayObject {
 
 
   /**
-   * Dispatched when the user releases a key.    
+   * Dispatched when the user releases a key.
    */
   final static public EventType KEYUP = make("keyUp");
   /**
-  Dispatched when a user presses the pointing device button over an InteractiveObject instance.   
+  Dispatched when a user presses the pointing device button over an InteractiveObject instance.
    */
   final static public EventType MOUSEDOWN = make("mouseDown");
   /**
-  Dispatched when the user attempts to change focus by using a pointer device.    
+  Dispatched when the user attempts to change focus by using a pointer device.
    */
   final static public EventType MOUSEFOCUSCHANGE = make("mouseFocusChange");
   /**
    */
   final static public EventType MOUSEMOVE = make("mouseMove");
   /**
-   * Dispatched when the user moves a pointing device away from an InteractiveObject instance.   
+   * Dispatched when the user moves a pointing device away from an InteractiveObject instance.
    */
   final static public EventType MOUSEOUT = make("mouseOut");
   /**
-   * Dispatched when the user moves a pointing device over an InteractiveObject instance.   
+   * Dispatched when the user moves a pointing device over an InteractiveObject instance.
    */
   final static public EventType MOUSEOVER = make("mouseOver");
   /**
-   * Dispatched when a user releases the pointing device button over an InteractiveObject instance. 
+   * Dispatched when a user releases the pointing device button over an InteractiveObject instance.
    */
   final static public EventType MOUSEUP = make("mouseUp");
 
   /**
-   * Dispatched when a user releases the pointing device button over an InteractiveObject instance. 
+   * Dispatched when a user releases the pointing device button over an InteractiveObject instance.
    */
   final static public EventType MOUSEWHEEL = make("mouseWheel");
 
   /**
-   * Dispatched when the user moves a pointing device away from an InteractiveObject instance.  
+   * Dispatched when the user moves a pointing device away from an InteractiveObject instance.
    */
   final static public EventType ROLLOUT = make("rollout");
 
@@ -152,15 +152,15 @@ public class InteractiveObject extends DisplayObject {
   final static public EventType ROLLOVER = make("rollOver");
 
   /**
-   * Dispatched when the value of the object's tabChildren flag changes. 
+   * Dispatched when the value of the object's tabChildren flag changes.
    */
   final static public EventType TABCHILDRENCHANGE = make("tabChildrenChange");
 
   /**
-   * Dispatched when the object's tabEnabled flag changes.  
+   * Dispatched when the object's tabEnabled flag changes.
    */
   final static public EventType TABCENABLEDCHANGE = make("tabEnabledChange");
-  
+
   /**
    * Dispatched when the value of the object's tabIndex property changes.
    */

@@ -1,12 +1,12 @@
 /**
  * Copyright 2010 The PlayN Authors
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -51,7 +51,7 @@ public class FlashPlatform implements Platform {
   private static final int LOG_FREQ = 2500;
   private static final float MAX_DELTA = 100;
   private static FlashPlatform platform;
- 
+
   static {
     platform = new FlashPlatform();
   }
@@ -164,7 +164,7 @@ public class FlashPlatform implements Platform {
   public RegularExpression regularExpression() {
     return regularExpression;
   }
-  
+
   @Override
   public void openURL(String url) {
       //TODO: implement
@@ -173,7 +173,7 @@ public class FlashPlatform implements Platform {
   private static int FPS_COUNTER_MAX = 300;
   @Override
   public void run(final Game game) {
-   
+
 
     final int updateRate = game.updateRate();
 
@@ -185,14 +185,14 @@ public class FlashPlatform implements Platform {
       private double lastTime;
       int frameCounter = 0;
       private double frameCounterStart = 0;
-      
+
       @Override
       public void fire() {
         double now = time();
         if (frameCounter == 0) {
           frameCounterStart = now;
         }
-        
+
         float delta = (float)(now - lastTime);
         if (delta > MAX_DELTA) {
           delta = MAX_DELTA;
@@ -219,7 +219,7 @@ public class FlashPlatform implements Platform {
         graphics.updateLayers();
         frameCounter++;
         if (frameCounter == FPS_COUNTER_MAX) {
-          double frameRate = frameCounter / 
+          double frameRate = frameCounter /
             ((time() - frameCounterStart) / 1000.0);
           PlayN.log().info("FPS: " + frameRate);
           frameCounter = 0;
@@ -234,7 +234,7 @@ public class FlashPlatform implements Platform {
   public double time() {
     return Duration.currentTimeMillis();
   }
-  
+
   @Override
   public Type type() {
     return Type.FLASH;
@@ -244,7 +244,7 @@ public class FlashPlatform implements Platform {
     //  http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/flash/display/DisplayObject.html#event:enterFrame
     FlashPlatform.captureEvent(Sprite.ENTERFRAME, new EventHandler<Event>() {
       public void handleEvent(Event evt) {
-        evt.preventDefault();  
+        evt.preventDefault();
         callback.fire();
       }
     });
@@ -269,7 +269,7 @@ public class FlashPlatform implements Platform {
   public Storage storage() {
     return storage;
   }
-  
+
   @Override
   public Analytics analytics() {
     return analytics;

@@ -37,7 +37,7 @@ class JsonVisitor {
     public ImmutableJsonContext(JsonValue node) {
       super(node);
     }
-    
+
     @Override
     public void removeMe() {
       immutableError();
@@ -71,7 +71,7 @@ class JsonVisitor {
   public void accept(JsonValue node) {
     accept(node, new ImmutableJsonContext(node));
   }
-  
+
   /**
    * Accept array or object type and visit its members.
    */

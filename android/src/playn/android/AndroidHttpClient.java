@@ -1,12 +1,12 @@
 /*
  * Copyright (C) 2008 ZXing authors
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -53,7 +53,7 @@ import org.apache.http.protocol.HttpContext;
  * <p>
  * This client processes cookies but does not retain them by default. To retain
  * cookies, simply add a cookie store to the HttpContext:
- * 
+ *
  * <pre>context.setAttribute(ClientContext.COOKIE_STORE, cookieStore);</pre>
  * </p>
  */
@@ -78,7 +78,7 @@ public final class AndroidHttpClient implements HttpClient {
 
   /**
    * Create a new HttpClient with reasonable defaults (which you can update).
-   * 
+   *
    * @param userAgent to report in your HTTP requests.
    * @return AndroidHttpClient for you to use for all your requests.
    */

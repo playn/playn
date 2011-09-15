@@ -1,12 +1,12 @@
 /**
  * Copyright 2011 The PlayN Authors
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -44,7 +44,7 @@ class AndroidImage implements CanvasImage {
   private int width, height;
   private int tex = -1, pow2tex = -1;
   private String path;
-  
+
   //contextId identifies which GL context the textures were last refreshed in
   private int contextId;
 
@@ -53,7 +53,7 @@ class AndroidImage implements CanvasImage {
     //Use a soft reference if we have a path to restore the bitmap from.
     bitmapRef = new SoftReference<Bitmap>(bitmap);
     width = bitmap.getWidth();
-    height = bitmap.getHeight();   
+    height = bitmap.getHeight();
   }
 
   public AndroidImage(int w, int h, boolean alpha) {
@@ -104,7 +104,7 @@ class AndroidImage implements CanvasImage {
   public int width() {
     return width;
   }
-  
+
   @Override
   public boolean isReady() {
     return bitmapRef != null || canvas != null;
@@ -148,7 +148,7 @@ class AndroidImage implements CanvasImage {
     }
     return null;
   }
-  
+
   String getPath() {
     return path;
   }
@@ -206,7 +206,7 @@ class AndroidImage implements CanvasImage {
   /*
    * Should be called from ensureTexture() and scaleTexture()
    */
-  private void loadTexture(AndroidGraphics gfx) { 
+  private void loadTexture(AndroidGraphics gfx) {
     boolean isTexture = gfx.gl20.glIsTexture(tex);
     if (isTexture && tex != -1) {
       return;
@@ -223,11 +223,11 @@ class AndroidImage implements CanvasImage {
   private void scaleTexture(AndroidGraphics gfx, boolean repeatX, boolean repeatY) {
     // Ensure that 'tex' is loaded. We use it below.
     loadTexture(gfx);
-    
+
     if (pow2tex != -1 && gfx.gl20.glIsTexture(pow2tex)) {
       return;
     }
-    
+
     // GL requires pow2 on axes that repeat.
     int width = GLUtil.nextPowerOfTwo(width()), height = GLUtil.nextPowerOfTwo(height());
 
@@ -275,7 +275,7 @@ class AndroidImage implements CanvasImage {
 
     gl20.glDeleteFramebuffers(1, new int[] {fbuf}, 0);
   }
-  
+
   @Override
   public void finalize() {
     if (AndroidPlatform.instance != null) {
@@ -283,7 +283,7 @@ class AndroidImage implements CanvasImage {
       if (gfx != null) clearTexture(gfx);
     }
   }
-  
+
   private boolean refreshNeeded() {
     return (contextId != GameViewGL.contextId());
   }

@@ -28,7 +28,7 @@ import flash.display.BitmapData;
 @FlashImport({"flash.display.Loader", "flash.events.Event", "flash.net.URLRequest"})
 class FlashImage implements Image {
   private List<ResourceCallback<Image>> callbacks = new ArrayList<ResourceCallback<Image>>();
-  
+
   private BitmapData imageData = null;
   FlashImage(String url) {
     scheduleLoad(url);
@@ -37,7 +37,7 @@ class FlashImage implements Image {
   FlashImage(BitmapData data) {
     this.imageData = data;
   }
-  
+
   /**
    * @param url
    */
@@ -48,8 +48,8 @@ class FlashImage implements Image {
         function(event) {
           self.@playn.flash.FlashImage::imageData = event.target.content.bitmapData;
           self.@playn.flash.FlashImage::runCallbacks(Z)(true);
-        }); 
-     loader.load(new URLRequest(url));   
+        });
+     loader.load(new URLRequest(url));
   }-*/;
 
   @Override
@@ -75,7 +75,7 @@ class FlashImage implements Image {
     }
     callbacks.clear();
   }
-  
+
   @Override
   public int width() {
     return imageData == null ? 0 : imageData.getWidth();

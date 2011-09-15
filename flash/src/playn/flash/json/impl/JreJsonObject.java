@@ -43,7 +43,7 @@ public class JreJsonObject extends JreJsonValue implements JsonObject {
     @SuppressWarnings("unchecked") T value = (T) map.get(key);
     return value;
   }
-  
+
   public Object getObject() {
     Map<String, Object> obj = new HashMap<String, Object>();
     for (Map.Entry<String, JsonValue> e : map.entrySet()) {

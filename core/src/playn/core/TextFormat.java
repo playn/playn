@@ -48,7 +48,8 @@ public class TextFormat {
   public static abstract class Effect {
     /** Indicates that no text effect should be used. */
     public static final Effect NONE = new Effect() {
-      @Override public String toString() {
+      @Override
+      public String toString() {
         return "none";
       }
     };
@@ -80,17 +81,23 @@ public class TextFormat {
         this.shadowOffsetY = shadowOffsetY;
       }
 
-      @Override public float adjustWidth (float width) {
+      @Override
+      public float adjustWidth (float width) {
         return width + Math.abs(shadowOffsetX);
       }
-      @Override public float adjustHeight (float height) {
+
+      @Override
+      public float adjustHeight (float height) {
         return height + Math.abs(shadowOffsetY);
       }
-      @Override public Integer getAltColor () {
+
+      @Override
+      public Integer getAltColor () {
         return shadowColor;
       }
 
-      @Override public String toString() {
+      @Override
+      public String toString() {
         return "shadow [color=" + Integer.toHexString(shadowColor) +
           ", offX=" + shadowOffsetX + ", offY=" + shadowOffsetY + "]";
       }
@@ -105,17 +112,21 @@ public class TextFormat {
         this.outlineColor = outlineColor;
       }
 
-      @Override public float adjustWidth (float width) {
+      @Override
+      public float adjustWidth (float width) {
         return width + 4;
       }
-      @Override public float adjustHeight (float height) {
+      @Override
+      public float adjustHeight (float height) {
         return height + 4;
       }
-      @Override public Integer getAltColor () {
+      @Override
+      public Integer getAltColor () {
         return outlineColor;
       }
 
-      @Override public String toString() {
+      @Override
+      public String toString() {
         return "outline [color=" + Integer.toHexString(outlineColor) + "]";
       }
     }
@@ -205,7 +216,8 @@ public class TextFormat {
     return new TextFormat(this.font, this.wrapWidth, this.align, this.textColor, effect);
   }
 
-  @Override public String toString() {
+  @Override
+  public String toString() {
     String wrapStr = shouldWrap() ? ""+wrapWidth : "n/a";
     return "[font=" + font + ", wrapWidth=" + wrapStr + ", align=" + align +
       ", textColor=" + Integer.toHexString(textColor) + ", effect=" + effect + "]";

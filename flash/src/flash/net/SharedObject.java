@@ -25,14 +25,14 @@ import flash.gwt.FlashImport;
 import flash.events.EventDispatcher;
 
 /**
- * Implementation of 
+ * Implementation of
  * <a href="http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/flash/net/SharedObject.html">
  * flash.net.SharedObject</a>
  */
 @FlashImport({"flash.net.SharedObject"})
 public class SharedObject extends EventDispatcher {
   protected SharedObject() {}
-  
+
   /**
    * Returns a reference to a locally persistent shared object that is only available to the current client.
    * @param name
@@ -40,9 +40,9 @@ public class SharedObject extends EventDispatcher {
    * @return
    */
   public static native SharedObject getLocal(String name, String localPath, boolean secure) /*-{
-    return flash.net.SharedObject.getLocal(name, localPath, secure); 
+    return flash.net.SharedObject.getLocal(name, localPath, secure);
   }-*/;
-  
+
   /**
    * The collection of attributes assigned to the data property of the object; these attributes can be shared and stored.
    * @return
@@ -50,7 +50,7 @@ public class SharedObject extends EventDispatcher {
   final public native JavaScriptObject getData() /*-{
     return this.data;
   }-*/;
-  
+
   /**
    * The current size of the shared object, in bytes.
    * @return
@@ -58,23 +58,23 @@ public class SharedObject extends EventDispatcher {
   final public native int size() /*-{
     return this.size;
   }-*/;
-  
-  
+
+
   /**
    * For local shared objects, purges all of the data and deletes the shared object from the disk.
    */
   public final native void clear() /*-{
     this.clear();
   }-*/;
-  
-  
+
+
   /**
    * Closes the connection between a remote shared object and the server.
    */
   public final native void close() /*-{
     this.close();
   }-*/;
-  
+
   /**
    * Immediately writes a locally persistent shared object to a local file.
    * @param minDiskSpace
@@ -83,7 +83,7 @@ public class SharedObject extends EventDispatcher {
   public final native String flush(int minDiskSpace) /*-{
     return this.flush(minDiskSpace);
   }-*/;
-  
+
   /**
    * Updates the value of a property in a shared object and indicates to the server that the value of the property has changed.
    * @param propertyName
@@ -92,8 +92,8 @@ public class SharedObject extends EventDispatcher {
   public final native void setProperty(String propertyName, Object value) /*-{
     this.setProperty(propertyName, value);
   }-*/;
-  
-  
+
+
   /**
    * Dispatched when an exception is thrown asynchronously — that is, from native asynchronous code.
    */
@@ -102,7 +102,7 @@ public class SharedObject extends EventDispatcher {
    * Dispatched when a SharedObject instance is reporting its status or error condition.
    */
   public static final EventType NETSTATUS = EventType.make("netStatus");
-  
+
   /**
    * Dispatched when a remote shared object has been updated by the server.
    */

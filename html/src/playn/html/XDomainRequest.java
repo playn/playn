@@ -7,7 +7,7 @@ import com.google.gwt.core.client.JavaScriptObject;
 /**
  * Internet Explorer's {@code XDomainRequest} object, which must be used instead of
  * {@link XMLHttpRequest} for cross domain requests.
- * 
+ *
  * @see http://msdn.microsoft.com/en-us/library/cc288060(v=vs.85).aspx
  */
 public final class XDomainRequest extends JavaScriptObject {
@@ -38,7 +38,7 @@ public final class XDomainRequest extends JavaScriptObject {
 
   /**
    * Gets the response text.
-   * 
+   *
    * @return the response text
    */
   public native String getResponseText() /*-{
@@ -47,7 +47,7 @@ public final class XDomainRequest extends JavaScriptObject {
 
   /**
    * Gets the content type.
-   * 
+   *
    * @return the content type
    */
   public native String getStatus() /*-{
@@ -60,7 +60,7 @@ public final class XDomainRequest extends JavaScriptObject {
 
   /**
    * Opens an asynchronous connection.
-   * 
+   *
    * @param httpMethod the HTTP method to use, one of {@literal GET} or {@literal POST}
    * @param url the URL to be opened
    */
@@ -77,7 +77,7 @@ public final class XDomainRequest extends JavaScriptObject {
 
   /**
    * Initiates a request with data. If there is no data, specify null.
-   * 
+   *
    * @param requestData the data to be sent with the request
    */
   public native void send(String requestData) /*-{
@@ -86,7 +86,7 @@ public final class XDomainRequest extends JavaScriptObject {
 
   /**
    * Sets the {@link Handler} to be notified when the object's state changes.
-   * 
+   *
    * @param handler the handler to be called when the state changes
    */
   public native void setHandler(Handler handler) /*-{

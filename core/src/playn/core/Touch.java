@@ -52,11 +52,13 @@ public interface Touch {
         return id;
       }
 
-      @Override public float pressure() {
+      @Override
+      public float pressure() {
         return pressure;
       }
 
-      @Override public float size() {
+      @Override
+      public float size() {
         return size;
       }
 

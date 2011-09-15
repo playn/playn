@@ -98,7 +98,7 @@ public class JreJsonArray extends JreJsonValue implements JsonArray {
         arrayCtx.setCurrentIndex(i);
         if (visitor.visitIndex(arrayCtx.getCurrentIndex(), arrayCtx)) {
           visitor.accept(get(i), arrayCtx);
-          arrayCtx.setFirst(false);         
+          arrayCtx.setFirst(false);
         }
       }
     }

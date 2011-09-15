@@ -33,7 +33,7 @@ import flash.gwt.FlashImport;
 final public class BitmapData extends JavaScriptObject {
 
     protected BitmapData() {}
-    
+
     public static BitmapData create(int width, int height) {
         return create(width, height, true, 0xFFFFFFFF);
     }
@@ -46,7 +46,7 @@ final public class BitmapData extends JavaScriptObject {
     public native void draw(Object source) /*-{
       this.draw(source);
     }-*/;
-  
+
     public native int getWidth() /*-{
         return this.width;
     }-*/;
@@ -73,7 +73,7 @@ final public class BitmapData extends JavaScriptObject {
         return this.setPixel32(x, y, color);
     }-*/;
 
-    
+
 
     public native void dispose() /*-{
         this.dispose();

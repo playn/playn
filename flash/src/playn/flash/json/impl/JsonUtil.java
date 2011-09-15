@@ -308,10 +308,10 @@ public class JsonUtil {
   }
 
   private static boolean isControlChar(char c) {
-    return (c >= 0x00 && c <= 0x1f)  
-        || (c >= 0x7f && c <= 0x9f) 
+    return (c >= 0x00 && c <= 0x1f)
+        || (c >= 0x7f && c <= 0x9f)
         || c == '\u00ad' || c == '\u070f' || c == '\u17b4' || c == '\u17b5'
-        || c == '\ufeff' 
+        || c == '\ufeff'
         || (c >= '\u0600' && c <= '\u0604')
         || (c >= '\u200c' && c <= '\u200f')
         || (c >= '\u2028' && c <= '\u202f')

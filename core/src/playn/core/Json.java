@@ -1,11 +1,11 @@
 /**
  * Copyright 2010 The PlayN Authors
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  * in compliance with the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software distributed under the License
  * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
  * or implied. See the License for the specific language governing permissions and limitations under
@@ -158,7 +158,7 @@ public interface Json {
      * Gets the array value at the given key, or <code>null</code> if there is no value at this key.
      */
     Array getArray(String key);
-    
+
     /**
      * Gets a set of keys for this JSON object.
      */
@@ -167,24 +167,24 @@ public interface Json {
 
   /**
    * Creates a new {@link Writer}, which can be used to serialize data into the JSON format.
-   * 
+   *
    * <code>
    * // An example of using the JSON writer interface.
    * Json.Writer w = json.newWriter();
-   * 
+   *
    * // Simple values.
    * w.key("x");
    * w.value(10);
    * w.key("y");
    * w.value(10);
-   * 
+   *
    * // Nested object.
    * w.key("nestedObject");
    * w.object();
    * w.key("id");
    * w.value("xyz123");
    * w.endObject();
-   * 
+   *
    * // Nested array.
    * w.key("nestedArray");
    * w.array();
@@ -192,9 +192,9 @@ public interface Json {
    *   w.value(i);
    * }
    * w.endArray();
-   * 
+   *
    * String jsonString = w.write();
-   * 
+   *
    * // Produces:
    * {
    *   'x': 10,

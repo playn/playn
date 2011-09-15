@@ -23,7 +23,7 @@ package flash.events;
  */
 public class KeyboardEvent extends Event {
   protected KeyboardEvent() {}
-  
+
   /**
    * Indicates whether the Alt key is active (true) or inactive (false).
    * @return
@@ -31,7 +31,7 @@ public class KeyboardEvent extends Event {
   final public native boolean isAltKey() /*-{
     return this.altKey;
   }-*/;
-  
+
   /**
    * Contains the character code value of the key pressed or released.
    * @return
@@ -39,8 +39,8 @@ public class KeyboardEvent extends Event {
   final public native int charCode() /*-{
     return this.charCode;
   }-*/;
-  
-  
+
+
   /**
    * The key code value of the key pressed or released.
    * @return
@@ -48,7 +48,7 @@ public class KeyboardEvent extends Event {
   final public native int keyCode() /*-{
     return this.keyCode;
   }-*/;
-  
+
   /**
    * Indicates the location of the key on the keyboard.
    * @return
@@ -56,16 +56,16 @@ public class KeyboardEvent extends Event {
   final public native int keyLocation() /*-{
     return this.keyLocation;
   }-*/;
-  
-  
+
+
   /**
    * On Windows, indicates whether the Ctrl key is active (true) or inactive (false).
    * @return
    */
   final public native boolean isCtrlKey() /*-{
-    return this.ctrlKey; 
+    return this.ctrlKey;
   }-*/;
-  
+
   /**
    * Indicates whether the Shift key is active (true) or inactive (false).
    * @return

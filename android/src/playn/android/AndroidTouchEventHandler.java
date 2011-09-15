@@ -101,7 +101,7 @@ class AndroidTouchEventHandler {
 
   /**
    * Performs the actual parsing of the MotionEvent event.
-   * 
+   *
    * @param event The MotionEvent to process
    * @param preventDefault Shared preventDefault state among returned {@link AndroidTouchEventImpl}
    * @return Processed array of {@link AndroidTouchEventImpl}s which share a preventDefault state.

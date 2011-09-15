@@ -1,12 +1,12 @@
 /**
  * Copyright 2010 The PlayN Authors
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -17,19 +17,19 @@ package playn.core;
 
 /**
  * A 2d drawing canvas.
- * 
+ *
  * <p>
  * Colors are specified as integer ARGB values, with alpha in the
  * most-significant byte.
  * </p>
- * 
+ *
  * TODO: - alpha (Flash and Java2D implementations are tricky). - textAlign?
- * 
+ *
  * TODO (maybe): - textBaseline? Don't see it in Android. - font? Abstracting
  * this is going to be tricky. - measureText? Canvas API is pretty anemic, but
  * would be easy to implement on Android/Flash. - pattern repetition flags? Not
  * clear that Flash supports them.
- * 
+ *
  * Notes: - Clipping is going to be tricky in Flash. It requires that a separate
  * DisplayObject be used as a "mask". I think this can be made to work with this
  * API, but I'm not sure.
@@ -44,7 +44,7 @@ public interface Canvas {
     /**
      * A (B is ignored). Display the source image instead of the destination
      * image.
-     * 
+     *
      * [Sa, Sc]
      */
     SRC,
@@ -52,7 +52,7 @@ public interface Canvas {
     /**
      * B atop A. Same as source-atop but using the destination image instead of
      * the source image and vice versa.
-     * 
+     *
      * [Sa, Sa * Dc + Sc * (1 - Da)]
      */
     DST_ATOP,
@@ -60,7 +60,7 @@ public interface Canvas {
     /**
      * A over B. Display the source image wherever the source image is opaque.
      * Display the destination image elsewhere.
-     * 
+     *
      * [Sa + (1 - Sa)*Da, Rc = Sc + (1 - Sa)*Dc]
      */
     SRC_OVER,
@@ -68,7 +68,7 @@ public interface Canvas {
     /**
      * B over A. Same as source-over but using the destination image instead of
      * the source image and vice versa.
-     * 
+     *
      * [Sa + (1 - Sa)*Da, Rc = Dc + (1 - Da)*Sc]
      */
     DST_OVER,
@@ -76,7 +76,7 @@ public interface Canvas {
     /**
      * A in B. Display the source image wherever both the source image and
      * destination image are opaque. Display transparency elsewhere.
-     * 
+     *
      * [Sa * Da, Sc * Da]
      */
     SRC_IN,
@@ -84,7 +84,7 @@ public interface Canvas {
     /**
      * B in A. Same as source-in but using the destination image instead of the
      * source image and vice versa.
-     * 
+     *
      * [Sa * Da, Sa * Dc]
      */
     DST_IN,
@@ -92,7 +92,7 @@ public interface Canvas {
     /**
      * A out B. Display the source image wherever the source image is opaque and
      * the destination image is transparent. Display transparency elsewhere.
-     * 
+     *
      * [Sa * (1 - Da), Sc * (1 - Da)]
      */
     SRC_OUT,
@@ -100,7 +100,7 @@ public interface Canvas {
     /**
      * B out A. Same as source-out but using the destination image instead of
      * the source image and vice versa.
-     * 
+     *
      * [Da * (1 - Sa), Dc * (1 - Sa)]
      */
     DST_OUT,
@@ -109,14 +109,14 @@ public interface Canvas {
      * A atop B. Display the source image wherever both images are opaque.
      * Display the destination image wherever the destination image is opaque
      * but the source image is transparent. Display transparency elsewhere.
-     * 
+     *
      * [Da, Sc * Da + (1 - Sa) * Dc]
      */
     SRC_ATOP,
 
     /**
      * A xor B. Exclusive OR of the source image and destination image.
-     * 
+     *
      * [Sa + Da - 2 * Sa * Da, Sc * (1 - Da) + (1 - Sa) * Dc]
      */
     XOR,
@@ -148,7 +148,7 @@ public interface Canvas {
 
   /**
    * Draws an image at the specified location.
-   * 
+   *
    * @param dx the destination x
    * @param dy the destination y
    */
@@ -157,7 +157,7 @@ public interface Canvas {
   /**
    * Draws an image, centered at the specified location.  Simply
    * subtracts image.width/2 from dx and image.height/2 from dy.
-   * 
+   *
    * @param image the image to draw
    * @param dx destination x
    * @param dy destination y
@@ -166,7 +166,7 @@ public interface Canvas {
 
   /**
    * Draws a scaled image at the specified location.
-   * 
+   *
    * @param dx the destination x
    * @param dy the destination y
    * @param dw the destination width
@@ -176,10 +176,10 @@ public interface Canvas {
 
   /**
    * Draws a scaled subset of an image at the specified location.
-   * 
+   *
    * TODO(jgw): Document whether out-of-bounds source coordinates clamp, repeat,
    * or do nothing.
-   * 
+   *
    * @param dx the destination x
    * @param dy the destination y
    * @param dw the destination width
@@ -235,7 +235,7 @@ public interface Canvas {
 
   /**
    * Restores the canvas's previous state.
-   * 
+   *
    * @see #save()
    */
   void restore();
@@ -248,7 +248,7 @@ public interface Canvas {
   /**
    * The save and restore methods preserve and restore the state of the canvas,
    * but not specific paths or graphics.
-   * 
+   *
    * The following values are saved:
    * <ul>
    * <li>transformation matrix</li>

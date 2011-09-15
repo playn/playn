@@ -1,12 +1,12 @@
 /**
  * Copyright 2010 The PlayN Authors
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -48,7 +48,7 @@ public class FlashAssetManager extends AbstractCachingAssetManager {
     clientBundles.put(regExp, clientBundle);
   }
 
- 
+
 
   @Override
   protected Sound loadSound(String path) {
@@ -92,7 +92,7 @@ public class FlashAssetManager extends AbstractCachingAssetManager {
 
   /**
    * Determine the resource key from a giveb path.
-   * 
+   *
    * @param fullPath full path, with or without a file extension
    * @return the key by which the resource can be looked up
    */
@@ -132,7 +132,7 @@ public class FlashAssetManager extends AbstractCachingAssetManager {
   protected void doGetText(String path, ResourceCallback<String> callback) {
     loadText(pathPrefix + path, callback);
   }
-  
+
   private static native void loadText(String path, ResourceCallback<String> callback) /*-{
      var req = new flash.net.URLRequest(path);
      var loader = new flash.net.URLLoader();

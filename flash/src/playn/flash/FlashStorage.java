@@ -55,7 +55,7 @@ public class FlashStorage implements Storage {
   @Override
   public boolean isPersisted() {
     // TODO Auto-generated method stub
-    return true; 
+    return true;
   }
 
   /* (non-Javadoc)

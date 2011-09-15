@@ -48,7 +48,7 @@ public class FlashImageLayer extends FlashLayer implements ImageLayer {
   float height = NOT_SET;
 
   private boolean dirty = true;
-  
+
   private boolean repeatX;
 
   private boolean repeatY;
@@ -133,7 +133,7 @@ public class FlashImageLayer extends FlashLayer implements ImageLayer {
         ((Bitmap) display()).setBitmapData(data);
       } else {
         ((Bitmap) display()).setBitmapData(clippedSource);
-      } 
+      }
       display().setWidth((int) dw);
       display().setHeight((int) dh);
       dirty = false;

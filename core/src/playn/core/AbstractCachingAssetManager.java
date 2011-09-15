@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public abstract class AbstractCachingAssetManager extends AbstractAssetManager {
-  
+
   Map<String, Object> cache = new HashMap<String, Object>();
 
   @Override

@@ -28,7 +28,7 @@ final public class Graphics extends JavaScriptObject {
   }-*/;
 
   public native void drawRect(float sx, float sy, float sw, float sh) /*-{
-    this.drawRect(sx, sy, sw, sh);    
+    this.drawRect(sx, sy, sw, sh);
   }-*/;
 
   public native void endFill() /*-{

@@ -9,7 +9,7 @@ public abstract class FlashGame implements EntryPoint {
   @Override
   public final void onModuleLoad() {
     GWT.setUncaughtExceptionHandler(new UncaughtExceptionHandler() {
-      
+
       @Override
       public void onUncaughtException(Throwable e) {
         // TODO Auto-generated method stub
@@ -20,7 +20,7 @@ public abstract class FlashGame implements EntryPoint {
         alert(msg);
       }
     });
-    
+
     // Need to do everything else in a deferred command, so that
     // The uncaut exception handler has taken effect
 //    Scheduler.get().scheduleDeferred(new ScheduledCommand() {
@@ -36,7 +36,7 @@ public abstract class FlashGame implements EntryPoint {
   private native void alert(String msg) /*-{
     flash.external.ExternalInterface.call("alert", msg);
   }-*/;
-  
-  
+
+
   public abstract void start();
 }

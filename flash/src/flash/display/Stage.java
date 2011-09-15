@@ -38,11 +38,11 @@ final public class Stage extends DisplayObjectContainer {
   public native void setFrameRate(int val) /*-{
     this.frameRate = val;
   }-*/;
-  
+
   public native int getStageHeight() /*-{
     return this.stageHeight;
   }-*/;
-  
+
   public native int getStageWidth() /*-{
   return this.stageWidth;
 }-*/;

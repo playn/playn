@@ -23,9 +23,9 @@ final public class EventType extends JavaScriptObject {
   public static native EventType make(String type) /*-{
     return type;
   }-*/;
-  
+
   public native String value() /*-{
     return this;
   }-*/;
-  
+
 }
