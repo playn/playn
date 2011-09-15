@@ -49,11 +49,13 @@ public interface Mouse {
         this.button = button;
       }
 
-      @Override protected String name() {
+      @Override
+      protected String name() {
         return "ButtonEvent";
       }
 
-      @Override protected void addFields(StringBuilder builder) {
+      @Override
+      protected void addFields(StringBuilder builder) {
         super.addFields(builder);
         builder.append(", button=").append(button);
       }
@@ -69,7 +71,8 @@ public interface Mouse {
         super(time, x, y);
       }
 
-      @Override protected String name() {
+      @Override
+      protected String name() {
         return "MotionEvent";
       }
     }
@@ -86,7 +89,8 @@ public interface Mouse {
     class Impl extends Events.Input.Impl implements WheelEvent {
       private float velocity;
 
-      @Override public float velocity() {
+      @Override
+      public float velocity() {
         return velocity;
       }
 
@@ -95,11 +99,13 @@ public interface Mouse {
         this.velocity = velocity;
       }
 
-      @Override protected String name() {
+      @Override
+      protected String name() {
         return "WheelEvent";
       }
 
-      @Override protected void addFields(StringBuilder builder) {
+      @Override
+      protected void addFields(StringBuilder builder) {
         super.addFields(builder);
         builder.append(", velocity=").append(velocity);
       }

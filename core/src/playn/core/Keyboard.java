@@ -39,11 +39,13 @@ public interface Keyboard {
         this.keyCode = keyCode;
       }
 
-      @Override protected String name() {
+      @Override
+      protected String name() {
         return "Keyboard.Event";
       }
 
-      @Override protected void addFields(StringBuilder builder) {
+      @Override
+      protected void addFields(StringBuilder builder) {
         super.addFields(builder);
         builder.append(", keyCode=").append(keyCode);
       }

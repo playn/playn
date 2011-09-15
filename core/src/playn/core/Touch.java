@@ -72,11 +72,13 @@ public interface Touch {
         this(time, x, y, id, -1, -1);
       }
 
-      @Override protected String name() {
+      @Override
+      protected String name() {
         return "Touch.Event";
       }
 
-      @Override protected void addFields(StringBuilder builder) {
+      @Override
+      protected void addFields(StringBuilder builder) {
         super.addFields(builder);
         builder.append(", id=").append(id).append(", pressure=").append(pressure).
           append(", size=").append(size);

@@ -30,7 +30,9 @@ public interface Pointer {
       public Impl(double time, float x, float y) {
         super(time, x, y);
       }
-      @Override protected String name() {
+
+      @Override
+      protected String name() {
         return "Pointer.Event";
       }
     }
