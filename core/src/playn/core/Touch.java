@@ -1,12 +1,12 @@
 /**
  * Copyright 2011 The PlayN Authors
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -71,27 +71,37 @@ public interface Touch {
       public Impl(double time, float x, float y, int id) {
         this(time, x, y, id, -1, -1);
       }
+
+      @Override protected String name() {
+        return "Touch.Event";
+      }
+
+      @Override protected void addFields(StringBuilder builder) {
+        super.addFields(builder);
+        builder.append(", id=").append(id).append(", pressure=").append(pressure).
+          append(", size=").append(size);
+      }
     }
   }
 
   interface Listener {
     /**
      * Called when a touch starts.
-     * 
+     *
      * @param touches one or more {@link Event}s.
      */
     void onTouchStart(Event[] touches);
 
     /**
      * Called when a touch moves (always between start/end events).
-     * 
+     *
      * @param touches one or more {@link Event}s.
      */
     void onTouchMove(Event[] touches);
 
     /**
      * Called when a touch ends.
-     * 
+     *
      * @param touches one or more {@link Event}s.
      */
     void onTouchEnd(Event[] touches);

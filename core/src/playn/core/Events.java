@@ -52,8 +52,7 @@ public class Events {
       private final double time;
       private boolean preventDefault; // default false
 
-      @Override
-      public double time() {
+      @Override public double time() {
         return time;
       }
 
@@ -61,15 +60,28 @@ public class Events {
         this.time = time;
       }
 
-      @Override
-      public void setPreventDefault(boolean preventDefault) {
+      @Override public void setPreventDefault(boolean preventDefault) {
         this.preventDefault = preventDefault;
       }
 
-      @Override
-      public boolean getPreventDefault() {
+      @Override public boolean getPreventDefault() {
         return preventDefault;
       }
+
+      protected String name() {
+          return "Events.Input";
+      }
+
+      @Override public String toString() {
+        StringBuilder builder = new StringBuilder(name()).append('[');
+        addFields(builder);
+        return builder.append(']').toString();
+      }
+
+      protected void addFields(StringBuilder builder) {
+        builder.append("time=").append(time).append(", preventDefault=").append(preventDefault);
+      }
+
     }
   }
 
@@ -88,13 +100,11 @@ public class Events {
     abstract class Impl extends Input.Impl implements Position {
       private final float x, y;
 
-      @Override
-      public float x() {
+      @Override public float x() {
         return x;
       }
 
-      @Override
-      public float y() {
+      @Override public float y() {
         return y;
       }
 
@@ -102,6 +112,15 @@ public class Events {
         super(time);
         this.x = x;
         this.y = y;
+      }
+
+      @Override protected String name() {
+        return "Events.Position";
+      }
+
+      @Override protected void addFields(StringBuilder builder) {
+        super.addFields(builder);
+        builder.append(", x=").append(x).append(", y=").append(y);
       }
     }
   }

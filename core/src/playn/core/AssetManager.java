@@ -17,12 +17,13 @@ package playn.core;
 
 /**
  * Fetches and returns assets.  This interface assumes that some or all assets
- * are asynchronously loaded.  Loading
+ * are asynchronously loaded.
  */
 public interface AssetManager {
 
   /**
    * Return an Image, given a path to the image resource.
+   *
    * @param path a path to the resource
    * @return the image
    */
@@ -44,13 +45,13 @@ public interface AssetManager {
   void getText(String path, ResourceCallback<String> callback);
 
   /**
-   * @return <code>true</code> if all requested assets have been loaded or errored out,
+   * Return <code>true</code> if all requested assets have been loaded or errored out,
    * or <code>false</code> if there are assets remaining to be retrieved
    */
   boolean isDone();
 
   /**
-   * @return how many assets have not yet been loaded or errored out
+   * Return how many assets have not yet been loaded or errored out
    */
   int getPendingRequestCount();
 }
