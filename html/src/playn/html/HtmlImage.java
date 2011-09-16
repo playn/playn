@@ -144,17 +144,18 @@ class HtmlImage implements Image {
       return;
     }
 
-    // Ensure that 'tex' is loaded. We use it below.
-    loadTexture(gfx);
-
     // GL requires pow2 on axes that repeat.
     int width = GLUtil.nextPowerOfTwo(width()), height = GLUtil.nextPowerOfTwo(height());
 
     // Don't scale if it's already a power of two.
     if ((width == 0) && (height == 0)) {
-      pow2tex = tex;
+      pow2tex = gfx.createTexture(repeatX, repeatY);
+      gfx.updateTexture(pow2tex, img);
       return;
     }
+
+    // Ensure that 'tex' is loaded. We use it below.
+    loadTexture(gfx);
 
     // width/height == 0 => already a power of two.
     if (width == 0) {
