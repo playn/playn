@@ -160,7 +160,9 @@ public class JavaJson implements Json {
 
     public Json.Array getKeys() {
       if (jso == null) return new JavaArray(new JSONArray());
-      return new JavaArray(new JSONArray(Arrays.asList(JSONObject.getNames(jso))));
+
+      String[] names = JSONObject.getNames(jso);
+      return new JavaArray(names != null ? new JSONArray(Arrays.asList(names)) : new JSONArray());
     }
   }
 
