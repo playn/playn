@@ -104,6 +104,7 @@ class HtmlTextLayout implements TextLayout {
       ctx.setShadowOffsetX(seffect.shadowOffsetX);
       ctx.setShadowOffsetY(seffect.shadowOffsetY);
       drawText(ctx, x, y);
+
     } else if (format.effect instanceof TextFormat.Effect.Outline) {
       TextFormat.Effect.Outline oeffect = (TextFormat.Effect.Outline)format.effect;
       ctx.save();
@@ -120,17 +121,18 @@ class HtmlTextLayout implements TextLayout {
 
       ctx.restore();
       drawText(ctx, x + 1, y + 1);
+
     } else {
       drawText(ctx, x, y);
     }
   }
 
   void drawText(Context2d ctx, float x, float y) {
-      float ypos = 0;
-      for (Line line : lines) {
-        ctx.fillText(line.text, x + format.align.getX(line.width, width), y + ypos);
-        ypos += metrics.height;
-      }
+    float ypos = 0;
+    for (Line line : lines) {
+      ctx.fillText(line.text, x + format.align.getX(line.width, width), y + ypos);
+      ypos += metrics.height;
+    }
   }
 
   void configContext(Context2d ctx) {
