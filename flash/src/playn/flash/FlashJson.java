@@ -146,6 +146,14 @@ class FlashJson implements Json {
     }
 
     /* (non-Javadoc)
+     * @see playn.core.Json.Object#containsKey(java.lang.String)
+     */
+    @Override
+    public boolean containsKey(String key) {
+      return obj.hasKey(key);
+    }
+
+    /* (non-Javadoc)
      * @see playn.core.Json.Object#getKeys()
      */
     @Override

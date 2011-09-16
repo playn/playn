@@ -160,6 +160,11 @@ public interface Json {
     Array getArray(String key);
 
     /**
+     * Returns true if this object contains a value at the specified key, false if not.
+     */
+    boolean containsKey(String key);
+
+    /**
      * Gets a set of keys for this JSON object.
      */
     Array getKeys();

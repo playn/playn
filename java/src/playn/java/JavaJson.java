@@ -154,6 +154,10 @@ public class JavaJson implements Json {
       return a == null ? null : new JavaArray(a);
     }
 
+    public boolean containsKey(String key) {
+      return (jso == null) ? false : jso.has(key);
+    }
+
     public Json.Array getKeys() {
       if (jso == null) return new JavaArray(new JSONArray());
       return new JavaArray(new JSONArray(Arrays.asList(JSONObject.getNames(jso))));

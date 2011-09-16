@@ -234,6 +234,11 @@ class HtmlJson implements Json {
     }-*/;
 
     @Override
+    public final native boolean containsKey(String key) /*-{
+      return this.hasOwnProperty(key);
+    }-*/;
+
+    @Override
     public final native Array getKeys() /*-{
       if (Object.prototype.keys) { return this.keys(); }
       var keys = [];
