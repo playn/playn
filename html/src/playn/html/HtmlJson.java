@@ -191,6 +191,26 @@ class HtmlJson implements Json {
       return this[index];
     }-*/;
 
+    public TypedArray<Boolean> getBooleanArray(int index) {
+      return asBooleanArray(getArray(index));
+    }
+
+    public TypedArray<Integer> getIntArray(int index) {
+      return asIntArray(getArray(index));
+    }
+
+    public TypedArray<Double> getNumberArray(int index) {
+      return asNumberArray(getArray(index));
+    }
+
+    public TypedArray<String> getStringArray(int index) {
+      return asStringArray(getArray(index));
+    }
+
+    public TypedArray<Object> getObjectArray(int index) {
+      return asObjectArray(getArray(index));
+    }
+
     @Override
     public final native int length() /*-{
       return this.length;
@@ -234,12 +254,41 @@ class HtmlJson implements Json {
     }-*/;
 
     @Override
+    public TypedArray<Boolean> getBooleanArray(String key) {
+      return asBooleanArray(getArray(key));
+    }
+
+    @Override
+    public TypedArray<Integer> getIntArray(String key) {
+      return asIntArray(getArray(key));
+    }
+
+    @Override
+    public TypedArray<Double> getNumberArray(String key) {
+      return asNumberArray(getArray(key));
+    }
+
+    @Override
+    public TypedArray<String> getStringArray(String key) {
+      return asStringArray(getArray(key));
+    }
+
+    @Override
+    public TypedArray<Object> getObjectArray(String key) {
+      return asObjectArray(getArray(key));
+    }
+
+    @Override
     public final native boolean containsKey(String key) /*-{
       return this.hasOwnProperty(key);
     }-*/;
 
     @Override
-    public final native Array getKeys() /*-{
+    public final TypedArray<String> getKeys() {
+      return asStringArray(getNativeKeys());
+    }
+
+    private final native Array getNativeKeys() /*-{
       if (Object.prototype.keys) { return this.keys(); }
       var keys = [];
       for (var key in this) if (this.hasOwnProperty(key)) {
@@ -249,10 +298,6 @@ class HtmlJson implements Json {
     }-*/;
 
   }
-
-  private static native JavaScriptObject jsonParse(String json) /*-{
-    return JSON.parse(json);
-  }-*/;
 
   @Override
   public Writer newWriter() {
@@ -264,4 +309,73 @@ class HtmlJson implements Json {
     HtmlObject object = jsonParse(json).cast();
     return object;
   }
+
+  private static TypedArray<Boolean> asBooleanArray(final Array jsa) {
+    return jsa == null ? null : new TypedArray<Boolean>() {
+      @Override
+      public int length() {
+        return jsa.length();
+      }
+      @Override
+      protected Boolean getImpl(int index) {
+        return jsa.getBoolean(index);
+      }
+    };
+  }
+
+  private static TypedArray<Integer> asIntArray(final Array jsa) {
+    return jsa == null ? null : new TypedArray<Integer>() {
+      @Override
+      public int length() {
+        return jsa.length();
+      }
+      @Override
+      protected Integer getImpl(int index) {
+        return jsa.getInt(index);
+      }
+    };
+  }
+
+  private static TypedArray<Double> asNumberArray(final Array jsa) {
+    return jsa == null ? null : new TypedArray<Double>() {
+      @Override
+      public int length() {
+        return jsa.length();
+      }
+      @Override
+      protected Double getImpl(int index) {
+        return jsa.getNumber(index);
+      }
+    };
+  }
+
+  private static TypedArray<String> asStringArray(final Array jsa) {
+    return jsa == null ? null : new TypedArray<String>() {
+      @Override
+      public int length() {
+        return jsa.length();
+      }
+      @Override
+      protected String getImpl(int index) {
+        return jsa.getString(index);
+      }
+    };
+  }
+
+  private static TypedArray<Object> asObjectArray(final Array jsa) {
+    return jsa == null ? null : new TypedArray<Object>() {
+      @Override
+      public int length() {
+        return jsa.length();
+      }
+      @Override
+      protected Object getImpl(int index) {
+        return jsa.getObject(index);
+      }
+    };
+  }
+
+  private static native JavaScriptObject jsonParse(String json) /*-{
+    return JSON.parse(json);
+  }-*/;
 }

@@ -28,9 +28,6 @@ import playn.flash.json.JsonValue;
 
 class FlashJson implements Json {
 
-  /* (non-Javadoc)
-  * @see playn.core.Json#parse(java.lang.String)
-  */
   @Override
   public Object parse(String json) {
     return new ObjectImpl((JsonObject) playn.flash.json.Json.instance().parse(json));
@@ -40,69 +37,65 @@ class FlashJson implements Json {
 
     private final JsonArray arr;
 
-    /**
-     * @param jsonArray
-     */
     public ArrayImpl(JsonArray arr) {
-      this.arr = arr != null ? arr : playn.flash.json.Json.instance().createArray();
+      this.arr = (arr != null) ? arr : playn.flash.json.Json.instance().createArray();
     }
 
-    /* (non-Javadoc)
-     * @see playn.core.Json.Array#getArray(int)
-     */
     @Override
     public Array getArray(int index) {
       return new ArrayImpl((JsonArray) arr.get(index));
     }
 
-    /* (non-Javadoc)
-     * @see playn.core.Json.Array#getBoolean(int)
-     */
     @Override
     public boolean getBoolean(int index) {
-      // TODO Auto-generated method stub
-      JsonValue b = arr.get(index);
-      return b != null ? ((JsonBoolean) b).getBoolean() : false;
+      return valueToBoolean(arr.get(index));
     }
 
-    /* (non-Javadoc)
-     * @see playn.core.Json.Array#getInt(int)
-     */
     @Override
     public int getInt(int index) {
-      // TODO Auto-generated method stub
       return (int) getNumber(index);
     }
 
-    /* (non-Javadoc)
-     * @see playn.core.Json.Array#getNumber(int)
-     */
     @Override
     public double getNumber(int index) {
-      JsonValue n = arr.get(index);
-      return n != null ? ((JsonNumber) n).getNumber() : 0;
+      return valueToNumber(arr.get(index));
     }
 
-    /* (non-Javadoc)
-     * @see playn.core.Json.Array#getObject(int)
-     */
     @Override
     public Object getObject(int index) {
-      return new ObjectImpl((JsonObject) arr.get(index));
+      return valueToObject(arr.get(index));
     }
 
-    /* (non-Javadoc)
-     * @see playn.core.Json.Array#getString(int)
-     */
     @Override
     public String getString(int index) {
-      JsonValue s = arr.get(index);
-      return s != null ? ((JsonString) s).getString() : "";
+      return valueToString(arr.get(index));
     }
 
-    /* (non-Javadoc)
-     * @see playn.core.Json.Array#length()
-     */
+    @Override
+    public TypedArray<Boolean> getBooleanArray(int index) {
+      return asBooleanArray((JsonArray) arr.get(index));
+    }
+
+    @Override
+    public TypedArray<Integer> getIntArray(int index) {
+      return asIntArray((JsonArray) arr.get(index));
+    }
+
+    @Override
+    public TypedArray<Double> getNumberArray(int index) {
+      return asNumberArray((JsonArray) arr.get(index));
+    }
+
+    @Override
+    public TypedArray<String> getStringArray(int index) {
+      return asStringArray((JsonArray) arr.get(index));
+    }
+
+    @Override
+    public TypedArray<Object> getObjectArray(int index) {
+      return asObjectArray((JsonArray) arr.get(index));
+    }
+
     @Override
     public int length() {
       return arr.length();
@@ -113,126 +106,85 @@ class FlashJson implements Json {
 
     private final JsonObject obj;
 
-    /**
-     * @param parse
-     */
     public ObjectImpl(JsonObject obj) {
       this.obj = obj != null ? obj : playn.flash.json.Json.instance().createObject();
     }
 
-    /* (non-Javadoc)
-     * @see playn.core.Json.Object#getArray(java.lang.String)
-     */
     @Override
     public Array getArray(String key) {
       return new ArrayImpl((JsonArray) obj.get(key));
     }
 
-    /* (non-Javadoc)
-     * @see playn.core.Json.Object#getBoolean(java.lang.String)
-     */
     @Override
     public boolean getBoolean(String key) {
-      JsonValue o = obj.get(key);
-      return o != null ? ((JsonBoolean) o).getBoolean() : false;
+      return valueToBoolean(obj.get(key));
     }
 
-    /* (non-Javadoc)
-     * @see playn.core.Json.Object#getInt(java.lang.String)
-     */
     @Override
     public int getInt(String key) {
       return (int) getNumber(key);
     }
 
-    /* (non-Javadoc)
-     * @see playn.core.Json.Object#containsKey(java.lang.String)
-     */
     @Override
     public boolean containsKey(String key) {
       return obj.hasKey(key);
     }
 
-    /* (non-Javadoc)
-     * @see playn.core.Json.Object#getKeys()
-     */
     @Override
-    public Array getKeys() {
-      // TODO Auto-generated method stub
-      return new Array() {
-
-        @Override
-        public Array getArray(int index) {
-          // TODO Auto-generated method stub
-          return null;
-        }
-
-        @Override
-        public boolean getBoolean(int index) {
-          // TODO Auto-generated method stub
-          return false;
-        }
-
-        @Override
-        public int getInt(int index) {
-          // TODO Auto-generated method stub
-          return 0;
-        }
-
-        @Override
-        public double getNumber(int index) {
-          // TODO Auto-generated method stub
-          return 0;
-        }
-
-        @Override
-        public Object getObject(int index) {
-          // TODO Auto-generated method stub
-          return null;
-        }
-
-        @Override
-        public String getString(int index) {
-          return obj.keys()[index];
-        }
-
+    public TypedArray<String> getKeys() {
+      return new TypedArray<String>() {
         @Override
         public int length() {
           return obj.keys().length;
         }
+        @Override
+        protected String getImpl(int index) {
+          return obj.keys()[index];
+        }
       };
     }
 
-    /* (non-Javadoc)
-     * @see playn.core.Json.Object#getNumber(java.lang.String)
-     */
     @Override
     public double getNumber(String key) {
-      JsonValue n = obj.get(key);
-      return n != null ? ((JsonNumber) n).getNumber() : 0;
+      return valueToNumber(obj.get(key));
     }
 
-    /* (non-Javadoc)
-     * @see playn.core.Json.Object#getObject(java.lang.String)
-     */
     @Override
     public Object getObject(String key) {
-      return new ObjectImpl((JsonObject) obj.get(key));
+      return valueToObject(obj.get(key));
     }
 
-    /* (non-Javadoc)
-     * @see playn.core.Json.Object#getString(java.lang.String)
-     */
     @Override
     public String getString(String key) {
-      JsonValue s = obj.get(key);
-      return s != null ? ((JsonString) s).getString() : "";
+      return valueToString(obj.get(key));
+    }
+
+    @Override
+    public TypedArray<Boolean> getBooleanArray(String key) {
+      return asBooleanArray((JsonArray) obj.get(key));
+    }
+
+    @Override
+    public TypedArray<Integer> getIntArray(String key) {
+      return asIntArray((JsonArray) obj.get(key));
+    }
+
+    @Override
+    public TypedArray<Double> getNumberArray(String key) {
+      return asNumberArray((JsonArray) obj.get(key));
+    }
+
+    @Override
+    public TypedArray<String> getStringArray(String key) {
+      return asStringArray((JsonArray) obj.get(key));
+    }
+
+    @Override
+    public TypedArray<Object> getObjectArray(String key) {
+      return asObjectArray((JsonArray) obj.get(key));
     }
   }
 
-  /* (non-Javadoc)
-  * @see playn.core.Json#newWriter()
-  */
   @Override
   public Writer newWriter() {
     // TODO Auto-generated method stub
@@ -372,5 +324,87 @@ class FlashJson implements Json {
     private boolean isFirstValue() {
       return isFirstValueStack.get(isFirstValueStack.size() - 1);
     }
+  }
+
+  private static boolean valueToBoolean(JsonValue value) {
+    return value != null ? ((JsonBoolean) value).getBoolean() : false;
+  }
+
+  private static double valueToNumber(JsonValue value) {
+    return value != null ? ((JsonNumber) value).getNumber() : 0;
+  }
+
+  // TODO: the default value handling of this and valueToObject differ from the other backends
+  private static String valueToString(JsonValue value) {
+    return value != null ? ((JsonString) value).getString() : "";
+  }
+
+  private static Object valueToObject(JsonValue value) {
+    return new ObjectImpl((JsonObject) value);
+  }
+
+  private static TypedArray<Boolean> asBooleanArray(final JsonArray jsa) {
+    return jsa == null ? null : new TypedArray<Boolean>() {
+      @Override
+      public int length() {
+        return jsa.length();
+      }
+      @Override
+      protected Boolean getImpl(int index) {
+        return valueToBoolean(jsa.get(index));
+      }
+    };
+  }
+
+  private static TypedArray<Integer> asIntArray(final JsonArray jsa) {
+    return jsa == null ? null : new TypedArray<Integer>() {
+      @Override
+      public int length() {
+        return jsa.length();
+      }
+      @Override
+      protected Integer getImpl(int index) {
+        return (int)valueToNumber(jsa.get(index));
+      }
+    };
+  }
+
+  private static TypedArray<Double> asNumberArray(final JsonArray jsa) {
+    return jsa == null ? null : new TypedArray<Double>() {
+      @Override
+      public int length() {
+        return jsa.length();
+      }
+      @Override
+      protected Double getImpl(int index) {
+        return valueToNumber(jsa.get(index));
+      }
+    };
+  }
+
+  private static TypedArray<String> asStringArray(final JsonArray jsa) {
+    return jsa == null ? null : new TypedArray<String>() {
+      @Override
+      public int length() {
+        return jsa.length();
+      }
+      @Override
+      protected String getImpl(int index) {
+        return valueToString(jsa.get(index));
+      }
+    };
+  }
+
+  private static TypedArray<Object> asObjectArray(final JsonArray jsa) {
+    return jsa == null ? null : new TypedArray<Object>() {
+      @Override
+      public int length() {
+        return jsa.length();
+      }
+      @Override
+      protected Object getImpl(int index) {
+        return valueToObject(jsa.get(index));
+      }
+    };
   }
 }

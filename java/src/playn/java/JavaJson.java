@@ -154,15 +154,36 @@ public class JavaJson implements Json {
       return a == null ? null : new JavaArray(a);
     }
 
+    public TypedArray<Boolean> getBooleanArray(String key) {
+      return asBooleanArray(jso.optJSONArray(key));
+    }
+
+    public TypedArray<Integer> getIntArray(String key) {
+      return asIntArray(jso.optJSONArray(key));
+    }
+
+    public TypedArray<Double> getNumberArray(String key) {
+      return asNumberArray(jso.optJSONArray(key));
+    }
+
+    public TypedArray<String> getStringArray(String key) {
+      return asStringArray(jso.optJSONArray(key));
+    }
+
+    public TypedArray<Object> getObjectArray(String key) {
+      return asObjectArray(jso.optJSONArray(key));
+    }
+
     public boolean containsKey(String key) {
       return (jso == null) ? false : jso.has(key);
     }
 
-    public Json.Array getKeys() {
-      if (jso == null) return new JavaArray(new JSONArray());
-
-      String[] names = JSONObject.getNames(jso);
-      return new JavaArray(names != null ? new JSONArray(Arrays.asList(names)) : new JSONArray());
+    public Json.TypedArray<String> getKeys() {
+      String[] names;
+      if (jso == null || (names = JSONObject.getNames(jso)) == null) {
+        return asStringArray(new JSONArray());
+      }
+      return asStringArray(new JSONArray(Arrays.asList(names)));
     }
   }
 
@@ -202,6 +223,26 @@ public class JavaJson implements Json {
       JSONArray a = jsa.optJSONArray(index);
       return a == null ? null : new JavaArray(a);
     }
+
+    public TypedArray<Boolean> getBooleanArray(int index) {
+      return asBooleanArray(jsa.optJSONArray(index));
+    }
+
+    public TypedArray<Integer> getIntArray(int index) {
+      return asIntArray(jsa.optJSONArray(index));
+    }
+
+    public TypedArray<Double> getNumberArray(int index) {
+      return asNumberArray(jsa.optJSONArray(index));
+    }
+
+    public TypedArray<String> getStringArray(int index) {
+      return asStringArray(jsa.optJSONArray(index));
+    }
+
+    public TypedArray<Object> getObjectArray(int index) {
+      return asObjectArray(jsa.optJSONArray(index));
+    }
   }
 
   @Override
@@ -216,5 +257,71 @@ public class JavaJson implements Json {
     } catch (JSONException e) {
       throw new RuntimeException(e);
     }
+  }
+
+  private static TypedArray<Boolean> asBooleanArray(final JSONArray jsa) {
+    return jsa == null ? null : new TypedArray<Boolean>() {
+      @Override
+      public int length() {
+        return jsa.length();
+      }
+      @Override
+      protected Boolean getImpl(int index) {
+        return jsa.optBoolean(index);
+      }
+    };
+  }
+
+  private static TypedArray<Integer> asIntArray(final JSONArray jsa) {
+    return jsa == null ? null : new TypedArray<Integer>() {
+      @Override
+      public int length() {
+        return jsa.length();
+      }
+      @Override
+      protected Integer getImpl(int index) {
+        return jsa.optInt(index);
+      }
+    };
+  }
+
+  private static TypedArray<Double> asNumberArray(final JSONArray jsa) {
+    return jsa == null ? null : new TypedArray<Double>() {
+      @Override
+      public int length() {
+        return jsa.length();
+      }
+      @Override
+      protected Double getImpl(int index) {
+        return jsa.optDouble(index);
+      }
+    };
+  }
+
+  private static TypedArray<String> asStringArray(final JSONArray jsa) {
+    return jsa == null ? null : new TypedArray<String>() {
+      @Override
+      public int length() {
+        return jsa.length();
+      }
+      @Override
+      protected String getImpl(int index) {
+        return jsa.optString(index);
+      }
+    };
+  }
+
+  private static TypedArray<Object> asObjectArray(final JSONArray jsa) {
+    return jsa == null ? null : new TypedArray<Object>() {
+      @Override
+      public int length() {
+        return jsa.length();
+      }
+      @Override
+      protected Object getImpl(int index) {
+        JSONObject o = jsa.optJSONObject(index);
+        return o == null ? null : new JavaObject(o);
+      }
+    };
   }
 }
