@@ -46,9 +46,14 @@ class HtmlGroupLayerDom extends HtmlLayerDom implements GroupLayer, ParentLayer 
   public void add(Layer layer) {
     Asserts.checkArgument(layer instanceof HtmlLayerDom);
     HtmlLayerDom hlayer = (HtmlLayerDom) layer;
+    int size = size();
     int index = impl.add(this, hlayer);
-    Node refChild = element().getChild(index);
-    element().insertBefore(hlayer.element(), refChild);
+    if (index == size) {
+      element().appendChild(hlayer.element());
+    } else {
+      Node refChild = element().getChild(index);
+      element().insertBefore(hlayer.element(), refChild);
+    }
   }
 
   @Override @Deprecated
