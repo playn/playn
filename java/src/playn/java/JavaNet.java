@@ -60,7 +60,7 @@ public class JavaNet implements Net {
       conn.connect();
       conn.getOutputStream().write(data.getBytes("UTF-8"));
       conn.getOutputStream().close();
-      readFully(new InputStreamReader(conn.getInputStream()));
+      callback.success(readFully(new InputStreamReader(conn.getInputStream())));
       conn.disconnect();
     } catch (MalformedURLException e) {
       callback.failure(e);
