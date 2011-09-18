@@ -191,23 +191,23 @@ class HtmlJson implements Json {
       return this[index];
     }-*/;
 
-    public TypedArray<Boolean> getBooleanArray(int index) {
+    public final TypedArray<Boolean> getBooleanArray(int index) {
       return asBooleanArray(getArray(index));
     }
 
-    public TypedArray<Integer> getIntArray(int index) {
+    public final TypedArray<Integer> getIntArray(int index) {
       return asIntArray(getArray(index));
     }
 
-    public TypedArray<Double> getNumberArray(int index) {
+    public final TypedArray<Double> getNumberArray(int index) {
       return asNumberArray(getArray(index));
     }
 
-    public TypedArray<String> getStringArray(int index) {
+    public final TypedArray<String> getStringArray(int index) {
       return asStringArray(getArray(index));
     }
 
-    public TypedArray<Object> getObjectArray(int index) {
+    public final TypedArray<Object> getObjectArray(int index) {
       return asObjectArray(getArray(index));
     }
 
@@ -254,27 +254,27 @@ class HtmlJson implements Json {
     }-*/;
 
     @Override
-    public TypedArray<Boolean> getBooleanArray(String key) {
+    public final TypedArray<Boolean> getBooleanArray(String key) {
       return asBooleanArray(getArray(key));
     }
 
     @Override
-    public TypedArray<Integer> getIntArray(String key) {
+    public final TypedArray<Integer> getIntArray(String key) {
       return asIntArray(getArray(key));
     }
 
     @Override
-    public TypedArray<Double> getNumberArray(String key) {
+    public final TypedArray<Double> getNumberArray(String key) {
       return asNumberArray(getArray(key));
     }
 
     @Override
-    public TypedArray<String> getStringArray(String key) {
+    public final TypedArray<String> getStringArray(String key) {
       return asStringArray(getArray(key));
     }
 
     @Override
-    public TypedArray<Object> getObjectArray(String key) {
+    public final TypedArray<Object> getObjectArray(String key) {
       return asObjectArray(getArray(key));
     }
 
