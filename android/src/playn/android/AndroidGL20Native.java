@@ -31,6 +31,6 @@ public class AndroidGL20Native extends AndroidGL20 {
   }
 
   static {
-    System.loadLibrary("playn-android");
+    System.loadLibrary("playn-android-nativelib");
   }
 }
