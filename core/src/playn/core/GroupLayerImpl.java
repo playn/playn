@@ -33,10 +33,10 @@ public class GroupLayerImpl<L extends AbstractLayer>
    * @return the index into the children array at which the layer was inserted (based on depth).
    */
   public int add(GroupLayer self, L child) {
-    // check whether the last child has the same depth as this child, in which case append this
-    // child to our list; this is a fast path for when all children have the same depth
+    // if this child has equal or greater depth to the last child, we can append directly and avoid
+    // a log(N) search; this is helpful when all children have the same depth
     int count = children.size(), index;
-    if (count == 0 || children.get(count-1).depth() == child.depth()) {
+    if (count == 0 || children.get(count-1).depth() <= child.depth()) {
       index = count;
     } else {
       // otherwise find the appropriate insertion point via binary search
