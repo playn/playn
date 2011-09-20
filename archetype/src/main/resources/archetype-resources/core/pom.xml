@@ -38,6 +38,10 @@
       <resource>
         <directory>${project.build.sourceDirectory}</directory>
       </resource>
+      <!-- and continue to include our standard resources -->
+      <resource>
+        <directory>${basedir}/src/main/resources</directory>
+      </resource>
     </resources>
   </build>
 </project>
