@@ -114,7 +114,8 @@ class AndroidCanvas implements playn.core.Canvas {
 
   @Override
   public void drawText(TextLayout layout, float x, float y) {
-    throw new UnsupportedOperationException();
+    ((AndroidTextLayout)layout).draw(canvas, x, y);
+    dirty = true;
   }
 
   @Override

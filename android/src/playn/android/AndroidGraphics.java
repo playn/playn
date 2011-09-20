@@ -391,12 +391,12 @@ class AndroidGraphics implements Graphics {
 
   @Override
   public Font createFont(String name, Font.Style style, float size) {
-    throw new UnsupportedOperationException();
+    return new AndroidFont(name, style, size);
   }
 
   @Override
   public TextLayout layoutText(String text, TextFormat format) {
-    throw new UnsupportedOperationException();
+    return new AndroidTextLayout(text, format);
   }
 
   /**
