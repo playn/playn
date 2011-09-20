@@ -13,18 +13,11 @@
   <name>PlayN Core</name>
   <description>The PlayN core interfaces</description>
 
-  <repositories>
-    <repository>
-      <id>sonatype-snapshots</id>
-      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-    </repository>
-  </repositories>
-
   <dependencies>
     <dependency>
       <groupId>com.samskivert</groupId>
       <artifactId>pythagoras</artifactId>
-      <version>1.1-SNAPSHOT</version>
+      <version>1.1</version>
     </dependency>
 
     <dependency>
