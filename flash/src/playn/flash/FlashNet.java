@@ -16,14 +16,15 @@
 package playn.flash;
 
 import playn.core.Net;
+import playn.core.util.Callback;
 
 public class FlashNet implements Net {
 
-  public void get(String url, final Callback callback) {
-
+  public void get(String url, final Callback<String> callback) {
+    callback.onFailure(new RuntimeException("Not implemented"));
   }
 
-  public void post(String url, String data, final Callback callback) {
-
+  public void post(String url, String data, final Callback<String> callback) {
+    callback.onFailure(new RuntimeException("Not implemented"));
   }
 }

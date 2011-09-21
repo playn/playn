@@ -27,20 +27,21 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 
 import playn.core.Net;
+import playn.core.util.Callback;
 
 class AndroidNet implements Net {
 
   @Override
-  public void get(String url, Callback callback) {
+  public void get(String url, Callback<String> callback) {
     doHttp(false, url, null, callback);
   }
 
   @Override
-  public void post(String url, String data, Callback callback) {
+  public void post(String url, String data, Callback<String> callback) {
     doHttp(true, url, data, callback);
   }
 
-  private void doHttp(boolean isPost, String url, String data, Callback callback) {
+  private void doHttp(boolean isPost, String url, String data, Callback<String> callback) {
     // TODO: use AsyncTask
     HttpClient httpclient = new DefaultHttpClient();
     HttpRequestBase req = null;
@@ -50,8 +51,7 @@ class AndroidNet implements Net {
         try {
           httppost.setEntity(new StringEntity(data));
         } catch (UnsupportedEncodingException e) {
-          // TODO Auto-generated catch block
-          callback.failure(e);
+          callback.onFailure(e);
         }
       }
       req = httppost;
@@ -60,9 +60,9 @@ class AndroidNet implements Net {
     }
     try {
       HttpResponse response = httpclient.execute(req);
-      callback.success(EntityUtils.toString(response.getEntity()));
+      callback.onSuccess(EntityUtils.toString(response.getEntity()));
     } catch (Exception e) {
-      callback.failure(e);
+      callback.onFailure(e);
     }
   }
 }

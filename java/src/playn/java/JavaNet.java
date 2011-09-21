@@ -16,6 +16,7 @@
 package playn.java;
 
 import playn.core.Net;
+import playn.core.util.Callback;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -29,7 +30,7 @@ public class JavaNet implements Net {
 
   private static final int BUF_SIZE = 4096;
 
-  public void get(String urlStr, Callback callback) {
+  public void get(String urlStr, Callback<String> callback) {
     // TODO: Make this non-blocking so that it doesn't differ from the html
     // version's behavior.
     try {
@@ -37,15 +38,15 @@ public class JavaNet implements Net {
       InputStream stream = url.openStream();
       InputStreamReader reader = new InputStreamReader(stream);
 
-      callback.success(readFully(reader));
+      callback.onSuccess(readFully(reader));
     } catch (MalformedURLException e) {
-      callback.failure(e);
+      callback.onFailure(e);
     } catch (IOException e) {
-      callback.failure(e);
+      callback.onFailure(e);
     }
   }
 
-  public void post(String urlStr, String data, Callback callback) {
+  public void post(String urlStr, String data, Callback<String> callback) {
     // TODO: Make this non-blocking so that it doesn't differ from the html
     // version's behavior.
     try {
@@ -60,12 +61,12 @@ public class JavaNet implements Net {
       conn.connect();
       conn.getOutputStream().write(data.getBytes("UTF-8"));
       conn.getOutputStream().close();
-      callback.success(readFully(new InputStreamReader(conn.getInputStream())));
+      callback.onSuccess(readFully(new InputStreamReader(conn.getInputStream())));
       conn.disconnect();
     } catch (MalformedURLException e) {
-      callback.failure(e);
+      callback.onFailure(e);
     } catch (IOException e) {
-      callback.failure(e);
+      callback.onFailure(e);
     }
   }
 

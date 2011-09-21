@@ -19,10 +19,11 @@ import com.google.gwt.xhr.client.ReadyStateChangeHandler;
 import com.google.gwt.xhr.client.XMLHttpRequest;
 
 import playn.core.Net;
+import playn.core.util.Callback;
 
 public class HtmlNet implements Net {
 
-  public void get(String url, final Callback callback) {
+  public void get(String url, final Callback<String> callback) {
     try {
       XMLHttpRequest xhr = XMLHttpRequest.create();
       xhr.open("GET", url);
@@ -31,20 +32,20 @@ public class HtmlNet implements Net {
         public void onReadyStateChange(XMLHttpRequest xhr) {
           if (xhr.getReadyState() == XMLHttpRequest.DONE) {
             if (xhr.getStatus() >= 400) {
-              callback.failure(new RuntimeException("Bad HTTP status code: " + xhr.getStatus()));
+              callback.onFailure(new RuntimeException("Bad HTTP status code: " + xhr.getStatus()));
             } else {
-              callback.success(xhr.getResponseText());
+              callback.onSuccess(xhr.getResponseText());
             }
           }
         }
       });
       xhr.send();
     } catch (Exception e) {
-      callback.failure(e);
+      callback.onFailure(e);
     }
   }
 
-  public void post(String url, String data, final Callback callback) {
+  public void post(String url, String data, final Callback<String> callback) {
     try {
       XMLHttpRequest xhr = XMLHttpRequest.create();
       xhr.open("POST", url);
@@ -53,16 +54,16 @@ public class HtmlNet implements Net {
         public void onReadyStateChange(XMLHttpRequest xhr) {
           if (xhr.getReadyState() == XMLHttpRequest.DONE) {
             if (xhr.getStatus() >= 400) {
-              callback.failure(new RuntimeException("Bad HTTP status code: " + xhr.getStatus()));
+              callback.onFailure(new RuntimeException("Bad HTTP status code: " + xhr.getStatus()));
             } else {
-              callback.success(xhr.getResponseText());
+              callback.onSuccess(xhr.getResponseText());
             }
           }
         }
       });
       xhr.send(data);
     } catch (Exception e) {
-      callback.failure(e);
+      callback.onFailure(e);
     }
   }
 }

@@ -15,6 +15,8 @@
  */
 package playn.core;
 
+import playn.core.util.Callback;
+
 /**
  * PlayN network interface.
  *
@@ -22,25 +24,13 @@ package playn.core;
  */
 public interface Net {
 
-  public interface Callback {
-    /**
-     * Called when a request is successful.
-     */
-    void success(String response);
-
-    /**
-     * Called when a request fails.
-     */
-    void failure(Throwable error);
-  }
-
   /**
    * Performs an HTTP GET request to the specified URL.
    */
-  void get(String url, Callback callback);
+  void get(String url, Callback<String> callback);
 
   /**
    * Performs an HTTP POST request to the specified URL.
    */
-  void post(String url, String data, Callback callback);
+  void post(String url, String data, Callback<String> callback);
 }
