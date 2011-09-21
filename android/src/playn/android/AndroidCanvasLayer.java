@@ -37,6 +37,7 @@ class AndroidCanvasLayer extends AndroidLayer implements CanvasLayer {
   @Override
   public void destroy() {
     super.destroy();
+    image.clearTexture(gfx); // don't wait for finalization to release resources
     image = null;
   }
 
