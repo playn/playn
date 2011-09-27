@@ -52,7 +52,7 @@ class HtmlTouch extends HtmlInput implements Touch {
       @Override
       public void handleEvent(NativeEvent nativeEvent) {
         if (listener != null) {
-          JsArray<com.google.gwt.dom.client.Touch> nativeTouches = nativeEvent.getTouches();
+          JsArray<com.google.gwt.dom.client.Touch> nativeTouches = nativeEvent.getChangedTouches();
           int nativeTouchesLen = nativeTouches.length();
 
           if (nativeTouchesLen == 0) {
@@ -85,7 +85,7 @@ class HtmlTouch extends HtmlInput implements Touch {
       @Override
       public void handleEvent(NativeEvent nativeEvent) {
         if (listener != null && inTouchSequence) {
-          JsArray<com.google.gwt.dom.client.Touch> nativeTouches = nativeEvent.getTouches();
+          JsArray<com.google.gwt.dom.client.Touch> nativeTouches = nativeEvent.getChangedTouches();
           int nativeTouchesLen = nativeTouches.length();
 
           boolean[] preventDefault = {false};
@@ -115,7 +115,7 @@ class HtmlTouch extends HtmlInput implements Touch {
       @Override
       public void handleEvent(NativeEvent nativeEvent) {
         if (listener != null && inTouchSequence) {
-          JsArray<com.google.gwt.dom.client.Touch> nativeTouches = nativeEvent.getTouches();
+          JsArray<com.google.gwt.dom.client.Touch> nativeTouches = nativeEvent.getChangedTouches();
           int nativeTouchesLen = nativeTouches.length();
 
           boolean[] preventDefault = {false};
