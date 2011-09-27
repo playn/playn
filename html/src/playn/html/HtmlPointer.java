@@ -98,9 +98,9 @@ class HtmlPointer extends HtmlInput implements Pointer {
       @Override
       public void handleEvent(NativeEvent nativeEvent) {
         if (listener != null && inDragSequence) {
-          if (nativeEvent.getTouches().length() > 0) {
+          if (nativeEvent.getChangedTouches().length() > 0) {
             inDragSequence = false;
-            com.google.gwt.dom.client.Touch touch = nativeEvent.getTouches().get(0);
+            com.google.gwt.dom.client.Touch touch = nativeEvent.getChangedTouches().get(0);
             float x = touch.getRelativeX(rootElement);
             float y = touch.getRelativeY(rootElement);
             Event.Impl event = new Event.Impl(PlayN.currentTime(), x, y);
