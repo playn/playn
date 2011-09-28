@@ -180,34 +180,14 @@ public interface Json {
     Array getArray(int index);
 
     /**
-     * Gets an array of boolean values at the given index, or <code>null</code> if there is no value
-     * at this index.
+     * Gets an array at the given index that assumes its values are of the given json type, or
+     * <code>null</code> if there is no value at this index.
+     *
+     * @param jsonType one of Json.Object, Boolean, Integer, Double, or String
+     *
+     * @throws IllegalArgumentException if jsonType is of an invalid type.
      */
-    TypedArray<Boolean> getBooleanArray(int index);
-
-    /**
-     * Gets an array of integer values at the given index, or <code>null</code> if there is no value
-     * at this index.
-     */
-    TypedArray<Integer> getIntArray(int index);
-
-    /**
-     * Gets an array of double values at the given index, or <code>null</code> if there is no value
-     * at this index.
-     */
-    TypedArray<Double> getNumberArray(int index);
-
-    /**
-     * Gets an array of string values at the given index, or <code>null</code> if there is no value
-     * at this index.
-     */
-    TypedArray<String> getStringArray(int index);
-
-    /**
-     * Gets an array of object values at the given index, or <code>null</code> if there is no value
-     * at this index.
-     */
-    TypedArray<Object> getObjectArray(int index);
+    <T> TypedArray<T> getArray(int index, Class<T> jsonType);
   }
 
   /**
@@ -249,34 +229,14 @@ public interface Json {
     Array getArray(String key);
 
     /**
-     * Gets an array of Boolean values at the given key, or <code>null</code> if there is no value
-     * at this key.
+     * Gets an array at the given key that assumes its values are of the given json type, or
+     * <code>null</code> if there is no value at this key.
+     *
+     * @param jsonType one of Json.Object, Boolean, Integer, Double, or String
+     *
+     * @throws IllegalArgumentException if jsonType is of an invalid type.
      */
-    TypedArray<Boolean> getBooleanArray(String key);
-
-    /**
-     * Gets an array of Integer values at the given key, or <code>null</code> if there is no value
-     * at this key.
-     */
-    TypedArray<Integer> getIntArray(String key);
-
-    /**
-     * Gets an array of double values at the given key, or <code>null</code> if there is no value
-     * at this key.
-     */
-    TypedArray<Double> getNumberArray(String key);
-
-    /**
-     * Gets an array of string values at the given key, or <code>null</code> if there is no value
-     * at this key.
-     */
-    TypedArray<String> getStringArray(String key);
-
-    /**
-     * Gets an array of object values at the given key, or <code>null</code> if there is no value
-     * at this key.
-     */
-    TypedArray<Object> getObjectArray(String key);
+    <T> TypedArray<T> getArray(String key, Class<T> valueType);
 
     /**
      * Returns true if this object contains a value at the specified key, false if not.

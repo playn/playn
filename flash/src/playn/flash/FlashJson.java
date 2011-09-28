@@ -72,28 +72,8 @@ class FlashJson implements Json {
     }
 
     @Override
-    public TypedArray<Boolean> getBooleanArray(int index) {
-      return asBooleanArray((JsonArray) arr.get(index));
-    }
-
-    @Override
-    public TypedArray<Integer> getIntArray(int index) {
-      return asIntArray((JsonArray) arr.get(index));
-    }
-
-    @Override
-    public TypedArray<Double> getNumberArray(int index) {
-      return asNumberArray((JsonArray) arr.get(index));
-    }
-
-    @Override
-    public TypedArray<String> getStringArray(int index) {
-      return asStringArray((JsonArray) arr.get(index));
-    }
-
-    @Override
-    public TypedArray<Object> getObjectArray(int index) {
-      return asObjectArray((JsonArray) arr.get(index));
+    public <T> TypedArray<T> getArray(int index, Class<T> arrayType) {
+      return asTypedArray((JsonArray) arr.get(index), arrayType);
     }
 
     @Override
@@ -160,28 +140,8 @@ class FlashJson implements Json {
     }
 
     @Override
-    public TypedArray<Boolean> getBooleanArray(String key) {
-      return asBooleanArray((JsonArray) obj.get(key));
-    }
-
-    @Override
-    public TypedArray<Integer> getIntArray(String key) {
-      return asIntArray((JsonArray) obj.get(key));
-    }
-
-    @Override
-    public TypedArray<Double> getNumberArray(String key) {
-      return asNumberArray((JsonArray) obj.get(key));
-    }
-
-    @Override
-    public TypedArray<String> getStringArray(String key) {
-      return asStringArray((JsonArray) obj.get(key));
-    }
-
-    @Override
-    public TypedArray<Object> getObjectArray(String key) {
-      return asObjectArray((JsonArray) obj.get(key));
+    public <T> TypedArray<T> getArray(String key, Class<T> arrayType) {
+      return asTypedArray((JsonArray) obj.get(key), arrayType);
     }
   }
 
@@ -343,8 +303,28 @@ class FlashJson implements Json {
     return new ObjectImpl((JsonObject) value);
   }
 
+  @SuppressWarnings("unchecked")
+  private static <T> TypedArray<T> asTypedArray(JsonArray jsa, Class<T> type) {
+    if (jsa == null) {
+      return null;
+    } else if (type == Json.Object.class) {
+      return (TypedArray<T>) asObjectArray(jsa);
+    } else if (type == Boolean.class) {
+      return (TypedArray<T>) asBooleanArray(jsa);
+    } else if (type == Integer.class) {
+      return (TypedArray<T>) asIntArray(jsa);
+    } else if (type == Double.class) {
+      return (TypedArray<T>) asNumberArray(jsa);
+    } else if (type == String.class) {
+      return (TypedArray<T>) asStringArray(jsa);
+    } else {
+      throw new IllegalArgumentException("Only json types may be used for TypedArray, not '" +
+        type.getName() + "'");
+    }
+  }
+
   private static TypedArray<Boolean> asBooleanArray(final JsonArray jsa) {
-    return jsa == null ? null : new TypedArray<Boolean>() {
+    return new TypedArray<Boolean>() {
       @Override
       public int length() {
         return jsa.length();
@@ -357,7 +337,7 @@ class FlashJson implements Json {
   }
 
   private static TypedArray<Integer> asIntArray(final JsonArray jsa) {
-    return jsa == null ? null : new TypedArray<Integer>() {
+    return new TypedArray<Integer>() {
       @Override
       public int length() {
         return jsa.length();
@@ -370,7 +350,7 @@ class FlashJson implements Json {
   }
 
   private static TypedArray<Double> asNumberArray(final JsonArray jsa) {
-    return jsa == null ? null : new TypedArray<Double>() {
+    return new TypedArray<Double>() {
       @Override
       public int length() {
         return jsa.length();
@@ -383,7 +363,7 @@ class FlashJson implements Json {
   }
 
   private static TypedArray<String> asStringArray(final JsonArray jsa) {
-    return jsa == null ? null : new TypedArray<String>() {
+    return new TypedArray<String>() {
       @Override
       public int length() {
         return jsa.length();
@@ -396,7 +376,7 @@ class FlashJson implements Json {
   }
 
   private static TypedArray<Object> asObjectArray(final JsonArray jsa) {
-    return jsa == null ? null : new TypedArray<Object>() {
+    return new TypedArray<Object>() {
       @Override
       public int length() {
         return jsa.length();

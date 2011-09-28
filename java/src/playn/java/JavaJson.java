@@ -154,24 +154,8 @@ public class JavaJson implements Json {
       return a == null ? null : new JavaArray(a);
     }
 
-    public TypedArray<Boolean> getBooleanArray(String key) {
-      return asBooleanArray(jso.optJSONArray(key));
-    }
-
-    public TypedArray<Integer> getIntArray(String key) {
-      return asIntArray(jso.optJSONArray(key));
-    }
-
-    public TypedArray<Double> getNumberArray(String key) {
-      return asNumberArray(jso.optJSONArray(key));
-    }
-
-    public TypedArray<String> getStringArray(String key) {
-      return asStringArray(jso.optJSONArray(key));
-    }
-
-    public TypedArray<Object> getObjectArray(String key) {
-      return asObjectArray(jso.optJSONArray(key));
+    public <T> TypedArray<T> getArray(String key, Class<T> arrayType) {
+      return asTypedArray(jso.optJSONArray(key), arrayType);
     }
 
     public boolean containsKey(String key) {
@@ -224,24 +208,8 @@ public class JavaJson implements Json {
       return a == null ? null : new JavaArray(a);
     }
 
-    public TypedArray<Boolean> getBooleanArray(int index) {
-      return asBooleanArray(jsa.optJSONArray(index));
-    }
-
-    public TypedArray<Integer> getIntArray(int index) {
-      return asIntArray(jsa.optJSONArray(index));
-    }
-
-    public TypedArray<Double> getNumberArray(int index) {
-      return asNumberArray(jsa.optJSONArray(index));
-    }
-
-    public TypedArray<String> getStringArray(int index) {
-      return asStringArray(jsa.optJSONArray(index));
-    }
-
-    public TypedArray<Object> getObjectArray(int index) {
-      return asObjectArray(jsa.optJSONArray(index));
+    public <T> TypedArray<T> getArray(int index, Class<T> arrayType) {
+      return asTypedArray(jsa.optJSONArray(index), arrayType);
     }
   }
 
@@ -259,8 +227,28 @@ public class JavaJson implements Json {
     }
   }
 
+  @SuppressWarnings("unchecked")
+  private static <T> TypedArray<T> asTypedArray(JSONArray jsa, Class<T> type) {
+    if (jsa == null) {
+      return null;
+    } else if (type == Json.Object.class) {
+      return (TypedArray<T>) asObjectArray(jsa);
+    } else if (type == Boolean.class) {
+      return (TypedArray<T>) asBooleanArray(jsa);
+    } else if (type == Integer.class) {
+      return (TypedArray<T>) asIntArray(jsa);
+    } else if (type == Double.class) {
+      return (TypedArray<T>) asNumberArray(jsa);
+    } else if (type == String.class) {
+      return (TypedArray<T>) asStringArray(jsa);
+    } else {
+      throw new IllegalArgumentException("Only json types may be used for TypedArray, not '" +
+        type.getName() + "'");
+    }
+  }
+
   private static TypedArray<Boolean> asBooleanArray(final JSONArray jsa) {
-    return jsa == null ? null : new TypedArray<Boolean>() {
+    return new TypedArray<Boolean>() {
       @Override
       public int length() {
         return jsa.length();
@@ -273,7 +261,7 @@ public class JavaJson implements Json {
   }
 
   private static TypedArray<Integer> asIntArray(final JSONArray jsa) {
-    return jsa == null ? null : new TypedArray<Integer>() {
+    return new TypedArray<Integer>() {
       @Override
       public int length() {
         return jsa.length();
@@ -286,7 +274,7 @@ public class JavaJson implements Json {
   }
 
   private static TypedArray<Double> asNumberArray(final JSONArray jsa) {
-    return jsa == null ? null : new TypedArray<Double>() {
+    return new TypedArray<Double>() {
       @Override
       public int length() {
         return jsa.length();
@@ -299,7 +287,7 @@ public class JavaJson implements Json {
   }
 
   private static TypedArray<String> asStringArray(final JSONArray jsa) {
-    return jsa == null ? null : new TypedArray<String>() {
+    return new TypedArray<String>() {
       @Override
       public int length() {
         return jsa.length();
@@ -312,7 +300,7 @@ public class JavaJson implements Json {
   }
 
   private static TypedArray<Object> asObjectArray(final JSONArray jsa) {
-    return jsa == null ? null : new TypedArray<Object>() {
+    return new TypedArray<Object>() {
       @Override
       public int length() {
         return jsa.length();
