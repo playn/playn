@@ -17,7 +17,7 @@ package playn.android;
 
 import android.graphics.Typeface;
 
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.Map;
 
 import playn.core.AbstractFont;
@@ -31,7 +31,8 @@ class AndroidFont extends AbstractFont {
     this.typeface = Typeface.create(name, TO_ANDROID_STYLE.get(style));
   }
 
-  protected static final Map<Style,Integer> TO_ANDROID_STYLE = new HashMap<Style,Integer>();
+  protected static final Map<Style,Integer> TO_ANDROID_STYLE =
+    new EnumMap<Style,Integer>(Style.class);
   static {
     TO_ANDROID_STYLE.put(Style.PLAIN,       Typeface.NORMAL);
     TO_ANDROID_STYLE.put(Style.BOLD,        Typeface.BOLD);
