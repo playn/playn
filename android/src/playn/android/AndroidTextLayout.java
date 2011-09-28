@@ -122,7 +122,7 @@ class AndroidTextLayout implements TextLayout {
 
         // if there is no whitespace on the line, then we hard-break in the middle of the word
         if (lineEnd == start) {
-          lines.add(new Line(text.substring(start, lineEnd), measuredWidth[0]));
+          lines.add(new Line(text.substring(start, start+count), measuredWidth[0]));
           start += count;
 
         } else {
