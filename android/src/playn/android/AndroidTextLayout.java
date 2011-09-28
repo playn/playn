@@ -77,12 +77,13 @@ class AndroidTextLayout implements TextLayout {
     // normalize newlines in the text (Windows: CRLF -> LF, Mac OS pre-X: CR -> LF)
     text = text.replace("\r\n", "\n").replace('\r', '\n');
 
-    // break the text and compute metrics
-    if (!format.shouldWrap() && text.indexOf('\n') == -1) {
-      lines.add(new Line(text, paint.measureText(text)));
-    } else {
-      for (String line : text.split("\\n")) {
+    // we always break lines on newlines
+    for (String line : text.split("\\n")) {
+      // we may break lines between newlines if we have a wrap width
+      if (format.shouldWrap()) {
         breakLine(line);
+      } else {
+        lines.add(new Line(line, paint.measureText(line)));
       }
     }
 
