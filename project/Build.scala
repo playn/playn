@@ -51,7 +51,8 @@ object PlayNBuild extends Build {
       unmanagedSourceDirectories in Test <+= baseDirectory / "tests",
       // adds source files to our jar file (needed by GWT)
       unmanagedResourceDirectories in Compile <+= baseDirectory / "src",
-      unmanagedBase <<= baseDirectory { base => base / "disabled" }
+      unmanagedBase <<= baseDirectory { base => base / "disabled" },
+      libraryDependencies ++= testDeps
     )
   ))
 
