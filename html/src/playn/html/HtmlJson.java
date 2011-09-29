@@ -21,6 +21,7 @@ import com.google.gwt.core.client.JavaScriptObject;
 
 import playn.core.Asserts;
 import playn.core.Json;
+import playn.core.TypedArrayBuilder;
 
 class HtmlJson implements Json {
 
@@ -192,7 +193,7 @@ class HtmlJson implements Json {
     }-*/;
 
     public final <T> TypedArray<T> getArray(int index, Class<T> arrayType) {
-      return asTypedArray(getArray(index), arrayType);
+      return arrayBuilder.build(getArray(index), arrayType);
     }
 
     @Override
@@ -239,7 +240,7 @@ class HtmlJson implements Json {
 
     @Override
     public final <T> TypedArray<T> getArray(String key, Class<T> arrayType) {
-      return asTypedArray(getArray(key), arrayType);
+      return arrayBuilder.build(getArray(key), arrayType);
     }
 
     @Override
@@ -249,7 +250,7 @@ class HtmlJson implements Json {
 
     @Override
     public final TypedArray<String> getKeys() {
-      return asStringArray(getNativeKeys());
+      return arrayBuilder.build(getNativeKeys(), String.class);
     }
 
     private final native Array getNativeKeys() /*-{
@@ -274,92 +275,28 @@ class HtmlJson implements Json {
     return object;
   }
 
-  @SuppressWarnings("unchecked")
-  private static <T> TypedArray<T> asTypedArray(Array jsa, Class<T> type) {
-    if (jsa == null) {
-      return null;
-    } else if (type == Json.Object.class) {
-      return (TypedArray<T>) asObjectArray(jsa);
-    } else if (type == Boolean.class) {
-      return (TypedArray<T>) asBooleanArray(jsa);
-    } else if (type == Integer.class) {
-      return (TypedArray<T>) asIntArray(jsa);
-    } else if (type == Double.class) {
-      return (TypedArray<T>) asNumberArray(jsa);
-    } else if (type == String.class) {
-      return (TypedArray<T>) asStringArray(jsa);
-    } else {
-      throw new IllegalArgumentException("Only json types may be used for TypedArray, not '" +
-        type.getName() + "'");
-    }
-  }
-
-  private static TypedArray<Boolean> asBooleanArray(final Array jsa) {
-    return new TypedArray<Boolean>() {
-      @Override
-      public int length() {
-        return jsa.length();
-      }
-      @Override
-      protected Boolean getImpl(int index) {
-        return jsa.getBoolean(index);
-      }
-    };
-  }
-
-  private static TypedArray<Integer> asIntArray(final Array jsa) {
-    return new TypedArray<Integer>() {
-      @Override
-      public int length() {
-        return jsa.length();
-      }
-      @Override
-      protected Integer getImpl(int index) {
-        return jsa.getInt(index);
-      }
-    };
-  }
-
-  private static TypedArray<Double> asNumberArray(final Array jsa) {
-    return new TypedArray<Double>() {
-      @Override
-      public int length() {
-        return jsa.length();
-      }
-      @Override
-      protected Double getImpl(int index) {
-        return jsa.getNumber(index);
-      }
-    };
-  }
-
-  private static TypedArray<String> asStringArray(final Array jsa) {
-    return new TypedArray<String>() {
-      @Override
-      public int length() {
-        return jsa.length();
-      }
-      @Override
-      protected String getImpl(int index) {
-        return jsa.getString(index);
-      }
-    };
-  }
-
-  private static TypedArray<Object> asObjectArray(final Array jsa) {
-    return new TypedArray<Object>() {
-      @Override
-      public int length() {
-        return jsa.length();
-      }
-      @Override
-      protected Object getImpl(int index) {
-        return jsa.getObject(index);
-      }
-    };
-  }
-
   private static native JavaScriptObject jsonParse(String json) /*-{
     return JSON.parse(json);
   }-*/;
+
+  private static TypedArrayBuilder<Array> arrayBuilder = new TypedArrayBuilder<Array>() {
+    public int length(Array array) {
+      return array.length();
+    }
+    public Json.Object getObject(Array array, int index) {
+      return array.getObject(index);
+    }
+    public Boolean getBoolean(Array array, int index) {
+      return array.getBoolean(index);
+    }
+    public Integer getInt(Array array, int index) {
+      return array.getInt(index);
+    }
+    public Double getNumber(Array array, int index) {
+      return array.getNumber(index);
+    }
+    public String getString(Array array, int index) {
+      return array.getString(index);
+    }
+  };
 }

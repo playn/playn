@@ -16,6 +16,7 @@
 package playn.java;
 
 import playn.core.Json;
+import playn.core.TypedArrayBuilder;
 import playn.java.json.JSONArray;
 import playn.java.json.JSONException;
 import playn.java.json.JSONObject;
@@ -155,7 +156,7 @@ public class JavaJson implements Json {
     }
 
     public <T> TypedArray<T> getArray(String key, Class<T> arrayType) {
-      return asTypedArray(jso.optJSONArray(key), arrayType);
+      return arrayBuilder.build(jso.optJSONArray(key), arrayType);
     }
 
     public boolean containsKey(String key) {
@@ -165,9 +166,9 @@ public class JavaJson implements Json {
     public Json.TypedArray<String> getKeys() {
       String[] names;
       if (jso == null || (names = JSONObject.getNames(jso)) == null) {
-        return asStringArray(new JSONArray());
+        return arrayBuilder.build(new JSONArray(), String.class);
       }
-      return asStringArray(new JSONArray(Arrays.asList(names)));
+      return arrayBuilder.build(new JSONArray(Arrays.asList(names)), String.class);
     }
   }
 
@@ -209,7 +210,7 @@ public class JavaJson implements Json {
     }
 
     public <T> TypedArray<T> getArray(int index, Class<T> arrayType) {
-      return asTypedArray(jsa.optJSONArray(index), arrayType);
+      return arrayBuilder.build(jsa.optJSONArray(index), arrayType);
     }
   }
 
@@ -227,89 +228,25 @@ public class JavaJson implements Json {
     }
   }
 
-  @SuppressWarnings("unchecked")
-  private static <T> TypedArray<T> asTypedArray(JSONArray jsa, Class<T> type) {
-    if (jsa == null) {
-      return null;
-    } else if (type == Json.Object.class) {
-      return (TypedArray<T>) asObjectArray(jsa);
-    } else if (type == Boolean.class) {
-      return (TypedArray<T>) asBooleanArray(jsa);
-    } else if (type == Integer.class) {
-      return (TypedArray<T>) asIntArray(jsa);
-    } else if (type == Double.class) {
-      return (TypedArray<T>) asNumberArray(jsa);
-    } else if (type == String.class) {
-      return (TypedArray<T>) asStringArray(jsa);
-    } else {
-      throw new IllegalArgumentException("Only json types may be used for TypedArray, not '" +
-        type.getName() + "'");
+  private static TypedArrayBuilder<JSONArray> arrayBuilder = new TypedArrayBuilder<JSONArray>() {
+    public int length(JSONArray array) {
+      return array.length();
     }
-  }
-
-  private static TypedArray<Boolean> asBooleanArray(final JSONArray jsa) {
-    return new TypedArray<Boolean>() {
-      @Override
-      public int length() {
-        return jsa.length();
-      }
-      @Override
-      protected Boolean getImpl(int index) {
-        return jsa.optBoolean(index);
-      }
-    };
-  }
-
-  private static TypedArray<Integer> asIntArray(final JSONArray jsa) {
-    return new TypedArray<Integer>() {
-      @Override
-      public int length() {
-        return jsa.length();
-      }
-      @Override
-      protected Integer getImpl(int index) {
-        return jsa.optInt(index);
-      }
-    };
-  }
-
-  private static TypedArray<Double> asNumberArray(final JSONArray jsa) {
-    return new TypedArray<Double>() {
-      @Override
-      public int length() {
-        return jsa.length();
-      }
-      @Override
-      protected Double getImpl(int index) {
-        return jsa.optDouble(index);
-      }
-    };
-  }
-
-  private static TypedArray<String> asStringArray(final JSONArray jsa) {
-    return new TypedArray<String>() {
-      @Override
-      public int length() {
-        return jsa.length();
-      }
-      @Override
-      protected String getImpl(int index) {
-        return jsa.optString(index);
-      }
-    };
-  }
-
-  private static TypedArray<Object> asObjectArray(final JSONArray jsa) {
-    return new TypedArray<Object>() {
-      @Override
-      public int length() {
-        return jsa.length();
-      }
-      @Override
-      protected Object getImpl(int index) {
-        JSONObject o = jsa.optJSONObject(index);
-        return o == null ? null : new JavaObject(o);
-      }
-    };
-  }
+    public Json.Object getObject(JSONArray array, int index) {
+      JSONObject o = array.optJSONObject(index);
+      return o == null ? null : new JavaObject(o);
+    }
+    public Boolean getBoolean(JSONArray array, int index) {
+      return array.optBoolean(index);
+    }
+    public Integer getInt(JSONArray array, int index) {
+      return array.optInt(index);
+    }
+    public Double getNumber(JSONArray array, int index) {
+      return array.optDouble(index);
+    }
+    public String getString(JSONArray array, int index) {
+      return array.optString(index);
+    }
+  };
 }

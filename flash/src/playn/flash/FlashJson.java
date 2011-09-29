@@ -19,6 +19,7 @@ import java.util.ArrayList;
 
 import playn.core.Asserts;
 import playn.core.Json;
+import playn.core.TypedArrayBuilder;
 import playn.flash.json.JsonArray;
 import playn.flash.json.JsonBoolean;
 import playn.flash.json.JsonNumber;
@@ -73,7 +74,7 @@ class FlashJson implements Json {
 
     @Override
     public <T> TypedArray<T> getArray(int index, Class<T> arrayType) {
-      return asTypedArray((JsonArray) arr.get(index), arrayType);
+      return arrayBuilder.build((JsonArray) arr.get(index), arrayType);
     }
 
     @Override
@@ -141,7 +142,7 @@ class FlashJson implements Json {
 
     @Override
     public <T> TypedArray<T> getArray(String key, Class<T> arrayType) {
-      return asTypedArray((JsonArray) obj.get(key), arrayType);
+      return arrayBuilder.build((JsonArray) obj.get(key), arrayType);
     }
   }
 
@@ -303,88 +304,24 @@ class FlashJson implements Json {
     return new ObjectImpl((JsonObject) value);
   }
 
-  @SuppressWarnings("unchecked")
-  private static <T> TypedArray<T> asTypedArray(JsonArray jsa, Class<T> type) {
-    if (jsa == null) {
-      return null;
-    } else if (type == Json.Object.class) {
-      return (TypedArray<T>) asObjectArray(jsa);
-    } else if (type == Boolean.class) {
-      return (TypedArray<T>) asBooleanArray(jsa);
-    } else if (type == Integer.class) {
-      return (TypedArray<T>) asIntArray(jsa);
-    } else if (type == Double.class) {
-      return (TypedArray<T>) asNumberArray(jsa);
-    } else if (type == String.class) {
-      return (TypedArray<T>) asStringArray(jsa);
-    } else {
-      throw new IllegalArgumentException("Only json types may be used for TypedArray, not '" +
-        type.getName() + "'");
+  private static TypedArrayBuilder<JsonArray> arrayBuilder = new TypedArrayBuilder<JsonArray>() {
+    public int length(JsonArray array) {
+      return array.length();
     }
-  }
-
-  private static TypedArray<Boolean> asBooleanArray(final JsonArray jsa) {
-    return new TypedArray<Boolean>() {
-      @Override
-      public int length() {
-        return jsa.length();
-      }
-      @Override
-      protected Boolean getImpl(int index) {
-        return valueToBoolean(jsa.get(index));
-      }
-    };
-  }
-
-  private static TypedArray<Integer> asIntArray(final JsonArray jsa) {
-    return new TypedArray<Integer>() {
-      @Override
-      public int length() {
-        return jsa.length();
-      }
-      @Override
-      protected Integer getImpl(int index) {
-        return (int)valueToNumber(jsa.get(index));
-      }
-    };
-  }
-
-  private static TypedArray<Double> asNumberArray(final JsonArray jsa) {
-    return new TypedArray<Double>() {
-      @Override
-      public int length() {
-        return jsa.length();
-      }
-      @Override
-      protected Double getImpl(int index) {
-        return valueToNumber(jsa.get(index));
-      }
-    };
-  }
-
-  private static TypedArray<String> asStringArray(final JsonArray jsa) {
-    return new TypedArray<String>() {
-      @Override
-      public int length() {
-        return jsa.length();
-      }
-      @Override
-      protected String getImpl(int index) {
-        return valueToString(jsa.get(index));
-      }
-    };
-  }
-
-  private static TypedArray<Object> asObjectArray(final JsonArray jsa) {
-    return new TypedArray<Object>() {
-      @Override
-      public int length() {
-        return jsa.length();
-      }
-      @Override
-      protected Object getImpl(int index) {
-        return valueToObject(jsa.get(index));
-      }
-    };
-  }
+    public Json.Object getObject(JsonArray array, int index) {
+      return valueToObject(array.get(index));
+    }
+    public Boolean getBoolean(JsonArray array, int index) {
+      return valueToBoolean(array.get(index));
+    }
+    public Integer getInt(JsonArray array, int index) {
+      return (int)valueToNumber(array.get(index));
+    }
+    public Double getNumber(JsonArray array, int index) {
+      return valueToNumber(array.get(index));
+    }
+    public String getString(JsonArray array, int index) {
+      return valueToString(array.get(index));
+    }
+  };
 }
