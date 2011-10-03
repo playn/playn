@@ -6,6 +6,10 @@
   <property name="classes.dir"  value="${target.dir}/classes"/>
   <property name="tclasses.dir" value="${target.dir}/test-classes"/>
 
+  <!-- Default to forking for junit so its assertion enabling is respected. If you have assertions
+       enabled in your JVM already, pass -Djunit.fork=false to ant to speed things up a bit. -->
+  <property name="junit.fork"   value="true"/>
+
   <!-- used to include additional source code in our jar file; -->
   <!-- pesky hack needed by gwtbox2d -->
   <property name="aux.src.dir"  value="notused"/>
@@ -73,6 +77,9 @@
       <batchtest todir="${target.dir}/test-reports">
         <fileset dir="${tsrc.dir}" includes="**/*${test}*Test.java"/>
       </batchtest>
+      <assertions>
+        <enable/>
+      </assertions>
     </unit>
   </target>
 
