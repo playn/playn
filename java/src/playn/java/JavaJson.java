@@ -38,76 +38,85 @@ public class JavaJson implements Json {
       reset();
     }
 
-    public void key(String key) {
+    public Writer key(String key) {
       try {
         w.key(key);
       } catch (JSONException e) {
         throw new RuntimeException(e);
       }
+      return this;
     }
 
-    public void value(boolean x) {
+    public Writer value(boolean x) {
       try {
         w.value(x);
       } catch (JSONException e) {
         throw new RuntimeException(e);
       }
+      return this;
     }
 
-    public void value(int x) {
+    public Writer value(int x) {
       try {
         w.value(x);
       } catch (JSONException e) {
         throw new RuntimeException(e);
       }
+      return this;
     }
 
-    public void value(double x) {
+    public Writer value(double x) {
       try {
         w.value(x);
       } catch (JSONException e) {
         throw new RuntimeException(e);
       }
+      return this;
     }
 
-    public void value(String x) {
+    public Writer value(String x) {
       try {
         w.value(x);
       } catch (JSONException e) {
         throw new RuntimeException(e);
       }
+      return this;
     }
 
-    public void object() {
+    public Writer object() {
       try {
         w.object();
       } catch (JSONException e) {
         throw new RuntimeException(e);
       }
+      return this;
     }
 
-    public void endObject() {
+    public Writer endObject() {
       try {
         w.endObject();
       } catch (JSONException e) {
         throw new RuntimeException(e);
       }
+      return this;
     }
 
-    public void array() {
+    public Writer array() {
       try {
         w.array();
       } catch (JSONException e) {
         throw new RuntimeException(e);
       }
+      return this;
     }
 
-    public void endArray() {
+    public Writer endArray() {
       try {
         w.endArray();
       } catch (JSONException e) {
         throw new RuntimeException(e);
       }
+      return this;
     }
 
     public String write() {

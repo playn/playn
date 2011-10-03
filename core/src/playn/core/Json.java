@@ -29,47 +29,47 @@ public interface Json {
     /**
      * Specifies the key to be used for the next value entry.
      */
-    void key(String key);
+    Writer key(String key);
 
     /**
      * Writes a boolean value.
      */
-    void value(boolean x);
+    Writer value(boolean x);
 
     /**
      * Writes an integer value.
      */
-    void value(int x);
+    Writer value(int x);
 
     /**
      * Writes a double value.
      */
-    void value(double x);
+    Writer value(double x);
 
     /**
      * Writes a string value.
      */
-    void value(String x);
+    Writer value(String x);
 
     /**
      * Begins a new nested object.
      */
-    void object();
+    Writer object();
 
     /**
      * Ends the current nested object.
      */
-    void endObject();
+    Writer endObject();
 
     /**
      * Begins a new nested array.
      */
-    void array();
+    Writer array();
 
     /**
      * Ends the current nested array.
      */
-    void endArray();
+    Writer endArray();
 
     /**
      * Serializes the object associated with this writer. The writer may be reused after this call.

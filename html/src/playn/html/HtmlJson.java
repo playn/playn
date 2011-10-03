@@ -32,65 +32,74 @@ class HtmlJson implements Json {
     private ArrayList<Boolean> isFirstValueStack = new ArrayList<Boolean>();
 
     @Override
-    public void array() {
+    public Writer array() {
       maybePrependKey();
       sb.append("[");
       pushInArray(true);
       pushIsFirstValue(true);
+      return this;
     }
 
     @Override
-    public void endArray() {
+    public Writer endArray() {
       sb.append("]");
       popInArray();
       popIsFirstValue();
+      return this;
     }
 
     @Override
-    public void endObject() {
+    public Writer endObject() {
       sb.append("}");
       popInArray();
       popIsFirstValue();
+      return this;
     }
 
     @Override
-    public void key(String key) {
+    public Writer key(String key) {
       Asserts.checkState(this.key == null);
       this.key = key;
+      return this;
     }
 
     @Override
-    public void object() {
+    public Writer object() {
       maybePrependKey(true);
       sb.append("{");
       pushInArray(false);
       pushIsFirstValue(true);
+      return this;
     }
 
     @Override
-    public void value(boolean x) {
+    public Writer value(boolean x) {
       maybePrependKey();
       sb.append(x);
+      return this;
     }
 
     @Override
-    public void value(double x) {
+    public Writer value(double x) {
       maybePrependKey();
       sb.append(x);
+      return this;
     }
 
     @Override
-    public void value(int x) {
+    public Writer value(int x) {
       maybePrependKey();
       sb.append(x);
+      return this;
     }
 
     @Override
-    public void value(String x) {
+    public Writer value(String x) {
       maybePrependKey();
       sb.append("\"");
       sb.append(x);
       sb.append("\"");
+      return this;
     }
 
     @Override
