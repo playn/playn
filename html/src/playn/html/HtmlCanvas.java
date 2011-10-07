@@ -48,97 +48,110 @@ class HtmlCanvas implements Canvas {
   }
 
   @Override
-  public void clear() {
+  public Canvas clear() {
     ctx.clearRect(0, 0, width, height);
     dirty = true;
+    return this;
   }
 
   @Override
-  public void clip(Path path) {
+  public Canvas clip(Path path) {
     Asserts.checkArgument(path instanceof HtmlPath);
     ((HtmlPath) path).replay(ctx);
     ctx.clip();
+    return this;
   }
 
   @Override
-  public void drawImage(Image img, float x, float y) {
+  public Canvas drawImage(Image img, float x, float y) {
     Asserts.checkArgument(img instanceof HtmlImage);
     ctx.drawImage(((HtmlImage) img).img, x, y);
     dirty = true;
+    return this;
   }
 
   @Override
-  public void drawImage(Image img, float x, float y, float w, float h) {
+  public Canvas drawImage(Image img, float x, float y, float w, float h) {
     Asserts.checkArgument(img instanceof HtmlImage);
     ctx.drawImage(((HtmlImage) img).img, x, y, w, h);
     dirty = true;
+    return this;
   }
 
   @Override
-  public void drawImage(Image img, float dx, float dy, float dw, float dh,
+  public Canvas drawImage(Image img, float dx, float dy, float dw, float dh,
       float sx, float sy, float sw, float sh) {
     Asserts.checkArgument(img instanceof HtmlImage);
     ctx.drawImage(((HtmlImage) img).img, sx, sy, sw, sh, dx,
         dy, dw, dh);
     dirty = true;
+    return this;
   }
 
   @Override
-  public void drawImageCentered(Image img, float x, float y) {
+  public Canvas drawImageCentered(Image img, float x, float y) {
     drawImage(img, x - img.width()/2, y - img.height()/2);
     dirty = true;
+    return this;
   }
 
   @Override
-  public void drawLine(float x0, float y0, float x1, float y1) {
+  public Canvas drawLine(float x0, float y0, float x1, float y1) {
     ctx.beginPath();
     ctx.moveTo(x0, y0);
     ctx.lineTo(x1, y1);
     ctx.stroke();
     dirty = true;
+    return this;
   }
 
   @Override
-  public void drawPoint(float x, float y) {
+  public Canvas drawPoint(float x, float y) {
     ctx.beginPath();
     ctx.moveTo(x, y);
     ctx.lineTo(x, y);
     ctx.stroke();
     dirty = true;
+    return this;
   }
 
   @Override
-  public void drawText(String text, float x, float y) {
+  public Canvas drawText(String text, float x, float y) {
     ctx.fillText(text, x, y);
     dirty = true;
+    return this;
   }
 
   @Override
-  public void drawText(TextLayout layout, float x, float y) {
+  public Canvas drawText(TextLayout layout, float x, float y) {
     ((HtmlTextLayout)layout).draw(ctx, x, y);
     dirty = true;
+    return this;
   }
 
   @Override
-  public void fillCircle(float x, float y, float radius) {
+  public Canvas fillCircle(float x, float y, float radius) {
     ctx.beginPath();
     ctx.arc(x, y, radius, 0, 2 * Math.PI);
     ctx.fill();
     dirty = true;
+    return this;
   }
 
   @Override
-  public void fillPath(Path path) {
+  public Canvas fillPath(Path path) {
     Asserts.checkArgument(path instanceof HtmlPath);
     ((HtmlPath) path).replay(ctx);
     ctx.fill();
     dirty = true;
+    return this;
   }
 
   @Override
-  public void fillRect(float x, float y, float w, float h) {
+  public Canvas fillRect(float x, float y, float w, float h) {
     ctx.fillRect(x, y, w, h);
     dirty = true;
+    return this;
   }
 
   @Override
@@ -147,108 +160,127 @@ class HtmlCanvas implements Canvas {
   }
 
   @Override
-  public void restore() {
+  public Canvas restore() {
     ctx.restore();
+    return this;
   }
 
   @Override
-  public void rotate(float radians) {
+  public Canvas rotate(float radians) {
     ctx.rotate(radians);
+    return this;
   }
 
   @Override
-  public void save() {
+  public Canvas save() {
     ctx.save();
+    return this;
   }
 
   @Override
-  public void scale(float x, float y) {
+  public Canvas scale(float x, float y) {
     ctx.scale(x, y);
+    return this;
   }
 
   @Override
-  public void setCompositeOperation(Canvas.Composite composite) {
+  public Canvas setCompositeOperation(Canvas.Composite composite) {
     ctx.setGlobalCompositeOperation(convertComposite(composite));
+    return this;
   }
 
   @Override
-  public void setFillColor(int color) {
+  public Canvas setFillColor(int color) {
     ctx.setFillStyle(HtmlGraphics.cssColor(color));
+    return this;
   }
 
   @Override
-  public void setFillGradient(Gradient gradient) {
+  public Canvas setFillGradient(Gradient gradient) {
     Asserts.checkArgument(gradient instanceof HtmlGradient);
     ctx.setFillStyle(((HtmlGradient) gradient).gradient);
+    return this;
   }
 
   @Override
-  public void setFillPattern(Pattern pattern) {
+  public Canvas setFillPattern(Pattern pattern) {
     Asserts.checkArgument(pattern instanceof HtmlPattern);
     ctx.setFillStyle(((HtmlPattern) pattern).pattern);
+    return this;
   }
 
   @Override
-  public void setLineCap(LineCap cap) {
+  public Canvas setLineCap(LineCap cap) {
     ctx.setLineCap(convertLineCap(cap));
+    return this;
   }
 
   @Override
-  public void setLineJoin(LineJoin join) {
+  public Canvas setLineJoin(LineJoin join) {
     ctx.setLineJoin(convertLineJoin(join));
+    return this;
   }
 
   @Override
-  public void setMiterLimit(float miter) {
+  public Canvas setMiterLimit(float miter) {
     ctx.setMiterLimit(miter);
+    return this;
   }
 
   @Override
-  public void setStrokeColor(int color) {
+  public Canvas setStrokeColor(int color) {
     ctx.setStrokeStyle(HtmlGraphics.cssColor(color));
+    return this;
   }
 
   @Override
-  public void setStrokeWidth(float w) {
+  public Canvas setStrokeWidth(float w) {
     ctx.setLineWidth(w);
+    return this;
   }
 
   @Override
-  public void setTransform(float m11, float m12, float m21, float m22, float dx, float dy) {
+  public Canvas setTransform(float m11, float m12, float m21, float m22, float dx, float dy) {
     ctx.setTransform(m11, m12, m21, m22, dx, dy);
+    return this;
   }
 
   @Override
-  public void strokeCircle(float x, float y, float radius) {
+  public Canvas strokeCircle(float x, float y, float radius) {
     ctx.beginPath();
     ctx.arc(x, y, radius, 0, 2 * Math.PI);
     ctx.stroke();
     dirty = true;
+    return this;
   }
 
   @Override
-  public void strokePath(Path path) {
+  public Canvas strokePath(Path path) {
     Asserts.checkArgument(path instanceof HtmlPath);
     ((HtmlPath) path).replay(ctx);
     ctx.stroke();
     dirty = true;
+    return this;
   }
 
   @Override
-  public void strokeRect(float x, float y, float w, float h) {
+  public Canvas strokeRect(float x, float y, float w, float h) {
     ctx.strokeRect(x, y, w, h);
     dirty = true;
+    return this;
   }
 
   @Override
-  public void transform(float m11, float m12, float m21, float m22, float dx,
+  public Canvas transform(float m11, float m12, float m21, float m22, float dx,
       float dy) {
     ctx.transform(m11, m12, m21, m22, dx, dy);
+    return this;
   }
 
   @Override
-  public void translate(float x, float y) {
+  public Canvas translate(float x, float y) {
     ctx.translate(x, y);
+    return this;
   }
 
   @Override

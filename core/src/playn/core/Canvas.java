@@ -23,6 +23,10 @@ package playn.core;
  * most-significant byte.
  * </p>
  *
+ * <p>
+ * All methods that modify the Canvas return it to allow calls to be chained.
+ * </p>
+ *
  * TODO: - alpha (Flash and Java2D implementations are tricky). - textAlign?
  *
  * TODO (maybe): - textBaseline? Don't see it in Android. - font? Abstracting
@@ -139,12 +143,12 @@ public interface Canvas {
   /**
    * Clears the entire canvas to rgba(0, 0, 0, 0).
    */
-  void clear();
+  Canvas clear();
 
   /**
    * Intersects the current clip with the specified path.
    */
-  void clip(Path clipPath);
+  Canvas clip(Path clipPath);
 
   /**
    * Draws an image at the specified location.
@@ -152,7 +156,7 @@ public interface Canvas {
    * @param dx the destination x
    * @param dy the destination y
    */
-  void drawImage(Image image, float dx, float dy);
+  Canvas drawImage(Image image, float dx, float dy);
 
   /**
    * Draws an image, centered at the specified location.  Simply
@@ -162,7 +166,7 @@ public interface Canvas {
    * @param dx destination x
    * @param dy destination y
    */
-  void drawImageCentered(Image image, float dx, float dy);
+  Canvas drawImageCentered(Image image, float dx, float dy);
 
   /**
    * Draws a scaled image at the specified location.
@@ -172,7 +176,7 @@ public interface Canvas {
    * @param dw the destination width
    * @param dh the destination height
    */
-  void drawImage(Image image, float dx, float dy, float dw, float dh);
+  Canvas drawImage(Image image, float dx, float dy, float dw, float dh);
 
   /**
    * Draws a scaled subset of an image at the specified location.
@@ -189,44 +193,44 @@ public interface Canvas {
    * @param sw the source width
    * @param sh the source height
    */
-  void drawImage(Image image, float dx, float dy, float dw, float dh, float sx, float sy, float sw,
-      float sh);
+  Canvas drawImage(Image image, float dx, float dy, float dw, float dh, float sx, float sy,
+      float sw, float sh);
 
   /**
    * Draws a line between the two specified points.
    */
-  void drawLine(float x0, float y0, float x1, float y1);
+  Canvas drawLine(float x0, float y0, float x1, float y1);
 
   /**
    * Draws a single point at the specified location.
    */
-  void drawPoint(float x, float y);
+  Canvas drawPoint(float x, float y);
 
   /**
    * Draws text at the specified location.
    */
-  void drawText(String text, float x, float y);
+  Canvas drawText(String text, float x, float y);
 
   /**
    * Draws the supplied text layout at the specified location. The text will be drawn in the
    * current fill color.
    */
-  void drawText(TextLayout layout, float x, float y);
+  Canvas drawText(TextLayout layout, float x, float y);
 
   /**
    * Fills a circle at the specified center and radius.
    */
-  void fillCircle(float x, float y, float radius);
+  Canvas fillCircle(float x, float y, float radius);
 
   /**
    * Fills the specified path.
    */
-  void fillPath(Path path);
+  Canvas fillPath(Path path);
 
   /**
    * Fills the specified rectangle.
    */
-  void fillRect(float x, float y, float width, float height);
+  Canvas fillRect(float x, float y, float width, float height);
 
   /**
    * The height of this canvas.
@@ -238,12 +242,12 @@ public interface Canvas {
    *
    * @see #save()
    */
-  void restore();
+  Canvas restore();
 
   /**
    * Rotates the current transformation matrix by the specified angle in radians.
    */
-  void rotate(float radians);
+  Canvas rotate(float radians);
 
   /**
    * The save and restore methods preserve and restore the state of the canvas,
@@ -262,90 +266,90 @@ public interface Canvas {
    * <li>composite operation</li>
    * </ul>
    */
-  void save();
+  Canvas save();
 
   /**
    * Scales the current transformation matrix by the specified amount.
    */
-  void scale(float x, float y);
+  Canvas scale(float x, float y);
 
   /**
    * Sets the Porter-Duff composite operation to be used for all painting.
    */
-  void setCompositeOperation(Composite composite);
+  Canvas setCompositeOperation(Composite composite);
 
   /**
    * Sets the color to be used for fill operations. This replaces any existing
    * fill gradient or pattern.
    */
-  void setFillColor(int color);
+  Canvas setFillColor(int color);
 
   /**
    * Sets the gradient to be used for fill operations. This replaces any
    * existing fill color or pattern.
    */
-  void setFillGradient(Gradient gradient);
+  Canvas setFillGradient(Gradient gradient);
 
   /**
    * Sets the pattern to be used for fill operations. This replaces any existing
    * fill color or gradient.
    */
-  void setFillPattern(Pattern pattern);
+  Canvas setFillPattern(Pattern pattern);
 
   /**
    * Sets the line-cap mode for strokes.
    */
-  void setLineCap(LineCap cap);
+  Canvas setLineCap(LineCap cap);
 
   /**
    * Sets the line-join mode for strokes.
    */
-  void setLineJoin(LineJoin join);
+  Canvas setLineJoin(LineJoin join);
 
   /**
    * Sets the miter limit for strokes.
    */
-  void setMiterLimit(float miter);
+  Canvas setMiterLimit(float miter);
 
   /**
    * Sets the color for strokes.
    */
-  void setStrokeColor(int color);
+  Canvas setStrokeColor(int color);
 
   /**
    * Sets the width for strokes, in pixels.
    */
-  void setStrokeWidth(float strokeWidth);
+  Canvas setStrokeWidth(float strokeWidth);
 
   /**
    * Sets the transformation matrix directly, replacing the existing matrix.
    */
-  void setTransform(float m11, float m12, float m21, float m22, float dx, float dy);
+  Canvas setTransform(float m11, float m12, float m21, float m22, float dx, float dy);
 
   /**
    * Strokes a circle at the specified center and radius.
    */
-  void strokeCircle(float x, float y, float radius);
+  Canvas strokeCircle(float x, float y, float radius);
 
   /**
    * Strokes the specified path.
    */
-  void strokePath(Path path);
+  Canvas strokePath(Path path);
 
   /**
    * Strokes the specified rectangle.
    */
-  void strokeRect(float x, float y, float width, float height);
+  Canvas strokeRect(float x, float y, float width, float height);
 
   /**
    * Multiplies the current transformation matrix by the given matrix.
    */
-  void transform(float m11, float m12, float m21, float m22, float dx, float dy);
+  Canvas transform(float m11, float m12, float m21, float m22, float dx, float dy);
 
   /**
    * Translates the current transformation matrix by the given amount.
    */
-  void translate(float x, float y);
+  Canvas translate(float x, float y);
 
   /**
    * The width of this canvas.

@@ -58,30 +58,34 @@ class JavaCanvas implements Canvas {
     return currentState().alpha;
   }
 
-  public void clear() {
+  public Canvas clear() {
     gfx.clearRect(0, 0, width, height);
+    return this;
   }
 
   @Override
-  public void clip(Path path) {
+  public Canvas clip(Path path) {
     Asserts.checkArgument(path instanceof JavaPath);
     currentState().clip = (JavaPath) path;
+    return this;
   }
 
-  public void drawImage(Image img, float x, float y) {
+  public Canvas drawImage(Image img, float x, float y) {
     Asserts.checkArgument(img instanceof JavaImage);
     JavaImage jimg = (JavaImage) img;
 
     currentState().prepareFill(gfx);
     int dx = (int) x, dy = (int) y, w = jimg.width(), h = jimg.height();
     gfx.drawImage(jimg.img, dx, dy, dx + w, dy + h, 0, 0, w, h, null);
+    return this;
   }
 
-  public void drawImageCentered(Image img, float x, float y) {
+  public Canvas drawImageCentered(Image img, float x, float y) {
     drawImage(img, x - img.width()/2, y - img.height()/2);
+    return this;
   }
 
-  public void drawImage(Image img, float x, float y, float w, float h) {
+  public Canvas drawImage(Image img, float x, float y, float w, float h) {
     Asserts.checkArgument(img instanceof JavaImage);
     JavaImage jimg = (JavaImage) img;
 
@@ -90,10 +94,11 @@ class JavaCanvas implements Canvas {
 
     currentState().prepareFill(gfx);
     gfx.drawImage(jimg.img, tx, null);
+    return this;
   }
 
   @Override
-  public void drawImage(Image img, float dx, float dy, float dw, float dh,
+  public Canvas drawImage(Image img, float dx, float dy, float dw, float dh,
                         float sx, float sy, float sw, float sh) {
     Asserts.checkArgument(img instanceof JavaImage);
     JavaImage jimg = (JavaImage) img;
@@ -103,53 +108,61 @@ class JavaCanvas implements Canvas {
     currentState().prepareFill(gfx);
     gfx.drawImage(jimg.img, (int)dx, (int)dy, (int)(dx + dw), (int)(dy + dh),
                   (int)sx, (int)sy, (int)(sx + sw), (int)(sy + sh), null);
+    return this;
   }
 
   @Override
-  public void drawLine(float x0, float y0, float x1, float y1) {
+  public Canvas drawLine(float x0, float y0, float x1, float y1) {
     currentState().prepareStroke(gfx);
     line.setLine(x0, y0, x1, y1);
     gfx.draw(line);
+    return this;
   }
 
   @Override
-  public void drawPoint(float x, float y) {
+  public Canvas drawPoint(float x, float y) {
     currentState().prepareStroke(gfx);
     gfx.drawLine((int) x, (int) y, (int) x, (int) y);
+    return this;
   }
 
   @Override
-  public void drawText(String text, float x, float y) {
+  public Canvas drawText(String text, float x, float y) {
     currentState().prepareFill(gfx);
     gfx.drawString(text, x, y);
+    return this;
   }
 
   @Override
-  public void drawText(TextLayout layout, float x, float y) {
+  public Canvas drawText(TextLayout layout, float x, float y) {
     currentState().prepareFill(gfx);
     ((JavaTextLayout)layout).paint(gfx, x, y);
+    return this;
   }
 
   @Override
-  public void fillCircle(float x, float y, float radius) {
+  public Canvas fillCircle(float x, float y, float radius) {
     currentState().prepareFill(gfx);
     ellipse.setFrame(x - radius, y - radius, 2 * radius, 2 * radius);
     gfx.fill(ellipse);
+    return this;
   }
 
   @Override
-  public void fillPath(Path path) {
+  public Canvas fillPath(Path path) {
     Asserts.checkArgument(path instanceof JavaPath);
 
     currentState().prepareFill(gfx);
     gfx.fill(((JavaPath) path).path);
+    return this;
   }
 
   @Override
-  public void fillRect(float x, float y, float width, float height) {
+  public Canvas fillRect(float x, float y, float width, float height) {
     currentState().prepareFill(gfx);
     rect.setRect(x, y, width, height);
     gfx.fill(rect);
+    return this;
   }
 
   @Override
@@ -158,123 +171,143 @@ class JavaCanvas implements Canvas {
   }
 
   @Override
-  public void restore() {
+  public Canvas restore() {
     stateStack.pop();
     gfx.setTransform(currentState().transform);
+    return this;
   }
 
   @Override
-  public void rotate(float angle) {
+  public Canvas rotate(float angle) {
     gfx.rotate(angle);
+    return this;
   }
 
   @Override
-  public void save() {
+  public Canvas save() {
     // update saved transform
     currentState().transform = gfx.getTransform();
 
     // clone to maintain current state
     stateStack.push(new JavaCanvasState(currentState()));
+    return this;
   }
 
   @Override
-  public void scale(float x, float y) {
+  public Canvas scale(float x, float y) {
     gfx.scale(x, y);
+    return this;
   }
 
-  public void setAlpha(float alpha) {
+  public Canvas setAlpha(float alpha) {
     currentState().alpha = alpha;
+    return this;
   }
 
   @Override
-  public void setCompositeOperation(Composite composite) {
+  public Canvas setCompositeOperation(Composite composite) {
     currentState().composite = composite;
+    return this;
   }
 
   @Override
-  public void setFillColor(int color) {
+  public Canvas setFillColor(int color) {
     currentState().fillColor = color;
     currentState().fillGradient = null;
     currentState().fillPattern = null;
+    return this;
   }
 
   @Override
-  public void setFillGradient(Gradient gradient) {
+  public Canvas setFillGradient(Gradient gradient) {
     Asserts.checkArgument(gradient instanceof JavaGradient);
 
     currentState().fillGradient = (JavaGradient) gradient;
     currentState().fillPattern = null;
     currentState().fillColor = 0;
+    return this;
   }
 
   @Override
-  public void setFillPattern(Pattern pattern) {
+  public Canvas setFillPattern(Pattern pattern) {
     Asserts.checkArgument(pattern instanceof JavaPattern);
 
     currentState().fillPattern = (JavaPattern) pattern;
     currentState().fillGradient = null;
     currentState().fillColor = 0;
+    return this;
   }
 
   @Override
-  public void setLineCap(LineCap cap) {
+  public Canvas setLineCap(LineCap cap) {
     currentState().lineCap = cap;
+    return this;
   }
 
   @Override
-  public void setLineJoin(LineJoin join) {
+  public Canvas setLineJoin(LineJoin join) {
     currentState().lineJoin = join;
+    return this;
   }
 
   @Override
-  public void setMiterLimit(float miter) {
+  public Canvas setMiterLimit(float miter) {
     currentState().miterLimit = miter;
+    return this;
   }
 
   @Override
-  public void setStrokeColor(int color) {
+  public Canvas setStrokeColor(int color) {
     currentState().strokeColor = color;
+    return this;
   }
 
   @Override
-  public void setStrokeWidth(float w) {
+  public Canvas setStrokeWidth(float w) {
     currentState().strokeWidth = w;
+    return this;
   }
 
   @Override
-  public void setTransform(float m11, float m12, float m21, float m22, float dx, float dy) {
+  public Canvas setTransform(float m11, float m12, float m21, float m22, float dx, float dy) {
     gfx.setTransform(new AffineTransform(m11, m12, m21, m22, dx, dy));
+    return this;
   }
 
   @Override
-  public void strokeCircle(float x, float y, float radius) {
+  public Canvas strokeCircle(float x, float y, float radius) {
     currentState().prepareStroke(gfx);
     ellipse.setFrame(x - radius, y - radius, 2 * radius, 2 * radius);
     gfx.draw(ellipse);
+    return this;
   }
 
   @Override
-  public void strokePath(Path path) {
+  public Canvas strokePath(Path path) {
     currentState().prepareStroke(gfx);
     gfx.setColor(new Color(currentState().strokeColor, false));
     gfx.draw(((JavaPath) path).path);
+    return this;
   }
 
   @Override
-  public void strokeRect(float x, float y, float width, float height) {
+  public Canvas strokeRect(float x, float y, float width, float height) {
     currentState().prepareStroke(gfx);
     rect.setRect(x, y, width, height);
     gfx.draw(rect);
+    return this;
   }
 
   @Override
-  public void transform(float m11, float m12, float m21, float m22, float dx, float dy) {
+  public Canvas transform(float m11, float m12, float m21, float m22, float dx, float dy) {
     gfx.transform(new AffineTransform(m11, m12, m21, m22, dx, dy));
+    return this;
   }
 
   @Override
-  public void translate(float x, float y) {
+  public Canvas translate(float x, float y) {
     gfx.translate(x, y);
+    return this;
   }
 
   @Override

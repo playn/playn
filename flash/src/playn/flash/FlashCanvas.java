@@ -41,84 +41,96 @@ class FlashCanvas implements Canvas {
   }
 
   @Override
-  public void clear() {
+  public Canvas clear() {
     dirty = true;
+    return this;
   }
 
   @Override
-  public void clip(Path path) {
+  public Canvas clip(Path path) {
+    return this;
   }
 
   @Override
-  public void drawImage(Image img, float x, float y) {
+  public Canvas drawImage(Image img, float x, float y) {
     Asserts.checkArgument(img instanceof FlashImage);
     dirty = true;
     PlayN.log().info("Drawing image " + ((FlashImage) img).bitmapData());
     context2d.drawImage(((FlashImage) img).bitmapData(), x, y);
+    return this;
   }
 
   @Override
-  public void drawImage(Image img, float x, float y, float w, float h) {
+  public Canvas drawImage(Image img, float x, float y, float w, float h) {
     Asserts.checkArgument(img instanceof FlashImage);
     dirty = true;
+    return this;
   }
 
   @Override
-  public void drawImage(Image img, float dx, float dy, float dw, float dh,
+  public Canvas drawImage(Image img, float dx, float dy, float dw, float dh,
       float sx, float sy, float sw, float sh) {
     Asserts.checkArgument(img instanceof FlashImage);
     dirty = true;
+    return this;
   }
 
   @Override
-  public void drawImageCentered(Image img, float x, float y) {
+  public Canvas drawImageCentered(Image img, float x, float y) {
     drawImage(img, x - img.width()/2, y - img.height()/2);
     dirty = true;
+    return this;
   }
 
   @Override
-  public void drawLine(float x0, float y0, float x1, float y1) {
+  public Canvas drawLine(float x0, float y0, float x1, float y1) {
     context2d.beginPath();
     context2d.moveTo(y0, y1);
     context2d.lineTo(x1, y1);
     context2d.stroke();
     dirty = true;
+    return this;
   }
 
   @Override
-  public void drawPoint(float x, float y) {
+  public Canvas drawPoint(float x, float y) {
     context2d.fillRect(x, y, 1, 1);
     dirty = true;
+    return this;
   }
 
   @Override
-  public void drawText(String text, float x, float y) {
+  public Canvas drawText(String text, float x, float y) {
     context2d.strokeText(text, x, y);
     context2d.fillText(text, x, y);
     dirty = true;
+    return this;
   }
 
   @Override
-  public void drawText(TextLayout layout, float x, float y) {
+  public Canvas drawText(TextLayout layout, float x, float y) {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  public void fillCircle(float x, float y, float radius) {
+  public Canvas fillCircle(float x, float y, float radius) {
     dirty = true;
+    return this;
   }
 
   @Override
-  public void fillPath(Path path) {
+  public Canvas fillPath(Path path) {
     ((FlashPath) path).replay(context2d);
     context2d.fill();
     dirty = true;
+    return this;
   }
 
   @Override
-  public void fillRect(float x, float y, float w, float h) {
+  public Canvas fillRect(float x, float y, float w, float h) {
     context2d.fillRect(x, y, w, h);
     dirty = true;
+    return this;
   }
 
   @Override
@@ -127,104 +139,122 @@ class FlashCanvas implements Canvas {
   }
 
   @Override
-  public void restore() {
+  public Canvas restore() {
     context2d.restore();
+    return this;
   }
 
   @Override
-  public void rotate(float radians) {
+  public Canvas rotate(float radians) {
     context2d.rotate(radians);
+    return this;
   }
 
   @Override
-  public void save() {
+  public Canvas save() {
     context2d.save();
+    return this;
   }
 
   @Override
-  public void scale(float x, float y) {
+  public Canvas scale(float x, float y) {
     context2d.scale(x, y);
+    return this;
   }
 
   @Override
-  public void setCompositeOperation(Composite composite) {
+  public Canvas setCompositeOperation(Composite composite) {
+    return this;
   }
 
   @Override
-  public void setFillColor(int color) {
+  public Canvas setFillColor(int color) {
     context2d.setFillStyle("rgba("
         + ((color >> 16) & 0xff) + ","
         + ((color >> 8) & 0xff) + ","
         + (color & 0xff) + ","
         + ((color >> 24) & 0xff) + ")");
-
+    return this;
   }
 
   @Override
-  public void setFillGradient(Gradient gradient) {
+  public Canvas setFillGradient(Gradient gradient) {
+    return this;
   }
 
   @Override
-  public void setFillPattern(Pattern pattern) {
+  public Canvas setFillPattern(Pattern pattern) {
+    return this;
   }
 
   @Override
-  public void setLineCap(LineCap cap) {
+  public Canvas setLineCap(LineCap cap) {
+    return this;
   }
 
   @Override
-  public void setLineJoin(LineJoin join) {
+  public Canvas setLineJoin(LineJoin join) {
+    return this;
   }
 
   @Override
-  public void setMiterLimit(float miter) {
+  public Canvas setMiterLimit(float miter) {
+    return this;
   }
 
   @Override
-  public void setStrokeColor(int color) {
+  public Canvas setStrokeColor(int color) {
     context2d.setStrokeStyle("rgba("
         + ((color >> 16) & 0xff) + ","
         + ((color >> 8) & 0xff) + ","
         + (color & 0xff) + ","
         + ((color >> 24) & 0xff) + ")");
+    return this;
   }
 
   @Override
-  public void setStrokeWidth(float w) {
+  public Canvas setStrokeWidth(float w) {
+    return this;
   }
 
   @Override
-  public void setTransform(float m11, float m12, float m21, float m22, float dx, float dy) {
+  public Canvas setTransform(float m11, float m12, float m21, float m22, float dx, float dy) {
     context2d.setTransform(m11, m12, m21, m22, dx, dy);
+    return this;
   }
 
   @Override
-  public void strokeCircle(float x, float y, float radius) {
+  public Canvas strokeCircle(float x, float y, float radius) {
     dirty = true;
+    return this;
   }
 
   @Override
-  public void strokePath(Path path) {
+  public Canvas strokePath(Path path) {
     ((FlashPath) path).replay(context2d);
     context2d.stroke();
     dirty = true;
+    return this;
   }
 
   @Override
-  public void strokeRect(float x, float y, float w, float h) {
+  public Canvas strokeRect(float x, float y, float w, float h) {
     context2d.strokeRect(x, y, w, h);
     dirty = true;
+    return this;
   }
 
   @Override
-  public void transform(float m11, float m12, float m21, float m22, float dx,
+  public Canvas transform(float m11, float m12, float m21, float m22, float dx,
       float dy) {
     context2d.transform(m11, m12, m21, m22, dx, dy);
+    return this;
   }
 
   @Override
-  public void translate(float x, float y) {
+  public Canvas translate(float x, float y) {
     context2d.translate(x, y);
+    return this;
   }
 
   @Override
