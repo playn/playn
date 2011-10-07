@@ -261,6 +261,15 @@ public interface Layer {
     }
 
     /**
+     * Converts the supplied point from screen coordinates to coordinates
+     * relative to the specified layer.
+     */
+    public static Point screenToLayer(Layer layer, float x, float y) {
+        Point into = new Point(x, y);
+        return screenToLayer(layer, into, into);
+    }
+
+    /**
      * Converts the supplied point from coordinates relative to its parent
      * to coordinates relative to the specified layer. The results are stored
      * into {@code into}, which is returned for convenience.
@@ -270,15 +279,6 @@ public interface Layer {
       into.x += layer.originX();
       into.y += layer.originY();
       return into;
-    }
-
-    /**
-     * Converts the supplied point from screen coordinates to coordinates
-     * relative to the specified layer.
-     */
-    public static Point screenToLayer(Layer layer, float x, float y) {
-      Point into = new Point(x, y);
-      return screenToLayer(layer, into.set(x, y), into);
     }
 
     /**
@@ -299,8 +299,7 @@ public interface Layer {
      * Returns true if a coordinate on the screen touches a {@link Layer.HasSize}.
      */
     public static boolean hitTest(Layer.HasSize layer, float x, float y) {
-      Point point = new Point(x, y);
-      screenToLayer(layer, point, point);
+      Point point = screenToLayer(layer, x, y);
       return (
           point.x() >= 0 &&  point.y() >= 0 &&
           point.x() <= layer.width() && point.y() <= layer.height());
