@@ -257,7 +257,16 @@ public interface Layer {
     public static Point screenToLayer(Layer layer, IPoint point, Point into) {
       Layer parent = layer.parent();
       IPoint cur = (parent == null) ? point : screenToLayer(parent, point, into);
-      into = layer.transform().inverseTransform(cur, into);
+      return parentToLayer(layer, cur, into);
+    }
+
+    /**
+     * Converts the supplied point from coordinates relative to its parent
+     * to coordinates relative to the specified layer. The results are stored
+     * into {@code into}, which is returned for convenience.
+     */
+    public static Point parentToLayer(Layer layer, IPoint point, Point into) {
+      into = layer.transform().inverseTransform(point, into);
       into.x += layer.originX();
       into.y += layer.originY();
       return into;
