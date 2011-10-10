@@ -69,13 +69,16 @@ class AndroidTouchEventHandler {
   public boolean onMotionEvent(MotionEvent nativeEvent) {
     double time = nativeEvent.getEventTime();
     int action = nativeEvent.getAction();
+    int changed = (action & MotionEvent.ACTION_POINTER_INDEX_MASK)
+        >> MotionEvent.ACTION_POINTER_INDEX_SHIFT;
     boolean[] preventDefault = {false};
 
     Touch.Event[] touches = parseMotionEvent(nativeEvent, preventDefault);
+    Touch.Event[] changedTouch = { touches[changed] };
     Touch.Event pointerEvent = touches[0];
     Pointer.Event.Impl event;
 
-    switch (action) {
+    switch (action & MotionEvent.ACTION_MASK) {
       case (MotionEvent.ACTION_DOWN):
         gameView.onTouchStart(touches);
         event = new Pointer.Event.Impl(time, pointerEvent.x(), pointerEvent.y());
@@ -86,6 +89,12 @@ class AndroidTouchEventHandler {
         event = new Pointer.Event.Impl(time, pointerEvent.x(), pointerEvent.y());
         gameView.onPointerEnd(event);
         return (preventDefault[0] || event.getPreventDefault());
+      case (MotionEvent.ACTION_POINTER_DOWN):
+        gameView.onTouchStart(changedTouch);
+        return preventDefault[0];
+      case (MotionEvent.ACTION_POINTER_UP):
+        gameView.onTouchEnd(changedTouch);
+        return preventDefault[0];
       case (MotionEvent.ACTION_MOVE):
         gameView.onTouchMove(touches);
         event = new Pointer.Event.Impl(time, pointerEvent.x(), pointerEvent.y());
