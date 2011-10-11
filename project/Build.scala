@@ -132,20 +132,22 @@ object PlayNBuild extends Build {
   //
   // Sample projects
 
-  def sampleProject (id :String) = Project(
-    id + "-sample", file("sample/" + id), settings = commonSettings ++ Seq(
+  def sampleProject (id :String, extraSettings :Seq[Setting[_]] = Seq()) = Project(
+    id + "-sample", file("sample/" + id), settings = commonSettings ++ extraSettings ++ Seq(
       name := ("playn-" + id + "-sample"),
+      baseDirectory in run := file("sample/" + id + "/core"),
       unmanagedSourceDirectories in Compile <+= baseDirectory / "core/src"
     )
-  ) dependsOn(core)
+  ) dependsOn(java)
 
   lazy val cute = sampleProject("cute")
   lazy val hello = sampleProject("hello")
   lazy val noise = sampleProject("noise")
-  lazy val peas = sampleProject("peas")
-  lazy val sprites = sampleProject("sprites")
-  lazy val text = sampleProject("text")
+  lazy val showcase = sampleProject("showcase", Seq(
+    libraryDependencies ++= Seq(
+      "com.threerings" % "tripleplay" % "1.0-SNAPSHOT"
+    )
+  )) dependsOn(gwtbox2d)
 
-  lazy val samples = Project("samples", file(".")) aggregate(
-    cute, hello, noise, peas, sprites, text)
+  lazy val samples = Project("samples", file(".")) aggregate(cute, hello, noise, showcase)
 }
