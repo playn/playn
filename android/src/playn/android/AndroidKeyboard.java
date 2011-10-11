@@ -36,6 +36,14 @@ public class AndroidKeyboard implements Keyboard {
     return false;
   }
 
+  boolean onKeyTyped(TypedEvent event) {
+    if (listener != null) {
+      listener.onKeyTyped(event);
+      return event.getPreventDefault();
+    }
+    return false;
+  }
+
   boolean onKeyUp(Event event) {
     if (listener != null) {
       listener.onKeyUp(event);

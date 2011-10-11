@@ -35,6 +35,16 @@ class FlashKeyboard implements Keyboard {
           if (event.getPreventDefault()) {
             nativeEvent.preventDefault();
           }
+
+          int charCode = nativeEvent.charCode();
+          if (charCode != 0) {
+            TypedEvent.Impl typedEvent =
+              new TypedEvent.Impl(PlayN.currentTime(), nativeEvent.keyCode(), (char)charCode);
+            listener.onKeyTyped(typedEvent);
+            if (typedEvent.getPreventDefault()) {
+              nativeEvent.preventDefault();
+            }
+          }
         }
       }
     });

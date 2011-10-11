@@ -173,6 +173,14 @@ public class GameViewGL extends GLSurfaceView implements SurfaceHolder.Callback 
     });
   }
 
+  void onKeyTyped(final Keyboard.TypedEvent event) {
+    queueEvent(new Runnable() {
+      public void run() {
+        keyboard.onKeyTyped(event);
+      }
+    });
+  }
+
   void onKeyUp(final Keyboard.Event event) {
     queueEvent(new Runnable() {
       public void run() {
