@@ -165,158 +165,67 @@ public class GameViewGL extends GLSurfaceView implements SurfaceHolder.Callback 
     super.onPause();
   }
 
-  void onKeyDown(Keyboard.Event event) {
-    queueEvent(new onKeyDownRunnable(event));
-  }
-
-  void onKeyUp(Keyboard.Event event) {
-    queueEvent(new onKeyUpRunnable(event));
-  }
-
-  void onPointerStart(Pointer.Event event) {
-    queueEvent(new onPointerStartRunnable(event));
-  }
-
-  void onPointerDrag(Pointer.Event event) {
-    queueEvent(new onPointerDragRunnable(event));
-  }
-
-  void onPointerEnd(Pointer.Event event) {
-    queueEvent(new onPointerEndRunnable(event));
-  }
-
-  void onTouchStart(Touch.Event[] touches) {
-    queueEvent(new onTouchStartRunnable(touches));
-  }
-
-  void onTouchMove(Touch.Event[] touches) {
-    queueEvent(new onTouchMoveRunnable(touches));
-  }
-
-  void onTouchEnd(Touch.Event[] touches) {
-    queueEvent(new onTouchEndRunnable(touches));
-  }
-
-  /*
-   * Runnables for posting inputs to the GL thread for processing
-   */
-  private class onPointerStartRunnable implements Runnable {
-    private Pointer.Event event;
-
-    onPointerStartRunnable(Pointer.Event event) {
-      super();
-      this.event = event;
-    }
-
-    @Override
-    public void run() {
-      if (pointer != null)
-        pointer.onPointerStart(event);
-    }
-  }
-
-  private class onPointerDragRunnable implements Runnable {
-    private Pointer.Event event;
-
-    onPointerDragRunnable(Pointer.Event event) {
-      super();
-      this.event = event;
-    }
-
-    @Override
-    public void run() {
-      if (pointer != null)
-        pointer.onPointerDrag(event);
-    }
-  }
-
-  private class onPointerEndRunnable implements Runnable {
-    private Pointer.Event event;
-
-    onPointerEndRunnable(Pointer.Event event) {
-      super();
-      this.event = event;
-    }
-
-    @Override
-    public void run() {
-      if (pointer != null)
-        pointer.onPointerEnd(event);
-    }
-  }
-
-  private class onTouchStartRunnable implements Runnable {
-    private Touch.Event[] touches;
-
-    onTouchStartRunnable(Touch.Event[] touches) {
-      super();
-      this.touches = touches;
-    }
-
-    @Override
-    public void run() {
-      if (touch != null)
-        touch.onTouchStart(touches);
-    }
-  }
-
-  private class onTouchMoveRunnable implements Runnable {
-    private Touch.Event[] touches;
-
-    onTouchMoveRunnable(Touch.Event[] touches) {
-      super();
-      this.touches = touches;
-    }
-
-    @Override
-    public void run() {
-      if (touch != null)
-        touch.onTouchMove(touches);
-    }
-  }
-
-  private class onTouchEndRunnable implements Runnable {
-    private Touch.Event[] touches;
-
-    onTouchEndRunnable(Touch.Event[] touches) {
-      super();
-      this.touches = touches;
-    }
-
-    @Override
-    public void run() {
-      if (touch != null)
-        touch.onTouchEnd(touches);
-    }
-  }
-
-  private class onKeyDownRunnable implements Runnable {
-    private Keyboard.Event event;
-
-    onKeyDownRunnable(Keyboard.Event event) {
-      super();
-      this.event = event;
-    }
-
-    @Override
-    public void run() {
-      if (keyboard != null)
+  void onKeyDown(final Keyboard.Event event) {
+    queueEvent(new Runnable() {
+      public void run() {
         keyboard.onKeyDown(event);
-    }
+      }
+    });
   }
 
-  private class onKeyUpRunnable implements Runnable {
-    private Keyboard.Event event;
-
-    onKeyUpRunnable(Keyboard.Event event) {
-      super();
-      this.event = event;
-    }
-
-    @Override
-    public void run() {
-      if (keyboard != null)
+  void onKeyUp(final Keyboard.Event event) {
+    queueEvent(new Runnable() {
+      public void run() {
         keyboard.onKeyUp(event);
-    }
+      }
+    });
+  }
+
+  void onPointerStart(final Pointer.Event event) {
+    queueEvent(new Runnable() {
+      public void run() {
+        pointer.onPointerStart(event);
+      }
+    });
+  }
+
+  void onPointerDrag(final Pointer.Event event) {
+    queueEvent(new Runnable() {
+      public void run() {
+        pointer.onPointerDrag(event);
+      }
+    });
+  }
+
+  void onPointerEnd(final Pointer.Event event) {
+    queueEvent(new Runnable() {
+      public void run() {
+        pointer.onPointerEnd(event);
+      }
+    });
+  }
+
+  void onTouchStart(final Touch.Event[] touches) {
+    queueEvent(new Runnable() {
+      public void run() {
+        touch.onTouchStart(touches);
+      }
+    });
+  }
+
+  void onTouchMove(final Touch.Event[] touches) {
+    queueEvent(new Runnable() {
+      public void run() {
+        touch.onTouchMove(touches);
+      }
+    });
+  }
+
+  void onTouchEnd(final Touch.Event[] touches) {
+    queueEvent(new Runnable() {
+      public void run() {
+        touch.onTouchEnd(touches);
+      }
+    });
   }
 }
