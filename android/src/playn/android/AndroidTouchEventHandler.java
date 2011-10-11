@@ -69,43 +69,46 @@ class AndroidTouchEventHandler {
   public boolean onMotionEvent(MotionEvent nativeEvent) {
     double time = nativeEvent.getEventTime();
     int action = nativeEvent.getAction();
-    int changed = (action & MotionEvent.ACTION_POINTER_INDEX_MASK)
-        >> MotionEvent.ACTION_POINTER_INDEX_SHIFT;
     boolean[] preventDefault = {false};
 
     Touch.Event[] touches = parseMotionEvent(nativeEvent, preventDefault);
-    Touch.Event[] changedTouch = { touches[changed] };
     Touch.Event pointerEvent = touches[0];
     Pointer.Event.Impl event;
 
     switch (action & MotionEvent.ACTION_MASK) {
-      case (MotionEvent.ACTION_DOWN):
+      case MotionEvent.ACTION_DOWN:
         gameView.onTouchStart(touches);
         event = new Pointer.Event.Impl(time, pointerEvent.x(), pointerEvent.y());
         gameView.onPointerStart(event);
         return (preventDefault[0] || event.getPreventDefault());
-      case (MotionEvent.ACTION_UP):
+      case MotionEvent.ACTION_UP:
         gameView.onTouchEnd(touches);
         event = new Pointer.Event.Impl(time, pointerEvent.x(), pointerEvent.y());
         gameView.onPointerEnd(event);
         return (preventDefault[0] || event.getPreventDefault());
-      case (MotionEvent.ACTION_POINTER_DOWN):
-        gameView.onTouchStart(changedTouch);
+      case MotionEvent.ACTION_POINTER_DOWN:
+        gameView.onTouchStart(getChangedTouches(action, touches));
         return preventDefault[0];
-      case (MotionEvent.ACTION_POINTER_UP):
-        gameView.onTouchEnd(changedTouch);
+      case MotionEvent.ACTION_POINTER_UP:
+        gameView.onTouchEnd(getChangedTouches(action, touches));
         return preventDefault[0];
-      case (MotionEvent.ACTION_MOVE):
+      case MotionEvent.ACTION_MOVE:
         gameView.onTouchMove(touches);
         event = new Pointer.Event.Impl(time, pointerEvent.x(), pointerEvent.y());
         gameView.onPointerDrag(event);
         return (preventDefault[0] || event.getPreventDefault());
-      case (MotionEvent.ACTION_CANCEL):
+      case MotionEvent.ACTION_CANCEL:
         break;
-      case (MotionEvent.ACTION_OUTSIDE):
+      case MotionEvent.ACTION_OUTSIDE:
         break;
     }
     return false;
+  }
+
+  private Touch.Event[] getChangedTouches(int action, Touch.Event[] touches) {
+    int changed = (action & MotionEvent.ACTION_POINTER_INDEX_MASK)
+      >> MotionEvent.ACTION_POINTER_INDEX_SHIFT;
+    return new Touch.Event[] { touches[changed] };
   }
 
   /**
@@ -134,7 +137,7 @@ class AndroidTouchEventHandler {
     return touches;
   }
 
-  public void calculateOffsets() {
+  void calculateOffsets() {
     Graphics graphics = AndroidPlatform.instance.graphics();
     xScreenOffset = -(graphics.screenWidth() - graphics.width()) / 2;
     yScreenOffset = -(graphics.screenHeight() - graphics.height()) / 2;
