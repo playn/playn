@@ -35,21 +35,21 @@ public interface Keyboard {
   /** An event dispatched when a key is pressed or released. */
   interface Event extends Events.Input {
     /**
-     * The code of the key that triggered this event, e.g. {@link #KEY_ESC}, etc.
+     * The key that triggered this event, e.g. {@link Key#A}, etc.
      */
-    int keyCode();
+    Key key();
 
     class Impl extends Events.Input.Impl implements Event {
-      private int keyCode;
+      private Key key;
 
       @Override
-      public int keyCode() {
-        return keyCode;
+      public Key key() {
+        return key;
       }
 
-      public Impl(double time, int keyCode) {
+      public Impl(double time, Key key) {
         super(time);
-        this.keyCode = keyCode;
+        this.key = key;
       }
 
       @Override
@@ -60,7 +60,7 @@ public interface Keyboard {
       @Override
       protected void addFields(StringBuilder builder) {
         super.addFields(builder);
-        builder.append(", keyCode=").append(keyCode);
+        builder.append(", key=").append(key);
       }
     }
   }
@@ -80,8 +80,8 @@ public interface Keyboard {
         return typedChar;
       }
 
-      public Impl(double time, int keyCode, char typedChar) {
-        super(time, keyCode);
+      public Impl(double time, Key key, char typedChar) {
+        super(time, key);
         this.typedChar = typedChar;
       }
 
@@ -121,17 +121,6 @@ public interface Keyboard {
     public void onKeyTyped(TypedEvent event) { /* NOOP! */ }
     public void onKeyUp(Event event) { /* NOOP! */ }
   }
-
-  int KEY_ESC = 27;
-  int KEY_SPACE = 32;
-
-  int KEY_LEFT = 37;
-  int KEY_UP = 38;
-  int KEY_RIGHT = 39;
-  int KEY_DOWN = 40;
-
-  // TODO(jgw): Lots more keyboard definitions. These values only work on the desktop at the moment
-  // and are completely untested on Android.
 
   /**
    * Sets the listener that will receive keyboard events. Setting the listener to
