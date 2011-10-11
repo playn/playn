@@ -199,15 +199,14 @@ public abstract class GameActivity extends Activity {
   @Override
   public boolean onKeyDown(int keyCode, KeyEvent nativeEvent) {
     long time = nativeEvent.getEventTime();
-    Key key = keyForCode(keyCode);
-    Keyboard.Event event = new Keyboard.Event.Impl(time, key);
+    Keyboard.Event event = new Keyboard.Event.Impl(time, keyForCode(keyCode));
     gameView.onKeyDown(event);
     boolean downPrevent = event.getPreventDefault();
 
     boolean typedPrevent = false;
     int unicodeChar = nativeEvent.getUnicodeChar();
     if (unicodeChar != 0) {
-      Keyboard.TypedEvent typedEvent = new Keyboard.TypedEvent.Impl(time, key, (char)unicodeChar);
+      Keyboard.TypedEvent typedEvent = new Keyboard.TypedEvent.Impl(time, (char)unicodeChar);
       gameView.onKeyTyped(typedEvent);
       typedPrevent = typedEvent.getPreventDefault();
     }

@@ -32,16 +32,14 @@ class HtmlKeyboard implements Keyboard {
       public void handleEvent(NativeEvent nativeEvent) {
         if (listener != null) {
           double now = PlayN.currentTime();
-          Key key = keyForCode(nativeEvent.getKeyCode());
-          Event.Impl event = new Event.Impl(now, key);
+          Event.Impl event = new Event.Impl(now, keyForCode(nativeEvent.getKeyCode()));
           listener.onKeyDown(event);
           if (event.getPreventDefault()) {
             nativeEvent.preventDefault();
           }
 
           if (nativeEvent.getCharCode() != 0) {
-            TypedEvent.Impl typedEvent = new TypedEvent.Impl(
-              now, key, (char)nativeEvent.getCharCode());
+            TypedEvent.Impl typedEvent = new TypedEvent.Impl(now, (char)nativeEvent.getCharCode());
             listener.onKeyTyped(typedEvent);
             if (typedEvent.getPreventDefault()) {
               nativeEvent.preventDefault();

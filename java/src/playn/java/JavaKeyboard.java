@@ -53,11 +53,13 @@ class JavaKeyboard implements Keyboard {
 
       public void keyTyped(KeyEvent nativeEvent) {
         if (listener != null) {
-          TypedEvent.Impl event = new TypedEvent.Impl(
-            nativeEvent.getWhen(), keyForCode(nativeEvent.getKeyCode()), nativeEvent.getKeyChar());
-          listener.onKeyTyped(event);
-          if (event.getPreventDefault()) {
-            nativeEvent.consume();
+          if (!Character.isISOControl(nativeEvent.getKeyChar())) {
+            TypedEvent.Impl event = new TypedEvent.Impl(
+              nativeEvent.getWhen(), nativeEvent.getKeyChar());
+            listener.onKeyTyped(event);
+            if (event.getPreventDefault()) {
+              nativeEvent.consume();
+            }
           }
         }
       }

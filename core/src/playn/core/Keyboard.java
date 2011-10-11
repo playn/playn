@@ -66,13 +66,13 @@ public interface Keyboard {
   }
 
   /** An event dispatched when a printable character is typed. */
-  interface TypedEvent extends Event {
+  interface TypedEvent extends Events.Input {
     /**
      * The character typed to trigger this event, e.g. 'c'.
      */
     char typedChar();
 
-    class Impl extends Event.Impl implements TypedEvent {
+    class Impl extends Events.Input.Impl implements TypedEvent {
       private char typedChar;
 
       @Override
@@ -80,8 +80,8 @@ public interface Keyboard {
         return typedChar;
       }
 
-      public Impl(double time, Key key, char typedChar) {
-        super(time, key);
+      public Impl(double time, char typedChar) {
+        super(time);
         this.typedChar = typedChar;
       }
 
