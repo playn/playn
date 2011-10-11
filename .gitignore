@@ -21,7 +21,8 @@ target
 /sample/cute/android/bin
 /sample/cute/android/gen
 
-# /sample/cute/html/war/WEB-INF/
+# /sample/cute/html/war/
+/sample/cute/html/war/cutegame
 /sample/cute/html/war/WEB-INF/lib
 /sample/cute/html/war/WEB-INF/classes
 /sample/cute/html/war/WEB-INF/deploy
@@ -61,27 +62,26 @@ target
 /sample/noise/war/WEB-INF/classes
 /sample/noise/war/WEB-INF/deploy
 
-# /sample/peas/android/
-/sample/peas/android/bin
-/sample/peas/android/gen
+# /sample/showcase/android/
+/sample/showcase/android/bin
+/sample/showcase/android/gen
 
-# /sample/peas/core/war/
-/sample/peas/core/war/peas
-/sample/peas/core/war/peasflash
+# /sample/showcase/core/war/
+/sample/showcase/core/war/showcase
+/sample/showcase/core/war/showcaseflash
 
-# /sample/peas/core/war/WEB-INF/
-/sample/peas/core/war/WEB-INF/lib
-/sample/peas/core/war/WEB-INF/classes
-/sample/peas/core/war/WEB-INF/deploy
+# /sample/showcase/html/war/WEB-INF/
+/sample/showcase/html/war/WEB-INF/lib
+/sample/showcase/html/war/WEB-INF/classes
+/sample/showcase/html/war/WEB-INF/deploy
 
-# /sample/peas/html/war/WEB-INF/
-/sample/peas/html/war/WEB-INF/lib
-/sample/peas/html/war/WEB-INF/classes
-/sample/peas/html/war/WEB-INF/deploy
+# /sample/showcase/flash/war/WEB-INF/
+/sample/showcase/flash/war/WEB-INF/lib
+/sample/showcase/flash/war/WEB-INF/classes
+/sample/showcase/flash/war/WEB-INF/deploy
 
-# /sample/sprites/android/
-/sample/sprites/android/bin
-/sample/sprites/android/gen
+# /sample/paymentsdemo/html/war/WEB-INF/
+/sample/paymentsdemo/html/war/WEB-INF/classes
 
 # /server/
 /server/bin
@@ -91,5 +91,9 @@ target
 /test/core/war/WEB-INF/classes
 /test/core/war/WEB-INF/deploy
 
-# /test/manualtests/html/
-/test/manualtests/html/target
+# /test/benchmark
+/test/benchmark/html/war/WEB-INF/classes
+
+# /test/manualtests
+/test/manualtests/html/war/WEB-INF/classes
+/test/manualtests/flash/war/WEB-INF/classes
