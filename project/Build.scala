@@ -38,7 +38,7 @@ object PlayNBuild extends Build {
   )
 
   val locals = new Locals(
-    ("pythagoras", null, "com.samskivert" % "pythagoras" % "1.1-SNAPSHOT")
+    ("pythagoras", null, "com.samskivert" % "pythagoras" % "1.1")
   )
 
   //
@@ -52,7 +52,7 @@ object PlayNBuild extends Build {
       // adds source files to our jar file (needed by GWT)
       unmanagedResourceDirectories in Compile <+= baseDirectory / "src",
       unmanagedBase <<= baseDirectory { base => base / "disabled" },
-      libraryDependencies ++= testDeps
+      libraryDependencies ++= locals.libDeps ++ testDeps
     )
   ))
 
