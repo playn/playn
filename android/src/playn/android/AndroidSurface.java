@@ -133,11 +133,12 @@ class AndroidSurface implements Surface {
   }
 
   @Override
-  public void clear() {
+  public Surface clear() {
     checkRefreshGL();
     gfx.bindFramebuffer(fbuf, width, height);
     gfx.gl20.glClearColor(0, 0, 0, 0);
     gfx.gl20.glClear(GL20.GL_COLOR_BUFFER_BIT);
+    return this;
   }
 
   void destroy() {
@@ -159,12 +160,13 @@ class AndroidSurface implements Surface {
    */
 
   @Override
-  public void drawImage(Image image, float x, float y) {
+  public Surface drawImage(Image image, float x, float y) {
     drawImage(image, x, y, image.width(), image.height());
+    return this;
   }
 
   @Override
-  public void drawImage(Image image, float x, float y, float dw, float dh) {
+  public Surface drawImage(Image image, float x, float y, float dw, float dh) {
     gfx.bindFramebuffer(fbuf, width, height);
 
     Asserts.checkArgument(image instanceof AndroidImage);
@@ -177,10 +179,11 @@ class AndroidSurface implements Surface {
             false, 1);
       }
     }
+    return this;
   }
 
   @Override
-  public void drawImage(Image image, float dx, float dy, float dw, float dh, float sx, float sy,
+  public Surface drawImage(Image image, float dx, float dy, float dw, float dh, float sx, float sy,
       float sw, float sh) {
     checkRefreshGL();
     gfx.bindFramebuffer(fbuf, width, height);
@@ -195,15 +198,17 @@ class AndroidSurface implements Surface {
             sw, sh, 1);
       }
     }
+    return this;
   }
 
   @Override
-  public void drawImageCentered(Image img, float x, float y) {
+  public Surface drawImageCentered(Image img, float x, float y) {
     drawImage(img, x - img.width() / 2, y - img.height() / 2);
+    return this;
   }
 
   @Override
-  public void drawLine(float x0, float y0, float x1, float y1, float width) {
+  public Surface drawLine(float x0, float y0, float x1, float y1, float width) {
     checkRefreshGL();
     gfx.bindFramebuffer(fbuf, this.width, this.height);
 
@@ -222,10 +227,11 @@ class AndroidSurface implements Surface {
     pos[6] = x0 + dy;
     pos[7] = y0 - dx;
     gfx.fillPoly(topTransform(), pos, fillColor, 1);
+    return this;
   }
 
   @Override
-  public void fillRect(float x, float y, float width, float height) {
+  public Surface fillRect(float x, float y, float width, float height) {
     checkRefreshGL();
     gfx.bindFramebuffer(fbuf, this.width, this.height);
 
@@ -236,6 +242,7 @@ class AndroidSurface implements Surface {
     } else {
       gfx.fillRect(topTransform(), x, y, width, height, fillColor, 1);
     }
+    return this;
   }
 
   @Override
@@ -244,55 +251,64 @@ class AndroidSurface implements Surface {
   }
 
   @Override
-  public void restore() {
+  public Surface restore() {
     Asserts.checkState(transformStack.size() > 1, "Unbalanced save/restore");
     transformStack.remove(transformStack.size() - 1);
+    return this;
   }
 
   @Override
-  public void rotate(float angle) {
+  public Surface rotate(float angle) {
     float sr = (float) Math.sin(angle);
     float cr = (float) Math.cos(angle);
     transform(cr, sr, -sr, cr, 0, 0);
+    return this;
   }
 
   @Override
-  public void save() {
-    transformStack.add((InternalTransform) new StockInternalTransform().set(topTransform()));
+  public Surface save() {
+    transformStack.add(new StockInternalTransform().set(topTransform()));
+    return this;
   }
 
   @Override
-  public void scale(float sx, float sy) {
+  public Surface scale(float sx, float sy) {
     topTransform().scale(sx, sy);
+    return this;
   }
 
   @Override
-  public void setTransform(float m00, float m01, float m10, float m11, float tx, float ty) {
+  public Surface setTransform(float m00, float m01, float m10, float m11, float tx, float ty) {
     topTransform().setTransform(m00, m01, m10, m11, tx, ty);
+    return this;
   }
 
   @Override
-  public void setFillColor(int color) {
+  public Surface setFillColor(int color) {
     // TODO: Add it to the state stack.
     this.fillColor = color;
     this.fillPattern = null;
+    return this;
   }
 
   @Override
-  public void setFillPattern(Pattern pattern) {
+  public Surface setFillPattern(Pattern pattern) {
     // TODO: Add it to the state stack.
     Asserts.checkArgument(pattern instanceof AndroidPattern);
     this.fillPattern = (AndroidPattern) pattern;
+    return this;
   }
 
   @Override
-  public void transform(float m00, float m01, float m10, float m11, float tx, float ty) {
+  public Surface transform(float m00, float m01, float m10, float m11, float tx, float ty) {
     topTransform().concatenate(m00, m01, m10, m11, tx, ty, 0, 0);
+    return this;
   }
 
   @Override
-  public void translate(float x, float y) {
+  public Surface translate(float x, float y) {
     topTransform().translate(x, y);
+    return this;
   }
 
   @Override

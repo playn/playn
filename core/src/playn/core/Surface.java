@@ -23,7 +23,7 @@ public interface Surface {
   /**
    * Sets the entire surface to the given color.
    */
-  void clear();
+  Surface clear();
 
   /**
    * Draws an image at the specified location.
@@ -31,7 +31,7 @@ public interface Surface {
    * @param dx the destination x
    * @param dy the destination y
    */
-  void drawImage(Image image, float dx, float dy);
+  Surface drawImage(Image image, float dx, float dy);
 
   /**
    * Draws a scaled image at the specified location.
@@ -41,7 +41,7 @@ public interface Surface {
    * @param dw the destination width
    * @param dh the destination height
    */
-  void drawImage(Image image, float dx, float dy, float dw, float dh);
+  Surface drawImage(Image image, float dx, float dy, float dw, float dh);
 
   /**
    * Draws a scaled subset of an image at the specified location.
@@ -58,7 +58,7 @@ public interface Surface {
    * @param sw the source width
    * @param sh the source height
    */
-  void drawImage(Image image, float dx, float dy, float dw, float dh, float sx, float sy, float sw,
+  Surface drawImage(Image image, float dx, float dy, float dw, float dh, float sx, float sy, float sw,
       float sh);
 
   /**
@@ -69,17 +69,17 @@ public interface Surface {
    * @param dx destination x
    * @param dy destination y
    */
-  void drawImageCentered(Image image, float dx, float dy);
+  Surface drawImageCentered(Image image, float dx, float dy);
 
   /**
    * TODO
    */
-  void drawLine(float x0, float y0, float x1, float y1, float width);
+  Surface drawLine(float x0, float y0, float x1, float y1, float width);
 
   /**
    * Fills the specified rectangle.
    */
-  void fillRect(float x, float y, float width, float height);
+  Surface fillRect(float x, float y, float width, float height);
 
   /**
    * The height of this surface.
@@ -89,48 +89,48 @@ public interface Surface {
   /**
    * Restores the transform previously stored by {@link #save()}.
    */
-  void restore();
+  Surface restore();
 
   /**
    * Rotates the current transformation matrix by the specified angle in radians.
    */
-  void rotate(float radians);
+  Surface rotate(float radians);
 
   /**
    * Saves the current transform.
    */
-  void save();
+  Surface save();
 
   /**
    * Scales the current transformation matrix by the specified amount on each axis.
    */
-  void scale(float sx, float sy);
+  Surface scale(float sx, float sy);
 
   /**
    * Sets the color to be used for fill operations. This replaces any existing
    * fill gradient or pattern.
    */
-  void setFillColor(int color);
+  Surface setFillColor(int color);
 
   /**
    * TODO
    */
-  void setFillPattern(Pattern pattern);
+  Surface setFillPattern(Pattern pattern);
 
   /**
    * Sets the transformation matrix directly, replacing the existing matrix.
    */
-  void setTransform(float m11, float m12, float m21, float m22, float dx, float dy);
+  Surface setTransform(float m11, float m12, float m21, float m22, float dx, float dy);
 
   /**
    * Multiplies the current transformation matrix by the given matrix.
    */
-  void transform(float m11, float m12, float m21, float m22, float dx, float dy);
+  Surface transform(float m11, float m12, float m21, float m22, float dx, float dy);
 
   /**
    * Translates the current transformation matrix by the given amount.
    */
-  void translate(float x, float y);
+  Surface translate(float x, float y);
 
   /**
    * The width of this surface.
