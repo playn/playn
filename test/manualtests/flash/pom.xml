@@ -91,7 +91,7 @@
             <configuration>
               <tasks>
                 <!-- Dependency plugin discards file permissions so we need to set them manually -->
-                <chmod file="${project.build.directory}/flex4sdk/bin/mxmlc" perm="ugo+rx"/>
+                <chmod file="${flexsdk.dir}/bin/mxmlc" perm="ugo+rx"/>
 	     </tasks>
             </configuration>
           </execution>
