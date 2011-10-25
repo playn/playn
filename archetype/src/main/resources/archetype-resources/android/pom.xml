@@ -46,8 +46,8 @@
     <plugins>
       <plugin>
         <groupId>com.jayway.maven.plugins.android.generation2</groupId>
-        <artifactId>maven-android-plugin</artifactId>
-        <version>3.0.0-alpha-2</version>
+        <artifactId>android-maven-plugin</artifactId>
+        <version>3.0.0-alpha-13</version>
         <configuration>
           <androidManifestFile>${project.basedir}/AndroidManifest.xml</androidManifestFile>
           <assetsDirectory>${project.basedir}/assets</assetsDirectory>
@@ -60,6 +60,11 @@
           <jvmArguments>
             <jvmArgument>-Xmx1024m</jvmArgument>
           </jvmArguments>
+          <dex>
+            <jvmArguments>
+              <jvmArgument>-Xmx1024m</jvmArgument>
+            </jvmArguments>
+          </dex>
         </configuration>
         <extensions>true</extensions>
       </plugin>
