@@ -33,6 +33,7 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <android.version>2.3.3</android.version>
+    <android.maven.version>3.0.0-alpha-13</android.maven.version>
     <gwt.version>2.3.0</gwt.version>
     <gwt.loglevel>INFO</gwt.loglevel>
     <gwt.outputstyle>PRETTY</gwt.outputstyle>
