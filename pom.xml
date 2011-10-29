@@ -34,7 +34,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <android.version>2.3.3</android.version>
     <android.maven.version>3.0.0-alpha-13</android.maven.version>
-    <gwt.version>2.3.0</gwt.version>
+    <gwt.version>2.4.0</gwt.version>
     <gwt.loglevel>INFO</gwt.loglevel>
     <gwt.outputstyle>PRETTY</gwt.outputstyle>
     <gwt.modulesuffix />
@@ -59,10 +59,6 @@
       <id>codehaus.snapshots</id>
       <url>http://snapshots.repository.codehaus.org/</url>
     </pluginRepository>
-    <pluginRepository>
-      <id>gwt-maven-plugin-playn</id>
-      <url>http://samskivert.github.com/gwt-maven-plugin/repository</url>
-    </pluginRepository>
   </pluginRepositories>
 
   <!-- Common dependencies for all modules -->
@@ -82,7 +78,7 @@
         <plugin>
           <groupId>org.codehaus.mojo</groupId>
           <artifactId>gwt-maven-plugin</artifactId>
-          <version>2.3.0-2-playn</version>
+          <version>2.4.0</version>
           <configuration>
             <logLevel>${gwt.loglevel}</logLevel>
             <style>${gwt.outputstyle}</style>
