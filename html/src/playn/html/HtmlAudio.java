@@ -20,6 +20,7 @@ import com.allen_sauer.gwt.voices.client.FlashSound;
 import com.allen_sauer.gwt.voices.client.Sound;
 import com.allen_sauer.gwt.voices.client.SoundController;
 import com.allen_sauer.gwt.voices.client.ui.FlashMovie;
+import com.google.gwt.dom.client.Element;
 
 /**
  * This class is temporarily public, in order to expose {@link #isFlash9AudioPluginMissing()}, to
@@ -27,12 +28,33 @@ import com.allen_sauer.gwt.voices.client.ui.FlashMovie;
  */
 public class HtmlAudio implements Audio {
 
+  private Element audioContext;
   private SoundController soundController = new SoundController();
+
+  /**
+   * Borrowed form com.allen_sauer.gwt.voices.client.WebAudioSound#createAudioContext()
+   */
+  private static native Element maybeCreateAudioContext()
+  /*-{
+   try {
+       return new AudioContext();
+     } catch (ignore) {
+     }
+   
+     try {
+       return new webkitAudioContext();
+     } catch (ignore) {
+     }
+   
+     return null;
+   }-*/;
 
   @SuppressWarnings("deprecation")
   public void init() {
-    PlayN.log().debug(
-        "Preferred sound type: " + soundController.getPreferredSoundType().getName());
+    PlayN.log().debug("Preferred sound type(s): " + soundController.getPreferredSoundType());
+
+    // Attempt to create Web Audio API audio context
+    audioContext = maybeCreateAudioContext();
   }
 
   HtmlSound createSound(String url) {
@@ -43,11 +65,23 @@ public class HtmlAudio implements Audio {
 
   @SuppressWarnings("deprecation")
   public boolean isFlash9AudioPluginMissing() {
-    if (soundController.getPreferredSoundType() != FlashSound.class) {
-      PlayN.log().debug("HTML5 audio requested; skipping Flash check");
+    if (audioContext != null) {
+      // Web Audio API is available; Flash not needed
       return false;
     }
 
+    // Is Flash one of the requested audio types?
+    for (Class<?> clzz : soundController.getPreferredSoundType()) {
+      if (clzz == FlashSound.class) {
+        return isFlash9AudioPluginMissingImpl();
+      }
+    }
+
+    // Flash audio is not one of the request sound types
+    return false;
+  }
+
+  public boolean isFlash9AudioPluginMissingImpl() {
     PlayN.log().debug(
         "FlashMovie.isExternalInterfaceSupported: " + FlashMovie.isExternalInterfaceSupported());
     PlayN.log().debug("FlashMovie.getMajorVersion: " + FlashMovie.getMajorVersion());
@@ -56,7 +90,7 @@ public class HtmlAudio implements Audio {
       return false;
     }
 
-    // Audio missing or disabled
+    // Flash plugin not installed or disabled
     return true;
   }
 }
