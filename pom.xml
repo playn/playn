@@ -36,9 +36,11 @@
     <module>flash</module>
     <module>android</module>
     <module>server</module>
-    <module>sample</module>
     <module>payments</module>
+<!--
+    <module>sample</module>
     <module>test</module>
+-->
   </modules>
 
   <properties>
