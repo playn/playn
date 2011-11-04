@@ -37,10 +37,8 @@
     <module>android</module>
     <module>server</module>
     <module>payments</module>
-<!--
     <module>sample</module>
     <module>test</module>
--->
   </modules>
 
   <properties>
