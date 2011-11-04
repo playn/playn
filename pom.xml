@@ -10,7 +10,7 @@
   <groupId>com.googlecode.playn</groupId>
   <artifactId>playn-project</artifactId>
   <packaging>pom</packaging>
-  <version>1.0-SNAPSHOT</version>
+  <version>1.0</version>
   <name>PlayN Project</name>
   <url>http://code.google.com/p/playn</url>
   <description>Cross platform game library for N≥4 platforms.</description>
@@ -55,7 +55,7 @@
     <gwt.soyc>false</gwt.soyc>
     <gwt.xdisable>true</gwt.xdisable>
     <gwt.draft>false</gwt.draft>
-    <gwt.workers></gwt.workers>
+    <gwt.workers />
     <maven.test.skip>false</maven.test.skip>
   </properties>
 
@@ -181,7 +181,7 @@
                     </goals>
                   </pluginExecutionFilter>
                   <action>
-                    <ignore/>
+                    <ignore />
                   </action>
                 </pluginExecution>
                 <pluginExecution>
@@ -194,7 +194,7 @@
                     </goals>
                   </pluginExecutionFilter>
                   <action>
-                    <ignore/>
+                    <ignore />
                   </action>
                 </pluginExecution>
               </pluginExecutions>
