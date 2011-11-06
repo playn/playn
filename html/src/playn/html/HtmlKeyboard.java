@@ -89,6 +89,7 @@ class HtmlKeyboard implements Keyboard {
 
     case KEY_PAUSE: return Key.PAUSE;
     case KEY_CAPS_LOCK: return Key.CAPS_LOCK;
+    case KEY_SPACE: return Key.SPACE;
     case KEY_INSERT: return Key.INSERT;
     case KEY_0: return Key.K0;
     case KEY_1: return Key.K1;
@@ -176,6 +177,7 @@ class HtmlKeyboard implements Keyboard {
   // these are absent from KeyCodes; we know not why...
   private static final int KEY_PAUSE = 19;
   private static final int KEY_CAPS_LOCK = 20;
+  private static final int KEY_SPACE = 32;
   private static final int KEY_INSERT = 45;
   private static final int KEY_0 = 48;
   private static final int KEY_1 = 49;
