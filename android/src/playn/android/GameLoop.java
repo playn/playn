@@ -29,7 +29,7 @@ public class GameLoop implements Runnable {
   private long timeOffset = System.currentTimeMillis();
 
   private int updateRate;
-  private int accum;
+  private float accum;
   private int lastTime;
 
   private float totalTime;
