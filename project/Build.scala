@@ -4,7 +4,7 @@ import Keys._
 object PlayNBuild extends Build {
   val commonSettings = Defaults.defaultSettings ++ Seq(
     organization     := "com.googlecode.playn",
-    version          := "1.0-SNAPSHOT",
+    version          := "1.1-SNAPSHOT",
     crossPaths       := false,
     javacOptions     ++= Seq("-Xlint", "-Xlint:-serial", "-source", "1.6", "-target", "1.6"),
     fork in Compile  := true,
@@ -13,7 +13,7 @@ object PlayNBuild extends Build {
     resolvers        += "Forplay Legacy" at "http://forplay.googlecode.com/svn/mavenrepo"
   )
 
-  val gwtVer = "2.3.0"
+  val gwtVer = "2.4.0"
   val gwtDeps = Seq(
     "com.google.gwt" % "gwt-user" % gwtVer,
     "com.google.gwt" % "gwt-dev" % gwtVer
@@ -72,8 +72,8 @@ object PlayNBuild extends Build {
       unmanagedResourceDirectories in Compile <+= baseDirectory / "src",
       libraryDependencies ++= gwtDeps ++ testDeps ++ Seq(
         "javax.validation" % "validation-api" % "1.0.0.GA", // TODO: sources also
-        "allen_sauer" % "gwt-log" % "3.1.4",
-        "allen_sauer" % "gwt-voices" % "2.1.2"
+        "com.allen-sauer.gwt.log" % "gwt-log" % "3.1.6",
+        "com.allen-sauer.gwt.voices" % "gwt-voices" % "2.1.3"
       )
     )
   ) dependsOn(core, webgl)
@@ -127,14 +127,12 @@ object PlayNBuild extends Build {
     )
   ) dependsOn(java)
 
-  lazy val cute = sampleProject("cute")
-  lazy val hello = sampleProject("hello")
-  lazy val noise = sampleProject("noise")
-  lazy val showcase = sampleProject("showcase", Seq(
-    libraryDependencies ++= Seq(
-      "com.threerings" % "tripleplay" % "1.0-SNAPSHOT"
-    )
-  )) dependsOn(gwtbox2d)
+  // lazy val cute = sampleProject("cute")
+  // lazy val hello = sampleProject("hello")
+  // lazy val noise = sampleProject("noise")
+  // lazy val showcase = sampleProject("showcase", Seq(
+  //   libraryDependencies += "com.threerings" % "tripleplay" % "1.0"
+  // )) dependsOn(gwtbox2d)
 
-  lazy val samples = Project("samples", file(".")) aggregate(cute, hello, noise, showcase)
+  // lazy val samples = Project("samples", file(".")) aggregate(cute, hello, noise, showcase)
 }
