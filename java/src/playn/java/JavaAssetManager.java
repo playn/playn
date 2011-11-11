@@ -15,12 +15,12 @@ package playn.java;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.URL;
 
 import javax.imageio.ImageIO;
 
-import com.google.common.io.CharStreams;
+import com.google.common.base.Charsets;
+import com.google.common.io.Resources;
 
 import playn.core.AbstractAssetManager;
 import playn.core.Image;
@@ -62,13 +62,9 @@ public class JavaAssetManager extends AbstractAssetManager {
   @Override
   protected Image doGetImage(String path) {
     try {
-      URL url = getClass().getClassLoader().getResource(pathPrefix + path);
-      if (url == null) {
-        throw new FileNotFoundException(pathPrefix + path);
-      }
-      return new JavaImage(ImageIO.read(url));
+      return new JavaImage(ImageIO.read(requireResource(pathPrefix + path)));
     } catch (Exception e) {
-      PlayN.log().warn("Could not load image at " + path, e);
+      PlayN.log().warn("Could not load image at " + pathPrefix + path, e);
       return new JavaImage(e);
     }
   }
@@ -88,13 +84,17 @@ public class JavaAssetManager extends AbstractAssetManager {
   @Override
   protected void doGetText(String path, ResourceCallback<String> callback) {
     try {
-      InputStream in = getClass().getClassLoader().getResourceAsStream(pathPrefix + path);
-      if (in == null) {
-        throw new FileNotFoundException(pathPrefix + path);
-      }
-      callback.done(CharStreams.toString(new InputStreamReader(in, "UTF-8")));
-    } catch (Throwable e) {
+      callback.done(Resources.toString(requireResource(pathPrefix + path), Charsets.UTF_8));
+    } catch (Exception e) {
       callback.error(e);
     }
+  }
+
+  protected URL requireResource(String path) throws FileNotFoundException {
+      URL url = getClass().getClassLoader().getResource(path);
+      if (url == null) {
+        throw new FileNotFoundException(path);
+      }
+      return url;
   }
 }
