@@ -106,6 +106,10 @@
       <compilerarg value="-Xlint"/>
       <compilerarg value="-Xlint:-serial"/>
     </javac>
+    <!-- copy all of our resources into the classes directory -->
+    <copy todir="${symbol_dollar}{classes.dir}">
+      <fileset dir="core/${symbol_dollar}{src.dir}" includes="**" excludes="**/*.java"/>
+    </copy>
   </target>
 
   <target name="-compile-html" depends="-prepare-html,compile">
