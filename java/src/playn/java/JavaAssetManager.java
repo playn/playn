@@ -75,11 +75,14 @@ public class JavaAssetManager extends AbstractAssetManager {
 
   @Override
   protected Sound doGetSound(String path) {
-    // TODO: Java won't play *.mp3, so for now use *.wav exclusively
-    path += ".wav";
-    // TODO: handle missing sound more cleanly?
-    return ((JavaAudio) PlayN.audio()).createSound(
-      path, getClass().getClassLoader().getResourceAsStream(pathPrefix + path));
+    path += ".mp3";
+    InputStream in = getClass().getClassLoader().getResourceAsStream(pathPrefix + path);
+    if (in == null) {
+      PlayN.log().warn("Could not find sound " + pathPrefix + path);
+      return ((JavaAudio) PlayN.audio()).createNoopSound();
+    } else {
+      return ((JavaAudio) PlayN.audio()).createSound(path, in);
+    }
   }
 
   @Override

@@ -20,8 +20,8 @@
 
     <dependency>
       <groupId>jlayer</groupId>
-      <artifactId>jlayer</artifactId>
-      <version>1.0.1</version>
+      <artifactId>mp3spi</artifactId>
+      <version>1.9.5</version>
     </dependency>
 
     <dependency>

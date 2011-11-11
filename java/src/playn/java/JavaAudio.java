@@ -23,10 +23,20 @@ import playn.core.Sound;
 class JavaAudio implements Audio {
 
   Sound createSound(String name, InputStream in) {
-    if (name.endsWith(".mp3")) {
-      return new JavaJLayerSound(name, in);
-    } else {
-      return new JavaSound(name, in);
-    }
+    return new JavaSound(name, in);
+  }
+
+  Sound createNoopSound() {
+    return new Sound() {
+      public boolean play() {
+        return false;
+      }
+      public void stop() {}
+      public void setLooping(boolean looping) {}
+      public void setVolume(float volume) {}
+      public boolean isPlaying() {
+        return false;
+      }
+    };
   }
 }
