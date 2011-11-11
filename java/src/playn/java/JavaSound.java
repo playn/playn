@@ -13,10 +13,6 @@
  */
 package playn.java;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.InputStream;
 
 import javax.sound.sampled.AudioInputStream;
@@ -26,7 +22,6 @@ import javax.sound.sampled.LineEvent;
 import javax.sound.sampled.LineEvent.Type;
 import javax.sound.sampled.LineListener;
 import javax.sound.sampled.LineUnavailableException;
-import javax.sound.sampled.UnsupportedAudioFileException;
 
 import playn.core.Asserts;
 import playn.core.PlayN;
@@ -34,29 +29,41 @@ import playn.core.Sound;
 
 class JavaSound implements Sound {
 
+  private final String name;
   private Clip clip;
   private boolean looping;
   private boolean playing;
-  private InputStream inputStream;
-  private final File file;
 
-  public JavaSound(File file) {
-    this.file = file;
+  public JavaSound(String name, InputStream in) {
+    this.name = name;
 
     try {
       clip = AudioSystem.getClip();
     } catch (LineUnavailableException e) {
-      PlayN.log().warn("Unable to create clip for " + file);
-      // give up
-      return;
+      PlayN.log().warn("Unable to create clip for " + name);
+      return; // give up
     } catch (IllegalArgumentException e) {
-      /*
-       * OpenJDK on Linux may throw java.lang.IllegalArgumentException: No line matching interface
-       * Clip supporting format PCM_SIGNED unknown sample rate, 16 bit, stereo, 4 bytes/frame,
-       * big-endian is supported.
-       */
-      PlayN.log().info("Failed to load sound " + file + " due to " + e.toString());
-      // give up
+      // OpenJDK on Linux may throw java.lang.IllegalArgumentException: No line matching interface
+      // Clip supporting format PCM_SIGNED unknown sample rate, 16 bit, stereo, 4 bytes/frame,
+      // big-endian is supported.
+      PlayN.log().info("Failed to load sound " + name + " due to " + e.toString());
+      return; // give up
+    }
+
+    AudioInputStream ais;
+    try {
+      // PlayN.log().info("calling AudioSystem.getAudioInputStream()");
+      ais = AudioSystem.getAudioInputStream(in);
+    } catch (Exception e) {
+      PlayN.log().warn("Failed to create audio stream for " + name, e);
+      return; // give up
+    }
+
+    try {
+      // PlayN.log().info("calling clip.open()");
+      clip.open(ais);
+    } catch (Exception e) {
+      PlayN.log().warn("Failed to open sound " + name, e);
       return;
     }
 
@@ -66,76 +73,18 @@ class JavaSound implements Sound {
         Type type = event.getType();
         if (LineEvent.Type.STOP == type) {
           // PlayN.log().info("STOP EVENT");
-          try {
-            clip.close();
-          } finally {
-            playing = false;
-          }
+          playing = false;
         }
       }
     });
-
   }
 
   @Override
   public boolean play() {
     // PlayN.log().info("play()");
-    if (playing) {
-      // we have not yet received LineEvent.Type.STOP
-      return false;
-    }
-    if (clip == null) {
-      // no audio clip to play
-      return false;
-    }
-    if (clip.isActive()) {
-      // already playing
-      return false;
-    }
-
-    try {
-      inputStream = new FileInputStream(file);
-    } catch (FileNotFoundException e) {
-      PlayN.log().warn("Sound file not found " + file);
-      // give up
-      return false;
-    }
-
-    AudioInputStream ais;
-    try {
-      // PlayN.log().info("calling AudioSystem.getAudioInputStream()");
-      ais = AudioSystem.getAudioInputStream(inputStream);
-    } catch (UnsupportedAudioFileException e) {
-      PlayN.log().warn(
-          "Failed to play sound " + file + " due to failure to get audio stream caused by "
-          + e.toString(), e);
-      return false;
-    } catch (IOException e) {
-      PlayN.log().warn(
-          "Failed to play sound " + file + " due to failure to get audio stream caused by "
-          + e.toString(), e);
-      return false;
-    }
-    try {
-      // PlayN.log().info("calling clip.open()");
-      clip.open(ais);
-    } catch (IOException e) {
-      PlayN.log().warn(
-          "Failed to play sound " + file + " due to failure to open clip caused by " + e.toString(),
-          e);
-      return false;
-    } catch (LineUnavailableException e) {
-      PlayN.log().info(
-          "Not playing sound " + file + " due to failure to open clip caused by " + e.toString());
-    } catch (IllegalArgumentException e) {
-      PlayN.log().info(
-          "Not playing sound " + file + " due to failure to open clip caused by " + e.toString());
-      return false;
-    } catch (IllegalStateException e) {
-      // Line may already be open
-      // TODO(fredsa): figure out why this happens
-      PlayN.log().info(
-          "Not playing sound " + file + " due to failure to open clip caused by " + e.toString());
+    if (playing ||         // we have not yet received LineEvent.Type.STOP
+        clip == null ||    // we have no audio clip to play
+        clip.isActive()) { // this should be caught by playing == true, but just in case...
       return false;
     }
     if (looping) {
@@ -150,12 +99,8 @@ class JavaSound implements Sound {
   @Override
   public void stop() {
     // PlayN.log().info("stop()");
-    if (clip == null) {
-      // no audio clip to stop
-      return;
-    }
-    if (!clip.isActive()) {
-      // clip is not playing
+    if (clip == null ||     // no audio clip to stop
+        !clip.isActive()) { // clip is not playing
       return;
     }
     // PlayN.log().info("Calling clip.stop()");

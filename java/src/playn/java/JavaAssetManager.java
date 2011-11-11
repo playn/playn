@@ -13,13 +13,14 @@
  */
 package playn.java;
 
-import java.awt.image.BufferedImage;
-import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.URL;
 
 import javax.imageio.ImageIO;
 
-import com.google.common.base.Charsets;
-import com.google.common.io.Files;
+import com.google.common.io.CharStreams;
 
 import playn.core.AbstractAssetManager;
 import playn.core.Image;
@@ -28,48 +29,67 @@ import playn.core.ResourceCallback;
 import playn.core.Sound;
 
 /**
- * TODO(jgw): Make it possible to add more filesystem roots.
+ * Loads Java assets via the classpath.
  */
 public class JavaAssetManager extends AbstractAssetManager {
 
-  private String pathPrefix = "war";
+  private String pathPrefix = "";
 
+  /**
+   * Configures the prefix prepended to asset paths before fetching them from the classpath. For
+   * example, if your assets are in {@code src/main/java/com/mygame/assets} (or in {@code
+   * src/main/resources/com/mygame/assets}), you can pass {@code com/mygame/assets} to this method
+   * and then load your assets without prefixing their path with that value every time. The value
+   * supplied to this method should not contain leading or trailing slashes. Note that this prefix
+   * should always use '/' as a path separator as it is used to construct URLs, not filesystem
+   * paths.
+   */
   public void setPathPrefix(String prefix) {
-    pathPrefix = prefix;
+    if (prefix.startsWith("/") || prefix.endsWith("/")) {
+      throw new IllegalArgumentException("Prefix must not start or end with '/'.");
+    }
+    pathPrefix = prefix + "/";
   }
 
+  /**
+   * Returns the currently configured path prefix. Note that this value will always have a trailing
+   * slash.
+   */
   public String getPathPrefix() {
       return pathPrefix;
   }
 
-  /**
-   * @param collection is ignored
-   * @param key the path to the file
-   */
   @Override
   protected Image doGetImage(String path) {
-    File imgFile = new File(pathPrefix, path);
     try {
-      BufferedImage img = ImageIO.read(imgFile);
-      return new JavaImage(img);
+      URL url = getClass().getClassLoader().getResource(pathPrefix + path);
+      if (url == null) {
+        throw new FileNotFoundException(pathPrefix + path);
+      }
+      return new JavaImage(ImageIO.read(url));
     } catch (Exception e) {
-      PlayN.log().warn("Could not load image at " + imgFile, e);
+      PlayN.log().warn("Could not load image at " + path, e);
       return new JavaImage(e);
     }
   }
 
   @Override
   protected Sound doGetSound(String path) {
-    // Java won't play *.mp3, so for now use *.wav exclusively
+    // TODO: Java won't play *.mp3, so for now use *.wav exclusively
     path += ".wav";
-    File file = new File(pathPrefix, path);
-    return ((JavaAudio) PlayN.audio()).createSound(file);
+    // TODO: handle missing sound more cleanly?
+    return ((JavaAudio) PlayN.audio()).createSound(
+      path, getClass().getClassLoader().getResourceAsStream(pathPrefix + path));
   }
 
   @Override
   protected void doGetText(String path, ResourceCallback<String> callback) {
     try {
-      callback.done(Files.toString(new File(pathPrefix, path), Charsets.UTF_8));
+      InputStream in = getClass().getClassLoader().getResourceAsStream(pathPrefix + path);
+      if (in == null) {
+        throw new FileNotFoundException(pathPrefix + path);
+      }
+      callback.done(CharStreams.toString(new InputStreamReader(in, "UTF-8")));
     } catch (Throwable e) {
       callback.error(e);
     }

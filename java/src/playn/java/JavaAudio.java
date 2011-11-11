@@ -15,18 +15,18 @@
  */
 package playn.java;
 
-import java.io.File;
+import java.io.InputStream;
 
 import playn.core.Audio;
 import playn.core.Sound;
 
 class JavaAudio implements Audio {
 
-  Sound createSound(File file) {
-    if (file.getName().endsWith(".mp3")) {
-      return new JavaJLayerSound(file);
+  Sound createSound(String name, InputStream in) {
+    if (name.endsWith(".mp3")) {
+      return new JavaJLayerSound(name, in);
     } else {
-      return new JavaSound(file);
+      return new JavaSound(name, in);
     }
   }
 }

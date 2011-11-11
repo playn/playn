@@ -15,9 +15,6 @@
  */
 package playn.java;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.InputStream;
 
 import javazoom.jl.decoder.JavaLayerException;
@@ -29,10 +26,8 @@ import playn.core.Sound;
 
 class JavaJLayerSound implements Sound {
 
-  private final File file;
-
+  private final String name;
   private Player player;
-
   private Thread thread;
 
   private Runnable runnable = new Runnable() {
@@ -40,26 +35,19 @@ class JavaJLayerSound implements Sound {
       try {
         player.play();
       } catch (JavaLayerException e) {
-        PlayN.log().warn("Failed to play sound file: " + file.getName(), e);
+        PlayN.log().warn("Failed to play sound: " + name, e);
       } catch (Throwable e) {
-        PlayN.log().warn("Failed to play sound file: " + file.getName(), e);
+        PlayN.log().warn("Failed to play sound: " + name, e);
       }
     }
   };
 
-  public JavaJLayerSound(File file) {
-    this.file = file;
-    InputStream is;
+  public JavaJLayerSound(String name, InputStream in) {
+    this.name = name;
     try {
-      is = new FileInputStream(file);
-    } catch (FileNotFoundException e) {
-      PlayN.log().warn("Failed to locate sound file: " + file.getName(), e);
-      return;
-    }
-    try {
-      player = new Player(is);
+      player = new Player(in);
     } catch (JavaLayerException e) {
-      PlayN.log().warn("Failed to locate create player for sound file: " + file.getName(), e);
+      PlayN.log().warn("Failed to locate create player for sound: " + name, e);
       return;
     }
     thread = new Thread(runnable);
@@ -68,13 +56,11 @@ class JavaJLayerSound implements Sound {
   @Override
   public boolean play() {
     if (thread == null) {
-      // failure in constructor prevented thread from being created
-      return false;
+      return false; // failure in constructor prevented thread from being created
     }
     stop();
     if (thread.isAlive()) {
-      PlayN.log().warn(
-          "Sound thread has not yet terminated. Will not play sound file: " + file.getName());
+      PlayN.log().warn("Sound thread has not yet terminated. Will not play sound: " + name);
       return false;
     }
     try {
@@ -94,9 +80,7 @@ class JavaJLayerSound implements Sound {
   @Override
   public void setLooping(boolean looping) {
     if (looping) {
-      PlayN.log().info(
-          "Sorry, looping not currently supported in Java. Will play sound file once: "
-              + file.getName());
+      PlayN.log().info("Looping not currently supported in Java. Will play sound once: " + name);
     }
   }
 
