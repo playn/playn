@@ -55,8 +55,8 @@ class AndroidSurfaceLayer extends AndroidLayer implements SurfaceLayer {
     // flipped
     // (This happens because it uses the same vertex program as everything else,
     // which flips vertically to put the origin at the top-left).
-    gfx.drawTexture(surface.tex(), width, height, localTransform(parentTransform), 0, height, width, -height,
-        false, false, parentAlpha * alpha);
+    gfx.drawTexture(surface.tex(), width, height, localTransform(parentTransform),
+                    0, height, width, -height, false, false, parentAlpha * alpha);
   }
 
   @Override
