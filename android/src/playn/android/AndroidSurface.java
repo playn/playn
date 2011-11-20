@@ -48,8 +48,9 @@ class AndroidSurface implements Surface {
     this.gfx = gfx;
     this.width = width;
     this.height = height;
-    refreshGL();
     transformStack.add(new StockInternalTransform());
+    refreshGL();
+    gfx.addSurface(this);
   }
 
   private void refreshGL() {
@@ -89,9 +90,6 @@ class AndroidSurface implements Surface {
       }
     }
     gfx.bindFramebuffer();
-
-    //Add this surface to a list of all surfaces to be stored and refreshed.
-    gfx.addSurface(this);
   }
 
   void checkRefreshGL() {
@@ -103,7 +101,6 @@ class AndroidSurface implements Surface {
   /*
    * Store the color buffer when the GL context is going to be lost.
    */
-
   void storePixels() {
     try {
       gfx.gl20.glBindFramebuffer(GL20.GL_FRAMEBUFFER, fbuf);
@@ -127,9 +124,7 @@ class AndroidSurface implements Surface {
       cachedPixels = null;
     }
     //Force a GL refresh before using this surface again.
-    gfx.destroyTexture(tex);
-    gfx.gl20.glDeleteBuffers(1, new int[] { fbuf }, 0);
-    tex = fbuf = -1;
+    destroyTextureEtc();
   }
 
   @Override
@@ -142,15 +137,19 @@ class AndroidSurface implements Surface {
   }
 
   void destroy() {
-    gfx.gl20.glDeleteBuffers(1, new int[] {fbuf}, 0);
-    gfx.destroyTexture(tex);
-    tex = fbuf = -1;
+    destroyTextureEtc();
     gfx.removeSurface(this);
   }
 
   int tex() {
     checkRefreshGL();
     return tex;
+  }
+
+  private void destroyTextureEtc() {
+    gfx.destroyTexture(tex);
+    gfx.gl20.glDeleteBuffers(1, new int[] { fbuf }, 0);
+    tex = fbuf = -1;
   }
 
   /*
