@@ -33,6 +33,12 @@ public class GroupLayerImpl<L extends AbstractLayer>
    * @return the index into the children array at which the layer was inserted (based on depth).
    */
   public int add(GroupLayer self, L child) {
+    // optimization if we're requested to add a child that's already added
+    GroupLayer parent = child.parent();
+    if (parent == self) {
+      return findChild(child, child.depth());
+    }
+
     // if this child has equal or greater depth to the last child, we can append directly and avoid
     // a log(N) search; this is helpful when all children have the same depth
     int count = children.size(), index;
@@ -44,7 +50,7 @@ public class GroupLayerImpl<L extends AbstractLayer>
     }
 
     // remove the child from any existing parent, preventing multiple parents
-    if (child.parent() != null) {
+    if (parent != null) {
       child.parent().remove(child);
     }
     children.add(index, child);
