@@ -48,7 +48,7 @@ public class JavaAssetManager extends AbstractAssetManager {
     if (prefix.startsWith("/") || prefix.endsWith("/")) {
       throw new IllegalArgumentException("Prefix must not start or end with '/'.");
     }
-    pathPrefix = prefix + "/";
+    pathPrefix = (prefix.length() == 0) ? prefix : (prefix + "/");
   }
 
   /**
