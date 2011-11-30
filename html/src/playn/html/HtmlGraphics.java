@@ -183,9 +183,9 @@ public abstract class HtmlGraphics implements Graphics {
         measureElement.getStyle().setFontStyle(Style.FontStyle.ITALIC);
         break;
       }
-      float height = (float)measureElement.getOffsetHeight();
+      float height = measureElement.getOffsetHeight();
       measureElement.setInnerText(EMWIDTH_TEXT);
-      float emwidth = (float)measureElement.getOffsetWidth();
+      float emwidth = measureElement.getOffsetWidth();
       metrics = new HtmlFontMetrics(height, emwidth);
       fontMetrics.put(font, metrics);
     }
