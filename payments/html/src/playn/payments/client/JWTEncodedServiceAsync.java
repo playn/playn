@@ -22,12 +22,12 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 public interface JWTEncodedServiceAsync {
 
   /**
-   * @param iat. The time when the JWT was issued, specified in seconds since
+   * @param iat The time when the JWT was issued, specified in seconds since
    *          the epoch.
-   * @param exp. The time when the purchase will expire, specified in seconds
+   * @param exp The time when the purchase will expire, specified in seconds
    *          since the epoch. This is a standard JWT field.
-   * @param request. The item being purchased.
-   * @param callback. Pass the encoded jwt value
+   * @param request The item being purchased.
+   * @param callback Pass the encoded jwt value
    * @throws IllegalArgumentException
    */
   void encodeJWT(String iat, String exp, PurchaseRequest.Serialized request, AsyncCallback<String> callback) throws IllegalArgumentException;

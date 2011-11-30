@@ -31,12 +31,12 @@ public class HtmlInAppPayments implements InAppPayments {
   
   /**
    * 
-   * @param iat. The time when the JWT was issued, specified in seconds since
+   * @param iat The time when the JWT was issued, specified in seconds since
    *          the epoch.
-   * @param exp. The time when the purchase will expire, specified in seconds
+   * @param exp The time when the purchase will expire, specified in seconds
    *          since the epoch. This is a standard JWT field.
-   * @param request. The item being purchased.
-   * @param encodedJWTcallback. Get the parsed JWT
+   * @param request The item being purchased.
+   * @param encodedJWTcallback Get the parsed JWT
    */
   @Override
   public void encodeJWT(String iat, String exp, PurchaseRequest request, final EncodeJWTCallback encodeJWTCallback) {
@@ -140,7 +140,7 @@ public class HtmlInAppPayments implements InAppPayments {
   /**
    * Callback function in the native javascript function. 
    * It will be called if payment flow succeeded.
-   * @param result. Object in the javascript.
+   * @param result Object in the javascript.
    */
   public void onSuccess(PurchaseResponseJSObject result) {
     purchaseCallback.successHandler(result);
@@ -149,7 +149,7 @@ public class HtmlInAppPayments implements InAppPayments {
   /**
    * Callback function in the native javascript function.
    * It will be called if payment flow failed.
-   * @param result. Object in the javascript.
+   * @param result Object in the javascript.
    */
   public void onFailure(PurchaseResponseJSObject result) {
     purchaseCallback.failureHandler(result);
