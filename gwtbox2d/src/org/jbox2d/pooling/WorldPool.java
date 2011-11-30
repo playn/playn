@@ -30,7 +30,6 @@ import org.jbox2d.collision.Collision;
 import org.jbox2d.collision.Distance;
 import org.jbox2d.collision.TimeOfImpact;
 import org.jbox2d.common.Mat22;
-import org.jbox2d.common.Settings;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.common.Vec3;
 import org.jbox2d.dynamics.contacts.CircleContact;

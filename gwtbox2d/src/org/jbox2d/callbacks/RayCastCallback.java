@@ -52,11 +52,7 @@ public interface RayCastCallback {
 	 * @param normal the normal vector at the point of intersection
 	 * @return -1 to filter, 0 to terminate, fraction to clip the ray for
 	 * closest hit, 1 to continue
-	 * @param fixture
-	 * @param point
-	 * @param normal
 	 * @param fraction
-	 * @return
 	 */
 	public float reportFixture(Fixture fixture, Vec2 point, Vec2 normal, float fraction);
 }

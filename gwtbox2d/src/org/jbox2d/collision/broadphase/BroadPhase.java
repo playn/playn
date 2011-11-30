@@ -101,7 +101,7 @@ public class BroadPhase implements TreeCallback {
 	/**
 	 * Destroy a proxy. It is up to the client to remove any pairs.
 	 * 
-	 * @param proxyId
+	 * @param proxy
 	 */
 	public final void destroyProxy(DynamicTreeNode proxy) {
 		unbufferMove(proxy);

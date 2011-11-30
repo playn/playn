@@ -99,7 +99,6 @@ public class Fixture {
 	/**
 	 * Is this fixture a sensor (non-solid)?
 	 * @return the true if the shape is a sensor.
-	 * @return
 	 */
 	public boolean isSensor(){
 		return m_isSensor;
@@ -150,7 +149,6 @@ public class Fixture {
 	/**
 	 * Get the parent body of this fixture. This is NULL if the fixture is not attached.
 	 * @return the parent body.
-	 * @return
 	 */
 	public Body getBody(){
 		return m_body;
@@ -159,7 +157,6 @@ public class Fixture {
 	/**
 	 * Get the next fixture in the parent body's fixture list.
 	 * @return the next shape.
-	 * @return
 	 */
 	public Fixture getNext(){
 		return m_next;
@@ -193,9 +190,7 @@ public class Fixture {
 	
 	/**
 	 * Test a point for containment in this fixture. This only works for convex shapes.
-	 * @param xf the shape world transform.
 	 * @param p a point in world coordinates.
-	 * @param p
 	 * @return
 	 */
 	public boolean testPoint(final Vec2 p){
@@ -206,8 +201,6 @@ public class Fixture {
 	 * Cast a ray against this shape.
 	 * @param output the ray-cast results.
 	 * @param input the ray-cast input parameters.
-	 * @param output
-	 * @param input
 	 */
 	public boolean raycast(RayCastOutput output, RayCastInput input){
 		return m_shape.raycast( output, input, m_body.m_xf);
@@ -216,7 +209,6 @@ public class Fixture {
 	/**
 	 * Get the mass data for this fixture. The mass data is based on the density and
 	 * the shape. The rotational inertia is about the shape's origin.
-	 * @return
 	 */
 	public void getMassData(MassData massData){
 		m_shape.computeMass(massData, m_density);
@@ -324,8 +316,8 @@ public class Fixture {
 	/**
 	 * Internal method
 	 * @param broadPhase
-	 * @param xf1
-	 * @param xf2
+	 * @param transform1
+	 * @param transform2
 	 */
 	protected void synchronize(BroadPhase broadPhase, final Transform transform1, final Transform transform2){
 		if(m_proxy == null){

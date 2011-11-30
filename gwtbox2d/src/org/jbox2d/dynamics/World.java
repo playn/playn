@@ -430,7 +430,7 @@ public class World {
 	 * destroy a joint. This may cause the connected bodies to begin colliding.
 	 * 
 	 * @warning This function is locked during callbacks.
-	 * @param joint
+	 * @param j
 	 */
 	public void destroyJoint(Joint j) {
 		assert (isLocked() == false);
@@ -520,7 +520,7 @@ public class World {
 	 * Take a time step. This performs collision detection, integration,
 	 * and constraint solution.
 	 * 
-	 * @param timeStep
+	 * @param dt
 	 *            the amount of time to simulate, this should not vary.
 	 * @param velocityIterations
 	 *            for the velocity constraint solver.
@@ -582,7 +582,7 @@ public class World {
 	 * call this after each call to Step, unless you are performing sub-steps. By default,
 	 * forces will be automatically cleared, so you don't need to call this function.
 	 * 
-	 * @see setAutoClearForces
+	 * @see #clearForces()
 	 */
 	public void clearForces() {
 		for (Body body = m_bodyList; body != null; body = body.getNext()) {

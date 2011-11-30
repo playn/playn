@@ -91,7 +91,6 @@ public abstract class Shape {
 	 * @param argOutput the ray-cast results.
 	 * @param argInput the ray-cast input parameters.
 	 * @param argTransform the transform to be applied to the shape.
-	 * @param argChildIndex the child shape index
 	 * @return if hit
 	 */
 	public abstract boolean raycast( RayCastOutput argOutput, RayCastInput argInput, Transform argTransform);

@@ -38,7 +38,6 @@ import org.jbox2d.common.MathUtils;
 import org.jbox2d.common.Settings;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.pooling.IOrderedStack;
-import org.jbox2d.pooling.OrderedStack;
 import org.jbox2d.pooling.OrderedStackVec2;
 
 // updated to rev 100
@@ -83,7 +82,7 @@ public class DynamicTree {
 	 * Create a proxy. Provide a tight fitting AABB and a userData pointer.
 	 * 
 	 * @param argAABB
-	 * @param userData
+	 * @param argUserData
 	 * @return
 	 */
 	public final DynamicTreeNode createProxy(final AABB argAABB, Object argUserData) {

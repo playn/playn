@@ -100,7 +100,7 @@ public class Sweep {
 	 * 
 	 * @param xf
 	 *            the result is placed here - must not be null
-	 * @param t
+	 * @param alpha
 	 *            the normalized time in [0,1].
 	 */
 	public final void getTransform(final Transform xf, final float alpha) {

@@ -426,7 +426,7 @@ public class Body {
 	/**
 	 * Set the angular velocity.
 	 * 
-	 * @param omega
+	 * @param w
 	 *            the new angular velocity in radians/second.
 	 */
 	public final void setAngularVelocity(float w) {
@@ -571,8 +571,6 @@ public class Body {
 	/**
 	 * Get the mass data of the body. The rotational inertia is relative
 	 * to the center of mass.
-	 * 
-	 * @return a struct containing the mass, inertia and center of the body.
 	 */
 	public final void getMassData(MassData data) {
 		// data.mass = m_mass;
@@ -759,7 +757,7 @@ public class Body {
 	/**
 	 * Gets a local point relative to the body's origin given a world point.
 	 * 
-	 * @param a
+	 * @param worldPoint
 	 *            point in world coordinates.
 	 * @return the corresponding local point relative to the body's origin.
 	 */
@@ -776,7 +774,7 @@ public class Body {
 	/**
 	 * Gets a local vector given a world vector.
 	 * 
-	 * @param a
+	 * @param worldVector
 	 *            vector in world coordinates.
 	 * @return the corresponding local vector.
 	 */
@@ -793,7 +791,7 @@ public class Body {
 	/**
 	 * Get the world linear velocity of a world point attached to this body.
 	 * 
-	 * @param a
+	 * @param worldPoint
 	 *            point in world coordinates.
 	 * @return the world velocity of a point.
 	 */
@@ -812,7 +810,7 @@ public class Body {
 	/**
 	 * Get the world velocity of a local point.
 	 * 
-	 * @param a
+	 * @param localPoint
 	 *            point in local coordinates.
 	 * @return the world velocity of a point.
 	 */
@@ -927,7 +925,6 @@ public class Body {
 	 * 
 	 * @param flag
 	 *            set to true to put body to sleep, false to wake it.
-	 * @param flag
 	 */
 	public void setAwake(boolean flag) {
 		if (flag) {

@@ -110,7 +110,7 @@ public class Mat33 {
 	 * Solve A * x = b, where b is a column vector. This is more efficient
 	 * than computing the inverse in one-shot cases.
 	 * @param b
-	 * @return
+	 * @param out
 	 */
 	public final void solve22ToOut(Vec2 b, Vec2 out){
 		final float a11 = col1.x, a12 = col2.x, a21 = col1.y, a22 = col2.y;

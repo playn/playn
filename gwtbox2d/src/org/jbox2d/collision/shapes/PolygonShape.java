@@ -331,7 +331,7 @@ public class PolygonShape extends Shape {
 	}
 	
 	/**
-	 * @see Shape#computeAABB(AABB, Transform, int)
+	 * @see Shape#computeAABB(AABB, Transform)
 	 */
 	@Override
 	public final void computeAABB(final AABB argAabb, final Transform argXf) {
@@ -536,8 +536,7 @@ public class PolygonShape extends Shape {
 
 	
 	/**
-	 * @see org.jbox2d.collision.shapes.Shape#raycast(org.jbox2d.collision.RayCastOutput,
-	 *      org.jbox2d.collision.RayCastInput, org.jbox2d.common.Transform, int)
+	 * @see org.jbox2d.collision.shapes.Shape#raycast(RayCastOutput, RayCastInput, Transform)
 	 */
 	@Override
 	public final boolean raycast(RayCastOutput argOutput, RayCastInput argInput, Transform argXf) {
@@ -708,7 +707,7 @@ public class PolygonShape extends Shape {
 	}
 	
 	/**
-	 * @see Shape#computeMass(MassData)
+	 * @see Shape#computeMass(MassData, float)
 	 */
 	@Override
   public void computeMass(final MassData massData, float density) {

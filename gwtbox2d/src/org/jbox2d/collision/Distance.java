@@ -200,8 +200,6 @@ public class Distance {
 		
 		/**
 		 * this returns pooled objects. don't keep or modify them
-		 * 
-		 * @return
 		 */
 		public void getClosestPoint(final Vec2 out) {
 			switch (m_count) {

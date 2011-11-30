@@ -64,7 +64,7 @@ public class AABB {
 	 * 
 	 * @param lowerVertex
 	 *            the bottom left vertex of the bounding box
-	 * @param maxVertex
+	 * @param upperVertex
 	 *            the top right vertex of the bounding box
 	 */
 	public AABB(final Vec2 lowerVertex, final Vec2 upperVertex) {
@@ -179,7 +179,8 @@ public class AABB {
 	 * @param input
 	 * @return
 	 */
-	public final boolean raycast(final RayCastOutput output, final RayCastInput input) {
+	@Deprecated
+  public final boolean raycast(final RayCastOutput output, final RayCastInput input) {
 		return raycast(output, input, new WorldPool(4, 4));
 	}
 	
