@@ -114,6 +114,7 @@ class FlashSound implements Sound {
     soundChannel = sound.play(looping);
     isPlaying = true;
     soundChannel.addEventListener(SoundChannel.SOUND_COMPLETE, new EventHandler<Event>() {
+      @Override
       public void handleEvent(Event evt) {
         isPlaying = false;
       }

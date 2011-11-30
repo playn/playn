@@ -86,6 +86,7 @@ class HtmlLayerDom extends AbstractLayer {
     elem.getStyle().setDisplay(visible ? Display.BLOCK : Display.NONE);
   }
 
+  @Override
   public void setOrigin(float x, float y) {
     super.setOrigin(x, y);
   }

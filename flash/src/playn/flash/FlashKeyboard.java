@@ -29,6 +29,7 @@ class FlashKeyboard implements playn.core.Keyboard {
   FlashKeyboard() {
     // Key handlers.
     FlashPlatform.captureEvent(InteractiveObject.KEYDOWN, new EventHandler<KeyboardEvent>() {
+      @Override
       public void handleEvent(KeyboardEvent nativeEvent) {
         if (listener != null) {
           Event.Impl event = new Event.Impl(PlayN.currentTime(), keyForCode(nativeEvent.keyCode()));
@@ -50,6 +51,7 @@ class FlashKeyboard implements playn.core.Keyboard {
     });
 
     FlashPlatform.captureEvent(InteractiveObject.KEYUP, new EventHandler<KeyboardEvent>() {
+      @Override
       public void handleEvent(KeyboardEvent nativeEvent) {
         if (listener != null) {
           Event.Impl event = new Event.Impl(PlayN.currentTime(), keyForCode(nativeEvent.keyCode()));

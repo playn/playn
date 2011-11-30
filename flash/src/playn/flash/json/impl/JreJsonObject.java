@@ -39,11 +39,13 @@ public class JreJsonObject extends JreJsonValue implements JsonObject {
     this.factory = factory;
   }
 
+  @Override
   public <T extends JsonValue> T get(String key) {
     @SuppressWarnings("unchecked") T value = (T) map.get(key);
     return value;
   }
 
+  @Override
   public Object getObject() {
     Map<String, Object> obj = new HashMap<String, Object>();
     for (Map.Entry<String, JsonValue> e : map.entrySet()) {
@@ -52,6 +54,7 @@ public class JreJsonObject extends JreJsonValue implements JsonObject {
     return obj;
   }
 
+  @Override
   public JsonType getType() {
     return JsonType.OBJECT;
   }
@@ -61,10 +64,12 @@ public class JreJsonObject extends JreJsonValue implements JsonObject {
     return map.containsKey(key);
   }
 
+  @Override
   public String[] keys() {
     return map.keySet().toArray(new String[map.size()]);
   }
 
+  @Override
   public void put(String key, JsonValue value) {
     if (value == null) {
       value = factory.createNull();
@@ -72,14 +77,17 @@ public class JreJsonObject extends JreJsonValue implements JsonObject {
     map.put(key, value);
   }
 
+  @Override
   public void put(String key, String value) {
     put(key, factory.create(value));
   }
 
+  @Override
   public void put(String key, double value) {
     put(key, factory.create(value));
   }
 
+  @Override
   public void put(String key, boolean bool) {
     put(key, factory.create(bool));
   }
@@ -94,10 +102,12 @@ public class JreJsonObject extends JreJsonValue implements JsonObject {
     return getObject().equals(((JreJsonValue)value).getObject());
   }
 
+  @Override
   public String toJson() {
     return JsonUtil.stringify(this);
   }
 
+  @Override
   public String toString() {
     return toJson();
   }

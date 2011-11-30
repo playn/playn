@@ -38,6 +38,7 @@ public class JavaJson implements Json {
       reset();
     }
 
+    @Override
     public Writer key(String key) {
       try {
         w.key(key);
@@ -47,6 +48,7 @@ public class JavaJson implements Json {
       return this;
     }
 
+    @Override
     public Writer value(boolean x) {
       try {
         w.value(x);
@@ -56,6 +58,7 @@ public class JavaJson implements Json {
       return this;
     }
 
+    @Override
     public Writer value(int x) {
       try {
         w.value(x);
@@ -65,6 +68,7 @@ public class JavaJson implements Json {
       return this;
     }
 
+    @Override
     public Writer value(double x) {
       try {
         w.value(x);
@@ -74,6 +78,7 @@ public class JavaJson implements Json {
       return this;
     }
 
+    @Override
     public Writer value(String x) {
       try {
         w.value(x);
@@ -83,6 +88,7 @@ public class JavaJson implements Json {
       return this;
     }
 
+    @Override
     public Writer object() {
       try {
         w.object();
@@ -92,6 +98,7 @@ public class JavaJson implements Json {
       return this;
     }
 
+    @Override
     public Writer endObject() {
       try {
         w.endObject();
@@ -101,6 +108,7 @@ public class JavaJson implements Json {
       return this;
     }
 
+    @Override
     public Writer array() {
       try {
         w.array();
@@ -110,6 +118,7 @@ public class JavaJson implements Json {
       return this;
     }
 
+    @Override
     public Writer endArray() {
       try {
         w.endArray();
@@ -119,6 +128,7 @@ public class JavaJson implements Json {
       return this;
     }
 
+    @Override
     public String write() {
       String result = sw.toString();
       reset();
@@ -138,40 +148,49 @@ public class JavaJson implements Json {
       this.jso = jso;
     }
 
+    @Override
     public boolean getBoolean(String key) {
       return jso.optBoolean(key);
     }
 
+    @Override
     public int getInt(String key) {
       return jso.optInt(key);
     }
 
+    @Override
     public double getNumber(String key) {
       return jso.optDouble(key);
     }
 
+    @Override
     public String getString(String key) {
       return jso.optString(key);
     }
 
+    @Override
     public Json.Object getObject(String key) {
       JSONObject o = jso.optJSONObject(key);
       return o == null ? null : new JavaObject(o);
     }
 
+    @Override
     public Json.Array getArray(String key) {
       JSONArray a = jso.optJSONArray(key);
       return a == null ? null : new JavaArray(a);
     }
 
+    @Override
     public <T> TypedArray<T> getArray(String key, Class<T> arrayType) {
       return arrayBuilder.build(jso.optJSONArray(key), arrayType);
     }
 
+    @Override
     public boolean containsKey(String key) {
       return (jso == null) ? false : jso.has(key);
     }
 
+    @Override
     public Json.TypedArray<String> getKeys() {
       String[] names;
       if (jso == null || (names = JSONObject.getNames(jso)) == null) {
@@ -188,36 +207,44 @@ public class JavaJson implements Json {
       this.jsa = jsa;
     }
 
+    @Override
     public int length() {
       return jsa.length();
     }
 
+    @Override
     public boolean getBoolean(int index) {
       return jsa.optBoolean(index);
     }
 
+    @Override
     public int getInt(int index) {
       return jsa.optInt(index);
     }
 
+    @Override
     public double getNumber(int index) {
       return jsa.optDouble(index);
     }
 
+    @Override
     public String getString(int index) {
       return jsa.optString(index);
     }
 
+    @Override
     public Json.Object getObject(int index) {
       JSONObject o = jsa.optJSONObject(index);
       return o == null ? null : new JavaObject(o);
     }
 
+    @Override
     public Json.Array getArray(int index) {
       JSONArray a = jsa.optJSONArray(index);
       return a == null ? null : new JavaArray(a);
     }
 
+    @Override
     public <T> TypedArray<T> getArray(int index, Class<T> arrayType) {
       return arrayBuilder.build(jsa.optJSONArray(index), arrayType);
     }
@@ -238,22 +265,28 @@ public class JavaJson implements Json {
   }
 
   private static TypedArrayBuilder<JSONArray> arrayBuilder = new TypedArrayBuilder<JSONArray>() {
+    @Override
     public int length(JSONArray array) {
       return array.length();
     }
+    @Override
     public Json.Object getObject(JSONArray array, int index) {
       JSONObject o = array.optJSONObject(index);
       return o == null ? null : new JavaObject(o);
     }
+    @Override
     public Boolean getBoolean(JSONArray array, int index) {
       return array.optBoolean(index);
     }
+    @Override
     public Integer getInt(JSONArray array, int index) {
       return array.optInt(index);
     }
+    @Override
     public Double getNumber(JSONArray array, int index) {
       return array.optDouble(index);
     }
+    @Override
     public String getString(JSONArray array, int index) {
       return array.optString(index);
     }

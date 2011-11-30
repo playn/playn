@@ -32,30 +32,37 @@ import playn.flash.json.JsonValue;
  */
 public class JreJsonFactory implements JsonFactory {
 
+  @Override
   public JsonString create(String string) {
     return new JreJsonString(Asserts.checkNotNull(string));
   }
 
+  @Override
   public JsonNumber create(double number) {
     return new JreJsonNumber(number);
   }
 
+  @Override
   public JsonBoolean create(boolean bool) {
     return new JreJsonBoolean(bool);
   }
 
+  @Override
   public JsonArray createArray() {
     return new JreJsonArray(this);
   }
 
+  @Override
   public JsonNull createNull() {
     return null;
   }
 
+  @Override
   public JsonObject createObject() {
     return new JreJsonObject(this);
   }
 
+  @Override
   public <T extends JsonValue> T parse(String jsonString) throws JsonException {
     if (jsonString.startsWith("(") && jsonString.endsWith(")")) {
        // some clients send in (json) expecting an eval is required

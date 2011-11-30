@@ -361,6 +361,7 @@ class HtmlGraphicsGL extends HtmlGraphics {
     // --texCount;
   }
 
+  @Override
   void updateLayers() {
     bindFramebuffer(null, canvas.getWidth(), canvas.getHeight());
 

@@ -128,6 +128,7 @@ class HtmlGroupLayerDom extends HtmlLayerDom implements GroupLayer, ParentLayer 
     }
   }
 
+  @Override
   void update() {
     super.update();
     for (HtmlLayerDom child : impl.children) {

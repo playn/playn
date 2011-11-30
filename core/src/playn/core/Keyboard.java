@@ -117,8 +117,11 @@ public interface Keyboard {
 
   /** A {@link Listener} implementation with NOOP stubs provided for each method. */
   class Adapter implements Listener {
+    @Override
     public void onKeyDown(Event event) { /* NOOP! */ }
+    @Override
     public void onKeyTyped(TypedEvent event) { /* NOOP! */ }
+    @Override
     public void onKeyUp(Event event) { /* NOOP! */ }
   }
 

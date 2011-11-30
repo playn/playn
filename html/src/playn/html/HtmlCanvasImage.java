@@ -27,6 +27,7 @@ class HtmlCanvasImage extends HtmlImage implements CanvasImage {
     canvas = surface;
   }
 
+  @Override
   public Canvas canvas() {
     return canvas;
   }

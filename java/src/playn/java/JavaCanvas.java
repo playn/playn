@@ -58,6 +58,7 @@ class JavaCanvas implements Canvas {
     return currentState().alpha;
   }
 
+  @Override
   public Canvas clear() {
     gfx.clearRect(0, 0, width, height);
     return this;
@@ -70,6 +71,7 @@ class JavaCanvas implements Canvas {
     return this;
   }
 
+  @Override
   public Canvas drawImage(Image img, float x, float y) {
     Asserts.checkArgument(img instanceof JavaImage);
     JavaImage jimg = (JavaImage) img;
@@ -80,11 +82,13 @@ class JavaCanvas implements Canvas {
     return this;
   }
 
+  @Override
   public Canvas drawImageCentered(Image img, float x, float y) {
     drawImage(img, x - img.width()/2, y - img.height()/2);
     return this;
   }
 
+  @Override
   public Canvas drawImage(Image img, float x, float y, float w, float h) {
     Asserts.checkArgument(img instanceof JavaImage);
     JavaImage jimg = (JavaImage) img;

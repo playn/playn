@@ -28,12 +28,17 @@ class JavaAudio implements Audio {
 
   Sound createNoopSound() {
     return new Sound() {
+      @Override
       public boolean play() {
         return false;
       }
+      @Override
       public void stop() {}
+      @Override
       public void setLooping(boolean looping) {}
+      @Override
       public void setVolume(float volume) {}
+      @Override
       public boolean isPlaying() {
         return false;
       }

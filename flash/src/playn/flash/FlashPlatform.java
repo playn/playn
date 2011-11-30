@@ -243,6 +243,7 @@ public class FlashPlatform implements Platform {
     private void requestAnimationFrame(final TimerCallback callback) {
     //  http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/flash/display/DisplayObject.html#event:enterFrame
     FlashPlatform.captureEvent(Sprite.ENTERFRAME, new EventHandler<Event>() {
+      @Override
       public void handleEvent(Event evt) {
         evt.preventDefault();
         callback.fire();

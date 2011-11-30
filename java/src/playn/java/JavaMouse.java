@@ -31,6 +31,7 @@ class JavaMouse implements Mouse {
 
   JavaMouse(JComponent frame) {
     frame.addMouseMotionListener(new MouseMotionListener() {
+      @Override
       public void mouseDragged(MouseEvent nativeEvent) {
         // mouseMoved(MouseEvent) does not fire when dragged
         if (listener != null) {
@@ -43,6 +44,7 @@ class JavaMouse implements Mouse {
         }
       }
 
+      @Override
       public void mouseMoved(MouseEvent nativeEvent) {
         if (listener != null) {
           MotionEvent.Impl event = new MotionEvent.Impl(nativeEvent.getWhen(), nativeEvent.getX(),
@@ -56,15 +58,19 @@ class JavaMouse implements Mouse {
     });
 
     frame.addMouseListener(new MouseListener() {
+      @Override
       public void mouseClicked(MouseEvent e) {
       }
 
+      @Override
       public void mouseEntered(MouseEvent e) {
       }
 
+      @Override
       public void mouseExited(MouseEvent e) {
       }
 
+      @Override
       public void mousePressed(MouseEvent nativeEvent) {
         if (listener != null) {
           ButtonEvent.Impl event = new ButtonEvent.Impl(nativeEvent.getWhen(), nativeEvent.getX(),
@@ -76,6 +82,7 @@ class JavaMouse implements Mouse {
         }
       }
 
+      @Override
       public void mouseReleased(MouseEvent nativeEvent) {
         if (listener != null) {
           ButtonEvent.Impl event = new ButtonEvent.Impl(nativeEvent.getWhen(), nativeEvent.getX(),

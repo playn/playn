@@ -54,26 +54,31 @@ public abstract class TypedArrayBuilder<A> {
   private static Map<Class<?>,Getter<?>> getters = new HashMap<Class<?>,Getter<?>>();
   static {
     getters.put(Boolean.class, new Getter<Boolean>() {
+      @Override
       public <A> Boolean get(TypedArrayBuilder<A> impl, A array, int index) {
         return impl.getBoolean(array, index);
       }
     });
     getters.put(Integer.class, new Getter<Integer>() {
+      @Override
       public <A> Integer get(TypedArrayBuilder<A> impl, A array, int index) {
         return impl.getInt(array, index);
       }
     });
     getters.put(Double.class, new Getter<Double>() {
+      @Override
       public <A> Double get(TypedArrayBuilder<A> impl, A array, int index) {
         return impl.getNumber(array, index);
       }
     });
     getters.put(String.class, new Getter<String>() {
+      @Override
       public <A> String get(TypedArrayBuilder<A> impl, A array, int index) {
         return impl.getString(array, index);
       }
     });
     getters.put(Json.Object.class, new Getter<Object>() {
+      @Override
       public <A> Json.Object get(TypedArrayBuilder<A> impl, A array, int index) {
         return impl.getObject(array, index);
       }

@@ -29,14 +29,17 @@ public class JreJsonBoolean extends JreJsonValue implements JsonBoolean {
     this.bool = bool;
   }
 
+  @Override
   public boolean getBoolean() {
     return bool;
   }
 
+  @Override
   public Object getObject() {
     return getBoolean();
   }
 
+  @Override
   public JsonType getType() {
     return JsonType.BOOLEAN;
   }
@@ -51,6 +54,7 @@ public class JreJsonBoolean extends JreJsonValue implements JsonBoolean {
     visitor.visit(getBoolean(), ctx);
   }
 
+  @Override
   public String toJson() throws IllegalStateException {
     return String.valueOf(bool);
   }

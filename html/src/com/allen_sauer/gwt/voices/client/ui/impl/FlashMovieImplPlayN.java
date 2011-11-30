@@ -38,18 +38,22 @@ public class FlashMovieImplPlayN extends FlashMovieImpl {
     PlayN.log().debug("CHOSE: " + impl.getClass().getName());
   }
 
+  @Override
   public Element createElementMaybeSetURL(String id, String url) {
     return impl.createElementMaybeSetURL(id, url);
   }
 
+  @Override
   public int getMajorVersion() {
     return impl.getMajorVersion();
   }
 
+  @Override
   public String getVersionString() {
     return impl.getVersionString();
   }
 
+  @Override
   protected String getRawVersionString() {
     return impl.getRawVersionString();
   }

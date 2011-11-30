@@ -28,6 +28,7 @@ class FlashMouse implements Mouse {
   FlashMouse() {
     // Mouse handlers.
     FlashPlatform.captureEvent(Sprite.MOUSEDOWN, new EventHandler<MouseEvent>() {
+      @Override
       public void handleEvent(MouseEvent nativeEvent) {
         if (listener != null) {
           ButtonEvent.Impl event = new ButtonEvent.Impl(PlayN.currentTime(),
@@ -40,6 +41,7 @@ class FlashMouse implements Mouse {
       }
     });
     FlashPlatform.captureEvent(Sprite.MOUSEUP, new EventHandler<MouseEvent>() {
+      @Override
       public void handleEvent(MouseEvent nativeEvent) {
         if (listener != null) {
           ButtonEvent.Impl event = new ButtonEvent.Impl(PlayN.currentTime(),
@@ -52,6 +54,7 @@ class FlashMouse implements Mouse {
       }
     });
     FlashPlatform.captureEvent(Sprite.MOUSEMOVE, new EventHandler<MouseEvent>() {
+      @Override
       public void handleEvent(MouseEvent nativeEvent) {
         if (listener != null) {
           MotionEvent.Impl event = new MotionEvent.Impl(PlayN.currentTime(),

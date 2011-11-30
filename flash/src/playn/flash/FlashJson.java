@@ -314,21 +314,27 @@ class FlashJson implements Json {
   }
 
   private static TypedArrayBuilder<JsonArray> arrayBuilder = new TypedArrayBuilder<JsonArray>() {
+    @Override
     public int length(JsonArray array) {
       return array.length();
     }
+    @Override
     public Json.Object getObject(JsonArray array, int index) {
       return valueToObject(array.get(index));
     }
+    @Override
     public Boolean getBoolean(JsonArray array, int index) {
       return valueToBoolean(array.get(index));
     }
+    @Override
     public Integer getInt(JsonArray array, int index) {
       return (int)valueToNumber(array.get(index));
     }
+    @Override
     public Double getNumber(JsonArray array, int index) {
       return valueToNumber(array.get(index));
     }
+    @Override
     public String getString(JsonArray array, int index) {
       return valueToString(array.get(index));
     }

@@ -20,10 +20,12 @@ import playn.core.util.Callback;
 
 public class FlashNet implements Net {
 
+  @Override
   public void get(String url, final Callback<String> callback) {
     callback.onFailure(new RuntimeException("Not implemented"));
   }
 
+  @Override
   public void post(String url, String data, final Callback<String> callback) {
     callback.onFailure(new RuntimeException("Not implemented"));
   }

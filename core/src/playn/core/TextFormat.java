@@ -24,16 +24,19 @@ public class TextFormat {
   /** Used to align multiline text. */
   public static enum Alignment {
     LEFT {
+      @Override
       public float getX(float textWidth, float lineWidth) {
         return 0;
       }
     },
     CENTER {
+      @Override
       public float getX(float textWidth, float lineWidth) {
         return (lineWidth - textWidth)/2;
       }
     },
     RIGHT {
+      @Override
       public float getX(float textWidth, float lineWidth) {
         return (lineWidth - textWidth);
       }

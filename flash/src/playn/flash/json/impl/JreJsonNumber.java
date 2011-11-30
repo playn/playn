@@ -30,14 +30,17 @@ public class JreJsonNumber extends JreJsonValue implements JsonNumber {
     this.number = number;
   }
 
+  @Override
   public double getNumber() {
     return number;
   }
 
+  @Override
   public Object getObject() {
     return getNumber();
   }
 
+  @Override
   public JsonType getType() {
     return JsonType.NUMBER;
   }
@@ -52,6 +55,7 @@ public class JreJsonNumber extends JreJsonValue implements JsonNumber {
     visitor.visit(getNumber(), ctx);
   }
 
+  @Override
   public String toJson() {
     String toReturn = String.valueOf(number);
     if (toReturn.endsWith(".0")) {

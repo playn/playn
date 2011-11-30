@@ -36,11 +36,13 @@ public class JreJsonArray extends JreJsonValue implements JsonArray {
     this.factory = factory;
   }
 
+  @Override
   public <T extends JsonValue> T get(int index) {
     @SuppressWarnings("unchecked") T value = (T) arrayValues.get(index);
     return value;
   }
 
+  @Override
   public Object getObject() {
     List<Object> objs = new ArrayList<Object>();
     for (JsonValue val : arrayValues) {
@@ -49,10 +51,12 @@ public class JreJsonArray extends JreJsonValue implements JsonArray {
     return objs;
   }
 
+  @Override
   public JsonType getType() {
     return playn.flash.json.JsonType.ARRAY;
   }
 
+  @Override
   public int length() {
     return arrayValues.size();
   }
@@ -62,6 +66,7 @@ public class JreJsonArray extends JreJsonValue implements JsonArray {
     arrayValues.remove(index);
   }
 
+  @Override
   public void set(int index, JsonValue value) {
     if (value == null) {
       value = factory.createNull();
@@ -73,14 +78,17 @@ public class JreJsonArray extends JreJsonValue implements JsonArray {
     }
   }
 
+  @Override
   public void set(int index, String string) {
     set(index, factory.create(string));
   }
 
+  @Override
   public void set(int index, double number) {
     set(index, factory.create(number));
   }
 
+  @Override
   public void set(int index, boolean bool) {
     set(index, factory.create(bool));
   }
@@ -105,6 +113,7 @@ public class JreJsonArray extends JreJsonValue implements JsonArray {
     visitor.endVisit(this, ctx);
   }
 
+  @Override
   public String toJson() {
     return JsonUtil.stringify(this);
   }

@@ -30,14 +30,17 @@ public class JreJsonString extends JreJsonValue implements JsonString {
     this.string = string;
   }
 
+  @Override
   public Object getObject() {
     return getString();
   }
 
+  @Override
   public String getString() {
     return string;
   }
 
+  @Override
   public JsonType getType() {
     return JsonType.STRING;
   }
@@ -52,6 +55,7 @@ public class JreJsonString extends JreJsonValue implements JsonString {
     visitor.visit(getString(), ctx);
   }
 
+  @Override
   public String toJson() throws IllegalStateException {
     return JsonUtil.quote(getString());
   }

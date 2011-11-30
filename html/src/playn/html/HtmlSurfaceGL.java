@@ -97,6 +97,7 @@ class HtmlSurfaceGL implements Surface {
     return this;
   }
 
+  @Override
   public Surface drawImageCentered(Image img, float x, float y) {
     drawImage(img, x - img.width()/2, y - img.height()/2);
     return this;
@@ -172,6 +173,7 @@ class HtmlSurfaceGL implements Surface {
     return this;
   }
 
+  @Override
   public Surface setFillColor(int color) {
     // TODO: Add it to the state stack.
     this.fillColor = color;

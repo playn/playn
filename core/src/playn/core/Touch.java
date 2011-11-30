@@ -115,8 +115,11 @@ public interface Touch {
    * A {@link Listener} implementation with NOOP stubs provided for each method.
    */
   class Adapter implements Listener {
+    @Override
     public void onTouchStart(Event[] touches) { /* NOOP! */ }
+    @Override
     public void onTouchMove(Event[] touches) { /* NOOP! */ }
+    @Override
     public void onTouchEnd(Event[] touches) { /* NOOP! */ }
   }
 

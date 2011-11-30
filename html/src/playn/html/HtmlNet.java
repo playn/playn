@@ -23,6 +23,7 @@ import playn.core.util.Callback;
 
 public class HtmlNet implements Net {
 
+  @Override
   public void get(String url, final Callback<String> callback) {
     try {
       XMLHttpRequest xhr = XMLHttpRequest.create();
@@ -45,6 +46,7 @@ public class HtmlNet implements Net {
     }
   }
 
+  @Override
   public void post(String url, String data, final Callback<String> callback) {
     try {
       XMLHttpRequest xhr = XMLHttpRequest.create();

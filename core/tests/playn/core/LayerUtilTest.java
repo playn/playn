@@ -107,24 +107,31 @@ public class LayerUtilTest {
 
   protected static class TestGroupLayer extends AbstractLayer implements GroupLayer {
     public final GroupLayerImpl<AbstractLayer> impl = new GroupLayerImpl<AbstractLayer>();
+    @Override
     public Layer get(int index) {
       return impl.children.get(index);
     }
+    @Override
     public void add(Layer layer) {
       impl.add(this, (AbstractLayer)layer);
     }
+    @Override
     @Deprecated public void add(int index, Layer layer) {
       impl.add(this, index, (AbstractLayer)layer);
     }
+    @Override
     public void remove(Layer layer) {
       impl.remove(this, (AbstractLayer)layer);
     }
+    @Override
     @Deprecated public void remove(int index) {
       impl.remove(this, index);
     }
+    @Override
     public void clear() {
       impl.clear(this);
     }
+    @Override
     public int size() {
       return impl.children.size();
     }

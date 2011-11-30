@@ -30,6 +30,7 @@ public class JavaNet implements Net {
 
   private static final int BUF_SIZE = 4096;
 
+  @Override
   public void get(String urlStr, Callback<String> callback) {
     // TODO: Make this non-blocking so that it doesn't differ from the html
     // version's behavior.
@@ -46,6 +47,7 @@ public class JavaNet implements Net {
     }
   }
 
+  @Override
   public void post(String urlStr, String data, Callback<String> callback) {
     // TODO: Make this non-blocking so that it doesn't differ from the html
     // version's behavior.

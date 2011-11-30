@@ -201,6 +201,7 @@ class HtmlJson implements Json {
       return this[index];
     }-*/;
 
+    @Override
     public final <T> TypedArray<T> getArray(int index, Class<T> arrayType) {
       return arrayBuilder.build(getArray(index), arrayType);
     }
@@ -289,21 +290,27 @@ class HtmlJson implements Json {
   }-*/;
 
   private static TypedArrayBuilder<Array> arrayBuilder = new TypedArrayBuilder<Array>() {
+    @Override
     public int length(Array array) {
       return array.length();
     }
+    @Override
     public Json.Object getObject(Array array, int index) {
       return array.getObject(index);
     }
+    @Override
     public Boolean getBoolean(Array array, int index) {
       return array.getBoolean(index);
     }
+    @Override
     public Integer getInt(Array array, int index) {
       return array.getInt(index);
     }
+    @Override
     public Double getNumber(Array array, int index) {
       return array.getNumber(index);
     }
+    @Override
     public String getString(Array array, int index) {
       return array.getString(index);
     }

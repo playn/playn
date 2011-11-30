@@ -29,6 +29,7 @@ class JavaKeyboard implements Keyboard {
 
   JavaKeyboard(JFrame frame) {
     frame.addKeyListener(new KeyListener() {
+      @Override
       public void keyPressed(KeyEvent nativeEvent) {
         if (listener != null) {
           Event.Impl event = new Event.Impl(
@@ -40,6 +41,7 @@ class JavaKeyboard implements Keyboard {
         }
       }
 
+      @Override
       public void keyReleased(KeyEvent nativeEvent) {
         if (listener != null) {
           Event.Impl event = new Event.Impl(
@@ -51,6 +53,7 @@ class JavaKeyboard implements Keyboard {
         }
       }
 
+      @Override
       public void keyTyped(KeyEvent nativeEvent) {
         if (listener != null) {
           if (!Character.isISOControl(nativeEvent.getKeyChar())) {

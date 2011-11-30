@@ -52,6 +52,7 @@ public class CanvasSurface implements Surface {
     return this;
   }
 
+  @Override
   public Surface drawImageCentered(Image image, float dx, float dy) {
     canvas.drawImageCentered(image, dx, dy);
     return this;

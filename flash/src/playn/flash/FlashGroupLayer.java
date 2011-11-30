@@ -111,6 +111,7 @@ public class FlashGroupLayer extends FlashLayer implements GroupLayer, ParentLay
     container().addChildAt(child, index);
   }
 
+  @Override
   protected void updateChildren() {
     for (Layer l : impl.children) {
       ((FlashLayer) l).update();

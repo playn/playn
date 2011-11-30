@@ -56,6 +56,7 @@ class HtmlLogEnhanced extends HtmlLog {
     com.allen_sauer.gwt.log.client.Log.info(msg);
   }
 
+  @Override
   public void info(String msg, Throwable e) {
     com.allen_sauer.gwt.log.client.Log.info(msg, e);
   }

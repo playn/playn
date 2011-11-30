@@ -29,6 +29,7 @@ class HtmlKeyboard implements Keyboard {
   public void init() {
     // Key handlers.
     HtmlPlatform.captureEvent("keydown", new EventHandler() {
+      @Override
       public void handleEvent(NativeEvent nativeEvent) {
         if (listener != null) {
           Event.Impl event = new Event.Impl(
@@ -55,6 +56,7 @@ class HtmlKeyboard implements Keyboard {
     });
 
     HtmlPlatform.captureEvent("keyup", new EventHandler() {
+      @Override
       public void handleEvent(NativeEvent nativeEvent) {
         if (listener != null) {
           Event.Impl event = new Event.Impl(

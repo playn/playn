@@ -43,16 +43,19 @@ public class HtmlPlatform implements Platform {
   /** Used by {@link #register(Mode)}. */
   public static enum Mode {
     WEBGL {
+      @Override
       public boolean useGL() {
         return true;
       }
     },
     CANVAS {
+      @Override
       public boolean useGL() {
         return false;
       }
     },
     AUTODETECT {
+      @Override
       public boolean useGL() {
         return shouldUseGL();
       }

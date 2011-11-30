@@ -30,6 +30,7 @@ class JavaPointer implements Pointer {
 
   JavaPointer(JComponent frame) {
     frame.addMouseMotionListener(new MouseMotionListener() {
+      @Override
       public void mouseDragged(MouseEvent nativeEvent) {
         if (listener != null) {
           Event.Impl event = new Event.Impl(nativeEvent.getWhen(), nativeEvent.getX(),
@@ -41,20 +42,25 @@ class JavaPointer implements Pointer {
         }
       }
 
+      @Override
       public void mouseMoved(MouseEvent e) {
       }
     });
 
     frame.addMouseListener(new MouseListener() {
+      @Override
       public void mouseClicked(MouseEvent e) {
       }
 
+      @Override
       public void mouseEntered(MouseEvent e) {
       }
 
+      @Override
       public void mouseExited(MouseEvent e) {
       }
 
+      @Override
       public void mousePressed(MouseEvent nativeEvent) {
         if (listener != null) {
           Event.Impl event = new Event.Impl(nativeEvent.getWhen(), nativeEvent.getX(),
@@ -66,6 +72,7 @@ class JavaPointer implements Pointer {
         }
       }
 
+      @Override
       public void mouseReleased(MouseEvent nativeEvent) {
         if (listener != null) {
           Event.Impl event = new Event.Impl(nativeEvent.getWhen(), nativeEvent.getX(),

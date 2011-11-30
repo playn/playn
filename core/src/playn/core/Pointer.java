@@ -66,8 +66,11 @@ public interface Pointer {
 
   /** A {@link Listener} implementation with NOOP stubs provided for each method. */
   class Adapter implements Listener {
+    @Override
     public void onPointerStart(Event event) { /* NOOP! */ }
+    @Override
     public void onPointerEnd(Event event) { /* NOOP! */ }
+    @Override
     public void onPointerDrag(Event event) { /* NOOP! */ }
   }
 

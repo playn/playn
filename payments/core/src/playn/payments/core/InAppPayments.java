@@ -71,9 +71,11 @@ public interface InAppPayments {
    * A {@link Listener} implementation with NOOP stubs provided for each method.
    */
   class Adapter implements PurchaseCallback {
+    @Override
     public void successHandler(PurchaseResponse result) { /* NOOP! */
     }
 
+    @Override
     public void failureHandler(PurchaseResponse result) { /* NOOP! */
     }
   }

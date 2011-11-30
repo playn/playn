@@ -165,9 +165,13 @@ public interface Mouse {
 
   /** A {@link Listener} implementation with NOOP stubs provided for each method. */
   class Adapter implements Listener {
+    @Override
     public void onMouseDown(ButtonEvent event) { /* NOOP! */ }
+    @Override
     public void onMouseUp(ButtonEvent event) { /* NOOP! */ }
+    @Override
     public void onMouseMove(MotionEvent event) { /* NOOP! */ }
+    @Override
     public void onMouseWheelScroll(WheelEvent event) { /* NOOP! */ }
   }
 

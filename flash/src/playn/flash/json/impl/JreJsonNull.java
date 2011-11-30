@@ -26,10 +26,12 @@ public class JreJsonNull extends JreJsonValue implements JsonNull {
 
   public static final JsonNull NULL_INSTANCE = new JreJsonNull();
 
+  @Override
   public Object getObject() {
     return null;
   }
 
+  @Override
   public JsonType getType() {
     return JsonType.NULL;
   }
@@ -44,6 +46,7 @@ public class JreJsonNull extends JreJsonValue implements JsonNull {
     visitor.visitNull(ctx);
   }
 
+  @Override
   public String toJson() {
     return null;
   }

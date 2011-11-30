@@ -86,6 +86,7 @@ class HtmlGraphicsDom extends HtmlGraphics {
     return rootLayer.element().getOffsetWidth();
   }
 
+  @Override
   void updateLayers() {
     rootLayer.update();
   }
