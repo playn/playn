@@ -9,5 +9,5 @@
 
   <public path="resources" />
 
-  <entry-point class='${package}.html.${gameName}Html'/>
+  <entry-point class='${package}.html.${JavaGameClassName}Html'/>
 </module>

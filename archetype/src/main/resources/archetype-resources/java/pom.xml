@@ -11,7 +11,7 @@
 
   <artifactId>${artifactId}</artifactId>
   <packaging>jar</packaging>
-  <name>${gameName} Java</name>
+  <name>${JavaGameClassName} Java</name>
 
   <dependencies>
     <dependency>
@@ -44,7 +44,7 @@
                   <goal>java</goal>
                 </goals>
                 <configuration>
-                  <mainClass>${package}.java.${gameName}Java</mainClass>
+                  <mainClass>${package}.java.${JavaGameClassName}Java</mainClass>
                 </configuration>
               </execution>
             </executions>

@@ -9,7 +9,7 @@ import playn.core.Game;
 import playn.core.Image;
 import playn.core.ImageLayer;
 
-public class ${gameName} implements Game {
+public class ${JavaGameClassName} implements Game {
   @Override
   public void init() {
     // create and add background image layer

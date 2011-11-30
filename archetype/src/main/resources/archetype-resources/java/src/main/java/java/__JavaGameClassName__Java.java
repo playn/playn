@@ -6,13 +6,13 @@ package ${package}.java;
 import playn.core.PlayN;
 import playn.java.JavaPlatform;
 
-import ${package}.core.${gameName};
+import ${package}.core.${JavaGameClassName};
 
-public class ${gameName}Java {
+public class ${JavaGameClassName}Java {
 
   public static void main(String[] args) {
     JavaPlatform platform = JavaPlatform.register();
     platform.assetManager().setPathPrefix("${packageInPathFormat}/resources");
-    PlayN.run(new ${gameName}());
+    PlayN.run(new ${JavaGameClassName}());
   }
 }

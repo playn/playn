@@ -11,7 +11,7 @@
 
   <artifactId>${artifactId}</artifactId>
   <packaging>apk</packaging>
-  <name>${gameName} Android</name>
+  <name>${JavaGameClassName} Android</name>
 
   <dependencies>
     <dependency>

@@ -9,5 +9,5 @@
 
   <public path="resources" />
 
-  <entry-point class='${package}.flash.${gameName}Flash'/>
+  <entry-point class='${package}.flash.${JavaGameClassName}Flash'/>
 </module>

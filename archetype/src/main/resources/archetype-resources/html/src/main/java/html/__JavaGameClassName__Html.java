@@ -7,14 +7,14 @@ import playn.core.PlayN;
 import playn.html.HtmlGame;
 import playn.html.HtmlPlatform;
 
-import ${package}.core.${gameName};
+import ${package}.core.${JavaGameClassName};
 
-public class ${gameName}Html extends HtmlGame {
+public class ${JavaGameClassName}Html extends HtmlGame {
 
   @Override
   public void start() {
     HtmlPlatform platform = HtmlPlatform.register();
     platform.assetManager().setPathPrefix("${rootArtifactId}/");
-    PlayN.run(new ${gameName}());
+    PlayN.run(new ${JavaGameClassName}());
   }
 }

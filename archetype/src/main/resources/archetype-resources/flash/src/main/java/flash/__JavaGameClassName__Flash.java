@@ -7,14 +7,14 @@ import playn.core.PlayN;
 import playn.flash.FlashGame;
 import playn.flash.FlashPlatform;
 
-import ${package}.core.${gameName};
+import ${package}.core.${JavaGameClassName};
 
-public class ${gameName}Flash extends FlashGame {
+public class ${JavaGameClassName}Flash extends FlashGame {
 
   @Override
   public void start() {
     FlashPlatform platform = FlashPlatform.register();
     platform.assetManager().setPathPrefix("${rootArtifactId}flash/");
-    PlayN.run(new ${gameName}());
+    PlayN.run(new ${JavaGameClassName}());
   }
 }

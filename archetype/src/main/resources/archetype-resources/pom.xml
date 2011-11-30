@@ -13,7 +13,7 @@
   <artifactId>\${artifactId}</artifactId>
   <version>\${version}</version>
   <packaging>pom</packaging>
-  <name>\${gameName} Metaproject</name>
+  <name>\${JavaGameClassName} Metaproject</name>
 
   <properties>
     <playn.version>${project.version}</playn.version>

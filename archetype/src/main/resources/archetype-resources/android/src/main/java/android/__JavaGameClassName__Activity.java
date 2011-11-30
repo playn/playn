@@ -6,13 +6,13 @@ package ${package}.android;
 import playn.android.GameActivity;
 import playn.core.PlayN;
 
-import ${package}.core.${gameName};
+import ${package}.core.${JavaGameClassName};
 
-public class ${gameName}Activity extends GameActivity {
+public class ${JavaGameClassName}Activity extends GameActivity {
 
   @Override
   public void main(){
     platform().assetManager().setPathPrefix("${packageInPathFormat}/resources");
-    PlayN.run(new ${gameName}());
+    PlayN.run(new ${JavaGameClassName}());
   }
 }

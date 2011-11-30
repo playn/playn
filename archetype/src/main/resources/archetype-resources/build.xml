@@ -4,9 +4,9 @@
 <?xml version="1.0"?>
 <project name="${rootArtifactId}" default="run-java" xmlns:artifact="urn:maven-artifact-ant">
   <!-- Define your project information here -->
-  <property name="java.classname" value="${package}.java.${gameName}Java"/>
-  <property name="html.classname" value="${package}.${gameName}"/>
-  <property name="html.index" value="${gameName}.html"/>
+  <property name="java.classname" value="${package}.java.${JavaGameClassName}Java"/>
+  <property name="html.classname" value="${package}.${JavaGameClassName}"/>
+  <property name="html.index" value="${JavaGameClassName}.html"/>
 
   <!-- Everything below here shouldn't need to be modified -->
   <!-- run 'ant -p' to see available targets -->

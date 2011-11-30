@@ -11,7 +11,7 @@
 
   <artifactId>${artifactId}</artifactId>
   <packaging>jar</packaging>
-  <name>${gameName} Core</name>
+  <name>${JavaGameClassName} Core</name>
 
   <dependencies>
     <dependency>
