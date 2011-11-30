@@ -51,7 +51,8 @@ public abstract class OrderedStack<E> implements IOrderedStack<E> {
 	/* (non-Javadoc)
 	 * @see org.jbox2d.pooling.IPoolingStack#pop()
 	 */
-	public final E pop(){
+	@Override
+  public final E pop(){
 		assert(index < size) : "End of stack reached, there is probably a leak somewhere";
 		return pool[index++];
 	}
@@ -59,7 +60,8 @@ public abstract class OrderedStack<E> implements IOrderedStack<E> {
 	/* (non-Javadoc)
 	 * @see org.jbox2d.pooling.IPoolingStack#pop(int)
 	 */
-	public final E[] pop(int argNum){
+	@Override
+  public final E[] pop(int argNum){
 		assert(index + argNum < size) : "End of stack reached, there is probably a leak somewhere";
 		assert(argNum <= container.length) : "Container array is too small";
 		// System.arraycopy(pool, index, container, 0, argNum);
@@ -73,7 +75,8 @@ public abstract class OrderedStack<E> implements IOrderedStack<E> {
 	/* (non-Javadoc)
 	 * @see org.jbox2d.pooling.IPoolingStack#push(int)
 	 */
-	public final void push(int argNum){
+	@Override
+  public final void push(int argNum){
 		index -= argNum;
 		assert (index >= 0) : "Beginning of stack reached, push/pops are unmatched";
 	}

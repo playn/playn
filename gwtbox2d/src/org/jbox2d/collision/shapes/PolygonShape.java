@@ -111,7 +111,8 @@ public class PolygonShape extends Shape {
 		m_centroid.setZero();
 	}
 	
-	public final Shape clone() {
+	@Override
+  public final Shape clone() {
 		PolygonShape shape = new PolygonShape();
 		shape.m_centroid.set(this.m_centroid);
 		for (int i = 0; i < shape.m_normals.length; i++) {
@@ -709,7 +710,8 @@ public class PolygonShape extends Shape {
 	/**
 	 * @see Shape#computeMass(MassData)
 	 */
-	public void computeMass(final MassData massData, float density) {
+	@Override
+  public void computeMass(final MassData massData, float density) {
 		// Polygon mass, centroid, and inertia.
 		// Let rho be the polygon density in mass per unit area.
 		// Then:

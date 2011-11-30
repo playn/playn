@@ -66,7 +66,8 @@ public class Sweep {
 	/** World angles */
 	public float a0, a;
 	
-	public String toString() {
+	@Override
+  public String toString() {
 		String s = "Sweep:\nlocalCenter: " + localCenter + "\n";
 		s += "c0: " + c0 + ", c: " + c + "\n";
 		s += "a0: " + a0 + ", a: " + a + "\n";

@@ -31,7 +31,8 @@ import java.util.HashMap;
 public abstract class DynamicTLArray<I> {
 	
 	private static class TLHashMap<K, V> extends ThreadLocal<HashMap<K, V>>{
-		protected HashMap<K, V> initialValue(){
+		@Override
+    protected HashMap<K, V> initialValue(){
 			return new HashMap<K, V>();
 		}
 	}

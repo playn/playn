@@ -86,7 +86,8 @@ public class CircleShape extends Shape {
 		m_radius = 0;
 	}
 	
-	public final Shape clone() {
+	@Override
+  public final Shape clone() {
 		CircleShape shape = new CircleShape();
 		shape.m_p.set(m_p);
 		shape.m_radius = m_radius;

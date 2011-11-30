@@ -37,7 +37,8 @@ import java.util.HashMap;
 public class IntArray {
 
 	private static class TLHashMap<K, V> extends ThreadLocal<HashMap<K, V>>{
-		protected HashMap<K, V> initialValue(){
+		@Override
+    protected HashMap<K, V> initialValue(){
 			return new HashMap<K, V>();
 		}
 	}
