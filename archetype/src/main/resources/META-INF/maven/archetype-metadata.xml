@@ -57,6 +57,12 @@
             <include>**/logging.properties</include>
           </includes>
         </fileSet>
+        <fileSet filtered="false">
+          <directory>src/main/webapp</directory>
+          <includes>
+            <include>favicon.ico</include>
+          </includes>
+        </fileSet>
       </fileSets>
     </module>
 <!-- flash subproject temporarily disabled -->
