@@ -16,6 +16,8 @@
   <properties>
     <gwt.module>${package}.${JavaGameClassName}</gwt.module>
     <gwt.name>${rootArtifactId}</gwt.name>
+    <!-- Desired Google App Engine SDK version -->
+    <gae.version>1.6.0</gae.version>
   </properties>
 
   <dependencies>
@@ -60,6 +62,10 @@
         <artifactId>maven-gae-plugin</artifactId>
         <version>0.9.2</version>
         <dependencies>
+          <!--
+            Declare explicit dependency on gae-runtime here,
+            so we can specify the App Engine SDK version
+          -->
           <dependency>
             <groupId>net.kindleit</groupId>
             <artifactId>gae-runtime</artifactId>
