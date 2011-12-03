@@ -44,15 +44,25 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <android.version>2.3.3</android.version>
     <android.maven.version>3.0.0-alpha-13</android.maven.version>
+    <gae.version>1.6.0</gae.version>
+    <!--
+      App Engine server side log levels:
+      SEVERE, WARNING, INFO, CONFIG, FINE, FINER, FINEST
+    -->
+    <gae.loglevel>INFO</gae.loglevel>
     <gwt.version>2.4.0</gwt.version>
+    <!--
+      GWT log levels:
+      ERROR, WARN, INFO, TRACE, DEBUG, SPAM, or ALL
+    -->
     <gwt.loglevel>INFO</gwt.loglevel>
     <gwt.outputstyle>PRETTY</gwt.outputstyle>
-    <gwt.modulesuffix />
+    <gwt.modulesuffix/>
     <gwt.inplace>false</gwt.inplace>
     <gwt.soyc>false</gwt.soyc>
     <gwt.xdisable>true</gwt.xdisable>
     <gwt.draft>false</gwt.draft>
-    <gwt.workers />
+    <gwt.workers/>
     <maven.test.skip>false</maven.test.skip>
   </properties>
 
@@ -178,7 +188,7 @@
                     </goals>
                   </pluginExecutionFilter>
                   <action>
-                    <ignore />
+                    <ignore/>
                   </action>
                 </pluginExecution>
                 <pluginExecution>
@@ -191,7 +201,7 @@
                     </goals>
                   </pluginExecutionFilter>
                   <action>
-                    <ignore />
+                    <ignore/>
                   </action>
                 </pluginExecution>
                 <pluginExecution>
@@ -211,7 +221,7 @@
                     </goals>
                   </pluginExecutionFilter>
                   <action>
-                    <ignore />
+                    <ignore/>
                   </action>
                 </pluginExecution>
                 <pluginExecution>
@@ -224,7 +234,7 @@
                     </goals>
                   </pluginExecutionFilter>
                   <action>
-                    <ignore />
+                    <ignore/>
                   </action>
                 </pluginExecution>
               </pluginExecutions>

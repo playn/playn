@@ -54,6 +54,7 @@
           </additionalBuildcommands>
           <additionalProjectnatures>
             <projectnature>com.google.gwt.eclipse.core.gwtNature</projectnature>
+            <projectnature>com.google.appengine.eclipse.core.gaeNature</projectnature>
           </additionalProjectnatures>
         </configuration>
       </plugin>
