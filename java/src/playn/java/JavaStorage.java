@@ -29,8 +29,8 @@ import playn.core.Storage;
  * TODO(pdr): probably want better handling on where the file is stored
  */
 class JavaStorage implements Storage {
-  private static String tempDir = System.getProperty("java.io.tmpdir");
-  private static String tempFile = "playn.tmp";
+  private static final String tempDir = System.getProperty("java.io.tmpdir");
+  private static final String tempFile = "playn.tmp";
   private boolean isPersisted = false; // false by default
   private Properties properties;
 
