@@ -204,8 +204,7 @@ public class Vec2 {
 	}
 
 	/** Return a copy of this vector. */
-	@Override
-  public final Vec2 clone() {
+	public final Vec2 clone() {
 		return new Vec2(x, y);
 	}
 

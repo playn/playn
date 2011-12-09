@@ -136,13 +136,12 @@ public class Vec3 {
 		z = 0;
 	}
 	
-	@Override
-  public Vec3 clone() {
+	public Vec3 clone() {
 		return new Vec3(this);
 	}
 	
 	@Override
-  public String toString() {
+	public String toString() {
 		return "(" + x + "," + y + "," + z + ")";
 	}
 	
