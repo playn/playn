@@ -70,6 +70,11 @@ class HtmlStorage implements Storage {
   }
 
   @Override
+  public Iterable<String> keys() {
+    return storageMap.keySet();
+  }
+
+  @Override
   public boolean isPersisted() {
     return isPersisted;
   }

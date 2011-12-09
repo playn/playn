@@ -49,6 +49,11 @@ public interface Storage {
   public String getItem(String key);
 
   /**
+   * Returns an object that can be used to iterate over all storage keys.
+   */
+  public Iterable<String> keys();
+
+  /**
    * Returns true if the Storage data will be persistent across restarts.
    */
   public boolean isPersisted();

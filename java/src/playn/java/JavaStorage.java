@@ -55,6 +55,11 @@ class JavaStorage implements Storage {
   }
 
   @Override
+  public Iterable<String> keys() {
+    return properties.stringPropertyNames();
+  }
+
+  @Override
   public boolean isPersisted() {
     return isPersisted;
   }

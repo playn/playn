@@ -43,6 +43,11 @@ public class AndroidStorage implements Storage {
   }
 
   @Override
+  public Iterable<String> keys() {
+    return settings.getAll().keySet();
+  }
+
+  @Override
   public boolean isPersisted() {
     return true;
   }
