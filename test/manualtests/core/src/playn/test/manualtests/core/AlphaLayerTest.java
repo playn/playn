@@ -44,6 +44,8 @@ public class AlphaLayerTest extends ManualTest {
   ImageLayer imageLayer2;
   SurfaceLayer surfaceLayer2;
   CanvasLayer canvasLayer2;
+  CanvasLayer canvasLayer3;
+  CanvasLayer canvasLayer4;
   ImageLayer groundTruthLayer;
 
   @Override
@@ -53,7 +55,7 @@ public class AlphaLayerTest extends ManualTest {
 
   @Override
   public String getDescription() {
-    return "Test that the alpha value on layers works the same on all layer types and that alpha is 'additive'. Left-to-right: ImageLayer, SurfaceLayer, CanvasLayer, ground truth (expected). The first three layers all have alpha 50% and are in a grouplayer with alpha 50% (should result in a 25% opaque image).";
+    return "Test that the alpha value on layers works the same on all layer types and that alpha is 'additive'. Left-to-right: ImageLayer, SurfaceLayer, CanvasLayer (layer alpha), CanvasLayer (canvas alpha), ground truth (expected). The first three layers all have alpha 50% and are in a grouplayer with alpha 50% (should result in a 25% opaque image).";
   }
 
   @Override
@@ -61,11 +63,11 @@ public class AlphaLayerTest extends ManualTest {
     rootLayer = graphics().rootLayer();
 
     // add a half white, half blue background
-    SurfaceLayer bg = graphics().createSurfaceLayer((int) (4 * width), (int) (4 * height));
+    SurfaceLayer bg = graphics().createSurfaceLayer((int) (5 * width), (int) (4 * height));
     bg.surface().setFillColor(Color.rgb(255, 255, 255));
     bg.surface().fillRect(0, 0, bg.surface().width(), bg.surface().height());
     bg.surface().setFillColor(Color.rgb(0, 0, 255));
-    bg.surface().fillRect(0, bg.surface().width() / 2, bg.surface().width(),
+    bg.surface().fillRect(0, bg.surface().height() / 2, bg.surface().width(),
         bg.surface().height() / 2);
     rootLayer.add(bg);
 
@@ -89,6 +91,12 @@ public class AlphaLayerTest extends ManualTest {
         surfaceLayer2.surface().drawImage(image, 0, 0);
         canvasLayer2 = graphics().createCanvasLayer(image.width(), image.height());
         canvasLayer2.canvas().drawImage(image, 0, 0);
+        canvasLayer3 = graphics().createCanvasLayer(image.width(), image.height());
+        canvasLayer3.setAlpha(0.5f);
+        canvasLayer3.canvas().drawImage(image, 0, 0);
+        canvasLayer4 = graphics().createCanvasLayer(image.width(), image.height());
+        canvasLayer4.setAlpha(0.5f);
+        canvasLayer4.canvas().drawImage(image, 0, 0);
 
         // add layers to the groupLayer
         imageLayer1.transform().translate(offset, offset);
@@ -100,6 +108,8 @@ public class AlphaLayerTest extends ManualTest {
         canvasLayer1.transform().translate(offset + 2 * width, offset);
         canvasLayer1.setAlpha(0.5f);
         groupLayer.add(canvasLayer1);
+        canvasLayer3.transform().translate(offset + 3 * width, offset);
+        groupLayer.add(canvasLayer3);
 
         imageLayer2.transform().translate(offset, offset + 2 * height);
         imageLayer2.setAlpha(0.5f);
@@ -110,6 +120,8 @@ public class AlphaLayerTest extends ManualTest {
         canvasLayer2.transform().translate(offset + 2 * width, offset + 2 * height);
         canvasLayer2.setAlpha(0.5f);
         groupLayer.add(canvasLayer2);
+        canvasLayer4.transform().translate(offset + 3 * width, offset + 2 * height);
+        groupLayer.add(canvasLayer4);
       }
 
       @Override
@@ -124,7 +136,7 @@ public class AlphaLayerTest extends ManualTest {
       @Override
       public void done(Image image) {
         groundTruthLayer = graphics().createImageLayer(image);
-        groundTruthLayer.transform().translate(3 * width, 0);
+        groundTruthLayer.transform().translate(4 * width, 0);
         rootLayer.add(groundTruthLayer);
       }
 

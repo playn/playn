@@ -25,7 +25,7 @@ public class ManualTestsGameJava {
   public static void main(String[] args) {
     JavaPlatform platform = JavaPlatform.register();
     JavaAssetManager assets = platform.assetManager();
-    assets.setPathPrefix("src/playn/test/manualtests/resources");
+    assets.setPathPrefix("playn/test/manualtests/resources");
     PlayN.run(new ManualTestsGame());
     platform.setTitle("Manual Tests");
   }

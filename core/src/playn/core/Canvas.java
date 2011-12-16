@@ -274,6 +274,15 @@ public interface Canvas {
   Canvas scale(float x, float y);
 
   /**
+   * Set the global alpha value to be used for all painting.
+   * <p>
+   * Values outside the range [0,1] will be clamped to the range [0,1].
+   *
+   * @param alpha alpha value in range [0,1] where 0 is transparent and 1 is opaque
+   */
+  Canvas setAlpha(float alpha);
+
+  /**
    * Sets the Porter-Duff composite operation to be used for all painting.
    */
   Canvas setCompositeOperation(Composite composite);

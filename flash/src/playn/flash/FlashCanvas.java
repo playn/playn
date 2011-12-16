@@ -163,6 +163,11 @@ class FlashCanvas implements Canvas {
   }
 
   @Override
+  public Canvas setAlpha(float alpha) {
+    return this;
+  }
+
+  @Override
   public Canvas setCompositeOperation(Composite composite) {
     return this;
   }

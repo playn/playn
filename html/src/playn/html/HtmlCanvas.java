@@ -184,6 +184,12 @@ class HtmlCanvas implements Canvas {
   }
 
   @Override
+  public Canvas setAlpha(float alpha) {
+    ctx.setGlobalAlpha(alpha);
+    return this;
+  }
+
+  @Override
   public Canvas setCompositeOperation(Canvas.Composite composite) {
     ctx.setGlobalCompositeOperation(convertComposite(composite));
     return this;
