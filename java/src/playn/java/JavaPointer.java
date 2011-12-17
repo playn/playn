@@ -33,7 +33,7 @@ class JavaPointer implements Pointer {
       public void mouseDragged(MouseEvent nativeEvent) {
         if (listener != null) {
           Event.Impl event = new Event.Impl(nativeEvent.getWhen(), nativeEvent.getX(),
-              nativeEvent.getY());
+              nativeEvent.getY(), false);
           listener.onPointerDrag(event);
           if (event.getPreventDefault()) {
             nativeEvent.consume();
@@ -58,7 +58,7 @@ class JavaPointer implements Pointer {
       public void mousePressed(MouseEvent nativeEvent) {
         if (listener != null) {
           Event.Impl event = new Event.Impl(nativeEvent.getWhen(), nativeEvent.getX(),
-              nativeEvent.getY());
+              nativeEvent.getY(), false);
           listener.onPointerStart(event);
           if (event.getPreventDefault()) {
             nativeEvent.consume();
@@ -69,7 +69,7 @@ class JavaPointer implements Pointer {
       public void mouseReleased(MouseEvent nativeEvent) {
         if (listener != null) {
           Event.Impl event = new Event.Impl(nativeEvent.getWhen(), nativeEvent.getX(),
-              nativeEvent.getY());
+              nativeEvent.getY(), false);
           listener.onPointerEnd(event);
           if (event.getPreventDefault()) {
             nativeEvent.consume();

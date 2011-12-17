@@ -24,11 +24,20 @@ public interface Pointer {
 
   /** The event dispatched to pointer listeners. */
   interface Event extends Events.Position {
-    // nothing currently here, for future compatibility
+    /** Returns true if this event originated from touch input, false otherwise. */
+    boolean isTouch();
 
     class Impl extends Events.Position.Impl implements Event {
-      public Impl(double time, float x, float y) {
+      private boolean isTouch;
+
+      public Impl(double time, float x, float y, boolean isTouch) {
         super(time, x, y);
+        this.isTouch = isTouch;
+      }
+
+      @Override
+      public boolean isTouch() {
+        return isTouch;
       }
 
       @Override

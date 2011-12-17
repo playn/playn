@@ -78,12 +78,12 @@ class AndroidTouchEventHandler {
     switch (action & MotionEvent.ACTION_MASK) {
       case MotionEvent.ACTION_DOWN:
         gameView.onTouchStart(touches);
-        event = new Pointer.Event.Impl(time, pointerEvent.x(), pointerEvent.y());
+        event = new Pointer.Event.Impl(time, pointerEvent.x(), pointerEvent.y(), true);
         gameView.onPointerStart(event);
         return (preventDefault[0] || event.getPreventDefault());
       case MotionEvent.ACTION_UP:
         gameView.onTouchEnd(touches);
-        event = new Pointer.Event.Impl(time, pointerEvent.x(), pointerEvent.y());
+        event = new Pointer.Event.Impl(time, pointerEvent.x(), pointerEvent.y(), true);
         gameView.onPointerEnd(event);
         return (preventDefault[0] || event.getPreventDefault());
       case MotionEvent.ACTION_POINTER_DOWN:
@@ -94,7 +94,7 @@ class AndroidTouchEventHandler {
         return preventDefault[0];
       case MotionEvent.ACTION_MOVE:
         gameView.onTouchMove(touches);
-        event = new Pointer.Event.Impl(time, pointerEvent.x(), pointerEvent.y());
+        event = new Pointer.Event.Impl(time, pointerEvent.x(), pointerEvent.y(), true);
         gameView.onPointerDrag(event);
         return (preventDefault[0] || event.getPreventDefault());
       case MotionEvent.ACTION_CANCEL:
