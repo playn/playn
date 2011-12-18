@@ -187,6 +187,7 @@ class AndroidCanvas implements Canvas {
     return this;
   }
 
+  @Override
   public Canvas setAlpha(float alpha) {
     currentState().setAlpha(alpha);
     return this;
