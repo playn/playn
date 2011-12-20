@@ -169,8 +169,18 @@ class HtmlImageLayerDom extends HtmlLayerDom implements ImageLayer {
     Style style = element().getStyle();
 
     // Set background-repeat to get the right repeating behavior.
-    String repeat = repeatX ? "repeat-x " : "";
-    repeat += repeatY ? "repeat-y" : "";
+    String repeat;
+    if (repeatX) {
+      if (repeatY) {
+        repeat = "repeat";
+      } else {
+        repeat = "repeat-x";
+      }
+    } else if (repeatY) {
+      repeat = "repeat-y";
+    } else {
+      repeat = "no-repeat";
+    }
     style.setProperty("backgroundRepeat", repeat);
 
     // Set background-size to get the right pinning behavior.

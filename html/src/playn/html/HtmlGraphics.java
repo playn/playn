@@ -192,7 +192,7 @@ public abstract class HtmlGraphics implements Graphics {
     return metrics;
   }
 
-  abstract void updateLayers();
+  abstract Element rootElement();
 
-  abstract Element getRootElement();
+  abstract void updateLayers();
 }

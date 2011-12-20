@@ -42,26 +42,7 @@ public class HtmlPlatform implements Platform {
 
   /** Used by {@link #register(Mode)}. */
   public static enum Mode {
-    WEBGL {
-      @Override
-      public boolean useGL() {
-        return true;
-      }
-    },
-    CANVAS {
-      @Override
-      public boolean useGL() {
-        return false;
-      }
-    },
-    AUTODETECT {
-      @Override
-      public boolean useGL() {
-        return shouldUseGL();
-      }
-    };
-
-    public abstract boolean useGL();
+    WEBGL, CANVAS, DOM, AUTODETECT;
   }
 
   /** Returned by {@link #agentInfo}. */
@@ -90,7 +71,7 @@ public class HtmlPlatform implements Platform {
    * Prepares the HTML platform for operation.
    */
   public static HtmlPlatform register() {
-    return register(Mode.AUTODETECT);
+    return register(null);
   }
 
   /**
@@ -164,15 +145,35 @@ public class HtmlPlatform implements Platform {
      */
     try {
       try {
-        graphics = mode.useGL() ? new HtmlGraphicsGL() : new HtmlGraphicsDom();
+        if (mode == null) {
+          mode = Renderer.requestedMode();
+        }
+
+        switch (mode) {
+          case AUTODETECT:
+            graphics = hasGLSupport() ? new HtmlGraphicsGL() : new HtmlGraphicsCanvas();
+            break;
+          case CANVAS:
+            graphics = new HtmlGraphicsCanvas();
+            break;
+          case DOM:
+            graphics = new HtmlGraphicsDom();
+            break;
+          case WEBGL:
+            graphics = new HtmlGraphicsGL();
+            break;
+        }
       } catch (RuntimeException e) {
         // HtmlGraphicsGL ctor throws a runtime exception if the context creation fails.
         log().info("Failed to create GL context. Falling back.");
-        graphics = new HtmlGraphicsDom();
+        graphics = new HtmlGraphicsCanvas();
       }
-      pointer = new HtmlPointer(graphics.getRootElement());
-      mouse = new HtmlMouse(graphics.getRootElement());
-      touch = new HtmlTouch(graphics.getRootElement());
+
+      pointer = new HtmlPointer(graphics.rootElement());
+      mouse = new HtmlMouse(graphics.rootElement());
+      touch = new HtmlTouch(graphics.rootElement());
+
+      graphics.setSize(HtmlPlatform.DEFAULT_WIDTH, HtmlPlatform.DEFAULT_HEIGHT);
     } catch (Throwable e) {
       log.error("init()", e);
       Window.alert("failed to init(): " + e.getMessage());
@@ -387,7 +388,7 @@ public class HtmlPlatform implements Platform {
    * @param cursor the {@link Cursor} to use, or null to hide the cursor.
    */
   public static void setCursor(Cursor cursor) {
-    Element rootElement = ((HtmlGraphics) PlayN.graphics()).getRootElement();
+    Element rootElement = ((HtmlGraphics) PlayN.graphics()).rootElement();
     if (cursor == null) {
       rootElement.getStyle().setProperty("cursor", "none");
     } else {
@@ -399,20 +400,8 @@ public class HtmlPlatform implements Platform {
    * Disable the right-click context menu.
    */
   public static void disableRightClickContextMenu() {
-    Element rootElement = ((HtmlGraphics) PlayN.graphics()).getRootElement();
+    Element rootElement = ((HtmlGraphics) PlayN.graphics()).rootElement();
     disableRightClickImpl(rootElement);
-  }
-
-  /**
-   * Return true if renderer query parameter equals {@link Renderer#GL} or is not set, and the
-   * browser supports WebGL
-   *
-   * @return true if renderer query parameter equals {@link Renderer#GL} or is not set, and the
-   *         browser supports WebGL
-   */
-  private static boolean shouldUseGL() {
-    boolean useGlFromFlag = Renderer.shouldUseGL();
-    return (useGlFromFlag && hasGLSupport());
   }
 
   /**

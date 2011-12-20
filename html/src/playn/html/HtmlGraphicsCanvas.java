@@ -1,11 +1,11 @@
 /**
  * Copyright 2010 The PlayN Authors
- *
+ * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  * in compliance with the License. You may obtain a copy of the License at
- *
+ * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software distributed under the License
  * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
  * or implied. See the License for the specific language governing permissions and limitations under
@@ -13,84 +13,85 @@
  */
 package playn.html;
 
-import com.google.gwt.dom.client.Document;
-import com.google.gwt.dom.client.Element;
-import com.google.gwt.dom.client.Style.Overflow;
-import com.google.gwt.dom.client.Style.Unit;
-
 import playn.core.CanvasLayer;
 import playn.core.GroupLayer;
 import playn.core.Image;
 import playn.core.ImageLayer;
 import playn.core.SurfaceLayer;
 
-class HtmlGraphicsDom extends HtmlGraphics {
+import com.google.gwt.canvas.dom.client.Context2d;
+import com.google.gwt.dom.client.CanvasElement;
+import com.google.gwt.dom.client.Document;
+import com.google.gwt.dom.client.Element;
 
-  private final HtmlGroupLayerDom rootLayer;
+class HtmlGraphicsCanvas extends HtmlGraphics {
 
-  public HtmlGraphicsDom() {
-    Element div = Document.get().createDivElement();
-    div.getStyle().setOverflow(Overflow.HIDDEN);
-    rootElement.appendChild(div);
+  private final HtmlGroupLayerCanvas rootLayer;
+  private final CanvasElement canvas;
+  private final Context2d ctx;
 
-    rootLayer = new HtmlGroupLayerDom(div);
+  public HtmlGraphicsCanvas() {
+    canvas = Document.get().createCanvasElement();
+    rootElement.appendChild(canvas);
+    ctx = canvas.getContext2d();
+    rootLayer = new HtmlGroupLayerCanvas();
   }
 
   @Override
   public CanvasLayer createCanvasLayer(int width, int height) {
-    return new HtmlCanvasLayerDom(width, height);
+    return new HtmlCanvasLayerCanvas(width, height);
   }
 
   @Override
   public GroupLayer createGroupLayer() {
-    return new HtmlGroupLayerDom();
+    return new HtmlGroupLayerCanvas();
   }
 
   @Override
   public ImageLayer createImageLayer() {
-    return new HtmlImageLayerDom();
+    return new HtmlImageLayerCanvas();
   }
 
   @Override
   public ImageLayer createImageLayer(Image img) {
-    return new HtmlImageLayerDom(img);
+    return new HtmlImageLayerCanvas(img);
   }
 
   @Override
   public SurfaceLayer createSurfaceLayer(int width, int height) {
-    return new HtmlSurfaceLayerDom(width, height);
+    return new HtmlSurfaceLayerCanvas(width, height);
   }
 
   @Override
-  public int height() {
-    return rootLayer.element().getOffsetHeight();
-  }
-
-  @Override
-  public HtmlGroupLayerDom rootLayer() {
+  public HtmlGroupLayerCanvas rootLayer() {
     return rootLayer;
   }
 
   @Override
   public void setSize(int width, int height) {
     super.setSize(width, height);
-
-    rootLayer.element().getStyle().setWidth(width, Unit.PX);
-    rootLayer.element().getStyle().setHeight(height, Unit.PX);
+    canvas.setWidth(width);
+    canvas.setHeight(height);
   }
 
   @Override
   public int width() {
-    return rootLayer.element().getOffsetWidth();
+    return canvas.getOffsetWidth();
   }
 
   @Override
-  void updateLayers() {
-    rootLayer.update();
+  public int height() {
+    return canvas.getOffsetHeight();
   }
 
   @Override
   Element rootElement() {
-    return rootLayer.element();
+    return canvas;
+  }
+
+  void updateLayers() {
+    ctx.clearRect(0, 0, width(), height());
+    rootLayer.paint(ctx, 1);
+    ctx.setGlobalAlpha(1);
   }
 }

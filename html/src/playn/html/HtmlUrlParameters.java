@@ -16,6 +16,7 @@ package playn.html;
 import com.google.gwt.user.client.Window;
 
 import playn.core.PlayN;
+import playn.html.HtmlPlatform.Mode;
 
 /**
  * Interface providing a central place to document all URL query parameters and values which affect
@@ -53,13 +54,21 @@ public interface HtmlUrlParameters {
   }
 
   public static class Renderer {
-    public static final String CANVAS = "canvas";
-    public static final String PARAM_NAME = "renderer";
+    static final String CANVAS = "canvas";
+    static final String DOM = "dom";
     static final String GL = "gl";
+    static final String PARAM_NAME = "renderer";
 
-    static boolean shouldUseGL() {
+    static Mode requestedMode() {
       String renderer = Window.Location.getParameter(PARAM_NAME);
-      return renderer == null || Renderer.GL.equals(renderer);
+      if (CANVAS.equals(renderer)) {
+        return Mode.CANVAS;
+      } else if (GL.equals(renderer)) {
+        return Mode.WEBGL;
+      } else if (DOM.equals(renderer)) {
+        return Mode.DOM;
+      }
+      return Mode.AUTODETECT;
     }
   }
 
@@ -71,5 +80,4 @@ public interface HtmlUrlParameters {
     static final String HTML5 = "html5";
     static final String PARAM_NAME = "gwt-voices";
   }
-
 }

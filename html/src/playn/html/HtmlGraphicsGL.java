@@ -13,32 +13,8 @@
  */
 package playn.html;
 
-import static com.google.gwt.webgl.client.WebGLRenderingContext.ARRAY_BUFFER;
-import static com.google.gwt.webgl.client.WebGLRenderingContext.BLEND;
-import static com.google.gwt.webgl.client.WebGLRenderingContext.CLAMP_TO_EDGE;
-import static com.google.gwt.webgl.client.WebGLRenderingContext.COLOR_BUFFER_BIT;
-import static com.google.gwt.webgl.client.WebGLRenderingContext.CULL_FACE;
-import static com.google.gwt.webgl.client.WebGLRenderingContext.DST_ALPHA;
-import static com.google.gwt.webgl.client.WebGLRenderingContext.ELEMENT_ARRAY_BUFFER;
-import static com.google.gwt.webgl.client.WebGLRenderingContext.FLOAT;
-import static com.google.gwt.webgl.client.WebGLRenderingContext.FRAMEBUFFER;
-import static com.google.gwt.webgl.client.WebGLRenderingContext.FUNC_ADD;
-import static com.google.gwt.webgl.client.WebGLRenderingContext.LINEAR;
-import static com.google.gwt.webgl.client.WebGLRenderingContext.NO_ERROR;
-import static com.google.gwt.webgl.client.WebGLRenderingContext.ONE_MINUS_SRC_ALPHA;
-import static com.google.gwt.webgl.client.WebGLRenderingContext.REPEAT;
-import static com.google.gwt.webgl.client.WebGLRenderingContext.RGBA;
-import static com.google.gwt.webgl.client.WebGLRenderingContext.SRC_ALPHA;
-import static com.google.gwt.webgl.client.WebGLRenderingContext.STREAM_DRAW;
-import static com.google.gwt.webgl.client.WebGLRenderingContext.TEXTURE0;
-import static com.google.gwt.webgl.client.WebGLRenderingContext.TEXTURE_2D;
-import static com.google.gwt.webgl.client.WebGLRenderingContext.TEXTURE_MAG_FILTER;
-import static com.google.gwt.webgl.client.WebGLRenderingContext.TEXTURE_MIN_FILTER;
-import static com.google.gwt.webgl.client.WebGLRenderingContext.TEXTURE_WRAP_S;
-import static com.google.gwt.webgl.client.WebGLRenderingContext.TEXTURE_WRAP_T;
-import static com.google.gwt.webgl.client.WebGLRenderingContext.TRIANGLES;
-import static com.google.gwt.webgl.client.WebGLRenderingContext.UNSIGNED_BYTE;
-import static com.google.gwt.webgl.client.WebGLRenderingContext.UNSIGNED_SHORT;
+import static com.google.gwt.webgl.client.WebGLRenderingContext.*;
+
 import playn.core.CanvasLayer;
 import playn.core.GroupLayer;
 import playn.core.Image;
@@ -248,13 +224,13 @@ class HtmlGraphicsGL extends HtmlGraphics {
     }
   }
 
+  private CanvasElement canvas;
   WebGLRenderingContext gl;
 
   private WebGLFramebuffer lastFBuf;
   private int screenWidth, screenHeight;
 
   private HtmlGroupLayerGL rootLayer;
-  private CanvasElement canvas;
 
   // Shaders & Meshes.
   private Shader curShader;
@@ -267,13 +243,13 @@ class HtmlGraphicsGL extends HtmlGraphics {
   HtmlGraphicsGL() {
     rootLayer = new HtmlGroupLayerGL(this);
 
-    createCanvas();
+    canvas = Document.get().createCanvasElement();
+    rootElement.appendChild(canvas);
+
     initGL();
 
     texShader = new TextureShader();
     colorShader = new ColorShader();
-
-    setSize(HtmlPlatform.DEFAULT_WIDTH, HtmlPlatform.DEFAULT_HEIGHT);
   }
 
   @Override
@@ -302,11 +278,6 @@ class HtmlGraphicsGL extends HtmlGraphics {
   }
 
   @Override
-  public int height() {
-    return canvas.getOffsetHeight();
-  }
-
-  @Override
   public HtmlGroupLayerGL rootLayer() {
     return rootLayer;
   }
@@ -314,7 +285,6 @@ class HtmlGraphicsGL extends HtmlGraphics {
   @Override
   public void setSize(int width, int height) {
     super.setSize(width, height);
-
     canvas.setWidth(width);
     canvas.setHeight(height);
     bindFramebuffer(null, width, height, true);
@@ -322,7 +292,12 @@ class HtmlGraphicsGL extends HtmlGraphics {
 
   @Override
   public int width() {
-    return canvas.getOffsetWidth();
+    return canvas.getWidth();
+  }
+
+  @Override
+  public int height() {
+    return canvas.getHeight();
   }
 
   void bindFramebuffer() {
@@ -366,6 +341,7 @@ class HtmlGraphicsGL extends HtmlGraphics {
     bindFramebuffer(null, canvas.getWidth(), canvas.getHeight());
 
     // Clear to transparent.
+    gl.clearColor(0, 0, 0, 0);
     gl.clear(COLOR_BUFFER_BIT);
 
     // Paint all the layers.
@@ -466,11 +442,6 @@ class HtmlGraphicsGL extends HtmlGraphics {
     }
   }
 
-  @Override
-  Element getRootElement() {
-    return canvas;
-  }
-
   void flush() {
     if (curShader != null) {
       curShader.flush();
@@ -478,9 +449,9 @@ class HtmlGraphicsGL extends HtmlGraphics {
     }
   }
 
-  private void createCanvas() {
-    canvas = Document.get().createCanvasElement();
-    rootElement.appendChild(canvas);
+  @Override
+  Element rootElement() {
+    return canvas;
   }
 
   private void initGL() {
@@ -551,11 +522,11 @@ class HtmlGraphicsGL extends HtmlGraphics {
       // (should be 100% opaque white).
       bindFramebuffer();
       gl.clearColor(1, 1, 1, 1);
+      gl.clear(COLOR_BUFFER_BIT);
       err = gl.getError();
       if (err != NO_ERROR) {
         throw new RuntimeException("Read back GL test failed to clear color (error " + err + ")");
       }
-      updateLayers();
       Uint8Array pixelData = Uint8Array.create(4);
       gl.readPixels(0, 0, 1, 1, RGBA, UNSIGNED_BYTE, pixelData);
       if (pixelData.get(0) != 255 || pixelData.get(1) != 255 || pixelData.get(2) != 255) {
