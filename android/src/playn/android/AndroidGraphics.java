@@ -23,8 +23,7 @@ import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 import playn.core.Asserts;
 import playn.core.CanvasImage;
@@ -327,7 +326,9 @@ class AndroidGraphics implements Graphics {
   private int viewWidth, viewHeight, lastFrameBuffer, screenWidth, screenHeight, fbufWidth,
       fbufHeight;
   private boolean sizeSetManually = false;
-  private Set<Surface> surfaces = new HashSet<Surface>();
+  
+  // Weak map to avoid keeping unused surfaces alive, synchronized to avoid threading issues
+  private Map<Surface, Void> surfaces = Collections.synchronizedMap(new WeakHashMap<Surface, Void>());
 
   // Debug
   private int texCount;
@@ -336,6 +337,9 @@ class AndroidGraphics implements Graphics {
   private Shader curShader;
   private TextureShader texShader;
   private ColorShader colorShader;
+
+  // Queue of native GL objects to destroy on the GL thread
+  private Stack<AndroidGraphicsDestroyable> destroyables = new Stack<AndroidGraphicsDestroyable>();
 
   public AndroidGraphics(AndroidGL20 gfx) {
     this.gl20 = gfx;
@@ -585,6 +589,11 @@ class AndroidGraphics implements Graphics {
 
     // Guarantee a flush
     useShader(null);
+
+    synchronized (destroyables) {
+      while (!destroyables.isEmpty())
+        destroyables.pop().destroy(this);
+    }
   }
 
   void refreshGL() {
@@ -737,7 +746,8 @@ class AndroidGraphics implements Graphics {
    * is destroyed and refreshed.
    */
   void addSurface(Surface surface) {
-    if (surface != null) surfaces.add(surface);
+    if (surface != null)
+      surfaces.put(surface, null);
   }
 
   void removeSurface(Surface surface) {
@@ -745,7 +755,7 @@ class AndroidGraphics implements Graphics {
   }
 
   void refreshSurfaces() {
-    for (Surface surface : surfaces) {
+    for (Surface surface : surfaces.keySet()) {
       Asserts.check(surface instanceof AndroidSurface);
       AndroidSurface asurf = (AndroidSurface) surface;
       asurf.checkRefreshGL();
@@ -753,10 +763,16 @@ class AndroidGraphics implements Graphics {
   }
 
   void storeSurfaces() {
-    for (Surface surface : surfaces) {
+    for (Surface surface : surfaces.keySet()) {
       Asserts.check(surface instanceof AndroidSurface);
       AndroidSurface asurf = (AndroidSurface) surface;
       asurf.storePixels();
+    }
+  }
+
+  void queueDestroyable(AndroidGraphicsDestroyable destroyable) {
+    synchronized (destroyables) {
+      destroyables.push(destroyable);
     }
   }
 }

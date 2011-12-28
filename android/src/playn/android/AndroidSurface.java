@@ -37,13 +37,27 @@ class AndroidSurface implements Surface {
 
   private final AndroidGraphics gfx;
   private final int width, height;
-  private int tex = -1, fbuf = -1;
   private final List<InternalTransform> transformStack = new ArrayList<InternalTransform>();
   private File cachedPixels;
 
   private int fillColor;
   private AndroidPattern fillPattern;
 
+  private AndroidSurfaceNativeData natives = new AndroidSurfaceNativeData();
+  
+  private static final class AndroidSurfaceNativeData extends AndroidGraphicsDestroyable {
+    private int tex = -1, fbuf = -1;
+
+    @Override
+    public void destroy(AndroidGraphics gfx) {
+      if (fbuf != -1)
+        gfx.gl20.glDeleteBuffers(1, new int[] {fbuf}, 0);
+      if (tex != -1)
+        gfx.destroyTexture(tex);
+      tex = fbuf = -1;
+    }
+  }
+  
   AndroidSurface(AndroidGraphics gfx, int width, int height) {
     this.gfx = gfx;
     this.width = width;
@@ -57,17 +71,17 @@ class AndroidSurface implements Surface {
     gfx.flush();
     AndroidGL20 gl20 = gfx.gl20;
     //Generate a texture for the framebuffer object's color buffer
-    if (tex != -1 && gl20.glIsTexture(tex)) gfx.destroyTexture(tex);
-    tex = gfx.createTexture(false, false);
+    if (natives.tex != -1 && gl20.glIsTexture(natives.tex)) gfx.destroyTexture(natives.tex);
+    natives.tex = gfx.createTexture(false, false);
     gl20.glTexImage2D(GL20.GL_TEXTURE_2D, 0, GL20.GL_RGBA, width, height, 0, GL20.GL_RGBA,
         GL20.GL_UNSIGNED_BYTE, null);
     //Generate the framebuffer and attach the texture
     int[] fbufBuffer = new int[1];
     gl20.glGenFramebuffers(1, fbufBuffer, 0);
-    fbuf = fbufBuffer[0];
-    gfx.gl20.glBindFramebuffer(GL20.GL_FRAMEBUFFER, fbuf);
+    natives.fbuf = fbufBuffer[0];
+    gfx.gl20.glBindFramebuffer(GL20.GL_FRAMEBUFFER, natives.fbuf);
     gl20.glFramebufferTexture2D(GL20.GL_FRAMEBUFFER, GL20.GL_COLOR_ATTACHMENT0, GL20.GL_TEXTURE_2D,
-        tex, 0);
+        natives.tex, 0);
     //Clear the framebuffer of junk pixels.
     clear();
     // Redraw color buffer after the GL context is lost and refreshed.
@@ -93,7 +107,7 @@ class AndroidSurface implements Surface {
   }
 
   void checkRefreshGL() {
-    if (tex == -1 || fbuf == -1 || !gfx.gl20.glIsFramebuffer(fbuf) || !gfx.gl20.glIsTexture(tex)) {
+    if (natives.tex == -1 || natives.fbuf == -1 || !gfx.gl20.glIsFramebuffer(natives.fbuf) || !gfx.gl20.glIsTexture(natives.tex)) {
       refreshGL();
     }
   }
@@ -103,7 +117,7 @@ class AndroidSurface implements Surface {
    */
   void storePixels() {
     try {
-      gfx.gl20.glBindFramebuffer(GL20.GL_FRAMEBUFFER, fbuf);
+      gfx.gl20.glBindFramebuffer(GL20.GL_FRAMEBUFFER, natives.fbuf);
       ByteBuffer pixelBuffer = ByteBuffer.allocate(width * height * 4);
       gfx.gl20.glReadPixels(0, 0, width, height, GL20.GL_RGBA, GL20.GL_UNSIGNED_BYTE, pixelBuffer);
       try {
@@ -124,32 +138,28 @@ class AndroidSurface implements Surface {
       cachedPixels = null;
     }
     //Force a GL refresh before using this surface again.
-    destroyTextureEtc();
+    natives.destroy(gfx);
   }
 
   @Override
   public Surface clear() {
     checkRefreshGL();
-    gfx.bindFramebuffer(fbuf, width, height);
+    gfx.bindFramebuffer(natives.fbuf, width, height);
     gfx.gl20.glClearColor(0, 0, 0, 0);
     gfx.gl20.glClear(GL20.GL_COLOR_BUFFER_BIT);
     return this;
   }
 
   void destroy() {
-    destroyTextureEtc();
     gfx.removeSurface(this);
+    if (natives != null)
+      natives.destroyNow();
+    natives = null;
   }
 
   int tex() {
     checkRefreshGL();
-    return tex;
-  }
-
-  private void destroyTextureEtc() {
-    gfx.destroyTexture(tex);
-    gfx.gl20.glDeleteBuffers(1, new int[] { fbuf }, 0);
-    tex = fbuf = -1;
+    return natives.tex;
   }
 
   /*
@@ -166,7 +176,7 @@ class AndroidSurface implements Surface {
 
   @Override
   public Surface drawImage(Image image, float x, float y, float dw, float dh) {
-    gfx.bindFramebuffer(fbuf, width, height);
+    gfx.bindFramebuffer(natives.fbuf, width, height);
 
     Asserts.checkArgument(image instanceof AndroidImage);
     AndroidImage aimage = (AndroidImage) image;
@@ -185,7 +195,7 @@ class AndroidSurface implements Surface {
   public Surface drawImage(Image image, float dx, float dy, float dw, float dh, float sx, float sy,
       float sw, float sh) {
     checkRefreshGL();
-    gfx.bindFramebuffer(fbuf, width, height);
+    gfx.bindFramebuffer(natives.fbuf, width, height);
 
     Asserts.checkArgument(image instanceof AndroidImage);
     AndroidImage aimage = (AndroidImage) image;
@@ -209,7 +219,7 @@ class AndroidSurface implements Surface {
   @Override
   public Surface drawLine(float x0, float y0, float x1, float y1, float width) {
     checkRefreshGL();
-    gfx.bindFramebuffer(fbuf, this.width, this.height);
+    gfx.bindFramebuffer(natives.fbuf, this.width, this.height);
 
     float dx = x1 - x0, dy = y1 - y0;
     float len = (float) Math.sqrt(dx * dx + dy * dy);
@@ -232,7 +242,7 @@ class AndroidSurface implements Surface {
   @Override
   public Surface fillRect(float x, float y, float width, float height) {
     checkRefreshGL();
-    gfx.bindFramebuffer(fbuf, this.width, this.height);
+    gfx.bindFramebuffer(natives.fbuf, this.width, this.height);
 
     if (fillPattern != null) {
       AndroidImage image = fillPattern.image;
@@ -321,8 +331,8 @@ class AndroidSurface implements Surface {
 
   @Override
   protected void finalize() throws Throwable {
-    destroy();
-    super.finalize();
+    if (natives != null)
+      natives.destroyLater();
   }
 
 }

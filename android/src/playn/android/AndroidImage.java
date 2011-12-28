@@ -21,12 +21,7 @@ import java.lang.ref.SoftReference;
 import java.util.ArrayList;
 import java.util.List;
 
-import playn.core.Asserts;
-import playn.core.Canvas;
-import playn.core.CanvasImage;
-import playn.core.Image;
-import playn.core.ResourceCallback;
-import playn.core.StockInternalTransform;
+import playn.core.*;
 import playn.core.gl.GL20;
 import playn.core.gl.GLUtil;
 import android.graphics.Bitmap;
@@ -42,13 +37,32 @@ class AndroidImage implements CanvasImage {
   private Bitmap canvasBitmap;
   private List<ResourceCallback<Image>> callbacks = new ArrayList<ResourceCallback<Image>>();
   private int width, height;
-  private int tex = -1, pow2tex = -1;
   private String path;
-
+  private AndroidImageNativeData natives = new AndroidImageNativeData();
+  
   //contextId identifies which GL context the textures were last refreshed in
   private int contextId;
 
-  public AndroidImage(String path, Bitmap bitmap) {
+  private static final class AndroidImageNativeData extends AndroidGraphicsDestroyable {
+    private int tex = -1, pow2tex = -1;
+    
+    @Override
+    public void destroy(AndroidGraphics gfx) {
+      if (pow2tex == tex) {
+        pow2tex = -1;
+      }
+      if (tex != -1) {
+        gfx.destroyTexture(tex);
+        tex = -1;
+      }
+      if (pow2tex != -1) {
+        gfx.destroyTexture(pow2tex);
+        pow2tex = -1;
+      }
+    }
+  }
+  
+  AndroidImage(String path, Bitmap bitmap) {
     this.path = path;
     //Use a soft reference if we have a path to restore the bitmap from.
     bitmapRef = new SoftReference<Bitmap>(bitmap);
@@ -56,7 +70,7 @@ class AndroidImage implements CanvasImage {
     height = bitmap.getHeight();
   }
 
-  public AndroidImage(int w, int h, boolean alpha) {
+  AndroidImage(int w, int h, boolean alpha) {
     // TODO: Why not always use the preferredBitmapConfig?  (Preserved from pre-GL code)
     canvasBitmap = Bitmap.createBitmap(w, h, alpha
         ? AndroidPlatform.instance.preferredBitmapConfig : Bitmap.Config.ARGB_8888);
@@ -95,6 +109,12 @@ class AndroidImage implements CanvasImage {
     canvas.clearDirty();
   }
 
+  public void destroy() {
+    if (natives != null)
+      natives.destroyNow();
+    natives = null;
+  }
+
   @Override
   public int height() {
     return height;
@@ -119,10 +139,7 @@ class AndroidImage implements CanvasImage {
     height = image.height();
     path = aimg.getPath();
     canvas = null;
-    tex = pow2tex = -1;
-    if (AndroidPlatform.instance != null && AndroidPlatform.instance.graphics() != null) {
-      clearTexture(AndroidPlatform.instance.graphics());
-    }
+    natives.destroyNow();
   }
 
   /*
@@ -169,17 +186,7 @@ class AndroidImage implements CanvasImage {
    * -- a subsequent call to ensureTexture() will recreate them.
    */
   void clearTexture(AndroidGraphics gfx) {
-    if (pow2tex == tex) {
-      pow2tex = -1;
-    }
-    if (tex != -1) {
-      gfx.destroyTexture(tex);
-      tex = -1;
-    }
-    if (pow2tex != -1) {
-      gfx.destroyTexture(pow2tex);
-      pow2tex = -1;
-    }
+    natives.destroy(gfx);
   }
 
   int ensureTexture(AndroidGraphics gfx, boolean repeatX, boolean repeatY) {
@@ -193,10 +200,10 @@ class AndroidImage implements CanvasImage {
     if (isReady()) {
       if (repeatX || repeatY) {
         scaleTexture(gfx, repeatX, repeatY);
-        return pow2tex;
+        return natives.pow2tex;
       } else {
         loadTexture(gfx);
-        return tex;
+        return natives.tex;
       }
     }
     log().error("Image not ready to draw -- cannot ensure texture.");
@@ -207,13 +214,13 @@ class AndroidImage implements CanvasImage {
    * Should be called from ensureTexture() and scaleTexture()
    */
   private void loadTexture(AndroidGraphics gfx) {
-    boolean isTexture = gfx.gl20.glIsTexture(tex);
-    if (isTexture && tex != -1) {
+    boolean isTexture = gfx.gl20.glIsTexture(natives.tex);
+    if (isTexture && natives.tex != -1) {
       return;
     }
     if (isTexture) clearTexture(gfx);
-    tex = gfx.createTexture(false, false);
-    gfx.updateTexture(tex, getBitmap());
+    natives.tex = gfx.createTexture(false, false);
+    gfx.updateTexture(natives.tex, getBitmap());
   }
 
   /*
@@ -224,7 +231,7 @@ class AndroidImage implements CanvasImage {
     // Ensure that 'tex' is loaded. We use it below.
     loadTexture(gfx);
 
-    if (pow2tex != -1 && gfx.gl20.glIsTexture(pow2tex)) {
+    if (natives.pow2tex != -1 && gfx.gl20.glIsTexture(natives.pow2tex)) {
       return;
     }
 
@@ -233,7 +240,7 @@ class AndroidImage implements CanvasImage {
 
     // Don't scale if it's already a power of two.
     if ((width == 0) && (height == 0)) {
-      pow2tex = tex;
+      natives.pow2tex = natives.tex;
       return;
     }
 
@@ -248,9 +255,9 @@ class AndroidImage implements CanvasImage {
     // TODO: Throw error if the size is bigger than GL_MAX_RENDERBUFFER_SIZE?
 
     // Create the pow2 texture.
-    pow2tex = gfx.createTexture(repeatX, repeatY);
+    natives.pow2tex = gfx.createTexture(repeatX, repeatY);
     AndroidGL20 gl20 = gfx.gl20;
-    gl20.glBindTexture(GL20.GL_TEXTURE_2D, pow2tex);
+    gl20.glBindTexture(GL20.GL_TEXTURE_2D, natives.pow2tex);
     gl20.glTexImage2D(GL20.GL_TEXTURE_2D, 0, GL20.GL_RGBA, width, height, 0, GL20.GL_RGBA,
         GL20.GL_UNSIGNED_BYTE, null);
 
@@ -260,15 +267,15 @@ class AndroidImage implements CanvasImage {
     int fbuf = fbufBuffer[0];
     gfx.bindFramebuffer(fbuf, width, height);
     gl20.glFramebufferTexture2D(GL20.GL_FRAMEBUFFER, GL20.GL_COLOR_ATTACHMENT0, GL20.GL_TEXTURE_2D,
-        pow2tex, 0);
+        natives.pow2tex, 0);
     // Render the scaled texture into the framebuffer.
     // (rebind the texture because gfx.bindFramebuffer() may have bound it when
     // flushing)
-    gl20.glBindTexture(GL20.GL_TEXTURE_2D, pow2tex);
+    gl20.glBindTexture(GL20.GL_TEXTURE_2D, natives.pow2tex);
     gl20.glClearColor(0, 0, 0, 0);
     gl20.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-    gfx.drawTexture(tex, width(), height(), StockInternalTransform.IDENTITY, 0, height, width,
+    gfx.drawTexture(natives.tex, width(), height(), StockInternalTransform.IDENTITY, 0, height, width,
         -height, false, false, 1);
     gfx.flush();
     gfx.bindFramebuffer();
@@ -278,10 +285,8 @@ class AndroidImage implements CanvasImage {
 
   @Override
   public void finalize() {
-    if (AndroidPlatform.instance != null) {
-      AndroidGraphics gfx = AndroidPlatform.instance.graphics();
-      if (gfx != null) clearTexture(gfx);
-    }
+    if (natives != null)
+      natives.destroyLater();
   }
 
   private boolean refreshNeeded() {
