@@ -7,5 +7,5 @@ uniform vec4 u_Color;
 uniform float u_Alpha;
 
 void main(void) {
-  gl_FragColor = vec4(u_Color.rgb, u_Color.a * u_Alpha);
+  gl_FragColor = vec4(u_Color.rgb * u_Alpha, u_Color.a * u_Alpha);
 }

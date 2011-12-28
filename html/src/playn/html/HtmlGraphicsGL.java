@@ -462,7 +462,8 @@ class HtmlGraphicsGL extends HtmlGraphics {
     gl.disable(CULL_FACE);
     gl.enable(BLEND);
     gl.blendEquation(FUNC_ADD);
-    gl.blendFuncSeparate(SRC_ALPHA, ONE_MINUS_SRC_ALPHA, SRC_ALPHA, DST_ALPHA);
+    gl.blendFunc(ONE, ONE_MINUS_SRC_ALPHA);
+    gl.pixelStorei(UNPACK_PREMULTIPLY_ALPHA_WEBGL, ONE);
 
     if (!tryBasicGlCalls()) {
       giveUp();

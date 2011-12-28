@@ -708,7 +708,7 @@ class AndroidGraphics implements Graphics {
   private void initGL() {
     gl20.glDisable(GL20.GL_CULL_FACE);
     gl20.glEnable(GL20.GL_BLEND);
-    gl20.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+    gl20.glBlendFunc(GL20.GL_ONE, GL20.GL_ONE_MINUS_SRC_ALPHA);
     gl20.glClearColor(0, 0, 0, 1);
   }
 
