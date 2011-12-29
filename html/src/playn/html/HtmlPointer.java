@@ -1,11 +1,11 @@
 /**
  * Copyright 2010 The PlayN Authors
- *
+ * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  * in compliance with the License. You may obtain a copy of the License at
- *
+ * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software distributed under the License
  * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
  * or implied. See the License for the specific language governing permissions and limitations under
@@ -13,8 +13,7 @@
  */
 package playn.html;
 
-import com.google.gwt.dom.client.Element;
-import com.google.gwt.dom.client.NativeEvent;
+import com.google.gwt.dom.client.*;
 import com.google.gwt.event.dom.client.TouchEvent;
 
 import playn.core.PlayN;
@@ -40,16 +39,15 @@ class HtmlPointer extends HtmlInput implements Pointer {
         @Override
         public void handleEvent(NativeEvent nativeEvent) {
           if (listener != null) {
+            Event.Impl event = null;
             if (nativeEvent.getChangedTouches().length() > 0) {
               inDragSequence = true;
-              com.google.gwt.dom.client.Touch touch = nativeEvent.getChangedTouches().get(0);
-              float x = touch.getRelativeX(rootElement);
-              float y = touch.getRelativeY(rootElement);
-              Event.Impl event = new Event.Impl(PlayN.currentTime(), x, y, true);
+              event = eventFromTouch(rootElement, nativeEvent.getChangedTouches().get(0));
               listener.onPointerStart(event);
-              if (event.getPreventDefault()) {
-                nativeEvent.preventDefault();
-              }
+            }
+            // cancel touch events by default to prevent browser scrolling on iOS
+            if (event == null || event.getPreventDefault()) {
+              nativeEvent.preventDefault();
             }
           }
         }
@@ -59,17 +57,18 @@ class HtmlPointer extends HtmlInput implements Pointer {
       capturePageEvent("touchend", new EventHandler() {
         @Override
         public void handleEvent(NativeEvent nativeEvent) {
-          if (listener != null && inDragSequence) {
-            if (nativeEvent.getChangedTouches().length() > 0) {
-              inDragSequence = false;
-              com.google.gwt.dom.client.Touch touch = nativeEvent.getChangedTouches().get(0);
-              float x = touch.getRelativeX(rootElement);
-              float y = touch.getRelativeY(rootElement);
-              Event.Impl event = new Event.Impl(PlayN.currentTime(), x, y, true);
-              listener.onPointerEnd(event);
-              if (event.getPreventDefault()) {
-                nativeEvent.preventDefault();
+          if (listener != null) {
+            Event.Impl event = null;
+            if (inDragSequence) {
+              if (nativeEvent.getChangedTouches().length() > 0) {
+                inDragSequence = false;
+                event = eventFromTouch(rootElement, nativeEvent.getChangedTouches().get(0));
+                listener.onPointerEnd(event);
               }
+            }
+            // cancel touch events by default to prevent browser scrolling on iOS
+            if (event == null || event.getPreventDefault()) {
+              nativeEvent.preventDefault();
             }
           }
         }
@@ -79,16 +78,17 @@ class HtmlPointer extends HtmlInput implements Pointer {
       capturePageEvent("touchmove", new EventHandler() {
         @Override
         public void handleEvent(NativeEvent nativeEvent) {
-          if (listener != null && inDragSequence) {
-            if (nativeEvent.getChangedTouches().length() > 0) {
-              com.google.gwt.dom.client.Touch touch = nativeEvent.getChangedTouches().get(0);
-              float x = touch.getRelativeX(rootElement);
-              float y = touch.getRelativeY(rootElement);
-              Event.Impl event = new Event.Impl(PlayN.currentTime(), x, y, true);
-              listener.onPointerDrag(event);
-              if (event.getPreventDefault()) {
-                nativeEvent.preventDefault();
+          if (listener != null) {
+            Event.Impl event = null;
+            if (inDragSequence) {
+              if (nativeEvent.getChangedTouches().length() > 0) {
+                event = eventFromTouch(rootElement, nativeEvent.getChangedTouches().get(0));
+                listener.onPointerDrag(event);
               }
+            }
+            // cancel touch events by default to prevent browser scrolling on iOS
+            if (event == null || event.getPreventDefault()) {
+              nativeEvent.preventDefault();
             }
           }
         }
@@ -145,4 +145,17 @@ class HtmlPointer extends HtmlInput implements Pointer {
       });
     }
   }
+
+  /**
+   * Converts a {@link Touch} to a pointer {@link Event}.
+   */
+  private static Event.Impl eventFromTouch(final Element rootElement, Touch touch) {
+    Event.Impl event;
+    float x = touch.getRelativeX(rootElement);
+    float y = touch.getRelativeY(rootElement);
+    event = new Event.Impl(PlayN.currentTime(), x, y, true);
+    event.setPreventDefault(true);
+    return event;
+  }
+
 }
