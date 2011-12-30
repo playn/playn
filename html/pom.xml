@@ -119,6 +119,9 @@
       <resource>
         <directory>${basedir}/src</directory>
       </resource>
+      <resource>
+        <directory>${basedir}/super</directory>
+      </resource>
     </resources>
   </build>
 </project>

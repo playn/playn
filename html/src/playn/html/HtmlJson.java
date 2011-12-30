@@ -1,256 +1,295 @@
 /**
  * Copyright 2010 The PlayN Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  */
 package playn.html;
 
-import java.util.ArrayList;
+import playn.core.Json;
+import playn.core.json.JsonImpl;
+import playn.core.json.JsonParserException;
+import playn.core.json.JsonSink;
+import playn.core.json.JsonTypedArray;
 
+import com.google.gwt.core.client.JavaScriptException;
 import com.google.gwt.core.client.JavaScriptObject;
 
-import playn.core.Asserts;
-import playn.core.Json;
-import playn.core.TypedArrayBuilder;
-
-class HtmlJson implements Json {
-
-  class HtmlWriter implements Json.Writer {
-    private StringBuilder sb = new StringBuilder();
-    private String key;
-    private ArrayList<Boolean> inArrayStack = new ArrayList<Boolean>();
-    private ArrayList<Boolean> isFirstValueStack = new ArrayList<Boolean>();
-
-    @Override
-    public Writer array() {
-      maybePrependKey();
-      sb.append("[");
-      pushInArray(true);
-      pushIsFirstValue(true);
-      return this;
-    }
-
-    @Override
-    public Writer endArray() {
-      sb.append("]");
-      popInArray();
-      popIsFirstValue();
-      return this;
-    }
-
-    @Override
-    public Writer endObject() {
-      sb.append("}");
-      popInArray();
-      popIsFirstValue();
-      return this;
-    }
-
-    @Override
-    public Writer key(String key) {
-      Asserts.checkState(this.key == null);
-      this.key = key;
-      return this;
-    }
-
-    @Override
-    public Writer object() {
-      maybePrependKey(true);
-      sb.append("{");
-      pushInArray(false);
-      pushIsFirstValue(true);
-      return this;
-    }
-
-    @Override
-    public Writer value(boolean x) {
-      maybePrependKey();
-      sb.append(x);
-      return this;
-    }
-
-    @Override
-    public Writer value(double x) {
-      maybePrependKey();
-      sb.append(x);
-      return this;
-    }
-
-    @Override
-    public Writer value(int x) {
-      maybePrependKey();
-      sb.append(x);
-      return this;
-    }
-
-    @Override
-    public Writer value(String x) {
-      maybePrependKey();
-      sb.append("\"");
-      sb.append(x);
-      sb.append("\"");
-      return this;
-    }
-
-    @Override
-    public String write() {
-      return sb.toString();
-    }
-
-    private void maybePrependKey() {
-      maybePrependKey(false);
-    }
-
-    /**
-     * Prepend the key if not in an array.
-     *
-     * Note: if this isn't the first key, we output a leading comma as well.
-     */
-    private void maybePrependKey(boolean isObject) {
-      // Special case for the opening object.
-      if (isObject && inArrayStack.size() == 0) {
-        return;
-      }
-
-      if (isFirstValue()) {
-        popIsFirstValue();
-        pushIsFirstValue(false);
-      } else {
-        sb.append(",");
-      }
-
-      if (inArray()) {
-        Asserts.checkState(this.key == null);
-      } else {
-        Asserts.checkState(this.key != null);
-        sb.append("\"");
-        sb.append(key);
-        sb.append("\":");
-        key = null;
-      }
-    }
-
-    private void pushInArray(boolean inArray) {
-      inArrayStack.add(inArray);
-    }
-
-    private boolean popInArray() {
-      return inArrayStack.remove(inArrayStack.size() - 1);
-    }
-
-    private boolean inArray() {
-      return inArrayStack.get(inArrayStack.size() - 1);
-    }
-
-    private void pushIsFirstValue(boolean isFirstValue) {
-      isFirstValueStack.add(isFirstValue);
-    }
-
-    private boolean popIsFirstValue() {
-      return isFirstValueStack.remove(isFirstValueStack.size() - 1);
-    }
-
-    private boolean isFirstValue() {
-      return isFirstValueStack.get(isFirstValueStack.size() - 1);
-    }
-  }
-
-  static class HtmlArray extends JavaScriptObject implements Json.Array {
+/**
+ * HTML implementation of {@link Json}. We're forced to wrap and unwrap JS objects here to work
+ * around GWT's development mode idiosyncrasies. Thankfully the wrapping is all elided once compiled
+ * to native code.
+ */
+public class HtmlJson extends JsonImpl implements Json {
+  static final class HtmlArray extends JavaScriptObject implements Json.Array {
     protected HtmlArray() {
     }
 
     @Override
-    public final native Array getArray(int index) /*-{
-      return this[index];
-    }-*/;
+    public void add(int index, java.lang.Object value) {
+      // splice won't work as expected if the index is past the end of the array - it appends in
+      // that case. Using set here instead to be more consistent.
+      if (index > length())
+        set0(index, wrapNative(value));
+      else
+        splice0(index, 0, wrapNative(value));
+    }
+
+    public void add(java.lang.Object value) {
+      push0(wrapNative(value));
+    };
 
     @Override
-    public final native boolean getBoolean(int index) /*-{
-      return this[index];
-    }-*/;
-
-    // FIXME TODO XXX: remove this parseFloat once we fix all the JSON
-    @Override
-    public final native double getNumber(int index) /*-{
-      return parseFloat(this[index]);
-    }-*/;
+    public Json.Array getArray(int index) {
+      return getArray(index, (Json.Array) null);
+    }
 
     @Override
-    public final native int getInt(int index) /*-{
-      if (!this[index]) return 0;
-      return parseInt(this[index]);
-    }-*/;
+    public final Json.Array getArray(int index, Json.Array dflt) {
+      return isValueArray(get0(index)) ? (Json.Array) unwrap0(get0(index)) : dflt;
+    };
 
     @Override
-    public final native Object getObject(int index) /*-{
-      return this[index];
-    }-*/;
+    public boolean getBoolean(int index) {
+      return getBoolean(index, false);
+    }
 
     @Override
-    public final native String getString(int index) /*-{
-      return this[index];
-    }-*/;
+    public final boolean getBoolean(int index, boolean dflt) {
+      return isValueBoolean(get0(index)) ? unwrapBoolean0(get0(index)) : dflt;
+    };
+
+    @Override
+    public double getDouble(int index) {
+      return getDouble(index, 0);
+    }
+
+    @Override
+    public final double getDouble(int index, double dflt) {
+      return isValueNumber(get0(index)) ? unwrapDouble0(get0(index)) : dflt;
+    };
+
+    @Override
+    public int getInt(int index) {
+      return (int) getDouble(index, 0);
+    }
+
+    @Override
+    public int getInt(int index, int dflt) {
+      return (int) getDouble(index, dflt);
+    }
+
+    @Override
+    public float getNumber(int index) {
+      return (float) getDouble(index, 0);
+    }
+
+    @Override
+    public float getNumber(int index, float dflt) {
+      return (float) getDouble(index, dflt);
+    }
+
+    @Override
+    public Object getObject(int index) {
+      return getObject(index, null);
+    }
+
+    @Override
+    public final Json.Object getObject(int index, Json.Object dflt) {
+      return isValueObject(get0(index)) ? (Json.Object) unwrap0(get0(index)) : dflt;
+    };
+
+    @Override
+    public String getString(int index) {
+      return getString(index, null);
+    }
+
+    @Override
+    public final String getString(int index, String dflt) {
+      return isValueString(get0(index)) ? (String) unwrap0(get0(index)) : dflt;
+    };
 
     @Override
     public final <T> TypedArray<T> getArray(int index, Class<T> arrayType) {
-      return arrayBuilder.build(getArray(index), arrayType);
+      return new JsonTypedArray<T>(getArray(index), arrayType);
     }
+
+    @Override
+    public boolean isArray(int index) {
+      return isValueArray(get0(index));
+    };
+
+    @Override
+    public boolean isBoolean(int index) {
+      return isValueBoolean(get0(index));
+    };
+
+    @Override
+    public native boolean isNull(int index) /*-{
+      return this[index] == null;
+    }-*/;
+
+    @Override
+    public boolean isNumber(int index) {
+      return isValueNumber(get0(index));
+    };
+
+    @Override
+    public boolean isObject(int index) {
+      return isValueObject(get0(index));
+    };
+
+    @Override
+    public boolean isString(int index) {
+      return isValueString(get0(index));
+    };
 
     @Override
     public final native int length() /*-{
       return this.length;
     }-*/;
+
+    private final native java.lang.Object get0(int index) /*-{
+      return @com.google.gwt.core.client.GWT::isProdMode()() ? this[index] : [ this[index] ];
+    }-*/;
+
+    @Override
+    public native void remove(int index) /*-{
+      // splice removes from the end if negative numbers are passed in
+      index >= 0 && this.splice(index, 1);
+    }-*/;
+    
+    @Override
+    public void set(int index, java.lang.Object value) {
+      set0(index, wrapNative(value));
+    }
+
+    @Override
+    public <T extends JsonSink<T>> JsonSink<T> write(JsonSink<T> sink) {
+      for (int i = 0; i < length(); i++) {
+        java.lang.Object o = get0(i);
+        if (o == null || isValueString(o))
+          sink.value((String)o);
+        else if (isValueArray(o))
+          sink.array((Json.Array) o);
+        else if (isValueObject(o))
+          sink.object((Json.Object) o);
+        else if (isValueBoolean(o))
+          sink.value(unwrapBoolean0(o));
+        else if (isValueNumber(o))
+          sink.value(unwrapDouble0(o));
+        else
+          throw new IllegalStateException("Invalid value inside JSON array");
+      }
+      return sink;
+    }
+
+    private native void push0(java.lang.Object value) /*-{
+      this.push(@com.google.gwt.core.client.GWT::isProdMode()() ? value : value[0]);
+    }-*/;
+
+    private native void set0(int index, java.lang.Object value) /*-{
+      this[index] = @com.google.gwt.core.client.GWT::isProdMode()() ? value : value[0];
+    }-*/;
+
+    private native void splice0(int index, int count, java.lang.Object value) /*-{
+      this.splice(index, count,
+          @com.google.gwt.core.client.GWT::isProdMode()() ? value : value[0]);
+    }-*/;
   }
 
-  static class HtmlObject extends JavaScriptObject implements Json.Object {
+  static final class HtmlObject extends JavaScriptObject implements Json.Object {
     protected HtmlObject() {
     }
 
     @Override
-    public final native Array getArray(String key) /*-{
-      return this[key];
-    }-*/;
+    public Array getArray(String key) {
+      return getArray(key, (Json.Array) null);
+    }
 
     @Override
-    public final native boolean getBoolean(String key) /*-{
-      return this[key];
-    }-*/;
+    public final Array getArray(String key, Json.Array dflt) {
+      return isValueArray(get0(key)) ? (Json.Array) unwrap0(get0(key)) : dflt;
+    };
 
     @Override
-    public final native int getInt(String key) /*-{
-      if (!this[key]) return 0;
-      return parseInt(this[key]);
-    }-*/;
-
-    // FIXME TODO XXX: remove this parseFloat once we fix all the JSON
-    @Override
-    public final native double getNumber(String key) /*-{
-      return parseFloat(this[key]);
-    }-*/;
+    public boolean getBoolean(String key) {
+      return getBoolean(key, false);
+    }
 
     @Override
-    public final native Object getObject(String key) /*-{
-      return this[key];
-    }-*/;
+    public final boolean getBoolean(String key, boolean dflt) {
+      return isValueBoolean(get0(key)) ? unwrapBoolean0(get0(key)) : dflt;
+    };
 
     @Override
-    public final native String getString(String key) /*-{
-      return this[key];
-    }-*/;
+    public double getDouble(String key) {
+      return getDouble(key, 0);
+    }
+
+    @Override
+    public final double getDouble(String key, double dflt) {
+      return isValueNumber(get0(key)) ? unwrapDouble0(get0(key)) : dflt;
+    };
+
+    @Override
+    public int getInt(String key) {
+      return (int) getDouble(key, 0);
+    }
+
+    @Override
+    public int getInt(String key, int dflt) {
+      return (int) getDouble(key, dflt);
+    }
+
+    @Override
+    public float getNumber(String key) {
+      return (float) getDouble(key, 0);
+    }
+
+    @Override
+    public float getNumber(String key, float dflt) {
+      return (float) getDouble(key, dflt);
+    }
+
+    @Override
+    public Object getObject(String key) {
+      return getObject(key, null);
+    }
+
+    @Override
+    public final Json.Object getObject(String key, Json.Object dflt) {
+      return isValueObject(get0(key)) ? (Json.Object) unwrap0(get0(key)) : dflt;
+    };
+
+    @Override
+    public String getString(String key) {
+      return getString(key, null);
+    }
+
+    @Override
+    public final String getString(String key, String dflt) {
+      return isValueString(get0(key)) ? (String) unwrap0(get0(key)) : dflt;
+    };
+
+    @Override
+    public <T> TypedArray<T> getArray(String key, Class<T> valueType, TypedArray<T> dflt) {
+      Json.Array array = getArray(key);
+      if (array == null)
+        return dflt;
+      return new JsonTypedArray<T>(array, valueType);
+    }
 
     @Override
     public final <T> TypedArray<T> getArray(String key, Class<T> arrayType) {
-      return arrayBuilder.build(getArray(key), arrayType);
+      return new JsonTypedArray<T>(getArray(key), arrayType);
     }
 
     @Override
@@ -259,60 +298,226 @@ class HtmlJson implements Json {
     }-*/;
 
     @Override
+    @Deprecated
     public final TypedArray<String> getKeys() {
-      return arrayBuilder.build(getNativeKeys(), String.class);
+      return keys();
     }
 
-    private final native Array getNativeKeys() /*-{
-      if (Object.prototype.keys) { return this.keys(); }
-      var keys = [];
-      for (var key in this) if (this.hasOwnProperty(key)) {
-        keys.push(key);
+    @Override
+    public TypedArray<String> keys() {
+      return new JsonTypedArray<String>(getNativeKeys(), String.class);
+    }
+
+    @Override
+    public boolean isArray(String key) {
+      return isValueArray(get0(key));
+    };
+
+    @Override
+    public boolean isBoolean(String key) {
+      return isValueBoolean(get0(key));
+    };
+
+    @Override
+    public native boolean isNull(String key) /*-{
+      return this[key] == null;
+    }-*/;
+
+    @Override
+    public boolean isNumber(String key) {
+      return isValueNumber(get0(key));
+    };
+
+    @Override
+    public boolean isObject(String key) {
+      return isValueObject(get0(key));
+    };
+
+    @Override
+    public boolean isString(String key) {
+      return isValueString(get0(key));
+    };
+
+    @Override
+    public void put(String key, java.lang.Object value) {
+      put0(key, wrapNative(value));
+    }
+    
+    @Override
+    public native void remove(String key) /*-{
+      delete this[key];
+    }-*/;
+
+    @Override
+    public <T extends JsonSink<T>> JsonSink<T> write(JsonSink<T> sink) {
+      for (String key : keys()) {
+        java.lang.Object o = get0(key);
+        if (o == null || isValueString(o))
+          sink.value(key, (String)o);
+        else if (isValueArray(o))
+          sink.array(key, (Json.Array) o);
+        else if (isValueObject(o))
+          sink.object(key, (Json.Object) o);
+        else if (isValueBoolean(o))
+          sink.value(key, getBoolean(key));
+        else if (isValueNumber(o))
+          sink.value(key, getDouble(key));
+        else
+          throw new IllegalStateException("Invalid value inside JSON object");
       }
+      return sink;
+    }
+
+    private final native JavaScriptObject get0(String key) /*-{
+      return @com.google.gwt.core.client.GWT::isProdMode()() ? this[key] : [ this[key] ];
+    }-*/;
+
+    private final native Array getNativeKeys() /*-{
+      if (Object.prototype.keys) {
+        return this.keys();
+      }
+      var keys = [];
+      for ( var key in this)
+        if (this.hasOwnProperty(key)) {
+          keys.push(key);
+        }
       return keys;
+    }-*/;
+
+    private native void put0(String key, java.lang.Object value) /*-{
+      this[key] = @com.google.gwt.core.client.GWT::isProdMode()() ? value : value[0];
     }-*/;
 
   }
 
   @Override
-  public Writer newWriter() {
-    return new HtmlWriter();
+  public Array createArray() {
+    return (Json.Array) JavaScriptObject.createArray().cast();
   }
 
   @Override
-  public Object parse(String json) {
-    HtmlObject object = jsonParse(json).cast();
-    return object;
+  public Object createObject() {
+    return (Json.Object) JavaScriptObject.createObject().cast();
   }
 
-  private static native JavaScriptObject jsonParse(String json) /*-{
-    return JSON.parse(json);
+  @Override
+  public Object parse(String json) throws JsonParserException {
+    try {
+      JavaScriptObject jsonParse = jsonParse(json);
+      if (!isValueObject(jsonParse))
+        throw new JsonParserException(null, "Input JSON was not an object", -1, -1, -1);
+      HtmlObject object = (HtmlObject) unwrap0(jsonParse);
+      return object;
+    } catch (JavaScriptException e) {
+      throw new JsonParserException(e, "Failed to parse JSON", -1, -1, -1);
+    }
+  }
+
+  @Override
+  public Array parseArray(String json) throws JsonParserException {
+    try {
+      JavaScriptObject jsonParse = jsonParse(json);
+      if (!isValueArray(jsonParse))
+        throw new JsonParserException(null, "Input JSON was not an array", -1, -1, -1);
+      HtmlArray array = (HtmlArray) unwrap0(jsonParse);
+      return array;
+    } catch (JavaScriptException e) {
+      throw new JsonParserException(e, "Failed to parse JSON", -1, -1, -1);
+    }
+  }
+
+  @Override
+  public boolean isArray(java.lang.Object o) {
+    return isObjectAnArray(o);
+  }
+
+  @Override
+  public boolean isObject(java.lang.Object o) {
+    return isObjectAnObject(o);
+  }
+
+  /**
+   * Static method for use from JsonTypes.
+   */
+  public static boolean isObjectAnArray(java.lang.Object o) {
+    return o instanceof JavaScriptObject && isValueArray(wrap0(o));
+  }
+
+  /**
+   * Static method for use from JsonTypes.
+   */
+  public static boolean isObjectAnObject(java.lang.Object o) {
+    return o instanceof JavaScriptObject && isValueObject(wrap0(o));
+  }
+
+  private static native boolean isValueArray(java.lang.Object value) /*-{
+    return (@com.google.gwt.core.client.GWT::isProdMode()() ? value : value[0]) instanceof Array;
   }-*/;
 
-  private static TypedArrayBuilder<Array> arrayBuilder = new TypedArrayBuilder<Array>() {
-    @Override
-    public int length(Array array) {
-      return array.length();
-    }
-    @Override
-    public Json.Object getObject(Array array, int index) {
-      return array.getObject(index);
-    }
-    @Override
-    public Boolean getBoolean(Array array, int index) {
-      return array.getBoolean(index);
-    }
-    @Override
-    public Integer getInt(Array array, int index) {
-      return array.getInt(index);
-    }
-    @Override
-    public Double getNumber(Array array, int index) {
-      return array.getNumber(index);
-    }
-    @Override
-    public String getString(Array array, int index) {
-      return array.getString(index);
-    }
-  };
+  private static native boolean isValueBoolean(java.lang.Object value) /*-{
+    return typeof (@com.google.gwt.core.client.GWT::isProdMode()() ? value : value[0]) == "boolean";
+  }-*/;
+
+  private static native boolean isValueNumber(java.lang.Object value) /*-{
+    return typeof (@com.google.gwt.core.client.GWT::isProdMode()() ? value : value[0]) == "number";
+  }-*/;
+
+  private static native boolean isValueObject(java.lang.Object value) /*-{
+    return (@com.google.gwt.core.client.GWT::isProdMode()() ? value : value[0]) != null
+        && typeof (@com.google.gwt.core.client.GWT::isProdMode()() ? value : value[0]) == "object"
+        && !((@com.google.gwt.core.client.GWT::isProdMode()() ? value : value[0]) instanceof Array);
+  }-*/;
+
+  private static native boolean isValueString(java.lang.Object value) /*-{
+    return typeof (@com.google.gwt.core.client.GWT::isProdMode()() ? value : value[0]) == "string";
+  }-*/;
+
+  private static native JavaScriptObject jsonParse(String json) /*-{
+    return @com.google.gwt.core.client.GWT::isProdMode()() ? JSON.parse(json) : [ JSON.parse(json) ];
+  }-*/;
+
+  private static native java.lang.Object unwrap0(java.lang.Object value) /*-{
+    return (@com.google.gwt.core.client.GWT::isProdMode()() ? value : value[0]);
+  }-*/;
+
+  private static native boolean unwrapBoolean0(java.lang.Object value) /*-{
+    return (@com.google.gwt.core.client.GWT::isProdMode()() ? value : value[0]);
+  }-*/;
+
+  private static native double unwrapDouble0(java.lang.Object value) /*-{
+    return (@com.google.gwt.core.client.GWT::isProdMode()() ? value : value[0]);
+  }-*/;
+
+  private static native java.lang.Object wrap0(double value) /*-{
+    return @com.google.gwt.core.client.GWT::isProdMode()() ? value : [ value ];
+  }-*/;
+
+  private static native java.lang.Object wrap0(boolean value) /*-{
+    return @com.google.gwt.core.client.GWT::isProdMode()() ? value : [ value ];
+  }-*/;
+
+  private static native java.lang.Object wrap0(java.lang.Object value) /*-{
+    return @com.google.gwt.core.client.GWT::isProdMode()() ? value : [ value ];
+  }-*/;
+
+  private static java.lang.Object wrapNative(java.lang.Object value) {
+    // String and null are safely coerced directly to JavaScriptObject
+    if (value == null || value instanceof String)
+      return wrap0(value);
+
+    // If it's a JavaScriptObject, assume that it's safely an array or object
+    if (value instanceof JavaScriptObject)
+      return wrap0(value);
+
+    // Treat all numbers as doubles, since that's basically what they all are under the hood in
+    // HTML mode
+    if (value instanceof Number)
+      return wrap0(((Number) value).doubleValue());
+
+    if (value instanceof Boolean)
+      return wrap0(((Boolean) value).booleanValue());
+
+    throw new IllegalArgumentException("Invalid JSON type");
+  }
+
 }

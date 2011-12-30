@@ -37,6 +37,7 @@ import playn.core.Mouse;
 import playn.core.Touch;
 import playn.core.Storage;
 import playn.core.RegularExpression;
+import playn.core.json.JsonImpl;
 
 public class JavaPlatform implements Platform {
   // Maximum delta time to consider between update() calls (in milliseconds). If the delta between
@@ -64,7 +65,7 @@ public class JavaPlatform implements Platform {
   private JavaRegularExpression regularExpression = new JavaRegularExpression();
   private JavaAudio audio = new JavaAudio();
   private JavaGraphics graphics;
-  private JavaJson json = new JavaJson();
+  private Json json = new JsonImpl();
   private JavaKeyboard keyboard;
   private JavaLog log = new JavaLog();
   private JavaNet net = new JavaNet();

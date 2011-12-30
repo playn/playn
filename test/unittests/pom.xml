@@ -3,17 +3,19 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>com.googlecode.playn</groupId>
-    <artifactId>playn-project</artifactId>
+    <artifactId>playn-test</artifactId>
     <version>1.1-SNAPSHOT</version>
   </parent>
 
-  <artifactId>playn-test</artifactId>
-  <name>PlayN Tests Metaproject</name>
+  <artifactId>playn-unittests</artifactId>
+  <name>PlayN Unit Tests Metaproject</name>
   <packaging>pom</packaging>
 
   <modules>
-    <module>benchmark</module>
-    <module>unittests</module>
-    <module>manualtests</module>
+    <module>core</module>
+    <module>html</module>
+<!--
+    <module>flash</module>
+-->
   </modules>
 </project>

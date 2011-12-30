@@ -93,7 +93,18 @@ target
 
 # /test/benchmark
 /test/benchmark/html/war/WEB-INF/classes
+/test/benchmark/html/war/WEB-INF/deploy/
+/test/benchmark/html/war/bench/
 
 # /test/manualtests
 /test/manualtests/html/war/WEB-INF/classes
+/test/manualtests/html/war/WEB-INF/deploy
+/test/manualtests/html/war/manualtestsgame
+/test/manualtests/html/gwt-unitCache
+
 /test/manualtests/flash/war/WEB-INF/classes
+
+# /test/unittests
+/test/unittests/html/war/playn.html.HtmlTests.JUnit/
+/test/unittests/html/war/WEB-INF/deploy/
+/test/unittests/html/gwt-unitCache/

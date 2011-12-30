@@ -1,0 +1,26 @@
+
+{"fn":function(){}}
+{"re":/abc/}
+{"dt":new Date()}
+{"foo":bar}
+{foo:1}
+{"unclosed":"object"
+["unclosed array"
+{"extra":"comma",}
+{"extra":"commas",,}
+["extra","comma",]
+["extra","commas",,]
+[,"<-- missing value"]
+["comma","after","close"],
+{"misplaced":"value"}" after close"
+{"foo":1}}
+{"foo":1+2}
+{"foo":01}
+{"foo":0x14}
+["illegal backslash escape: \x15"]
+{"foo" null}
+{"foo"::1}
+{"foo",1}
+["colon instead of":"comma"]
+{'foo':1}
+["mismatched"}

@@ -20,7 +20,7 @@ import playn.core.Json;
 import playn.core.Mouse;
 import playn.core.Platform;
 import playn.core.PlayN;
-import playn.java.JavaJson;
+import playn.core.json.JsonImpl;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
@@ -45,7 +45,7 @@ public class AndroidPlatform implements Platform {
 
   private AndroidAudio audio;
   private AndroidGraphics graphics;
-  private JavaJson json;
+  private Json json;
   private AndroidKeyboard keyboard;
   private AndroidLog log;
   private AndroidNet net;
@@ -63,7 +63,7 @@ public class AndroidPlatform implements Platform {
     this.activity = activity;
     audio = new AndroidAudio();
     graphics = new AndroidGraphics(gl20);
-    json = new JavaJson();
+    json = new JsonImpl();
     keyboard = new AndroidKeyboard();
     log = new AndroidLog();
     net = new AndroidNet();

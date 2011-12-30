@@ -22,6 +22,7 @@
     <exclude name='**/*Test.java' />
   </source>
   <source path='html'/>
+  <super-source path="super" />
 
   <!--
     Speed up compile time. Target only modern HTML5 browsers.

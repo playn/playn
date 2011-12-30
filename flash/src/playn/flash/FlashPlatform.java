@@ -41,6 +41,7 @@ import playn.core.Platform;
 import playn.core.Pointer;
 import playn.core.Mouse;
 import playn.core.RegularExpression;
+import playn.core.json.JsonImpl;
 import playn.html.HtmlRegularExpression;
 
 public class FlashPlatform implements Platform {
@@ -74,7 +75,7 @@ public class FlashPlatform implements Platform {
   private HtmlRegularExpression regularExpression;
   private Game game;
   private FlashGraphics graphics;
-  private FlashJson json;
+  private Json json;
   private FlashKeyboard keyboard;
   private FlashLog log;
   private FlashNet net;
@@ -98,7 +99,7 @@ public class FlashPlatform implements Platform {
     keyboard = new FlashKeyboard();
     pointer = new FlashPointer();
     mouse = new FlashMouse();
-    json = new FlashJson();
+    json = new JsonImpl();
     graphics = new FlashGraphics();
     storage = new FlashStorage();
     analytics = new FlashAnalytics();

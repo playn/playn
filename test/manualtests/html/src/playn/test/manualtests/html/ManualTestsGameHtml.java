@@ -15,9 +15,8 @@
  */
 package playn.test.manualtests.html;
 
-import playn.html.HtmlAssetManager;
-
 import playn.core.PlayN;
+import playn.html.HtmlAssetManager;
 import playn.html.HtmlGame;
 import playn.html.HtmlPlatform;
 import playn.test.manualtests.core.ManualTestsGame;
