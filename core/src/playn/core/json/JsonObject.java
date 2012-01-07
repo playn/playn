@@ -71,9 +71,7 @@ class JsonObject implements Json.Object {
    */
   public boolean getBoolean(String key, boolean default_) {
     Object o = get(key);
-    if (o instanceof Boolean)
-      return (Boolean) o;
-    return default_;
+    return o instanceof Boolean ? (Boolean) o : default_;
   }
 
   /**
@@ -89,9 +87,7 @@ class JsonObject implements Json.Object {
    */
   public double getDouble(String key, double default_) {
     Object o = get(key);
-    if (o instanceof Number)
-      return ((Number) o).doubleValue();
-    return default_;
+    return o instanceof Number ? ((Number) o).doubleValue() : default_;
   }
 
   /**
@@ -107,9 +103,7 @@ class JsonObject implements Json.Object {
    */
   public float getNumber(String key, float default_) {
     Object o = get(key);
-    if (o instanceof Number)
-      return ((Number) o).floatValue();
-    return default_;
+    return o instanceof Number ? ((Number) o).floatValue() : default_;
   }
 
   /**
@@ -125,9 +119,7 @@ class JsonObject implements Json.Object {
    */
   public int getInt(String key, int default_) {
     Object o = get(key);
-    if (o instanceof Number)
-      return ((Number) o).intValue();
-    return default_;
+    return o instanceof Number ? ((Number) o).intValue() : default_;
   }
 
   /**
@@ -255,10 +247,8 @@ class JsonObject implements Json.Object {
 
   @Override
   public <T extends JsonSink<T>> JsonSink<T> write(JsonSink<T> sink) {
-    for (Map.Entry<String, Object> entry : map.entrySet()) {
+    for (Map.Entry<String, Object> entry : map.entrySet())
       sink.value(entry.getKey(), entry.getValue());
-    }
-
     return sink;
   }
 

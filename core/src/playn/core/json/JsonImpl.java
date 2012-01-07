@@ -15,7 +15,6 @@ package playn.core.json;
 
 import playn.core.Json;
 
-
 /**
  * {@link Json} implementation for Java-like platforms.
  * 

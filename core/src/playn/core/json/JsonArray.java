@@ -100,9 +100,7 @@ class JsonArray implements Json.Array {
    */
   public boolean getBoolean(int key, boolean default_) {
     Object o = get(key);
-    if (o instanceof Boolean)
-      return (Boolean)o;
-    return default_;
+    return o instanceof Boolean ? (Boolean)o : default_;
   }
 
   /**
@@ -117,9 +115,7 @@ class JsonArray implements Json.Array {
    */
   public double getDouble(int key, double default_) {
     Object o = get(key);
-    if (o instanceof Number)
-      return ((Number)o).doubleValue();
-    return default_;
+    return o instanceof Number ? ((Number)o).doubleValue() : default_;
   }
 
   /**
@@ -134,9 +130,7 @@ class JsonArray implements Json.Array {
    */
   public float getNumber(int key, float default_) {
     Object o = get(key);
-    if (o instanceof Number)
-      return ((Number)o).floatValue();
-    return default_;
+    return o instanceof Number ? ((Number)o).floatValue() : default_;
   }
 
   /**
@@ -151,9 +145,7 @@ class JsonArray implements Json.Array {
    */
   public int getInt(int key, int default_) {
     Object o = get(key);
-    if (o instanceof Number)
-      return ((Number)o).intValue();
-    return default_;
+    return o instanceof Number ? ((Number)o).intValue() : default_;
   }
 
   /**
@@ -168,9 +160,7 @@ class JsonArray implements Json.Array {
    */
   public Json.Object getObject(int key, Json.Object default_) {
     Object o = get(key);
-    if (o instanceof Json.Object)
-      return (Json.Object)get(key);
-    return default_;
+    return o instanceof Json.Object ? (Json.Object)get(key) : default_;
   }
 
   /**
@@ -258,10 +248,8 @@ class JsonArray implements Json.Array {
   
   @Override
   public <T extends JsonSink<T>> JsonSink<T> write(JsonSink<T> sink) {
-    for (int i = 0; i < list.size(); i++) {
+    for (int i = 0; i < list.size(); i++)
       sink.value(list.get(i));
-    }
-    
     return sink;
   }
   
