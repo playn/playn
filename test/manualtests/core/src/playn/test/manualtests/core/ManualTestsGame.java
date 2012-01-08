@@ -28,6 +28,7 @@ public class ManualTestsGame implements Game {
     new ImageTypeTest(),
     new AlphaLayerTest(),
     new DepthTest(),
+    new ClearBackgroundTest(),
     /*new YourTest(),*/
   };
   int currentTest;
