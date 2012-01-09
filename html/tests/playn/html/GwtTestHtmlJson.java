@@ -15,10 +15,18 @@ package playn.html;
 
 import playn.core.Json;
 import playn.shared.json.JsonImplArrayTest;
+import playn.shared.json.JsonImplObjectTest;
+import playn.shared.json.JsonImplParseTest;
+import playn.shared.json.JsonImplWriterTest;
 
 import com.google.gwt.junit.client.GWTTestCase;
 
-public class GwtTestHtmlJsonArray extends GWTTestCase {
+public class GwtTestHtmlJson extends GWTTestCase {
+  @Override
+  public String getModuleName() {
+    return "playn.html.HtmlTests";
+  }
+
   private class BaseArrayTest extends JsonImplArrayTest {
     @Override
     protected Json json() {
@@ -54,8 +62,48 @@ public class GwtTestHtmlJsonArray extends GWTTestCase {
     new BaseArrayTest().testTypedArray();
   }
 
-  @Override
-  public String getModuleName() {
-    return "playn.html.HtmlTests";
+  private class BaseObjectTest extends JsonImplObjectTest {
+    @Override
+    protected Json json() {
+      return new HtmlJson();
+    }
+  }
+
+  public void testIsObject() {
+    new BaseObjectTest().testIsObject();
+  }
+
+  public void testObjectBasics() {
+    new BaseObjectTest().testObjectBasics();
+  }
+
+  public void testObjectTypes() {
+    new BaseObjectTest().testObjectTypes();
+  }
+
+  private class BaseWriterTest extends JsonImplWriterTest {
+    @Override
+    protected Json json() {
+      return new HtmlJson();
+    }
+  }
+
+  public void testWriter() {
+    new BaseWriterTest().testWriter();
+  }
+
+  private class BaseParseTest extends JsonImplParseTest {
+    @Override
+    protected Json json() {
+      return new HtmlJson();
+    }
+  }
+
+  public void testParseArray() {
+    new BaseParseTest().testParseArray();
+  }
+
+  public void testParseObject() {
+    new BaseParseTest().testParseObject();
   }
 }
