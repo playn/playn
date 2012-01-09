@@ -42,8 +42,7 @@ public class ClearBackgroundTest extends ManualTest {
   @Override
   public void init() {
     rootLayer = graphics().rootLayer();
-
-    graphics().rootLayer().clear();
+    rootLayer.clear();
 
     // add a grey square
     square = graphics().createSurfaceLayer(width, height);
