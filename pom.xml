@@ -44,7 +44,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <android.version>2.3.3</android.version>
     <android.maven.version>3.0.0-alpha-13</android.maven.version>
-    <gae.version>1.6.0</gae.version>
+    <gae.version>1.6.1</gae.version>
     <!--
       App Engine server side log levels:
       SEVERE, WARNING, INFO, CONFIG, FINE, FINER, FINEST

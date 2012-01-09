@@ -17,7 +17,7 @@
     <gwt.module>${package}.${JavaGameClassName}</gwt.module>
     <gwt.name>${rootArtifactId}</gwt.name>
     <!-- Desired Google App Engine SDK version -->
-    <gae.version>1.6.0</gae.version>
+    <gae.version>1.6.1</gae.version>
   </properties>
 
   <dependencies>
