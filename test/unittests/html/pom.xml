@@ -11,32 +11,17 @@
   <name>PlayN HTML Tests</name>
 
   <dependencies>
-    <dependency>
-      <groupId>com.googlecode.playn</groupId>
-      <artifactId>playn-java</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>com.googlecode.playn</groupId>
-      <artifactId>playn-core</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>com.googlecode.playn</groupId>
-      <artifactId>playn-html</artifactId>
-      <version>${project.version}</version>
-    </dependency>
     <!-- We re-run some of the core tests in HTML mode -->
     <dependency>
       <groupId>com.googlecode.playn</groupId>
       <artifactId>playn-unittests-core</artifactId>
       <version>${project.version}</version>
     </dependency>
-    
+
     <dependency>
-      <groupId>com.google.gwt</groupId>
-      <artifactId>gwt-user</artifactId>
-      <version>${gwt.version}</version>
+      <groupId>com.googlecode.playn</groupId>
+      <artifactId>playn-html</artifactId>
+      <version>${project.version}</version>
     </dependency>
 
     <dependency>
@@ -45,17 +30,48 @@
       <version>${gwt.version}</version>
       <scope>provided</scope>
     </dependency>
-    
+
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.8.1</version>
+    </dependency>
   </dependencies>
 
   <build>
-    <sourceDirectory>test</sourceDirectory>
+    <sourceDirectory>src</sourceDirectory>
     <testSourceDirectory>test</testSourceDirectory>
 
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-source-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>2.6</version>
+        <configuration>
+          <!-- exclude GWT tests from normal test phase -->
+          <excludes>
+            <exclude>**/*Test.java</exclude>
+          </excludes>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>gwt-maven-plugin</artifactId>
+        <!-- telll GWT Maven that our tests have standard name (not GwtTest*) -->
+        <configuration>
+          <includes>**/*Test.java</includes>
+          <mode>htmlunit</mode>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>test</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
 
