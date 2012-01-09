@@ -128,14 +128,6 @@
               <version>${gwt.version}</version>
             </dependency>
           </dependencies>
-          <executions>
-            <execution>
-              <phase>prepare-package</phase>
-              <goals>
-                <goal>compile</goal>
-              </goals>
-            </execution>
-          </executions>
         </plugin>
 
         <plugin>
