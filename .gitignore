@@ -103,8 +103,3 @@ target
 /test/manualtests/html/gwt-unitCache
 
 /test/manualtests/flash/war/WEB-INF/classes
-
-# /test/unittests
-/test/unittests/html/war/playn.html.HtmlTests.JUnit/
-/test/unittests/html/war/WEB-INF/deploy/
-/test/unittests/html/gwt-unitCache/
