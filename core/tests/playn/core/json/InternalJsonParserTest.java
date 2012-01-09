@@ -35,8 +35,8 @@ public class InternalJsonParserTest {
   @Test
   public void testWhitespace() throws JsonParserException {
     assertEquals(JsonObject.class,
-        JsonParser.object().from(" \t\r\n  { \t\r\n \"abc\"   \t\r\n : \t\r\n  1 \t\r\n  }  \t\r\n   ")
-            .getClass());
+                 JsonParser.object().from(
+                   " \t\r\n  { \t\r\n \"abc\"   \t\r\n : \t\r\n  1 \t\r\n  }  \t\r\n   ").getClass());
     assertEquals("{}", JsonParser.object().from("{}").toString());
   }
 
@@ -89,7 +89,8 @@ public class InternalJsonParserTest {
 
   @Test
   public void testArrayWithEverything() throws JsonParserException {
-    JsonArray a = JsonParser.array().from("[1, -1.0e6, \"abc\", [1,2,3], {\"abc\":123}, true, false]");
+    JsonArray a = JsonParser.array().from(
+      "[1, -1.0e6, \"abc\", [1,2,3], {\"abc\":123}, true, false]");
     assertEquals("[1, -1000000.0, abc, [1, 2, 3], {abc=123}, true, false]", a.toString());
     assertEquals(1.0, a.getDouble(0), 0.001f);
     assertEquals(1, a.getInt(0));
@@ -106,10 +107,8 @@ public class InternalJsonParserTest {
   public void testObjectWithEverything() throws JsonParserException {
     // TODO: Is this deterministic if we use string keys?
     JsonObject o = JsonParser.object().from(
-        "{\"abc\":123, \"def\":456.0, \"ghi\":[true, false], \"jkl\":null, \"mno\":true}");
-
+      "{\"abc\":123, \"def\":456.0, \"ghi\":[true, false], \"jkl\":null, \"mno\":true}");
     assertEquals("{jkl=null, abc=123, ghi=[true, false], def=456.0, mno=true}", o.toString());
-
     assertEquals(123, o.getInt("abc"));
     assertEquals(456, o.getInt("def"));
     assertEquals(true, o.getArray("ghi").getBoolean(0));
@@ -133,13 +132,14 @@ public class InternalJsonParserTest {
     assertEquals("\uffff", JsonParser.any().from("\"\\uffff\""));
 
     assertEquals("all together: \\/\n\r\t\b\f (fin)",
-        JsonParser.any().from("\"all together: \\\\\\/\\n\\r\\t\\b\\f (fin)\""));
+                 JsonParser.any().from("\"all together: \\\\\\/\\n\\r\\t\\b\\f (fin)\""));
   }
 
   @Test
   public void testNumbers() throws JsonParserException {
-    String[] testCases = new String[] { "0", "1", "-0", "-1", "0.1", "1.1", "-0.1", "0.10", "-0.10", "0e1", "0e0",
-        "-0e-1", "0.0e0", "-0.0e0" };
+    String[] testCases = new String[] {
+      "0", "1", "-0", "-1", "0.1", "1.1", "-0.1", "0.10", "-0.10",
+      "0e1", "0e0", "-0e-1", "0.0e0", "-0.0e0" };
     for (String testCase : testCases) {
       Number n = (Number)JsonParser.any().from(testCase);
       assertEquals(Double.parseDouble(testCase), n.doubleValue(), Double.MIN_NORMAL);
@@ -161,7 +161,8 @@ public class InternalJsonParserTest {
     assertEquals("-0.0", Double.toString(((Number)JsonParser.any().from("-0e-1")).doubleValue()));
     assertEquals("-0.0", Double.toString(((Number)JsonParser.any().from("-0e-0")).doubleValue()));
     assertEquals("-0.0", Double.toString(((Number)JsonParser.any().from("-0e-01")).doubleValue()));
-    assertEquals("-0.0", Double.toString(((Number)JsonParser.any().from("-0e-000000000001")).doubleValue()));
+    assertEquals("-0.0", Double.toString(((Number)JsonParser.any().from("-0e-000000000001")).
+                                         doubleValue()));
 
     assertEquals("-0.0", JsonStringWriter.toString(-0.0));
     assertEquals("-0.0", JsonStringWriter.toString(-0.0f));
@@ -236,9 +237,9 @@ public class InternalJsonParserTest {
 
   @Test
   public void testFailNumberEdgeCases() {
-    String[] edgeCases = { "-", ".", "e", "01", "-01", "+01", "01.1", "-01.1", "+01.1", ".1", "-.1", "+.1", "+1",
-        "0.", "-0.", "+0.", "0.e", "-0.e", "+0.e", "0e", "-0e", "+0e", "0e-", "-0e-", "+0e-", "0e+", "-0e+",
-        "+0e+" };
+    String[] edgeCases = { "-", ".", "e", "01", "-01", "+01", "01.1", "-01.1", "+01.1", ".1", "-.1",
+                           "+.1", "+1", "0.", "-0.", "+0.", "0.e", "-0.e", "+0.e", "0e", "-0e",
+                           "+0e", "0e-", "-0e-", "+0e-", "0e+", "-0e+", "+0e+" };
     for (String edgeCase : edgeCases) {
       try {
         JsonParser.object().from(edgeCase);
@@ -554,7 +555,7 @@ public class InternalJsonParserTest {
     // This doesn't work - keys don't sort properly
     // assertEquals(json, json2);
   }
-//
+
 //  @Test
 //  public void tortureTestUrl() throws JsonParserException {
 //    JsonObject o = JsonParser.object().from(getClass().getClassLoader().getResource("sample.json"));
@@ -569,7 +570,7 @@ public class InternalJsonParserTest {
 
   /**
    * Tests from json.org: http://www.json.org/JSON_checker/
-   * 
+   *
    * Skips two tests that don't match reality (ie: Chrome).
    */
   @Test
@@ -603,7 +604,7 @@ public class InternalJsonParserTest {
       }
 
       String testCase = new String(buffer, "ASCII");
-      if (positive)
+      if (positive) {
         try {
           Object out = JsonParser.any().from(testCase);
           JsonStringWriter.toString(out);
@@ -611,7 +612,7 @@ public class InternalJsonParserTest {
           e.printStackTrace();
           fail("Should not have failed " + ze.getName() + ": " + testCase);
         }
-      else {
+      } else {
         try {
           JsonParser.object().from(testCase);
           fail("Should have failed " + ze.getName() + ": " + testCase);
@@ -639,12 +640,13 @@ public class InternalJsonParserTest {
 
   private void testException(JsonParserException e, int linePos, int charPos) {
     assertEquals("line " + linePos + " char " + charPos,
-        "line " + e.getLinePosition() + " char " + e.getCharPosition());
+                 "line " + e.getLinePosition() + " char " + e.getCharPosition());
   }
 
   private void testException(JsonParserException e, int linePos, int charPos, String inError) {
     assertEquals("line " + linePos + " char " + charPos,
-        "line " + e.getLinePosition() + " char " + e.getCharPosition());
-    assertTrue("Error did not contain '" + inError + "': " + e.getMessage(), e.getMessage().contains(inError));
+                 "line " + e.getLinePosition() + " char " + e.getCharPosition());
+    assertTrue("Error did not contain '" + inError + "': " + e.getMessage(),
+               e.getMessage().contains(inError));
   }
 }

@@ -13,7 +13,6 @@
 
   <modules>
     <module>benchmark</module>
-    <module>unittests</module>
     <module>manualtests</module>
   </modules>
 </project>

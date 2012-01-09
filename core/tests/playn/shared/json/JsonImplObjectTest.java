@@ -36,7 +36,7 @@ public class JsonImplObjectTest extends AbstractJsonTest {
     assertFalse(json().isObject(new Double(1)));
     assertFalse(json().isObject(null));
   }
-  
+
   @Test
   public void testObjectBasics() {
     Json.Object o = json().parse("{\"a\":1, \"b\":2}");
@@ -45,20 +45,21 @@ public class JsonImplObjectTest extends AbstractJsonTest {
       assertTrue(s.equals("a") || s.equals("b"));
     }
     assertEquals(2, keys.length());
-    
+
     o.put("b", "string");
     assertTrue(o.isString("b"));
-    
+
     o.remove("b");
     assertFalse(o.isString("b"));
     assertTrue(o.isNull("b"));
-    
+
     assertEquals(1, o.keys().length());
   }
-  
+
   @Test
   public void testObjectTypes() {
-    Json.Object o = json().parse("{\"null\": null, \"number\":1, \"string\":\"string\", \"boolean\":true, \"array\":[], \"object\":{}}");
+    Json.Object o = json().parse("{\"null\": null, \"number\":1, \"string\":\"string\", " +
+                                 "\"boolean\":true, \"array\":[], \"object\":{}}");
 
     assertTrue(o.isArray("array"));
     assertFalse(o.isArray("boolean"));

@@ -51,8 +51,10 @@ public class InternalJsonWriterTest {
     assertEquals("[null]", new JsonStringWriter().array().value((String)null).end().write());
     assertEquals("[null]", new JsonStringWriter().array().value((Number)null).end().write());
     assertEquals("[null]", new JsonStringWriter().array().nul().end().write());
-    assertEquals("{\"a\":null}", new JsonStringWriter().object().value("a", (String)null).end().write());
-    assertEquals("{\"a\":null}", new JsonStringWriter().object().value("a", (Number)null).end().write());
+    assertEquals("{\"a\":null}", new JsonStringWriter().
+                 object().value("a", (String)null).end().write());
+    assertEquals("{\"a\":null}", new JsonStringWriter().
+                 object().value("a", (Number)null).end().write());
     assertEquals("{\"a\":null}", new JsonStringWriter().object().nul("a").end().write());
   }
 
@@ -66,13 +68,13 @@ public class InternalJsonWriterTest {
       chars.append((char)i);
 
     assertEquals(
-        "\"\\u0000\\u0001\\u0002\\u0003\\u0004\\u0005\\u0006\\u0007\\b\\t\\n\\u000b\\f\\r\\u000e\\u000f\\u0010"
-            + "\\u0011\\u0012\\u0013\\u0014\\u0015\\u0016\\u0017\\u0018\\u0019\\u001a\\u001b\\u001c\\u001d"
-            + "\\u001e\\u001f !\\\"#$%&'()*+,-./0123456789:;<=>?@"
-            + "ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\\\]^_`abcdefghijklmnopqrstuvwxyz{|}~\\u0080\\u0081\\u0082"
-            + "\\u0083\\u0084\\u0085\\u0086\\u0087\\u0088\\u0089\\u008a\\u008b\\u008c\\u008d\\u008e\\u008f"
-            + "\\u0090\\u0091\\u0092\\u0093\\u0094\\u0095\\u0096\\u0097\\u0098\\u0099\\u009a\\u009b\\u009c"
-            + "\\u009d\\u009e\\u009f\"", JsonStringWriter.toString(chars.toString()));
+      "\"\\u0000\\u0001\\u0002\\u0003\\u0004\\u0005\\u0006\\u0007\\b\\t\\n\\u000b\\f\\r\\u000e\\u000f"
+      + "\\u0010\\u0011\\u0012\\u0013\\u0014\\u0015\\u0016\\u0017\\u0018\\u0019\\u001a\\u001b\\u001c"
+      + "\\u001d\\u001e\\u001f !\\\"#$%&'()*+,-./0123456789:;<=>?@"
+      + "ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\\\]^_`abcdefghijklmnopqrstuvwxyz{|}~\\u0080\\u0081\\u0082"
+      + "\\u0083\\u0084\\u0085\\u0086\\u0087\\u0088\\u0089\\u008a\\u008b\\u008c\\u008d\\u008e\\u008f"
+      + "\\u0090\\u0091\\u0092\\u0093\\u0094\\u0095\\u0096\\u0097\\u0098\\u0099\\u009a\\u009b\\u009c"
+      + "\\u009d\\u009e\\u009f\"", JsonStringWriter.toString(chars.toString()));
   }
 
   /**
@@ -85,20 +87,20 @@ public class InternalJsonWriterTest {
       chars.append((char)i);
 
     assertEquals(
-        "\\u0000\\u0001\\u0002\\u0003\\u0004\\u0005\\u0006\\u0007\\b\\t\\n\\u000b\\f\\r\\u000e\\u000f\\u0010"
-            + "\\u0011\\u0012\\u0013\\u0014\\u0015\\u0016\\u0017\\u0018\\u0019\\u001a\\u001b\\u001c\\u001d"
-            + "\\u001e\\u001f !\\\"#$%&'()*+,-./0123456789:;<=>?@"
-            + "ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\\\]^_`abcdefghijklmnopqrstuvwxyz{|}~\\u0080\\u0081\\u0082"
-            + "\\u0083\\u0084\\u0085\\u0086\\u0087\\u0088\\u0089\\u008a\\u008b\\u008c\\u008d\\u008e\\u008f"
-            + "\\u0090\\u0091\\u0092\\u0093\\u0094\\u0095\\u0096\\u0097\\u0098\\u0099\\u009a\\u009b\\u009c"
-            + "\\u009d\\u009e\\u009f", JsonWriterBase.escape(chars.toString()));
+      "\\u0000\\u0001\\u0002\\u0003\\u0004\\u0005\\u0006\\u0007\\b\\t\\n\\u000b\\f\\r\\u000e\\u000f"
+      + "\\u0010\\u0011\\u0012\\u0013\\u0014\\u0015\\u0016\\u0017\\u0018\\u0019\\u001a\\u001b\\u001c"
+      + "\\u001d\\u001e\\u001f !\\\"#$%&'()*+,-./0123456789:;<=>?@"
+      + "ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\\\]^_`abcdefghijklmnopqrstuvwxyz{|}~\\u0080\\u0081\\u0082"
+      + "\\u0083\\u0084\\u0085\\u0086\\u0087\\u0088\\u0089\\u008a\\u008b\\u008c\\u008d\\u008e\\u008f"
+      + "\\u0090\\u0091\\u0092\\u0093\\u0094\\u0095\\u0096\\u0097\\u0098\\u0099\\u009a\\u009b\\u009c"
+      + "\\u009d\\u009e\\u009f", JsonWriterBase.escape(chars.toString()));
   }
 
   @Test
   public void testWriteToSystemOutLikeStream() {
     ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-    new JsonAppendableWriter(new PrintStream(bytes)).object().value("a", 1).value("b", 2).end().done();
-
+    new JsonAppendableWriter(
+      new PrintStream(bytes)).object().value("a", 1).value("b", 2).end().done();
     assertEquals("{\"a\":1,\"b\":2}", new String(bytes.toByteArray(), Charset.forName("UTF-8")));
   }
 
@@ -143,8 +145,8 @@ public class InternalJsonWriterTest {
    */
   @Test
   public void testNestedArray() {
-    String json = new JsonStringWriter().array().array().array().value(true).value(false).value(true).end().end()
-        .end().write();
+    String json = new JsonStringWriter().array().array().array().value(true).value(false).
+      value(true).end().end().end().write();
     assertEquals("[[[true,false,true]]]", json);
   }
 
@@ -153,8 +155,8 @@ public class InternalJsonWriterTest {
    */
   @Test
   public void testNestedArray2() {
-    String json = new JsonStringWriter().array().value(true).array().array().value(false).end().end().value(true)
-        .end().write();
+    String json = new JsonStringWriter().array().value(true).array().array().value(false).end().end().
+      value(true).end().write();
     assertEquals("[true,[[false]],true]", json);
   }
 
@@ -163,7 +165,8 @@ public class InternalJsonWriterTest {
    */
   @Test
   public void testObject() {
-    String json = new JsonStringWriter().object().value("a", true).value("b", false).value("c", true).end().write();
+    String json = new JsonStringWriter().object().value("a", true).value("b", false).
+      value("c", true).end().write();
     assertEquals("{\"a\":true,\"b\":false,\"c\":true}", json);
   }
 
@@ -172,7 +175,8 @@ public class InternalJsonWriterTest {
    */
   @Test
   public void testNestedObject() {
-    String json = new JsonStringWriter().object().object("a").value("b", false).value("c", true).end().end().write();
+    String json = new JsonStringWriter().object().object("a").value("b", false).value("c", true).
+      end().end().write();
     assertEquals("{\"a\":{\"b\":false,\"c\":true}}", json);
   }
 
@@ -183,24 +187,25 @@ public class InternalJsonWriterTest {
   public void testNestedObjectArray() {
     //@formatter:off
     String json = new JsonStringWriter()
-        .object()
-          .object("a")
-            .array("b")
-              .object()
-                .value("a", 1)
-                .value("b", 2)
-              .end()
-              .object()
-                .value("c", 1.0)
-                .value("d", 2.0)
-              .end()
-            .end()
-            .value("c", JsonArray.from("a", "b", "c"))
-          .end()
-        .end()
+      .object()
+      .object("a")
+      .array("b")
+      .object()
+      .value("a", 1)
+      .value("b", 2)
+      .end()
+      .object()
+      .value("c", 1.0)
+      .value("d", 2.0)
+      .end()
+      .end()
+      .value("c", JsonArray.from("a", "b", "c"))
+      .end()
+      .end()
       .write();
     //@formatter:on
-    assertEquals("{\"a\":{\"b\":[{\"a\":1,\"b\":2},{\"c\":1.0,\"d\":2.0}],\"c\":[\"a\",\"b\",\"c\"]}}", json);
+    assertEquals("{\"a\":{\"b\":[{\"a\":1,\"b\":2},{\"c\":1.0,\"d\":2.0}]," +
+                 "\"c\":[\"a\",\"b\",\"c\"]}}", json);
   }
 
   /**
@@ -242,8 +247,8 @@ public class InternalJsonWriterTest {
   @Ignore("unsupported right now")
   @Test
   public void testQuickObjectArrayNested() {
-    assertEquals("[[1,2],[[3]]]",
-        JsonStringWriter.toString(new Object[] { new Object[] { 1, 2 }, new Object[] { new Object[] { 3 } } }));
+    assertEquals("[[1,2],[[3]]]", JsonStringWriter.toString(
+                   new Object[] { new Object[] { 1, 2 }, new Object[] { new Object[] { 3 } } }));
   }
 
   @Ignore("unsupported right now")
@@ -251,7 +256,7 @@ public class InternalJsonWriterTest {
   public void testQuickObjectArrayEmpty() {
     assertEquals("[]", JsonStringWriter.toString(new Object[0]));
   }
-  
+
   @Ignore("unsupported right now")
   @Test
   public void testObjectArrayInMap() {
@@ -260,7 +265,9 @@ public class InternalJsonWriterTest {
     o.put("array of Boolean", new Boolean[] { true, false });
     o.put("array of int", new int[] { 1, 2, 3 });
     o.put("array of JsonObject", new JsonObject[] { new JsonObject(), null });
-    assertEquals("{\"array of JsonObject\":[{},null],\"array of Boolean\":[true,false],\"array of string\":[\"a\",\"b\",\"c\"],\"array of int\":[1,2,3]}", JsonStringWriter.toString(o));
+    assertEquals("{\"array of JsonObject\":[{},null],\"array of Boolean\":[true,false]," +
+                 "\"array of string\":[\"a\",\"b\",\"c\"],\"array of int\":[1,2,3]}",
+                 JsonStringWriter.toString(o));
   }
 
   @Test

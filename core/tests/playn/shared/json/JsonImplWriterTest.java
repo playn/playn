@@ -22,7 +22,7 @@ import playn.core.Json;
 /**
  * Test the public-facing {@link Json} writer API. The underlying writer is exercised in other
  * tests.
- * 
+ *
  * Tests in this class are re-used to test HTML mode.
  */
 public class JsonImplWriterTest extends AbstractJsonTest {

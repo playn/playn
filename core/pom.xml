@@ -35,10 +35,16 @@
         <artifactId>maven-source-plugin</artifactId>
       </plugin>
     </plugins>
+
     <resources>
       <resource>
         <directory>${basedir}/src</directory>
       </resource>
     </resources>
+    <testResources>
+      <testResource>
+        <directory>${basedir}/tests</directory>
+      </testResource>
+    </testResources>
   </build>
 </project>

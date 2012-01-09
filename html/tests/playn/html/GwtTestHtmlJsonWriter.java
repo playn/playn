@@ -14,24 +14,20 @@
 package playn.html;
 
 import playn.core.Json;
-import playn.shared.json.JsonImplParseTest;
+import playn.shared.json.JsonImplWriterTest;
 
 import com.google.gwt.junit.client.GWTTestCase;
 
-public class HtmlJsonParseTest extends GWTTestCase {
-  private class BaseArrayTest extends JsonImplParseTest {
+public class GwtTestHtmlJsonWriter extends GWTTestCase {
+  private class BaseArrayTest extends JsonImplWriterTest {
     @Override
     protected Json json() {
       return new HtmlJson();
     }
   }
-  
-  public void testParseArray() {
-    new BaseArrayTest().testParseArray();
-  }
 
-  public void testParseObject() {
-    new BaseArrayTest().testParseObject();
+  public void testWriter() {
+    new BaseArrayTest().testWriter();
   }
 
   @Override
