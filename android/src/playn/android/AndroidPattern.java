@@ -15,12 +15,15 @@
  */
 package playn.android;
 
-import playn.core.Image;
-import playn.core.Pattern;
 import android.graphics.BitmapShader;
 import android.graphics.Shader;
 
-class AndroidPattern implements Pattern {
+import playn.core.Image;
+import playn.core.Pattern;
+import playn.core.gl.GLPattern;
+import playn.core.gl.ImageGL;
+
+class AndroidPattern implements Pattern, GLPattern {
 
   BitmapShader shader;
   AndroidImage image;
@@ -29,5 +32,10 @@ class AndroidPattern implements Pattern {
     this.image = (AndroidImage) image;
     shader = new BitmapShader(this.image.getBitmap(), Shader.TileMode.REPEAT,
         Shader.TileMode.REPEAT);
+  }
+
+  @Override
+  public ImageGL image() {
+    return image;
   }
 }

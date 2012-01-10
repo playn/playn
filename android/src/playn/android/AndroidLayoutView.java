@@ -21,7 +21,6 @@ import android.view.Gravity;
 import android.widget.LinearLayout;
 
 public class AndroidLayoutView extends LinearLayout {
-  private GameViewGL gameView;
 
   public AndroidLayoutView(Activity activity) {
     super(activity);
@@ -46,9 +45,4 @@ public class AndroidLayoutView extends LinearLayout {
   public void onLayout(boolean changed, int l, int t, int r, int b) {
     super.onLayout(changed, l, t, r, b);
   }
-
-  public void setGameView(GameViewGL gameView) {
-    this.gameView = gameView;
-  }
-
 }

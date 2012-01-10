@@ -75,7 +75,6 @@ public abstract class GameActivity extends Activity {
     viewLayout = new AndroidLayoutView(this);
     gameView = new GameViewGL(gl20, this, context);
     viewLayout.addView(gameView);
-    viewLayout.setGameView(gameView);
 
     // Build the Window and View
     if (isHoneycombOrLater()) {

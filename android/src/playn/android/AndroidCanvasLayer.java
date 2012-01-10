@@ -19,13 +19,14 @@ import playn.core.Asserts;
 import playn.core.Canvas;
 import playn.core.CanvasLayer;
 import playn.core.InternalTransform;
+import playn.core.gl.LayerGL;
 
-class AndroidCanvasLayer extends AndroidLayer implements CanvasLayer {
+class AndroidCanvasLayer extends LayerGL implements CanvasLayer {
 
   private AndroidImage image;
 
-  AndroidCanvasLayer(AndroidGraphics gfx, int width, int height, boolean alpha) {
-    super(gfx);
+  AndroidCanvasLayer(AndroidGLContext ctx, int width, int height, boolean alpha) {
+    super(ctx);
     image = (AndroidImage) (AndroidPlatform.instance.graphics().createImage(width, height, alpha));
   }
 
@@ -37,7 +38,7 @@ class AndroidCanvasLayer extends AndroidLayer implements CanvasLayer {
   @Override
   public void destroy() {
     super.destroy();
-    image.clearTexture(gfx); // don't wait for finalization to release resources
+    image.destroy(); // don't wait for finalization to release resources
     image = null;
   }
 
@@ -46,12 +47,12 @@ class AndroidCanvasLayer extends AndroidLayer implements CanvasLayer {
     if (!visible())
       return;
 
-    int tex = image.ensureTexture(gfx, false, false);
+    int tex = (Integer) image.ensureTexture((AndroidGLContext) ctx, false, false);
     if (tex != -1) {
       InternalTransform xform = localTransform(parentTransform);
       float childAlpha = parentAlpha * alpha;
-      gfx.drawTexture(tex, image.width(), image.height(), xform, width(), height(), false,
-          false, childAlpha);
+      ctx.drawTexture(tex, image.width(), image.height(), xform, width(), height(),
+                      false, false, childAlpha);
     }
   }
 

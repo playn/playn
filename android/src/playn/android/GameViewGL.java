@@ -49,7 +49,7 @@ public class GameViewGL extends GLSurfaceView implements SurfaceHolder.Callback 
       contextId++;
       // EGLContext lost, so surfaces need to be rebuilt and redrawn.
       if (gfx != null) {
-        gfx.refreshGL();
+        gfx.ctx.onSurfaceCreated();
       }
     }
 
@@ -82,7 +82,7 @@ public class GameViewGL extends GLSurfaceView implements SurfaceHolder.Callback 
 
     void onPause() {
       if (gfx != null) {
-        gfx.storeSurfaces();
+        gfx.ctx.onSurfaceLost();
       }
     }
   }

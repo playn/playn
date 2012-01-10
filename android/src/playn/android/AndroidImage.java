@@ -15,68 +15,55 @@
  */
 package playn.android;
 
-import static playn.core.PlayN.log;
-
 import java.lang.ref.SoftReference;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.graphics.Bitmap;
+
 import playn.core.*;
 import playn.core.gl.GL20;
+import playn.core.gl.GLContext;
 import playn.core.gl.GLUtil;
-import android.graphics.Bitmap;
+import playn.core.gl.ImageGL;
+
+import static playn.core.PlayN.log;
 
 /**
  * Android implementation of CanvasImage class. Prioritizes the SoftReference to
  * the bitmap, and only holds a hard reference if the game has requested that a
  * Canvas be created.
  */
-class AndroidImage implements CanvasImage {
+class AndroidImage implements CanvasImage, ImageGL, AndroidGLContext.Refreshable {
+  private AndroidGLContext ctx;
   private SoftReference<Bitmap> bitmapRef;
   private AndroidCanvas canvas;
   private Bitmap canvasBitmap;
   private List<ResourceCallback<Image>> callbacks = new ArrayList<ResourceCallback<Image>>();
   private int width, height;
   private String path;
-  private AndroidImageNativeData natives = new AndroidImageNativeData();
-  
-  //contextId identifies which GL context the textures were last refreshed in
-  private int contextId;
+  private int tex = -1, pow2tex = -1;
 
-  private static final class AndroidImageNativeData extends AndroidGraphicsDestroyable {
-    private int tex = -1, pow2tex = -1;
-    
-    @Override
-    public void destroy(AndroidGraphics gfx) {
-      if (pow2tex == tex) {
-        pow2tex = -1;
-      }
-      if (tex != -1) {
-        gfx.destroyTexture(tex);
-        tex = -1;
-      }
-      if (pow2tex != -1) {
-        gfx.destroyTexture(pow2tex);
-        pow2tex = -1;
-      }
-    }
-  }
-  
-  AndroidImage(String path, Bitmap bitmap) {
+  AndroidImage(AndroidGLContext ctx, String path, Bitmap bitmap) {
+    this(ctx, bitmap.getWidth(), bitmap.getHeight());
     this.path = path;
-    //Use a soft reference if we have a path to restore the bitmap from.
+    // Use a soft reference if we have a path to restore the bitmap from.
     bitmapRef = new SoftReference<Bitmap>(bitmap);
-    width = bitmap.getWidth();
-    height = bitmap.getHeight();
   }
 
-  AndroidImage(int w, int h, boolean alpha) {
+  AndroidImage(AndroidGLContext ctx, int width, int height, boolean alpha) {
+    this(ctx, width, height);
     // TODO: Why not always use the preferredBitmapConfig?  (Preserved from pre-GL code)
-    canvasBitmap = Bitmap.createBitmap(w, h, alpha
-        ? AndroidPlatform.instance.preferredBitmapConfig : Bitmap.Config.ARGB_8888);
-    bitmapRef = null;
-    width = w;
-    height = h;
+    canvasBitmap = Bitmap.createBitmap(
+      width, height, alpha ? AndroidPlatform.instance.preferredBitmapConfig :
+      Bitmap.Config.ARGB_8888);
+  }
+
+  private AndroidImage(AndroidGLContext ctx, int width, int height) {
+    this.ctx = ctx;
+    this.width = width;
+    this.height = height;
+    ctx.addRefreshable(this);
   }
 
   @Override
@@ -101,6 +88,15 @@ class AndroidImage implements CanvasImage {
     return canvas;
   }
 
+  @Override
+  public void onSurfaceCreated() {
+  }
+
+  @Override
+  public void onSurfaceLost() {
+    clearTexture();
+  }
+
   boolean canvasDirty() {
     return (canvas != null && canvas.dirty());
   }
@@ -110,9 +106,8 @@ class AndroidImage implements CanvasImage {
   }
 
   public void destroy() {
-    if (natives != null)
-      natives.destroyNow();
-    natives = null;
+    ctx.removeRefreshable(this);
+    clearTexture();
   }
 
   @Override
@@ -139,16 +134,14 @@ class AndroidImage implements CanvasImage {
     height = image.height();
     path = aimg.getPath();
     canvas = null;
-    natives.destroyNow();
+    clearTexture();
   }
 
   /*
-   * getBitmap() can be exceptionally slow, as it will likely
-   * need to retrieve the bitmap from the file path.  As such
-   * it should only be called when a direct reference to the
-   * Bitmap is necessary.  (Note that this is less of an
-   * issue for an AndroidImage that has had a canvas built,
-   * as a hard reference to the bitmap is held in memory then).
+   * getBitmap() can be exceptionally slow, as it will likely need to retrieve the bitmap from the
+   * file path. As such it should only be called when a direct reference to the Bitmap is
+   * necessary. (Note that this is less of an issue for an AndroidImage that has had a canvas
+   * built, as a hard reference to the bitmap is held in memory then).
    */
   Bitmap getBitmap() {
     if (canvasBitmap != null) {
@@ -185,62 +178,67 @@ class AndroidImage implements CanvasImage {
    * Clears textures associated with this image. This does not destroy the image
    * -- a subsequent call to ensureTexture() will recreate them.
    */
-  void clearTexture(AndroidGraphics gfx) {
-    natives.destroy(gfx);
+  void clearTexture() {
+    if (pow2tex == tex) {
+      pow2tex = -1;
+    }
+    if (tex != -1) {
+      ctx.destroyTexture(tex);
+      tex = -1;
+    }
+    if (pow2tex != -1) {
+      ctx.destroyTexture(pow2tex);
+      pow2tex = -1;
+    }
   }
 
-  int ensureTexture(AndroidGraphics gfx, boolean repeatX, boolean repeatY) {
+  @Override
+  public Object ensureTexture(GLContext ctx, boolean repeatX, boolean repeatY) {
     // Create requested textures if loaded.
-    if (canvasDirty() || refreshNeeded()) {
-      //Force texture refresh
+    if (canvasDirty()) {
+      // Force texture refresh
       if (canvas != null) clearDirty();
-      clearTexture(gfx);
-      contextId = GameViewGL.contextId();
+      clearTexture();
     }
     if (isReady()) {
       if (repeatX || repeatY) {
-        scaleTexture(gfx, repeatX, repeatY);
-        return natives.pow2tex;
+        scaleTexture((AndroidGLContext) ctx, repeatX, repeatY);
+        return pow2tex;
       } else {
-        loadTexture(gfx);
-        return natives.tex;
+        loadTexture((AndroidGLContext) ctx);
+        return tex;
       }
     }
     log().error("Image not ready to draw -- cannot ensure texture.");
-    return -1;
+    return null;
   }
 
   /*
-   * Should be called from ensureTexture() and scaleTexture()
+   * Called from ensureTexture() and scaleTexture()
    */
-  private void loadTexture(AndroidGraphics gfx) {
-    boolean isTexture = gfx.gl20.glIsTexture(natives.tex);
-    if (isTexture && natives.tex != -1) {
+  private void loadTexture(AndroidGLContext ctx) {
+    if (tex != -1 && ctx.gl20.glIsTexture((Integer) tex))
       return;
-    }
-    if (isTexture) clearTexture(gfx);
-    natives.tex = gfx.createTexture(false, false);
-    gfx.updateTexture(natives.tex, getBitmap());
+    tex = (Integer) ctx.createTexture(false, false);
+    ctx.updateTexture(tex, getBitmap());
   }
 
   /*
-   * Create a pow2 texture for repeating images.
-   * Should be called from ensureTexture()
+   * Creates a pow2 texture for repeating images. Called from ensureTexture()
    */
-  private void scaleTexture(AndroidGraphics gfx, boolean repeatX, boolean repeatY) {
+  private void scaleTexture(AndroidGLContext ctx, boolean repeatX, boolean repeatY) {
     // Ensure that 'tex' is loaded. We use it below.
-    loadTexture(gfx);
+    loadTexture(ctx);
 
-    if (natives.pow2tex != -1 && gfx.gl20.glIsTexture(natives.pow2tex)) {
+    if (pow2tex != -1 && ctx.gl20.glIsTexture(pow2tex))
       return;
-    }
 
     // GL requires pow2 on axes that repeat.
     int width = GLUtil.nextPowerOfTwo(width()), height = GLUtil.nextPowerOfTwo(height());
 
     // Don't scale if it's already a power of two.
     if ((width == 0) && (height == 0)) {
-      natives.pow2tex = natives.tex;
+      pow2tex = tex;
       return;
     }
 
@@ -255,42 +253,31 @@ class AndroidImage implements CanvasImage {
     // TODO: Throw error if the size is bigger than GL_MAX_RENDERBUFFER_SIZE?
 
     // Create the pow2 texture.
-    natives.pow2tex = gfx.createTexture(repeatX, repeatY);
-    AndroidGL20 gl20 = gfx.gl20;
-    gl20.glBindTexture(GL20.GL_TEXTURE_2D, natives.pow2tex);
-    gl20.glTexImage2D(GL20.GL_TEXTURE_2D, 0, GL20.GL_RGBA, width, height, 0, GL20.GL_RGBA,
-        GL20.GL_UNSIGNED_BYTE, null);
+    pow2tex = (Integer) ctx.createTexture(width, height, repeatX, repeatY);
 
     // Point a new framebuffer at it.
-    int[] fbufBuffer = new int[1];
-    gl20.glGenFramebuffers(1, fbufBuffer, 0);
-    int fbuf = fbufBuffer[0];
-    gfx.bindFramebuffer(fbuf, width, height);
-    gl20.glFramebufferTexture2D(GL20.GL_FRAMEBUFFER, GL20.GL_COLOR_ATTACHMENT0, GL20.GL_TEXTURE_2D,
-        natives.pow2tex, 0);
-    // Render the scaled texture into the framebuffer.
-    // (rebind the texture because gfx.bindFramebuffer() may have bound it when
-    // flushing)
-    gl20.glBindTexture(GL20.GL_TEXTURE_2D, natives.pow2tex);
-    gl20.glClearColor(0, 0, 0, 0);
-    gl20.glClear(GL20.GL_COLOR_BUFFER_BIT);
+    int fbuf = (Integer) ctx.createFramebuffer(pow2tex);
 
-    gfx.drawTexture(natives.tex, width(), height(), StockInternalTransform.IDENTITY, 0, height, width,
-        -height, false, false, 1);
-    gfx.flush();
-    gfx.bindFramebuffer();
+    // Render the scaled texture into the framebuffer. (rebind the texture because
+    // ctx.bindFramebuffer() may have unbound it when flushing)
+    ctx.gl20.glBindTexture(GL20.GL_TEXTURE_2D, pow2tex);
+    ctx.clear(0, 0, 0, 0);
 
-    gl20.glDeleteFramebuffers(1, new int[] {fbuf}, 0);
+    ctx.drawTexture(tex, width(), height(), StockInternalTransform.IDENTITY,
+                    0, height, width, -height, false, false, 1);
+    ctx.flush();
+    ctx.bindFramebuffer();
+
+    ctx.deleteFramebuffer(fbuf);
   }
 
   @Override
-  public void finalize() {
-    if (natives != null)
-      natives.destroyLater();
+  protected void finalize() {
+    if (pow2tex == tex)
+      pow2tex = -1;
+    if (tex != -1)
+      ctx.queueDestroyTexture(tex);
+    if (pow2tex != -1)
+      ctx.queueDeleteFramebuffer(pow2tex);
   }
-
-  private boolean refreshNeeded() {
-    return (contextId != GameViewGL.contextId());
-  }
-
 }

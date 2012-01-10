@@ -60,7 +60,7 @@ public class AndroidAssetManager extends AbstractAssetManager {
 
   @Override
   protected Image doGetImage(String path) {
-    return new AndroidImage(path, doGetBitmap(path));
+    return new AndroidImage(AndroidPlatform.instance.graphics().ctx, path, doGetBitmap(path));
   }
 
   /**
