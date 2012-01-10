@@ -163,9 +163,13 @@ public class HtmlPlatform implements Platform {
             graphics = new HtmlGraphicsGL();
             break;
         }
+
+      // HtmlGraphicsGL ctor throws a runtime exception if the context creation fails.
       } catch (RuntimeException e) {
-        // HtmlGraphicsGL ctor throws a runtime exception if the context creation fails.
-        log().info("Failed to create GL context. Falling back.");
+        log().info("Failed to create GL context (" + e.getMessage() + "). Falling back.");
+        graphics = new HtmlGraphicsCanvas();
+      } catch (Throwable t) {
+        log().info("GL context creation failed with an unknown error." + t);
         graphics = new HtmlGraphicsCanvas();
       }
 
@@ -270,7 +274,6 @@ public class HtmlPlatform implements Platform {
 
       @Override
       public void fire() {
-        requestAnimationFrame(paintCallback);
         double now = time();
         float delta = (float) (now - lastTime);
         if (delta > MAX_DELTA) {
@@ -290,7 +293,12 @@ public class HtmlPlatform implements Platform {
         }
 
         game.paint(accum / updateRate);
-        graphics.updateLayers();
+        try {
+          graphics.updateLayers();
+          requestAnimationFrame(paintCallback);
+        } catch (Throwable t) {
+          PlayN.log().warn("Ack", t);
+        }
       }
     };
     requestAnimationFrame(paintCallback);

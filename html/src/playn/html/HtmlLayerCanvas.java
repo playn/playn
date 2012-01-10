@@ -18,14 +18,13 @@ package playn.html;
 import com.google.gwt.canvas.dom.client.Context2d;
 
 import playn.core.AbstractLayer;
-import playn.core.InternalTransform;
 
 abstract class HtmlLayerCanvas extends AbstractLayer {
 
   abstract void paint(Context2d ctx, float parentAlpha);
 
-  @Override protected InternalTransform createTransform() {
-    return new HtmlInternalTransform();
+  protected HtmlLayerCanvas() {
+    super(new HtmlInternalTransform());
   }
 
   void transform(Context2d ctx) {

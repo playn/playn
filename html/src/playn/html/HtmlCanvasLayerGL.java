@@ -19,12 +19,14 @@ import playn.core.Asserts;
 import playn.core.Canvas;
 import playn.core.CanvasLayer;
 import playn.core.InternalTransform;
+import playn.core.gl.LayerGL;
 
 import com.google.gwt.dom.client.CanvasElement;
 import com.google.gwt.dom.client.Document;
+import com.google.gwt.dom.client.ImageElement;
 import com.google.gwt.webgl.client.WebGLTexture;
 
-class HtmlCanvasLayerGL extends HtmlLayerGL implements CanvasLayer {
+class HtmlCanvasLayerGL extends LayerGL implements CanvasLayer {
 
   private final int width;
   private final int height;
@@ -32,8 +34,8 @@ class HtmlCanvasLayerGL extends HtmlLayerGL implements CanvasLayer {
   private HtmlCanvas canvas;
   private WebGLTexture tex;
 
-  HtmlCanvasLayerGL(HtmlGraphicsGL gfx, int width, int height) {
-    super(gfx);
+  HtmlCanvasLayerGL(HtmlGLContext ctx, int width, int height) {
+    super(ctx);
 
     this.width = width;
     this.height = height;
@@ -43,7 +45,7 @@ class HtmlCanvasLayerGL extends HtmlLayerGL implements CanvasLayer {
     canvas.setHeight(height);
 
     this.canvas = new HtmlCanvas(canvas, width, height);
-    tex = gfx.createTexture(false, false);
+    tex = ctx.createTexture(false, false);
   }
 
   @Override
@@ -54,7 +56,7 @@ class HtmlCanvasLayerGL extends HtmlLayerGL implements CanvasLayer {
   @Override
   public void destroy() {
     super.destroy();
-    gfx.destroyTexture(tex);
+    ctx.destroyTexture(tex);
     tex = null;
     canvas = null;
   }
@@ -65,9 +67,9 @@ class HtmlCanvasLayerGL extends HtmlLayerGL implements CanvasLayer {
 
     if (canvas.dirty()) {
       canvas.clearDirty();
-      gfx.updateTexture(tex, canvas.canvas());
+      ((HtmlGLContext) ctx).updateTexture(tex, canvas.canvas().<ImageElement>cast());
     }
-    gfx.drawTexture(tex, width, height, localTransform(parentTransform), width, height, false,
+    ctx.drawTexture(tex, width, height, localTransform(parentTransform), width, height, false,
         false, parentAlpha * alpha);
   }
 

@@ -21,7 +21,7 @@ import com.google.gwt.dom.client.Style.Position;
 import com.google.gwt.dom.client.Style.Visibility;
 
 import playn.core.AbstractLayer;
-import playn.core.InternalTransform;
+import playn.core.StockInternalTransform;
 
 class HtmlLayerDom extends AbstractLayer {
 
@@ -65,7 +65,8 @@ class HtmlLayerDom extends AbstractLayer {
   private final Element elem;
 
   HtmlLayerDom(Element elem) {
-    super();
+    super(HtmlPlatform.hasTypedArraySupport ?
+          new HtmlInternalTransform() : new StockInternalTransform());
     this.elem = elem;
     elem.getStyle().setPosition(Position.ABSOLUTE);
     elem.getStyle().setVisibility(Visibility.HIDDEN);
@@ -127,13 +128,6 @@ class HtmlLayerDom extends AbstractLayer {
     matrix += " translate(" + css(-originX) + "px," + css(-originY) + "px)";
 
     elem.getStyle().setProperty(transformName, matrix);
-  }
-
-  @Override
-  protected InternalTransform createTransform() {
-    // only use HtmlInternalTransform on browsers that support typed arrays
-    return HtmlPlatform.hasTypedArraySupport ?
-      new HtmlInternalTransform() : super.createTransform();
   }
 
   private String xlate(float x) {

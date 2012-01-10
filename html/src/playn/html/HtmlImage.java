@@ -15,23 +15,26 @@
  */
 package playn.html;
 
-import static com.google.gwt.webgl.client.WebGLRenderingContext.COLOR_ATTACHMENT0;
-import static com.google.gwt.webgl.client.WebGLRenderingContext.FRAMEBUFFER;
-import static com.google.gwt.webgl.client.WebGLRenderingContext.RGBA;
-import static com.google.gwt.webgl.client.WebGLRenderingContext.TEXTURE_2D;
-import static com.google.gwt.webgl.client.WebGLRenderingContext.UNSIGNED_BYTE;
-import playn.core.Asserts;
-import playn.core.Image;
-import playn.core.ResourceCallback;
-import playn.core.gl.GLUtil;
-
 import com.google.gwt.dom.client.CanvasElement;
 import com.google.gwt.dom.client.ImageElement;
 import com.google.gwt.dom.client.NativeEvent;
 import com.google.gwt.webgl.client.WebGLFramebuffer;
 import com.google.gwt.webgl.client.WebGLTexture;
 
-class HtmlImage implements Image {
+import static com.google.gwt.webgl.client.WebGLRenderingContext.COLOR_ATTACHMENT0;
+import static com.google.gwt.webgl.client.WebGLRenderingContext.FRAMEBUFFER;
+import static com.google.gwt.webgl.client.WebGLRenderingContext.RGBA;
+import static com.google.gwt.webgl.client.WebGLRenderingContext.TEXTURE_2D;
+import static com.google.gwt.webgl.client.WebGLRenderingContext.UNSIGNED_BYTE;
+
+import playn.core.Asserts;
+import playn.core.Image;
+import playn.core.ResourceCallback;
+import playn.core.gl.GLContext;
+import playn.core.gl.GLUtil;
+import playn.core.gl.ImageGL;
+
+class HtmlImage implements Image, ImageGL {
 
   private static native boolean isComplete(ImageElement img) /*-{
     return img.complete;
@@ -96,33 +99,15 @@ class HtmlImage implements Image {
     return isComplete(this.img);
   }
 
-  /*
-   * Clears textures associated with this image. This does not destroy the image -- a subsequent
-   * call to ensureTexture() will recreate them.
-   */
-  void clearTexture(HtmlGraphicsGL gfx) {
-    if (pow2tex == tex) {
-      pow2tex = null;
-    }
-
-    if (tex != null) {
-      gfx.destroyTexture(tex);
-      tex = null;
-    }
-    if (pow2tex != null) {
-      gfx.destroyTexture(pow2tex);
-      pow2tex = null;
-    }
-  }
-
-  WebGLTexture ensureTexture(HtmlGraphicsGL gfx, boolean repeatX, boolean repeatY) {
+  @Override
+  public WebGLTexture ensureTexture(GLContext ctx, boolean repeatX, boolean repeatY) {
     // Create requested textures if loaded.
     if (isReady()) {
       if (repeatX || repeatY) {
-        scaleTexture(gfx, repeatX, repeatY);
+        scaleTexture((HtmlGLContext) ctx, repeatX, repeatY);
         return pow2tex;
       } else {
-        loadTexture(gfx);
+        loadTexture((HtmlGLContext) ctx);
         return tex;
       }
     }
@@ -130,16 +115,35 @@ class HtmlImage implements Image {
     return null;
   }
 
-  private void loadTexture(HtmlGraphicsGL gfx) {
+  /*
+   * Clears textures associated with this image. This does not destroy the image -- a subsequent
+   * call to ensureTexture() will recreate them.
+   */
+  void clearTexture(HtmlGLContext ctx) {
+    if (pow2tex == tex) {
+      pow2tex = null;
+    }
+
+    if (tex != null) {
+      ctx.destroyTexture(tex);
+      tex = null;
+    }
+    if (pow2tex != null) {
+      ctx.destroyTexture(pow2tex);
+      pow2tex = null;
+    }
+  }
+
+  private void loadTexture(HtmlGLContext ctx) {
     if (tex != null) {
       return;
     }
 
-    tex = gfx.createTexture(false, false);
-    gfx.updateTexture(tex, img);
+    tex = ctx.createTexture(false, false);
+    ctx.updateTexture(tex, img);
   }
 
-  private void scaleTexture(HtmlGraphicsGL gfx, boolean repeatX, boolean repeatY) {
+  private void scaleTexture(HtmlGLContext ctx, boolean repeatX, boolean repeatY) {
     if (pow2tex != null) {
       return;
     }
@@ -149,13 +153,13 @@ class HtmlImage implements Image {
 
     // Don't scale if it's already a power of two.
     if ((width == 0) && (height == 0)) {
-      pow2tex = gfx.createTexture(repeatX, repeatY);
-      gfx.updateTexture(pow2tex, img);
+      pow2tex = ctx.createTexture(repeatX, repeatY);
+      ctx.updateTexture(pow2tex, img);
       return;
     }
 
     // Ensure that 'tex' is loaded. We use it below.
-    loadTexture(gfx);
+    loadTexture(ctx);
 
     // width/height == 0 => already a power of two.
     if (width == 0) {
@@ -166,23 +170,23 @@ class HtmlImage implements Image {
     }
 
     // Create the pow2 texture.
-    pow2tex = gfx.createTexture(repeatX, repeatY);
-    gfx.gl.bindTexture(TEXTURE_2D, pow2tex);
-    gfx.gl.texImage2D(TEXTURE_2D, 0, RGBA, width, height, 0, RGBA, UNSIGNED_BYTE, null);
+    pow2tex = ctx.createTexture(repeatX, repeatY);
+    ctx.gl.bindTexture(TEXTURE_2D, pow2tex);
+    ctx.gl.texImage2D(TEXTURE_2D, 0, RGBA, width, height, 0, RGBA, UNSIGNED_BYTE, null);
 
     // Point a new framebuffer at it.
-    WebGLFramebuffer fbuf = gfx.gl.createFramebuffer();
-    gfx.bindFramebuffer(fbuf, width, height);
-    gfx.gl.framebufferTexture2D(FRAMEBUFFER, COLOR_ATTACHMENT0, TEXTURE_2D, pow2tex, 0);
+    WebGLFramebuffer fbuf = ctx.gl.createFramebuffer();
+    ctx.bindFramebuffer(fbuf, width, height);
+    ctx.gl.framebufferTexture2D(FRAMEBUFFER, COLOR_ATTACHMENT0, TEXTURE_2D, pow2tex, 0);
 
     // Render the scaled texture into the framebuffer.
-    // (rebind the texture because gfx.bindFramebuffer() may have bound it when flushing)
-    gfx.gl.bindTexture(TEXTURE_2D, pow2tex);
-    gfx.drawTexture(tex, width(), height(), HtmlInternalTransform.IDENTITY,
+    // (rebind the texture because ctx.bindFramebuffer() may have bound it when flushing)
+    ctx.gl.bindTexture(TEXTURE_2D, pow2tex);
+    ctx.drawTexture(tex, width(), height(), HtmlInternalTransform.IDENTITY,
                     0, height, width, -height, false, false, 1);
-    gfx.flush();
-    gfx.bindFramebuffer();
+    ctx.flush();
+    ctx.bindFramebuffer();
 
-    gfx.gl.deleteFramebuffer(fbuf);
+    ctx.gl.deleteFramebuffer(fbuf);
   }
 }
