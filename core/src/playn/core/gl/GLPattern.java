@@ -15,24 +15,12 @@
  */
 package playn.core.gl;
 
-import playn.core.AbstractLayer;
-import playn.core.InternalTransform;
+import playn.core.Pattern;
 
-public abstract class LayerGL extends AbstractLayer {
-  private final InternalTransform savedLocal;
-
-  protected final GLContext ctx;
-
-  protected LayerGL(GLContext ctx) {
-    super(ctx.createTransform());
-    this.ctx = ctx;
-    this.savedLocal = ctx.createTransform();
-  }
-
-  protected InternalTransform localTransform(InternalTransform parentTransform) {
-    savedLocal.set(parentTransform);
-    return savedLocal.concatenate(transform, originX, originY);
-  }
-
-  public abstract void paint(InternalTransform parentTransform, float parentAlpha);
+/**
+ * Provide access to the texture that implements a pattern in GL.
+ */
+public interface GLPattern extends Pattern
+{
+  ImageGL image();
 }

@@ -21,16 +21,13 @@ import flash.gwt.FlashImport;
 
 import playn.core.AbstractLayer;
 import playn.core.InternalTransform;
+import playn.core.StockInternalTransform;
 
 @FlashImport({"flash.display.Sprite"})
 public class FlashLayer extends AbstractLayer {
 
-
   protected final DisplayObject displayObject;
 
-  /**
-   *
-   */
   public FlashLayer(DisplayObject displayObject) {
     this.displayObject = displayObject;
 //    ((InteractiveObject) displayObject).setMouseEnabled(false);
@@ -51,21 +48,14 @@ public class FlashLayer extends AbstractLayer {
     updateChildren();
   }
 
-  /**
-   *
-   */
   protected void updateChildren() {
     // TODO Auto-generated method stub
-
   }
 
-   /**
-   *
-   */
   private void updateDisplay() {
 //    display().setX((int) originX);
 //    display().setY((int) originY);
-    InternalTransform x = createTransform();
+    InternalTransform x = new StockInternalTransform();
     x.concatenate(transform, originX, originY);
     display().setTransform(x.m00(), x.m01(), x.m10(), x.m11(), x.tx(), x.ty());
   }

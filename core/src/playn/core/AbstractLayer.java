@@ -44,7 +44,11 @@ public abstract class AbstractLayer implements Layer {
   protected int flags;
 
   protected AbstractLayer() {
-    transform = createTransform();
+    this(new StockInternalTransform());
+  }
+
+  protected AbstractLayer(InternalTransform transform) {
+    this.transform = transform;
     alpha = 1;
     setFlag(Flag.VISIBLE, true);
   }
@@ -173,9 +177,5 @@ public abstract class AbstractLayer implements Layer {
     } else {
       flags &= ~flag.bitmask;
     }
-  }
-
-  protected InternalTransform createTransform() {
-    return new StockInternalTransform();
   }
 }
