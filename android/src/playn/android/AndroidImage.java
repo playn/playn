@@ -42,7 +42,7 @@ class AndroidImage extends ImageGL implements CanvasImage, AndroidGLContext.Refr
   private List<ResourceCallback<Image>> callbacks = new ArrayList<ResourceCallback<Image>>();
   private int width, height;
   private String path;
-  private int tex = -1, pow2tex = -1;
+  private int tex = -1, reptex = -1;
 
   AndroidImage(AndroidGLContext ctx, String path, Bitmap bitmap) {
     this(ctx, bitmap.getWidth(), bitmap.getHeight());
@@ -165,7 +165,7 @@ class AndroidImage extends ImageGL implements CanvasImage, AndroidGLContext.Refr
     if (isReady()) {
       if (repeatX || repeatY) {
         scaleTexture((AndroidGLContext) ctx, repeatX, repeatY);
-        return pow2tex;
+        return reptex;
       } else {
         loadTexture((AndroidGLContext) ctx);
         return tex;
@@ -181,72 +181,56 @@ class AndroidImage extends ImageGL implements CanvasImage, AndroidGLContext.Refr
   }
 
   void clearTexture() {
-    if (pow2tex == tex) {
-      pow2tex = -1;
-    }
     if (tex != -1) {
       ctx.destroyTexture(tex);
       tex = -1;
     }
-    if (pow2tex != -1) {
-      ctx.destroyTexture(pow2tex);
-      pow2tex = -1;
+    if (reptex != -1) {
+      ctx.destroyTexture(reptex);
+      reptex = -1;
     }
   }
 
-  /*
-   * Called from ensureTexture() and scaleTexture()
-   */
   private void loadTexture(AndroidGLContext ctx) {
-    if (tex != -1 && ctx.gl20.glIsTexture((Integer) tex))
+    if (tex != -1)
       return;
-    tex = (Integer) ctx.createTexture(false, false);
+    tex = ctx.createTexture(false, false);
     ctx.updateTexture(tex, getBitmap());
   }
 
-  /*
-   * Creates a pow2 texture for repeating images. Called from ensureTexture()
-   */
   private void scaleTexture(AndroidGLContext ctx, boolean repeatX, boolean repeatY) {
-    // Ensure that 'tex' is loaded. We use it below.
+    if (reptex != -1)
+      return;
+
+    // GL requires pow2 on axes that repeat
+    int width = GLUtil.nextPowerOfTwo(width()), height = GLUtil.nextPowerOfTwo(height());
+    reptex = ctx.createTexture(width, height, repeatX, repeatY);
+
+    // no need to scale if our source data is already a power of two
+    if ((width == 0) && (height == 0)) {
+      ctx.updateTexture(reptex, getBitmap());
+      return;
+    }
+
+    // otherwise we need to scale our non-repeated texture, which we'll load normally
     loadTexture(ctx);
 
-    if (pow2tex != -1 && ctx.gl20.glIsTexture(pow2tex))
-      return;
-
-    // GL requires pow2 on axes that repeat.
-    int width = GLUtil.nextPowerOfTwo(width()), height = GLUtil.nextPowerOfTwo(height());
-
-    // Don't scale if it's already a power of two.
-    if ((width == 0) && (height == 0)) {
-      pow2tex = tex;
-      return;
-    }
-
     // width/height == 0 => already a power of two.
-    if (width == 0) {
+    if (width == 0)
       width = width();
-    }
-    if (height == 0) {
+    if (height == 0)
       height = height();
-    }
 
     // TODO: Throw error if the size is bigger than GL_MAX_RENDERBUFFER_SIZE?
 
-    // Create the pow2 texture.
-    pow2tex = (Integer) ctx.createTexture(width, height, repeatX, repeatY);
-
-    // Point a new framebuffer at it.
-    int fbuf = (Integer) ctx.createFramebuffer(pow2tex);
-
-    // Render the scaled texture into the framebuffer. (rebind the texture because
-    // ctx.bindFramebuffer() may have unbound it when flushing)
-    ctx.gl20.glBindTexture(GL20.GL_TEXTURE_2D, pow2tex);
+    // point a new framebuffer at it
+    int fbuf = ctx.createFramebuffer(reptex);
+    ctx.gl20.glBindTexture(GL20.GL_TEXTURE_2D, reptex);
     ctx.clear(0, 0, 0, 0);
 
+    // render the non-repeated texture into the framebuffer properly scaled
     ctx.drawTexture(tex, width(), height(), StockInternalTransform.IDENTITY,
                     0, height, width, -height, false, false, 1);
-    ctx.flush();
     ctx.bindFramebuffer();
 
     ctx.deleteFramebuffer(fbuf);
@@ -254,11 +238,9 @@ class AndroidImage extends ImageGL implements CanvasImage, AndroidGLContext.Refr
 
   @Override
   protected void finalize() {
-    if (pow2tex == tex)
-      pow2tex = -1;
     if (tex != -1)
       ctx.queueDestroyTexture(tex);
-    if (pow2tex != -1)
-      ctx.queueDeleteFramebuffer(pow2tex);
+    if (reptex != -1)
+      ctx.queueDeleteFramebuffer(reptex);
   }
 }

@@ -46,7 +46,7 @@ class HtmlImage extends ImageGL {
   ImageElement img;
 
   // only used in the WebGL renderer.
-  protected WebGLTexture tex, pow2tex;
+  protected WebGLTexture tex, reptex;
 
   HtmlImage(CanvasElement img) {
     fakeComplete(img);
@@ -98,7 +98,7 @@ class HtmlImage extends ImageGL {
     if (isReady()) {
       if (repeatX || repeatY) {
         scaleTexture((HtmlGLContext) ctx, repeatX, repeatY);
-        return pow2tex;
+        return reptex;
       } else {
         loadTexture((HtmlGLContext) ctx);
         return tex;
@@ -110,17 +110,13 @@ class HtmlImage extends ImageGL {
 
   @Override
   public void clearTexture(GLContext ctx) {
-    if (pow2tex == tex) {
-      pow2tex = null;
-    }
-
     if (tex != null) {
       ctx.destroyTexture(tex);
       tex = null;
     }
-    if (pow2tex != null) {
-      ctx.destroyTexture(pow2tex);
-      pow2tex = null;
+    if (reptex != null) {
+      ctx.destroyTexture(reptex);
+      reptex = null;
     }
   }
 
@@ -132,47 +128,36 @@ class HtmlImage extends ImageGL {
   }
 
   private void scaleTexture(HtmlGLContext ctx, boolean repeatX, boolean repeatY) {
-    if (pow2tex != null) {
+    if (reptex != null)
       return;
-    }
 
-    // GL requires pow2 on axes that repeat.
+    // GL requires pow2 on axes that repeat
     int width = GLUtil.nextPowerOfTwo(width()), height = GLUtil.nextPowerOfTwo(height());
+    reptex = ctx.createTexture(width, height, repeatX, repeatY);
 
-    // Don't scale if it's already a power of two.
+    // no need to scale if our source data is already a power of two
     if ((width == 0) && (height == 0)) {
-      pow2tex = ctx.createTexture(repeatX, repeatY);
-      ctx.updateTexture(pow2tex, img);
+      ctx.updateTexture(reptex, img);
       return;
     }
 
-    // Ensure that 'tex' is loaded. We use it below.
+    // otherwise we need to scale our non-repeated texture, which we'll load normally
     loadTexture(ctx);
 
     // width/height == 0 => already a power of two.
-    if (width == 0) {
+    if (width == 0)
       width = width();
-    }
-    if (height == 0) {
+    if (height == 0)
       height = height();
-    }
 
-    // Create the pow2 texture.
-    pow2tex = ctx.createTexture(repeatX, repeatY);
-    ctx.gl.bindTexture(TEXTURE_2D, pow2tex);
-    ctx.gl.texImage2D(TEXTURE_2D, 0, RGBA, width, height, 0, RGBA, UNSIGNED_BYTE, null);
-
-    // Point a new framebuffer at it.
+    // point a new framebuffer at it
     WebGLFramebuffer fbuf = ctx.gl.createFramebuffer();
-    ctx.bindFramebuffer(fbuf, width, height);
-    ctx.gl.framebufferTexture2D(FRAMEBUFFER, COLOR_ATTACHMENT0, TEXTURE_2D, pow2tex, 0);
+    ctx.gl.framebufferTexture2D(FRAMEBUFFER, COLOR_ATTACHMENT0, TEXTURE_2D, reptex, 0);
+    ctx.gl.bindTexture(TEXTURE_2D, reptex);
 
-    // Render the scaled texture into the framebuffer.
-    // (rebind the texture because ctx.bindFramebuffer() may have bound it when flushing)
-    ctx.gl.bindTexture(TEXTURE_2D, pow2tex);
+    // render the non-repeated texture into the framebuffer properly scaled
     ctx.drawTexture(tex, width(), height(), HtmlInternalTransform.IDENTITY,
                     0, height, width, -height, false, false, 1);
-    ctx.flush();
     ctx.bindFramebuffer();
 
     ctx.gl.deleteFramebuffer(fbuf);
