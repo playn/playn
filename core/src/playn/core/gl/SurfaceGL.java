@@ -22,7 +22,6 @@ import playn.core.Asserts;
 import playn.core.Image;
 import playn.core.InternalTransform;
 import playn.core.Pattern;
-import playn.core.StockInternalTransform;
 import playn.core.Surface;
 
 public class SurfaceGL implements Surface {
@@ -41,7 +40,7 @@ public class SurfaceGL implements Surface {
     this.width = width;
     this.height = height;
 
-    transformStack.add(createTransform());
+    transformStack.add(ctx.createTransform());
     createTexture();
   }
 
@@ -167,7 +166,7 @@ public class SurfaceGL implements Surface {
 
   @Override
   public Surface save() {
-    transformStack.add(createTransform().set(topTransform()));
+    transformStack.add(ctx.createTransform().set(topTransform()));
     return this;
   }
 
@@ -224,10 +223,6 @@ public class SurfaceGL implements Surface {
       ctx.queueDestroyTexture(tex);
     if (fbuf != null)
       ctx.queueDeleteFramebuffer(fbuf);
-  }
-
-  protected InternalTransform createTransform() {
-    return new StockInternalTransform();
   }
 
   private InternalTransform topTransform() {
