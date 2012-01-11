@@ -48,7 +48,7 @@ class JavaGraphics implements Graphics {
     this.rootLayer = new JavaGroupLayer();
   }
 
-  @Override
+  @Override @Deprecated
   public CanvasLayer createCanvasLayer(int width, int height) {
     return new JavaCanvasLayer(width, height);
   }

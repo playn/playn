@@ -27,7 +27,6 @@ import static com.google.gwt.webgl.client.WebGLRenderingContext.RGBA;
 import static com.google.gwt.webgl.client.WebGLRenderingContext.TEXTURE_2D;
 import static com.google.gwt.webgl.client.WebGLRenderingContext.UNSIGNED_BYTE;
 
-import playn.core.Asserts;
 import playn.core.Image;
 import playn.core.ResourceCallback;
 import playn.core.gl.GLContext;
@@ -47,7 +46,7 @@ class HtmlImage extends ImageGL {
   ImageElement img;
 
   // only used in the WebGL renderer.
-  private WebGLTexture tex, pow2tex;
+  protected WebGLTexture tex, pow2tex;
 
   HtmlImage(CanvasElement img) {
     fakeComplete(img);
@@ -126,10 +125,8 @@ class HtmlImage extends ImageGL {
   }
 
   private void loadTexture(HtmlGLContext ctx) {
-    if (tex != null) {
+    if (tex != null)
       return;
-    }
-
     tex = ctx.createTexture(false, false);
     ctx.updateTexture(tex, img);
   }

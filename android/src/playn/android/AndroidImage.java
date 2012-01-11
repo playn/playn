@@ -97,14 +97,6 @@ class AndroidImage extends ImageGL implements CanvasImage, AndroidGLContext.Refr
     clearTexture();
   }
 
-  boolean canvasDirty() {
-    return (canvas != null && canvas.dirty());
-  }
-
-  void clearDirty() {
-    canvas.clearDirty();
-  }
-
   public void destroy() {
     ctx.removeRefreshable(this);
     clearTexture();
@@ -164,10 +156,10 @@ class AndroidImage extends ImageGL implements CanvasImage, AndroidGLContext.Refr
 
   @Override
   public Object ensureTexture(GLContext ctx, boolean repeatX, boolean repeatY) {
-    // Create requested textures if loaded.
-    if (canvasDirty()) {
-      // Force texture refresh
-      if (canvas != null) clearDirty();
+    // if we have a canvas, and it's dirty, force the recreation of our texture which will obtain
+    // the latest canvas data
+    if (canvas != null && canvas.dirty()) {
+      canvas.clearDirty();
       clearTexture();
     }
     if (isReady()) {

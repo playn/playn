@@ -19,7 +19,6 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 
-import playn.core.Asserts;
 import playn.core.Image;
 import playn.core.Canvas;
 import playn.core.CanvasImage;

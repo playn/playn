@@ -15,6 +15,7 @@
  */
 package playn.android;
 
+import playn.core.gl.CanvasLayerGL;
 import playn.core.gl.GroupLayerGL;
 import playn.core.gl.SurfaceLayerGL;
 
@@ -122,13 +123,9 @@ class AndroidGraphics implements Graphics {
     return screenWidth;
   }
 
-  @Override
+  @Override @Deprecated
   public CanvasLayer createCanvasLayer(int width, int height) {
-    return new AndroidCanvasLayer(ctx, width, height, true);
-  }
-
-  public CanvasLayer createCanvasLayer(int width, int height, boolean alpha) {
-    return new AndroidCanvasLayer(ctx, width, height, alpha);
+    return new CanvasLayerGL(ctx, createImage(width, height));
   }
 
   @Override

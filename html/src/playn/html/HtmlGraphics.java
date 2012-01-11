@@ -99,8 +99,7 @@ public abstract class HtmlGraphics implements Graphics {
 
   @Override
   public CanvasImage createImage(int w, int h) {
-    HtmlCanvas surface = new HtmlCanvas(w, h);
-    return new HtmlCanvasImage(surface);
+    return new HtmlCanvasImage(new HtmlCanvas(w, h));
   }
 
   @Override

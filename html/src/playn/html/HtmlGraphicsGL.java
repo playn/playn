@@ -18,6 +18,7 @@ import playn.core.GroupLayer;
 import playn.core.Image;
 import playn.core.ImageLayer;
 import playn.core.SurfaceLayer;
+import playn.core.gl.CanvasLayerGL;
 import playn.core.gl.GroupLayerGL;
 import playn.core.gl.ImageLayerGL;
 import playn.core.gl.SurfaceLayerGL;
@@ -45,9 +46,9 @@ class HtmlGraphicsGL extends HtmlGraphics {
     }
   }
 
-  @Override
+  @Override @Deprecated
   public CanvasLayer createCanvasLayer(int width, int height) {
-    return new HtmlCanvasLayerGL(ctx, width, height);
+    return new CanvasLayerGL(ctx, createImage(width, height));
   }
 
   @Override

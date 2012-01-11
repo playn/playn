@@ -27,8 +27,9 @@ public interface Graphics {
   GroupLayer rootLayer();
 
   /**
-   * TODO
+   * @deprecated("Use createImage(int,int) and createImageLayer(Image)")
    */
+  @Deprecated
   CanvasLayer createCanvasLayer(int width, int height);
 
   /**
