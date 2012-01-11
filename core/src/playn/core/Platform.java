@@ -19,7 +19,7 @@ package playn.core;
  * Generic platform interface. New platforms are defined as implementations of this interface.
  */
 public interface Platform {
-  public enum Type { JAVA, HTML, ANDROID, FLASH }
+  public enum Type { JAVA, HTML, ANDROID, IOS, FLASH }
 
   Audio audio();
 

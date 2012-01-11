@@ -35,6 +35,7 @@
     <module>html</module>
     <module>flash</module>
     <module>android</module>
+    <module>ios</module>
     <module>server</module>
     <module>payments</module>
     <module>test</module>
@@ -45,6 +46,7 @@
     <android.version>2.3.3</android.version>
     <android.maven.version>3.0.0-alpha-13</android.maven.version>
     <gae.version>1.6.1</gae.version>
+    <monotouch.version>2.1</monotouch.version>
     <!--
       App Engine server side log levels:
       SEVERE, WARNING, INFO, CONFIG, FINE, FINER, FINEST
