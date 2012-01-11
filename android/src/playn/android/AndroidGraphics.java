@@ -15,7 +15,11 @@
  */
 package playn.android;
 
+import android.app.ActivityManager;
+import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.LinearGradient;
+import android.graphics.PixelFormat;
 import android.graphics.RadialGradient;
 import android.graphics.Shader.TileMode;
 import android.view.View;
@@ -41,6 +45,7 @@ class AndroidGraphics extends GraphicsGL {
   private static int startingScreenHeight;
 
   public final AndroidGLContext ctx;
+  public final Bitmap.Config preferredBitmapConfig = mapDisplayPixelFormat();
 
   final GroupLayerGL rootLayer;
   private final GameViewGL gameView;
@@ -59,11 +64,7 @@ class AndroidGraphics extends GraphicsGL {
 
   @Override
   public CanvasImage createImage(int w, int h) {
-    return new AndroidImage(ctx, w, h, true);
-  }
-
-  public CanvasImage createImage(int w, int h, boolean alpha) {
-    return new AndroidImage(ctx, w, h, alpha);
+    return new AndroidCanvasImage(ctx, w, h, true);
   }
 
   @Override
@@ -81,7 +82,7 @@ class AndroidGraphics extends GraphicsGL {
   @Override
   public Pattern createPattern(Image img) {
     Asserts.checkArgument(img instanceof AndroidImage);
-    return new AndroidPattern(img);
+    return new AndroidPattern((AndroidImage) img);
   }
 
   @Override
@@ -169,6 +170,13 @@ class AndroidGraphics extends GraphicsGL {
     return ctx;
   }
 
+  /** Used to create bitmaps for canvas images. */
+  Bitmap createBitmap(int width, int height, boolean alpha) {
+    // TODO: Why not always use the preferredBitmapConfig?  (Preserved from pre-GL code)
+    return Bitmap.createBitmap(
+      width, height, alpha ? preferredBitmapConfig : Bitmap.Config.ARGB_8888);
+  }
+
   void preparePaint() {
     ctx.processPending();
     ctx.bindFramebuffer();
@@ -193,6 +201,24 @@ class AndroidGraphics extends GraphicsGL {
       }
     });
     ctx.setSize(width, height);
+  }
+
+  /**
+   * Determines the most performant pixel format for the active display.
+   */
+  private Bitmap.Config mapDisplayPixelFormat() {
+    // TODO:  This method will require testing over a variety of devices.
+    int format = AndroidPlatform.instance.activity.
+      getWindowManager().getDefaultDisplay().getPixelFormat();
+    ActivityManager activityManager = (ActivityManager) AndroidPlatform.instance.activity.
+      getApplication().getSystemService(Context.ACTIVITY_SERVICE);
+    int memoryClass = activityManager.getMemoryClass();
+
+    // For low memory devices (like the HTC Magic), prefer 16-bit bitmaps
+    // FIXME: The memoryClass check is from the Canvas-only implementation and may function incorrectly with OpenGL
+    if (format == PixelFormat.RGBA_4444 ||  memoryClass <= 16)
+      return Bitmap.Config.ARGB_4444;
+    else return Bitmap.Config.ARGB_8888;
   }
 
   /**

@@ -15,10 +15,6 @@
  */
 package playn.android;
 
-import java.lang.ref.SoftReference;
-import java.util.ArrayList;
-import java.util.List;
-
 import android.graphics.Bitmap;
 
 import playn.core.*;
@@ -29,63 +25,21 @@ import playn.core.gl.ImageGL;
 
 import static playn.core.PlayN.log;
 
-/**
- * Android implementation of CanvasImage class. Prioritizes the SoftReference to
- * the bitmap, and only holds a hard reference if the game has requested that a
- * Canvas be created.
- */
-class AndroidImage extends ImageGL implements CanvasImage, AndroidGLContext.Refreshable {
-  private AndroidGLContext ctx;
-  private SoftReference<Bitmap> bitmapRef;
-  private AndroidCanvas canvas;
-  private Bitmap canvasBitmap;
-  private List<ResourceCallback<Image>> callbacks = new ArrayList<ResourceCallback<Image>>();
-  private int width, height;
-  private String path;
+class AndroidImage extends ImageGL implements AndroidGLContext.Refreshable {
+  private final AndroidGLContext ctx;
+  private final Bitmap bitmap;
   private int tex = -1, reptex = -1;
 
-  AndroidImage(AndroidGLContext ctx, String path, Bitmap bitmap) {
-    this(ctx, bitmap.getWidth(), bitmap.getHeight());
-    this.path = path;
-    // Use a soft reference if we have a path to restore the bitmap from.
-    bitmapRef = new SoftReference<Bitmap>(bitmap);
-  }
-
-  AndroidImage(AndroidGLContext ctx, int width, int height, boolean alpha) {
-    this(ctx, width, height);
-    // TODO: Why not always use the preferredBitmapConfig?  (Preserved from pre-GL code)
-    canvasBitmap = Bitmap.createBitmap(
-      width, height, alpha ? AndroidPlatform.instance.preferredBitmapConfig :
-      Bitmap.Config.ARGB_8888);
-  }
-
-  private AndroidImage(AndroidGLContext ctx, int width, int height) {
+  AndroidImage(AndroidGLContext ctx, Bitmap bitmap) {
     this.ctx = ctx;
-    this.width = width;
-    this.height = height;
+    this.bitmap = bitmap;
     ctx.addRefreshable(this);
   }
 
   @Override
   public void addCallback(ResourceCallback<Image> callback) {
-    callbacks.add(callback);
-    if (isReady()) {
-      runCallbacks(true);
-    }
-  }
-
-  @Override
-  public Canvas canvas() {
-    if (canvas == null) {
-      canvasBitmap = getBitmap();
-      if (canvasBitmap != null) {
-        canvas = new AndroidCanvas(canvasBitmap);
-      } else {
-        canvas = new AndroidCanvas(width, height);
-      }
-    }
-    bitmapRef = null;
-    return canvas;
+    // we're always ready immediately
+    callback.done(this);
   }
 
   @Override
@@ -104,64 +58,21 @@ class AndroidImage extends ImageGL implements CanvasImage, AndroidGLContext.Refr
 
   @Override
   public int height() {
-    return height;
+    return bitmap.getHeight();
   }
 
   @Override
   public int width() {
-    return width;
+    return bitmap.getWidth();
   }
 
   @Override
   public boolean isReady() {
-    return bitmapRef != null || canvas != null;
-  }
-
-  /*
-   * getBitmap() can be exceptionally slow, as it will likely need to retrieve the bitmap from the
-   * file path. As such it should only be called when a direct reference to the Bitmap is
-   * necessary. (Note that this is less of an issue for an AndroidImage that has had a canvas
-   * built, as a hard reference to the bitmap is held in memory then).
-   */
-  Bitmap getBitmap() {
-    if (canvasBitmap != null) {
-      return canvasBitmap;
-    }
-    if (bitmapRef != null) {
-      Bitmap bm = bitmapRef.get();
-      if (bm == null && path != null) {
-        if (AndroidPlatform.DEBUG_LOGS) log().debug("Bitmap " + path + " fell out of memory");
-        bitmapRef = new SoftReference<Bitmap>(
-            bm = AndroidPlatform.instance.assetManager().doGetBitmap(path));
-      }
-      return bm;
-    }
-    return null;
-  }
-
-  String getPath() {
-    return path;
-  }
-
-  private void runCallbacks(boolean success) {
-    for (ResourceCallback<Image> cb : callbacks) {
-      if (success) {
-        cb.done(this);
-      } else {
-        cb.error(new Exception("Error loading image"));
-      }
-    }
-    callbacks.clear();
+    return true;
   }
 
   @Override
   public Object ensureTexture(GLContext ctx, boolean repeatX, boolean repeatY) {
-    // if we have a canvas, and it's dirty, force the recreation of our texture which will obtain
-    // the latest canvas data
-    if (canvas != null && canvas.dirty()) {
-      canvas.clearDirty();
-      clearTexture();
-    }
     if (isReady()) {
       if (repeatX || repeatY) {
         scaleTexture((AndroidGLContext) ctx, repeatX, repeatY);
@@ -180,7 +91,19 @@ class AndroidImage extends ImageGL implements CanvasImage, AndroidGLContext.Refr
     clearTexture(); // we don't need the ctx arg
   }
 
-  void clearTexture() {
+  Bitmap bitmap() {
+    return bitmap;
+  }
+
+  @Override
+  protected void finalize() {
+    if (tex != -1)
+      ctx.queueDestroyTexture(tex);
+    if (reptex != -1)
+      ctx.queueDeleteFramebuffer(reptex);
+  }
+
+  private void clearTexture() {
     if (tex != -1) {
       ctx.destroyTexture(tex);
       tex = -1;
@@ -195,7 +118,7 @@ class AndroidImage extends ImageGL implements CanvasImage, AndroidGLContext.Refr
     if (tex != -1)
       return;
     tex = ctx.createTexture(false, false);
-    ctx.updateTexture(tex, getBitmap());
+    ctx.updateTexture(tex, bitmap);
   }
 
   private void scaleTexture(AndroidGLContext ctx, boolean repeatX, boolean repeatY) {
@@ -208,7 +131,7 @@ class AndroidImage extends ImageGL implements CanvasImage, AndroidGLContext.Refr
 
     // no need to scale if our source data is already a power of two
     if ((width == 0) && (height == 0)) {
-      ctx.updateTexture(reptex, getBitmap());
+      ctx.updateTexture(reptex, bitmap);
       return;
     }
 
@@ -234,13 +157,5 @@ class AndroidImage extends ImageGL implements CanvasImage, AndroidGLContext.Refr
     ctx.bindFramebuffer();
 
     ctx.deleteFramebuffer(fbuf);
-  }
-
-  @Override
-  protected void finalize() {
-    if (tex != -1)
-      ctx.queueDestroyTexture(tex);
-    if (reptex != -1)
-      ctx.queueDeleteFramebuffer(reptex);
   }
 }

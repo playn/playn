@@ -60,7 +60,7 @@ public class AndroidAssetManager extends AbstractAssetManager {
 
   @Override
   protected Image doGetImage(String path) {
-    return new AndroidImage(AndroidPlatform.instance.graphics().ctx, path, doGetBitmap(path));
+    return new AndroidImage(AndroidPlatform.instance.graphics().ctx, doGetBitmap(path));
   }
 
   /**
@@ -83,10 +83,9 @@ public class AndroidAssetManager extends AbstractAssetManager {
 
   private Bitmap decodeBitmap(InputStream is) {
     BitmapFactory.Options options = new BitmapFactory.Options();
-    //
     options.inDither = true;
     // Prefer the bitmap config we computed from the window parameter
-    options.inPreferredConfig = AndroidPlatform.instance.preferredBitmapConfig;
+    options.inPreferredConfig = AndroidPlatform.instance.graphics().preferredBitmapConfig;
     // Never scale bitmaps based on device parameters
     options.inScaled = false;
     return BitmapFactory.decodeStream(is, null, options);

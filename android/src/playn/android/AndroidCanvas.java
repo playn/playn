@@ -36,19 +36,11 @@ class AndroidCanvas implements Canvas {
   private static RectF rectf = new RectF();
 
   private final android.graphics.Canvas canvas;
-  private final Bitmap bitmap;
   private boolean dirty = true;
 
   private LinkedList<AndroidCanvasState> paintStack = new LinkedList<AndroidCanvasState>();
 
-  AndroidCanvas(int width, int height) {
-    bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.RGB_565);
-    canvas = new android.graphics.Canvas(bitmap);
-    paintStack.addFirst(new AndroidCanvasState());
-  }
-
   AndroidCanvas(Bitmap bitmap) {
-    this.bitmap = bitmap;
     canvas = new android.graphics.Canvas(bitmap);
     paintStack.addFirst(new AndroidCanvasState());
   }
@@ -83,12 +75,9 @@ class AndroidCanvas implements Canvas {
   public Canvas drawImage(Image img, float dx, float dy, float dw, float dh, float sx, float sy,
       float sw, float sh) {
     Asserts.checkArgument(img instanceof AndroidImage);
-    Bitmap bitmap = ((AndroidImage) img).getBitmap();
-    if (bitmap != null) {
-      rect.set((int) sx, (int) sy, (int) (sx + sw), (int) (sy + sh));
-      rectf.set(dx, dy, dx + dw, dy + dh);
-      canvas.drawBitmap(bitmap, rect, rectf, currentState().prepareImage());
-    }
+    rect.set((int) sx, (int) sy, (int) (sx + sw), (int) (sy + sh));
+    rectf.set(dx, dy, dx + dw, dy + dh);
+    canvas.drawBitmap(((AndroidImage) img).bitmap(), rect, rectf, currentState().prepareImage());
     dirty = true;
     return this;
   }

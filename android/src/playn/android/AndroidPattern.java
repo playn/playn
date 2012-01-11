@@ -18,20 +18,18 @@ package playn.android;
 import android.graphics.BitmapShader;
 import android.graphics.Shader;
 
-import playn.core.Image;
 import playn.core.Pattern;
 import playn.core.gl.GLPattern;
 import playn.core.gl.ImageGL;
 
 class AndroidPattern implements Pattern, GLPattern {
 
-  BitmapShader shader;
-  AndroidImage image;
+  private final AndroidImage image;
+  final BitmapShader shader;
 
-  AndroidPattern(Image image) {
-    this.image = (AndroidImage) image;
-    shader = new BitmapShader(this.image.getBitmap(), Shader.TileMode.REPEAT,
-        Shader.TileMode.REPEAT);
+  AndroidPattern(AndroidImage image) {
+    this.image = image;
+    shader = new BitmapShader(image.bitmap(), Shader.TileMode.REPEAT, Shader.TileMode.REPEAT);
   }
 
   @Override

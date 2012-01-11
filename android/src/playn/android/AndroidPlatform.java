@@ -15,19 +15,15 @@
  */
 package playn.android;
 
+import android.content.Intent;
+import android.net.Uri;
+
 import playn.core.Game;
 import playn.core.Json;
 import playn.core.Mouse;
 import playn.core.Platform;
 import playn.core.PlayN;
 import playn.core.json.JsonImpl;
-import android.app.ActivityManager;
-import android.content.Context;
-import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.Bitmap.Config;
-import android.graphics.PixelFormat;
-import android.net.Uri;
 
 public class AndroidPlatform implements Platform {
   public static final boolean DEBUG_LOGS = true;
@@ -56,8 +52,6 @@ public class AndroidPlatform implements Platform {
   private AndroidAssetManager assetManager;
   private AndroidAnalytics analytics;
 
-  public Bitmap.Config preferredBitmapConfig;
-
   private AndroidPlatform(GameActivity activity) {
     instance = this;
     this.activity = activity;
@@ -75,25 +69,6 @@ public class AndroidPlatform implements Platform {
     storage = new AndroidStorage(activity);
 
     assetManager.assets = activity.getAssets();
-
-    preferredBitmapConfig = mapDisplayPixelFormat();
-  }
-
-  /**
-   * Determines the most performant pixel format for the active display.
-   */
-  // TODO:  This method will require testing over a variety of devices.
-  private Config mapDisplayPixelFormat() {
-    int format = activity.getWindowManager().getDefaultDisplay().getPixelFormat();
-    ActivityManager activityManager = (ActivityManager) activity.getApplication().getSystemService(
-        Context.ACTIVITY_SERVICE);
-    int memoryClass = activityManager.getMemoryClass();
-
-    // For low memory devices (like the HTC Magic), prefer 16-bit bitmaps
-    // FIXME: The memoryClass check is from the Canvas-only implementation and may function incorrectly with OpenGL
-    if (format == PixelFormat.RGBA_4444 ||  memoryClass <= 16)
-      return Bitmap.Config.ARGB_4444;
-    else return Bitmap.Config.ARGB_8888;
   }
 
   @Override
