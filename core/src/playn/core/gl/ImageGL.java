@@ -15,13 +15,44 @@
  */
 package playn.core.gl;
 
+import playn.core.Asserts;
 import playn.core.Image;
 
-public interface ImageGL extends Image {
+public abstract class ImageGL implements Image {
+
+  /** The current count of references to this image. */
+  protected int refs;
 
   /**
    * Creates a texture for this image (if one does not already exist) and returns it. May return
    * null if the underlying image data is not yet ready.
    */
-  Object ensureTexture(GLContext ctx, boolean repeatX, boolean repeatY);
+  public abstract Object ensureTexture(GLContext ctx, boolean repeatX, boolean repeatY);
+
+  /**
+   * Releases this image's texture memory.
+   */
+  public abstract void clearTexture(GLContext ctx);
+
+  /**
+   * Increments this image's reference count. Called by {@link ImageLayerGL} to let the image know
+   * that it's part of the scene graph. Note that this reference counting mechanism only exists to
+   * make more efficient use of texture memory. Images are also used by things like {@link Pattern}
+   * which does not support reference counting, thus images must also provide some fallback
+   * mechanism for releasing their texture when no longer needed (like in their finalizer).
+   */
+  public void reference(GLContext ctx) {
+    refs++; // we still create our texture on demand
+  }
+
+  /**
+   * Decrements this image's reference count. Called by {@link ImageLayerGL} to let the image know
+   * that may no longer be part of the scene graph.
+   */
+  public void release(GLContext ctx) {
+    Asserts.checkState(refs > 0, "Released an image with no references!");
+    if (--refs == 0) {
+      clearTexture(ctx);
+    }
+  }
 }

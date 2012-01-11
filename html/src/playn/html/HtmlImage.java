@@ -34,7 +34,7 @@ import playn.core.gl.GLContext;
 import playn.core.gl.GLUtil;
 import playn.core.gl.ImageGL;
 
-class HtmlImage implements Image, ImageGL {
+class HtmlImage extends ImageGL {
 
   private static native boolean isComplete(ImageElement img) /*-{
     return img.complete;
@@ -109,11 +109,8 @@ class HtmlImage implements Image, ImageGL {
     return null;
   }
 
-  /*
-   * Clears textures associated with this image. This does not destroy the image -- a subsequent
-   * call to ensureTexture() will recreate them.
-   */
-  void clearTexture(HtmlGLContext ctx) {
+  @Override
+  public void clearTexture(GLContext ctx) {
     if (pow2tex == tex) {
       pow2tex = null;
     }

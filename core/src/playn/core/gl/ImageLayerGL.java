@@ -37,6 +37,12 @@ public class ImageLayerGL extends LayerGL implements ImageLayer {
   }
 
   @Override
+  public void destroy() {
+    super.destroy();
+    setImage(null);
+  }
+
+  @Override
   public void clearHeight() {
     heightSet = false;
   }
@@ -67,7 +73,11 @@ public class ImageLayerGL extends LayerGL implements ImageLayer {
   @Override
   public void setImage(Image img) {
     Asserts.checkArgument(img instanceof ImageGL);
+    if (this.img != null)
+      this.img.release(ctx);
     this.img = (ImageGL) img;
+    if (this.img != null)
+      this.img.reference(ctx);
   }
 
   @Override

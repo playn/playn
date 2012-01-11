@@ -34,7 +34,7 @@ import static playn.core.PlayN.log;
  * the bitmap, and only holds a hard reference if the game has requested that a
  * Canvas be created.
  */
-class AndroidImage implements CanvasImage, ImageGL, AndroidGLContext.Refreshable {
+class AndroidImage extends ImageGL implements CanvasImage, AndroidGLContext.Refreshable {
   private AndroidGLContext ctx;
   private SoftReference<Bitmap> bitmapRef;
   private AndroidCanvas canvas;
@@ -162,24 +162,6 @@ class AndroidImage implements CanvasImage, ImageGL, AndroidGLContext.Refreshable
     callbacks.clear();
   }
 
-  /*
-   * Clears textures associated with this image. This does not destroy the image
-   * -- a subsequent call to ensureTexture() will recreate them.
-   */
-  void clearTexture() {
-    if (pow2tex == tex) {
-      pow2tex = -1;
-    }
-    if (tex != -1) {
-      ctx.destroyTexture(tex);
-      tex = -1;
-    }
-    if (pow2tex != -1) {
-      ctx.destroyTexture(pow2tex);
-      pow2tex = -1;
-    }
-  }
-
   @Override
   public Object ensureTexture(GLContext ctx, boolean repeatX, boolean repeatY) {
     // Create requested textures if loaded.
@@ -199,6 +181,25 @@ class AndroidImage implements CanvasImage, ImageGL, AndroidGLContext.Refreshable
     }
     log().error("Image not ready to draw -- cannot ensure texture.");
     return null;
+  }
+
+  @Override
+  public void clearTexture(GLContext ctx) {
+    clearTexture(); // we don't need the ctx arg
+  }
+
+  void clearTexture() {
+    if (pow2tex == tex) {
+      pow2tex = -1;
+    }
+    if (tex != -1) {
+      ctx.destroyTexture(tex);
+      tex = -1;
+    }
+    if (pow2tex != -1) {
+      ctx.destroyTexture(pow2tex);
+      pow2tex = -1;
+    }
   }
 
   /*

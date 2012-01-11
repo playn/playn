@@ -21,9 +21,19 @@ package playn.core;
 public interface Image {
 
   /**
+   * This image's width in pixels.
+   */
+  int width();
+
+  /**
    * This image's height in pixels.
    */
   int height();
+
+  /**
+   * Whether or not this image is ready to be used.
+   */
+  boolean isReady();
 
   /**
    * Adds a callback to be notified when this image is loaded. If the image is
@@ -31,14 +41,4 @@ public interface Image {
    * discarded once the image is loaded.
    */
   void addCallback(ResourceCallback<Image> callback);
-
-  /**
-   * This image's width in pixels.
-   */
-  int width();
-
-  /**
-   * Whether or not this image is ready to be used.
-   */
-  boolean isReady();
 }
