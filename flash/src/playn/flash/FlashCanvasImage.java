@@ -44,11 +44,6 @@ public class FlashCanvasImage extends FlashImage implements CanvasImage {
   }
 
   @Override
-  public void replaceWith(Image image) {
-    throw new UnsupportedOperationException("Can't replace FlashCanvas with image");
-  }
-
-  @Override
   public int width() {
     return canvas().height();
   }

@@ -57,11 +57,6 @@ class FlashImage implements Image {
     return imageData == null ? 0 : imageData.getHeight();
   }
 
-  @Override
-  public void replaceWith(Image image) {
-    imageData = ((FlashImage) image).imageData;
-  }
-
   private void runCallbacks(boolean success) {
     Iterator<ResourceCallback<Image>> it = callbacks.iterator();
     while (it.hasNext()) {

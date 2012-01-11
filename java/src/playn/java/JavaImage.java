@@ -53,12 +53,6 @@ class JavaImage implements CanvasImage {
   }
 
   @Override
-  public void replaceWith(Image img) {
-    Asserts.checkArgument(img instanceof JavaImage);
-    this.img = ((JavaImage) img).img;
-  }
-
-  @Override
   public void addCallback(ResourceCallback<Image> callback) {
     if (img == null) {
       callback.error(exception != null ? exception : new RuntimeException("Error loading image"));

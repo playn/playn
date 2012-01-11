@@ -26,11 +26,6 @@ public interface Image {
   int height();
 
   /**
-   * Replace this image's surface with that of another image.
-   */
-  void replaceWith(Image image);
-
-  /**
    * Adds a callback to be notified when this image is loaded. If the image is
    * already loaded, the callback will be notified immediately. The callback is
    * discarded once the image is loaded.

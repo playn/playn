@@ -125,18 +125,6 @@ class AndroidImage implements CanvasImage, ImageGL, AndroidGLContext.Refreshable
     return bitmapRef != null || canvas != null;
   }
 
-  @Override
-  public void replaceWith(Image image) {
-    Asserts.checkArgument(image instanceof AndroidImage);
-    AndroidImage aimg = (AndroidImage) image;
-    bitmapRef = new SoftReference<Bitmap>(aimg.getBitmap());
-    width = image.width();
-    height = image.height();
-    path = aimg.getPath();
-    canvas = null;
-    clearTexture();
-  }
-
   /*
    * getBitmap() can be exceptionally slow, as it will likely need to retrieve the bitmap from the
    * file path. As such it should only be called when a direct reference to the Bitmap is

@@ -64,12 +64,6 @@ class HtmlImage implements Image, ImageGL {
   }
 
   @Override
-  public void replaceWith(Image image) {
-    Asserts.checkArgument(image instanceof HtmlImage);
-    img = ((HtmlImage) image).img;
-  }
-
-  @Override
   public int width() {
     return img == null ? 0 : img.getWidth();
   }
