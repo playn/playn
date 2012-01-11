@@ -17,13 +17,13 @@ package playn.android;
 
 import android.graphics.Bitmap;
 
-import playn.core.*;
+import playn.core.Image;
+import playn.core.ResourceCallback;
+import playn.core.StockInternalTransform;
 import playn.core.gl.GL20;
 import playn.core.gl.GLContext;
 import playn.core.gl.GLUtil;
 import playn.core.gl.ImageGL;
-
-import static playn.core.PlayN.log;
 
 class AndroidImage extends ImageGL implements AndroidGLContext.Refreshable {
   private final AndroidGLContext ctx;
@@ -73,17 +73,13 @@ class AndroidImage extends ImageGL implements AndroidGLContext.Refreshable {
 
   @Override
   public Object ensureTexture(GLContext ctx, boolean repeatX, boolean repeatY) {
-    if (isReady()) {
-      if (repeatX || repeatY) {
-        scaleTexture((AndroidGLContext) ctx, repeatX, repeatY);
-        return reptex;
-      } else {
-        loadTexture((AndroidGLContext) ctx);
-        return tex;
-      }
+    if (repeatX || repeatY) {
+      scaleTexture((AndroidGLContext) ctx, repeatX, repeatY);
+      return reptex;
+    } else {
+      loadTexture((AndroidGLContext) ctx);
+      return tex;
     }
-    log().error("Image not ready to draw -- cannot ensure texture.");
-    return null;
   }
 
   @Override
