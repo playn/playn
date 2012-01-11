@@ -89,7 +89,7 @@ class HtmlGraphicsCanvas extends HtmlGraphics {
     return canvas;
   }
 
-  void updateLayers() {
+  void paintLayers() {
     ctx.clearRect(0, 0, width(), height());
     rootLayer.paint(ctx, 1);
     ctx.setGlobalAlpha(1);

@@ -85,7 +85,7 @@ class HtmlGraphicsDom extends HtmlGraphics {
   }
 
   @Override
-  void updateLayers() {
+  void paintLayers() {
     rootLayer.update();
   }
 

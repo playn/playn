@@ -264,7 +264,7 @@ public class HtmlGLContext extends GLContext
     this.colorShader = new ColorShader();
   }
 
-  void update(LayerGL rootLayer) {
+  void paint(LayerGL rootLayer) {
     bindFramebuffer();
 
     // Clear to transparent.

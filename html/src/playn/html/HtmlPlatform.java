@@ -294,7 +294,7 @@ public class HtmlPlatform implements Platform {
         }
 
         game.paint(accum / updateRate);
-        graphics.updateLayers();
+        graphics.paintLayers();
       }
     };
     requestAnimationFrame(paintCallback);

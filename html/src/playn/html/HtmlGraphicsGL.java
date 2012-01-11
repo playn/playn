@@ -95,8 +95,9 @@ class HtmlGraphicsGL extends HtmlGraphics {
   }
 
   @Override
-  void updateLayers() {
-    ctx.update(rootLayer);
+  void paintLayers() {
+    ctx.processPending();
+    ctx.paint(rootLayer);
   }
 
   @Override
