@@ -274,6 +274,7 @@ public class HtmlPlatform implements Platform {
 
       @Override
       public void fire() {
+        requestAnimationFrame(paintCallback);
         double now = time();
         float delta = (float) (now - lastTime);
         if (delta > MAX_DELTA) {
@@ -293,12 +294,7 @@ public class HtmlPlatform implements Platform {
         }
 
         game.paint(accum / updateRate);
-        try {
-          graphics.updateLayers();
-          requestAnimationFrame(paintCallback);
-        } catch (Throwable t) {
-          PlayN.log().warn("Ack", t);
-        }
+        graphics.updateLayers();
       }
     };
     requestAnimationFrame(paintCallback);
