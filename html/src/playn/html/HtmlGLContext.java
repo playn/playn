@@ -282,9 +282,6 @@ public class HtmlGLContext extends GLContext
     WebGLFramebuffer fbuf = gl.createFramebuffer();
     gl.bindFramebuffer(FRAMEBUFFER, fbuf);
     gl.framebufferTexture2D(FRAMEBUFFER, COLOR_ATTACHMENT0, TEXTURE_2D, (WebGLTexture) tex, 0);
-    gl.bindTexture(TEXTURE_2D, null);
-    gl.bindFramebuffer(FRAMEBUFFER, null);
-    // TODO[MDB]: necessary to do all this?: bindFramebuffer();
     return fbuf;
   }
 
