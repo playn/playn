@@ -15,6 +15,10 @@
  */
 package playn.ios;
 
+import cli.MonoTouch.UIKit.UIScreen;
+import cli.MonoTouch.UIKit.UIWindow;
+import cli.System.Drawing.RectangleF;
+
 import playn.core.Game;
 import playn.core.Json;
 import playn.core.Keyboard;
@@ -48,6 +52,9 @@ public class IOSPlatform implements Platform {
   private IOSAnalytics analytics;
 
   private Game game;
+  private float accum, delta;
+
+  private final UIWindow mainWindow;
 
   private IOSPlatform() {
     instance = this;
@@ -62,6 +69,10 @@ public class IOSPlatform implements Platform {
     assetManager = new IOSAssetManager();
     analytics = new IOSAnalytics();
     storage = new IOSStorage();
+
+    RectangleF bounds = UIScreen.get_MainScreen().get_Bounds();
+    mainWindow = new UIWindow(bounds);
+    mainWindow.Add(new IOSGameView(bounds));
   }
 
   @Override
@@ -137,6 +148,9 @@ public class IOSPlatform implements Platform {
   @Override
   public void run(Game game) {
     this.game = game;
+    // make our main window visible
+    mainWindow.MakeKeyAndVisible();
+    // initialize the game and start things off
     game.init();
   }
 
@@ -156,8 +170,24 @@ public class IOSPlatform implements Platform {
   }
 
   void update(float delta) {
-    if (game != null) {
+    // perform the game updates
+    float updateRate = game.updateRate();
+    if (updateRate == 0) {
       game.update(delta);
+      accum = 0;
+    } else {
+      accum += delta;
+      while (accum >= updateRate) {
+        game.update(updateRate);
+        accum -= updateRate;
+      }
     }
+
+    // save the delta, we'll get a call to paint later
+    delta = (updateRate == 0) ? 0 : accum / updateRate;
+  }
+
+  void paint() {
+    graphics.paint(delta);
   }
 }

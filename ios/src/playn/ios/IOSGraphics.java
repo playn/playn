@@ -118,4 +118,8 @@ public class IOSGraphics extends GraphicsGL {
   protected GLContext ctx() {
     return ctx;
   }
+
+  void paint(float delta) {
+    // TODO
+  }
 }
