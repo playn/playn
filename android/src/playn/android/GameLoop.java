@@ -35,8 +35,6 @@ public class GameLoop implements Runnable {
   private float totalTime;
   private int framesPainted;
 
-  private float paintAlpha;
-
   public GameLoop() {
     gfx = AndroidPlatform.instance.graphics();
   }
@@ -79,8 +77,7 @@ public class GameLoop implements Runnable {
       }
     }
 
-    paintAlpha = (updateRate == 0) ? 0 : accum / updateRate;
-    paint();
+    paint((updateRate == 0) ? 0 : accum / updateRate);
 
     if (LOG_FPS) {
       totalTime += delta / 1000;
@@ -103,7 +100,7 @@ public class GameLoop implements Runnable {
     return running.get();
   }
 
-  protected void paint() {
+  protected void paint(float paintAlpha) {
     gfx.preparePaint();
     AndroidPlatform.instance.game.paint(paintAlpha); // Run the game's custom painting code
     gfx.paintLayers(); // Paint the scene graph
