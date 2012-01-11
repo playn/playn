@@ -382,7 +382,7 @@ public class AndroidGLContext extends GLContext
   }
 
   @Override
-  public Object createFramebuffer(Object tex) {
+  public Integer createFramebuffer(Object tex) {
     // Generate the framebuffer and attach the texture
     int[] fbufBuffer = new int[1];
     gl20.glGenFramebuffers(1, fbufBuffer, 0);
@@ -423,7 +423,7 @@ public class AndroidGLContext extends GLContext
   }
 
   @Override
-  public Object createTexture(boolean repeatX, boolean repeatY) {
+  public Integer createTexture(boolean repeatX, boolean repeatY) {
     int[] texId = new int[1];
     gl20.glGenTextures(1, texId, 0);
     int texture = texId[0];
@@ -440,8 +440,8 @@ public class AndroidGLContext extends GLContext
   }
 
   @Override
-  public Object createTexture(int width, int height, boolean repeatX, boolean repeatY) {
-    int tex = (Integer) createTexture(repeatX, repeatY);
+  public Integer createTexture(int width, int height, boolean repeatX, boolean repeatY) {
+    int tex = createTexture(repeatX, repeatY);
     gl20.glTexImage2D(GL20.GL_TEXTURE_2D, 0, GL20.GL_RGBA, width, height, 0, GL20.GL_RGBA,
                       GL20.GL_UNSIGNED_BYTE, null);
     return tex;
