@@ -15,10 +15,6 @@
  */
 package playn.android;
 
-import playn.core.gl.CanvasLayerGL;
-import playn.core.gl.GroupLayerGL;
-import playn.core.gl.SurfaceLayerGL;
-
 import android.graphics.LinearGradient;
 import android.graphics.RadialGradient;
 import android.graphics.Shader.TileMode;
@@ -26,21 +22,20 @@ import android.view.View;
 
 import playn.core.Asserts;
 import playn.core.CanvasImage;
-import playn.core.CanvasLayer;
 import playn.core.Font;
 import playn.core.Gradient;
-import playn.core.Graphics;
 import playn.core.GroupLayer;
 import playn.core.Image;
-import playn.core.ImageLayer;
 import playn.core.Path;
 import playn.core.Pattern;
-import playn.core.SurfaceLayer;
 import playn.core.TextFormat;
 import playn.core.TextLayout;
-import playn.core.gl.ImageLayerGL;
+import playn.core.gl.GLContext;
+import playn.core.gl.GraphicsGL;
+import playn.core.gl.GroupLayerGL;
+import playn.core.gl.SurfaceGL;
 
-class AndroidGraphics implements Graphics {
+class AndroidGraphics extends GraphicsGL {
 
   private static int startingScreenWidth;
   private static int startingScreenHeight;
@@ -123,31 +118,6 @@ class AndroidGraphics implements Graphics {
     return screenWidth;
   }
 
-  @Override @Deprecated
-  public CanvasLayer createCanvasLayer(int width, int height) {
-    return new CanvasLayerGL(ctx, createImage(width, height));
-  }
-
-  @Override
-  public GroupLayer createGroupLayer() {
-    return new GroupLayerGL(ctx);
-  }
-
-  @Override
-  public ImageLayer createImageLayer() {
-    return new ImageLayerGL(ctx);
-  }
-
-  @Override
-  public ImageLayer createImageLayer(Image image) {
-    return new ImageLayerGL(ctx, (AndroidImage) image);
-  }
-
-  @Override
-  public SurfaceLayer createSurfaceLayer(int width, int height) {
-    return new SurfaceLayerGL(ctx, new AndroidSurfaceGL(ctx, width, height));
-  }
-
   @Override
   public int height() {
     return ctx.viewHeight;
@@ -187,6 +157,16 @@ class AndroidGraphics implements Graphics {
   @Override
   public void setSize(int width, int height) {
     setSize(width, height, true);
+  }
+
+  @Override
+  protected SurfaceGL createSurface(int width, int height) {
+    return new AndroidSurfaceGL(ctx, width, height);
+  }
+
+  @Override
+  protected GLContext ctx() {
+    return ctx;
   }
 
   void preparePaint() {
