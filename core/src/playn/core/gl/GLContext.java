@@ -21,7 +21,7 @@ import playn.core.StockInternalTransform;
 
 public abstract class GLContext {
 
-  // Queue of native GL objects to destroy on the GL thread
+  // a queue of pending actions to execute on the GL thread
   private ArrayList<Runnable> penders = new ArrayList<Runnable>();
 
   /**
