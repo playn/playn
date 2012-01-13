@@ -15,47 +15,51 @@
  */
 package playn.ios;
 
+import cli.System.Console;
+
 import playn.core.Log;
 
 class IOSLog implements Log
 {
-  @Override
-  public void error(String msg, Throwable e) {
-    throw new RuntimeException("TODO");
-  }
-
-  @Override
-  public void error(String msg) {
-    throw new RuntimeException("TODO");
-  }
-
-  @Override
-  public void info(String msg) {
-    throw new RuntimeException("TODO");
-  }
-
-  @Override
-  public void info(String msg, Throwable e) {
-    throw new RuntimeException("TODO");
-  }
+  // TODO: stack traces
 
   @Override
   public void debug(String msg) {
-    throw new RuntimeException("TODO");
+    Console.WriteLine("DEBUG: " + msg);
   }
 
   @Override
   public void debug(String msg, Throwable e) {
-    throw new RuntimeException("TODO");
+    debug(msg + ": " + e.getMessage());
+  }
+
+  @Override
+  public void info(String msg) {
+    Console.WriteLine(msg);
+  }
+
+  @Override
+  public void info(String msg, Throwable e) {
+    info(msg + ": " + e.getMessage());
   }
 
   @Override
   public void warn(String msg) {
-    throw new RuntimeException("TODO");
+    Console.WriteLine("WARN: " + msg);
   }
 
   @Override
   public void warn(String msg, Throwable e) {
-    throw new RuntimeException("TODO");
+    warn(msg + ": " + e.getMessage());
+  }
+
+  @Override
+  public void error(String msg) {
+    Console.WriteLine("ERROR: " + msg);
+  }
+
+  @Override
+  public void error(String msg, Throwable e) {
+    error(msg + ": " + e.getMessage());
   }
 }
