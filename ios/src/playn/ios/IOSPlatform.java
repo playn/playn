@@ -52,7 +52,7 @@ public class IOSPlatform implements Platform {
   private IOSAnalytics analytics;
 
   private Game game;
-  private float accum, delta;
+  private float accum, alpha;
 
   private final UIWindow mainWindow;
 
@@ -170,6 +170,8 @@ public class IOSPlatform implements Platform {
   }
 
   void update(float delta) {
+    PlayN.log().debug("Update " + delta);
+
     // perform the game updates
     float updateRate = game.updateRate();
     if (updateRate == 0) {
@@ -183,11 +185,12 @@ public class IOSPlatform implements Platform {
       }
     }
 
-    // save the delta, we'll get a call to paint later
-    delta = (updateRate == 0) ? 0 : accum / updateRate;
+    // save the alpha, we'll get a call to paint later
+    alpha = (updateRate == 0) ? 0 : accum / updateRate;
   }
 
   void paint() {
-    graphics.paint(delta);
+    PlayN.log().debug("Paint " + alpha);
+    graphics.paint(alpha);
   }
 }
