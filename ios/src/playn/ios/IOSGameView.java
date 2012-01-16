@@ -24,6 +24,7 @@ import cli.OpenTK.Platform.iPhoneOS.iPhoneOSGameView;
 
 import cli.MonoTouch.Foundation.ExportAttribute;
 import cli.MonoTouch.OpenGLES.EAGLColorFormat;
+import cli.MonoTouch.OpenGLES.EAGLRenderingAPI;
 import cli.MonoTouch.UIKit.UIScreen;
 
 class IOSGameView extends iPhoneOSGameView
@@ -42,6 +43,8 @@ class IOSGameView extends iPhoneOSGameView
     set_ContentScaleFactor(UIScreen.get_MainScreen().get_Scale());
     // set_MultipleTouchEnabled(true);
     set_AutoResize(false);
+    // TODO: support OpenGL ES 1.1?
+    set_ContextRenderingApi(EAGLRenderingAPI.wrap(EAGLRenderingAPI.OpenGLES2));
   }
 
   @Override

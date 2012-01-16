@@ -15,12 +15,13 @@
  */
 package playn.ios;
 
+import playn.core.PlayN;
 import playn.core.Pointer;
 
 class IOSPointer implements Pointer
 {
   @Override
   public void setListener(Listener listener) {
-    throw new RuntimeException("TODO");
+    PlayN.log().warn("TODO: implement IOSPointer");
   }
 }

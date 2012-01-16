@@ -15,8 +15,18 @@
  */
 package playn.ios;
 
+import cli.System.IO.FileAccess;
+import cli.System.IO.FileMode;
+import cli.System.IO.FileShare;
+import cli.System.IO.FileStream;
+import cli.System.IO.Stream;
+
+import cli.MonoTouch.Foundation.NSData;
+import cli.MonoTouch.UIKit.UIImage;
+
 import playn.core.AssetManager;
 import playn.core.Image;
+import playn.core.PlayN;
 import playn.core.ResourceCallback;
 import playn.core.Sound;
 
@@ -24,7 +34,16 @@ class IOSAssetManager implements AssetManager
 {
   @Override
   public Image getImage(String path) {
-    throw new RuntimeException("TODO");
+    try {
+      Stream stream = new FileStream(path, FileMode.wrap(FileMode.Open),
+                                     FileAccess.wrap(FileAccess.Read),
+                                     FileShare.wrap(FileShare.Read));
+      NSData data = NSData.FromStream(stream);
+      return new IOSImage(UIImage.LoadFromData(data));
+    } catch (Throwable t) {
+      PlayN.log().warn("Failed to load image: " + path, t);
+      return new IOSImage(new UIImage());
+    }
   }
 
   @Override

@@ -55,6 +55,7 @@ public class IOSPlatform implements Platform {
   private float accum, alpha;
 
   private final UIWindow mainWindow;
+  private final IOSGameView gameView;
 
   private IOSPlatform() {
     instance = this;
@@ -72,7 +73,7 @@ public class IOSPlatform implements Platform {
 
     RectangleF bounds = UIScreen.get_MainScreen().get_Bounds();
     mainWindow = new UIWindow(bounds);
-    mainWindow.Add(new IOSGameView(bounds));
+    mainWindow.Add(gameView = new IOSGameView(bounds));
   }
 
   @Override
@@ -148,6 +149,8 @@ public class IOSPlatform implements Platform {
   @Override
   public void run(Game game) {
     this.game = game;
+    // start the main game loop (TODO: support 0 update rate)
+    gameView.Run(1000d / game.updateRate());
     // make our main window visible
     mainWindow.MakeKeyAndVisible();
     // initialize the game and start things off
