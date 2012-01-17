@@ -368,17 +368,25 @@ class IOSGLContext extends GLContext
 
   @Override
   public Integer createFramebuffer(Object tex) {
-    throw new RuntimeException("TODO");
+    int[] fbufw = new int[1];
+    GL.GenFramebuffers(1, fbufw);
+
+    int fbuf = fbufw[0];
+    GL.BindFramebuffer(All.wrap(All.Framebuffer), fbuf);
+    GL.FramebufferTexture2D(All.wrap(All.Framebuffer), All.wrap(All.ColorAttachment0),
+                            All.wrap(All.Texture2D), (Integer) tex, 0);
+
+    return fbuf;
   }
 
   @Override
   public void deleteFramebuffer(Object fbuf) {
-    throw new RuntimeException("TODO");
+    GL.DeleteFramebuffers(1, new int[] { (Integer) fbuf });
   }
 
   @Override
   public void bindFramebuffer(Object fbuf, int width, int height) {
-    throw new RuntimeException("TODO");
+    bindFramebuffer((Integer)fbuf, width, height, false);
   }
 
   @Override
@@ -436,18 +444,65 @@ class IOSGLContext extends GLContext
   @Override
   public void fillRect(InternalTransform local, float dx, float dy, float dw, float dh,
                        float texWidth, float texHeight, Object tex, float alpha) {
-    throw new RuntimeException("TODO");
+    texShader.prepare((Integer) tex, alpha);
+
+    float sx = dx / texWidth, sy = dy / texHeight;
+    float sw = dw / texWidth, sh = dh / texHeight;
+
+    int idx = texShader.beginPrimitive(4, 4);
+    texShader.buildVertex(local, dx, dy, sx, sy);
+    texShader.buildVertex(local, dx + dw, dy, sx + sw, sy);
+    texShader.buildVertex(local, dx, dy + dh, sx, sy + sh);
+    texShader.buildVertex(local, dx + dw, dy + sy, sx + sw, sy + sh);
+
+    texShader.addElement(idx + 0);
+    texShader.addElement(idx + 1);
+    texShader.addElement(idx + 2);
+    texShader.addElement(idx + 3);
   }
 
   @Override
   public void fillRect(InternalTransform local, float dx, float dy, float dw, float dh,
                        int color, float alpha) {
-    throw new RuntimeException("TODO");
+    colorShader.prepare(color, alpha);
+    checkGlError("fillRect shader prepared");
+
+    int idx = colorShader.beginPrimitive(4, 4);
+    colorShader.buildVertex(local, dx, dy);
+    colorShader.buildVertex(local, dx + dw, dy);
+    colorShader.buildVertex(local, dx, dy + dh);
+    colorShader.buildVertex(local, dx + dw, dy + dh);
+
+    colorShader.addElement(idx + 0);
+    colorShader.addElement(idx + 1);
+    colorShader.addElement(idx + 2);
+    colorShader.addElement(idx + 3);
+    checkGlError("fillRect done");
   }
 
   @Override
   public void fillPoly(InternalTransform local, float[] positions, int color, float alpha) {
-    throw new RuntimeException("TODO");
+    colorShader.prepare(color, alpha);
+
+    // FIXME: Rewrite to take advantage of GL_TRIANGLE_STRIP
+    int idx = colorShader.beginPrimitive(4, 6); // FIXME: This won't work for non-line polys.
+    int points = positions.length / 2;
+    for (int i = 0; i < points; ++i) {
+      float dx = positions[i * 2];
+      float dy = positions[i * 2 + 1];
+      colorShader.buildVertex(local, dx, dy);
+    }
+
+    int a = idx + 0, b = idx + 1, c = idx + 2;
+    int tris = points - 2;
+    for (int i = 0; i < tris; i++) {
+      colorShader.addElement(a);
+      colorShader.addElement(b);
+      colorShader.addElement(c);
+      a = c;
+      b = a + 1;
+      c = (i == tris - 2) ? idx : b + 1;
+    }
   }
 
   @Override
