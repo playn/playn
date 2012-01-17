@@ -88,7 +88,7 @@ public class AndroidSurfaceGL extends SurfaceGL
         cachedPixels = null;
       }
       pixelBuffer = null;
-      actx.checkGlError("store Pixels");
+      actx.checkGLError("store Pixels");
     } catch (OutOfMemoryError e) {
       PlayN.log().error("OutOfMemoryError reading cached Surface to buffer.");
       cachedPixels = null;
