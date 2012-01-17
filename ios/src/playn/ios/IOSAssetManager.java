@@ -20,6 +20,7 @@ import cli.System.IO.FileMode;
 import cli.System.IO.FileShare;
 import cli.System.IO.FileStream;
 import cli.System.IO.Stream;
+import cli.System.IO.StreamReader;
 
 import cli.MonoTouch.Foundation.NSData;
 import cli.MonoTouch.UIKit.UIImage;
@@ -53,16 +54,24 @@ class IOSAssetManager implements AssetManager
 
   @Override
   public void getText(String path, ResourceCallback<String> callback) {
-    throw new RuntimeException("TODO");
+    StreamReader reader = null;
+    try {
+      reader = new StreamReader(path);
+      callback.done(reader.ReadToEnd());
+    } catch (Throwable t) {
+      callback.error(t);
+    } finally {
+      reader.Close();
+    }
   }
 
   @Override
   public boolean isDone() {
-    throw new RuntimeException("TODO");
+    return true; // nothing is async
   }
 
   @Override
   public int getPendingRequestCount() {
-    throw new RuntimeException("TODO");
+    return 0; // nothing is async
   }
 }
