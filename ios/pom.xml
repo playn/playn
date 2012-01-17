@@ -33,27 +33,6 @@
     </dependency>
 
     <dependency>
-      <groupId>com.xamarin</groupId>
-      <artifactId>system-core</artifactId>
-      <version>${monotouch.version}</version>
-      <scope>provided</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>com.xamarin</groupId>
-      <artifactId>system</artifactId>
-      <version>${monotouch.version}</version>
-      <scope>provided</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>com.xamarin</groupId>
-      <artifactId>mscorlib</artifactId>
-      <version>4.0</version>
-      <scope>provided</scope>
-    </dependency>
-
-    <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <version>4.8.1</version>
