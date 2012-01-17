@@ -40,199 +40,11 @@ import playn.core.gl.LayerGL;
  */
 public class HtmlGLContext extends GLContext
 {
-  private static final int VERTEX_SIZE = 10;              // 10 floats per vertex
-
-// TODO(jgw): Re-enable longer element buffers once we figure out why they're causing weird
-// performance degradation.
-//  private static final int MAX_VERTS = 400;               // 100 quads
-//  private static final int MAX_ELEMS = MAX_VERTS * 6 / 4; // At most 6 verts per quad
-
-// These values allow only one quad at a time (there's no generalized polygon rendering available
-// in Surface yet that would use more than 4 points / 2 triangles).
-  private static final int MAX_VERTS = 4;
-  private static final int MAX_ELEMS = 6;
-
-  private class Shader {
-    WebGLProgram program;
-    WebGLUniformLocation uScreenSizeLoc;
-    int aMatrix, aTranslation, aPosition, aTexture;
-
-    WebGLBuffer vertexBuffer, elementBuffer;
-
-    Float32Array vertexData = Float32Array.create(VERTEX_SIZE * MAX_VERTS);
-    Uint16Array elementData = Uint16Array.create(MAX_ELEMS);
-    int vertexOffset, elementOffset;
-
-    Shader(String fragmentShader) {
-      // Compile the shader.
-      String vertexShader = Shaders.INSTANCE.vertexShader().getText();
-      program = WebGLUtil.createShaderProgram(gl, vertexShader, fragmentShader);
-
-      // glGet*() calls are slow; determine locations once.
-      uScreenSizeLoc = gl.getUniformLocation(program, "u_ScreenSize");
-      aMatrix = gl.getAttribLocation(program, "a_Matrix");
-      aTranslation = gl.getAttribLocation(program, "a_Translation");
-      aPosition = gl.getAttribLocation(program, "a_Position");
-      aTexture = gl.getAttribLocation(program, "a_Texture");
-
-      // Create the vertex and index buffers.
-      vertexBuffer = gl.createBuffer();
-      elementBuffer = gl.createBuffer();
-    }
-
-    boolean prepare() {
-      if (useShader(this)) {
-        gl.useProgram(program);
-        gl.uniform2fv(uScreenSizeLoc, new float[] { screenWidth, screenHeight });
-        gl.bindBuffer(ARRAY_BUFFER, vertexBuffer);
-        gl.bindBuffer(ELEMENT_ARRAY_BUFFER, elementBuffer);
-
-        gl.enableVertexAttribArray(aMatrix);
-        gl.enableVertexAttribArray(aTranslation);
-        gl.enableVertexAttribArray(aPosition);
-        if (aTexture != -1) {
-          gl.enableVertexAttribArray(aTexture);
-        }
-
-        gl.vertexAttribPointer(aMatrix, 4, FLOAT, false, 40, 0);
-        gl.vertexAttribPointer(aTranslation, 2, FLOAT, false, 40, 16);
-        gl.vertexAttribPointer(aPosition, 2, FLOAT, false, 40, 24);
-        if (aTexture != -1) {
-          gl.vertexAttribPointer(aTexture, 2, FLOAT, false, 40, 32);
-        }
-
-        return true;
-      }
-      return false;
-    }
-
-    void flush() {
-      if (vertexOffset == 0) {
-        return;
-      }
-
-      // TODO(jgw): Change this back. It only works because we've limited MAX_VERTS, which only
-      // works because there are no >4 vertex draws happening.
-      // gl.bufferData(ARRAY_BUFFER, vertexData.subarray(0, vertexOffset), STREAM_DRAW);
-      // gl.bufferData(ELEMENT_ARRAY_BUFFER, elementData.subarray(0, elementOffset), STREAM_DRAW);
-      gl.bufferData(ARRAY_BUFFER, vertexData, STREAM_DRAW);
-      gl.bufferData(ELEMENT_ARRAY_BUFFER, elementData, STREAM_DRAW);
-
-      gl.drawElements(TRIANGLES, elementOffset, UNSIGNED_SHORT, 0);
-      vertexOffset = elementOffset = 0;
-    }
-
-    int beginPrimitive(int vertexCount, int elemCount) {
-      int vertIdx = vertexOffset / VERTEX_SIZE;
-      if ((vertIdx + vertexCount > MAX_VERTS) || (elementOffset + elemCount > MAX_ELEMS)) {
-        flush();
-        return 0;
-      }
-      return vertIdx;
-    }
-
-    void buildVertex(InternalTransform local, float dx, float dy) {
-      buildVertex(local, dx, dy, 0, 0);
-    }
-
-    void buildVertex(InternalTransform local, float dx, float dy, float sx, float sy) {
-      vertexData.set(((HtmlInternalTransform)local).matrix(), vertexOffset);
-      vertexData.set(vertexOffset + 6, dx);
-      vertexData.set(vertexOffset + 7, dy);
-      vertexData.set(vertexOffset + 8, sx);
-      vertexData.set(vertexOffset + 9, sy);
-      vertexOffset += VERTEX_SIZE;
-    }
-
-    void addElement(int index) {
-      elementData.set(elementOffset++, index);
-    }
-  }
-
-  private class TextureShader extends Shader {
-    WebGLUniformLocation uTexture;
-    WebGLUniformLocation uAlpha;
-    WebGLTexture lastTex;
-    float lastAlpha;
-
-    TextureShader() {
-      super(Shaders.INSTANCE.texFragmentShader().getText());
-      uTexture = gl.getUniformLocation(program, "u_Texture");
-      uAlpha = gl.getUniformLocation(program, "u_Alpha");
-    }
-
-    @Override
-    void flush() {
-      gl.bindTexture(TEXTURE_2D, lastTex);
-      super.flush();
-    }
-
-    void prepare(WebGLTexture tex, float alpha) {
-      if (super.prepare()) {
-        gl.activeTexture(TEXTURE0);
-        gl.uniform1i(uTexture, 0);
-      }
-
-      if (tex == lastTex && alpha == lastAlpha) {
-        return;
-      }
-      flush();
-
-      gl.uniform1f(uAlpha, alpha);
-      lastAlpha = alpha;
-      lastTex = tex;
-    }
-  }
-
-  private class ColorShader extends Shader {
-    WebGLUniformLocation uColor;
-    WebGLUniformLocation uAlpha;
-    Float32Array colors = Float32Array.create(4);
-    int lastColor;
-    float lastAlpha;
-
-    ColorShader() {
-      super(Shaders.INSTANCE.colorFragmentShader().getText());
-      uColor = gl.getUniformLocation(program, "u_Color");
-      uAlpha = gl.getUniformLocation(program, "u_Alpha");
-    }
-
-    void prepare(int color, float alpha) {
-      super.prepare();
-
-      if (color == lastColor && alpha == lastAlpha) {
-        return;
-      }
-      flush();
-
-      gl.uniform1f(uAlpha, alpha);
-      lastAlpha = alpha;
-      setColor(color);
-    }
-
-    private void setColor(int color) {
-      // ABGR.
-      colors.set(3, (float)((color >> 24) & 0xff) / 255);
-      colors.set(0, (float)((color >> 16) & 0xff) / 255);
-      colors.set(1, (float)((color >> 8) & 0xff) / 255);
-      colors.set(2, (float)((color >> 0) & 0xff) / 255);
-      gl.uniform4fv(uColor, colors);
-
-      lastColor = color;
-    }
-  }
 
   public final WebGLRenderingContext gl;
-
   private final CanvasElement canvas;
-  private final TextureShader texShader;
-  private final ColorShader colorShader;
-
   private WebGLFramebuffer lastFBuf;
-  private int screenWidth, screenHeight;
-
-  // Shaders & Meshes.
-  private Shader curShader;
+  int screenWidth, screenHeight;
 
   // Debug counters.
   // private int texCount;
@@ -260,8 +72,8 @@ public class HtmlGLContext extends GLContext
     // try basic GL operations to detect failure cases early
     tryBasicGLCalls();
 
-    this.texShader = new TextureShader();
-    this.colorShader = new ColorShader();
+    this.texShader = new HtmlGLShader.Texture(this);
+    this.colorShader = new HtmlGLShader.Color(this);
   }
 
   void paint(LayerGL rootLayer) {
@@ -343,86 +155,6 @@ public class HtmlGLContext extends GLContext
   }
 
   @Override
-  public void drawTexture(Object otex, float texWidth, float texHeight, InternalTransform local,
-                          float dx, float dy, float dw, float dh,
-                          float sx, float sy, float sw, float sh, float alpha) {
-    WebGLTexture tex = (WebGLTexture)otex;
-    texShader.prepare(tex, alpha);
-
-    sx /= texWidth;  sw /= texWidth;
-    sy /= texHeight; sh /= texHeight;
-
-    int idx = texShader.beginPrimitive(4, 6);
-    texShader.buildVertex(local, dx,      dy,      sx,      sy);
-    texShader.buildVertex(local, dx + dw, dy,      sx + sw, sy);
-    texShader.buildVertex(local, dx,      dy + dh, sx,      sy + sh);
-    texShader.buildVertex(local, dx + dw, dy + dh, sx + sw, sy + sh);
-
-    texShader.addElement(idx + 0); texShader.addElement(idx + 1); texShader.addElement(idx + 2);
-    texShader.addElement(idx + 1); texShader.addElement(idx + 3); texShader.addElement(idx + 2);
-  }
-
-  @Override
-  public void fillRect(InternalTransform local, float dx, float dy, float dw, float dh,
-                       float texWidth, float texHeight, Object otex, float alpha) {
-    WebGLTexture tex = (WebGLTexture) otex;
-    texShader.prepare(tex, alpha);
-
-    float sx = dx / texWidth, sy = dy / texHeight;
-    float sw = dw / texWidth, sh = dh / texHeight;
-
-    int idx = texShader.beginPrimitive(4, 6);
-    texShader.buildVertex(local, dx,      dy,      sx,      sy);
-    texShader.buildVertex(local, dx + dw, dy,      sx + sw, sy);
-    texShader.buildVertex(local, dx,      dy + dh, sx,      sy + sh);
-    texShader.buildVertex(local, dx + dw, dy + dh, sx + sw, sy + sh);
-
-    texShader.addElement(idx + 0); texShader.addElement(idx + 1); texShader.addElement(idx + 2);
-    texShader.addElement(idx + 1); texShader.addElement(idx + 3); texShader.addElement(idx + 2);
-  }
-
-  @Override
-  public void fillRect(InternalTransform local, float dx, float dy, float dw, float dh, int color,
-                       float alpha) {
-    colorShader.prepare(color, alpha);
-
-    int idx = colorShader.beginPrimitive(4, 6);
-    colorShader.buildVertex(local, dx,      dy);
-    colorShader.buildVertex(local, dx + dw, dy);
-    colorShader.buildVertex(local, dx,      dy + dh);
-    colorShader.buildVertex(local, dx + dw, dy + dh);
-
-    colorShader.addElement(idx + 0);
-    colorShader.addElement(idx + 1);
-    colorShader.addElement(idx + 2);
-    colorShader.addElement(idx + 1);
-    colorShader.addElement(idx + 3);
-    colorShader.addElement(idx + 2);
-  }
-
-  @Override
-  public void fillPoly(InternalTransform local, float[] positions, int color, float alpha) {
-    colorShader.prepare(color, alpha);
-
-    int idx = colorShader.beginPrimitive(4, 6);
-    int points = positions.length / 2;
-    for (int i = 0; i < points; ++i) {
-      float dx = positions[i * 2];
-      float dy = positions[i * 2 + 1];
-      colorShader.buildVertex(local, dx, dy);
-    }
-
-    int a = idx + 0, b = idx + 1, c = idx + 2;
-    int tris = points - 2;
-    for (int i = 0; i < tris; ++i) {
-      colorShader.addElement(a); colorShader.addElement(b); colorShader.addElement(c);
-      a = c;
-      b = a + 1;
-      c = (i == tris - 2) ? idx : b + 1;
-    }
-  }
-
-  @Override
   public void clear(float red, float green, float blue, float alpha) {
     gl.clearColor(red, green, blue, alpha);
     gl.clear(COLOR_BUFFER_BIT);
@@ -437,17 +169,13 @@ public class HtmlGLContext extends GLContext
   }
 
   @Override
-  public InternalTransform createTransform() {
-    return new HtmlInternalTransform();
+  public void checkGLError(String op) {
+    // error checking? we don't need no steenking error checking!
   }
 
-  private boolean useShader(Shader shader) {
-    if (curShader != shader) {
-      flush();
-      curShader = shader;
-      return true;
-    }
-    return false;
+  @Override
+  public InternalTransform createTransform() {
+    return new HtmlInternalTransform();
   }
 
   private void tryBasicGLCalls() throws RuntimeException {
