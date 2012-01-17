@@ -15,12 +15,61 @@
  */
 package playn.ios;
 
+import cli.System.Drawing.PointF;
+import cli.System.Convert;
+
+import cli.MonoTouch.Foundation.NSObject;
+import cli.MonoTouch.Foundation.NSSet;
+import cli.MonoTouch.Foundation.NSSetEnumerator;
+import cli.MonoTouch.UIKit.UIEvent;
+import cli.MonoTouch.UIKit.UITouch;
+
 import playn.core.Touch;
 
 class IOSTouch implements Touch
 {
+  private Listener listener;
+
   @Override
   public void setListener(Listener listener) {
-    throw new RuntimeException("TODO");
+    this.listener = listener;
+  }
+
+  void onTouchesBegan(NSSet touches, UIEvent event) {
+    if (listener != null) {
+      listener.onTouchStart(toTouchEvents(touches, event));
+    }
+  }
+
+  void onTouchesMoved(NSSet touches, UIEvent event) {
+    if (listener != null) {
+      listener.onTouchMove(toTouchEvents(touches, event));
+    }
+  }
+
+  void onTouchesEnded(NSSet touches, UIEvent event) {
+    if (listener != null) {
+      listener.onTouchEnd(toTouchEvents(touches, event));
+    }
+  }
+
+  void onTouchesCancelled(NSSet touches, UIEvent event) {
+    if (listener != null) {
+      // TODO: ???
+    }
+  }
+
+  private Touch.Event[] toTouchEvents(NSSet touches, UIEvent event) {
+    final Touch.Event[] events = new Touch.Event[Convert.ToInt32(touches.get_Count())];
+    touches.Enumerate(new NSSetEnumerator(new NSSetEnumerator.Method() {
+      public void Invoke (NSObject obj, boolean[] stop) {
+        UITouch touch = (UITouch) obj;
+        PointF loc = touch.LocationInView(touch.get_View());
+        // TODO: sort out what to do about lack of ID
+        events[_idx] = new Touch.Event.Impl(touch.get_Timestamp(), loc.get_X(), loc.get_Y(), 0);
+      }
+      private int _idx = 0;
+    }));
+    return events;
   }
 }

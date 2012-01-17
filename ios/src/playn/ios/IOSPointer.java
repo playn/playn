@@ -15,13 +15,60 @@
  */
 package playn.ios;
 
+import cli.System.Drawing.PointF;
+
+import cli.MonoTouch.Foundation.NSObject;
+import cli.MonoTouch.Foundation.NSSet;
+import cli.MonoTouch.Foundation.NSSetEnumerator;
+import cli.MonoTouch.UIKit.UIEvent;
+import cli.MonoTouch.UIKit.UITouch;
+
 import playn.core.PlayN;
 import playn.core.Pointer;
 
 class IOSPointer implements Pointer
 {
+  private Listener listener;
+
   @Override
   public void setListener(Listener listener) {
-    PlayN.log().warn("TODO: implement IOSPointer");
+    this.listener = listener;
+  }
+
+  void onTouchesBegan(NSSet touches, UIEvent event) {
+    if (listener != null) {
+      listener.onPointerStart(toPointerEvent(touches, event));
+    }
+  }
+
+  void onTouchesMoved(NSSet touches, UIEvent event) {
+    if (listener != null) {
+      listener.onPointerDrag(toPointerEvent(touches, event));
+    }
+  }
+
+  void onTouchesEnded(NSSet touches, UIEvent event) {
+    if (listener != null) {
+      listener.onPointerEnd(toPointerEvent(touches, event));
+    }
+  }
+
+  void onTouchesCancelled(NSSet touches, UIEvent event) {
+    if (listener != null) {
+      // TODO: ???
+    }
+  }
+
+  private Pointer.Event toPointerEvent(NSSet touches, UIEvent event) {
+    final Pointer.Event[] eventw = new Pointer.Event[1];
+    touches.Enumerate(new NSSetEnumerator(new NSSetEnumerator.Method() {
+      public void Invoke (NSObject obj, boolean[] stop) {
+        UITouch touch = (UITouch) obj;
+        PointF loc = touch.LocationInView(touch.get_View());
+        eventw[0] = new Pointer.Event.Impl(touch.get_Timestamp(), loc.get_X(), loc.get_Y(), true);
+        stop[0] = true;
+      }
+    }));
+    return eventw[0];
   }
 }
