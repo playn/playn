@@ -16,10 +16,14 @@
 package playn.ios;
 
 import cli.MonoTouch.UIKit.UIImage;
+import cli.OpenTK.Graphics.ES20.All;
+import cli.OpenTK.Graphics.ES20.GL;
 
 import playn.core.Image;
 import playn.core.ResourceCallback;
+import playn.core.StockInternalTransform;
 import playn.core.gl.GLContext;
+import playn.core.gl.GLUtil;
 import playn.core.gl.ImageGL;
 
 /**
@@ -27,9 +31,12 @@ import playn.core.gl.ImageGL;
  */
 public class IOSImage extends ImageGL implements Image
 {
-  public final UIImage image;
+  private final UIImage image;
+  private final IOSGLContext ctx;
+  private int tex = -1, reptex = -1;
 
-  IOSImage (UIImage image) {
+  IOSImage (IOSGLContext ctx, UIImage image) {
+    this.ctx = ctx;
     this.image = image;
   }
 
@@ -55,11 +62,77 @@ public class IOSImage extends ImageGL implements Image
 
   @Override
   public Object ensureTexture(GLContext ctx, boolean repeatX, boolean repeatY) {
-    return null; // TODO
+    if (repeatX || repeatY) {
+      ensureScaledTexture(repeatX, repeatY);
+      return reptex;
+    } else {
+      ensureTexture();
+      return tex;
+    }
   }
 
   @Override
   public void clearTexture(GLContext ctx) {
-    // TODO
+    if (tex != -1) {
+      ctx.destroyTexture(tex);
+      tex = -1;
+    }
+    if (reptex != -1) {
+      ctx.destroyTexture(reptex);
+      reptex = -1;
+    }
+  }
+
+  @Override
+  protected void finalize() {
+    if (tex != -1)
+      ctx.queueDestroyTexture(tex);
+    if (reptex != -1)
+      ctx.queueDeleteFramebuffer(reptex);
+  }
+
+  private void ensureTexture() {
+    if (tex != -1)
+      return;
+    tex = ctx.createTexture(false, false);
+    ctx.updateTexture(tex, image);
+  }
+
+  private void ensureScaledTexture(boolean repeatX, boolean repeatY) {
+    if (reptex != -1)
+      return;
+
+    // TODO: if width/height > 1024, repeatedly scale by 0.5 until within bounds
+
+    // GL requires pow2 on axes that repeat
+    int width = GLUtil.nextPowerOfTwo(width()), height = GLUtil.nextPowerOfTwo(height());
+    reptex = ctx.createTexture(width, height, repeatX, repeatY);
+
+    // no need to scale if our source data is already a power of two
+    if ((width == 0) && (height == 0)) {
+      ctx.updateTexture(reptex, image);
+      return;
+    }
+
+    // otherwise we need to scale our non-repeated texture, which we'll load normally
+    ensureTexture();
+
+    // width/height == 0 => already a power of two.
+    if (width == 0)
+      width = width();
+    if (height == 0)
+      height = height();
+
+    // point a new framebuffer at it
+    int fbuf = ctx.createFramebuffer(reptex);
+    GL.BindTexture(All.wrap(All.Texture2D), reptex);
+    ctx.clear(0, 0, 0, 0);
+
+    // render the non-repeated texture into the framebuffer properly scaled
+    ctx.drawTexture(tex, width(), height(), StockInternalTransform.IDENTITY,
+                    0, height, width, -height, false, false, 1);
+    ctx.bindFramebuffer();
+
+    ctx.deleteFramebuffer(fbuf);
   }
 }

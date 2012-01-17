@@ -15,8 +15,11 @@
  */
 package playn.ios;
 
+import cli.System.Drawing.RectangleF;
+
 import playn.core.CanvasImage;
 import playn.core.Font;
+import playn.core.Game;
 import playn.core.Gradient;
 import playn.core.GroupLayer;
 import playn.core.Image;
@@ -33,13 +36,15 @@ import playn.core.gl.GroupLayerGL;
  */
 public class IOSGraphics extends GraphicsGL {
 
+  private final GroupLayerGL rootLayer;
+  private final int screenWidth, screenHeight;
+
   final IOSGLContext ctx;
-  final GroupLayerGL rootLayer;
 
-  private int screenWidth, screenHeight;
-
-  public IOSGraphics() {
-    ctx = new IOSGLContext();
+  public IOSGraphics(RectangleF bounds) {
+    screenWidth = (int)bounds.get_Width();
+    screenHeight = (int)bounds.get_Height();
+    ctx = new IOSGLContext(screenWidth, screenHeight);
     rootLayer = new GroupLayerGL(ctx);
   }
 
@@ -119,7 +124,10 @@ public class IOSGraphics extends GraphicsGL {
     return ctx;
   }
 
-  void paint(float delta) {
-    // TODO
+  void paint(Game game, float alpha) {
+    ctx.processPending();
+    ctx.bindFramebuffer();
+    game.paint(alpha); // run the game's custom painting code
+    ctx.paintLayers(rootLayer);
   }
 }

@@ -27,6 +27,8 @@ import cli.MonoTouch.OpenGLES.EAGLColorFormat;
 import cli.MonoTouch.OpenGLES.EAGLRenderingAPI;
 import cli.MonoTouch.UIKit.UIScreen;
 
+import playn.core.PlayN;
+
 class IOSGameView extends iPhoneOSGameView
 {
   private static final float MAX_DELTA = 100;
@@ -36,15 +38,22 @@ class IOSGameView extends iPhoneOSGameView
   public IOSGameView(RectangleF bounds) {
     super(bounds);
 
-    set_LayerColorFormat(EAGLColorFormat.RGBA8);
     // TODO: I assume we want to manually manage loss of EGL context
     set_LayerRetainsBacking(false);
     // TODO: is this for retina displays?
     set_ContentScaleFactor(UIScreen.get_MainScreen().get_Scale());
     // set_MultipleTouchEnabled(true);
     set_AutoResize(false);
+    set_LayerColorFormat(EAGLColorFormat.RGBA8);
     // TODO: support OpenGL ES 1.1?
     set_ContextRenderingApi(EAGLRenderingAPI.wrap(EAGLRenderingAPI.OpenGLES2));
+  }
+
+  @Override
+  protected void CreateFrameBuffer() {
+    super.CreateFrameBuffer();
+    // now that we're loaded, initialize the GL subsystem
+    IOSPlatform.instance.graphics().ctx.init();
   }
 
   @Override

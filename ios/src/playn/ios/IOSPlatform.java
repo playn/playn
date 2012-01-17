@@ -58,12 +58,16 @@ public class IOSPlatform implements Platform {
   private final IOSGameView gameView;
 
   private IOSPlatform() {
+    RectangleF bounds = UIScreen.get_MainScreen().get_Bounds();
+
+    // create log first so that other services can use it during initialization
+    log = new IOSLog();
+
     instance = this;
     audio = new IOSAudio();
-    graphics = new IOSGraphics();
+    graphics = new IOSGraphics(bounds);
     json = new JsonImpl();
     keyboard = new IOSKeyboard();
-    log = new IOSLog();
     net = new IOSNet();
     pointer = new IOSPointer();
     touch = new IOSTouch();
@@ -71,7 +75,6 @@ public class IOSPlatform implements Platform {
     analytics = new IOSAnalytics();
     storage = new IOSStorage();
 
-    RectangleF bounds = UIScreen.get_MainScreen().get_Bounds();
     mainWindow = new UIWindow(bounds);
     mainWindow.Add(gameView = new IOSGameView(bounds));
   }
@@ -173,7 +176,7 @@ public class IOSPlatform implements Platform {
   }
 
   void update(float delta) {
-    PlayN.log().debug("Update " + delta);
+    // PlayN.log().debug("Update " + delta);
 
     // perform the game updates
     float updateRate = game.updateRate();
@@ -193,7 +196,7 @@ public class IOSPlatform implements Platform {
   }
 
   void paint() {
-    PlayN.log().debug("Paint " + alpha);
-    graphics.paint(alpha);
+    // PlayN.log().debug("Paint " + alpha);
+    graphics.paint(game, alpha);
   }
 }

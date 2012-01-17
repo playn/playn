@@ -39,10 +39,10 @@ class IOSAssetManager implements AssetManager
                                      FileAccess.wrap(FileAccess.Read),
                                      FileShare.wrap(FileShare.Read));
       NSData data = NSData.FromStream(stream);
-      return new IOSImage(UIImage.LoadFromData(data));
+      return new IOSImage(IOSPlatform.instance.graphics().ctx, UIImage.LoadFromData(data));
     } catch (Throwable t) {
       PlayN.log().warn("Failed to load image: " + path, t);
-      return new IOSImage(new UIImage());
+      return new IOSImage(IOSPlatform.instance.graphics().ctx, new UIImage());
     }
   }
 
