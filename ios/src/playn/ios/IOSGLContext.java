@@ -150,11 +150,15 @@ class IOSGLContext extends GLContext
     // bctx.TranslateCTM(0, height - imageSize.Height);
     bctx.DrawImage(new RectangleF(0, 0, width, height), cimage);
 
-    GL.TexImage2D(All.wrap(All.Texture2D), 0, All.Rgba, width, height, 0, All.wrap(All.Rgba),
-                  All.wrap(All.UnsignedByte), data);
+    updateTexture(tex, width, height, data);
 
     bctx.Dispose();
     Marshal.FreeHGlobal(data);
+  }
+
+  void updateTexture(int tex, int width, int height, IntPtr data) {
+    GL.TexImage2D(All.wrap(All.Texture2D), 0, All.Rgba, width, height, 0, All.wrap(All.Rgba),
+                  All.wrap(All.UnsignedByte), data);
   }
 
   void paintLayers(GroupLayerGL rootLayer) {
