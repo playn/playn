@@ -15,6 +15,7 @@
  */
 package playn.ios;
 
+import cli.MonoTouch.CoreGraphics.CGColorSpace;
 import cli.System.Drawing.RectangleF;
 
 import playn.core.CanvasImage;
@@ -36,6 +37,9 @@ import playn.core.gl.GroupLayerGL;
  */
 public class IOSGraphics extends GraphicsGL {
 
+  // a shared colorspace instance for use all over the place
+  static final CGColorSpace colorSpace = CGColorSpace.CreateDeviceRGB();
+
   private final GroupLayerGL rootLayer;
   private final int screenWidth, screenHeight;
 
@@ -49,29 +53,29 @@ public class IOSGraphics extends GraphicsGL {
   }
 
   @Override
-  public CanvasImage createImage(int w, int h) {
-    throw new UnsupportedOperationException();
+  public CanvasImage createImage(int width, int height) {
+    return new IOSCanvasImage(ctx, width, height);
   }
 
   @Override
   public Gradient createLinearGradient(float x0, float y0, float x1, float y1,
                                        int[] colors, float[] positions) {
-    throw new UnsupportedOperationException();
+    return new IOSGradient.Linear(x0, y0, x1, y1, colors, positions);
   }
 
   @Override
   public Path createPath() {
-    throw new UnsupportedOperationException();
+    return new IOSPath();
   }
 
   @Override
-  public Pattern createPattern(Image img) {
-    throw new UnsupportedOperationException();
+  public Pattern createPattern(Image image) {
+    return new IOSPattern((IOSAbstractImage) image);
   }
 
   @Override
   public Gradient createRadialGradient(float x, float y, float r, int[] colors, float[] positions) {
-    throw new UnsupportedOperationException();
+    return new IOSGradient.Radial(x, y, r, colors, positions);
   }
 
   @Override

@@ -15,38 +15,22 @@
  */
 package playn.ios;
 
-import cli.MonoTouch.CoreGraphics.CGImage;
-import cli.MonoTouch.UIKit.UIImage;
-
 /**
- * Implements {@link Image} based on a static bitmap.
+ * Maintains canvas state that is not maintained via CGContext.
  */
-public class IOSImage extends IOSAbstractImage
+class IOSCanvasState
 {
-  private final UIImage image;
+  IOSGradient gradient;
 
-  IOSImage (IOSGLContext ctx, UIImage image) {
-    super(ctx);
-    this.image = image;
+  IOSCanvasState() {
+    this((IOSGradient)null);
   }
 
-  @Override
-  public int width() {
-    return image.get_CGImage().get_Width();
+  IOSCanvasState(IOSCanvasState toCopy) {
+    this(toCopy.gradient);
   }
 
-  @Override
-  public int height() {
-    return image.get_CGImage().get_Height();
-  }
-
-  @Override
-  CGImage cgImage() {
-    return image.get_CGImage();
-  }
-
-  @Override
-  protected void updateTexture(int tex) {
-    ctx.updateTexture(tex, image);
+  IOSCanvasState(IOSGradient gradient) {
+    this.gradient = gradient;
   }
 }

@@ -15,6 +15,8 @@
  */
 package playn.ios;
 
+import cli.MonoTouch.CoreGraphics.CGImage;
+
 import playn.core.Canvas;
 import playn.core.CanvasImage;
 import playn.core.gl.GLContext;
@@ -33,7 +35,7 @@ public class IOSCanvasImage extends IOSAbstractImage implements CanvasImage
 
   @Override
   public Canvas canvas() {
-    return null; // TODO
+    return canvas;
   }
 
   @Override
@@ -47,11 +49,6 @@ public class IOSCanvasImage extends IOSAbstractImage implements CanvasImage
   }
 
   @Override
-  protected void updateTexture(int tex) {
-    ctx.updateTexture(tex, width(), height(), canvas.data());
-  }
-
-  @Override
   public Object ensureTexture(GLContext ctx, boolean repeatX, boolean repeatY) {
     // if we have a canvas, and it's dirty, force the recreation of our texture which will obtain
     // the latest canvas data
@@ -60,5 +57,15 @@ public class IOSCanvasImage extends IOSAbstractImage implements CanvasImage
       clearTexture(ctx);
     }
     return super.ensureTexture(ctx, repeatX, repeatY);
+  }
+
+  @Override
+  CGImage cgImage() {
+    throw new RuntimeException("TODO: IOSCanvasImage.cgImage");
+  }
+
+  @Override
+  protected void updateTexture(int tex) {
+    ctx.updateTexture(tex, width(), height(), canvas.data());
   }
 }

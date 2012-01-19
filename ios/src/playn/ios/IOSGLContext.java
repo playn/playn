@@ -20,7 +20,6 @@ import cli.System.IntPtr;
 import cli.System.Runtime.InteropServices.Marshal;
 
 import cli.MonoTouch.CoreGraphics.CGBitmapContext;
-import cli.MonoTouch.CoreGraphics.CGColorSpace;
 import cli.MonoTouch.CoreGraphics.CGImage;
 import cli.MonoTouch.CoreGraphics.CGImageAlphaInfo;
 import cli.MonoTouch.UIKit.UIImage;
@@ -140,11 +139,9 @@ class IOSGLContext extends GLContext
     int width = cimage.get_Width(), height = cimage.get_Height();
 
     IntPtr data = Marshal.AllocHGlobal(width * height * 4);
-    CGColorSpace colorSpace = CGColorSpace.CreateDeviceRGB();
     CGBitmapContext bctx = new CGBitmapContext(
-      data, width, height, 8, 4 * width, colorSpace,
+      data, width, height, 8, 4 * width, IOSGraphics.colorSpace,
       CGImageAlphaInfo.wrap(CGImageAlphaInfo.PremultipliedLast));
-    colorSpace.Dispose();
 
     bctx.ClearRect(new RectangleF(0, 0, width, height));
     // bctx.TranslateCTM(0, height - imageSize.Height);

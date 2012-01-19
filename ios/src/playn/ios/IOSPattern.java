@@ -15,38 +15,18 @@
  */
 package playn.ios;
 
-import cli.MonoTouch.CoreGraphics.CGImage;
+import cli.MonoTouch.CoreGraphics.CGColor;
+import cli.MonoTouch.UIKit.UIColor;
 import cli.MonoTouch.UIKit.UIImage;
 
-/**
- * Implements {@link Image} based on a static bitmap.
- */
-public class IOSImage extends IOSAbstractImage
+import playn.core.Pattern;
+
+class IOSPattern implements Pattern
 {
-  private final UIImage image;
+  CGColor colorWithPattern;
 
-  IOSImage (IOSGLContext ctx, UIImage image) {
-    super(ctx);
-    this.image = image;
-  }
-
-  @Override
-  public int width() {
-    return image.get_CGImage().get_Width();
-  }
-
-  @Override
-  public int height() {
-    return image.get_CGImage().get_Height();
-  }
-
-  @Override
-  CGImage cgImage() {
-    return image.get_CGImage();
-  }
-
-  @Override
-  protected void updateTexture(int tex) {
-    ctx.updateTexture(tex, image);
+  IOSPattern(IOSAbstractImage image) {
+    // this is a circuitous route, but I'm not savvy enough to find a more direct one
+    colorWithPattern = UIColor.FromPatternImage(new UIImage(image.cgImage())).get_CGColor();
   }
 }

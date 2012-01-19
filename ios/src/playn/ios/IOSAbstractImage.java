@@ -15,6 +15,7 @@
  */
 package playn.ios;
 
+import cli.MonoTouch.CoreGraphics.CGImage;
 import cli.OpenTK.Graphics.ES20.All;
 import cli.OpenTK.Graphics.ES20.GL;
 
@@ -32,6 +33,11 @@ abstract class IOSAbstractImage extends ImageGL implements Image
 {
   protected final IOSGLContext ctx;
   protected int tex = -1, reptex = -1;
+
+  /**
+   * Returns a core graphics image that can be used to paint this image into a canvas.
+   */
+  abstract CGImage cgImage();
 
   /**
    * Uploads our image data into the supplied texture id.
