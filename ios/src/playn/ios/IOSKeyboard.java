@@ -16,11 +16,12 @@
 package playn.ios;
 
 import playn.core.Keyboard;
+import playn.core.PlayN;
 
 class IOSKeyboard implements Keyboard
 {
   @Override
   public void setListener(Listener listener) {
-    throw new RuntimeException("TODO");
+    PlayN.log().warn("Keyboard not (currently) supported on iOS.");
   }
 }
