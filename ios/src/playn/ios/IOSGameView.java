@@ -22,6 +22,7 @@ import cli.System.EventArgs;
 import cli.OpenTK.FrameEventArgs;
 import cli.OpenTK.Platform.iPhoneOS.iPhoneOSGameView;
 
+import cli.MonoTouch.CoreAnimation.CAEAGLLayer;
 import cli.MonoTouch.Foundation.ExportAttribute;
 import cli.MonoTouch.Foundation.NSSet;
 import cli.MonoTouch.OpenGLES.EAGLColorFormat;
@@ -56,6 +57,15 @@ class IOSGameView extends iPhoneOSGameView
     super.CreateFrameBuffer();
     // now that we're loaded, initialize the GL subsystem
     IOSPlatform.instance.graphics().ctx.init();
+  }
+
+  @Override
+  protected void ConfigureLayer (CAEAGLLayer eaglLayer) {
+    super.ConfigureLayer(eaglLayer);
+    eaglLayer.set_Opaque(true);
+
+    // scale our EAGL layer up if we're on a Retina device; TODO: make this a Platform option?
+    eaglLayer.set_ContentsScale(1);
   }
 
   @Override
