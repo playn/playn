@@ -23,6 +23,7 @@ import cli.OpenTK.FrameEventArgs;
 import cli.OpenTK.Platform.iPhoneOS.iPhoneOSGameView;
 
 import cli.MonoTouch.CoreAnimation.CAEAGLLayer;
+import cli.MonoTouch.CoreAnimation.CALayer;
 import cli.MonoTouch.Foundation.ExportAttribute;
 import cli.MonoTouch.Foundation.NSSet;
 import cli.MonoTouch.OpenGLES.EAGLColorFormat;
@@ -37,14 +38,16 @@ class IOSGameView extends iPhoneOSGameView
   private static final float MAX_DELTA = 100;
 
   private DateTime lastUpdate = DateTime.get_Now();
+  private final float scale;
 
-  public IOSGameView(RectangleF bounds) {
+  public IOSGameView(RectangleF bounds, float scale) {
     super(bounds);
+    this.scale = scale;
 
     // TODO: I assume we want to manually manage loss of EGL context
     set_LayerRetainsBacking(false);
-    // TODO: is this for retina displays?
-    set_ContentScaleFactor(UIScreen.get_MainScreen().get_Scale());
+    // TODO: figure out twisty maze of Retina scale bullshit
+    set_ContentScaleFactor(scale);
     // set_MultipleTouchEnabled(true);
     set_AutoResize(false);
     set_LayerColorFormat(EAGLColorFormat.RGBA8);
@@ -53,19 +56,16 @@ class IOSGameView extends iPhoneOSGameView
   }
 
   @Override
+  protected void ConfigureLayer (CAEAGLLayer eaglLayer) {
+    eaglLayer.set_Opaque(true);
+    super.ConfigureLayer(eaglLayer);
+  }
+
+  @Override
   protected void CreateFrameBuffer() {
     super.CreateFrameBuffer();
     // now that we're loaded, initialize the GL subsystem
     IOSPlatform.instance.graphics().ctx.init();
-  }
-
-  @Override
-  protected void ConfigureLayer (CAEAGLLayer eaglLayer) {
-    super.ConfigureLayer(eaglLayer);
-    eaglLayer.set_Opaque(true);
-
-    // scale our EAGL layer up if we're on a Retina device; TODO: make this a Platform option?
-    eaglLayer.set_ContentsScale(1);
   }
 
   @Override

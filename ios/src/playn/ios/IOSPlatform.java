@@ -59,13 +59,14 @@ public class IOSPlatform implements Platform {
 
   private IOSPlatform() {
     RectangleF bounds = UIScreen.get_MainScreen().get_Bounds();
+    float scale = 1f; // TODO: UIScreen.get_MainScreen().get_Scale();
 
     // create log first so that other services can use it during initialization
     log = new IOSLog();
 
     instance = this;
     audio = new IOSAudio();
-    graphics = new IOSGraphics(bounds);
+    graphics = new IOSGraphics(bounds, scale);
     json = new JsonImpl();
     keyboard = new IOSKeyboard();
     net = new IOSNet();
@@ -76,7 +77,7 @@ public class IOSPlatform implements Platform {
     storage = new IOSStorage();
 
     mainWindow = new UIWindow(bounds);
-    mainWindow.Add(gameView = new IOSGameView(bounds));
+    mainWindow.Add(gameView = new IOSGameView(bounds, scale));
   }
 
   @Override
