@@ -137,6 +137,10 @@ class IOSGLContext extends GLContext
   void updateTexture(int tex, UIImage image) {
     CGImage cimage = image.get_CGImage();
     int width = cimage.get_Width(), height = cimage.get_Height();
+    if (width == 0 || height == 0) {
+      PlayN.log().warn("Ignoring texture update for empty image (" + width + "x" + height + ").");
+      return;
+    }
 
     IntPtr data = Marshal.AllocHGlobal(width * height * 4);
     CGBitmapContext bctx = new CGBitmapContext(
