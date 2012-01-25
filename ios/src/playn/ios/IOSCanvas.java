@@ -183,7 +183,7 @@ public class IOSCanvas implements Canvas
 
   @Override
   public Canvas drawText(TextLayout layout, float x, float y) {
-    // TODO
+    ((IOSTextLayout) layout).draw(bctx, x, y);
     isDirty = true;
     return this;
   }
@@ -363,7 +363,7 @@ public class IOSCanvas implements Canvas
     return states.peek();
   }
 
-  private static CGColor toCGColor(int color) {
+  static CGColor toCGColor(int color) {
     float blue = (color & 0xFF) / 255f;
     color >>= 8;
     float green = (color & 0xFF) / 255f;

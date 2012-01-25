@@ -15,8 +15,11 @@
  */
 package playn.ios;
 
+import cli.MonoTouch.CoreGraphics.CGBitmapContext;
 import cli.MonoTouch.CoreGraphics.CGColorSpace;
+import cli.MonoTouch.CoreGraphics.CGImageAlphaInfo;
 import cli.System.Drawing.RectangleF;
+import cli.System.Runtime.InteropServices.Marshal;
 
 import playn.core.CanvasImage;
 import playn.core.Font;
@@ -39,9 +42,16 @@ public class IOSGraphics extends GraphicsGL {
 
   // a shared colorspace instance for use all over the place
   static final CGColorSpace colorSpace = CGColorSpace.CreateDeviceRGB();
+  static final IOSFont defaultFont = new IOSFont("Helvetica", Font.Style.PLAIN, 16);
 
   private final GroupLayerGL rootLayer;
   private final int screenWidth, screenHeight;
+
+  // a scratch bitmap context used for measuring text
+  private static final int S_SIZE = 10;
+  final CGBitmapContext scratchCtx = new CGBitmapContext(
+    Marshal.AllocHGlobal(S_SIZE * S_SIZE * 4), S_SIZE, S_SIZE, 8, 4 * S_SIZE, colorSpace,
+    CGImageAlphaInfo.wrap(CGImageAlphaInfo.PremultipliedLast));
 
   final IOSGLContext ctx;
 
@@ -80,12 +90,12 @@ public class IOSGraphics extends GraphicsGL {
 
   @Override
   public Font createFont(String name, Font.Style style, float size) {
-    throw new UnsupportedOperationException();
+    return new IOSFont(name, style, size);
   }
 
   @Override
   public TextLayout layoutText(String text, TextFormat format) {
-    throw new UnsupportedOperationException();
+    return IOSTextLayout.create(this, text, format);
   }
 
   @Override
