@@ -16,6 +16,7 @@
 package playn.ios;
 
 import cli.MonoTouch.CoreGraphics.CGBitmapContext;
+import cli.MonoTouch.CoreGraphics.CGColor;
 import cli.MonoTouch.CoreGraphics.CGPath;
 import cli.MonoTouch.CoreText.CTFrame;
 import cli.MonoTouch.CoreText.CTFramesetter;
@@ -45,6 +46,14 @@ abstract class IOSTextLayout implements TextLayout {
     IOSFont font = (format.font == null) ? gfx.defaultFont : (IOSFont) format.font;
     CTStringAttributes attribs = new CTStringAttributes();
     attribs.set_Font(font.ctFont);
+    attribs.set_ForegroundColorFromContext(true);
+
+    if (format.effect instanceof TextFormat.Effect.Outline) {
+      attribs.set_StrokeColor(IOSCanvas.toCGColor(format.effect.getAltColor()));
+      // negative stroke width means stroke and fill, rather than just stroke
+      attribs.set_StrokeWidth(new cli.System.Nullable$$00601_$$$_F_$$$$_(-3));
+    }
+
     CTParagraphStyleSettings pstyle = new CTParagraphStyleSettings();
     // the "view C# as Java" abstraction is suffering a bit here; please avert your eyes
     pstyle.set_Alignment(new cli.System.Nullable$$00601_$$$_Lcli__MonoTouch__CoreText__CTTextAlignment_$$$$_(toCT(format.align)));
@@ -133,17 +142,16 @@ abstract class IOSTextLayout implements TextLayout {
           float lineX = origins[idx++].get_X() + bounds.get_X() + bounds.get_Width();
           maxX = Math.max(maxX, lineX);
         }
-        this.width = (maxX - minX);
+        this.width = format.effect.adjustWidth(maxX - minX);
 
         this.lineHeight = (origins.length < 2) ? fontLineHeight :
           (origins[0].get_Y() - origins[1].get_Y());
         float gap = lineHeight - fontLineHeight;
-        this.height = lineHeight * frame.GetLines().length - gap;
+        this.height = format.effect.adjustHeight(lineHeight * frame.GetLines().length - gap);
 
       } finally {
         fs.Dispose();
       }
-
     }
 
     @Override
@@ -162,7 +170,7 @@ abstract class IOSTextLayout implements TextLayout {
     }
 
     @Override
-    void draw(CGBitmapContext bctx, float x, float y) {
+    void drawOnce(CGBitmapContext bctx, float x, float y) {
       float dx = x + adjustX;
       float dy = y + MAX_HEIGHT - font.ctFont.get_DescentMetric();
       bctx.TranslateCTM(dx, dy);
@@ -192,16 +200,17 @@ abstract class IOSTextLayout implements TextLayout {
 
     @Override
     public float width() {
-      return bounds.get_X() + bounds.get_Width();
+      return format.effect.adjustWidth(bounds.get_X() + bounds.get_Width());
     }
 
     @Override
     public float height() {
-      return font.ctFont.get_AscentMetric() + font.ctFont.get_DescentMetric();
+      return format.effect.adjustHeight(
+        font.ctFont.get_AscentMetric() + font.ctFont.get_DescentMetric());
     }
 
     @Override
-    void draw(CGBitmapContext bctx, float x, float y) {
+    void drawOnce(CGBitmapContext bctx, float x, float y) {
       float dy = y + font.ctFont.get_AscentMetric();
       bctx.TranslateCTM(x, dy);
       bctx.ScaleCTM(1, -1);
@@ -223,7 +232,33 @@ abstract class IOSTextLayout implements TextLayout {
     return format;
   }
 
-  abstract void draw(CGBitmapContext bctx, float x, float y);
+  void draw(CGBitmapContext bctx, float x, float y) {
+    float tx = 0, ty = 0;
+    if (format.effect instanceof TextFormat.Effect.Shadow) {
+      TextFormat.Effect.Shadow seffect = (TextFormat.Effect.Shadow)format.effect;
+      // if the shadow is negative, we need to move the real text down/right to keep everything
+      // within our bounds
+      float sx, sy;
+      if (seffect.shadowOffsetX > 0) {
+        sx = seffect.shadowOffsetX;
+      } else {
+        tx = -seffect.shadowOffsetX;
+        sx = 0;
+      }
+      if (seffect.shadowOffsetY > 0) {
+        sy = seffect.shadowOffsetY;
+      } else {
+        ty = -seffect.shadowOffsetY;
+        sy = 0;
+      }
+      bctx.SetFillColor(IOSCanvas.toCGColor(format.effect.getAltColor()));
+      drawOnce(bctx, x+sx, y+sy);
+    }
+    bctx.SetFillColor(IOSCanvas.toCGColor(format.textColor));
+    drawOnce(bctx, x+tx, y+ty);
+  }
+
+  abstract void drawOnce(CGBitmapContext bctx, float x, float y);
 
   protected static CTTextAlignment toCT(TextFormat.Alignment align) {
     switch (align) {
