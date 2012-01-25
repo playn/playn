@@ -15,6 +15,8 @@
  */
 package playn.ios;
 
+import cli.MonoTouch.Foundation.NSUrl;
+import cli.MonoTouch.UIKit.UIApplication;
 import cli.MonoTouch.UIKit.UIScreen;
 import cli.MonoTouch.UIKit.UIWindow;
 import cli.System.Drawing.RectangleF;
@@ -33,8 +35,8 @@ import playn.core.json.JsonImpl;
  */
 public class IOSPlatform implements Platform {
 
-  public static void register() {
-    PlayN.setPlatform(new IOSPlatform());
+  public static void register(UIApplication app) {
+    PlayN.setPlatform(new IOSPlatform(app));
   }
 
   static IOSPlatform instance;
@@ -54,10 +56,12 @@ public class IOSPlatform implements Platform {
   private Game game;
   private float accum, alpha;
 
+  private final UIApplication app;
   private final UIWindow mainWindow;
   private final IOSGameView gameView;
 
-  private IOSPlatform() {
+  private IOSPlatform(UIApplication app) {
+    this.app = app;
     RectangleF bounds = UIScreen.get_MainScreen().get_Bounds();
     float scale = 1f; // TODO: UIScreen.get_MainScreen().get_Scale();
 
@@ -122,7 +126,9 @@ public class IOSPlatform implements Platform {
 
   @Override
   public void openURL(String url) {
-    throw new RuntimeException("TODO");
+    if (!app.OpenUrl(new NSUrl(url))) {
+      log().warn("Failed to open URL: " + url);
+    }
   }
 
   @Override
