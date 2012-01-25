@@ -36,8 +36,10 @@ import playn.core.json.JsonImpl;
  */
 public class IOSPlatform implements Platform {
 
-  public static void register(UIApplication app) {
-    PlayN.setPlatform(new IOSPlatform(app));
+  public static IOSPlatform register(UIApplication app) {
+    IOSPlatform platform = new IOSPlatform(app);
+    PlayN.setPlatform(platform);
+    return platform;
   }
 
   static IOSPlatform instance;

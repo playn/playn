@@ -19,12 +19,14 @@ import cli.System.IO.FileAccess;
 import cli.System.IO.FileMode;
 import cli.System.IO.FileShare;
 import cli.System.IO.FileStream;
+import cli.System.IO.Path;
 import cli.System.IO.Stream;
 import cli.System.IO.StreamReader;
 
 import cli.MonoTouch.Foundation.NSData;
 import cli.MonoTouch.UIKit.UIImage;
 
+import playn.core.Asserts;
 import playn.core.AssetManager;
 import playn.core.Image;
 import playn.core.PlayN;
@@ -33,16 +35,33 @@ import playn.core.Sound;
 
 class IOSAssetManager implements AssetManager
 {
+  private String pathPrefix = "";
+
+  /**
+   * Configures the prefix prepended to asset paths before fetching them from the app directory.
+   * Note that you specify path components as an array, <em>not</em> a single string that contains
+   * multiple components with embedded path separators.
+   */
+  public void setPathPrefix(String... components) {
+    Asserts.checkArgument(components.length > 0);
+    for (String component : components) {
+      Asserts.checkArgument(!component.contains("/") && !component.contains("\\"),
+                            "Path components must not contain path separators: " + component);
+    }
+    pathPrefix = Path.Combine(components);
+  }
+
   @Override
   public Image getImage(String path) {
+    String fullPath = Path.Combine(pathPrefix, path);
     try {
-      Stream stream = new FileStream(path, FileMode.wrap(FileMode.Open),
+      Stream stream = new FileStream(fullPath, FileMode.wrap(FileMode.Open),
                                      FileAccess.wrap(FileAccess.Read),
                                      FileShare.wrap(FileShare.Read));
       NSData data = NSData.FromStream(stream);
       return new IOSImage(IOSPlatform.instance.graphics().ctx, UIImage.LoadFromData(data));
     } catch (Throwable t) {
-      PlayN.log().warn("Failed to load image: " + path, t);
+      PlayN.log().warn("Failed to load image: " + path + " [full=" + fullPath + "]", t);
       return new IOSImage(IOSPlatform.instance.graphics().ctx, new UIImage());
     }
   }
@@ -54,9 +73,10 @@ class IOSAssetManager implements AssetManager
 
   @Override
   public void getText(String path, ResourceCallback<String> callback) {
+    String fullPath = Path.Combine(pathPrefix, path);
     StreamReader reader = null;
     try {
-      reader = new StreamReader(path);
+      reader = new StreamReader(fullPath);
       callback.done(reader.ReadToEnd());
     } catch (Throwable t) {
       callback.error(t);
