@@ -49,7 +49,7 @@ class IOSAssetManager implements AssetManager
 
   @Override
   public Sound getSound(String path) {
-    throw new RuntimeException("TODO");
+    return new IOSSound(); // TODO
   }
 
   @Override
