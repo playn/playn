@@ -54,74 +54,95 @@ class IOSStorage implements Storage
   }
 
   @Override
-  public void setItem(String key, String value) throws RuntimeException {
-    // first try to update
-    DbCommand cmd = createCommand("update Data set DataValue = @value where DataKey = @key");
-    cmd.get_Parameters().Add(createParam(cmd, "@value", value));
-    cmd.get_Parameters().Add(createParam(cmd, "@key", key));
+  public boolean isPersisted() {
+    return true;
+  }
 
-    // if that modified zero rows, then insert
-    if (executeUpdate(cmd) == 0) {
-      cmd = createCommand("insert into Data (DataKey, DataValue) values (@key, @value)");
-      cmd.get_Parameters().Add(createParam(cmd, "@key", key));
-      cmd.get_Parameters().Add(createParam(cmd, "@value", value));
-      if (executeUpdate(cmd) == 0) {
-        PlayN.log().warn("Failed to insert storage item [key=" + key + "]");
+  @Override
+  public Iterable<String> keys() {
+    try {
+      List<String> keys = new ArrayList<String>();
+      DbCommand cmd = createCommand("select DataKey from Data");
+
+      IDataReader reader = null;
+      try {
+        conn.Open();
+        reader = cmd.ExecuteReader();
+        while (reader.Read()) {
+          keys.add(reader.GetString(0));
+        }
+        return keys;
+
+      } finally {
+        if (reader != null)
+          reader.Dispose();
+        cmd.Dispose();
+        conn.Close();
+        conn.Dispose();
       }
+
+    } catch (Throwable t) {
+      throw new RuntimeException("keys() failed: " + t);
+    }
+  }
+
+  @Override
+  public String getItem(String key) {
+    try {
+      DbCommand cmd = createCommand("select DataValue from Data where DataKey = @key");
+      cmd.get_Parameters().Add(createParam(cmd, "@key", key));
+
+      IDataReader reader = null;
+      try {
+        conn.Open();
+        reader = cmd.ExecuteReader();
+        return reader.Read() ? reader.GetString(0) : null;
+
+      } finally {
+        if (reader != null)
+          reader.Dispose();
+        cmd.Dispose();
+        conn.Close();
+        conn.Dispose();
+      }
+
+    } catch (Throwable t) {
+      throw new RuntimeException("getItem(" + key + ") failed: " + t);
+    }
+  }
+
+  @Override
+  public void setItem(String key, String value) throws RuntimeException {
+    try {
+      // first try to update
+      DbCommand cmd = createCommand("update Data set DataValue = @value where DataKey = @key");
+      cmd.get_Parameters().Add(createParam(cmd, "@value", value));
+      cmd.get_Parameters().Add(createParam(cmd, "@key", key));
+
+      // if that modified zero rows, then insert
+      if (executeUpdate(cmd) == 0) {
+        cmd = createCommand("insert into Data (DataKey, DataValue) values (@key, @value)");
+        cmd.get_Parameters().Add(createParam(cmd, "@key", key));
+        cmd.get_Parameters().Add(createParam(cmd, "@value", value));
+        if (executeUpdate(cmd) == 0) {
+          PlayN.log().warn("Failed to insert storage item [key=" + key + "]");
+        }
+      }
+
+    } catch (Throwable t) {
+      throw new RuntimeException("setItem(" + key + ", " + value + ") failed: " + t);
     }
   }
 
   @Override
   public void removeItem(String key) {
-    DbCommand cmd = createCommand("delete from Data where DataKey = @key");
-    cmd.get_Parameters().Add(createParam(cmd, "@key", key));
-    executeUpdate(cmd);
-  }
-
-  @Override
-  public String getItem(String key) {
-    DbCommand cmd = createCommand("select DataValue from Data where DataKey = @key");
-    cmd.get_Parameters().Add(createParam(cmd, "@key", key));
-
-    IDataReader reader = null;
     try {
-      conn.Open();
-      reader = cmd.ExecuteReader();
-      return reader.Read() ? reader.GetString(0) : null;
-
-    } finally {
-      conn.Close();
-      if (reader != null)
-        reader.Dispose();
-      cmd.Dispose();
+      DbCommand cmd = createCommand("delete from Data where DataKey = @key");
+      cmd.get_Parameters().Add(createParam(cmd, "@key", key));
+      executeUpdate(cmd);
+    } catch (Throwable t) {
+      throw new RuntimeException("removeItem(" + key + ") failed: " + t);
     }
-  }
-
-  @Override
-  public Iterable<String> keys() {
-    List<String> keys = new ArrayList<String>();
-    DbCommand cmd = createCommand("select DataKey from Data");
-
-    IDataReader reader = null;
-    try {
-      conn.Open();
-      reader = cmd.ExecuteReader();
-      while (reader.Read()) {
-        keys.add(reader.GetString(0));
-      }
-      return keys;
-
-    } finally {
-      conn.Close();
-      if (reader != null)
-        reader.Dispose();
-      cmd.Dispose();
-    }
-  }
-
-  @Override
-  public boolean isPersisted() {
-    return true;
   }
 
   private DbParameter createParam(DbCommand cmd, String name, String value) {
@@ -144,8 +165,9 @@ class IOSStorage implements Storage
       conn.Open();
       return cmd.ExecuteNonQuery();
     } finally {
-      conn.Close();
       cmd.Dispose();
+      conn.Close();
+      conn.Dispose();
     }
   }
 }
