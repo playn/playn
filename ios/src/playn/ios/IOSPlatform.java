@@ -191,7 +191,7 @@ public class IOSPlatform implements Platform {
   }
 
   void update(float delta) {
-    // PlayN.log().debug("Update " + delta);
+    // log.debug("Update " + delta);
 
     // perform the game updates
     float updateRate = game.updateRate();
@@ -211,7 +211,7 @@ public class IOSPlatform implements Platform {
   }
 
   void paint() {
-    // PlayN.log().debug("Paint " + alpha);
+    // log.debug("Paint " + alpha);
     graphics.paint(game, alpha);
   }
 }

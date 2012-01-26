@@ -53,6 +53,7 @@ class IOSAssetManager implements AssetManager
 
   @Override
   public Image getImage(String path) {
+    PlayN.log().debug("Loading image " + path);
     String fullPath = Path.Combine(pathPrefix, path);
     try {
       Stream stream = new FileStream(fullPath, FileMode.wrap(FileMode.Open),
@@ -68,11 +69,13 @@ class IOSAssetManager implements AssetManager
 
   @Override
   public Sound getSound(String path) {
+    PlayN.log().debug("Loading sound " + path);
     return new IOSSound(); // TODO
   }
 
   @Override
   public void getText(String path, ResourceCallback<String> callback) {
+    PlayN.log().debug("Loading text " + path);
     String fullPath = Path.Combine(pathPrefix, path);
     StreamReader reader = null;
     try {
