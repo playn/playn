@@ -22,9 +22,13 @@ import cli.System.Runtime.InteropServices.Marshal;
 import cli.MonoTouch.CoreGraphics.CGBitmapContext;
 import cli.MonoTouch.CoreGraphics.CGImage;
 import cli.MonoTouch.CoreGraphics.CGImageAlphaInfo;
+import cli.MonoTouch.UIKit.UIDevice;
+import cli.MonoTouch.UIKit.UIDeviceOrientation;
 import cli.MonoTouch.UIKit.UIImage;
 import cli.OpenTK.Graphics.ES20.All;
 import cli.OpenTK.Graphics.ES20.GL;
+
+import pythagoras.f.FloatMath;
 
 import playn.core.InternalTransform;
 import playn.core.PlayN;
@@ -40,6 +44,7 @@ class IOSGLContext extends GLContext
 
   int fbufWidth, fbufHeight;
   private int lastFrameBuffer;
+  private InternalTransform rootTransform = StockInternalTransform.IDENTITY;
 
   IOSGLContext(int screenWidth, int screenHeight) {
     fbufWidth = viewWidth = screenWidth;
@@ -48,6 +53,29 @@ class IOSGLContext extends GLContext
 
   void init() {
     reinitGL();
+  }
+
+  void setOrientation(UIDeviceOrientation orientation) {
+    switch (orientation.Value) {
+    case UIDeviceOrientation.Portrait:
+      rootTransform = StockInternalTransform.IDENTITY;
+      break;
+    case UIDeviceOrientation.PortraitUpsideDown:
+      rootTransform = new StockInternalTransform();
+      rootTransform.translate(-viewWidth, -viewHeight);
+      rootTransform.scale(-1, -1);
+      break;
+    case UIDeviceOrientation.LandscapeLeft:
+      rootTransform = new StockInternalTransform();
+      rootTransform.rotate(FloatMath.PI/2);
+      rootTransform.translate(0, -viewWidth);
+      break;
+    case UIDeviceOrientation.LandscapeRight:
+      rootTransform = new StockInternalTransform();
+      rootTransform.rotate(-FloatMath.PI/2);
+      rootTransform.translate(-viewHeight, 0);
+      break;
+    }
   }
 
   @Override
@@ -166,7 +194,7 @@ class IOSGLContext extends GLContext
     checkGLError("updateLayers start");
     bindFramebuffer();
     GL.Clear(All.ColorBufferBit | All.DepthBufferBit); // clear to transparent
-    rootLayer.paint(StockInternalTransform.IDENTITY, 1); // paint all the layers
+    rootLayer.paint(rootTransform, 1); // paint all the layers
     checkGLError("updateLayers end");
     useShader(null); // guarantee a flush
   }

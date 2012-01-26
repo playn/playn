@@ -25,9 +25,13 @@ import cli.OpenTK.Platform.iPhoneOS.iPhoneOSGameView;
 import cli.MonoTouch.CoreAnimation.CAEAGLLayer;
 import cli.MonoTouch.CoreAnimation.CALayer;
 import cli.MonoTouch.Foundation.ExportAttribute;
+import cli.MonoTouch.Foundation.NSNotification;
+import cli.MonoTouch.Foundation.NSNotificationCenter;
 import cli.MonoTouch.Foundation.NSSet;
 import cli.MonoTouch.OpenGLES.EAGLColorFormat;
 import cli.MonoTouch.OpenGLES.EAGLRenderingAPI;
+import cli.MonoTouch.UIKit.UIDevice;
+import cli.MonoTouch.UIKit.UIDeviceOrientation;
 import cli.MonoTouch.UIKit.UIEvent;
 import cli.MonoTouch.UIKit.UIScreen;
 
@@ -53,6 +57,14 @@ class IOSGameView extends iPhoneOSGameView
     set_LayerColorFormat(EAGLColorFormat.RGBA8);
     // TODO: support OpenGL ES 1.1?
     set_ContextRenderingApi(EAGLRenderingAPI.wrap(EAGLRenderingAPI.OpenGLES2));
+
+    NSNotificationCenter.get_DefaultCenter().AddObserver(
+      UIDevice.get_OrientationDidChangeNotification(),
+      new cli.System.Action$$00601_$$$_Lcli__MonoTouch__Foundation__NSNotification_$$$$_(new cli.System.Action$$00601_$$$_Lcli__MonoTouch__Foundation__NSNotification_$$$$_.Method() {
+        @Override
+        public void Invoke(NSNotification nf) {
+          OnOrientationChange(UIDevice.get_CurrentDevice().get_Orientation());
+        }}));
   }
 
   @Override
@@ -79,14 +91,15 @@ class IOSGameView extends iPhoneOSGameView
   }
 
   @Override
-  protected void OnLoad(EventArgs e)
-  {
+  protected void OnLoad(EventArgs e) {
     super.OnLoad(e);
+    UIDevice.get_CurrentDevice().BeginGeneratingDeviceOrientationNotifications();
   }
 
   @Override
   protected void OnUnload(EventArgs e) {
     super.OnUnload(e);
+    UIDevice.get_CurrentDevice().EndGeneratingDeviceOrientationNotifications();
   }
 
   @Override
@@ -154,6 +167,11 @@ class IOSGameView extends iPhoneOSGameView
     super.TouchesCancelled(touches, event);
     IOSPlatform.instance.touch().onTouchesCancelled(touches, event);
     IOSPlatform.instance.pointer().onTouchesCancelled(touches, event);
+  }
+
+  private void OnOrientationChange(UIDeviceOrientation orientation) {
+    IOSPlatform.instance.graphics().ctx.setOrientation(orientation);
+    // TODO: notify the app of the orientation change
   }
 
   @ExportAttribute.Annotation("layerClass")

@@ -128,11 +128,6 @@ public class IOSGraphics extends GraphicsGL {
     // setSize(width, height, true);
   }
 
-  // @Override
-  // protected SurfaceGL createSurface(int width, int height) {
-  //   return new AndroidSurfaceGL(ctx, width, height);
-  // }
-
   @Override
   protected GLContext ctx() {
     return ctx;
