@@ -27,6 +27,7 @@ import playn.core.Gradient;
 import playn.core.Graphics;
 import playn.core.GroupLayer;
 import playn.core.Image;
+import playn.core.ImmediateLayer;
 import playn.core.ImageLayer;
 import playn.core.Path;
 import playn.core.Pattern;
@@ -76,6 +77,17 @@ class FlashGraphics implements Graphics {
   @Override
   public SurfaceLayer createSurfaceLayer(int width, int height) {
     return new FlashSurfaceLayer(width, height);
+  }
+
+  @Override
+  public ImmediateLayer.Clipped createImmediateLayer(
+      int width, int height, ImmediateLayer.Renderer renderer) {
+    throw new UnsupportedOperationException("Immediate layer not supported by Flash");
+  }
+
+  @Override
+  public ImmediateLayer createImmediateLayer(ImmediateLayer.Renderer renderer) {
+    throw new UnsupportedOperationException("Immediate layer not supported by Flash");
   }
 
   @Override

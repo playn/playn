@@ -67,8 +67,12 @@ class JavaCanvas implements Canvas {
   @Override
   public Canvas clip(Path path) {
     Asserts.checkArgument(path instanceof JavaPath);
-    currentState().clip = (JavaPath) path;
+    currentState().clipper = (JavaPath) path;
     return this;
+  }
+
+  void clip(JavaCanvasState.Clipper clipper) {
+    currentState().clipper = clipper;
   }
 
   @Override

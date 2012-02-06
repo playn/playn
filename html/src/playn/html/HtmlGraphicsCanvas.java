@@ -17,6 +17,7 @@ import playn.core.CanvasLayer;
 import playn.core.GroupLayer;
 import playn.core.Image;
 import playn.core.ImageLayer;
+import playn.core.ImmediateLayer;
 import playn.core.SurfaceLayer;
 
 import com.google.gwt.canvas.dom.client.Context2d;
@@ -60,6 +61,17 @@ class HtmlGraphicsCanvas extends HtmlGraphics {
   @Override
   public SurfaceLayer createSurfaceLayer(int width, int height) {
     return new HtmlSurfaceLayerCanvas(width, height);
+  }
+
+  @Override
+  public ImmediateLayer.Clipped createImmediateLayer(
+      int width, int height, ImmediateLayer.Renderer renderer) {
+    return new HtmlImmediateLayerCanvas.Clipped(ctx, width, height, renderer);
+  }
+
+  @Override
+  public ImmediateLayer createImmediateLayer(ImmediateLayer.Renderer renderer) {
+    return new HtmlImmediateLayerCanvas(ctx, renderer);
   }
 
   @Override

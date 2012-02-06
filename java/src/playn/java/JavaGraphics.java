@@ -24,6 +24,7 @@ import playn.core.Graphics;
 import playn.core.GroupLayer;
 import playn.core.Image;
 import playn.core.ImageLayer;
+import playn.core.ImmediateLayer;
 import playn.core.Path;
 import playn.core.Pattern;
 import playn.core.SurfaceLayer;
@@ -75,6 +76,17 @@ class JavaGraphics implements Graphics {
   }
 
   @Override
+  public ImmediateLayer.Clipped createImmediateLayer(
+      int width, int height, ImmediateLayer.Renderer renderer) {
+    return new JavaImmediateLayer.Clipped(width, height, renderer);
+  }
+
+  @Override
+  public ImmediateLayer createImmediateLayer(ImmediateLayer.Renderer renderer) {
+    return new JavaImmediateLayer(renderer);
+  }
+
+  @Override
   public JavaGroupLayer rootLayer() {
     return rootLayer;
   }
@@ -85,7 +97,8 @@ class JavaGraphics implements Graphics {
   }
 
   @Override
-  public Gradient createLinearGradient(float x0, float y0, float x1, float y1, int[] colors, float[] positions) {
+  public Gradient createLinearGradient(float x0, float y0, float x1, float y1,
+      int[] colors, float[] positions) {
     return JavaGradient.createLinear(x0, y0, x1, y1, positions, colors);
   }
 

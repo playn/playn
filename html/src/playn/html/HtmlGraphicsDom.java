@@ -22,6 +22,7 @@ import playn.core.CanvasLayer;
 import playn.core.GroupLayer;
 import playn.core.Image;
 import playn.core.ImageLayer;
+import playn.core.ImmediateLayer;
 import playn.core.SurfaceLayer;
 
 class HtmlGraphicsDom extends HtmlGraphics {
@@ -59,6 +60,17 @@ class HtmlGraphicsDom extends HtmlGraphics {
   @Override
   public SurfaceLayer createSurfaceLayer(int width, int height) {
     return new HtmlSurfaceLayerDom(width, height);
+  }
+
+  @Override
+  public ImmediateLayer.Clipped createImmediateLayer(
+      int width, int height, ImmediateLayer.Renderer renderer) {
+    throw new UnsupportedOperationException("Immediate layer not supported by HTML/DOM");
+  }
+
+  @Override
+  public ImmediateLayer createImmediateLayer(ImmediateLayer.Renderer renderer) {
+    throw new UnsupportedOperationException("Immediate layer not supported by HTML/DOM");
   }
 
   @Override

@@ -20,6 +20,7 @@ import playn.core.Graphics;
 import playn.core.GroupLayer;
 import playn.core.Image;
 import playn.core.ImageLayer;
+import playn.core.ImmediateLayer;
 import playn.core.SurfaceLayer;
 
 /**
@@ -50,6 +51,17 @@ public abstract class GraphicsGL implements Graphics
   @Override
   public SurfaceLayer createSurfaceLayer(int width, int height) {
     return new SurfaceLayerGL(ctx(), createSurface(width, height));
+  }
+
+  @Override
+  public ImmediateLayer.Clipped createImmediateLayer(
+      int width, int height, ImmediateLayer.Renderer renderer) {
+    return new ImmediateLayerGL.Clipped(ctx(), width, height, renderer);
+  }
+
+  @Override
+  public ImmediateLayer createImmediateLayer(ImmediateLayer.Renderer renderer) {
+    return new ImmediateLayerGL(ctx(), renderer);
   }
 
   protected SurfaceGL createSurface(int width, int height) {

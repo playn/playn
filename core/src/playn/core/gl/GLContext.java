@@ -43,6 +43,14 @@ public abstract class GLContext {
 
   public abstract void destroyTexture(Object tex);
 
+  /** Starts a series of drawing commands that are clipped to the specified rectangle (in view
+   * coordinates, not OpenGL coordinates). Thus must be followed by a call to {@link #endClipped}
+   * when the clipped drawing commands are done. */
+  public abstract void startClipped(int x, int y, int width, int height);
+
+  /** Ends a series of drawing commands that were clipped per a call to {@link #startClipped}. */
+  public abstract void endClipped();
+
   public abstract void clear(float r, float g, float b, float a);
 
   /**

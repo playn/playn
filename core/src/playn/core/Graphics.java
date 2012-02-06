@@ -43,6 +43,21 @@ public interface Graphics {
   SurfaceLayer createSurfaceLayer(int width, int height);
 
   /**
+   * Creates an immediate layer that is clipped to the specified rectangular region.
+   * @param width the horizontal extent of the layer's drawable region.
+   * @param height the vertical extent of the layer's drawable region.
+   */
+  ImmediateLayer.Clipped createImmediateLayer(
+      int width, int height, ImmediateLayer.Renderer renderer);
+
+  /**
+   * Creates an unclipped immediate layer. This layer may draw anywhere on the framebuffer, though
+   * its rendering operations will be transformed appropriately, based on the layer's current
+   * transform.
+   */
+  ImmediateLayer createImmediateLayer(ImmediateLayer.Renderer renderer);
+
+  /**
    * TODO
    */
   ImageLayer createImageLayer();

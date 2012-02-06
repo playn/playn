@@ -17,10 +17,11 @@ package playn.java;
 
 import playn.core.Path;
 
+import java.awt.Graphics2D;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Path2D;
 
-class JavaPath implements Path {
+class JavaPath implements Path, JavaCanvasState.Clipper {
 
   Path2D path = new GeneralPath();
 
@@ -53,5 +54,10 @@ class JavaPath implements Path {
   public void arcTo(float radius, float x, float y) {
     // TODO: convert this form to one that Arc2D accepts.
     path.lineTo(x, y);
+  }
+
+  @Override
+  public void setClip(Graphics2D gfx) {
+    gfx.setClip(path);
   }
 }

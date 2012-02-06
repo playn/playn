@@ -155,6 +155,19 @@ public class HtmlGLContext extends GLContext
   }
 
   @Override
+  public void startClipped(int x, int y, int width, int height) {
+    flush(); // flush any pending unclipped calls
+    gl.scissor(x, screenHeight-y-height, width, height);
+    gl.enable(SCISSOR_TEST);
+  }
+
+  @Override
+  public void endClipped() {
+    flush(); // flush our clipped calls with SCISSOR_TEST still enabled
+    gl.disable(SCISSOR_TEST);
+  }
+
+  @Override
   public void clear(float red, float green, float blue, float alpha) {
     gl.clearColor(red, green, blue, alpha);
     gl.clear(COLOR_BUFFER_BIT);

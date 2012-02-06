@@ -28,6 +28,17 @@ import java.awt.geom.AffineTransform;
 
 class JavaCanvasState {
 
+  public interface Clipper {
+    void setClip(Graphics2D gfx);
+  }
+
+  private static Clipper NOCLIP = new Clipper() {
+    @Override
+    public void setClip(Graphics2D gfx) {
+      gfx.setClip(null);
+    }
+  };
+
   int fillColor;
   int strokeColor;
   JavaGradient fillGradient;
@@ -37,24 +48,24 @@ class JavaCanvasState {
   LineCap lineCap;
   LineJoin lineJoin;
   float miterLimit;
-  JavaPath clip;
+  Clipper clipper;
   Composite composite;
   float alpha;
 
   JavaCanvasState() {
     this(0xff000000, 0xffffffff, null, null, new AffineTransform(), 1.0f, LineCap.SQUARE,
-        LineJoin.MITER, 10.0f, null, Composite.SRC_OVER, 1);
+         LineJoin.MITER, 10.0f, NOCLIP, Composite.SRC_OVER, 1);
  }
 
   JavaCanvasState(JavaCanvasState toCopy) {
     this(toCopy.fillColor, toCopy.strokeColor, toCopy.fillGradient, toCopy.fillPattern,
-        toCopy.transform, toCopy.strokeWidth, toCopy.lineCap, toCopy.lineJoin, toCopy.miterLimit,
-        toCopy.clip, toCopy.composite, toCopy.alpha);
+         toCopy.transform, toCopy.strokeWidth, toCopy.lineCap, toCopy.lineJoin, toCopy.miterLimit,
+         toCopy.clipper, toCopy.composite, toCopy.alpha);
   }
 
-  JavaCanvasState(int fillColor, int strokeColor, JavaGradient fillGradient,
-      JavaPattern fillPattern, AffineTransform transform, float strokeWidth, LineCap lineCap,
-      LineJoin lineJoin, float miterLimit, JavaPath clip, Composite composite, float alpha) {
+  JavaCanvasState(int fillColor, int strokeColor, JavaGradient fillGradient, JavaPattern fillPattern,
+      AffineTransform transform, float strokeWidth, LineCap lineCap, LineJoin lineJoin,
+      float miterLimit, Clipper clipper, Composite composite, float alpha) {
     this.fillColor = fillColor;
     this.strokeColor = strokeColor;
     this.fillGradient = fillGradient;
@@ -64,6 +75,7 @@ class JavaCanvasState {
     this.lineCap = lineCap;
     this.lineJoin = lineJoin;
     this.miterLimit = miterLimit;
+    this.clipper = clipper;
     this.composite = composite;
     this.alpha = alpha;
   }
@@ -72,7 +84,7 @@ class JavaCanvasState {
   void prepareStroke(Graphics2D gfx) {
     gfx.setStroke(new BasicStroke(strokeWidth, convertLineCap(), convertLineJoin(), miterLimit));
     gfx.setColor(convertColor(strokeColor));
-    gfx.setClip(clip != null ? clip.path : null);
+    clipper.setClip(gfx);
     gfx.setComposite(convertComposite(composite, alpha));
   }
 
@@ -86,7 +98,7 @@ class JavaCanvasState {
     } else {
       gfx.setPaint(convertColor(fillColor));
     }
-    gfx.setClip(clip != null ? clip.path : null);
+    clipper.setClip(gfx);
     gfx.setComposite(convertComposite(composite, alpha));
   }
 

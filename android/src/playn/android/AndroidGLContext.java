@@ -179,11 +179,23 @@ public class AndroidGLContext extends GLContext
 
   @Override
   public void destroyTexture(Object tex) {
-    //Flush in case this texture is queued up to be drawn
-    flush();
+    flush(); // flush in case this texture is queued up to be drawn
     gl20.glDeleteTextures(1, new int[] {(Integer) tex}, 0);
     --texCount;
     if (AndroidPlatform.DEBUG_LOGS) log().debug(texCount + " textures remain.");
+  }
+
+  @Override
+  public void startClipped(int x, int y, int width, int height) {
+    flush(); // flush any pending unclipped calls
+    gl20.glScissor(x, fbufHeight-y-height, width, height);
+    gl20.glEnable(GL20.GL_SCISSOR_TEST);
+  }
+
+  @Override
+  public void endClipped() {
+    flush(); // flush our clipped calls with SCISSOR_TEST still enabled
+    gl20.glDisable(GL20.GL_SCISSOR_TEST);
   }
 
   @Override

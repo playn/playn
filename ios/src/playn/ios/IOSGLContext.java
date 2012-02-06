@@ -130,6 +130,19 @@ class IOSGLContext extends GLContext
   }
 
   @Override
+  public void startClipped(int x, int y, int width, int height) {
+    flush(); // flush any pending unclipped calls
+    GL.Scissor(x, fbufHeight-y-height, width, height);
+    GL.Enable(All.wrap(All.ScissorTest));
+  }
+
+  @Override
+  public void endClipped() {
+    flush(); // flush our clipped calls with SCISSOR_TEST still enabled
+    GL.Disable(All.wrap(All.ScissorTest));
+  }
+
+  @Override
   public void clear(float r, float g, float b, float a) {
     GL.ClearColor(r, g, b, a);
     GL.Clear(All.ColorBufferBit);

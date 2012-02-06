@@ -17,10 +17,12 @@ import playn.core.CanvasLayer;
 import playn.core.GroupLayer;
 import playn.core.Image;
 import playn.core.ImageLayer;
+import playn.core.ImmediateLayer;
 import playn.core.SurfaceLayer;
 import playn.core.gl.CanvasLayerGL;
 import playn.core.gl.GroupLayerGL;
 import playn.core.gl.ImageLayerGL;
+import playn.core.gl.ImmediateLayerGL;
 import playn.core.gl.SurfaceLayerGL;
 
 import com.google.gwt.dom.client.CanvasElement;
@@ -69,6 +71,17 @@ class HtmlGraphicsGL extends HtmlGraphics {
   @Override
   public SurfaceLayer createSurfaceLayer(int width, int height) {
     return new SurfaceLayerGL(ctx, width, height);
+  }
+
+  @Override
+  public ImmediateLayer.Clipped createImmediateLayer(
+      int width, int height, ImmediateLayer.Renderer renderer) {
+    return new ImmediateLayerGL.Clipped(ctx, width, height, renderer);
+  }
+
+  @Override
+  public ImmediateLayer createImmediateLayer(ImmediateLayer.Renderer renderer) {
+    return new ImmediateLayerGL(ctx, renderer);
   }
 
   @Override

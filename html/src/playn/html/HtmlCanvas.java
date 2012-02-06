@@ -39,12 +39,20 @@ class HtmlCanvas implements Canvas {
   }
 
   HtmlCanvas(CanvasElement canvas, int width, int height) {
+    this(canvas, canvas.getContext2d(), width, height);
+    canvas.setWidth(width);
+    canvas.setHeight(height);
+  }
+
+  HtmlCanvas(Context2d ctx, int width, int height) {
+    this(null, ctx, width, height);
+  }
+
+  private HtmlCanvas(CanvasElement canvas, Context2d ctx, int width, int height) {
     this.canvas = canvas;
     this.width = width;
     this.height = height;
-    canvas.setWidth(width);
-    canvas.setHeight(height);
-    ctx = canvas.getContext2d();
+    this.ctx = ctx;
   }
 
   @Override
