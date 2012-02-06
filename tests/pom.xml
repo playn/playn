@@ -22,5 +22,6 @@
 <!--
     <module>flash</module>
 -->
+    <module>android</module>
   </modules>
 </project>

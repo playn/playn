@@ -15,13 +15,11 @@
  */
 package playn.tests.core;
 
-import static playn.core.PlayN.*;
-
 import playn.core.Color;
 import playn.core.Game;
-import playn.core.Mouse;
+import playn.core.Pointer;
 import playn.core.SurfaceLayer;
-import playn.core.Mouse.ButtonEvent;
+import static playn.core.PlayN.*;
 
 public class TestsGame implements Game {
   Test[] tests = new Test[] {
@@ -36,16 +34,13 @@ public class TestsGame implements Game {
   @Override
   public void init() {
     // display basic instructions
-    log().info("Tests. Right click to go to the next test.");
+    log().info("Click or touch to go to the next test.");
 
     // add a listener for pointer (mouse, touch) input
-    mouse().setListener(new Mouse.Adapter() {
+    pointer().setListener(new Pointer.Adapter() {
       @Override
-      public void onMouseDown(ButtonEvent event) {
-        if (event.button() == 2) {
-          nextTest();
-          return;
-        }
+      public void onPointerStart(Pointer.Event event) {
+        nextTest();
       }
     });
 
