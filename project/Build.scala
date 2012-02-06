@@ -27,6 +27,8 @@ object PlayNBuild extends Build {
       )
       case "gwtbox2d" => Seq(
         unmanagedSourceDirectories in Compile <+= baseDirectory / "src",
+        // exclude GWT generator code
+        excludeFilter in unmanagedSources ~= { _ || "PoolingStackGenerator.java" },
         // adds source files to our jar file (needed by GWT)
         unmanagedResourceDirectories in Compile <+= baseDirectory / "src"
       )
