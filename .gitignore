@@ -86,20 +86,14 @@ target
 # /server/
 /server/bin
 
-# /test/core/war/WEB-INF/
-/test/core/war/WEB-INF/lib
-/test/core/war/WEB-INF/classes
-/test/core/war/WEB-INF/deploy
-
-# /test/benchmark
-/test/benchmark/html/war/WEB-INF/classes
-/test/benchmark/html/war/WEB-INF/deploy/
-/test/benchmark/html/war/bench/
+# /benchmark
+/benchmark/html/war/WEB-INF/classes
+/benchmark/html/war/WEB-INF/deploy/
+/benchmark/html/war/bench/
 
 # /test/manualtests
-/test/manualtests/html/war/WEB-INF/classes
-/test/manualtests/html/war/WEB-INF/deploy
-/test/manualtests/html/war/manualtestsgame
-/test/manualtests/html/gwt-unitCache
-
-/test/manualtests/flash/war/WEB-INF/classes
+/tests/html/war/WEB-INF/classes
+/tests/html/war/WEB-INF/deploy
+/tests/html/war/manualtestsgame
+/tests/html/gwt-unitCache
+/tests/flash/war/WEB-INF/classes
