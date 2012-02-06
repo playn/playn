@@ -11,12 +11,13 @@ object PlayNBuild extends Build {
       fork in Compile := true,
       autoScalaLibrary := false, // no scala-library dependency
       publishArtifact in (Compile, packageDoc) := false, // no scaladocs; it fails
-      resolvers    += "Forplay Legacy" at "http://forplay.googlecode.com/svn/mavenrepo"
+      resolvers    += "Forplay Legacy" at "http://forplay.googlecode.com/svn/mavenrepo",
+      // everybody gets their source and tests directories rewritten
+      unmanagedSourceDirectories in Compile <+= baseDirectory / "src",
+      unmanagedSourceDirectories in Test <+= baseDirectory / "tests"
     )
     override def projectSettings (name :String) = name match {
       case "core" => Seq(
-        unmanagedSourceDirectories in Compile <+= baseDirectory / "src",
-        unmanagedSourceDirectories in Test <+= baseDirectory / "tests",
         // adds source files to our jar file (needed by GWT)
         unmanagedResourceDirectories in Compile <+= baseDirectory / "src",
         unmanagedBase <<= baseDirectory { base => base / "disabled" },
@@ -26,34 +27,23 @@ object PlayNBuild extends Build {
         )
       )
       case "gwtbox2d" => Seq(
-        unmanagedSourceDirectories in Compile <+= baseDirectory / "src",
         // exclude GWT generator code
         excludeFilter in unmanagedSources ~= { _ || "PoolingStackGenerator.java" },
         // adds source files to our jar file (needed by GWT)
         unmanagedResourceDirectories in Compile <+= baseDirectory / "src"
       )
       case "webgl" => Seq(
-        unmanagedSourceDirectories in Compile <+= baseDirectory / "src",
         // adds source files to our jar file (needed by GWT)
         unmanagedResourceDirectories in Compile <+= baseDirectory / "src"
       )
       case "html" => Seq(
-        unmanagedSourceDirectories in Compile <+= baseDirectory / "src",
-        unmanagedSourceDirectories in Test <+= baseDirectory / "tests",
         // adds source files to our jar file (needed by GWT)
         unmanagedResourceDirectories in Compile <+= baseDirectory / "src"
       )
-      case "flash" => Seq(
-        unmanagedSourceDirectories in Compile <+= baseDirectory / "src",
-        unmanagedSourceDirectories in Test <+= baseDirectory / "tests"
-      )
-      case "java" => Seq(
-        unmanagedSourceDirectories in Compile <+= baseDirectory / "src",
-        unmanagedSourceDirectories in Test <+= baseDirectory / "tests"
-      )
-      case "android" => Seq(
-        unmanagedSourceDirectories in Compile <+= baseDirectory / "src",
-        unmanagedSourceDirectories in Test <+= baseDirectory / "tests"
+      case "tests-core" => Seq(
+        // copy resources from playn/tests/resources
+        unmanagedResourceDirectories in Compile <+= baseDirectory / "src",
+        excludeFilter in unmanagedResources ~= { _ || "*.java" }
       )
       case _ => Nil
     }
@@ -66,8 +56,10 @@ object PlayNBuild extends Build {
   lazy val html = builder("html")
   lazy val flash = builder("flash")
   lazy val android = builder("android")
+  lazy val testsCore = builder("tests-core")
+  lazy val testsJava = builder("tests-java")
 
   // one giant fruit roll-up to bring them all together
   lazy val playn = Project("playn", file(".")) aggregate(
-    core, gwtbox2d, webgl, java, html, flash, android)
+    core, gwtbox2d, webgl, java, html, flash, android, testsCore, testsJava)
 }
