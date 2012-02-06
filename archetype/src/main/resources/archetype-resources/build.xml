@@ -134,7 +134,7 @@
         <path refid="html.classpath"/>
       </classpath>
       <jvmarg value="-Djava.awt.headless=true"/>
-      <arg value="-style"/><arg value="${symbol_dollar}{gwt.style}"/>-->
+      <arg value="-style"/><arg value="${symbol_dollar}{gwt.style}"/>
       <arg value="-war"/>
       <arg value="${symbol_dollar}{target.dir}/webapp"/>
       <arg value="${symbol_dollar}{html.classname}"/>
