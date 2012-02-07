@@ -196,7 +196,7 @@ public class HtmlGLShader implements GLShader {
     gl.bufferData(ARRAY_BUFFER, vertexData, STREAM_DRAW);
     gl.bufferData(ELEMENT_ARRAY_BUFFER, elementData, STREAM_DRAW);
 
-    gl.drawElements(TRIANGLES, elementOffset, UNSIGNED_SHORT, 0);
+    gl.drawElements(TRIANGLE_STRIP, elementOffset, UNSIGNED_SHORT, 0);
     vertexOffset = elementOffset = 0;
   }
 
