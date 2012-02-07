@@ -23,6 +23,7 @@ import static playn.core.PlayN.*;
 
 public class TestsGame implements Game {
   Test[] tests = new Test[] {
+    new CanvasTest(),
     new ImmediateTest(),
     new ImageTypeTest(),
     new AlphaLayerTest(),
