@@ -14,7 +14,7 @@ public class ${JavaGameClassName}Flash extends FlashGame {
   @Override
   public void start() {
     FlashPlatform platform = FlashPlatform.register();
-    platform.assetManager().setPathPrefix("${rootArtifactId}flash/");
+    platform.assets().setPathPrefix("${rootArtifactId}flash/");
     PlayN.run(new ${JavaGameClassName}());
   }
 }

@@ -27,13 +27,13 @@ import cli.MonoTouch.Foundation.NSData;
 import cli.MonoTouch.UIKit.UIImage;
 
 import playn.core.Asserts;
-import playn.core.AssetManager;
+import playn.core.Assets;
 import playn.core.Image;
 import playn.core.PlayN;
 import playn.core.ResourceCallback;
 import playn.core.Sound;
 
-class IOSAssetManager implements AssetManager
+class IOSAssets implements Assets
 {
   private String pathPrefix = "";
 

@@ -21,11 +21,21 @@ package playn.core;
 public interface Platform {
   public enum Type { JAVA, HTML, ANDROID, IOS, FLASH }
 
+  void run(Game game);
+
+  Platform.Type type();
+
+  double time();
+
+  float random();
+
+  void openURL(String url);
+
   Audio audio();
 
   Graphics graphics();
 
-  AssetManager assetManager();
+  Assets assets();
 
   Json json();
 
@@ -45,15 +55,5 @@ public interface Platform {
 
   Analytics analytics();
 
-  float random();
-
-  void run(Game game);
-
-  double time();
-
-  Platform.Type type();
-
   RegularExpression regularExpression();
-
-  void openURL(String url);
 }

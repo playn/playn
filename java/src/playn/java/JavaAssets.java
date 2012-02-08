@@ -22,7 +22,7 @@ import javax.imageio.ImageIO;
 import com.google.common.base.Charsets;
 import com.google.common.io.Resources;
 
-import playn.core.AbstractAssetManager;
+import playn.core.AbstractAssets;
 import playn.core.Image;
 import playn.core.PlayN;
 import playn.core.ResourceCallback;
@@ -31,7 +31,7 @@ import playn.core.Sound;
 /**
  * Loads Java assets via the classpath.
  */
-public class JavaAssetManager extends AbstractAssetManager {
+public class JavaAssets extends AbstractAssets {
 
   private String pathPrefix = "";
 

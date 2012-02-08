@@ -23,7 +23,7 @@ public class BenchJava {
 
   public static void main(String[] args) {
     JavaPlatform p = JavaPlatform.register();
-    p.assetManager().setPathPrefix("src/playn/bench/resources");
+    p.assets().setPathPrefix("src/playn/bench/resources");
     PlayN.run(new Bench());
   }
 }

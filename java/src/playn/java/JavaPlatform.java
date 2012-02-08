@@ -72,7 +72,7 @@ public class JavaPlatform implements Platform {
   private JavaPointer pointer;
   private JavaMouse mouse;
   private JavaStorage storage = new JavaStorage();
-  private JavaAssetManager assetManager = new JavaAssetManager();
+  private JavaAssets assets = new JavaAssets();
 
   private int updateRate = 0;
   private Analytics analytics = new JavaAnalytics();
@@ -146,8 +146,8 @@ public class JavaPlatform implements Platform {
   }
 
   @Override
-  public JavaAssetManager assetManager() {
-    return assetManager;
+  public JavaAssets assets() {
+    return assets;
   }
 
   @Override

@@ -67,7 +67,7 @@ public class ImageTypeTest extends Test {
         bg.surface().height() / 2);
     rootLayer.add(bg);
 
-    image1 = assetManager().getImage(imageSrc);
+    image1 = assets().getImage(imageSrc);
     image1.addCallback(new ResourceCallback<Image>() {
       @Override
       public void done(Image image) {
@@ -106,7 +106,7 @@ public class ImageTypeTest extends Test {
     });
 
     // add ground truth image
-    imageGroundTruth = assetManager().getImage(imageGroundTruthSrc);
+    imageGroundTruth = assets().getImage(imageGroundTruthSrc);
     imageGroundTruth.addCallback(new ResourceCallback<Image>() {
       @Override
       public void done(Image image) {

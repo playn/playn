@@ -70,7 +70,7 @@ public class FlashPlatform implements Platform {
   }-*/;
 
 
-  private FlashAssetManager assetManager = new FlashAssetManager();
+  private FlashAssets assets = new FlashAssets();
   private FlashAudio audio;
   private HtmlRegularExpression regularExpression;
   private Game game;
@@ -106,8 +106,8 @@ public class FlashPlatform implements Platform {
   }
 
   @Override
-  public FlashAssetManager assetManager() {
-    return assetManager;
+  public FlashAssets assets() {
+    return assets;
   }
 
   @Override

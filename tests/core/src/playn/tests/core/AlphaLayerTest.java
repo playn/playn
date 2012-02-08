@@ -76,7 +76,7 @@ public class AlphaLayerTest extends Test {
     groupLayer.setAlpha(0.5f);
     rootLayer.add(groupLayer);
 
-    image1 = assetManager().getImage(imageSrc);
+    image1 = assets().getImage(imageSrc);
     image1.addCallback(new ResourceCallback<Image>() {
       @Override
       public void done(Image image) {
@@ -131,7 +131,7 @@ public class AlphaLayerTest extends Test {
     });
 
     // add ground truth of 25% opaque image
-    imageGroundTruth = assetManager().getImage(imageGroundTruthSrc);
+    imageGroundTruth = assets().getImage(imageGroundTruthSrc);
     imageGroundTruth.addCallback(new ResourceCallback<Image>() {
       @Override
       public void done(Image image) {

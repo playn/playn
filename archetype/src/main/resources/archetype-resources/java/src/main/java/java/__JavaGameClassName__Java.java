@@ -12,7 +12,7 @@ public class ${JavaGameClassName}Java {
 
   public static void main(String[] args) {
     JavaPlatform platform = JavaPlatform.register();
-    platform.assetManager().setPathPrefix("${packageInPathFormat}/resources");
+    platform.assets().setPathPrefix("${packageInPathFormat}/resources");
     PlayN.run(new ${JavaGameClassName}());
   }
 }

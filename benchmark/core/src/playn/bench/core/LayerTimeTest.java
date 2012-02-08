@@ -69,11 +69,11 @@ class LayerTimeTest extends TimeTest {
   void init(GroupLayer root) {
     this.root = root;
 
-    Image bg = assetManager().getImage("images/background.png");
+    Image bg = assets().getImage("images/background.png");
 
     images = new Image[IMAGES.length];
     for (int i = 0; i < IMAGES.length; ++i) {
-      images[i] = assetManager().getImage("images/" + IMAGES[i] + ".png");
+      images[i] = assets().getImage("images/" + IMAGES[i] + ".png");
     }
 
     bgLayer = graphics().createImageLayer(bg);

@@ -24,7 +24,7 @@ public class TestsGameActivity extends GameActivity {
 
   @Override
   public void main(){
-    platform().assetManager().setPathPrefix("playn/tests/resources");
+    platform().assets().setPathPrefix("playn/tests/resources");
     PlayN.run(new TestsGame());
   }
 }

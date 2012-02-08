@@ -16,7 +16,6 @@
 package playn.tests.html;
 
 import playn.core.PlayN;
-import playn.html.HtmlAssetManager;
 import playn.html.HtmlGame;
 import playn.html.HtmlPlatform;
 
@@ -27,10 +26,9 @@ public class TestsGameHtml extends HtmlGame {
   @Override
   public void start() {
     HtmlPlatform platform = HtmlPlatform.register();
-    HtmlAssetManager assets = platform.assetManager();
-    assets.setPathPrefix("testsgame/");
-    PlayN.run(new TestsGame());
     platform.setTitle("Tests");
+    platform.assets().setPathPrefix("testsgame/");
     HtmlPlatform.disableRightClickContextMenu();
+    PlayN.run(new TestsGame());
   }
 }

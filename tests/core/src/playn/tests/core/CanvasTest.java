@@ -63,7 +63,7 @@ public class CanvasTest extends Test {
         canvas.setFillGradient(graphics().createLinearGradient(
                                  0, 0, 100, 100, new int[] { 0xFF0000FF, 0xFF00FF00 },
                                  new float[] { 0, 1 }));
-        canvas.setFillPattern(graphics().createPattern(assetManager().getImage("images/tile.png")));
+        canvas.setFillPattern(graphics().createPattern(assets().getImage("images/tile.png")));
         canvas.fillRect(0, 0, 100, 100);
       }
     });
@@ -92,7 +92,7 @@ public class CanvasTest extends Test {
         canvas.fillRect(0, 0, 100, 100);
 
         // draw an image normally, scaled, cropped, cropped and scaled, etc.
-        Image pea = assetManager().getImage("images/pea.png");
+        Image pea = assets().getImage("images/pea.png");
         float half = 37/2f;
         canvas.drawImage(pea, 10, 10);
         canvas.drawImage(pea, 55, 10, 37, 37, half, half, half, half);

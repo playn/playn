@@ -16,7 +16,6 @@
 package playn.tests.java;
 
 import playn.core.PlayN;
-import playn.java.JavaAssetManager;
 import playn.java.JavaPlatform;
 
 import playn.tests.core.TestsGame;
@@ -25,9 +24,8 @@ public class TestsGameJava {
 
   public static void main(String[] args) {
     JavaPlatform platform = JavaPlatform.register();
-    JavaAssetManager assets = platform.assetManager();
-    assets.setPathPrefix("playn/tests/resources");
-    PlayN.run(new TestsGame());
     platform.setTitle("Tests");
+    platform.assets().setPathPrefix("playn/tests/resources");
+    PlayN.run(new TestsGame());
   }
 }

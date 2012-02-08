@@ -14,7 +14,7 @@ public class ${JavaGameClassName}Html extends HtmlGame {
   @Override
   public void start() {
     HtmlPlatform platform = HtmlPlatform.register();
-    platform.assetManager().setPathPrefix("${rootArtifactId}/");
+    platform.assets().setPathPrefix("${rootArtifactId}/");
     PlayN.run(new ${JavaGameClassName}());
   }
 }

@@ -22,7 +22,7 @@ public class JavaImageTest extends AbstractPlayNTest {
 
   @Test
   public void testMissingImage() {
-    Image missing = PlayN.assetManager().getImage("missing.png");
+    Image missing = PlayN.assets().getImage("missing.png");
     assertNotNull(missing);
 
     // ensure that width/height do not NPE

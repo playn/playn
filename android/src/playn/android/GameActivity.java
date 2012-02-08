@@ -50,8 +50,8 @@ public abstract class GameActivity extends Activity {
   private Context context;
 
   /**
-   * The entry-point into a PlayN game. Developers should implement main() to
-   * call platform().assetManager().setPathPrefix() and PlayN.run().
+   * The entry-point into a PlayN game. Developers should implement main() to call
+   * platform().assets().setPathPrefix() and PlayN.run().
    */
   public abstract void main();
 

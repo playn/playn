@@ -27,7 +27,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.HttpGet;
 
-import playn.core.AbstractAssetManager;
+import playn.core.AbstractAssets;
 import playn.core.Image;
 import playn.core.ResourceCallback;
 import playn.core.Sound;
@@ -37,7 +37,7 @@ import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.util.Log;
 
-public class AndroidAssetManager extends AbstractAssetManager {
+public class AndroidAssets extends AbstractAssets {
 
   public String pathPrefix = null;
   public AssetManager assets;

@@ -69,11 +69,11 @@ class SurfaceTimeTest extends TimeTest {
 
   @Override
   void init(GroupLayer root) {
-    background = assetManager().getImage("images/background.png");
+    background = assets().getImage("images/background.png");
 
     images = new Image[LayerTimeTest.IMAGES.length];
     for (int i = 0; i < images.length; ++i) {
-      images[i] = assetManager().getImage("images/" + LayerTimeTest.IMAGES[i] + ".png");
+      images[i] = assets().getImage("images/" + LayerTimeTest.IMAGES[i] + ".png");
     }
 
     surfLayer = graphics().createSurfaceLayer(graphics().width(), graphics().height());

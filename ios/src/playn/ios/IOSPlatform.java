@@ -53,7 +53,7 @@ public class IOSPlatform implements Platform {
   private IOSPointer pointer;
   private IOSStorage storage;
   private IOSTouch touch;
-  private IOSAssetManager assetManager;
+  private IOSAssets assets;
   private IOSAnalytics analytics;
 
   private Game game;
@@ -79,7 +79,7 @@ public class IOSPlatform implements Platform {
     net = new IOSNet();
     pointer = new IOSPointer();
     touch = new IOSTouch();
-    assetManager = new IOSAssetManager();
+    assets = new IOSAssets();
     analytics = new IOSAnalytics();
     storage = new IOSStorage();
 
@@ -88,8 +88,8 @@ public class IOSPlatform implements Platform {
   }
 
   @Override
-  public IOSAssetManager assetManager() {
-    return assetManager;
+  public IOSAssets assets() {
+    return assets;
   }
 
   @Override

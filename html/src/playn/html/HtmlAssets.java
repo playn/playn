@@ -31,7 +31,7 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.xhr.client.ReadyStateChangeHandler;
 import com.google.gwt.xhr.client.XMLHttpRequest;
 
-import playn.core.AbstractCachingAssetManager;
+import playn.core.AbstractCachingAssets;
 import playn.core.AutoClientBundleWithLookup;
 import playn.core.PlayN;
 import playn.core.Image;
@@ -39,7 +39,7 @@ import playn.core.ResourceCallback;
 import playn.core.Sound;
 import playn.html.XDomainRequest.Handler;
 
-public class HtmlAssetManager extends AbstractCachingAssetManager {
+public class HtmlAssets extends AbstractCachingAssets {
 
   /**
    * Whether or not to log successful progress of {@code XMLHTTPRequest} and

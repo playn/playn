@@ -28,119 +28,6 @@ public class PlayN {
 
   private static Platform platform;
 
-  public static RegularExpression regularExpression() {
-    return platform.regularExpression();
-  }
-
-  /**
-   * Gets the {@link Audio} interface.
-   */
-  public static Audio audio() {
-    return platform.audio();
-  }
-
-  /**
-   * Gets the current time, as a double value in milliseconds since January 1,
-   * 1970, 00:00:00 GMT.
-   *
-   * <p>
-   * This is equivalent to the standard JRE <code>new Date().getTime();</code>,
-   * but it slightly more terse, and avoids the use of <code>long</code> values,
-   * which are best to avoid when translating to Javascript.
-   * </p>
-   */
-  public static double currentTime() {
-    return platform.time();
-  }
-
-  /**
-   * Gets the {@link Graphics} interface.
-   */
-  public static Graphics graphics() {
-    return platform.graphics();
-  }
-
-  public static AssetManager assetManager() {
-    return platform.assetManager();
-  }
-
-  /**
-   * Gets the {@link Json} interface.
-   */
-  public static Json json() {
-    return platform.json();
-  }
-
-  /**
-   * Gets the {@link Keyboard} input interface.
-   */
-  public static Keyboard keyboard() {
-    return platform.keyboard();
-  }
-
-  /**
-   * Gets the {@link Log} interface.
-   */
-  public static Log log() {
-    return platform.log();
-  }
-
-  /**
-   * Gets the {@link Net} interface.
-   */
-  public static Net net() {
-    return platform.net();
-  }
-
-  /**
-   * Gets the {@link Pointer} input interface.
-   */
-  public static Pointer pointer() {
-    return platform.pointer();
-  }
-
-  /**
-   * Gets the {@link Mouse} input interface if supported, or null otherwise.
-   */
-  public static Mouse mouse() {
-    return platform.mouse();
-  }
-
-  /**
-   * Gets the {@Link Platform.Type} platform type enum.
-   */
-  public static Platform.Type platformType() {
-    return platform.type();
-  }
-
-  /**
-   * Gets the {@link Touch} input interface if supported, or null otherwise.
-   */
-  public static Touch touch() {
-    return platform.touch();
-  }
-
-  /**
-   * Gets the {@link Storage} storage interface.
-   */
-  public static Storage storage() {
-    return platform.storage();
-  }
-
-  /**
-   * Gets the {@link Analytics} analytics interface.
-   */
-  public static Analytics analytics() {
-    return platform.analytics();
-  }
-
-  /**
-   * Gets a random floating-point value in the range [0, 1).
-   */
-  public static float random() {
-    return platform.random();
-  }
-
   /**
    * Call this method to start your {@link Game}. It must be called only once,
    * and all work after this call is made will be performed in {@link Game}'s
@@ -151,16 +38,140 @@ public class PlayN {
   }
 
   /**
+   * Returns the current time, as a double value in millis since January 1, 1970, 00:00:00 GMT.
+   *
+   * <p> This is equivalent to the standard JRE {@code new Date().getTime();}, but it slightly
+   * terser, and avoids the use of {@code long} values, which are best avoided when translating to
+   * JavaScript. </p>
+   */
+  public static double currentTime() {
+    return platform.time();
+  }
+
+  /**
+   * Gets a random floating-point value in the range [0, 1).
+   */
+  public static float random() {
+    return platform.random();
+  }
+
+  /**
    * Opens the given URL in the default browser.
-   * @param url URL
    */
   public static void openURL(String url) {
     platform.openURL(url);
   }
 
   /**
-   * Called in a {@link Platform}'s registration method. Do not call this
-   * directly unless you're implementing a new platform.
+   * Returns the platform {@Link Platform.Type}.
+   */
+  public static Platform.Type platformType() {
+    return platform.type();
+  }
+
+  /**
+   * Returns the {@link Audio} service.
+   */
+  public static Audio audio() {
+    return platform.audio();
+  }
+
+  /**
+   * Returns the {@link Graphics} service.
+   */
+  public static Graphics graphics() {
+    return platform.graphics();
+  }
+
+  /**
+   * Returns the {@link Assets} service.
+   */
+  public static Assets assets() {
+    return platform.assets();
+  }
+
+  /**
+   * Returns the {@link Assets} service.
+   * @deprecated Use {@link #assets}.
+   */
+  @Deprecated
+  public static Assets assetManager() {
+    return platform.assets();
+  }
+
+  /**
+   * Returns the {@link Json} service.
+   */
+  public static Json json() {
+    return platform.json();
+  }
+
+  /**
+   * Returns the {@link Keyboard} input service.
+   */
+  public static Keyboard keyboard() {
+    return platform.keyboard();
+  }
+
+  /**
+   * Returns the {@link Log} service.
+   */
+  public static Log log() {
+    return platform.log();
+  }
+
+  /**
+   * Returns the {@link Net} service.
+   */
+  public static Net net() {
+    return platform.net();
+  }
+
+  /**
+   * Returns the {@link Pointer} input service.
+   */
+  public static Pointer pointer() {
+    return platform.pointer();
+  }
+
+  /**
+   * Returns the {@link Mouse} input service (if supported, null otherwise).
+   */
+  public static Mouse mouse() {
+    return platform.mouse();
+  }
+
+  /**
+   * Returns the {@link RegularExpression} service.
+   */
+  public static RegularExpression regularExpression() {
+    return platform.regularExpression();
+  }
+
+  /**
+   * Returns the {@link Touch} input service (if supported, null otherwise).
+   */
+  public static Touch touch() {
+    return platform.touch();
+  }
+
+  /**
+   * Returns the {@link Storage} storage service.
+   */
+  public static Storage storage() {
+    return platform.storage();
+  }
+
+  /**
+   * Returns the {@link Analytics} analytics service.
+   */
+  public static Analytics analytics() {
+    return platform.analytics();
+  }
+
+  /**
+   * Configures the current {@link Platform}. Do not call this directly unless you're implementing
+   * a new platform.
    */
   public static void setPlatform(Platform platform) {
     PlayN.platform = platform;

@@ -26,7 +26,7 @@ public class TestsGameFlash extends FlashGame {
   @Override
   public void start() {
     FlashPlatform platform = FlashPlatform.register();
-    platform.assetManager().setPathPrefix("testsgame/");
+    platform.assets().setPathPrefix("testsgame/");
     PlayN.run(new TestsGame());
   }
 }

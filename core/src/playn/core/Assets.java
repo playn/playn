@@ -19,7 +19,7 @@ package playn.core;
  * Fetches and returns assets.  This interface assumes that some or all assets
  * are asynchronously loaded.
  */
-public interface AssetManager {
+public interface Assets {
 
   /**
    * Return an Image, given a path to the image resource.

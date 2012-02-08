@@ -49,7 +49,7 @@ public class AndroidPlatform implements Platform {
   private AndroidStorage storage;
   private AndroidTouch touch;
   private AndroidTouchEventHandler touchHandler;
-  private AndroidAssetManager assetManager;
+  private AndroidAssets assets;
   private AndroidAnalytics analytics;
 
   private AndroidPlatform(GameActivity activity) {
@@ -64,16 +64,16 @@ public class AndroidPlatform implements Platform {
     pointer = new AndroidPointer();
     touch = new AndroidTouch();
     touchHandler = new AndroidTouchEventHandler(activity.gameView());
-    assetManager = new AndroidAssetManager();
+    assets = new AndroidAssets();
     analytics = new AndroidAnalytics();
     storage = new AndroidStorage(activity);
 
-    assetManager.assets = activity.getAssets();
+    assets.assets = activity.getAssets();
   }
 
   @Override
-  public AndroidAssetManager assetManager() {
-    return assetManager;
+  public AndroidAssets assets() {
+    return assets;
   }
 
   @Override

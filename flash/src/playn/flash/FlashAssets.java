@@ -27,13 +27,13 @@ import playn.core.ResourceCallback;
 import java.util.HashMap;
 import java.util.Map;
 
-import playn.core.AbstractCachingAssetManager;
+import playn.core.AbstractCachingAssets;
 import playn.core.PlayN;
 import playn.core.Image;
 import playn.core.Sound;
 
 @FlashImport({"flash.net.URLLoader", "flash.net.URLRequest"})
-public class FlashAssetManager extends AbstractCachingAssetManager {
+public class FlashAssets extends AbstractCachingAssets {
 
 
   private String pathPrefix = "";
@@ -126,7 +126,7 @@ public class FlashAssetManager extends AbstractCachingAssetManager {
 
 
   /* (non-Javadoc)
-   * @see playn.core.AbstractAssetManager#doGetText(java.lang.String, playn.core.ResourceCallback)
+   * @see playn.core.AbstractAssets#doGetText(java.lang.String, playn.core.ResourceCallback)
    */
   @Override
   protected void doGetText(String path, ResourceCallback<String> callback) {

@@ -108,7 +108,7 @@ public class HtmlPlatform implements Platform {
     return agentInfo;
   }
 
-  private HtmlAssetManager assetManager = GWT.create(HtmlAssetManager.class);
+  private HtmlAssets assets = GWT.create(HtmlAssets.class);
   private HtmlAudio audio = new HtmlAudio();
   private HtmlRegularExpression regularExpression = new HtmlRegularExpression();
   private Game game;
@@ -191,8 +191,8 @@ public class HtmlPlatform implements Platform {
   }
 
   @Override
-  public HtmlAssetManager assetManager() {
-    return assetManager;
+  public HtmlAssets assets() {
+    return assets;
   }
 
   @Override
