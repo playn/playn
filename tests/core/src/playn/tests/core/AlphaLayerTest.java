@@ -16,15 +16,14 @@
 
 package playn.tests.core;
 
-import static playn.core.PlayN.*;
-
-import playn.core.CanvasLayer;
+import playn.core.CanvasImage;
 import playn.core.Color;
 import playn.core.GroupLayer;
 import playn.core.Image;
 import playn.core.ImageLayer;
 import playn.core.ResourceCallback;
 import playn.core.SurfaceLayer;
+import static playn.core.PlayN.*;
 
 public class AlphaLayerTest extends Test {
   GroupLayer rootLayer;
@@ -40,12 +39,12 @@ public class AlphaLayerTest extends Test {
   GroupLayer groupLayer;
   ImageLayer imageLayer1;
   SurfaceLayer surfaceLayer1;
-  CanvasLayer canvasLayer1;
+  ImageLayer canvasLayer1;
   ImageLayer imageLayer2;
   SurfaceLayer surfaceLayer2;
-  CanvasLayer canvasLayer2;
-  CanvasLayer canvasLayer3;
-  CanvasLayer canvasLayer4;
+  ImageLayer canvasLayer2;
+  ImageLayer canvasLayer3;
+  ImageLayer canvasLayer4;
   ImageLayer groundTruthLayer;
 
   @Override
@@ -55,7 +54,7 @@ public class AlphaLayerTest extends Test {
 
   @Override
   public String getDescription() {
-    return "Test that the alpha value on layers works the same on all layer types and that alpha is 'additive'. Left-to-right: ImageLayer, SurfaceLayer, CanvasLayer (layer alpha), CanvasLayer (canvas alpha), ground truth (expected). The first three layers all have alpha 50% and are in a grouplayer with alpha 50% (should result in a 25% opaque image).";
+    return "Test that the alpha value on layers works the same on all layer types and that alpha is 'additive'. Left-to-right: ImageLayer, SurfaceLayer, CanvasImage (layer alpha), CanvasImage (canvas alpha), ground truth (expected). The first three layers all have alpha 50% and are in a grouplayer with alpha 50% (should result in a 25% opaque image).";
   }
 
   @Override
@@ -84,19 +83,23 @@ public class AlphaLayerTest extends Test {
         imageLayer1 = graphics().createImageLayer(image);
         surfaceLayer1 = graphics().createSurfaceLayer(image.width(), image.height());
         surfaceLayer1.surface().drawImage(image, 0, 0);
-        canvasLayer1 = graphics().createCanvasLayer(image.width(), image.height());
-        canvasLayer1.canvas().drawImage(image, 0, 0);
+        CanvasImage canvas1 = graphics().createImage(image.width(), image.height());
+        canvas1.canvas().drawImage(image, 0, 0);
+        canvasLayer1 = graphics().createImageLayer(canvas1);
         imageLayer2 = graphics().createImageLayer(image);
         surfaceLayer2 = graphics().createSurfaceLayer(image.width(), image.height());
         surfaceLayer2.surface().drawImage(image, 0, 0);
-        canvasLayer2 = graphics().createCanvasLayer(image.width(), image.height());
-        canvasLayer2.canvas().drawImage(image, 0, 0);
-        canvasLayer3 = graphics().createCanvasLayer(image.width(), image.height());
+        CanvasImage canvas2 = graphics().createImage(image.width(), image.height());
+        canvas2.canvas().drawImage(image, 0, 0);
+        canvasLayer2 = graphics().createImageLayer(canvas2);
+        CanvasImage canvas3 = graphics().createImage(image.width(), image.height());
+        canvas3.canvas().drawImage(image, 0, 0);
+        canvasLayer3 = graphics().createImageLayer(canvas3);
         canvasLayer3.setAlpha(0.5f);
-        canvasLayer3.canvas().drawImage(image, 0, 0);
-        canvasLayer4 = graphics().createCanvasLayer(image.width(), image.height());
+        CanvasImage canvas4 = graphics().createImage(image.width(), image.height());
+        canvas4.canvas().drawImage(image, 0, 0);
+        canvasLayer4 = graphics().createImageLayer(canvas4);
         canvasLayer4.setAlpha(0.5f);
-        canvasLayer4.canvas().drawImage(image, 0, 0);
 
         // add layers to the groupLayer
         imageLayer1.transform().translate(offset, offset);

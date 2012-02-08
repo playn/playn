@@ -16,15 +16,14 @@
 
 package playn.tests.core;
 
-import static playn.core.PlayN.*;
-
-import playn.core.CanvasLayer;
+import playn.core.CanvasImage;
 import playn.core.Color;
 import playn.core.GroupLayer;
 import playn.core.Image;
 import playn.core.ImageLayer;
 import playn.core.ResourceCallback;
 import playn.core.SurfaceLayer;
+import static playn.core.PlayN.*;
 
 public class ImageTypeTest extends Test {
   GroupLayer rootLayer;
@@ -39,10 +38,10 @@ public class ImageTypeTest extends Test {
   Image imageGroundTruth;
   ImageLayer imageLayer1;
   SurfaceLayer surfaceLayer1;
-  CanvasLayer canvasLayer1;
+  ImageLayer canvasLayer1;
   ImageLayer imageLayer2;
   SurfaceLayer surfaceLayer2;
-  CanvasLayer canvasLayer2;
+  ImageLayer canvasLayer2;
   ImageLayer groundTruthLayer;
 
   @Override
@@ -52,7 +51,7 @@ public class ImageTypeTest extends Test {
 
   @Override
   public String getDescription() {
-    return "Test that image types display the same. Left-to-right: ImageLayer, SurfaceLayer, CanvasLayer, ground truth (expected).";
+    return "Test that image types display the same. Left-to-right: ImageLayer, SurfaceLayer, CanvasImage, ground truth (expected).";
   }
 
   @Override
@@ -75,13 +74,15 @@ public class ImageTypeTest extends Test {
         imageLayer1 = graphics().createImageLayer(image);
         surfaceLayer1 = graphics().createSurfaceLayer(image.width(), image.height());
         surfaceLayer1.surface().drawImage(image, 0, 0);
-        canvasLayer1 = graphics().createCanvasLayer(image.width(), image.height());
-        canvasLayer1.canvas().drawImage(image, 0, 0);
+        CanvasImage canvas1 = graphics().createImage(image.width(), image.height());
+        canvas1.canvas().drawImage(image, 0, 0);
+        canvasLayer1 = graphics().createImageLayer(canvas1);
         imageLayer2 = graphics().createImageLayer(image);
         surfaceLayer2 = graphics().createSurfaceLayer(image.width(), image.height());
         surfaceLayer2.surface().drawImage(image, 0, 0);
-        canvasLayer2 = graphics().createCanvasLayer(image.width(), image.height());
-        canvasLayer2.canvas().drawImage(image, 0, 0);
+        CanvasImage canvas2 = graphics().createImage(image.width(), image.height());
+        canvas2.canvas().drawImage(image, 0, 0);
+        canvasLayer2 = graphics().createImageLayer(canvas2);
 
         // add layers to the rootLayer
         imageLayer1.transform().translate(offset, offset);

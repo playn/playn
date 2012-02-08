@@ -15,10 +15,10 @@
  */
 package playn.tests.core;
 
-import static playn.core.PlayN.*;
-
-import playn.core.CanvasLayer;
+import playn.core.CanvasImage;
 import playn.core.GroupLayer;
+import playn.core.ImageLayer;
+import static playn.core.PlayN.*;
 
 public class DepthTest extends Test {
   @Override
@@ -35,8 +35,9 @@ public class DepthTest extends Test {
   public void init() {
     GroupLayer rootLayer = graphics().rootLayer();
 
-    CanvasLayer info = graphics().createCanvasLayer(250, 20);
-    info.canvas().drawText(rootLayer.getClass().getName(), 0, 15);
+    CanvasImage image = graphics().createImage(250, 20);
+    image.canvas().drawText(rootLayer.getClass().getName(), 0, 15);
+    ImageLayer info = graphics().createImageLayer(image);
     info.setTranslation(5, 5);
     rootLayer.add(info);
 
@@ -45,14 +46,15 @@ public class DepthTest extends Test {
                     0xFF00CC00, 0xFFFF9900, 0xFF0066FF, 0x0FFCC6666 };
     int width = 200, height = 200;
     for (int ii = 0; ii < depths.length; ii++) {
-      CanvasLayer layer = graphics().createCanvasLayer(width, height);
       int depth = depths[ii];
+      image = graphics().createImage(width, height);
+      image.canvas().setFillColor(fills[ii]);
+      image.canvas().fillRect(0, 0, width, height);
+      image.canvas().setFillColor(0xFF000000);
+      image.canvas().drawText(depth + "/" + ii, 5, 15);
+      ImageLayer layer = graphics().createImageLayer(image);
       layer.setDepth(depth);
       layer.setTranslation(225-50*depth, 125+25*depth);
-      layer.canvas().setFillColor(fills[ii]);
-      layer.canvas().fillRect(0, 0, width, height);
-      layer.canvas().setFillColor(0xFF000000);
-      layer.canvas().drawText(depth + "/" + ii, 5, 15);
       rootLayer.add(layer);
     }
   }
