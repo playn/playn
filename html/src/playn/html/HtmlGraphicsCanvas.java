@@ -38,7 +38,7 @@ class HtmlGraphicsCanvas extends HtmlGraphics {
     rootLayer = new HtmlGroupLayerCanvas();
   }
 
-  @Override
+  @Override @Deprecated
   public CanvasLayer createCanvasLayer(int width, int height) {
     return new HtmlCanvasLayerCanvas(width, height);
   }

@@ -64,7 +64,7 @@ class FlashGraphics implements Graphics {
     return rootLayer;
   }
 
-  @Override
+  @Override @Deprecated
   public CanvasLayer createCanvasLayer(int width, int height) {
     return new FlashCanvasLayer(width, height);
   }
