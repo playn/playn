@@ -69,10 +69,22 @@ class HtmlLogSimple extends HtmlLog {
   }
 
   private void sendToConsole(String msg, Throwable e) {
-    // Keep console output intact by using System.out for both
+    // keep console output intact by using System.out for both
     System.out.println(msg);
     if (e != null) {
       e.printStackTrace(System.out);
     }
+    // also send it to the browser's console
+    sendToBrowserConsole(msg, e);
   }
+
+  private native void sendToBrowserConsole(String msg, Throwable e) /*-{
+    if ($wnd.console) {
+      if (e != null) {
+        $wnd.console.info(msg, e);
+      } else {
+        $wnd.console.info(msg);
+      }
+    }
+  }-*/;
 }
