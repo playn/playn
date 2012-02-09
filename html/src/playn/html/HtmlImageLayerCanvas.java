@@ -139,12 +139,11 @@ class HtmlImageLayerCanvas extends HtmlLayerCanvas implements ImageLayer {
       if (repeatX || repeatY) {
         updatePattern(ctx);
 
-        ctx.save();
         ctx.setFillStyle(pattern);
+        ctx.beginPath();
         ctx.rect(0, 0, width, height);
         ctx.scale(repeatX ? 1 : width / img.width(), repeatY ? 1 : height / img.height());
         ctx.fill();
-        ctx.restore();
       } else {
         ctx.drawImage(img.img, 0, 0, width, height);
       }
