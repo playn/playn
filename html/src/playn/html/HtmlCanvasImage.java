@@ -15,9 +15,6 @@
  */
 package playn.html;
 
-import com.google.gwt.dom.client.ImageElement;
-import com.google.gwt.webgl.client.WebGLTexture;
-
 import playn.core.Canvas;
 import playn.core.CanvasImage;
 import playn.core.gl.GLContext;
@@ -37,12 +34,10 @@ class HtmlCanvasImage extends HtmlImage implements CanvasImage {
   }
 
   @Override
-  public WebGLTexture ensureTexture(GLContext ctx, boolean repeatX, boolean repeatY) {
+  public Object ensureTexture(GLContext ctx, boolean repeatX, boolean repeatY) {
     if (canvas.dirty()) {
       canvas.clearDirty();
-      if (tex != null) {
-        ((HtmlGLContext) ctx).updateTexture(tex, canvas.canvas().<ImageElement>cast());
-      } // if tex is null, loadTexture will grab the latest canvas data from the image
+      clearTexture(ctx);
     }
     return super.ensureTexture(ctx, repeatX, repeatY);
   }

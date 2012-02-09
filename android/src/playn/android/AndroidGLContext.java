@@ -17,19 +17,12 @@ package playn.android;
 
 import static playn.core.PlayN.log;
 
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
-import java.nio.ShortBuffer;
 import java.util.*;
 
 import android.graphics.Bitmap;
 import android.opengl.GLUtils;
-import android.util.Log;
 
 import playn.core.Asserts;
-import playn.core.InternalTransform;
 import playn.core.StockInternalTransform;
 import playn.core.gl.GL20;
 import playn.core.gl.GLContext;
@@ -135,7 +128,8 @@ public class AndroidGLContext extends GLContext
     bindFramebuffer((Integer)fbuf, width, height, false);
   }
 
-  void bindFramebuffer() {
+  @Override
+  public void bindFramebuffer() {
     bindFramebuffer(0, viewWidth, viewHeight, false);
   }
 

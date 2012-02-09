@@ -18,6 +18,8 @@ package playn.ios;
 import cli.MonoTouch.CoreGraphics.CGImage;
 import cli.MonoTouch.UIKit.UIImage;
 
+import playn.core.gl.GLContext;
+
 /**
  * Implements {@link Image} based on a static bitmap.
  */
@@ -46,7 +48,7 @@ public class IOSImage extends IOSAbstractImage
   }
 
   @Override
-  protected void updateTexture(int tex) {
-    ctx.updateTexture(tex, image);
+  protected void updateTexture(GLContext ctx, Object tex) {
+    this.ctx.updateTexture((Integer)tex, image);
   }
 }

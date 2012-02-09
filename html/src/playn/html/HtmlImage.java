@@ -18,19 +18,11 @@ package playn.html;
 import com.google.gwt.dom.client.CanvasElement;
 import com.google.gwt.dom.client.ImageElement;
 import com.google.gwt.dom.client.NativeEvent;
-import com.google.gwt.webgl.client.WebGLFramebuffer;
 import com.google.gwt.webgl.client.WebGLTexture;
-
-import static com.google.gwt.webgl.client.WebGLRenderingContext.COLOR_ATTACHMENT0;
-import static com.google.gwt.webgl.client.WebGLRenderingContext.FRAMEBUFFER;
-import static com.google.gwt.webgl.client.WebGLRenderingContext.RGBA;
-import static com.google.gwt.webgl.client.WebGLRenderingContext.TEXTURE_2D;
-import static com.google.gwt.webgl.client.WebGLRenderingContext.UNSIGNED_BYTE;
 
 import playn.core.Image;
 import playn.core.ResourceCallback;
 import playn.core.gl.GLContext;
-import playn.core.gl.GLUtil;
 import playn.core.gl.ImageGL;
 
 class HtmlImage extends ImageGL {
@@ -44,9 +36,6 @@ class HtmlImage extends ImageGL {
   }-*/;
 
   ImageElement img;
-
-  // only used in the WebGL renderer.
-  protected WebGLTexture tex, reptex;
 
   HtmlImage(CanvasElement img) {
     fakeComplete(img);
@@ -93,73 +82,7 @@ class HtmlImage extends ImageGL {
   }
 
   @Override
-  public WebGLTexture ensureTexture(GLContext ctx, boolean repeatX, boolean repeatY) {
-    // Create requested textures if loaded.
-    if (isReady()) {
-      if (repeatX || repeatY) {
-        scaleTexture((HtmlGLContext) ctx, repeatX, repeatY);
-        return reptex;
-      } else {
-        loadTexture((HtmlGLContext) ctx);
-        return tex;
-      }
-    }
-
-    return null;
-  }
-
-  @Override
-  public void clearTexture(GLContext ctx) {
-    if (tex != null) {
-      ctx.destroyTexture(tex);
-      tex = null;
-    }
-    if (reptex != null) {
-      ctx.destroyTexture(reptex);
-      reptex = null;
-    }
-  }
-
-  private void loadTexture(HtmlGLContext ctx) {
-    if (tex != null)
-      return;
-    tex = ctx.createTexture(false, false);
-    ctx.updateTexture(tex, img);
-  }
-
-  private void scaleTexture(HtmlGLContext ctx, boolean repeatX, boolean repeatY) {
-    if (reptex != null)
-      return;
-
-    // GL requires pow2 on axes that repeat
-    int width = GLUtil.nextPowerOfTwo(width()), height = GLUtil.nextPowerOfTwo(height());
-    reptex = ctx.createTexture(width, height, repeatX, repeatY);
-
-    // no need to scale if our source data is already a power of two
-    if ((width == 0) && (height == 0)) {
-      ctx.updateTexture(reptex, img);
-      return;
-    }
-
-    // otherwise we need to scale our non-repeated texture, which we'll load normally
-    loadTexture(ctx);
-
-    // width/height == 0 => already a power of two.
-    if (width == 0)
-      width = width();
-    if (height == 0)
-      height = height();
-
-    // point a new framebuffer at it
-    WebGLFramebuffer fbuf = ctx.gl.createFramebuffer();
-    ctx.gl.framebufferTexture2D(FRAMEBUFFER, COLOR_ATTACHMENT0, TEXTURE_2D, reptex, 0);
-    ctx.gl.bindTexture(TEXTURE_2D, reptex);
-
-    // render the non-repeated texture into the framebuffer properly scaled
-    ctx.drawTexture(tex, width(), height(), HtmlInternalTransform.IDENTITY,
-                    0, height, width, -height, false, false, 1);
-    ctx.bindFramebuffer();
-
-    ctx.gl.deleteFramebuffer(fbuf);
+  protected void updateTexture(GLContext ctx, Object tex) {
+    ((HtmlGLContext)ctx).updateTexture((WebGLTexture)tex, img);
   }
 }

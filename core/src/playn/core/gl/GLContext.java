@@ -29,18 +29,29 @@ public abstract class GLContext {
   protected GLShader.Texture texShader;
   protected GLShader.Color colorShader;
 
-  /** Creates a framebuffer that will render into the supplied texture. The created framebuffer
-   * must be left bound at the end of this call. */
+  /** Creates a framebuffer that will render into the supplied texture. */
   public abstract Object createFramebuffer(Object tex);
 
+  /** Deletes the supplied frame buffer (which will have come from {@link #createFramebuffer}). */
   public abstract void deleteFramebuffer(Object fbuf);
 
+  /** Binds the supplied frame buffer.
+   * @param width the width of the backing texture.
+   * @param height the height of the backing texture.
+   */
   public abstract void bindFramebuffer(Object fbuf, int width, int height);
 
+  /** Binds the default framebuffer. */
+  public abstract void bindFramebuffer();
+
+  /** Creates a texture with the specified repeat behavior. */
   public abstract Object createTexture(boolean repeatX, boolean repeatY);
 
+  /** Creates a texture of the specified size, with the specified repeat behavior, into which we
+   * can subsequently render. */
   public abstract Object createTexture(int width, int height, boolean repeatX, boolean repeatY);
 
+  /** Destroys the supplied texture. */
   public abstract void destroyTexture(Object tex);
 
   /** Starts a series of drawing commands that are clipped to the specified rectangle (in view
@@ -51,16 +62,13 @@ public abstract class GLContext {
   /** Ends a series of drawing commands that were clipped per a call to {@link #startClipped}. */
   public abstract void endClipped();
 
+  /** Clears the bound framebuffer with the specified color. */
   public abstract void clear(float r, float g, float b, float a);
 
-  /**
-   * NOOP except when debugging, checks whether any GL errors have occurred, logging them if so.
-   */
+  /** NOOP except when debugging, checks and logs whether any GL errors have occurred. */
   public abstract void checkGLError(String op);
 
-  /**
-   * Processes any pending GL actions. Should be called once per frame.
-   */
+  /** Processes any pending GL actions. Should be called once per frame. */
   public void processPending() {
     synchronized (penders) {
       if (!penders.isEmpty()) {
@@ -76,6 +84,7 @@ public abstract class GLContext {
     }
   }
 
+  /** Queues a texture to be destroyed on the GL thread. */
   public void queueDestroyTexture(final Object tex) {
     queuePender(new Runnable() {
       public void run() {
@@ -84,6 +93,7 @@ public abstract class GLContext {
     });
   }
 
+  /** Queues a framebuffer to be destroyed on the GL thread. */
   public void queueDeleteFramebuffer(final Object fbuf) {
     queuePender(new Runnable() {
       public void run() {
@@ -92,6 +102,7 @@ public abstract class GLContext {
     });
   }
 
+  /** Creates an identity transform, which may subsequently be mutated. */
   public InternalTransform createTransform() {
     return new StockInternalTransform();
   }

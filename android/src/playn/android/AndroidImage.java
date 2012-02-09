@@ -19,21 +19,21 @@ import android.graphics.Bitmap;
 
 import playn.core.Image;
 import playn.core.ResourceCallback;
-import playn.core.StockInternalTransform;
-import playn.core.gl.GL20;
 import playn.core.gl.GLContext;
-import playn.core.gl.GLUtil;
 import playn.core.gl.ImageGL;
 
 class AndroidImage extends ImageGL implements AndroidGLContext.Refreshable {
   private final AndroidGLContext ctx;
   private final Bitmap bitmap;
-  private int tex = -1, reptex = -1;
 
   AndroidImage(AndroidGLContext ctx, Bitmap bitmap) {
     this.ctx = ctx;
     this.bitmap = bitmap;
     ctx.addRefreshable(this);
+  }
+
+  Bitmap bitmap() {
+    return bitmap;
   }
 
   @Override
@@ -48,12 +48,12 @@ class AndroidImage extends ImageGL implements AndroidGLContext.Refreshable {
 
   @Override
   public void onSurfaceLost() {
-    clearTexture();
+    clearTexture(ctx);
   }
 
   public void destroy() {
     ctx.removeRefreshable(this);
-    clearTexture();
+    clearTexture(ctx);
   }
 
   @Override
@@ -72,86 +72,15 @@ class AndroidImage extends ImageGL implements AndroidGLContext.Refreshable {
   }
 
   @Override
-  public Object ensureTexture(GLContext ctx, boolean repeatX, boolean repeatY) {
-    if (repeatX || repeatY) {
-      scaleTexture((AndroidGLContext) ctx, repeatX, repeatY);
-      return reptex;
-    } else {
-      loadTexture((AndroidGLContext) ctx);
-      return tex;
-    }
-  }
-
-  @Override
-  public void clearTexture(GLContext ctx) {
-    clearTexture(); // we don't need the ctx arg
-  }
-
-  Bitmap bitmap() {
-    return bitmap;
+  protected void updateTexture(GLContext ctx, Object tex) {
+    this.ctx.updateTexture((Integer)tex, bitmap);
   }
 
   @Override
   protected void finalize() {
-    if (tex != -1)
+    if (tex != null)
       ctx.queueDestroyTexture(tex);
-    if (reptex != -1)
+    if (reptex != null)
       ctx.queueDeleteFramebuffer(reptex);
-  }
-
-  private void clearTexture() {
-    if (tex != -1) {
-      ctx.destroyTexture(tex);
-      tex = -1;
-    }
-    if (reptex != -1) {
-      ctx.destroyTexture(reptex);
-      reptex = -1;
-    }
-  }
-
-  private void loadTexture(AndroidGLContext ctx) {
-    if (tex != -1)
-      return;
-    tex = ctx.createTexture(false, false);
-    ctx.updateTexture(tex, bitmap);
-  }
-
-  private void scaleTexture(AndroidGLContext ctx, boolean repeatX, boolean repeatY) {
-    if (reptex != -1)
-      return;
-
-    // GL requires pow2 on axes that repeat
-    int width = GLUtil.nextPowerOfTwo(width()), height = GLUtil.nextPowerOfTwo(height());
-    reptex = ctx.createTexture(width, height, repeatX, repeatY);
-
-    // no need to scale if our source data is already a power of two
-    if ((width == 0) && (height == 0)) {
-      ctx.updateTexture(reptex, bitmap);
-      return;
-    }
-
-    // otherwise we need to scale our non-repeated texture, which we'll load normally
-    loadTexture(ctx);
-
-    // width/height == 0 => already a power of two.
-    if (width == 0)
-      width = width();
-    if (height == 0)
-      height = height();
-
-    // TODO: Throw error if the size is bigger than GL_MAX_RENDERBUFFER_SIZE?
-
-    // point a new framebuffer at it
-    int fbuf = ctx.createFramebuffer(reptex);
-    ctx.gl20.glBindTexture(GL20.GL_TEXTURE_2D, reptex);
-    ctx.clear(0, 0, 0, 0);
-
-    // render the non-repeated texture into the framebuffer properly scaled
-    ctx.drawTexture(tex, width(), height(), StockInternalTransform.IDENTITY,
-                    0, height, width, -height, false, false, 1);
-    ctx.bindFramebuffer();
-
-    ctx.deleteFramebuffer(fbuf);
   }
 }

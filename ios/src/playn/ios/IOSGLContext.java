@@ -22,7 +22,6 @@ import cli.System.Runtime.InteropServices.Marshal;
 import cli.MonoTouch.CoreGraphics.CGBitmapContext;
 import cli.MonoTouch.CoreGraphics.CGImage;
 import cli.MonoTouch.CoreGraphics.CGImageAlphaInfo;
-import cli.MonoTouch.UIKit.UIDevice;
 import cli.MonoTouch.UIKit.UIDeviceOrientation;
 import cli.MonoTouch.UIKit.UIImage;
 import cli.OpenTK.Graphics.ES20.All;
@@ -102,6 +101,11 @@ class IOSGLContext extends GLContext
   }
 
   @Override
+  public void bindFramebuffer() {
+    bindFramebuffer(0, viewWidth, viewHeight, false);
+  }
+
+  @Override
   public Integer createTexture(boolean repeatX, boolean repeatY) {
     int[] texw = new int[1];
     GL.GenTextures(1, texw);
@@ -156,10 +160,6 @@ class IOSGLContext extends GLContext
         PlayN.log().error(op + ": glError " + error);
       }
     }
-  }
-
-  void bindFramebuffer() {
-    bindFramebuffer(0, viewWidth, viewHeight, false);
   }
 
   void bindFramebuffer(int frameBuffer, int width, int height, boolean force) {

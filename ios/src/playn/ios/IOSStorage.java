@@ -23,7 +23,6 @@ import cli.System.IO.Path;
 import cli.Mono.Data.Sqlite.SqliteConnection;
 import cli.System.Data.CommandType;
 import cli.System.Data.Common.DbCommand;
-import cli.System.Data.Common.DbDataReader;
 import cli.System.Data.Common.DbParameter;
 import cli.System.Data.DbType;
 import cli.System.Data.IDataReader;

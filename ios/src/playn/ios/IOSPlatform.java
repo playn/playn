@@ -24,7 +24,6 @@ import cli.System.Drawing.RectangleF;
 
 import playn.core.Game;
 import playn.core.Json;
-import playn.core.Keyboard;
 import playn.core.Mouse;
 import playn.core.Platform;
 import playn.core.PlayN;

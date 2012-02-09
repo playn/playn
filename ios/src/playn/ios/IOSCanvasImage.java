@@ -65,7 +65,7 @@ public class IOSCanvasImage extends IOSAbstractImage implements CanvasImage
   }
 
   @Override
-  protected void updateTexture(int tex) {
-    ctx.updateTexture(tex, width(), height(), canvas.data());
+  protected void updateTexture(GLContext ctx, Object tex) {
+    this.ctx.updateTexture((Integer)tex, width(), height(), canvas.data());
   }
 }

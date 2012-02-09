@@ -15,14 +15,9 @@
  */
 package playn.html;
 
-import com.google.gwt.dom.client.CanvasElement;
-import com.google.gwt.dom.client.ImageElement;
 import com.google.gwt.typedarrays.client.Float32Array;
-import com.google.gwt.typedarrays.client.Int32Array;
 import com.google.gwt.typedarrays.client.Uint16Array;
-import com.google.gwt.typedarrays.client.Uint8Array;
 import com.google.gwt.webgl.client.WebGLBuffer;
-import com.google.gwt.webgl.client.WebGLFramebuffer;
 import com.google.gwt.webgl.client.WebGLProgram;
 import com.google.gwt.webgl.client.WebGLRenderingContext;
 import com.google.gwt.webgl.client.WebGLTexture;
@@ -32,9 +27,7 @@ import com.google.gwt.webgl.client.WebGLUtil;
 import static com.google.gwt.webgl.client.WebGLRenderingContext.*;
 
 import playn.core.InternalTransform;
-import playn.core.gl.GLContext;
 import playn.core.gl.GLShader;
-import playn.core.gl.LayerGL;
 
 public class HtmlGLShader implements GLShader {
   public static class Texture extends HtmlGLShader implements GLShader.Texture {

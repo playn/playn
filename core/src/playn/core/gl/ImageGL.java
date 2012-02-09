@@ -23,16 +23,38 @@ public abstract class ImageGL implements Image {
   /** The current count of references to this image. */
   protected int refs;
 
+  /** Our texture and repeatable texture handles. */
+  protected Object tex, reptex;
+
   /**
    * Creates a texture for this image (if one does not already exist) and returns it. May return
    * null if the underlying image data is not yet ready.
    */
-  public abstract Object ensureTexture(GLContext ctx, boolean repeatX, boolean repeatY);
+  public Object ensureTexture(GLContext ctx, boolean repeatX, boolean repeatY) {
+    if (!isReady()) {
+      return null;
+    } else if (repeatX || repeatY) {
+      scaleTexture(ctx, repeatX, repeatY);
+      return reptex;
+    } else {
+      loadTexture(ctx);
+      return tex;
+    }
+  }
 
   /**
    * Releases this image's texture memory.
    */
-  public abstract void clearTexture(GLContext ctx);
+  public void clearTexture(GLContext ctx) {
+    if (tex != null) {
+      ctx.destroyTexture(tex);
+      tex = null;
+    }
+    if (reptex != null) {
+      ctx.destroyTexture(reptex);
+      reptex = null;
+    }
+  }
 
   /**
    * Increments this image's reference count. Called by {@link ImageLayerGL} to let the image know
@@ -54,5 +76,57 @@ public abstract class ImageGL implements Image {
     if (--refs == 0) {
       clearTexture(ctx);
     }
+  }
+
+  /**
+   * Copies our current image data into the supplied texture.
+   */
+  protected abstract void updateTexture(GLContext ctx, Object tex);
+
+  private void loadTexture(GLContext ctx) {
+    if (tex != null)
+      return;
+    tex = ctx.createTexture(false, false);
+    updateTexture(ctx, tex);
+  }
+
+  private void scaleTexture(GLContext ctx, boolean repeatX, boolean repeatY) {
+    if (reptex != null)
+      return;
+
+    // GL requires pow2 on axes that repeat
+    int width = GLUtil.nextPowerOfTwo(width()), height = GLUtil.nextPowerOfTwo(height());
+
+    // TODO: if width/height > platform_max_size, repeatedly scale by 0.5 until within bounds
+    // platform_max_size = 1024 for iOS, GL10.GL_MAX_TEXTURE_SIZE on android, etc.
+
+    // no need to scale if our source data is already a power of two
+    if ((width == 0) && (height == 0)) {
+      reptex = ctx.createTexture(width(), height(), repeatX, repeatY);
+      updateTexture(ctx, reptex);
+      return;
+    }
+
+    // otherwise we need to scale our non-repeated texture, so load that normally
+    loadTexture(ctx);
+
+    // width/height == 0 => already a power of two.
+    if (width == 0)
+      width = width();
+    if (height == 0)
+      height = height();
+
+    // create our texture and point a new framebuffer at it
+    reptex = ctx.createTexture(width, height, repeatX, repeatY);
+    Object fbuf = ctx.createFramebuffer(reptex);
+
+    // render the non-repeated texture into the framebuffer properly scaled
+    ctx.bindFramebuffer(fbuf, width, height);
+    ctx.drawTexture(tex, width(), height(), ctx.createTransform(),
+                    0, height, width, -height, false, false, 1);
+
+    // we no longer need this framebuffer; rebind the default framebuffer and delete ours
+    ctx.bindFramebuffer();
+    ctx.deleteFramebuffer(fbuf);
   }
 }

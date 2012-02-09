@@ -16,7 +16,6 @@
 package playn.ios;
 
 import cli.MonoTouch.CoreGraphics.CGBitmapContext;
-import cli.MonoTouch.CoreGraphics.CGColor;
 import cli.MonoTouch.CoreGraphics.CGPath;
 import cli.MonoTouch.CoreText.CTFrame;
 import cli.MonoTouch.CoreText.CTFramesetter;

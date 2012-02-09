@@ -21,13 +21,9 @@ import com.google.gwt.typedarrays.client.Float32Array;
 import com.google.gwt.typedarrays.client.Int32Array;
 import com.google.gwt.typedarrays.client.Uint16Array;
 import com.google.gwt.typedarrays.client.Uint8Array;
-import com.google.gwt.webgl.client.WebGLBuffer;
 import com.google.gwt.webgl.client.WebGLFramebuffer;
-import com.google.gwt.webgl.client.WebGLProgram;
 import com.google.gwt.webgl.client.WebGLRenderingContext;
 import com.google.gwt.webgl.client.WebGLTexture;
-import com.google.gwt.webgl.client.WebGLUniformLocation;
-import com.google.gwt.webgl.client.WebGLUtil;
 
 import static com.google.gwt.webgl.client.WebGLRenderingContext.*;
 
@@ -107,7 +103,8 @@ public class HtmlGLContext extends GLContext
     gl.deleteFramebuffer((WebGLFramebuffer) fbuf);
   }
 
-  void bindFramebuffer() {
+  @Override
+  public void bindFramebuffer() {
     bindFramebuffer(null, canvas.getWidth(), canvas.getHeight(), false);
   }
 
@@ -141,7 +138,6 @@ public class HtmlGLContext extends GLContext
     gl.texImage2D(TEXTURE_2D, 0, RGBA, width, height, 0, RGBA, UNSIGNED_BYTE, null);
     return tex;
   }
-
 
   @Override
   public void destroyTexture(Object tex) {

@@ -21,7 +21,6 @@ import java.util.Map;
 import cli.MonoTouch.CoreText.CTFont;
 
 import playn.core.AbstractFont;
-import playn.core.Asserts;
 
 class IOSFont extends AbstractFont
 {

@@ -23,7 +23,6 @@ import cli.OpenTK.FrameEventArgs;
 import cli.OpenTK.Platform.iPhoneOS.iPhoneOSGameView;
 
 import cli.MonoTouch.CoreAnimation.CAEAGLLayer;
-import cli.MonoTouch.CoreAnimation.CALayer;
 import cli.MonoTouch.Foundation.ExportAttribute;
 import cli.MonoTouch.Foundation.NSNotification;
 import cli.MonoTouch.Foundation.NSNotificationCenter;
@@ -33,7 +32,6 @@ import cli.MonoTouch.OpenGLES.EAGLRenderingAPI;
 import cli.MonoTouch.UIKit.UIDevice;
 import cli.MonoTouch.UIKit.UIDeviceOrientation;
 import cli.MonoTouch.UIKit.UIEvent;
-import cli.MonoTouch.UIKit.UIScreen;
 
 import playn.core.PlayN;
 

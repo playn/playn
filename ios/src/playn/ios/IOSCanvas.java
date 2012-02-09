@@ -24,8 +24,6 @@ import cli.System.IntPtr;
 import cli.System.Runtime.InteropServices.Marshal;
 
 import cli.MonoTouch.CoreGraphics.*;
-import cli.OpenTK.Graphics.ES20.All;
-import cli.OpenTK.Graphics.ES20.GL;
 
 import playn.core.Canvas;
 import playn.core.Canvas.LineCap;

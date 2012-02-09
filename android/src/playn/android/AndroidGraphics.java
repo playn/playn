@@ -30,7 +30,6 @@ import playn.core.Font;
 import playn.core.Gradient;
 import playn.core.GroupLayer;
 import playn.core.Image;
-import playn.core.ImmediateLayer;
 import playn.core.Path;
 import playn.core.Pattern;
 import playn.core.TextFormat;
