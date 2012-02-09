@@ -58,6 +58,7 @@ class HtmlImmediateLayerCanvas extends HtmlLayerCanvas implements ImmediateLayer
 
     @Override
     protected void render(Context2d ctx) {
+      ctx.beginPath();
       ctx.rect(0, 0, width, height);
       ctx.clip();
       super.render(ctx);
