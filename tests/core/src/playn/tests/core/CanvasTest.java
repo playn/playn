@@ -17,9 +17,11 @@ package playn.tests.core;
 
 import playn.core.Canvas;
 import playn.core.CanvasImage;
-import playn.core.ImageLayer;
 import playn.core.Image;
+import playn.core.ImageLayer;
+import playn.core.Layer;
 import static playn.core.PlayN.*;
+import playn.core.ResourceCallback;
 
 public class CanvasTest extends Test {
 
@@ -58,12 +60,9 @@ public class CanvasTest extends Test {
       }
     });
 
-    addTestCanvas(100, 100, new Drawer() {
-      public void draw(Canvas canvas) {
-        canvas.setFillGradient(graphics().createLinearGradient(
-                                 0, 0, 100, 100, new int[] { 0xFF0000FF, 0xFF00FF00 },
-                                 new float[] { 0, 1 }));
-        canvas.setFillPattern(graphics().createPattern(assets().getImage("images/tile.png")));
+    addTestCanvas(100, 100, "images/tile.png", new ImageDrawer() {
+      public void draw(Canvas canvas, Image tile) {
+        canvas.setFillPattern(graphics().createPattern(tile));
         canvas.fillRect(0, 0, 100, 100);
       }
     });
@@ -86,13 +85,12 @@ public class CanvasTest extends Test {
       }
     });
 
-    addTestCanvas(100, 100, new Drawer() {
-      public void draw(Canvas canvas) {
+    addTestCanvas(100, 100, "images/pea.png", new ImageDrawer() {
+      public void draw(Canvas canvas, Image pea) {
         canvas.setFillColor(0xFF99CCFF);
         canvas.fillRect(0, 0, 100, 100);
 
         // draw an image normally, scaled, cropped, cropped and scaled, etc.
-        Image pea = assets().getImage("images/pea.png");
         float half = 37/2f;
         canvas.drawImage(pea, 10, 10);
         canvas.drawImage(pea, 55, 10, 37, 37, half, half, half, half);
@@ -100,19 +98,43 @@ public class CanvasTest extends Test {
         canvas.drawImage(pea, 55, 55, 37, 37, half, half/2, half, half);
       }
     });
+
+    ImageLayer layer = graphics().createImageLayer(createCanvasImage(30, 30, new Drawer() {
+      public void draw(Canvas canvas) {
+        canvas.setFillColor(0xFF99CCFF);
+        canvas.fillCircle(15, 15, 15);
+        canvas.setStrokeColor(0xFF000000);
+        canvas.strokeRect(0, 0, 29, 29);
+      }
+    }));
+    layer.setRepeatX(true);
+    layer.setRepeatY(true);
+    layer.setSize(100, 100);
+    addTestLayer(100, 100, layer);
+  }
+
+  private interface Drawer {
+    void draw(Canvas canvas);
   }
 
   private void addTestCanvas(int width, int height, Drawer drawer) {
-    // if this canvas won't fit in this row, wrap down to the next
+    CanvasImage image = createCanvasImage(width, height, drawer);
+    addTestLayer(width, height, graphics().createImageLayer(image));
+  }
+
+  private CanvasImage createCanvasImage(int width, int height, final Drawer drawer) {
+    final CanvasImage image = graphics().createImage(width, height);
+    drawer.draw(image.canvas());
+    return image;
+  }
+
+  private void addTestLayer(int width, int height, Layer layer) {
+    // if this layer won't fit in this row, wrap down to the next
     if (nextX + width > graphics().width()) {
       nextY += (maxY + GAP);
       nextX = GAP;
       maxY = 0;
     }
-    // create the canvas, render it and add it to the scene graph
-    CanvasImage image = graphics().createImage(width, height);
-    drawer.draw(image.canvas());
-    ImageLayer layer = graphics().createImageLayer(image);
     layer.setTranslation(nextX, nextY);
     graphics().rootLayer().add(layer);
     // update our positioning info
@@ -120,7 +142,20 @@ public class CanvasTest extends Test {
     maxY = Math.max(maxY, height);
   }
 
-  private interface Drawer {
-    void draw(Canvas canvas);
+  private interface ImageDrawer {
+    void draw(Canvas canvas, Image image);
+  }
+
+  private void addTestCanvas(int width, int height, String imagePath, final ImageDrawer drawer) {
+    final CanvasImage target = graphics().createImage(width, height);
+    assets().getImage(imagePath).addCallback(new ResourceCallback<Image>() {
+      public void done(Image image) {
+        drawer.draw(target.canvas(), image);
+      }
+      public void error(Throwable err) {
+        System.err.println("Oops! " + err);
+      }
+    });
+    addTestLayer(width, height, graphics().createImageLayer(target));
   }
 }
