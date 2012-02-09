@@ -122,6 +122,7 @@ public abstract class ImageGL implements Image {
 
     // render the non-repeated texture into the framebuffer properly scaled
     ctx.bindFramebuffer(fbuf, width, height);
+    ctx.clear(0, 0, 0, 0);
     ctx.drawTexture(tex, width(), height(), ctx.createTransform(),
                     0, height, width, -height, false, false, 1);
 
