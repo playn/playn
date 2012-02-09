@@ -17,8 +17,9 @@ package playn.tests.core;
 
 import playn.core.Color;
 import playn.core.Game;
+import playn.core.ImmediateLayer;
 import playn.core.Pointer;
-import playn.core.SurfaceLayer;
+import playn.core.Surface;
 import static playn.core.PlayN.*;
 
 public class TestsGame implements Game {
@@ -56,11 +57,15 @@ public class TestsGame implements Game {
 
   void nextTest() {
     currentTest = (currentTest + 1) % tests.length;
+
     // setup root layer for next test
     graphics().rootLayer().clear();
-    SurfaceLayer bg = graphics().createSurfaceLayer(graphics().width(), graphics().height());
-    bg.surface().setFillColor(Color.rgb(255, 255, 255));
-    bg.surface().fillRect(0, 0, bg.surface().width(), bg.surface().height());
+    ImmediateLayer bg = graphics().createImmediateLayer(new ImmediateLayer.Renderer() {
+      public void render(Surface surf) {
+        surf.setFillColor(Color.rgb(255, 255, 255));
+        surf.fillRect(0, 0, graphics().width(), graphics().height());
+      }
+    });
     bg.setDepth(Float.NEGATIVE_INFINITY); // render behind everything
     graphics().rootLayer().add(bg);
 
