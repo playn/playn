@@ -133,7 +133,7 @@ public abstract class HtmlGraphics implements Graphics {
       float[] positions) {
     Asserts.checkArgument(colors.length == positions.length);
 
-    CanvasGradient gradient = dummyCtx.createRadialGradient(x, y, r, x, y, r);
+    CanvasGradient gradient = dummyCtx.createRadialGradient(x, y, 0, x, y, r);
     for (int i = 0; i < colors.length; ++i) {
       gradient.addColorStop(positions[i], cssColorString(colors[i]));
     }
