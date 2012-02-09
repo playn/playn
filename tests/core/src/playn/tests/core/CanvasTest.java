@@ -20,8 +20,8 @@ import playn.core.CanvasImage;
 import playn.core.Image;
 import playn.core.ImageLayer;
 import playn.core.Layer;
-import static playn.core.PlayN.*;
 import playn.core.ResourceCallback;
+import static playn.core.PlayN.*;
 
 public class CanvasTest extends Test {
 

@@ -24,7 +24,6 @@ import playn.core.SurfaceLayer;
 import static playn.core.PlayN.*;
 
 public class ClearBackgroundTest extends Test {
-  private GroupLayer rootLayer;
   private float time;
   private SurfaceLayer square;
   static int width = 100;
@@ -43,14 +42,14 @@ public class ClearBackgroundTest extends Test {
 
   @Override
   public void init() {
-    rootLayer = graphics().rootLayer();
-    rootLayer.clear();
+    // remove the background layer added by default
+    graphics().rootLayer().clear();
 
     // add a grey square
     square = graphics().createSurfaceLayer(width, height);
     square.surface().setFillColor(Color.rgb(200, 200, 200));
     square.surface().fillRect(0, 0, square.surface().width(), square.surface().height());
-    rootLayer.add(square);
+    graphics().rootLayer().add(square);
   }
 
   @Override
