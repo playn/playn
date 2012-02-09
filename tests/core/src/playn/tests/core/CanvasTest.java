@@ -104,7 +104,7 @@ public class CanvasTest extends Test {
         canvas.setFillColor(0xFF99CCFF);
         canvas.fillCircle(15, 15, 15);
         canvas.setStrokeColor(0xFF000000);
-        canvas.strokeRect(0, 0, 29, 29);
+        canvas.strokeRect(0, 0, 30, 30);
       }
     }));
     layer.setRepeatX(true);
