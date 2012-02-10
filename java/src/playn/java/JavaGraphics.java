@@ -15,6 +15,9 @@
  */
 package playn.java;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import playn.core.Asserts;
 import playn.core.CanvasImage;
 import playn.core.CanvasLayer;
@@ -30,13 +33,14 @@ import playn.core.Pattern;
 import playn.core.SurfaceLayer;
 import playn.core.TextFormat;
 import playn.core.TextLayout;
+import static playn.core.PlayN.*;
 
 import java.awt.Component;
 import java.awt.Dimension;
 
 import javax.swing.JFrame;
 
-class JavaGraphics implements Graphics {
+public class JavaGraphics implements Graphics {
 
   private final Component component;
   private final JavaGroupLayer rootLayer;
@@ -46,6 +50,23 @@ class JavaGraphics implements Graphics {
     this.frame = frame;
     this.component = component;
     this.rootLayer = new JavaGroupLayer();
+  }
+
+  /**
+   * Registers a font with the graphics system.
+   *
+   * @param name the name under which to register the font.
+   * @param path the path to the font resource (relative to the asset manager's path prefix).
+   * Currently only TrueType ({@code .ttf}) fonts are supported.
+   */
+  public void registerFont(String name, String path) {
+    try {
+      java.awt.Font font = java.awt.Font.createFont(
+        java.awt.Font.TRUETYPE_FONT, ((JavaAssets) assets()).getAssetStream(path));
+      _fonts.put(name, font);
+    } catch (Exception e) {
+      log().warn("Failed to load font [name=" + name + ", path=" + path + "]", e);
+    }
   }
 
   @Override @Deprecated
@@ -118,7 +139,12 @@ class JavaGraphics implements Graphics {
 
   @Override
   public Font createFont(String name, Font.Style style, float size) {
-    return new JavaFont(name, style, size);
+    java.awt.Font jfont = _fonts.get(name);
+    // if we don't have a custom font registered for this name, assume it's a platform font
+    if (jfont == null) {
+      jfont = new java.awt.Font(name, java.awt.Font.PLAIN, 12);
+    }
+    return new JavaFont(name, style, size, jfont);
   }
 
   @Override
@@ -153,4 +179,6 @@ class JavaGraphics implements Graphics {
     component.setPreferredSize(new Dimension(width, height));
     frame.pack();
   }
+
+  protected Map<String,java.awt.Font> _fonts = new HashMap<String,java.awt.Font>();
 }

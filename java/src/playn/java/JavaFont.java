@@ -24,11 +24,11 @@ class JavaFont extends AbstractFont {
 
   public final java.awt.Font jfont;
 
-  public JavaFont(String name, Style style, float size) {
+  public JavaFont(String name, Style style, float size, java.awt.Font jfont) {
     super(name, style, size);
-    // the Font constructor takes only integer size, so we instantiate it at an arbitrary size and
-    // derive a font of the desired (floating point) size
-    jfont = new java.awt.Font(name, TO_JAVA_STYLE.get(style), 12).deriveFont(size);
+    // the Font constructor takes only integer size, so we instantiate it at an arbitrary size (and
+    // style) and derive a font of the desired (floating point) size (and style)
+    this.jfont = jfont.deriveFont(TO_JAVA_STYLE.get(style), size);
   }
 
   protected static final Map<Style,Integer> TO_JAVA_STYLE = new HashMap<Style,Integer>();

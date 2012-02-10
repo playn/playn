@@ -15,6 +15,7 @@ package playn.java;
 
 import java.awt.EventQueue;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 
@@ -68,6 +69,14 @@ public class JavaAssets extends AbstractAssets {
    */
   public String getPathPrefix() {
     return pathPrefix;
+  }
+
+  InputStream getAssetStream(String path) throws IOException {
+    InputStream in = getClass().getClassLoader().getResourceAsStream(pathPrefix + path);
+    if (in == null) {
+      throw new FileNotFoundException(path);
+    }
+    return in;
   }
 
   @Override
