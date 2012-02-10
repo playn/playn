@@ -74,14 +74,8 @@ public abstract class GLContext {
       head = penders;
       penders = null;
     }
-    while (head != null) {
-      try {
-        head.action.run();
-      } catch (Throwable t) {
-        PlayN.log().warn("Pending GL action choked.", t);
-      }
-      head = head.next;
-    }
+    if (head != null)
+      head.process();
   }
 
   /** Queues a texture to be destroyed on the GL thread. */
@@ -238,9 +232,19 @@ public abstract class GLContext {
     public final Runnable action;
     public final Pender next;
 
-    public Pender (Runnable action, Pender next) {
+    public Pender(Runnable action, Pender next) {
       this.action = action;
       this.next = next;
+    }
+
+    public void process() {
+      if (next != null)
+        next.process();
+      try {
+        action.run();
+      } catch (Throwable t) {
+        PlayN.log().warn("Pending GL action choked.", t);
+      }
     }
   }
 }
