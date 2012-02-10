@@ -13,8 +13,6 @@
  */
 package playn.core.gl;
 
-import java.util.ArrayList;
-
 import playn.core.InternalTransform;
 import playn.core.PlayN;
 import playn.core.StockInternalTransform;
@@ -22,7 +20,8 @@ import playn.core.StockInternalTransform;
 public abstract class GLContext {
 
   // a queue of pending actions to execute on the GL thread
-  private ArrayList<Runnable> penders = new ArrayList<Runnable>();
+  private Pender penders = null;
+  private Object penderLock = new Object();
 
   // our shaders
   protected GLShader curShader;
@@ -70,17 +69,18 @@ public abstract class GLContext {
 
   /** Processes any pending GL actions. Should be called once per frame. */
   public void processPending() {
+    Pender head;
     synchronized (penders) {
-      if (!penders.isEmpty()) {
-        for (Runnable pender : penders) {
-          try {
-            pender.run();
-          } catch (Throwable t) {
-            PlayN.log().warn("Pending GL action choked.", t);
-          }
-        }
-        penders.clear();
+      head = penders;
+      penders = null;
+    }
+    while (head != null) {
+      try {
+        head.action.run();
+      } catch (Throwable t) {
+        PlayN.log().warn("Pending GL action choked.", t);
       }
+      head = head.next;
     }
   }
 
@@ -228,9 +228,19 @@ public abstract class GLContext {
     return true;
   }
 
-  private void queuePender(Runnable pender) {
-    synchronized (penders) {
-      penders.add(pender);
+  private void queuePender(Runnable action) {
+    synchronized (penderLock) {
+      penders = new Pender(action, penders);
+    }
+  }
+
+  private static class Pender {
+    public final Runnable action;
+    public final Pender next;
+
+    public Pender (Runnable action, Pender next) {
+      this.action = action;
+      this.next = next;
     }
   }
 }
