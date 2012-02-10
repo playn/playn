@@ -39,8 +39,12 @@ import android.util.Log;
 
 public class AndroidAssets extends AbstractAssets {
 
-  public String pathPrefix = null;
-  public AssetManager assets;
+  private final AssetManager assets;
+  private String pathPrefix = null;
+
+  AndroidAssets(AssetManager assets) {
+    this.assets = assets;
+  }
 
   public void setPathPrefix(String prefix) {
     pathPrefix = prefix;

@@ -64,11 +64,9 @@ public class AndroidPlatform implements Platform {
     pointer = new AndroidPointer();
     touch = new AndroidTouch();
     touchHandler = new AndroidTouchEventHandler(activity.gameView());
-    assets = new AndroidAssets();
+    assets = new AndroidAssets(activity.getAssets());
     analytics = new AndroidAnalytics();
     storage = new AndroidStorage(activity);
-
-    assets.assets = activity.getAssets();
   }
 
   @Override
