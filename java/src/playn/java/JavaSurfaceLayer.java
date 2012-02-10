@@ -16,20 +16,20 @@
 package playn.java;
 
 import playn.core.Asserts;
-
-import static playn.core.PlayN.graphics;
+import playn.core.CanvasImage;
 import playn.core.CanvasSurface;
 import playn.core.Surface;
 import playn.core.SurfaceLayer;
+import static playn.core.PlayN.graphics;
 
 class JavaSurfaceLayer extends JavaLayer implements SurfaceLayer {
 
-  private JavaImage img;
+  private CanvasImage img;
   private Surface surface;
 
   JavaSurfaceLayer(int width, int height) {
     super();
-    img = (JavaImage) graphics().createImage(width, height);
+    img = graphics().createImage(width, height);
     surface = new CanvasSurface(img.canvas());
   }
 

@@ -33,7 +33,7 @@ class JavaImageLayer extends JavaLayer implements ImageLayer {
   private boolean repeatX, repeatY;
 
   private JavaImage image;
-  private JavaImage cachedImage;
+  private JavaCanvasImage cachedImage;
   private boolean dirty = true;
 
   JavaImageLayer() {
@@ -144,7 +144,7 @@ class JavaImageLayer extends JavaLayer implements ImageLayer {
 
   @Override
   void paint(JavaCanvas canvas) {
-    if (!visible()) return;
+    if (!visible() || !image.isReady()) return;
 
     canvas.save();
     transform(canvas);
@@ -156,7 +156,7 @@ class JavaImageLayer extends JavaLayer implements ImageLayer {
     if (repeatX || repeatY) {
       if (dirty) {
         // repaint repeated image onto cached image
-        cachedImage = (JavaImage) graphics().createImage((int) dw, (int) dh);
+        cachedImage = (JavaCanvasImage) graphics().createImage((int) dw, (int) dh);
 
         float anchorWidth = repeatX ? image.width() : dw;
         float anchorHeight = repeatY ? image.height() : dh;

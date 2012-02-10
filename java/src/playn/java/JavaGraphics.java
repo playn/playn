@@ -33,7 +33,6 @@ import playn.core.TextLayout;
 
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.image.BufferedImage;
 
 import javax.swing.JFrame;
 
@@ -93,7 +92,7 @@ class JavaGraphics implements Graphics {
 
   @Override
   public CanvasImage createImage(int w, int h) {
-    return new JavaImage(new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB));
+    return new JavaCanvasImage(w, h);
   }
 
   @Override

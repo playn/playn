@@ -13,6 +13,7 @@
  */
 package playn.java;
 
+import java.awt.EventQueue;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.net.URL;
@@ -33,7 +34,17 @@ import playn.core.Sound;
  */
 public class JavaAssets extends AbstractAssets {
 
+  /** Makes asset loading asynchronous to mimic the behavior of the HTML backend. */
+  private static final boolean asyncLoad = Boolean.getBoolean("playn.java.asyncLoad");
+
   private String pathPrefix = "";
+
+  static void doResourceAction(Runnable action) {
+    if (asyncLoad)
+      EventQueue.invokeLater(action);
+    else
+      action.run();
+  }
 
   /**
    * Configures the prefix prepended to asset paths before fetching them from the classpath. For
@@ -56,16 +67,16 @@ public class JavaAssets extends AbstractAssets {
    * slash.
    */
   public String getPathPrefix() {
-      return pathPrefix;
+    return pathPrefix;
   }
 
   @Override
   protected Image doGetImage(String path) {
     try {
-      return new JavaImage(ImageIO.read(requireResource(pathPrefix + path)));
+      return new JavaStaticImage(ImageIO.read(requireResource(pathPrefix + path)));
     } catch (Exception e) {
       PlayN.log().warn("Could not load image at " + pathPrefix + path, e);
-      return new JavaImage(e);
+      return new JavaErrorImage(e);
     }
   }
 
@@ -82,19 +93,23 @@ public class JavaAssets extends AbstractAssets {
   }
 
   @Override
-  protected void doGetText(String path, ResourceCallback<String> callback) {
-    try {
-      callback.done(Resources.toString(requireResource(pathPrefix + path), Charsets.UTF_8));
-    } catch (Exception e) {
-      callback.error(e);
-    }
+  protected void doGetText(final String path, final ResourceCallback<String> callback) {
+    doResourceAction(new Runnable() {
+      public void run() {
+        try {
+          callback.done(Resources.toString(requireResource(pathPrefix + path), Charsets.UTF_8));
+        } catch (Exception e) {
+          callback.error(e);
+        }
+      }
+    });
   }
 
   protected URL requireResource(String path) throws FileNotFoundException {
-      URL url = getClass().getClassLoader().getResource(path);
-      if (url == null) {
-        throw new FileNotFoundException(path);
-      }
-      return url;
+    URL url = getClass().getClassLoader().getResource(path);
+    if (url == null) {
+      throw new FileNotFoundException(path);
+    }
+    return url;
   }
 }
