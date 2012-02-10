@@ -70,7 +70,7 @@ public abstract class GLContext {
   /** Processes any pending GL actions. Should be called once per frame. */
   public void processPending() {
     Pender head;
-    synchronized (penders) {
+    synchronized (penderLock) {
       head = penders;
       penders = null;
     }
