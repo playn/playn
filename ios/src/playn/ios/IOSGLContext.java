@@ -71,29 +71,30 @@ class IOSGLContext extends GLContext
       supportedOrients.add(UIDeviceOrientation.PortraitUpsideDown);
   }
 
-  void setOrientation(UIDeviceOrientation orientation) {
-    if (supportedOrients.contains(orientation.Value)) {
-      switch (orientation.Value) {
-      case UIDeviceOrientation.Portrait:
-        rootTransform = StockInternalTransform.IDENTITY;
-        break;
-      case UIDeviceOrientation.PortraitUpsideDown:
-        rootTransform = new StockInternalTransform();
-        rootTransform.translate(-viewWidth, -viewHeight);
-        rootTransform.scale(-1, -1);
-        break;
-      case UIDeviceOrientation.LandscapeLeft:
-        rootTransform = new StockInternalTransform();
-        rootTransform.rotate(FloatMath.PI/2);
-        rootTransform.translate(0, -viewWidth);
-        break;
-      case UIDeviceOrientation.LandscapeRight:
-        rootTransform = new StockInternalTransform();
-        rootTransform.rotate(-FloatMath.PI/2);
-        rootTransform.translate(-viewHeight, 0);
-        break;
-      }
-  }
+  boolean setOrientation(UIDeviceOrientation orientation) {
+    if (!supportedOrients.contains(orientation.Value))
+      return false;
+    switch (orientation.Value) {
+    case UIDeviceOrientation.Portrait:
+      rootTransform = StockInternalTransform.IDENTITY;
+      break;
+    case UIDeviceOrientation.PortraitUpsideDown:
+      rootTransform = new StockInternalTransform();
+      rootTransform.translate(-viewWidth, -viewHeight);
+      rootTransform.scale(-1, -1);
+      break;
+    case UIDeviceOrientation.LandscapeLeft:
+      rootTransform = new StockInternalTransform();
+      rootTransform.rotate(FloatMath.PI/2);
+      rootTransform.translate(0, -viewWidth);
+      break;
+    case UIDeviceOrientation.LandscapeRight:
+      rootTransform = new StockInternalTransform();
+      rootTransform.rotate(-FloatMath.PI/2);
+      rootTransform.translate(-viewHeight, 0);
+      break;
+    }
+    return true;
   }
 
   @Override
