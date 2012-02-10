@@ -15,6 +15,9 @@
  */
 package playn.ios;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import cli.System.Drawing.RectangleF;
 import cli.System.IntPtr;
 import cli.System.Runtime.InteropServices.Marshal;
@@ -44,6 +47,7 @@ class IOSGLContext extends GLContext
   int fbufWidth, fbufHeight;
   private int lastFrameBuffer;
   private InternalTransform rootTransform = StockInternalTransform.IDENTITY;
+  private Set<Integer> supportedOrients = new HashSet<Integer>();
 
   IOSGLContext(int screenWidth, int screenHeight) {
     fbufWidth = viewWidth = screenWidth;
@@ -54,27 +58,42 @@ class IOSGLContext extends GLContext
     reinitGL();
   }
 
+  void setSupportedOrientations(boolean portrait, boolean landscapeRight,
+                                boolean upsideDown, boolean landscapeLeft) {
+    supportedOrients.clear();
+    if (portrait)
+      supportedOrients.add(UIDeviceOrientation.Portrait);
+    if (landscapeRight)
+      supportedOrients.add(UIDeviceOrientation.LandscapeRight);
+    if (landscapeLeft)
+      supportedOrients.add(UIDeviceOrientation.LandscapeLeft);
+    if (upsideDown)
+      supportedOrients.add(UIDeviceOrientation.PortraitUpsideDown);
+  }
+
   void setOrientation(UIDeviceOrientation orientation) {
-    switch (orientation.Value) {
-    case UIDeviceOrientation.Portrait:
-      rootTransform = StockInternalTransform.IDENTITY;
-      break;
-    case UIDeviceOrientation.PortraitUpsideDown:
-      rootTransform = new StockInternalTransform();
-      rootTransform.translate(-viewWidth, -viewHeight);
-      rootTransform.scale(-1, -1);
-      break;
-    case UIDeviceOrientation.LandscapeLeft:
-      rootTransform = new StockInternalTransform();
-      rootTransform.rotate(FloatMath.PI/2);
-      rootTransform.translate(0, -viewWidth);
-      break;
-    case UIDeviceOrientation.LandscapeRight:
-      rootTransform = new StockInternalTransform();
-      rootTransform.rotate(-FloatMath.PI/2);
-      rootTransform.translate(-viewHeight, 0);
-      break;
-    }
+    if (supportedOrients.contains(orientation.Value)) {
+      switch (orientation.Value) {
+      case UIDeviceOrientation.Portrait:
+        rootTransform = StockInternalTransform.IDENTITY;
+        break;
+      case UIDeviceOrientation.PortraitUpsideDown:
+        rootTransform = new StockInternalTransform();
+        rootTransform.translate(-viewWidth, -viewHeight);
+        rootTransform.scale(-1, -1);
+        break;
+      case UIDeviceOrientation.LandscapeLeft:
+        rootTransform = new StockInternalTransform();
+        rootTransform.rotate(FloatMath.PI/2);
+        rootTransform.translate(0, -viewWidth);
+        break;
+      case UIDeviceOrientation.LandscapeRight:
+        rootTransform = new StockInternalTransform();
+        rootTransform.rotate(-FloatMath.PI/2);
+        rootTransform.translate(-viewHeight, 0);
+        break;
+      }
+  }
   }
 
   @Override

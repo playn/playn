@@ -86,6 +86,14 @@ public class IOSPlatform implements Platform {
     mainWindow.Add(gameView = new IOSGameView(bounds, scale));
   }
 
+  /**
+   * Configures the orientations supported by your game.
+   */
+  public void setSupportedOrientations(boolean portrait, boolean landscapeRight,
+                                       boolean upsideDown, boolean landscapeLeft) {
+    graphics.ctx.setSupportedOrientations(portrait, landscapeRight, upsideDown, landscapeLeft);
+  }
+
   @Override
   public IOSAssets assets() {
     return assets;
