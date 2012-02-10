@@ -139,14 +139,11 @@ public class AndroidAssets extends AbstractAssets {
     }
   }
 
-  // FIXME: This should be much more intelligent than appending .wav to the path.
-  // The current AndroidSound implementation using MediaPlayer (AndroidCompressedSound)
-  // can already read many more formats than just .wav
   @Override
   protected Sound doGetSound(String path) {
     try {
-      InputStream in = openAsset(path + ".wav");
-      return AndroidPlatform.instance.audio().getSound(path + ".wav", in);
+      InputStream in = openAsset(path + ".mp3");
+      return AndroidPlatform.instance.audio().getSound(path + ".mp3", in);
     } catch (IOException e) {
       log().error("Unable to load sound: " + path, e);
       return new ErrorSound(path);
