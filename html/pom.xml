@@ -56,14 +56,14 @@
     <dependency>
       <groupId>com.allen-sauer.gwt.log</groupId>
       <artifactId>gwt-log</artifactId>
-      <version>3.1.6</version>
+      <version>3.1.8</version>
       <optional>true</optional>
     </dependency>
 
     <dependency>
       <groupId>com.allen-sauer.gwt.voices</groupId>
       <artifactId>gwt-voices</artifactId>
-      <version>2.1.5</version>
+      <version>2.1.7</version>
     </dependency>
 
     <dependency>
