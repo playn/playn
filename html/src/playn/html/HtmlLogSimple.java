@@ -79,7 +79,7 @@ class HtmlLogSimple extends HtmlLog {
   }
 
   private native void sendToBrowserConsole(String msg, Throwable e) /*-{
-    if ($wnd.console) {
+    if ($wnd.console && $wnd.console.info) {
       if (e != null) {
         $wnd.console.info(msg, e);
       } else {
