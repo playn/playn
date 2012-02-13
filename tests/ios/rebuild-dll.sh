@@ -17,6 +17,6 @@ mono $IKVM_HOME/bin/ikvmc.exe -nostdlib -debug -target:library -out:tests-core.d
     -r:$MONO_PATH/monotouch.dll \
     -r:$MONO_PATH/Mono.Data.Sqlite.dll \
     $MAVEN_REPO/com/samskivert/pythagoras/1.1/pythagoras-1.1.jar \
-    $MAVEN_REPO/com/googlecode/playn/playn-core/1.1-SNAPSHOT/playn-core-1.1-SNAPSHOT.jar \
-    $MAVEN_REPO/com/googlecode/playn/playn-ios/1.1-SNAPSHOT/playn-ios-1.1-SNAPSHOT.jar \
-    ../core/target/playn-tests-core-1.1-SNAPSHOT.jar
+    $MAVEN_REPO/com/googlecode/playn/playn-core/1.2-SNAPSHOT/playn-core-1.2-SNAPSHOT.jar \
+    $MAVEN_REPO/com/googlecode/playn/playn-ios/1.2-SNAPSHOT/playn-ios-1.2-SNAPSHOT.jar \
+    ../core/target/playn-tests-core-1.2-SNAPSHOT.jar
