@@ -89,8 +89,9 @@ public class JavaNet implements Net {
   private String readFully(Reader reader) throws IOException {
     StringBuffer result = new StringBuffer();
     char[] buf = new char[BUF_SIZE];
-    while (-1 != reader.read(buf)) {
-      result.append(buf);
+    int len = 0;
+    while (-1 != (len = reader.read(buf))) {
+      result.append(buf, 0, len);
     }
     return result.toString();
   }
