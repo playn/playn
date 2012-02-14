@@ -36,7 +36,7 @@ public interface Image {
   boolean isReady();
 
   /**
-   * Adds a callback to be notified when this image is loaded. If the image is
+   * Adds a callback to be notified when this image has loaded. If the image is
    * already loaded, the callback will be notified immediately. The callback is
    * discarded once the image is loaded.
    */

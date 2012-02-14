@@ -114,9 +114,11 @@ public class AndroidAssets extends AbstractAssets {
 
   private class ErrorSound implements Sound {
     private final String path;
+    private final IOException exception;
 
-    public ErrorSound(String path) {
+    public ErrorSound(String path, IOException exception) {
       this.path = path;
+      this.exception = exception;
     }
 
     @Override
@@ -141,6 +143,11 @@ public class AndroidAssets extends AbstractAssets {
     public boolean isPlaying() {
       return false;
     }
+
+    @Override
+    public void addCallback(ResourceCallback<Sound> callback) {
+      callback.error(exception);
+    }
   }
 
   @Override
@@ -150,7 +157,7 @@ public class AndroidAssets extends AbstractAssets {
       return AndroidPlatform.instance.audio().getSound(path + ".mp3", in);
     } catch (IOException e) {
       log().error("Unable to load sound: " + path, e);
-      return new ErrorSound(path);
+      return new ErrorSound(path, e);
     }
   }
 

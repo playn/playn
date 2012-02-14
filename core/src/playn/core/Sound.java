@@ -14,7 +14,7 @@
 package playn.core;
 
 /**
- * TODO(fredsa): Add something like {@link Image#addCallback(ResourceCallback)}.
+ * A sound.
  */
 public interface Sound {
 
@@ -54,4 +54,11 @@ public interface Sound {
    * @return {@literal true} if the audio stream is currently playing
    */
   boolean isPlaying();
+
+  /**
+   * Adds a callback to be notified when this sound has loaded. If the sound is
+   * already loaded the callback will be notified immediately. The callback is
+   * discarded once the sound is loaded.
+   */
+  void addCallback(ResourceCallback<Sound> callback);
 }

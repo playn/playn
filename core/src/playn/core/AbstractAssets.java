@@ -47,10 +47,9 @@ public abstract class AbstractAssets implements Assets {
 
   @Override
   public final Sound getSound(String path) {
+    incrementRequestCount();
     Sound sound = doGetSound(path);
-    // TODO
-    // incrementRequestCount();
-    // sound.setCallback(callback);
+    sound.addCallback(callback);
     return sound;
   }
 

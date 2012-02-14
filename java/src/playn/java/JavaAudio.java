@@ -15,6 +15,8 @@
  */
 package playn.java;
 
+import playn.core.ResourceCallback;
+
 import java.io.InputStream;
 
 import playn.core.Audio;
@@ -41,6 +43,10 @@ class JavaAudio implements Audio {
       @Override
       public boolean isPlaying() {
         return false;
+      }
+      @Override
+      public void addCallback(ResourceCallback<Sound> callback) {
+        callback.done(this);
       }
     };
   }

@@ -19,19 +19,37 @@ import com.allen_sauer.gwt.voices.client.handler.PlaybackCompleteEvent;
 import com.allen_sauer.gwt.voices.client.handler.SoundHandler;
 import com.allen_sauer.gwt.voices.client.handler.SoundLoadStateChangeEvent;
 
+import playn.core.AbstractSound;
 import playn.core.Asserts;
-import playn.core.Sound;
 
-class HtmlSound implements Sound {
+class HtmlSound extends AbstractSound {
 
   private final com.allen_sauer.gwt.voices.client.Sound sound;
+
   private boolean playing;
 
   HtmlSound(com.allen_sauer.gwt.voices.client.Sound sound) {
     this.sound = sound;
     sound.addEventHandler(new SoundHandler() {
-      @Override
+        @Override
       public void onSoundLoadStateChange(SoundLoadStateChangeEvent event) {
+        switch (event.getLoadState()) {
+          case LOAD_STATE_UNINITIALIZED:
+          case LOAD_STATE_SUPPORTED_NOT_READY:
+            // ignore
+            break;
+          case LOAD_STATE_SUPPORTED_AND_READY:
+          case LOAD_STATE_SUPPORT_NOT_KNOWN:
+          case LOAD_STATE_SUPPORTED_MAYBE_READY:
+            onLoadComplete();
+            break;
+          case LOAD_STATE_NOT_SUPPORTED:
+            onLoadError(new RuntimeException(event.getLoadStateAsString()));
+            break;
+          default:
+            throw new RuntimeException("Unrecognized sound load state "
+                + event.getLoadStateAsString());
+        }
       }
 
       @Override
@@ -68,4 +86,5 @@ class HtmlSound implements Sound {
   public boolean isPlaying() {
     return playing;
   }
+
 }

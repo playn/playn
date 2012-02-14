@@ -13,6 +13,9 @@
  */
 package playn.java;
 
+import playn.core.Image;
+import playn.core.ResourceCallback;
+
 import java.io.InputStream;
 
 import javax.sound.sampled.AudioFormat;
@@ -113,5 +116,10 @@ class JavaSound implements Sound {
   @Override
   public boolean isPlaying() {
     return (clip != null) && clip.isActive();
+  }
+
+  @Override
+  public void addCallback(ResourceCallback<Sound> callback) {
+    callback.done(this);
   }
 }

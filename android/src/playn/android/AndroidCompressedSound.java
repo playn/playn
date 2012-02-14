@@ -17,15 +17,15 @@ package playn.android;
 
 import static playn.core.PlayN.log;
 
+import android.media.MediaPlayer;
+import android.media.MediaPlayer.OnErrorListener;
+import android.util.Log;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-
-import android.media.MediaPlayer;
-import android.media.MediaPlayer.OnErrorListener;
-import android.util.Log;
 
 /**
  * An implementation of AndroidSound using the Android MediaPlayer
@@ -62,6 +62,7 @@ public class AndroidCompressedSound extends AndroidSound {
       resetMp();
     }catch(IOException e) {
       log().error("IOException thrown building MediaPlayer for sound.");
+      onLoadError(e);
     }
   }
 
@@ -151,6 +152,7 @@ public class AndroidCompressedSound extends AndroidSound {
   void prepared() {
     prepared = true;
     Log.d("playn", "Prepared");
+    onLoadComplete();
     if (playOnPrepare) {
       playOnPrepare = false;
       play();
@@ -168,6 +170,7 @@ public class AndroidCompressedSound extends AndroidSound {
         @Override
         public boolean onError(MediaPlayer mp, int what, int extra) {
           log().error("Error preparing MediaPlayer while loading sound.");
+          onLoadError(new RuntimeException("Error preparing MediaPlayer while loading sound"));
           return false;
         }
       });

@@ -15,9 +15,9 @@
  */
 package playn.android;
 
-import playn.core.Sound;
+import playn.core.AbstractSound;
 
-abstract class AndroidSound implements Sound {
+abstract class AndroidSound extends AbstractSound {
   public AndroidSound() { }
 
   @Override

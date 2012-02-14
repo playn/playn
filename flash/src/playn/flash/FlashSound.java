@@ -21,10 +21,9 @@ import flash.events.Event;
 import flash.events.EventDispatcher;
 import flash.events.EventType;
 import flash.gwt.FlashImport;
+import playn.core.AbstractSound;
 
-import playn.core.Sound;
-
-class FlashSound implements Sound {
+class FlashSound extends AbstractSound {
 
   private NativeSound sound;
 
@@ -49,14 +48,22 @@ class FlashSound implements Sound {
     }-*/;
   }
 
-  @FlashImport({"flash.net.URLRequest", "flash.media.Sound"})
+  @FlashImport({"flash.net.URLRequest", "flash.media.Sound", "flash.events.Event", "flash.events.IOErrorEvent"})
   final static class NativeSound extends JavaScriptObject {
-
     protected NativeSound() {
     }
 
-    public static native NativeSound createSound(String uri) /*-{
+    public static native NativeSound createSound(String uri, FlashSound flashSound) /*-{
       var s = new flash.media.Sound();
+
+      s.addEventListener(Event.COMPLETE, function(event:Event):void {
+        flashSound.@playn.core.AbstractSound::onComplete()();
+      });
+
+      s.addEventListener(IOErrorEvent.IO_ERROR, function(event:Event):void {
+        flashSound.@playn.core.AbstractSound::onLoadError(Ljava/lang/Throwable;)(new Error("IOErrorEvent.IO_ERROR"));
+      });
+
       s.load(new URLRequest(uri));
       return s;
     }-*/;
@@ -64,13 +71,19 @@ class FlashSound implements Sound {
     public native SoundChannel play(boolean looping) /*-{
       return this.play(0, looping ? 99999999 : 0);
     }-*/;
+
   }
 
   public static FlashSound createSound(String uri) {
-    return new FlashSound(NativeSound.createSound(uri));
+    FlashSound flashSound = new FlashSound();
+    flashSound.setNativeSound(NativeSound.createSound(uri, flashSound));
+    return flashSound;
   }
 
-  public FlashSound(NativeSound sound) {
+  public FlashSound() {
+  }
+
+  private void setNativeSound(NativeSound sound) {
     this.sound = sound;
   }
 
@@ -103,7 +116,6 @@ class FlashSound implements Sound {
     if (soundChannel != null) {
       soundChannel.setVolume(volume);
     }
-
   }
 
   /* (non-Javadoc)

@@ -15,6 +15,8 @@
  */
 package playn.ios;
 
+import playn.core.ResourceCallback;
+
 import playn.core.Sound;
 
 class IOSSound implements Sound
@@ -42,5 +44,10 @@ class IOSSound implements Sound
   @Override
   public boolean isPlaying() {
     return false; // TODO
+  }
+
+  @Override
+  public void addCallback(ResourceCallback<Sound> callback) {
+    callback.done(this); // we're always ready
   }
 }
