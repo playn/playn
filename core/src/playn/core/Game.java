@@ -16,8 +16,7 @@
 package playn.core;
 
 /**
- * Main game interface. To start a new game, implement this interface and call
- * {@link PlayN#run(Game)}.
+ * Main game interface. To start a new game, implement this interface and call {@link PlayN#run}.
  *
  * TODO(jgw): Callbacks for resize, background, foreground, shutdown.
  *
@@ -37,9 +36,8 @@ public interface Game {
    * (adding, removing layers). You should not animate scene graph properties in update; such
    * actions should be taken in {@link #paint}.
    *
-   * @param delta time, in ms, passed since the previous {@link #update(float)} (if {@link
-   * #updateRate()} is zero, this will be wall time, otherwise it will always be {@link
-   * #updateRate()})
+   * @param delta time, in ms, passed since the previous {@link #update} (if {@link #updateRate} is
+   * zero, this will be wall time, otherwise it will always be {@link #updateRate}).
    */
   void update(float delta);
 
@@ -59,7 +57,7 @@ public interface Game {
   /**
    * Return the update rate of the main game loop, in ms.
    *
-   * <p> Using an update rate of zero will cause {@link #update()} to be called precisely once per
+   * <p> Using an update rate of zero will cause {@link #update} to be called precisely once per
    * rendered frame, regardless of the frame-rate. </p>
    *
    * @return update rate of the main game loop, in ms.

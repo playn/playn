@@ -63,7 +63,7 @@ public class PlayN {
   }
 
   /**
-   * Returns the platform {@Link Platform.Type}.
+   * Returns the platform {@link Platform.Type}.
    */
   public static Platform.Type platformType() {
     return platform.type();

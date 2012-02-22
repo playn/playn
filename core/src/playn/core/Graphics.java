@@ -27,7 +27,7 @@ public interface Graphics {
   GroupLayer rootLayer();
 
   /**
-   * @deprecated("Use createImage(int,int) and createImageLayer(Image)")
+   * @deprecated Use {@link #createImage(int,int)} and {@link #createImageLayer(Image)}.
    */
   @Deprecated
   CanvasLayer createCanvasLayer(int width, int height);
@@ -81,8 +81,7 @@ public interface Graphics {
       int colors[], float positions[]);
 
   /**
-   * Creates a path object that may be used with {@link Canvas} drawing
-   * methods.
+   * Creates a path object that may be used with {@link Canvas} drawing methods.
    */
   Path createPath();
 
@@ -107,7 +106,7 @@ public interface Graphics {
 
   /**
    * Lays out the supplied text using the specified format. The text may subsequently be rendered
-   * on a canvas via {@link Canvas#drawText(TextLayout)}.
+   * on a canvas via {@link Canvas#drawText(TextLayout,float,float)}.
    */
   TextLayout layoutText(String text, TextFormat format);
 

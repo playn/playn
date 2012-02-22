@@ -1,11 +1,11 @@
 /**
  * Copyright 2011 The PlayN Authors
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  * in compliance with the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software distributed under the License
  * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
  * or implied. See the License for the specific language governing permissions and limitations under
@@ -46,7 +46,7 @@ public interface Json {
     /**
      * Returns the value at the given index, or the default value for <code>T</code> if there's a
      * value of a different type at the index.
-     * 
+     *
      * @throws ArrayIndexOutOfBoundsException if <code>index &lt; 0</code> or <code>index >=
      * length</code>
      */
@@ -55,7 +55,7 @@ public interface Json {
     /**
      * Returns the value at the given index, or the specified default value if there's a value of a
      * different type at the index.
-     * 
+     *
      * @throws ArrayIndexOutOfBoundsException if <code>index &lt; 0</code> or <code>index >=
      * length</code>
      */
@@ -159,9 +159,9 @@ public interface Json {
     /**
      * Gets an array at the given index that assumes its values are of the given json type, or
      * <code>null</code> if there is no value at this index.
-     * 
+     *
      * @param jsonType one of Json.Object, Boolean, Integer, Double, or String
-     * 
+     *
      * @throws IllegalArgumentException if jsonType is of an invalid type.
      */
     <T> TypedArray<T> getArray(int index, Class<T> jsonType);
@@ -211,7 +211,7 @@ public interface Json {
      * Removes a JSON value from the given index. If the index is out of bounds, this is a no-op.
      */
     void remove(int index);
-    
+
     /**
      * Sets a JSON boolean, null, number, object, or array value at the given index. If the index
      * is past the end of the array, the array is null-padded to the given index.
@@ -304,23 +304,23 @@ public interface Json {
     /**
      * Gets an array at the given key that assumes its values are of the given json type, or
      * <code>null</code> if there is no value at this key.
-     * 
+     *
      * @param jsonType one of Json.Object, Boolean, Integer, Double, or String
-     * 
+     *
      * @throws IllegalArgumentException if jsonType is of an invalid type.
      */
-    <T> TypedArray<T> getArray(String key, Class<T> valueType);
+    <T> TypedArray<T> getArray(String key, Class<T> jsonType);
 
     /**
      * Gets an array at the given key that assumes its values are of the given json type, or the
      * default if there is no value at this key.
-     * 
+     *
      * @param jsonType one of Json.Object, Boolean, Integer, Double, or String
      * @param dflt An existing typed array
-     * 
+     *
      * @throws IllegalArgumentException if jsonType is of an invalid type.
      */
-    <T> TypedArray<T> getArray(String key, Class<T> valueType, TypedArray<T> dflt);
+    <T> TypedArray<T> getArray(String key, Class<T> jsonType, TypedArray<T> dflt);
 
     /**
      * Returns true if this object contains a value at the specified key, false if not.
@@ -328,7 +328,7 @@ public interface Json {
     boolean containsKey(String key);
 
     /**
-     * Gets a set of keys for this JSON object. Use {@link Object#keys()} instead.
+     * Gets a set of keys for this JSON object. Use {@link #keys} instead.
      */
     @Deprecated
     TypedArray<String> getKeys();
@@ -378,7 +378,7 @@ public interface Json {
      * Removes a JSON value at the given key.
      */
     void remove(String key);
-    
+
     /**
      * Writes this object to a {@link JsonSink}.
      */
@@ -396,7 +396,7 @@ public interface Json {
   Object createObject();
 
   /**
-   * Determines if the given object is a JSON {@link Array}. 
+   * Determines if the given object is a JSON {@link Array}.
    */
   boolean isArray(java.lang.Object o);
 
@@ -407,7 +407,7 @@ public interface Json {
 
   /**
    * Creates a new {@link Writer}, which can be used to serialize data into the JSON format.
-   * 
+   *
    * <code>
    * // An example of using the JSON writer interface.
    * String jsonString = json.newWriter()
@@ -426,7 +426,7 @@ public interface Json {
    *         .end()
    *     .end()
    * .done();
-   * 
+   *
    * // Produces:
    * {
    *   'x': 10,

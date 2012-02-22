@@ -17,6 +17,7 @@ package playn.core.gl;
 
 import playn.core.Asserts;
 import playn.core.Image;
+import playn.core.Pattern;
 
 public abstract class ImageGL implements Image {
 

@@ -32,7 +32,7 @@ public class Events {
      * be performed. By default, the default action is not prevented.
      * <p>
      * For example, pressing the down key in a browser typically scrolls the window. Calling
-     * {@link #setPreventDefault(true)} prevents this action.
+     * {@code setPreventDefault(true)} prevents this action.
      * <p>
      * Note: this must be set from inside the event handler callback (e.g., onKeyUp()). If it is
      * called after the callback has returned, setPreventDefault will have no effect.

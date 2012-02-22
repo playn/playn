@@ -14,7 +14,7 @@
 package playn.core.json;
 
 /**
- * Thrown when {@link JsonWriter} is used to write invalid JSON.
+ * Thrown when {@link playn.core.Json.Writer} is used to write invalid JSON.
  */
 public class JsonWriterException extends RuntimeException {
   private static final long serialVersionUID = 1L;

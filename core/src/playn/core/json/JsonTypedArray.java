@@ -1,11 +1,11 @@
 /**
  * Copyright 2011 The PlayN Authors
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  * in compliance with the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software distributed under the License
  * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
  * or implied. See the License for the specific language governing permissions and limitations under
@@ -21,9 +21,9 @@ import java.util.NoSuchElementException;
 import playn.core.Json;
 
 /**
- * Base {@link Json.TypedArray} implementation shared among platforms.
- * 
- * This class is public to allow the other engines to re-use it, but it is not part of the public API.
+ * Base {@link playn.core.Json.TypedArray} implementation shared among platforms.
+ *
+ * This class is public so that backends can re-use it, but it is not part of the public API.
  */
 public class JsonTypedArray<T> implements Json.TypedArray<T> {
   private final Json.Array array;
