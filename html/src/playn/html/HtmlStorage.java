@@ -15,6 +15,7 @@
  */
 package playn.html;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -71,7 +72,7 @@ class HtmlStorage implements Storage {
 
   @Override
   public Iterable<String> keys() {
-    return storageMap.keySet();
+    return new ArrayList<String>(storageMap.keySet());
   }
 
   @Override

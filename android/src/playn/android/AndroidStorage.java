@@ -15,6 +15,7 @@
  */
 package playn.android;
 
+import java.util.ArrayList;
 import playn.core.Storage;
 import android.app.Activity;
 import android.content.SharedPreferences;
@@ -44,7 +45,7 @@ public class AndroidStorage implements Storage {
 
   @Override
   public Iterable<String> keys() {
-    return settings.getAll().keySet();
+    return new ArrayList<String>(settings.getAll().keySet());
   }
 
   @Override

@@ -49,7 +49,9 @@ public interface Storage {
   public String getItem(String key);
 
   /**
-   * Returns an object that can be used to iterate over all storage keys.
+   * Returns an object that can be used to iterate over all storage keys. <em>Note:</em> changes
+   * made to storage while iterating over the keys will not be reflected in the iteration, nor will
+   * they conflict with it.
    */
   public Iterable<String> keys();
 
