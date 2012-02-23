@@ -63,7 +63,7 @@
     <dependency>
       <groupId>com.allen-sauer.gwt.voices</groupId>
       <artifactId>gwt-voices</artifactId>
-      <version>2.1.7</version>
+      <version>2.1.8</version>
     </dependency>
 
     <dependency>
