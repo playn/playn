@@ -27,8 +27,6 @@ import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.Bundle;
-import android.os.PowerManager;
-import android.os.PowerManager.WakeLock;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
@@ -46,7 +44,6 @@ public abstract class GameActivity extends Activity {
 
   private GameViewGL gameView;
   private AndroidLayoutView viewLayout;
-  private WakeLock wakeLock;
   private Context context;
 
   /**
@@ -94,19 +91,6 @@ public abstract class GameActivity extends Activity {
       setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
     } else {
       setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-    }
-
-    // Check that the Wake Lock permissions are set correctly.
-    try {
-      PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
-      wakeLock = pm.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK
-          | PowerManager.ON_AFTER_RELEASE, "playn");
-      wakeLock.acquire();
-    } catch (SecurityException e) {
-      // Warn the developer of a missing permission. The other calls to
-      // wakeLock.acquire/release will throw.
-      new AlertDialog.Builder(this).setMessage(
-          "Unable to acquire wake lock. Please add <uses-permission android:name=\"android.permission.WAKE_LOCK\" /> to the manifest.").show();
     }
 
     // Make sure the AndroidManifest.xml is set up correctly.
@@ -161,7 +145,6 @@ public abstract class GameActivity extends Activity {
     for (File file : tempFiles) {
       file.delete();
     }
-    wakeLock.release();
     platform().audio().onDestroy();
     super.onDestroy();
   }
@@ -172,7 +155,6 @@ public abstract class GameActivity extends Activity {
     gameView.notifyVisibilityChanged(View.INVISIBLE);
     if (platform() != null)
       platform().audio().onPause();
-    wakeLock.release();
     super.onPause();
 
     // TODO: Notify game
@@ -184,7 +166,6 @@ public abstract class GameActivity extends Activity {
     gameView.notifyVisibilityChanged(View.VISIBLE);
     if (platform() != null)
       platform().audio().onResume();
-    wakeLock.acquire();
     super.onResume();
 
     // TODO: Notify game
