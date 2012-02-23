@@ -84,6 +84,16 @@ public class AssetWatcher {
   }
 
   /**
+   * Adds a sound resource to be watched.
+   */
+  @SuppressWarnings("unchecked")
+  public void add(Sound sound) {
+    Asserts.checkState(!start || listener == null);
+    ++total;
+    sound.addCallback(callback);
+  }
+
+  /**
    * Whether all resources have completed loading, either successfully or in error.
    */
   public boolean isDone() {
