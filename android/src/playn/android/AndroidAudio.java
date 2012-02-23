@@ -28,7 +28,7 @@ class AndroidAudio implements Audio {
 
   public AndroidAudio() { }
 
-  Sound getSound(String path, InputStream in) throws IOException {
+  Sound createSound(String path, InputStream in) throws IOException {
     String extension = path.substring(path.lastIndexOf('.'));
     AndroidSound sound;
 

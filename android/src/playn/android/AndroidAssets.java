@@ -154,7 +154,7 @@ public class AndroidAssets extends AbstractAssets {
   protected Sound doGetSound(String path) {
     try {
       InputStream in = openAsset(path + ".mp3");
-      return AndroidPlatform.instance.audio().getSound(path + ".mp3", in);
+      return AndroidPlatform.instance.audio().createSound(path + ".mp3", in);
     } catch (IOException e) {
       log().error("Unable to load sound: " + path, e);
       return new ErrorSound(path, e);
