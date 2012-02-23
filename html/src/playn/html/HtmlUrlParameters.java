@@ -78,6 +78,8 @@ public interface HtmlUrlParameters {
   public static interface Sound {
     static final String FLASH = "flash";
     static final String HTML5 = "html5";
+    static final String NATIVE = "native";
+    static final String WEBAUDIO = "webaudio";
     static final String PARAM_NAME = "gwt-voices";
   }
 }
