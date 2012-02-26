@@ -15,6 +15,7 @@ package playn.flash;
 
 import com.google.gwt.canvas.dom.client.CssColor;
 
+import flash.display.StageAlign;
 import flash.display.StageScaleMode;
 import flash.display.Sprite;
 
@@ -35,9 +36,16 @@ import playn.core.SurfaceLayer;
 import playn.core.TextFormat;
 import playn.core.TextLayout;
 
+import java.util.HashMap;
+import java.util.Map;
+
 class FlashGraphics implements Graphics {
 
-  static CssColor cssColor(int color) {
+  private final Map<Font,FlashFontMetrics> fontMetrics = new HashMap<Font,FlashFontMetrics>();
+    private FlashCanvasLayer.CanvasElement dummyCanvas;
+    private FlashCanvasLayer.Context2d dummyCtx;
+
+    static CssColor cssColor(int color) {
     return CssColor.make(cssColorString(color));
   }
 
@@ -49,13 +57,25 @@ class FlashGraphics implements Graphics {
     return "rgba(" + r + "," + g + "," + b + "," + a + ")";
   }
 
+    FlashFontMetrics getFontMetrics(Font font) {
+        FlashFontMetrics metrics = fontMetrics.get(font);
+        if (metrics == null) {
 
-  protected FlashGraphics() {
+            metrics = new FlashFontMetrics(12, 10);
+            fontMetrics.put(font, metrics);
+        }
+        return metrics;
+    }
+
+    protected FlashGraphics() {
     rootLayer = FlashGroupLayer.getRoot();
     setSize (screenWidth(), screenHeight());
-    Sprite.getRootSprite().getStage().setScaleMode(StageScaleMode.EXACT_FIT);
+    Sprite.getRootSprite().getStage().setScaleMode(StageScaleMode.NO_SCALE);
+    Sprite.getRootSprite().getStage().setStageAlign(StageAlign.TOP_LEFT);
     PlayN.log().info("Graphics System Initialized: Dimensions ("
         + screenWidth() + " x " + screenHeight() + ")");
+    dummyCanvas = FlashCanvasLayer.CanvasElement.create();
+    dummyCtx = dummyCanvas.getContext();
   }
 
   FlashGroupLayer rootLayer;
@@ -129,12 +149,12 @@ class FlashGraphics implements Graphics {
 
   @Override
   public Font createFont(String name, Font.Style style, float size) {
-    throw new UnsupportedOperationException();
+    return new FlashFont(name, style, size);
   }
 
   @Override
   public TextLayout layoutText(String text, TextFormat format) {
-    throw new UnsupportedOperationException();
+    return new FlashTextLayout(dummyCtx, text, format);
   }
 
   @Override
@@ -149,19 +169,19 @@ class FlashGraphics implements Graphics {
 
   @Override
   public int width() {
-    return Sprite.getRootSprite().getWidth();
+    return screenWidth();
   }
 
   @Override
   public int height() {
-    return Sprite.getRootSprite().getHeight();
+    return screenHeight();
   }
 
   @Override
   public void setSize(int width, int height) {
     PlayN.log().info("Setting size " + width + "x" + height);
-    Sprite.getRootSprite().setWidth(width);
-    Sprite.getRootSprite().setHeight(height);
+//    Sprite.getRootSprite().setWidth(width);
+//    Sprite.getRootSprite().setHeight(height);
   }
 
   public void updateLayers() {

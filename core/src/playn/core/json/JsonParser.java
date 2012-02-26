@@ -261,7 +261,7 @@ final class JsonParser {
     boolean isDouble = false;
     while (isDigitCharacter(peekChar())) {
       char next = (char)advanceChar();
-      isDouble |= next == '.' || next == 'e' || next == 'E';
+      isDouble = next == '.' || next == 'e' || next == 'E' || isDouble;
       reusableBuffer.append(next);
     }
 

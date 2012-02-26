@@ -45,7 +45,7 @@ public class FlashCanvasImage extends FlashImage implements CanvasImage {
 
   @Override
   public int width() {
-    return canvas().height();
+    return canvas().width();
   }
 
   @Override

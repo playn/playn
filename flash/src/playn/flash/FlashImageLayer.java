@@ -35,7 +35,7 @@ import playn.core.ImageLayer;
 // TODO(pdr): fix setWidth, setHeight, setRepeat*, etc.
 public class FlashImageLayer extends FlashLayer implements ImageLayer {
 
-  private final Image image;
+  private Image image;
 
   private BitmapData bitmapData;
 
@@ -78,6 +78,7 @@ public class FlashImageLayer extends FlashLayer implements ImageLayer {
   }
 
   private void setBitmapData(FlashImage resource) {
+    this.image = resource;
     bitmapData = resource.bitmapData();
     applySourceRect();
   }
@@ -242,7 +243,7 @@ public class FlashImageLayer extends FlashLayer implements ImageLayer {
   @Override
   public float height() {
     Asserts.checkNotNull(image, "Image must not be null");
-    return height != NOT_SET ? height : sourceRect != null ? sourceRect.getHeight() : image.height();
+    return height != NOT_SET ? height : sourceRect != null ? sourceRect.getHeight() : image().height();
   }
 
   @Override

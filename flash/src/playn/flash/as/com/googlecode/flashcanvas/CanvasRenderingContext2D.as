@@ -829,8 +829,8 @@ package com.googlecode.flashcanvas
             var fontData:Array = state.font.split(" ");
 
             format.italic = fontData[0] == "italic";
-            format.size = 10;
-            format.font = "sans-serif"; // fontData.slice(3).join(" ").replace(/["']/g, "");
+            format.size = parseFloat(fontData[2]);
+            format.font = fontData.slice(3).join(" ").replace(/["']/g, "");
 
             var weight:Number = parseInt(fontData[1]);
             format.bold = (!isNaN(weight) && weight > 400 || fontData[1] == "bold");
@@ -885,9 +885,15 @@ package com.googlecode.flashcanvas
             _renderText(text, x, y, maxWidth, true);
         }
 
-        public function measureText():*
+        public function measureText(text:String):*
         {
-            // TODO: Implement
+            var textFormat:TextFormat = _parseFont();
+            // Create TextField object
+            var textField:TextField     = new TextField();
+            textField.autoSize          = TextFieldAutoSize.LEFT;
+            textField.defaultTextFormat = textFormat;
+            textField.text              = text.replace(/[\t\n\f\r]/g, " ");
+            return {width: textField.textWidth, height: textField.textHeight };
         }
 
         /*

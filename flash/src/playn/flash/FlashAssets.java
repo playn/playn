@@ -133,7 +133,7 @@ public class FlashAssets extends AbstractCachingAssets {
     loadText(pathPrefix + path, callback);
   }
 
-  private static native void loadText(String path, ResourceCallback<String> callback) /*-{
+  static native void loadText(String path, ResourceCallback<String> callback) /*-{
      var req = new flash.net.URLRequest(path);
      var loader = new flash.net.URLLoader();
      loader.addEventListener("complete", function(evt) {

@@ -63,6 +63,7 @@ class FlashCanvas implements Canvas {
   @Override
   public Canvas drawImage(Image img, float x, float y, float w, float h) {
     Asserts.checkArgument(img instanceof FlashImage);
+    context2d.drawImage(((FlashImage) img).bitmapData(), x, y, w, h);
     dirty = true;
     return this;
   }
@@ -72,6 +73,7 @@ class FlashCanvas implements Canvas {
       float sx, float sy, float sw, float sh) {
     Asserts.checkArgument(img instanceof FlashImage);
     dirty = true;
+    context2d.drawImage(((FlashImage) img).bitmapData(), dx, dy, dw, dh, sx, sy, sw, sh);
     return this;
   }
 
@@ -107,10 +109,12 @@ class FlashCanvas implements Canvas {
     return this;
   }
 
-  @Override
-  public Canvas drawText(TextLayout layout, float x, float y) {
-    throw new UnsupportedOperationException();
-  }
+    @Override
+    public Canvas drawText(TextLayout layout, float x, float y) {
+        ((FlashTextLayout) layout).draw(context2d, x, y);
+        dirty = true;
+        return this;
+    }
 
   @Override
   public Canvas fillCircle(float x, float y, float radius) {

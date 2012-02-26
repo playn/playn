@@ -49,6 +49,8 @@ class FlashImage implements Image {
           self.@playn.flash.FlashImage::imageData = event.target.content.bitmapData;
           self.@playn.flash.FlashImage::runCallbacks(Z)(true);
         });
+      loader.addEventListener(flash.events.IOErrorEvent.IO_ERROR,  function() {} );
+      loader.contentLoaderInfo.addEventListener(flash.events.IOErrorEvent.IO_ERROR,  function() {} );
      loader.load(new URLRequest(url));
   }-*/;
 

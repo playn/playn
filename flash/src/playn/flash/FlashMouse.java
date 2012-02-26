@@ -80,10 +80,10 @@ class FlashMouse implements Mouse {
    * @return {@link Mouse} button corresponding to the event
    */
   protected static int getMouseButton(MouseEvent e) {
-    if (e.isButtonDown()) {
+//    if (e.isButtonDown()) {
       return Mouse.BUTTON_LEFT;
-    } else {
-      return Mouse.BUTTON_RIGHT;
-    }
+//    } else {
+//      return Mouse.BUTTON_RIGHT;
+//    }
   }
 }

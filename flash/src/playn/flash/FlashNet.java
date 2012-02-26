@@ -15,18 +15,38 @@
  */
 package playn.flash;
 
+import flash.gwt.FlashImport;
 import playn.core.Net;
+import playn.core.PlayN;
+import playn.core.ResourceCallback;
 import playn.core.util.Callback;
-
 public class FlashNet implements Net {
 
   @Override
   public void get(String url, final Callback<String> callback) {
-    callback.onFailure(new RuntimeException("Not implemented"));
+    PlayN.assets().getText(url, new ResourceCallback<String>() {
+        @Override
+        public void done(String resource) {
+            callback.onSuccess(resource);
+        }
+
+        @Override
+        public void error(Throwable err) {
+           callback.onFailure(err);
+        }
+    });
   }
 
   @Override
-  public void post(String url, String data, final Callback<String> callback) {
-    callback.onFailure(new RuntimeException("Not implemented"));
-  }
+  public native void post(String url, String data, final Callback<String> callback) /*-{
+      var loader  = new flash.net.URLLoader();
+      var request = new flash.net.URLRequest(url);
+
+      request.method = flash.net.URLRequestMethod.POST;
+      request.data = data;
+      loader.addEventListener(Event.COMPLETE, function() {
+        callback.@playn.core.util.Callback::onSuccess(Ljava/lang/Object;)(loader.data);
+      });
+      loader.load(request);
+  }-*/;
 }

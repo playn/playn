@@ -67,7 +67,26 @@ public class FlashCanvasLayer extends FlashLayer implements CanvasLayer {
 
   @FlashImport({"com.googlecode.flashcanvas.CanvasRenderingContext2D"})
   final static class Context2d extends JavaScriptObject {
-    protected Context2d() {}
+
+   /**
+   * Enum for text baseline style.
+   */
+   public enum TextBaseline {
+      ALPHABETIC("alphabetic"), BOTTOM("bottom"), HANGING("hanging"), IDEOGRAPHIC("ideographic"),
+      MIDDLE("middle"), TOP("top");
+
+      private final String value;
+
+      private TextBaseline(String value) {
+          this.value = value;
+      }
+
+      public String getValue() {
+          return value;
+      }
+   }
+
+      protected Context2d() {}
     public native void resize(int x, int y) /*-{
       this.resize(x,y);
     }-*/;
@@ -140,7 +159,7 @@ public class FlashCanvasLayer extends FlashLayer implements CanvasLayer {
 
     public native void translate(float tx, float ty) /*-{
     // TODO Auto-generated method stub
-      this.translate(sx, sy);
+      this.translate(tx, ty);
     }-*/;
     /**
      * @param m11
@@ -204,6 +223,30 @@ public class FlashCanvasLayer extends FlashLayer implements CanvasLayer {
     public native void setLineWidth(float width) /*-{
       this.lineWidth = width;
     }-*/;
+
+    public native void setTextBaseline(String baseline) /*-{
+       this.textBaseline = baseline;
+    }-*/;
+
+      public native void setFont(String font) /*-{
+          this.font = font;
+      }-*/;
+
+
+      final static class Measure extends JavaScriptObject {
+          protected Measure(){}
+
+          public native int getWidth() /*-{
+              return this.width;
+          }-*/;
+          
+          public native int getHeight() /*-{
+              return this.height-4;
+          }-*/;
+      }
+      public native Measure measureText(String line) /*-{
+          return this.measureText(line);
+      }-*/;
   }
 
   @Override

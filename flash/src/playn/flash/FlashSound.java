@@ -56,11 +56,11 @@ class FlashSound extends AbstractSound {
     public static native NativeSound createSound(String uri, FlashSound flashSound) /*-{
       var s = new flash.media.Sound();
 
-      s.addEventListener(Event.COMPLETE, function(event:Event):void {
-        flashSound.@playn.core.AbstractSound::onComplete()();
+      s.addEventListener(Event.COMPLETE, function(event) {
+        flashSound.@playn.core.AbstractSound::onLoadComplete()();
       });
 
-      s.addEventListener(IOErrorEvent.IO_ERROR, function(event:Event):void {
+      s.addEventListener(IOErrorEvent.IO_ERROR, function(event) {
         flashSound.@playn.core.AbstractSound::onLoadError(Ljava/lang/Throwable;)(new Error("IOErrorEvent.IO_ERROR"));
       });
 
