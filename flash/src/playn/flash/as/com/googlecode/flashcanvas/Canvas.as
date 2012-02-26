@@ -49,7 +49,7 @@ package com.googlecode.flashcanvas
 
         public function Canvas(width:int = 300, height:int = 150)
         {
-            super(null, PixelSnapping.ALWAYS);
+            super(null, PixelSnapping.ALWAYS, true);
             resize(width, height);
         }
 

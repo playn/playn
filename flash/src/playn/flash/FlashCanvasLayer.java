@@ -68,7 +68,7 @@ public class FlashCanvasLayer extends FlashLayer implements CanvasLayer {
   @FlashImport({"com.googlecode.flashcanvas.CanvasRenderingContext2D"})
   final static class Context2d extends JavaScriptObject {
 
-   /**
+      /**
    * Enum for text baseline style.
    */
    public enum TextBaseline {
@@ -86,13 +86,13 @@ public class FlashCanvasLayer extends FlashLayer implements CanvasLayer {
       }
    }
 
-      protected Context2d() {}
+    protected Context2d() {}
+
     public native void resize(int x, int y) /*-{
       this.resize(x,y);
     }-*/;
 
-
-     public native void beginPath() /*-{
+    public native void beginPath() /*-{
       this.beginPath();
     }-*/;
 
@@ -104,11 +104,19 @@ public class FlashCanvasLayer extends FlashLayer implements CanvasLayer {
       this.lineTo(x, y);
     }-*/;
 
-     public native void stroke() /*-{
+    public native void stroke() /*-{
       this.stroke();
     }-*/;
 
-     public native void setStrokeStyle(String color) /*-{
+    public native void clip() /*-{
+      this.clip();
+    }-*/;
+
+    public native void setGlobalAlpha(float alpha) /*-{
+        this.globalAlpha = alpha;
+    }-*/;
+
+    public native void setStrokeStyle(String color) /*-{
       this.strokeStyle = color;
     }-*/;
 
@@ -181,6 +189,10 @@ public class FlashCanvasLayer extends FlashLayer implements CanvasLayer {
 
     public native void fillText(String text, float x, float y) /*-{
       this.fillText(text, x, y);
+    }-*/;
+
+    public native void rect(float x, float y, float w, float h) /*-{
+        this.rect(x, y, w, h);
     }-*/;
 
     public native void fillRect(float x, float y, float w, float h) /*-{

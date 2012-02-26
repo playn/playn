@@ -208,20 +208,16 @@ public class FlashPlatform implements Platform {
 
         if (updateRate == 0) {
           game.update(delta);
-//          log().info("Update took " + (time() - now));
           accum = 0;
         } else {
           accum += delta;
           while (accum > updateRate) {
             game.update(updateRate);
-//            log().info("Update took " + (time() - now));
             accum -= updateRate;
           }
         }
 
-//        double now2 = time();
         game.paint(accum / updateRate);
-//        log().info("Paint took " + (time() - now2));
 
         graphics.updateLayers();
         frameCounter++;

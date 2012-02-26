@@ -300,4 +300,8 @@ class FlashCanvas implements Canvas {
   public BitmapData bitmapData() {
     return context2d.bitmapData();
   }
+
+  public Context2d getContext2d() {
+    return context2d;
+  }
 }

@@ -893,7 +893,8 @@ package com.googlecode.flashcanvas
             textField.autoSize          = TextFieldAutoSize.LEFT;
             textField.defaultTextFormat = textFormat;
             textField.text              = text.replace(/[\t\n\f\r]/g, " ");
-            return {width: textField.textWidth, height: textField.textHeight };
+            textField.setTextFormat(textFormat);
+            return {width: textField.textWidth + 4, height: textField.textHeight + 4 };
         }
 
         /*
@@ -1154,6 +1155,7 @@ package com.googlecode.flashcanvas
             textField.autoSize          = TextFieldAutoSize.LEFT;
             textField.defaultTextFormat = textFormat;
             textField.text              = text.replace(/[\t\n\f\r]/g, " ");
+            textField.setTextFormat(textFormat);
 
             // Get the size of the text
             var width:int  = textField.textWidth;
@@ -1162,7 +1164,7 @@ package com.googlecode.flashcanvas
 
             // Remove 2px margins around the text
             var matrix:Matrix = new Matrix();
-            matrix.translate(-2, -2);
+//            matrix.translate(-2, -2);
 
             if (isStroke)
             {
@@ -1174,7 +1176,7 @@ package com.googlecode.flashcanvas
             }
 
             // Convert the text into BitmapData
-            var bitmapData:BitmapData = new BitmapData(width, height, true, 0);
+            var bitmapData:BitmapData = new BitmapData(width + 4, height + 4, true, 0);
             bitmapData.draw(textField, matrix);
 
             // Adjust x coordinates

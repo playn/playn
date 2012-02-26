@@ -12,13 +12,6 @@
   <description>The PlayN Flash backend</description>
 
   <dependencies>
-
-    <dependency>
-      <groupId>com.googlecode.gwt-flash</groupId>
-      <artifactId>gwt-flash</artifactId>
-      <version>1.1-SNAPSHOT</version>
-    </dependency>
-
     <dependency>
       <groupId>com.googlecode.playn</groupId>
       <artifactId>playn-core</artifactId>
@@ -65,6 +58,12 @@
       <version>1.0.0.GA</version>
       <classifier>sources</classifier>
       <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>com.googlecode.gwt-flash</groupId>
+      <artifactId>gwt-flash</artifactId>
+      <version>1.1-SNAPSHOT</version>
     </dependency>
 
     <dependency>

@@ -15,6 +15,7 @@ package playn.flash;
 
 import com.google.gwt.canvas.dom.client.CssColor;
 
+import com.google.gwt.dom.client.Style;
 import flash.display.StageAlign;
 import flash.display.StageScaleMode;
 import flash.display.Sprite;
@@ -41,9 +42,15 @@ import java.util.Map;
 
 class FlashGraphics implements Graphics {
 
+  private static final String HEIGHT_TEXT =
+        "THEQUICKBROWNFOXJUMPEDOVERTHELAZYDOGthequickbrownfoxjumpedoverthelazydog";
+  private static final String EMWIDTH_TEXT = "m";
+
   private final Map<Font,FlashFontMetrics> fontMetrics = new HashMap<Font,FlashFontMetrics>();
     private FlashCanvasLayer.CanvasElement dummyCanvas;
     private FlashCanvasLayer.Context2d dummyCtx;
+    private FlashCanvas canvas;
+    private FlashCanvasLayer.Context2d ctx;
 
     static CssColor cssColor(int color) {
     return CssColor.make(cssColorString(color));
@@ -57,21 +64,34 @@ class FlashGraphics implements Graphics {
     return "rgba(" + r + "," + g + "," + b + "," + a + ")";
   }
 
-    FlashFontMetrics getFontMetrics(Font font) {
-        FlashFontMetrics metrics = fontMetrics.get(font);
-        if (metrics == null) {
+  FlashFontMetrics getFontMetrics(Font font) {
+    FlashFontMetrics metrics = fontMetrics.get(font);
+    if (metrics == null) {
+      String italic = "normal";
+      String bold = "normal";
+      switch (font.style()) {
+          case BOLD:        bold = "bold";   break;
+          case ITALIC:      italic = "italic"; break;
+          case BOLD_ITALIC: bold = "bold"; italic = "italic"; break;
+      }
 
-            metrics = new FlashFontMetrics(12, 10);
-            fontMetrics.put(font, metrics);
-        }
-        return metrics;
+      dummyCtx.setFont(italic + " " + bold + " " + font.size() + " " + font.name());
+      metrics = new FlashFontMetrics(dummyCtx.measureText(HEIGHT_TEXT).getHeight(),
+              dummyCtx.measureText(EMWIDTH_TEXT).getWidth());
+      fontMetrics.put(font, metrics);
     }
+    return metrics;
+  }
 
-    protected FlashGraphics() {
+  protected FlashGraphics() {
     rootLayer = FlashGroupLayer.getRoot();
+    FlashCanvasLayer.CanvasElement canvasElement = FlashCanvasLayer.CanvasElement.create();
+    canvas = new FlashCanvas(screenWidth(), screenHeight(), canvasElement.getContext());
+    ctx = canvas.getContext2d();
     setSize (screenWidth(), screenHeight());
     Sprite.getRootSprite().getStage().setScaleMode(StageScaleMode.NO_SCALE);
     Sprite.getRootSprite().getStage().setStageAlign(StageAlign.TOP_LEFT);
+    Sprite.getRootSprite().addChild((Sprite) canvasElement.cast());
     PlayN.log().info("Graphics System Initialized: Dimensions ("
         + screenWidth() + " x " + screenHeight() + ")");
     dummyCanvas = FlashCanvasLayer.CanvasElement.create();
@@ -102,12 +122,12 @@ class FlashGraphics implements Graphics {
   @Override
   public ImmediateLayer.Clipped createImmediateLayer(
       int width, int height, ImmediateLayer.Renderer renderer) {
-    throw new UnsupportedOperationException("Immediate layer not supported by Flash");
+    return new FlashImmediateLayerCanvas.Clipped(ctx, width, height, renderer);
   }
 
   @Override
   public ImmediateLayer createImmediateLayer(ImmediateLayer.Renderer renderer) {
-    throw new UnsupportedOperationException("Immediate layer not supported by Flash");
+    return new FlashImmediateLayerCanvas(ctx, renderer);
   }
 
   @Override
@@ -179,9 +199,7 @@ class FlashGraphics implements Graphics {
 
   @Override
   public void setSize(int width, int height) {
-    PlayN.log().info("Setting size " + width + "x" + height);
-//    Sprite.getRootSprite().setWidth(width);
-//    Sprite.getRootSprite().setHeight(height);
+    ctx.resize(width, height);
   }
 
   public void updateLayers() {
