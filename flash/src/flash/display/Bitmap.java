@@ -22,12 +22,14 @@ import flash.gwt.FlashImport;
 final public class Bitmap extends DisplayObject {
   protected Bitmap() {}
   public static native Bitmap create(BitmapData data) /*-{
-    return new flash.display.Bitmap(data);
+    return new flash.display.Bitmap(data, "auto", true);
   }-*/;
   /**
    * @param bitmapData
    */
   public native void setBitmapData(BitmapData bitmapData) /*-{
     this.bitmapData = bitmapData;
+    this.smoothing = true;
+    this.pixelSnapping = "auto";
   }-*/;
 }

@@ -39,6 +39,12 @@ public class FlashLayer extends AbstractLayer {
     display().setVisible(visible);
   }
 
+  @Override
+  public void setAlpha(float alpha) {
+    super.setAlpha(alpha);
+    display().setAlpha(alpha);
+  }
+
   DisplayObject display() {
     return displayObject;
   }

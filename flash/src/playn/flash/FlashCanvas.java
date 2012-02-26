@@ -168,7 +168,7 @@ class FlashCanvas implements Canvas {
 
   @Override
   public Canvas setAlpha(float alpha) {
-    // TODO: Hook up to context2d global alpha
+    context2d.setGlobalAlpha(alpha);
     return this;
   }
 
