@@ -28,6 +28,10 @@ public class CanvasTest extends Test {
   private final static float GAP = 10;
   private float nextX, nextY, maxY;
 
+  private CanvasImage timeImg;
+  private double startMillis;
+  private int lastSecs;
+
   @Override
   public String getName() {
     return "CanvasTest";
@@ -41,6 +45,8 @@ public class CanvasTest extends Test {
   @Override
   public void init() {
     nextX = nextY = GAP;
+    startMillis = currentTime();
+    lastSecs = -1;
 
     addTestCanvas(100, 100, new Drawer() {
       public void draw(Canvas canvas) {
@@ -111,6 +117,24 @@ public class CanvasTest extends Test {
     layer.setRepeatY(true);
     layer.setSize(100, 100);
     addTestLayer(100, 100, layer);
+
+    timeImg = graphics().createImage(100, 100);
+    addTestLayer(100, 100, graphics().createImageLayer(timeImg));
+  }
+
+  @Override
+  public void paint(float delta) {
+    super.paint(delta);
+
+    double elapsedMillis = currentTime() - startMillis;
+    int curSecs = (int)(elapsedMillis/1000);
+    if (curSecs != lastSecs) {
+      timeImg.canvas().clear();
+      timeImg.canvas().setStrokeColor(0xFF000000);
+      timeImg.canvas().strokeRect(0, 0, 100, 100);
+      timeImg.canvas().drawText(""+curSecs, 40, 55);
+      lastSecs = curSecs;
+    }
   }
 
   private interface Drawer {
