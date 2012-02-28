@@ -45,7 +45,7 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <android.version>2.3.3</android.version>
-    <android.maven.version>3.0.0-alpha-13</android.maven.version>
+    <android.maven.version>3.1.1</android.maven.version>
     <monotouch.version>5.1</monotouch.version>
     <gwt.version>2.4.0</gwt.version>
     <!--
@@ -202,7 +202,7 @@
                       android-maven-plugin
                     </artifactId>
                     <versionRange>
-                      [3.0.0-alpha-13,)
+                      [3.1.1,)
                     </versionRange>
                     <goals>
                       <goal>generate-sources</goal>
