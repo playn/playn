@@ -12,13 +12,6 @@
   <description>The PlayN Flash backend</description>
 
   <dependencies>
-
-    <dependency>
-      <groupId>com.googlecode.gwt-flash</groupId>
-      <artifactId>gwt-flash</artifactId>
-      <version>1.1-SNAPSHOT</version>
-    </dependency>
-
     <dependency>
       <groupId>com.googlecode.playn</groupId>
       <artifactId>playn-core</artifactId>
@@ -30,6 +23,12 @@
       <groupId>com.googlecode.playn</groupId>
       <artifactId>playn-html</artifactId>
       <version>${project.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.googlecode.gwt-flash</groupId>
+      <artifactId>gwt-flash</artifactId>
+      <version>1.1</version>
     </dependency>
 
     <dependency>
