@@ -26,7 +26,7 @@
     </dependency>
 
     <dependency>
-      <groupId>com.googlecode.gwt</groupId>
+      <groupId>com.google.gwt</groupId>
       <artifactId>gwt-flash</artifactId>
       <version>1.1</version>
     </dependency>
