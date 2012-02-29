@@ -13,9 +13,12 @@
  */
 package playn.shared.json;
 
+import org.junit.Ignore;
+
 import playn.core.Json;
 import playn.core.json.JsonImpl;
 
+@Ignore
 public class AbstractJsonTest {
   protected Json json() {
     return new JsonImpl();
