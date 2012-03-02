@@ -55,9 +55,18 @@ class IOSNet implements Net
         try {
           WebResponse rsp = req.EndGetResponse(result);
           reader = new StreamReader(rsp.GetResponseStream());
-          callback.onSuccess(reader.ReadToEnd());
-        } catch (Throwable t) {
-          callback.onFailure(t);
+          final String data = reader.ReadToEnd();
+          IOSPlatform.instance.queueAction(new Runnable() {
+            public void run () {
+              callback.onSuccess(data);
+            }
+          });
+        } catch (final Throwable t) {
+          IOSPlatform.instance.queueAction(new Runnable() {
+            public void run () {
+              callback.onFailure(t);
+            }
+          });
         } finally {
           if (reader != null)
             reader.Close();

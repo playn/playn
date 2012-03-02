@@ -15,6 +15,9 @@
  */
 package playn.ios;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import cli.MonoTouch.Foundation.NSUrl;
 import cli.MonoTouch.UIKit.UIApplication;
 import cli.MonoTouch.UIKit.UIScreen;
@@ -61,6 +64,8 @@ public class IOSPlatform implements Platform {
   private final UIApplication app;
   private final UIWindow mainWindow;
   private final IOSGameView gameView;
+
+  private final List<Runnable> pendingActions = new ArrayList<Runnable>();
 
   private IOSPlatform(UIApplication app) {
     this.app = app;
@@ -200,6 +205,24 @@ public class IOSPlatform implements Platform {
   void update(float delta) {
     // log.debug("Update " + delta);
 
+    // process any pending actions
+    List<Runnable> actions = null;
+    synchronized (pendingActions) {
+      if (!pendingActions.isEmpty()) {
+        actions = new ArrayList<Runnable>(pendingActions);
+        pendingActions.clear();
+      }
+    }
+    if (actions != null) {
+      for (Runnable action : actions) {
+        try {
+          action.run();
+        } catch (Exception e) {
+          log().warn("Pending action failed", e);
+        }
+      }
+    }
+
     // perform the game updates
     float updateRate = game.updateRate();
     if (updateRate == 0) {
@@ -220,5 +243,12 @@ public class IOSPlatform implements Platform {
   void paint() {
     // log.debug("Paint " + alpha);
     graphics.paint(game, alpha);
+  }
+
+  /** Queues an action to be executed before the next {@link #update}. */
+  void queueAction(Runnable r) {
+    synchronized (pendingActions) {
+      pendingActions.add(r);
+    }
   }
 }
