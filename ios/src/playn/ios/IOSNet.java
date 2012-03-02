@@ -15,6 +15,13 @@
  */
 package playn.ios;
 
+import cli.System.AsyncCallback;
+import cli.System.IAsyncResult;
+import cli.System.IO.StreamReader;
+import cli.System.IO.StreamWriter;
+import cli.System.Net.WebRequest;
+import cli.System.Net.WebResponse;
+
 import playn.core.Net;
 import playn.core.util.Callback;
 
@@ -22,11 +29,40 @@ class IOSNet implements Net
 {
   @Override
   public void get(String url, Callback<String> callback) {
-    throw new RuntimeException("TODO");
+    final WebRequest req = WebRequest.Create(url);
+    req.BeginGetResponse(wrap(req, callback), null);
   }
 
   @Override
   public void post(String url, String data, Callback<String> callback) {
-    throw new RuntimeException("TODO");
+    final WebRequest req = WebRequest.Create(url);
+    try {
+      req.set_Method("POST");
+      StreamWriter out = new StreamWriter(req.GetRequestStream());
+      out.Write(data);
+      out.Close();
+      req.BeginGetResponse(wrap(req, callback), null);
+    } catch (Throwable t) {
+      callback.onFailure(t);
+    }
+  }
+
+  protected AsyncCallback wrap (final WebRequest req, final Callback<String> callback) {
+    return new AsyncCallback(new AsyncCallback.Method() {
+      @Override
+      public void Invoke(IAsyncResult result) {
+        StreamReader reader = null;
+        try {
+          WebResponse rsp = req.EndGetResponse(result);
+          reader = new StreamReader(rsp.GetResponseStream());
+          callback.onSuccess(reader.ReadToEnd());
+        } catch (Throwable t) {
+          callback.onFailure(t);
+        } finally {
+          if (reader != null)
+            reader.Close();
+        }
+      }
+    });
   }
 }
