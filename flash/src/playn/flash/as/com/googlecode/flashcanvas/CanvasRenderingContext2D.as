@@ -40,6 +40,7 @@ package com.googlecode.flashcanvas
     import flash.display.JointStyle;
     import flash.display.LineScaleMode;
     import flash.display.Shape;
+    import flash.display.Sprite;
     import flash.display.SpreadMethod;
     import flash.events.ErrorEvent;
     import flash.events.Event;
@@ -829,7 +830,8 @@ package com.googlecode.flashcanvas
             var fontData:Array = state.font.split(" ");
 
             format.italic = fontData[0] == "italic";
-            format.size = parseFloat(fontData[2]);
+            var size = parseFloat(fontData[2]);
+            format.size = isNaN(size) ? 12 : size;
             format.font = fontData.slice(3).join(" ").replace(/["']/g, "");
 
             var weight:Number = parseInt(fontData[1]);
@@ -1125,7 +1127,15 @@ package com.googlecode.flashcanvas
 
         private function _renderShape():void
         {
-            _canvas.bitmapData.draw(shape);
+            if (this.globalCompositeOperation && this.globalCompositeOperation != "src-over") {
+                var srcBitmap = new BitmapData(this._canvas.width, this._canvas.height, true, 0);
+                srcBitmap.draw(shape);
+                this._canvas.bitmapData = porterDuff(srcBitmap,  this._canvas.bitmapData);
+                srcBitmap.dispose();
+            }  else {
+                // Render the image to the Canvas
+                _canvas.bitmapData.draw(shape);
+            }
             shape.graphics.clear();
         }
 
@@ -1216,10 +1226,15 @@ package com.googlecode.flashcanvas
                 // Make the BitmapData translucent
                 colorTransform = new ColorTransform(1, 1, 1, alpha);
             }
-
-            // Render the BitmapData to the Canvas
-            _canvas.bitmapData.draw(bitmapData, matrix, colorTransform, null, null, true);
-
+            if (this.globalCompositeOperation != "src-over") {
+              var srcBitmap:BitmapData = new BitmapData(_canvas.width,  _canvas.height,  true, 0);
+              srcBitmap.draw(bitmapData,  matrix,  colorTransform,  null, null, true);
+              // Render the BitmapData to the Canvas
+              _canvas.bitmapData = porterDuff(srcBitmap,  _canvas.bitmapData);
+              srcBitmap.dispose();
+            } else {
+              _canvas.bitmapData.draw(bitmapData,  matrix,  colorTransform,  null, null, true);
+            }
             // Release the memory
             bitmapData.dispose();
         }
@@ -1304,11 +1319,119 @@ package com.googlecode.flashcanvas
                 colorTransform = new ColorTransform(1, 1, 1, state.globalAlpha);
             }
 
-            // Render the image to the Canvas
-            _canvas.bitmapData.draw(source, matrix, colorTransform, null, null, true);
-
+         
+            if (this.globalCompositeOperation && this.globalCompositeOperation != "src-over") {
+                this._canvas.bitmapData = porterDuff(source,  this._canvas.bitmapData);
+            }  else {
+              // Render the image to the Canvas
+               _canvas.bitmapData.draw(source, matrix, colorTransform, null, null, true);
+            }
             // Release the memory
             source.dispose();
         }
-    }
+
+        function porterDuff(srcBitmap:BitmapData, dstBitmap:BitmapData):BitmapData {
+            if (true) {
+                var compSprite:Sprite = new Sprite();
+                var src:Bitmap = new Bitmap(srcBitmap);
+                var dst:Bitmap = new Bitmap(dstBitmap);
+                switch(this.globalCompositeOperation) {
+                    case "src-in":
+                        dst.blendMode = BlendMode.ALPHA;
+                        compSprite.addChild(src);
+                        compSprite.addChild(dst);
+                        break;
+                    case "dst-in":
+                        src.blendMode = BlendMode.ALPHA;
+                        compSprite.addChild(dst);
+                        compSprite.addChild(src);
+                        break;
+                    case "src-over":
+                        dstBitmap.draw(srcBitmap);
+                        return dstBitmap;
+                    case "dst-over":
+                        compSprite.addChild(src);
+                        compSprite.addChild(dst);
+                        break;
+                    case "dst-out":
+                        src.blendMode = BlendMode.ERASE;
+                        compSprite.addChild(dst);
+                        compSprite.addChild(src);
+                        break;
+                    case "src-out":
+                        dst.blendMode = BlendMode.ERASE;
+                        compSprite.addChild(src);
+                        compSprite.addChild(dst);
+                        break;
+                    case "src-atop":{
+                        var s1:Sprite = new Sprite();
+                        s1.blendMode = BlendMode.LAYER;
+                        compSprite.addChild(s1);
+                        s1.addChild(dst);
+                        src.blendMode = BlendMode.ERASE;
+                        s1.addChild(src);
+                        s1 = new Sprite();
+                        s1.blendMode = BlendMode.LAYER;
+                        compSprite.addChild(s1);
+                        var src2:Bitmap = new Bitmap(srcBitmap);
+                        var dst2:Bitmap = new Bitmap(dstBitmap);
+                        s1.addChild(src2);
+                        s1.addChild(dst2);
+                        dst2.blendMode = BlendMode.ALPHA;
+                        break;
+                    }
+
+                    case "dst-atop":{
+                        var s1:Sprite = new Sprite();
+                        s1.blendMode = BlendMode.LAYER;
+                        compSprite.addChild(s1);
+                        s1.addChild(src);
+                        dst.blendMode = BlendMode.ERASE;
+                        s1.addChild(dst);
+                        s1 = new Sprite();
+                        s1.blendMode = BlendMode.LAYER;
+                        compSprite.addChild(s1);
+                        var src2:Bitmap = new Bitmap(srcBitmap);
+                        var dst2:Bitmap = new Bitmap(dstBitmap);
+                        s1.addChild(dst2);
+                        s1.addChild(src2);
+                        src2.blendMode = BlendMode.ALPHA;
+                        break;
+                    }
+                    case "xor":{
+                        var s1:Sprite = new Sprite();
+                        s1.blendMode = BlendMode.LAYER;
+                        compSprite.addChild(s1);
+                        s1.addChild(dst);
+                        s1.addChild(src);
+                        src.blendMode = BlendMode.ERASE;
+                        s1 = new Sprite();
+                        s1.blendMode = BlendMode.LAYER;
+                        compSprite.addChild(s1);
+                        var src3:Bitmap = new Bitmap(srcBitmap);
+                        s1.addChild(src3);
+                        var dst3:Bitmap = new Bitmap(dstBitmap);
+                        dst3.blendMode = BlendMode.ERASE;
+                        s1.addChild(dst3);
+                        break;
+                    }
+
+                    case "src":{
+                        compSprite.addChild(src);
+                        break;
+                    }
+                    default:
+                        compSprite.addChild(dst);
+                        compSprite.addChild(src);
+                        break;
+
+                }
+                var newCanvas:BitmapData = new BitmapData(dstBitmap.width, dstBitmap.height, true, 0x00000000);
+                newCanvas.draw(compSprite);
+                return newCanvas;
+            }
+            return dstBitmap;
+        }
+
+}
 }

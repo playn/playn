@@ -87,7 +87,7 @@ class FlashCanvas implements Canvas {
   @Override
   public Canvas drawLine(float x0, float y0, float x1, float y1) {
     context2d.beginPath();
-    context2d.moveTo(y0, y1);
+    context2d.moveTo(x0, y0);
     context2d.lineTo(x1, y1);
     context2d.stroke();
     dirty = true;
@@ -119,6 +119,10 @@ class FlashCanvas implements Canvas {
   @Override
   public Canvas fillCircle(float x, float y, float radius) {
     dirty = true;
+    context2d.beginPath();
+    context2d.arc(x, y, radius, 0, (float) (Math.PI*2), true);
+    context2d.close();
+    context2d.fill();
     return this;
   }
 
@@ -174,6 +178,7 @@ class FlashCanvas implements Canvas {
 
   @Override
   public Canvas setCompositeOperation(Composite composite) {
+    context2d.setGlobalCompositeOperation(composite.name().toLowerCase().replace('_', '-'));
     return this;
   }
 
@@ -183,7 +188,7 @@ class FlashCanvas implements Canvas {
         + ((color >> 16) & 0xff) + ","
         + ((color >> 8) & 0xff) + ","
         + (color & 0xff) + ","
-        + ((color >> 24) & 0xff) + ")");
+        + ((color >> 24) & 0xff)/255.0 + ")");
     return this;
   }
 
@@ -224,6 +229,7 @@ class FlashCanvas implements Canvas {
 
   @Override
   public Canvas setStrokeWidth(float w) {
+    context2d.setStrokeWidth(w);
     return this;
   }
 

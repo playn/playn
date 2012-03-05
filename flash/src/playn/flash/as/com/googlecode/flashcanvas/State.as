@@ -71,7 +71,7 @@ package com.googlecode.flashcanvas
             shadowOffsetY            = 0;
             shadowBlur               = 0;
             shadowColor              = new CSSColor("rgba(0,0,0,0)");
-            globalCompositeOperation = "source-over";
+            globalCompositeOperation = "src-over";
             font                     = "normal 10px sans-serif";
             textAlign                = "start";
             textBaseline             = "alphabetic";

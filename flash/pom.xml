@@ -18,6 +18,12 @@
       <version>${project.version}</version>
     </dependency>
 
+    <dependency>
+      <groupId>com.googlecode.gwt-flash</groupId>
+      <artifactId>gwt-flash</artifactId>
+      <version>1.2-SNAPSHOT</version>
+    </dependency>
+
     <!-- needed because Flash uses playn.html.regex stuff and AutoClientBundle -->
     <dependency>
       <groupId>com.googlecode.playn</groupId>
@@ -25,11 +31,7 @@
       <version>${project.version}</version>
     </dependency>
 
-    <dependency>
-      <groupId>com.googlecode.gwt-flash</groupId>
-      <artifactId>gwt-flash</artifactId>
-      <version>1.2-SNAPSHOT</version>
-    </dependency>
+
 
     <dependency>
       <groupId>com.google.gwt</groupId>
