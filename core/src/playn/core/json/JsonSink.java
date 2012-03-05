@@ -20,7 +20,7 @@ import playn.core.Json;
 
 /**
  * Common interface for things that accept JSON objects. Normally not referenced by users.
- * 
+ *
  * @param <SELF> A subclass of {@link JsonSink}.
  */
 public interface JsonSink<SELF extends JsonSink<SELF>> {
@@ -90,24 +90,9 @@ public interface JsonSink<SELF extends JsonSink<SELF>> {
   SELF value(String s);
 
   /**
-   * Emits an integer value.
-   */
-  SELF value(int i);
-
-  /**
    * Emits a boolean value.
    */
   SELF value(boolean b);
-
-  /**
-   * Emits a double value.
-   */
-  SELF value(double d);
-
-  /**
-   * Emits a float value.
-   */
-  SELF value(float f);
 
   /**
    * Emits a {@link Number} value.
@@ -120,24 +105,9 @@ public interface JsonSink<SELF extends JsonSink<SELF>> {
   SELF value(String key, String s);
 
   /**
-   * Emits an integer value with a key.
-   */
-  SELF value(String key, int i);
-
-  /**
    * Emits a boolean value with a key.
    */
   SELF value(String key, boolean b);
-
-  /**
-   * Emits a double value with a key.
-   */
-  SELF value(String key, double d);
-
-  /**
-   * Emits a float value with a key.
-   */
-  SELF value(String key, float f);
 
   /**
    * Emits a {@link Number} value with a key.

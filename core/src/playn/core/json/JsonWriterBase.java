@@ -23,7 +23,7 @@ import playn.core.Json;
 /**
  * Internal class that handles emitting to an {@link Appendable}. Users only see the public
  * subclasses, {@link JsonStringWriter} and {@link JsonAppendableWriter}.
- * 
+ *
  * @param <SELF> A subclass of {@link JsonSink}.
  */
 class JsonWriterBase<SELF extends JsonSink<SELF>> implements JsonSink<SELF> {
@@ -79,7 +79,7 @@ class JsonWriterBase<SELF extends JsonSink<SELF>> implements JsonSink<SELF> {
 
     return end();
   }
-  
+
   @Override
   public SELF object(Map<?, ?> map) {
     return object(null, map);
@@ -117,7 +117,7 @@ class JsonWriterBase<SELF extends JsonSink<SELF>> implements JsonSink<SELF> {
       object(key);
 
     obj.write(this);
-    
+
     return end();
   }
 
@@ -203,30 +203,9 @@ class JsonWriterBase<SELF extends JsonSink<SELF>> implements JsonSink<SELF> {
   }
 
   @Override
-  public SELF value(int i) {
-    preValue();
-    raw(Integer.toString(i));
-    return castThis();
-  }
-
-  @Override
   public SELF value(boolean b) {
     preValue();
     raw(Boolean.toString(b));
-    return castThis();
-  }
-
-  @Override
-  public SELF value(double d) {
-    preValue();
-    raw(Double.toString(d));
-    return castThis();
-  }
-
-  @Override
-  public SELF value(float d) {
-    preValue();
-    raw(Float.toString(d));
     return castThis();
   }
 
@@ -250,30 +229,9 @@ class JsonWriterBase<SELF extends JsonSink<SELF>> implements JsonSink<SELF> {
   }
 
   @Override
-  public SELF value(String key, int i) {
-    preValue(key);
-    raw(Integer.toString(i));
-    return castThis();
-  }
-
-  @Override
   public SELF value(String key, boolean b) {
     preValue(key);
     raw(Boolean.toString(b));
-    return castThis();
-  }
-
-  @Override
-  public SELF value(String key, double d) {
-    preValue(key);
-    raw(Double.toString(d));
-    return castThis();
-  }
-
-  @Override
-  public SELF value(String key, float d) {
-    preValue(key);
-    raw(Float.toString(d));
     return castThis();
   }
 
@@ -344,7 +302,7 @@ class JsonWriterBase<SELF extends JsonSink<SELF>> implements JsonSink<SELF> {
 
   /**
    * Ensures that the object is in the finished state.
-   * 
+   *
    * @throws JsonWriterException if the written JSON is not properly balanced, ie: all arrays and
    *           objects that were started have been properly ended.
    */
@@ -455,7 +413,7 @@ class JsonWriterBase<SELF extends JsonSink<SELF>> implements JsonSink<SELF> {
   private boolean shouldBeEscaped(char c) {
     return c < ' ' || (c >= '\u0080' && c < '\u00a0') || (c >= '\u2000' && c < '\u2100');
   }
-  
+
   /**
    * Used for testing.
    */

@@ -21,7 +21,7 @@ import playn.core.Json;
 
 /**
  * Builds a {@link JsonObject} or {@link JsonArray}.
- * 
+ *
  * @param <T>
  *            The type of JSON object to build.
  */
@@ -40,7 +40,7 @@ final class JsonBuilder<T> implements JsonSink<JsonBuilder<T>> {
   public T done() {
     return root;
   }
-  
+
   @Override
   public JsonBuilder<T> array(Collection<?> c) {
     return value(c);
@@ -65,7 +65,7 @@ final class JsonBuilder<T> implements JsonSink<JsonBuilder<T>> {
   public JsonBuilder<T> object(Map<?, ?> map) {
     return value(map);
   }
-  
+
   @Override
   public JsonBuilder<T> object(Json.Object object) {
     return value(object);
@@ -80,7 +80,7 @@ final class JsonBuilder<T> implements JsonSink<JsonBuilder<T>> {
   public JsonBuilder<T> object(String key, Json.Object object) {
     return value(key, object);
   }
-  
+
   @Override
   public JsonBuilder<T> nul() {
     return value((Object)null);
@@ -109,23 +109,8 @@ final class JsonBuilder<T> implements JsonSink<JsonBuilder<T>> {
   }
 
   @Override
-  public JsonBuilder<T> value(int i) {
-    return value((Object)i);
-  }
-
-  @Override
   public JsonBuilder<T> value(boolean b) {
     return value((Object)b);
-  }
-
-  @Override
-  public JsonBuilder<T> value(double d) {
-    return value((Object)d);
-  }
-
-  @Override
-  public JsonBuilder<T> value(float f) {
-    return value((Object)f);
   }
 
   @Override
@@ -139,23 +124,8 @@ final class JsonBuilder<T> implements JsonSink<JsonBuilder<T>> {
   }
 
   @Override
-  public JsonBuilder<T> value(String key, int i) {
-    return value(key, (Object)i);
-  }
-
-  @Override
   public JsonBuilder<T> value(String key, boolean b) {
     return value(key, (Object)b);
-  }
-
-  @Override
-  public JsonBuilder<T> value(String key, double d) {
-    return value(key, (Object)d);
-  }
-
-  @Override
-  public JsonBuilder<T> value(String key, float f) {
-    return value(key, (Object)f);
   }
 
   @Override
@@ -210,7 +180,7 @@ final class JsonBuilder<T> implements JsonSink<JsonBuilder<T>> {
       throw new JsonWriterException("Attempted to write a keyed value to a JsonArray");
     }
   }
-  
+
   private JsonArray arr() {
     try {
       return (JsonArray)json.peek();
