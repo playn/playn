@@ -189,12 +189,7 @@ public class IOSPlatform implements Platform {
 
   @Override
   public double time() {
-    // NOTE: the CLR epoch is "00:00:00, 1/1/0001" not "00:00:00, 1/1/1970"; we should probably
-    // change the PlayN.currentTime() interface to return millis since app start rather than millis
-    // since epoch; if a game wants to do (limited) date processing, it can create a Date()
-
-    // get_Ticks returns 100 nanosecond ticks; turn that into millis
-    return DateTime.get_Now().get_Ticks()/10000d;
+    return System.currentTimeMillis();
   }
 
   @Override
