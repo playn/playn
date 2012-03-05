@@ -30,24 +30,29 @@ class IOSNet implements Net
   @Override
   public void get(String url, Callback<String> callback) {
     final WebRequest req = WebRequest.Create(url);
-    req.BeginGetResponse(wrap(req, callback), null);
+    req.BeginGetResponse(gotResponse(req, callback), null);
   }
 
   @Override
-  public void post(String url, String data, Callback<String> callback) {
+  public void post(String url, final String data, final Callback<String> callback) {
     final WebRequest req = WebRequest.Create(url);
-    try {
-      req.set_Method("POST");
-      StreamWriter out = new StreamWriter(req.GetRequestStream());
-      out.Write(data);
-      out.Close();
-      req.BeginGetResponse(wrap(req, callback), null);
-    } catch (Throwable t) {
-      callback.onFailure(t);
-    }
+    req.set_Method("POST");
+    req.BeginGetRequestStream(new AsyncCallback(new AsyncCallback.Method() {
+      @Override
+      public void Invoke(IAsyncResult result) {
+        try {
+          StreamWriter out = new StreamWriter(req.GetRequestStream());
+          out.Write(data);
+          out.Close();
+          req.BeginGetResponse(gotResponse(req, callback), null);
+        } catch (Throwable t) {
+          queueFailure(callback, t);
+        }
+      }
+    }), null);
   }
 
-  protected AsyncCallback wrap (final WebRequest req, final Callback<String> callback) {
+  protected AsyncCallback gotResponse (final WebRequest req, final Callback<String> callback) {
     return new AsyncCallback(new AsyncCallback.Method() {
       @Override
       public void Invoke(IAsyncResult result) {
@@ -62,15 +67,19 @@ class IOSNet implements Net
             }
           });
         } catch (final Throwable t) {
-          IOSPlatform.instance.queueAction(new Runnable() {
-            public void run () {
-              callback.onFailure(t);
-            }
-          });
+          queueFailure(callback, t);
         } finally {
           if (reader != null)
             reader.Close();
         }
+      }
+    });
+  }
+
+  private void queueFailure (final Callback<?> callback, final Throwable t) {
+    IOSPlatform.instance.queueAction(new Runnable() {
+      public void run () {
+        callback.onFailure(t);
       }
     });
   }
