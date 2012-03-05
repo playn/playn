@@ -104,8 +104,9 @@ class HtmlTouch extends HtmlInput implements Touch {
             nativeEvent.preventDefault();
           }
 
-          // ending a touch sequence
-          inTouchSequence = false;
+          // if there are no remaining active touches, note that this touch sequence has ended
+          if (nativeEvent.getTouches().length() == 0)
+            inTouchSequence = false;
         }
       }
     });
@@ -149,6 +150,6 @@ class HtmlTouch extends HtmlInput implements Touch {
    * @return return the unique identifier of a touch, or 0
    */
   private static native int getTouchIdentifier(NativeEvent evt, int index) /*-{
-    return evt.touches[index].identifier || 0;
+    return evt.changedTouches[index].identifier || 0;
   }-*/;
 }
