@@ -6,6 +6,8 @@ fi
 MAVEN_REPO=$HOME/.m2/repository
 export MONO_PATH=/Developer/MonoTouch/usr/lib/mono/2.1
 
+cd `dirname $0`
+
 echo "Converting Java bytecode to CLR dll..."
 rm -f tests-core.dll
 mono $IKVM_HOME/bin/ikvmc.exe -nostdlib -debug -target:library -out:tests-core.dll \
