@@ -76,7 +76,7 @@ final class JsonParser {
   JsonParser(String s) throws JsonParserException {
     this.string = s;
     this.bufferLength = s.length();
-    eof = s.isEmpty();
+    eof = (s.length() == 0);
   }
 
   /**
