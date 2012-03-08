@@ -61,7 +61,7 @@ public class IOSCanvasImage extends IOSAbstractImage implements CanvasImage
 
   @Override
   CGImage cgImage() {
-    throw new RuntimeException("TODO: IOSCanvasImage.cgImage");
+    return canvas.cgImage();
   }
 
   @Override

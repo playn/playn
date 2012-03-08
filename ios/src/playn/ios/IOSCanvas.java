@@ -73,6 +73,12 @@ public class IOSCanvas implements Canvas
     return data;
   }
 
+  public CGImage cgImage() {
+    // TODO: make sure the image created by this call doesn't require any manual resource
+    // releasing, other than being eventually garbage collected
+    return bctx.ToImage();
+  }
+
   public boolean dirty() {
     return isDirty;
   }
