@@ -14,7 +14,7 @@ public class DebugDrawBox2D extends DebugDraw {
   private static String CANVASERROR =
       "Must set canvas (DebugDrawBox2D.setCanvas()) in DebugDrawBox2D before drawing.";
 
-  private CanvasLayer canvas;
+  private Canvas canvas;
 
   private float strokeWidth;
 
@@ -56,8 +56,8 @@ public class DebugDrawBox2D extends DebugDraw {
     tempVec1.set(center.x + radius, center.y + radius);
     getWorldToScreenToOut(tempVec1, tempVec1);
     getWorldToScreenToOut(center, tempVec2);
-    canvas.canvas().fillCircle(tempVec2.x, tempVec2.y, tempVec1.x - tempVec2.x);
-    canvas.canvas().strokeCircle(tempVec2.x, tempVec2.y, tempVec1.x - tempVec2.x);
+    canvas.fillCircle(tempVec2.x, tempVec2.y, tempVec1.x - tempVec2.x);
+    canvas.strokeCircle(tempVec2.x, tempVec2.y, tempVec1.x - tempVec2.x);
   }
 
   @Override
@@ -70,7 +70,7 @@ public class DebugDrawBox2D extends DebugDraw {
     setFillColor(color);
     setStrokeColor(color);
     getWorldToScreenToOut(argPoint, tempVec1);
-    canvas.canvas().fillCircle(tempVec1.x, tempVec1.y, argRadiusOnScreen);
+    canvas.fillCircle(tempVec1.x, tempVec1.y, argRadiusOnScreen);
   }
 
   @Override
@@ -84,7 +84,7 @@ public class DebugDrawBox2D extends DebugDraw {
     setFillColor(color);
     getWorldToScreenToOut(p1, tempVec1);
     getWorldToScreenToOut(p2, tempVec2);
-    canvas.canvas().drawLine(tempVec1.x, tempVec1.y, tempVec2.x, tempVec2.y);
+    canvas.drawLine(tempVec1.x, tempVec1.y, tempVec2.x, tempVec2.y);
   }
 
   @Override
@@ -101,8 +101,8 @@ public class DebugDrawBox2D extends DebugDraw {
     getWorldToScreenToOut(tempVec1, tempVec1);
     getWorldToScreenToOut(center, tempVec2);
     getWorldToScreenToOut(axis, tempVec3);
-    canvas.canvas().fillCircle(tempVec2.x, tempVec2.y, tempVec1.x - tempVec2.x);
-    canvas.canvas().strokeCircle(tempVec2.x, tempVec2.y, tempVec1.x - tempVec2.x);
+    canvas.fillCircle(tempVec2.x, tempVec2.y, tempVec1.x - tempVec2.x);
+    canvas.strokeCircle(tempVec2.x, tempVec2.y, tempVec1.x - tempVec2.x);
   }
 
   @Override
@@ -124,8 +124,8 @@ public class DebugDrawBox2D extends DebugDraw {
       }
     }
     path.close();
-    canvas.canvas().fillPath(path);
-    canvas.canvas().strokePath(path);
+    canvas.fillPath(path);
+    canvas.strokePath(path);
   }
 
   @Override
@@ -149,25 +149,25 @@ public class DebugDrawBox2D extends DebugDraw {
     tempVec2.setZero();
     float k_axisScale = 0.4f;
 
-    canvas.canvas().setStrokeColor(Color.rgb(1, 0, 0)); // note: violates
+    canvas.setStrokeColor(Color.rgb(1, 0, 0)); // note: violates
                                                         // strokeAlpha
     tempVec2.x = xf.position.x + k_axisScale * xf.R.m11;
     tempVec2.y = xf.position.y + k_axisScale * xf.R.m12;
     getWorldToScreenToOut(tempVec2, tempVec2);
-    canvas.canvas().drawLine(tempVec1.x, tempVec1.y, tempVec2.x, tempVec2.y);
+    canvas.drawLine(tempVec1.x, tempVec1.y, tempVec2.x, tempVec2.y);
 
-    canvas.canvas().setStrokeColor(Color.rgb(0, 1, 0)); // note: violates
+    canvas.setStrokeColor(Color.rgb(0, 1, 0)); // note: violates
                                                         // strokeAlpha
     tempVec2.x = xf.position.x + k_axisScale * xf.R.m21;
     tempVec2.y = xf.position.y + k_axisScale * xf.R.m22;
     getWorldToScreenToOut(tempVec2, tempVec2);
-    canvas.canvas().drawLine(tempVec1.x, tempVec1.y, tempVec2.x, tempVec2.y);
+    canvas.drawLine(tempVec1.x, tempVec1.y, tempVec2.x, tempVec2.y);
 
-    canvas.canvas().setStrokeColor(Color.argb(strokeAlpha, 1, 0, 0)); // restores
+    canvas.setStrokeColor(Color.argb(strokeAlpha, 1, 0, 0)); // restores
                                                                       // strokeAlpha
   }
 
-  public CanvasLayer getCanvas() {
+  public Canvas getCanvas() {
     return canvas;
   }
 
@@ -206,9 +206,9 @@ public class DebugDrawBox2D extends DebugDraw {
     updateCamera();
   }
 
-  public void setCanvas(CanvasLayer canvas) {
-    this.canvas = canvas;
-    canvas.canvas().setStrokeWidth(strokeWidth);
+  public void setCanvas(CanvasImage image) {
+    this.canvas = image.canvas();
+    canvas.setStrokeWidth(strokeWidth);
   }
 
   public void setFillAlpha(int fillAlpha) {
@@ -226,7 +226,7 @@ public class DebugDrawBox2D extends DebugDraw {
   public void setStrokeWidth(float strokeWidth) {
     this.strokeWidth = strokeWidth;
     if (canvas != null) {
-      canvas.canvas().setStrokeWidth(strokeWidth);
+      canvas.setStrokeWidth(strokeWidth);
     }
   }
 
@@ -242,7 +242,7 @@ public class DebugDrawBox2D extends DebugDraw {
       cacheFillR = color.x;
       cacheFillG = color.y;
       cacheFillB = color.z;
-      canvas.canvas()
+      canvas
           .setFillColor(
               Color.argb(fillAlpha, (int) (255 * color.x), (int) (255 * color.y),
                   (int) (255 * color.z)));
@@ -261,7 +261,7 @@ public class DebugDrawBox2D extends DebugDraw {
       cacheStrokeR = color.x;
       cacheStrokeG = color.y;
       cacheStrokeB = color.z;
-      canvas.canvas().setStrokeColor(
+      canvas.setStrokeColor(
           Color.argb(strokeAlpha, (int) (255 * color.x), (int) (255 * color.y),
               (int) (255 * color.z)));
     }
@@ -273,6 +273,6 @@ public class DebugDrawBox2D extends DebugDraw {
 
   @Override
   public void clear() {
-    getCanvas().canvas().clear();
+    canvas.clear();
   }
 }
