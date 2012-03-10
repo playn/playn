@@ -15,20 +15,60 @@
  */
 package playn.ios;
 
+import cli.MonoTouch.AVFoundation.AVAudioPlayer;
+import cli.MonoTouch.AVFoundation.AVStatusEventArgs;
+import cli.MonoTouch.Foundation.NSError;
+import cli.MonoTouch.Foundation.NSUrl;
+import playn.core.Asserts;
+import playn.core.PlayN;
 import playn.core.ResourceCallback;
 
 import playn.core.Sound;
 
 class IOSSound implements Sound
 {
+  private String path;
+  private AVAudioPlayer player;
+
+  public IOSSound (String path) {
+    this.path = path;
+  }
+
   @Override
   public boolean play() {
-    return false; // TODO
+    Asserts.check(path != null, "Asked to play() a null file");
+
+    PlayN.log().debug("play() [" + path +"]");
+    NSError[] error = new NSError[1];
+    player = AVAudioPlayer.FromUrl(NSUrl.FromFilename(path), error);
+    if (error[0] != null) {
+      PlayN.log().warn("Error starting sound [" + path + ", " + error[0] + "]");
+      return false;
+    }
+
+    player.add_FinishedPlaying(
+      new cli.System.EventHandler$$00601_$$$_Lcli__MonoTouch__AVFoundation__AVStatusEventArgs_$$$$_(new cli.System.EventHandler$$00601_$$$_Lcli__MonoTouch__AVFoundation__AVStatusEventArgs_$$$$_.Method() {
+        public void Invoke(Object obj, AVStatusEventArgs args) {
+          PlayN.log().debug("sound finished [" + path + "]");
+          if (player != null) {
+            // TODO: can't really Dispose here
+            //player.Dispose();
+            player = null;
+          }
+        }
+      }));
+    return player.Play();
   }
 
   @Override
   public void stop() {
-    // TODO
+    Asserts.check(path != null, "Asked to stop() a null file");
+
+    PlayN.log().debug("stop() [" + path + "]");
+    if (player != null) {
+      // TODO: Does this trigger FinishedPlaying on the player?
+      player.Stop();
+    }
   }
 
   @Override
@@ -43,11 +83,12 @@ class IOSSound implements Sound
 
   @Override
   public boolean isPlaying() {
-    return false; // TODO
+    return player != null && player.get_Playing();
   }
 
   @Override
   public void addCallback(ResourceCallback<Sound> callback) {
+    // TODO
     callback.done(this); // we're always ready
   }
 }

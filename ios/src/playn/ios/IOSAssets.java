@@ -69,8 +69,10 @@ class IOSAssets implements Assets
 
   @Override
   public Sound getSound(String path) {
+    path += ".mp3";
     PlayN.log().debug("Loading sound " + path);
-    return new IOSSound(); // TODO
+    String fullPath = Path.Combine(pathPrefix, path);
+    return ((IOSAudio) PlayN.audio()).createSound(fullPath);
   }
 
   @Override
