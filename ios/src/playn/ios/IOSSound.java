@@ -37,7 +37,9 @@ class IOSSound implements Sound
   @Override
   public boolean play() {
     Asserts.check(path != null, "Asked to play() a null file");
-    stop();
+    if (player != null) {
+      player.set_CurrentTime(0);
+    }
     if (player == null) {
       NSError[] error = new NSError[1];
       player = AVAudioPlayer.FromUrl(NSUrl.FromFilename(path), error);
@@ -54,6 +56,7 @@ class IOSSound implements Sound
     Asserts.check(path != null, "Asked to stop() a null file");
     if (player != null) {
       player.Stop();
+      player.set_CurrentTime(0);
     }
   }
 
