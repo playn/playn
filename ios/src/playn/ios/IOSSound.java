@@ -37,36 +37,22 @@ class IOSSound implements Sound
   @Override
   public boolean play() {
     Asserts.check(path != null, "Asked to play() a null file");
-
-    PlayN.log().debug("play() [" + path +"]");
-    NSError[] error = new NSError[1];
-    player = AVAudioPlayer.FromUrl(NSUrl.FromFilename(path), error);
-    if (error[0] != null) {
-      PlayN.log().warn("Error starting sound [" + path + ", " + error[0] + "]");
-      return false;
+    stop();
+    if (player == null) {
+      NSError[] error = new NSError[1];
+      player = AVAudioPlayer.FromUrl(NSUrl.FromFilename(path), error);
+      if (error[0] != null) {
+        PlayN.log().warn("Error loading sound [" + path + ", " + error[0] + "]");
+        return false;
+      }
     }
-
-    player.add_FinishedPlaying(
-      new cli.System.EventHandler$$00601_$$$_Lcli__MonoTouch__AVFoundation__AVStatusEventArgs_$$$$_(new cli.System.EventHandler$$00601_$$$_Lcli__MonoTouch__AVFoundation__AVStatusEventArgs_$$$$_.Method() {
-        public void Invoke(Object obj, AVStatusEventArgs args) {
-          PlayN.log().debug("sound finished [" + path + "]");
-          if (player != null) {
-            // TODO: can't really Dispose here
-            //player.Dispose();
-            player = null;
-          }
-        }
-      }));
     return player.Play();
   }
 
   @Override
   public void stop() {
     Asserts.check(path != null, "Asked to stop() a null file");
-
-    PlayN.log().debug("stop() [" + path + "]");
     if (player != null) {
-      // TODO: Does this trigger FinishedPlaying on the player?
       player.Stop();
     }
   }
@@ -88,7 +74,13 @@ class IOSSound implements Sound
 
   @Override
   public void addCallback(ResourceCallback<Sound> callback) {
-    // TODO
     callback.done(this); // we're always ready
+  }
+
+  public void dispose() {
+    if (player != null) {
+      player.Dispose();
+      player = null;
+    }
   }
 }
