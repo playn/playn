@@ -61,7 +61,7 @@ class IOSSound implements Sound
   public void stop() {
     Asserts.check(path != null, "Asked to stop() a null file");
     if (player != null) {
-      player.Stop();
+      player.Pause();
       player.set_CurrentTime(0);
     }
   }
