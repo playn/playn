@@ -29,6 +29,8 @@ class IOSSound implements Sound
 {
   private String path;
   private AVAudioPlayer player;
+  private boolean looping;
+  private float volume = 1.0f;
 
   public IOSSound (String path) {
     this.path = path;
@@ -47,6 +49,10 @@ class IOSSound implements Sound
         PlayN.log().warn("Error loading sound [" + path + ", " + error[0] + "]");
         return false;
       }
+      if (looping) {
+        player.set_NumberOfLoops(-1); // -1 loops indefinitely.
+      }
+      player.set_Volume(volume);
     }
     return player.Play();
   }
@@ -62,12 +68,24 @@ class IOSSound implements Sound
 
   @Override
   public void setLooping(boolean looping) {
-    // TODO
+    if (this.looping == looping) {
+      return;
+    }
+    this.looping = looping;
+    if (player != null) {
+      player.set_NumberOfLoops(looping ? -1 : 0);
+    }
   }
 
   @Override
   public void setVolume(float volume) {
-    // TODO
+    if (this.volume == volume) {
+      return;
+    }
+    this.volume = volume;
+    if (player != null) {
+      player.set_Volume(volume);
+    }
   }
 
   @Override
