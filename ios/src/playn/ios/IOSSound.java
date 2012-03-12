@@ -16,7 +16,6 @@
 package playn.ios;
 
 import cli.MonoTouch.AVFoundation.AVAudioPlayer;
-import cli.MonoTouch.AVFoundation.AVStatusEventArgs;
 import cli.MonoTouch.Foundation.NSError;
 import cli.MonoTouch.Foundation.NSUrl;
 import playn.core.Asserts;
@@ -25,67 +24,47 @@ import playn.core.ResourceCallback;
 
 import playn.core.Sound;
 
+/**
+ * An implementation of Sound using the AVAudioPlayer.
+ */
 class IOSSound implements Sound
 {
-  private String path;
   private AVAudioPlayer player;
-  private boolean looping;
-  private float volume = 1.0f;
 
   public IOSSound (String path) {
-    this.path = path;
+    NSError[] error = new NSError[1];
+    player = AVAudioPlayer.FromUrl(NSUrl.FromFilename(path), error);
+    if (error[0] != null) {
+        PlayN.log().warn("Error loading sound [" + path + ", " + error[0] + "]");
+        return;
+    }
+    player.PrepareToPlay();
   }
 
   @Override
   public boolean play() {
-    Asserts.check(path != null, "Asked to play() a null file");
-    if (player != null) {
-      player.set_CurrentTime(0);
-    }
-    if (player == null) {
-      NSError[] error = new NSError[1];
-      player = AVAudioPlayer.FromUrl(NSUrl.FromFilename(path), error);
-      if (error[0] != null) {
-        PlayN.log().warn("Error loading sound [" + path + ", " + error[0] + "]");
-        return false;
-      }
-      if (looping) {
-        player.set_NumberOfLoops(-1); // -1 loops indefinitely.
-      }
-      player.set_Volume(volume);
-    }
+    Asserts.check(player != null, "Playing a null player");
+    player.set_CurrentTime(0);
     return player.Play();
   }
 
   @Override
   public void stop() {
-    Asserts.check(path != null, "Asked to stop() a null file");
-    if (player != null) {
-      player.Pause();
-      player.set_CurrentTime(0);
-    }
+    Asserts.check(player != null, "Stopping a null player");
+    player.Pause();
+    player.set_CurrentTime(0);
   }
 
   @Override
   public void setLooping(boolean looping) {
-    if (this.looping == looping) {
-      return;
-    }
-    this.looping = looping;
-    if (player != null) {
-      player.set_NumberOfLoops(looping ? -1 : 0);
-    }
+    Asserts.check(player != null, "Setting looping on a null player");
+    player.set_NumberOfLoops(looping ? -1 : 0);
   }
 
   @Override
   public void setVolume(float volume) {
-    if (this.volume == volume) {
-      return;
-    }
-    this.volume = volume;
-    if (player != null) {
-      player.set_Volume(volume);
-    }
+    Asserts.check(player != null, "Setting volume on a null player");
+    player.set_Volume(volume);
   }
 
   @Override
@@ -95,7 +74,10 @@ class IOSSound implements Sound
 
   @Override
   public void addCallback(ResourceCallback<Sound> callback) {
-    callback.done(this); // we're always ready
+    if (player != null) {
+      // non-null players are always ready
+      callback.done(this);
+    }
   }
 
   public void dispose() {
