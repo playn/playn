@@ -42,7 +42,7 @@ public class AndroidGLContext extends GLContext
     void onSurfaceCreated();
   }
 
-  public static final boolean CHECK_ERRORS = true;
+  public static final boolean CHECK_ERRORS = false;
 
   public int viewWidth, viewHeight;
   int fbufWidth, fbufHeight;
