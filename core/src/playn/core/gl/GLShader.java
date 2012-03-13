@@ -33,6 +33,46 @@ public interface GLShader
   }
 
   /**
+   * Adds a quad to the current render operation. This calls the appropriate sequence of {@link
+   * #beginPrimitive}, {@link #addVertex} and {@link #addElement} for you.
+   */
+  void addQuad(InternalTransform local,
+               float x1, float y1, float sx1, float sy1,
+               float x2, float y2, float sx2, float sy2,
+               float x3, float y3, float sx3, float sy3,
+               float x4, float y4, float sx4, float sy4);
+
+  /**
+   * Adds a quad to the current render operation. This calls the appropriate sequence of {@link
+   * #beginPrimitive}, {@link #addVertex} and {@link #addElement} for you.
+   */
+  void addQuad(InternalTransform local,
+               float x1, float y1, float x2, float y2,
+               float x3, float y3, float x4, float y4);
+
+  /**
+   * Adds a collection of triangles to the current render operation. This calls the appropriate
+   * sequence of {@link #beginPrimitive}, {@link #addVertex} and {@link #addElement} for you.
+   *
+   * @param xys a list of x/y coordinates as: {@code [x1, y1, x2, y2, ...]}.
+   * @param indices the index of the triangle vertices in the supplied {@code xys} array. This must
+   * be in proper winding order for OpenGL rendering.
+   */
+  void addTriangles(InternalTransform local, float[] xys, int[] indices);
+
+  /**
+   * Adds a collection of triangles to the current render operation. This calls the appropriate
+   * sequence of {@link #beginPrimitive}, {@link #addVertex} and {@link #addElement} for you.
+   *
+   * @param xys a list of x/y coordinates as: {@code [x1, y1, x2, y2, ...]}.
+   * @param sxys a list of sx/sy texture coordinates as: {@code [sx1, sy1, sx2, sy2, ...]}. This
+   * must be of the same length as {@code xys}.
+   * @param indices the index of the triangle vertices in the supplied {@code xys} array. This must
+   * be in proper winding order for OpenGL rendering.
+   */
+  void addTriangles(InternalTransform local, float[] xys, float[] sxys, int[] indices);
+
+  /**
    * Begins a primitive with the specified vertex and element count.
    */
   int beginPrimitive(int vertexCount, int elemCount);
@@ -40,12 +80,8 @@ public interface GLShader
   /**
    * Adds a vertex to a primitive that was started with {@link #beginPrimitive}.
    */
-  void buildVertex(InternalTransform local, float dx, float dy);
-
-  /**
-   * Adds a vertex to a primitive that was started with {@link #beginPrimitive}.
-   */
-  void buildVertex(InternalTransform local, float dx, float dy, float sx, float sy);
+  void addVertex(float m00, float m01, float m10, float m11, float tx, float ty,
+                 float dx, float dy, float sx, float sy);
 
   /**
    * Adds an element to a primitive that was started with {@link #beginPrimitive}.

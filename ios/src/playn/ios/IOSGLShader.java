@@ -24,9 +24,10 @@ import cli.OpenTK.Graphics.ES20.GL;
 
 import playn.core.InternalTransform;
 import playn.core.PlayN;
+import playn.core.gl.AbstractGLShader;
 import playn.core.gl.GLShader;
 
-public class IOSGLShader implements GLShader {
+public class IOSGLShader extends AbstractGLShader {
 
   public static class Texture extends IOSGLShader implements GLShader.Texture {
     private int uTexture, uAlpha, lastTex;
@@ -104,11 +105,10 @@ public class IOSGLShader implements GLShader {
   }
 
   private static final int VERTEX_SIZE = 10; // 10 floats per vertex
-  private static final int MAX_VERTS = 4;
-  private static final int MAX_ELEMS = 6;
-  private static final int FLOAT_SIZE_BYTES = 4;
-  private static final int SHORT_SIZE_BYTES = 2;
-  private static final int VERTEX_STRIDE = VERTEX_SIZE * FLOAT_SIZE_BYTES;
+  private static final int MAX_VERTS = 4*32;
+  private static final int MAX_ELEMS = 6*MAX_VERTS/4;
+  private static final int SIZEOF_FLOAT = 4;
+  private static final int VERTEX_STRIDE = VERTEX_SIZE * SIZEOF_FLOAT;
 
   protected final IOSGLContext ctx;
   protected final int program, uScreenSizeLoc, aMatrix, aTranslation, aPosition, aTexture;
@@ -183,12 +183,7 @@ public class IOSGLShader implements GLShader {
       return;
 
     ctx.checkGLError("Shader.flush");
-    // GL.BufferData(All.wrap(All.ArrayBuffer), vertexOffset * FLOAT_SIZE_BYTES,
-    //               vertexHandle.AddrOfPinnedObject(), All.wrap(All.StreamDraw));
-    // GL.BufferData(All.wrap(All.ElementArrayBuffer), elementOffset * SHORT_SIZE_BYTES,
-    //               elementHandle.AddrOfPinnedObject(), All.wrap(All.StreamDraw));
-    // ctx.checkGLError("Shader.flush BufferData");
-    GL.DrawElements(All.wrap(All.TriangleStrip), elementOffset, All.wrap(All.UnsignedShort),
+    GL.DrawElements(All.wrap(All.Triangles), elementOffset, All.wrap(All.UnsignedShort),
                     elementHandle.AddrOfPinnedObject());
     vertexOffset = elementOffset = 0;
     ctx.checkGLError("Shader.flush DrawElements");
@@ -205,19 +200,15 @@ public class IOSGLShader implements GLShader {
   }
 
   @Override
-  public void buildVertex(InternalTransform local, float dx, float dy) {
-    buildVertex(local, dx, dy, 0, 0);
-  }
-
-  @Override
-  public void buildVertex(InternalTransform local, float dx, float dy, float sx, float sy) {
+  public void addVertex(float m00, float m01, float m10, float m11, float tx, float ty,
+                        float dx, float dy, float sx, float sy) {
     int ii = vertexOffset;
-    vertexData[ii++] = local.m00();
-    vertexData[ii++] = local.m01();
-    vertexData[ii++] = local.m10();
-    vertexData[ii++] = local.m11();
-    vertexData[ii++] = local.tx();
-    vertexData[ii++] = local.ty();
+    vertexData[ii++] = m00;
+    vertexData[ii++] = m01;
+    vertexData[ii++] = m10;
+    vertexData[ii++] = m11;
+    vertexData[ii++] = tx;
+    vertexData[ii++] = ty;
     vertexData[ii++] = dx;
     vertexData[ii++] = dy;
     vertexData[ii++] = sx;

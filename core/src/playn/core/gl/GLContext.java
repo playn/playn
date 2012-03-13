@@ -117,89 +117,58 @@ public abstract class GLContext {
                           float dx, float dy, float dw, float dh,
                           float sx, float sy, float sw, float sh, float alpha) {
     texShader.prepare(tex, alpha);
-    checkGLError("drawTexture shader prepared");
-
+    checkGLError("drawTexture texture prepared");
     sx /= texWidth;
     sw /= texWidth;
     sy /= texHeight;
     sh /= texHeight;
-
-    int idx = texShader.beginPrimitive(4, 4);
-    texShader.buildVertex(local, dx, dy, sx, sy);
-    texShader.buildVertex(local, dx + dw, dy, sx + sw, sy);
-    texShader.buildVertex(local, dx, dy + dh, sx, sy + sh);
-    texShader.buildVertex(local, dx + dw, dy + dh, sx + sw, sy + sh);
-
-    texShader.addElement(idx + 0);
-    texShader.addElement(idx + 1);
-    texShader.addElement(idx + 2);
-    texShader.addElement(idx + 3);
+    texShader.addQuad(local, dx, dy, sx, sy,
+                      dx + dw, dy, sx + sw, sy,
+                      dx, dy + dh, sx, sy + sh,
+                      dx + dw, dy + dh, sx + sw, sy + sh);
     checkGLError("drawTexture end");
   }
 
   public void fillRect(InternalTransform local, float dx, float dy, float dw, float dh,
                        float texWidth, float texHeight, Object tex, float alpha) {
     texShader.prepare(tex, alpha);
-    checkGLError("fillRect tex shader prepared");
-
+    checkGLError("fillRect tex prepared");
     float sx = dx / texWidth, sy = dy / texHeight;
     float sw = dw / texWidth, sh = dh / texHeight;
-
-    int idx = texShader.beginPrimitive(4, 4);
-    texShader.buildVertex(local, dx, dy, sx, sy);
-    texShader.buildVertex(local, dx + dw, dy, sx + sw, sy);
-    texShader.buildVertex(local, dx, dy + dh, sx, sy + sh);
-    texShader.buildVertex(local, dx + dw, dy + sy, sx + sw, sy + sh);
-
-    texShader.addElement(idx + 0);
-    texShader.addElement(idx + 1);
-    texShader.addElement(idx + 2);
-    texShader.addElement(idx + 3);
+    texShader.addQuad(local, dx, dy, sx, sy,
+                      dx + dw, dy, sx + sw, sy,
+                      dx, dy + dh, sx, sy + sh,
+                      dx + dw, dy + sy, sx + sw, sy + sh);
     checkGLError("fillRect tex end");
   }
 
   public void fillRect(InternalTransform local, float dx, float dy, float dw, float dh,
                        int color, float alpha) {
     colorShader.prepare(color, alpha);
-    checkGLError("fillRect color shader prepared");
-
-    int idx = colorShader.beginPrimitive(4, 4);
-    colorShader.buildVertex(local, dx, dy);
-    colorShader.buildVertex(local, dx + dw, dy);
-    colorShader.buildVertex(local, dx, dy + dh);
-    colorShader.buildVertex(local, dx + dw, dy + dh);
-
-    colorShader.addElement(idx + 0);
-    colorShader.addElement(idx + 1);
-    colorShader.addElement(idx + 2);
-    colorShader.addElement(idx + 3);
+    checkGLError("fillRect color prepared");
+    colorShader.addQuad(local, dx, dy, dx + dw, dy,
+                        dx, dy + dh, dx + dw, dy + dh);
     checkGLError("fillRect color end");
   }
 
-  public void fillPoly(InternalTransform local, float[] positions, int color, float alpha) {
+  public void fillQuad(InternalTransform local, float x1, float y1, float x2, float y2,
+                       float x3, float y3, float x4, float y4,
+                       float texWidth, float texHeight, Object tex, float alpha) {
+    texShader.prepare(tex, alpha);
+    checkGLError("fillQuad tex prepared");
+    texShader.addQuad(local, x1, y1, x1/texWidth, y1/texHeight,
+                      x2, y2, x2/texWidth, y2/texHeight,
+                      x3, y3, x3/texWidth, y3/texHeight,
+                      x4, y4, x4/texWidth, y4/texHeight);
+    checkGLError("fillQuad tex end");
+  }
+
+  public void fillQuad(InternalTransform local, float x1, float y1, float x2, float y2,
+                       float x3, float y3, float x4, float y4, int color, float alpha) {
     colorShader.prepare(color, alpha);
-    checkGLError("fillPoly shader prepared");
-
-    // FIXME: Rewrite to take advantage of GL_TRIANGLE_STRIP
-    int idx = colorShader.beginPrimitive(4, 6); // FIXME: This won't work for non-line polys.
-    int points = positions.length / 2;
-    for (int i = 0; i < points; ++i) {
-      float dx = positions[i * 2];
-      float dy = positions[i * 2 + 1];
-      colorShader.buildVertex(local, dx, dy);
-    }
-
-    int a = idx + 0, b = idx + 1, c = idx + 2;
-    int tris = points - 2;
-    for (int i = 0; i < tris; i++) {
-      colorShader.addElement(a);
-      colorShader.addElement(b);
-      colorShader.addElement(c);
-      a = c;
-      b = a + 1;
-      c = (i == tris - 2) ? idx : b + 1;
-    }
-    checkGLError("fillPoly end");
+    checkGLError("fillQuad color prepared");
+    colorShader.addQuad(local, x1, y1, x2, y2, x3, y3, x4, y4);
+    checkGLError("fillQuad color end");
   }
 
   public void flush() {

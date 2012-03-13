@@ -24,13 +24,14 @@ import java.nio.ShortBuffer;
 import android.util.Log;
 
 import playn.core.InternalTransform;
+import playn.core.gl.AbstractGLShader;
 import playn.core.gl.GL20;
 import playn.core.gl.GLShader;
 
 /**
  * Implements shaders for Android.
  */
-public class AndroidGLShader implements GLShader
+public class AndroidGLShader extends AbstractGLShader
 {
   static class Texture extends AndroidGLShader implements GLShader.Texture {
     private int uTexture, uAlpha, lastTex;
@@ -114,8 +115,8 @@ public class AndroidGLShader implements GLShader
   }
 
   private static final int VERTEX_SIZE = 10; // 10 floats per vertex
-  private static final int MAX_VERTS = 4;
-  private static final int MAX_ELEMS = 6;
+  private static final int MAX_VERTS = 32*4;
+  private static final int MAX_ELEMS = 6*MAX_VERTS/4;
   private static final int FLOAT_SIZE_BYTES = 4;
   private static final int SHORT_SIZE_BYTES = 2;
   private static final int VERTEX_STRIDE = VERTEX_SIZE * FLOAT_SIZE_BYTES;
@@ -189,12 +190,13 @@ public class AndroidGLShader implements GLShader
       return;
     }
     ctx.checkGLError("Shader.flush");
+    vertexData.position(0);
     gl20.glBufferData(GL20.GL_ARRAY_BUFFER, vertexOffset * FLOAT_SIZE_BYTES, vertexData,
                       GL20.GL_STREAM_DRAW);
     gl20.glBufferData(GL20.GL_ELEMENT_ARRAY_BUFFER, elementOffset * SHORT_SIZE_BYTES,
                       elementData, GL20.GL_STREAM_DRAW);
     ctx.checkGLError("Shader.flush BufferData");
-    gl20.glDrawElements(GL20.GL_TRIANGLE_STRIP, elementOffset, GL20.GL_UNSIGNED_SHORT, 0);
+    gl20.glDrawElements(GL20.GL_TRIANGLES, elementOffset, GL20.GL_UNSIGNED_SHORT, 0);
     vertexOffset = elementOffset = 0;
     ctx.checkGLError("Shader.flush DrawElements");
   }
@@ -210,27 +212,20 @@ public class AndroidGLShader implements GLShader
   }
 
   @Override
-  public void buildVertex(InternalTransform local, float dx, float dy) {
-    buildVertex(local, dx, dy, 0, 0);
-  }
-
-  @Override
-  public void buildVertex(InternalTransform local, float dx, float dy, float sx, float sy) {
+  public void addVertex(float m00, float m01, float m10, float m11, float tx, float ty,
+                        float dx, float dy, float sx, float sy) {
     vertexData.position(vertexOffset);
-    vertexData.put(local.m00());
-    vertexData.put(local.m01());
-    vertexData.put(local.m10());
-    vertexData.put(local.m11());
-    vertexData.put(local.tx());
-    vertexData.put(local.ty());
+    vertexData.put(m00);
+    vertexData.put(m01);
+    vertexData.put(m10);
+    vertexData.put(m11);
+    vertexData.put(tx);
+    vertexData.put(ty);
     vertexData.put(dx);
     vertexData.put(dy);
     vertexData.put(sx);
     vertexData.put(sy);
-    vertexData.position(0);
-
     vertexOffset += VERTEX_SIZE;
-
   }
 
   @Override

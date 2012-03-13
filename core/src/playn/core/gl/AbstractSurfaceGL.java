@@ -96,12 +96,18 @@ abstract class AbstractSurfaceGL implements Surface {
     dx = dx * (width / 2) / len;
     dy = dy * (width / 2) / len;
 
-    float[] pos = new float[8];
-    pos[0] = x0 - dy; pos[1] = y0 + dx;
-    pos[2] = x1 - dy; pos[3] = y1 + dx;
-    pos[4] = x1 + dy; pos[5] = y1 - dx;
-    pos[6] = x0 + dy; pos[7] = y0 - dx;
-    ctx.fillPoly(topTransform(), pos, fillColor, 1);
+    float qx1 = x0 - dy, qy1 = y0 + dx;
+    float qx2 = x0 + dy, qy2 = y0 - dx;
+    float qx3 = x1 - dy, qy3 = y1 + dx;
+    float qx4 = x1 + dy, qy4 = y1 - dx;
+
+    if (fillPattern != null) {
+      Object tex = fillPattern.ensureTexture(ctx, true, true);
+      ctx.fillQuad(topTransform(), qx1, qy1, qx2, qy2, qx3, qy3, qx4, qy4,
+                   fillPattern.width(), fillPattern.height(), tex, 1);
+    } else {
+      ctx.fillQuad(topTransform(), qx1, qy1, qx2, qy2, qx3, qy3, qx4, qy4, fillColor, 1);
+    }
     return this;
   }
 

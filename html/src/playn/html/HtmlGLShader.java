@@ -27,9 +27,10 @@ import com.google.gwt.webgl.client.WebGLUtil;
 import static com.google.gwt.webgl.client.WebGLRenderingContext.*;
 
 import playn.core.InternalTransform;
+import playn.core.gl.AbstractGLShader;
 import playn.core.gl.GLShader;
 
-public class HtmlGLShader implements GLShader {
+public class HtmlGLShader extends AbstractGLShader {
   public static class Texture extends HtmlGLShader implements GLShader.Texture {
     private WebGLUniformLocation uTexture;
     private WebGLUniformLocation uAlpha;
@@ -113,8 +114,11 @@ public class HtmlGLShader implements GLShader {
   //  private static final int MAX_VERTS = 400;               // 100 quads
   //  private static final int MAX_ELEMS = MAX_VERTS * 6 / 4; // At most 6 verts per quad
 
-  // These values allow only one quad at a time (there's no generalized polygon rendering available
-  // in Surface yet that would use more than 4 points / 2 triangles).
+  // These values allow only one quad at a time; TODO: determine whether the benefit of not
+  // re-range-checking the elements array on every frame offsets the benefit of potentially drawing
+  // multiple quads in a single call; since we don't sort the scene graph to encourage
+  // same-textured quads to be rendered back to back, we may almost never render multiple quads
+  // without flushing anyway
   private static final int MAX_VERTS = 4;
   private static final int MAX_ELEMS = 6;
 
@@ -189,7 +193,7 @@ public class HtmlGLShader implements GLShader {
     gl.bufferData(ARRAY_BUFFER, vertexData, STREAM_DRAW);
     gl.bufferData(ELEMENT_ARRAY_BUFFER, elementData, STREAM_DRAW);
 
-    gl.drawElements(TRIANGLE_STRIP, elementOffset, UNSIGNED_SHORT, 0);
+    gl.drawElements(TRIANGLES, elementOffset, UNSIGNED_SHORT, 0);
     vertexOffset = elementOffset = 0;
   }
 
@@ -204,13 +208,14 @@ public class HtmlGLShader implements GLShader {
   }
 
   @Override
-  public void buildVertex(InternalTransform local, float dx, float dy) {
-    buildVertex(local, dx, dy, 0, 0);
-  }
-
-  @Override
-  public void buildVertex(InternalTransform local, float dx, float dy, float sx, float sy) {
-    vertexData.set(((HtmlInternalTransform)local).matrix(), vertexOffset);
+  public void addVertex(float m00, float m01, float m10, float m11, float tx, float ty,
+                        float dx, float dy, float sx, float sy) {
+    vertexData.set(vertexOffset + 0, m00);
+    vertexData.set(vertexOffset + 1, m01);
+    vertexData.set(vertexOffset + 2, m10);
+    vertexData.set(vertexOffset + 3, m11);
+    vertexData.set(vertexOffset + 4, tx);
+    vertexData.set(vertexOffset + 5, ty);
     vertexData.set(vertexOffset + 6, dx);
     vertexData.set(vertexOffset + 7, dy);
     vertexData.set(vertexOffset + 8, sx);
