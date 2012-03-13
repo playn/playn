@@ -21,6 +21,7 @@ import java.util.List;
 import cli.MonoTouch.Foundation.NSUrl;
 import cli.MonoTouch.UIKit.UIApplication;
 import cli.MonoTouch.UIKit.UIScreen;
+import cli.MonoTouch.UIKit.UIViewController;
 import cli.MonoTouch.UIKit.UIWindow;
 import cli.System.DateTime;
 import cli.System.Drawing.RectangleF;
@@ -39,7 +40,11 @@ import playn.core.json.JsonImpl;
 public class IOSPlatform implements Platform {
 
   public static IOSPlatform register(UIApplication app) {
-    IOSPlatform platform = new IOSPlatform(app);
+    return register(app, null);
+  }
+
+  public static IOSPlatform register(UIApplication app, UIViewController ctrl) {
+    IOSPlatform platform = new IOSPlatform(app, ctrl);
     PlayN.setPlatform(platform);
     return platform;
   }
@@ -67,7 +72,7 @@ public class IOSPlatform implements Platform {
 
   private final List<Runnable> pendingActions = new ArrayList<Runnable>();
 
-  private IOSPlatform(UIApplication app) {
+  private IOSPlatform(UIApplication app, UIViewController ctrl) {
     this.app = app;
     RectangleF bounds = UIScreen.get_MainScreen().get_Bounds();
     float scale = 1f; // TODO: UIScreen.get_MainScreen().get_Scale();
@@ -88,6 +93,8 @@ public class IOSPlatform implements Platform {
     storage = new IOSStorage();
 
     mainWindow = new UIWindow(bounds);
+    if (ctrl != null)
+      mainWindow.set_RootViewController(ctrl);
     mainWindow.Add(gameView = new IOSGameView(bounds, scale));
   }
 
