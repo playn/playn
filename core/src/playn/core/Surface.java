@@ -21,7 +21,64 @@ package playn.core;
 public interface Surface {
 
   /**
-   * Sets the entire surface to the given color.
+   * Returns the width of this surface.
+   */
+  int width();
+
+  /**
+   * Returns the height of this surface.
+   */
+  int height();
+
+  /**
+   * Saves the current transform.
+   */
+  Surface save();
+
+  /**
+   * Restores the transform previously stored by {@link #save()}.
+   */
+  Surface restore();
+
+  /**
+   * Translates the current transformation matrix by the given amount.
+   */
+  Surface translate(float x, float y);
+
+  /**
+   * Scales the current transformation matrix by the specified amount on each axis.
+   */
+  Surface scale(float sx, float sy);
+
+  /**
+   * Rotates the current transformation matrix by the specified angle in radians.
+   */
+  Surface rotate(float radians);
+
+  /**
+   * Multiplies the current transformation matrix by the given matrix.
+   */
+  Surface transform(float m11, float m12, float m21, float m22, float dx, float dy);
+
+  /**
+   * Sets the transformation matrix directly, replacing the existing matrix.
+   */
+  Surface setTransform(float m11, float m12, float m21, float m22, float dx, float dy);
+
+  /**
+   * Sets the color to be used for fill operations. This replaces any existing fill gradient or
+   * pattern.
+   */
+  Surface setFillColor(int color);
+
+  /**
+   * Sets the pattern to be used for fill operations. This replaces any existing fill gradient or
+   * pattern.
+   */
+  Surface setFillPattern(Pattern pattern);
+
+  /**
+   * Clears the entire surface to transparent blackness.
    */
   Surface clear();
 
@@ -58,12 +115,12 @@ public interface Surface {
    * @param sw the source width
    * @param sh the source height
    */
-  Surface drawImage(Image image, float dx, float dy, float dw, float dh, float sx, float sy, float sw,
-      float sh);
+  Surface drawImage(Image image, float dx, float dy, float dw, float dh,
+      float sx, float sy, float sw, float sh);
 
   /**
-   * Draws an image, centered at the specified location.  Simply
-   * subtracts image.width/2 from dx and image.height/2 from dy.
+   * Draws an image, centered at the specified location. Simply subtracts image.width/2 from dx and
+   * image.height/2 from dy.
    *
    * @param image the image to draw
    * @param dx destination x
@@ -72,7 +129,7 @@ public interface Surface {
   Surface drawImageCentered(Image image, float dx, float dy);
 
   /**
-   * TODO
+   * Fills a line between the specified coordinates, of the specified (pixel) width.
    */
   Surface drawLine(float x0, float y0, float x1, float y1, float width);
 
@@ -80,60 +137,4 @@ public interface Surface {
    * Fills the specified rectangle.
    */
   Surface fillRect(float x, float y, float width, float height);
-
-  /**
-   * The height of this surface.
-   */
-  int height();
-
-  /**
-   * Restores the transform previously stored by {@link #save()}.
-   */
-  Surface restore();
-
-  /**
-   * Rotates the current transformation matrix by the specified angle in radians.
-   */
-  Surface rotate(float radians);
-
-  /**
-   * Saves the current transform.
-   */
-  Surface save();
-
-  /**
-   * Scales the current transformation matrix by the specified amount on each axis.
-   */
-  Surface scale(float sx, float sy);
-
-  /**
-   * Sets the color to be used for fill operations. This replaces any existing
-   * fill gradient or pattern.
-   */
-  Surface setFillColor(int color);
-
-  /**
-   * TODO
-   */
-  Surface setFillPattern(Pattern pattern);
-
-  /**
-   * Sets the transformation matrix directly, replacing the existing matrix.
-   */
-  Surface setTransform(float m11, float m12, float m21, float m22, float dx, float dy);
-
-  /**
-   * Multiplies the current transformation matrix by the given matrix.
-   */
-  Surface transform(float m11, float m12, float m21, float m22, float dx, float dy);
-
-  /**
-   * Translates the current transformation matrix by the given amount.
-   */
-  Surface translate(float x, float y);
-
-  /**
-   * The width of this surface.
-   */
-  int width();
 }
