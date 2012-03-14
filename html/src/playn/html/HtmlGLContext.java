@@ -29,6 +29,7 @@ import static com.google.gwt.webgl.client.WebGLRenderingContext.*;
 
 import playn.core.InternalTransform;
 import playn.core.gl.GLContext;
+import playn.core.gl.GLShader;
 import playn.core.gl.LayerGL;
 
 /**
@@ -36,11 +37,13 @@ import playn.core.gl.LayerGL;
  */
 public class HtmlGLContext extends GLContext
 {
-
   public final WebGLRenderingContext gl;
   private final CanvasElement canvas;
   private WebGLFramebuffer lastFBuf;
   int screenWidth, screenHeight;
+
+  private GLShader.Texture texShader;
+  private GLShader.Color colorShader;
 
   // Debug counters.
   // private int texCount;
@@ -170,14 +173,6 @@ public class HtmlGLContext extends GLContext
   }
 
   @Override
-  public void flush() {
-    if (curShader != null) {
-      curShader.flush();
-      curShader = null;
-    }
-  }
-
-  @Override
   public void checkGLError(String op) {
     // error checking? we don't need no steenking error checking!
   }
@@ -185,6 +180,23 @@ public class HtmlGLContext extends GLContext
   @Override
   public InternalTransform createTransform() {
     return new HtmlInternalTransform();
+  }
+
+  @Override
+  protected GLShader.Texture quadTexShader() {
+    return texShader;
+  }
+  @Override
+  protected GLShader.Texture trisTexShader() {
+    return texShader;
+  }
+  @Override
+  protected GLShader.Color quadColorShader() {
+    return colorShader;
+  }
+  @Override
+  protected GLShader.Color trisColorShader() {
+    return colorShader;
   }
 
   private void tryBasicGLCalls() throws RuntimeException {

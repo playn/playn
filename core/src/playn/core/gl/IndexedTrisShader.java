@@ -18,9 +18,9 @@ package playn.core.gl;
 import playn.core.InternalTransform;
 
 /**
- * A base {@link GLShader} implementation that handles common operations.
+ * A {@link GLShader} implementation that decomposes quads into indexed triangles.
  */
-public abstract class AbstractGLShader implements GLShader
+public abstract class IndexedTrisShader implements GLShader
 {
   @Override
   public void addQuad(InternalTransform local,
@@ -73,4 +73,20 @@ public abstract class AbstractGLShader implements GLShader
     for (int ii = 0, ll = indices.length; ii < ll; ii++)
       addElement(vertIdx+indices[ii]);
   }
+
+  /**
+   * Begins a primitive with the specified vertex and element count.
+   */
+  protected abstract int beginPrimitive(int vertexCount, int elemCount);
+
+  /**
+   * Adds a vertex to a primitive that was started with {@link #beginPrimitive}.
+   */
+  protected abstract void addVertex(float m00, float m01, float m10, float m11, float tx, float ty,
+                                    float dx, float dy, float sx, float sy);
+
+  /**
+   * Adds an element to a primitive that was started with {@link #beginPrimitive}.
+   */
+  protected abstract void addElement(int index);
 }

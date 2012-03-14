@@ -23,10 +23,7 @@ public abstract class GLContext {
   private Pender penders = null;
   private Object penderLock = new Object();
 
-  // our shaders
-  protected GLShader curShader;
-  protected GLShader.Texture texShader;
-  protected GLShader.Color colorShader;
+  private GLShader curShader;
 
   /** Creates a framebuffer that will render into the supplied texture. */
   public abstract Object createFramebuffer(Object tex);
@@ -116,86 +113,94 @@ public abstract class GLContext {
   public void drawTexture(Object tex, float texWidth, float texHeight, InternalTransform local,
                           float dx, float dy, float dw, float dh,
                           float sx, float sy, float sw, float sh, float alpha) {
-    texShader.prepare(tex, alpha);
+    GLShader.Texture shader = quadTexShader();
+    shader.prepare(tex, alpha);
     checkGLError("drawTexture texture prepared");
     sx /= texWidth; sy /= texHeight;
     sw /= texWidth; sh /= texHeight;
-    texShader.addQuad(local,
-                      dx,      dy,      sx,      sy,
-                      dx + dw, dy,      sx + sw, sy,
-                      dx,      dy + dh, sx,      sy + sh,
-                      dx + dw, dy + dh, sx + sw, sy + sh);
+    shader.addQuad(local,
+                   dx,      dy,      sx,      sy,
+                   dx + dw, dy,      sx + sw, sy,
+                   dx,      dy + dh, sx,      sy + sh,
+                   dx + dw, dy + dh, sx + sw, sy + sh);
     checkGLError("drawTexture end");
   }
 
   public void fillRect(InternalTransform local, float dx, float dy, float dw, float dh,
                        float texWidth, float texHeight, Object tex, float alpha) {
-    texShader.prepare(tex, alpha);
+    GLShader.Texture shader = quadTexShader();
+    shader.prepare(tex, alpha);
     checkGLError("fillRect tex prepared");
     float sx = dx / texWidth, sy = dy / texHeight;
     float sw = dw / texWidth, sh = dh / texHeight;
-    texShader.addQuad(local,
-                      dx,      dy,      sx,      sy,
-                      dx + dw, dy,      sx + sw, sy,
-                      dx,      dy + dh, sx,      sy + sh,
-                      dx + dw, dy + dh, sx + sw, sy + sh);
+    shader.addQuad(local,
+                   dx,      dy,      sx,      sy,
+                   dx + dw, dy,      sx + sw, sy,
+                   dx,      dy + dh, sx,      sy + sh,
+                   dx + dw, dy + dh, sx + sw, sy + sh);
     checkGLError("fillRect tex end");
   }
 
   public void fillRect(InternalTransform local, float dx, float dy, float dw, float dh,
                        int color, float alpha) {
-    colorShader.prepare(color, alpha);
+    GLShader.Color shader = quadColorShader();
+    shader.prepare(color, alpha);
     checkGLError("fillRect color prepared");
-    colorShader.addQuad(local,
-                        dx,      dy,
-                        dx + dw, dy,
-                        dx,      dy + dh,
-                        dx + dw, dy + dh);
+    shader.addQuad(local,
+                   dx,      dy,
+                   dx + dw, dy,
+                   dx,      dy + dh,
+                   dx + dw, dy + dh);
     checkGLError("fillRect color end");
   }
 
   public void fillQuad(InternalTransform local, float x1, float y1, float x2, float y2,
                        float x3, float y3, float x4, float y4,
                        float texWidth, float texHeight, Object tex, float alpha) {
-    texShader.prepare(tex, alpha);
+    GLShader.Texture shader = quadTexShader();
+    shader.prepare(tex, alpha);
     checkGLError("fillQuad tex prepared");
-    texShader.addQuad(local,
-                      x1, y1, x1/texWidth, y1/texHeight,
-                      x2, y2, x2/texWidth, y2/texHeight,
-                      x3, y3, x3/texWidth, y3/texHeight,
-                      x4, y4, x4/texWidth, y4/texHeight);
+    shader.addQuad(local,
+                   x1, y1, x1/texWidth, y1/texHeight,
+                   x2, y2, x2/texWidth, y2/texHeight,
+                   x3, y3, x3/texWidth, y3/texHeight,
+                   x4, y4, x4/texWidth, y4/texHeight);
     checkGLError("fillQuad tex end");
   }
 
   public void fillQuad(InternalTransform local, float x1, float y1, float x2, float y2,
                        float x3, float y3, float x4, float y4, int color, float alpha) {
-    colorShader.prepare(color, alpha);
+    GLShader.Color shader = quadColorShader();
+    shader.prepare(color, alpha);
     checkGLError("fillQuad color prepared");
-    colorShader.addQuad(local, x1, y1, x2, y2, x3, y3, x4, y4);
+    shader.addQuad(local, x1, y1, x2, y2, x3, y3, x4, y4);
     checkGLError("fillQuad color end");
   }
 
   public void fillTriangles(InternalTransform local, float[] xys, int[] indices,
                             float texWidth, float texHeight, Object tex, float alpha) {
-    texShader.prepare(tex, alpha);
+    GLShader.Texture shader = trisTexShader();
+    shader.prepare(tex, alpha);
     checkGLError("fillTris tex prepared");
-    texShader.addTriangles(local, xys, texWidth, texHeight, indices);
+    shader.addTriangles(local, xys, texWidth, texHeight, indices);
     checkGLError("fillTris tex end");
   }
 
   public void fillTriangles(InternalTransform local, float[] xys, int[] indices,
                             int color, float alpha) {
-    colorShader.prepare(color, alpha);
+    GLShader.Color shader = trisColorShader();
+    shader.prepare(color, alpha);
     checkGLError("fillTris color prepared");
-    colorShader.addTriangles(local, xys, 1, 1, indices);
+    shader.addTriangles(local, xys, 1, 1, indices);
     checkGLError("fillTris color end");
   }
 
   public void fillTriangles(InternalTransform local, float[] xys, float[] sxys, int[] indices,
                             Object tex, float alpha) {
-    texShader.prepare(tex, alpha);
+    GLShader.Texture shader = trisTexShader();
+    shader.prepare(tex, alpha);
     checkGLError("fillTris tex prepared");
-    texShader.addTriangles(local, xys, sxys, indices);
+    shader.addTriangles(local, xys, sxys, indices);
     checkGLError("fillTris tex end");
   }
 
@@ -218,6 +223,11 @@ public abstract class GLContext {
     curShader = shader;
     return true;
   }
+
+  protected abstract GLShader.Texture quadTexShader();
+  protected abstract GLShader.Texture trisTexShader();
+  protected abstract GLShader.Color quadColorShader();
+  protected abstract GLShader.Color trisColorShader();
 
   private void queuePender(Runnable action) {
     synchronized (penderLock) {

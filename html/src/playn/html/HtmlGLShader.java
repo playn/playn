@@ -27,10 +27,11 @@ import com.google.gwt.webgl.client.WebGLUtil;
 import static com.google.gwt.webgl.client.WebGLRenderingContext.*;
 
 import playn.core.InternalTransform;
-import playn.core.gl.AbstractGLShader;
 import playn.core.gl.GLShader;
+import playn.core.gl.IndexedTrisShader;
 
-public class HtmlGLShader extends AbstractGLShader {
+public class HtmlGLShader extends IndexedTrisShader {
+
   public static class Texture extends HtmlGLShader implements GLShader.Texture {
     private WebGLUniformLocation uTexture;
     private WebGLUniformLocation uAlpha;
@@ -198,7 +199,7 @@ public class HtmlGLShader extends AbstractGLShader {
   }
 
   @Override
-  public int beginPrimitive(int vertexCount, int elemCount) {
+  protected int beginPrimitive(int vertexCount, int elemCount) {
     int vertIdx = vertexOffset / VERTEX_SIZE;
     if ((vertIdx + vertexCount > MAX_VERTS) || (elementOffset + elemCount > MAX_ELEMS)) {
       flush();
@@ -208,8 +209,8 @@ public class HtmlGLShader extends AbstractGLShader {
   }
 
   @Override
-  public void addVertex(float m00, float m01, float m10, float m11, float tx, float ty,
-                        float dx, float dy, float sx, float sy) {
+  protected void addVertex(float m00, float m01, float m10, float m11, float tx, float ty,
+                           float dx, float dy, float sx, float sy) {
     vertexData.set(vertexOffset + 0, m00);
     vertexData.set(vertexOffset + 1, m01);
     vertexData.set(vertexOffset + 2, m10);
@@ -224,7 +225,7 @@ public class HtmlGLShader extends AbstractGLShader {
   }
 
   @Override
-  public void addElement(int index) {
+  protected void addElement(int index) {
     elementData.set(elementOffset++, index);
   }
 }

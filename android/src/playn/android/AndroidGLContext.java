@@ -16,6 +16,7 @@
 package playn.android;
 
 import static playn.core.PlayN.log;
+import playn.core.gl.GLShader;
 
 import java.util.*;
 
@@ -47,6 +48,9 @@ public class AndroidGLContext extends GLContext
   public int viewWidth, viewHeight;
   int fbufWidth, fbufHeight;
   private int lastFrameBuffer;
+
+  private GLShader.Texture texShader;
+  private GLShader.Color colorShader;
 
   final AndroidGL20 gl20;
 
@@ -199,15 +203,6 @@ public class AndroidGLContext extends GLContext
   }
 
   @Override
-  public void flush() {
-    if (curShader != null) {
-      checkGLError("flush()");
-      curShader.flush();
-      curShader = null;
-    }
-  }
-
-  @Override
   public void checkGLError(String op) {
     if (CHECK_ERRORS) {
       int error;
@@ -215,6 +210,23 @@ public class AndroidGLContext extends GLContext
         log().error(this.getClass().getName() + " -- " + op + ": glError " + error);
       }
     }
+  }
+
+  @Override
+  protected GLShader.Texture quadTexShader() {
+    return texShader;
+  }
+  @Override
+  protected GLShader.Texture trisTexShader() {
+    return texShader;
+  }
+  @Override
+  protected GLShader.Color quadColorShader() {
+    return colorShader;
+  }
+  @Override
+  protected GLShader.Color trisColorShader() {
+    return colorShader;
   }
 
   void addRefreshable(Refreshable ref) {

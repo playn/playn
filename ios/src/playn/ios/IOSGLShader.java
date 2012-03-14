@@ -24,10 +24,10 @@ import cli.OpenTK.Graphics.ES20.GL;
 
 import playn.core.InternalTransform;
 import playn.core.PlayN;
-import playn.core.gl.AbstractGLShader;
 import playn.core.gl.GLShader;
+import playn.core.gl.IndexedTrisShader;
 
-public class IOSGLShader extends AbstractGLShader {
+public class IOSGLShader extends IndexedTrisShader {
 
   public static class Texture extends IOSGLShader implements GLShader.Texture {
     private int uTexture, uAlpha, lastTex;
@@ -191,7 +191,7 @@ public class IOSGLShader extends AbstractGLShader {
   }
 
   @Override
-  public int beginPrimitive(int vertexCount, int elemCount) {
+  protected int beginPrimitive(int vertexCount, int elemCount) {
     int vertIdx = vertexOffset / VERTEX_SIZE;
     int verts = vertIdx + vertexCount, elems = elementOffset + elemCount;
     int availVerts = vertexData.length / VERTEX_SIZE, availElems = elementData.length;
@@ -207,8 +207,8 @@ public class IOSGLShader extends AbstractGLShader {
   }
 
   @Override
-  public void addVertex(float m00, float m01, float m10, float m11, float tx, float ty,
-                        float dx, float dy, float sx, float sy) {
+  protected void addVertex(float m00, float m01, float m10, float m11, float tx, float ty,
+                           float dx, float dy, float sx, float sy) {
     int ii = vertexOffset;
     vertexData[ii++] = m00;
     vertexData[ii++] = m01;
@@ -224,7 +224,7 @@ public class IOSGLShader extends AbstractGLShader {
   }
 
   @Override
-  public void addElement(int index) {
+  protected void addElement(int index) {
     elementData[elementOffset++] = (short) index;
   }
 

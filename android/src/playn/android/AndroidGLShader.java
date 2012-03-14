@@ -24,14 +24,14 @@ import java.nio.ShortBuffer;
 import android.util.Log;
 
 import playn.core.InternalTransform;
-import playn.core.gl.AbstractGLShader;
 import playn.core.gl.GL20;
 import playn.core.gl.GLShader;
+import playn.core.gl.IndexedTrisShader;
 
 /**
  * Implements shaders for Android.
  */
-public class AndroidGLShader extends AbstractGLShader
+public class AndroidGLShader extends IndexedTrisShader
 {
   static class Texture extends AndroidGLShader implements GLShader.Texture {
     private int uTexture, uAlpha, lastTex;
@@ -203,7 +203,7 @@ public class AndroidGLShader extends AbstractGLShader
   }
 
   @Override
-  public int beginPrimitive(int vertexCount, int elemCount) {
+  protected int beginPrimitive(int vertexCount, int elemCount) {
     int vertIdx = vertexOffset / VERTEX_SIZE;
     int verts = vertIdx + vertexCount, elems = elementOffset + elemCount;
     int availVerts = vertexData.capacity() / VERTEX_SIZE, availElems = elementData.capacity();
@@ -219,8 +219,8 @@ public class AndroidGLShader extends AbstractGLShader
   }
 
   @Override
-  public void addVertex(float m00, float m01, float m10, float m11, float tx, float ty,
-                        float dx, float dy, float sx, float sy) {
+  protected void addVertex(float m00, float m01, float m10, float m11, float tx, float ty,
+                           float dx, float dy, float sx, float sy) {
     vertexData.position(vertexOffset);
     vertexData.put(m00);
     vertexData.put(m01);
@@ -236,7 +236,7 @@ public class AndroidGLShader extends AbstractGLShader
   }
 
   @Override
-  public void addElement(int index) {
+  protected void addElement(int index) {
     elementData.position(elementOffset);
     elementData.put((short) index);
     elementOffset++;

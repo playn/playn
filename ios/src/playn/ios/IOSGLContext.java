@@ -36,6 +36,7 @@ import playn.core.InternalTransform;
 import playn.core.PlayN;
 import playn.core.StockInternalTransform;
 import playn.core.gl.GLContext;
+import playn.core.gl.GLShader;
 import playn.core.gl.GroupLayerGL;
 
 class IOSGLContext extends GLContext
@@ -48,6 +49,9 @@ class IOSGLContext extends GLContext
   private int lastFrameBuffer;
   private InternalTransform rootTransform = StockInternalTransform.IDENTITY;
   private Set<Integer> supportedOrients = new HashSet<Integer>();
+
+  private GLShader.Texture texShader;
+  private GLShader.Color colorShader;
 
   IOSGLContext(int screenWidth, int screenHeight) {
     fbufWidth = viewWidth = screenWidth;
@@ -180,6 +184,23 @@ class IOSGLContext extends GLContext
         PlayN.log().error(op + ": glError " + error);
       }
     }
+  }
+
+  @Override
+  protected GLShader.Texture quadTexShader() {
+    return texShader;
+  }
+  @Override
+  protected GLShader.Texture trisTexShader() {
+    return texShader;
+  }
+  @Override
+  protected GLShader.Color quadColorShader() {
+    return colorShader;
+  }
+  @Override
+  protected GLShader.Color trisColorShader() {
+    return colorShader;
   }
 
   void bindFramebuffer(int frameBuffer, int width, int height, boolean force) {
