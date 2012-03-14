@@ -19,6 +19,7 @@ package playn.flash;
 import playn.core.Asserts;
 import playn.core.Surface;
 import playn.core.Image;
+import playn.core.PlayN;
 import playn.core.Pattern;
 import playn.flash.FlashCanvasLayer.Context2d;
 
@@ -59,7 +60,7 @@ public class FlashSurface implements Surface {
 
   @Override
   public Surface drawImage(Image img, float dx, float dy, float dw, float dh,
-      float sx, float sy, float sw, float sh) {
+                           float sx, float sy, float sw, float sh) {
     Asserts.checkArgument(img instanceof FlashImage);
     dirty = true;
     context2d.drawImage(((FlashImage) img).bitmapData(), dx, dy, dw, dh, sx, sy, sw, sh);
@@ -79,6 +80,29 @@ public class FlashSurface implements Surface {
     context2d.fillRect(x, y, w, h);
     dirty = true;
     return this;
+  }
+
+  @Override
+  public Surface fillTriangles(float[] xys, int[] indices) {
+    FlashPath path = (FlashPath)PlayN.graphics().createPath();
+    for (int ii = 0; ii < indices.length; ii += 3) {
+      int a = 2*indices[ii], b = 2*indices[ii+1], c = 2*indices[ii+2];
+      path.moveTo(xys[a], xys[a+1]);
+      path.lineTo(xys[b], xys[b+1]);
+      path.lineTo(xys[c], xys[c+1]);
+      path.close();
+    }
+    path.replay(context2d);
+    context2d.fill();
+    dirty = true;
+    return this;
+  }
+
+  @Override
+  public Surface fillTriangles(float[] xys, float[] sxys, int[] indices) {
+    // canvas-based surfaces can't handle texture coordinates, so ignore them; the caller has been
+    // warned of this sub-optimal fallback behavior in this method's javadocs
+    return fillTriangles(xys, indices);
   }
 
   @Override
@@ -110,35 +134,29 @@ public class FlashSurface implements Surface {
     return this;
   }
 
-
-
   @Override
-   public Surface setFillColor(int color) {
-     context2d.setFillStyle("rgba("
-         + ((color >> 16) & 0xff) + ","
-         + ((color >> 8) & 0xff) + ","
-         + (color & 0xff) + ","
-         + ((color >> 24) & 0xff) + ")");
-     return this;
-   }
+  public Surface setFillColor(int color) {
+    context2d.setFillStyle("rgba("
+                           + ((color >> 16) & 0xff) + ","
+                           + ((color >> 8) & 0xff) + ","
+                           + (color & 0xff) + ","
+                           + ((color >> 24) & 0xff) + ")");
+    return this;
+  }
 
-   public Surface setStrokeColor(int color) {
-     context2d.setStrokeStyle("rgba("
-         + ((color >> 16) & 0xff) + ","
-         + ((color >> 8) & 0xff) + ","
-         + (color & 0xff) + ","
-         + ((color >> 24) & 0xff) + ")");
-     return this;
-   }
-
-
+  public Surface setStrokeColor(int color) {
+    context2d.setStrokeStyle("rgba("
+                             + ((color >> 16) & 0xff) + ","
+                             + ((color >> 8) & 0xff) + ","
+                             + (color & 0xff) + ","
+                             + ((color >> 24) & 0xff) + ")");
+    return this;
+  }
 
   @Override
   public Surface setFillPattern(Pattern pattern) {
-      return this;
+    return this;
   }
-
-
 
   @Override
   public Surface setTransform(float m11, float m12, float m21, float m22, float dx, float dy) {
@@ -148,7 +166,7 @@ public class FlashSurface implements Surface {
 
   @Override
   public Surface transform(float m11, float m12, float m21, float m22, float dx,
-      float dy) {
+                           float dy) {
     context2d.transform(m11, m12, m21, m22, dx, dy);
     return this;
   }
@@ -163,7 +181,6 @@ public class FlashSurface implements Surface {
   public final int width() {
     return width;
   }
-
 
   void clearDirty() {
     dirty = false;
@@ -185,6 +202,4 @@ public class FlashSurface implements Surface {
     context2d.stroke();
     return this;
   }
-
-
 }
