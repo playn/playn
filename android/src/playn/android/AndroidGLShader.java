@@ -115,8 +115,8 @@ public class AndroidGLShader extends AbstractGLShader
   }
 
   private static final int VERTEX_SIZE = 10; // 10 floats per vertex
-  private static final int MAX_VERTS = 32*4;
-  private static final int MAX_ELEMS = 6*MAX_VERTS/4;
+  private static final int START_VERTS = 16*4;
+  private static final int START_ELEMS = 6*START_VERTS/4;
   private static final int FLOAT_SIZE_BYTES = 4;
   private static final int SHORT_SIZE_BYTES = 2;
   private static final int VERTEX_STRIDE = VERTEX_SIZE * FLOAT_SIZE_BYTES;
@@ -125,11 +125,10 @@ public class AndroidGLShader extends AbstractGLShader
   protected final AndroidGL20 gl20;
   protected final int program, uScreenSizeLoc, aMatrix, aTranslation, aPosition, aTexture;
 
-  protected final FloatBuffer vertexData = ByteBuffer.allocateDirect(
-    VERTEX_STRIDE * MAX_VERTS).order(ByteOrder.nativeOrder()).asFloatBuffer();
-  protected final ShortBuffer elementData = ByteBuffer.allocateDirect(
-    MAX_ELEMS * SHORT_SIZE_BYTES).order(ByteOrder.nativeOrder()).asShortBuffer();
-  protected int vertexBuffer, elementBuffer, vertexOffset, elementOffset;
+  protected FloatBuffer vertexData;
+  protected ShortBuffer elementData;
+  protected final int vertexBuffer, elementBuffer;
+  protected int vertexOffset, elementOffset;
 
   protected AndroidGLShader(AndroidGLContext ctx, String fragShader) {
     this.ctx = ctx;
@@ -143,11 +142,13 @@ public class AndroidGLShader extends AbstractGLShader
     aPosition = gl20.glGetAttribLocation(program, "a_Position");
     aTexture = gl20.glGetAttribLocation(program, "a_Texture");
 
-    // Create the vertex and index buffers
+    // create the vertex and index buffer handles and buffers
     int[] buffers = new int[2];
     gl20.glGenBuffers(2, buffers, 0);
     vertexBuffer = buffers[0];
     elementBuffer = buffers[1];
+    expandVerts(START_VERTS);
+    expandElems(START_ELEMS);
   }
 
   protected boolean prepare() {
@@ -204,8 +205,14 @@ public class AndroidGLShader extends AbstractGLShader
   @Override
   public int beginPrimitive(int vertexCount, int elemCount) {
     int vertIdx = vertexOffset / VERTEX_SIZE;
-    if ((vertIdx + vertexCount > MAX_VERTS) || (elementOffset + elemCount > MAX_ELEMS)) {
+    int verts = vertIdx + vertexCount, elems = elementOffset + elemCount;
+    int availVerts = vertexData.capacity() / VERTEX_SIZE, availElems = elementData.capacity();
+    if ((verts > availVerts) || (elems > availElems)) {
       flush();
+      if (vertexCount > availVerts)
+        expandVerts(vertexCount);
+      if (elemCount > availElems)
+        expandElems(elemCount);
       return 0;
     }
     return vertIdx;
@@ -261,6 +268,16 @@ public class AndroidGLShader extends AbstractGLShader
     }
 
     return shader;
+  }
+
+  private void expandVerts(int vertCount) {
+    vertexData = ByteBuffer.allocateDirect(vertCount * VERTEX_STRIDE).order(
+      ByteOrder.nativeOrder()).asFloatBuffer();
+  }
+
+  private void expandElems(int elemCount) {
+    elementData = ByteBuffer.allocateDirect(elemCount * SHORT_SIZE_BYTES).order(
+      ByteOrder.nativeOrder()).asShortBuffer();
   }
 
   // Creates program object, attaches shaders, and links into pipeline

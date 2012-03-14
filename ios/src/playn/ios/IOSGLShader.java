@@ -105,29 +105,30 @@ public class IOSGLShader extends AbstractGLShader {
   }
 
   private static final int VERTEX_SIZE = 10; // 10 floats per vertex
-  private static final int MAX_VERTS = 4*32;
-  private static final int MAX_ELEMS = 6*MAX_VERTS/4;
+  private static final int START_VERTS = 4*16;
+  private static final int START_ELEMS = 6*START_VERTS/4;
   private static final int SIZEOF_FLOAT = 4;
   private static final int VERTEX_STRIDE = VERTEX_SIZE * SIZEOF_FLOAT;
 
   protected final IOSGLContext ctx;
   protected final int program, uScreenSizeLoc, aMatrix, aTranslation, aPosition, aTexture;
 
-  protected final float[] vertexData = new float[VERTEX_SIZE * MAX_VERTS];
-  protected final GCHandle vertexHandle = GCHandle.Alloc(
-    vertexData, GCHandleType.wrap(GCHandleType.Pinned));
+  protected float[] vertexData;
+  protected GCHandle vertexHandle;
   protected final int vertexBuffer;
   protected int vertexOffset;
 
-  protected final short[] elementData = new short[MAX_ELEMS];
-  protected final GCHandle elementHandle = GCHandle.Alloc(
-    elementData, GCHandleType.wrap(GCHandleType.Pinned));
+  protected short[] elementData;
+  protected GCHandle elementHandle;
   protected final int elementBuffer;
   protected int elementOffset;
 
   protected IOSGLShader(IOSGLContext ctx, String fragShader) {
     this.ctx = ctx;
     program = createProgram(VERTEX_SHADER, fragShader);
+
+    expandVerts(START_VERTS);
+    expandElems(START_ELEMS);
 
     uScreenSizeLoc = GL.GetUniformLocation(program, "u_ScreenSize");
     aMatrix = GL.GetAttribLocation(program, "a_Matrix");
@@ -192,8 +193,14 @@ public class IOSGLShader extends AbstractGLShader {
   @Override
   public int beginPrimitive(int vertexCount, int elemCount) {
     int vertIdx = vertexOffset / VERTEX_SIZE;
-    if ((vertIdx + vertexCount > MAX_VERTS) || (elementOffset + elemCount > MAX_ELEMS)) {
+    int verts = vertIdx + vertexCount, elems = elementOffset + elemCount;
+    int availVerts = vertexData.length / VERTEX_SIZE, availElems = elementData.length;
+    if ((verts > availVerts) || (elems > availElems)) {
       flush();
+      if (vertexCount > availVerts)
+        expandVerts(vertexCount);
+      if (elemCount > availElems)
+        expandElems(elemCount);
       return 0;
     }
     return vertIdx;
@@ -219,6 +226,20 @@ public class IOSGLShader extends AbstractGLShader {
   @Override
   public void addElement(int index) {
     elementData[elementOffset++] = (short) index;
+  }
+
+  private void expandVerts(int vertCount) {
+    if (vertexHandle != null)
+      vertexHandle.Free();
+    vertexData = new float[VERTEX_SIZE * vertCount];
+    vertexHandle = GCHandle.Alloc(vertexData, GCHandleType.wrap(GCHandleType.Pinned));
+  }
+
+  private void expandElems(int elemCount) {
+    if (elementHandle != null)
+      elementHandle.Free();
+    elementData = new short[elemCount];
+    elementHandle = GCHandle.Alloc(elementData, GCHandleType.wrap(GCHandleType.Pinned));
   }
 
   private int loadShader(All type, final String shaderSource) {
