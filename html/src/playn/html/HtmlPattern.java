@@ -17,9 +17,10 @@ package playn.html;
 
 import com.google.gwt.canvas.dom.client.CanvasPattern;
 
-import playn.core.Pattern;
+import playn.core.gl.GLPattern;
+import playn.core.gl.ImageGL;
 
-class HtmlPattern implements Pattern {
+class HtmlPattern implements GLPattern {
 
   final HtmlImage image;
   final CanvasPattern pattern;
@@ -27,5 +28,10 @@ class HtmlPattern implements Pattern {
   HtmlPattern(HtmlImage image, CanvasPattern pattern) {
     this.image = image;
     this.pattern = pattern;
+  }
+
+  @Override
+  public ImageGL image() {
+    return image;
   }
 }
