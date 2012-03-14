@@ -55,10 +55,13 @@ public interface GLShader
    * sequence of {@link #beginPrimitive}, {@link #addVertex} and {@link #addElement} for you.
    *
    * @param xys a list of x/y coordinates as: {@code [x1, y1, x2, y2, ...]}.
+   * @param texWidth the width of the texture for which we will auto-generate texture coordinates.
+   * @param texHeight the height of the texture for which we will auto-generate texture coordinates.
    * @param indices the index of the triangle vertices in the supplied {@code xys} array. This must
    * be in proper winding order for OpenGL rendering.
    */
-  void addTriangles(InternalTransform local, float[] xys, int[] indices);
+  void addTriangles(InternalTransform local, float[] xys, float texWidth, float texHeight,
+                    int[] indices);
 
   /**
    * Adds a collection of triangles to the current render operation. This calls the appropriate

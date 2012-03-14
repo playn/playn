@@ -51,12 +51,14 @@ public abstract class AbstractGLShader implements GLShader
   }
 
   @Override
-  public void addTriangles(InternalTransform local, float[] xys, int[] indices) {
+  public void addTriangles(InternalTransform local, float[] xys, float tw, float th, int[] indices) {
     float m00 = local.m00(), m01 = local.m01(), m10 = local.m10(), m11 = local.m11();
     float tx = local.tx(), ty = local.ty();
     int vertIdx = beginPrimitive(xys.length/2, indices.length);
-    for (int ii = 0, ll = xys.length; ii < ll; ii += 2)
-      addVertex(m00, m01, m10, m11, tx, ty, xys[ii], xys[ii+1], 0, 0);
+    for (int ii = 0, ll = xys.length; ii < ll; ii += 2) {
+      float x = xys[ii], y = xys[ii+1];
+      addVertex(m00, m01, m10, m11, tx, ty, x, y, x/tw, y/th);
+    }
     for (int ii = 0, ll = indices.length; ii < ll; ii++)
       addElement(vertIdx+indices[ii]);
   }

@@ -126,6 +126,31 @@ abstract class AbstractSurfaceGL implements Surface {
   }
 
   @Override
+  public Surface fillTriangles(float[] xys, int[] indices) {
+    bindFramebuffer();
+
+    if (fillPattern != null) {
+      Object tex = fillPattern.ensureTexture(ctx, true, true);
+      ctx.fillTriangles(topTransform(), xys, indices,
+                        fillPattern.width(), fillPattern.height(), tex, 1);
+    } else {
+      ctx.fillTriangles(topTransform(), xys, indices, fillColor, 1);
+    }
+    return this;
+  }
+
+  @Override
+  public Surface fillTriangles(float[] xys, float[] sxys, int[] indices) {
+    bindFramebuffer();
+
+    if (fillPattern == null)
+      throw new IllegalStateException("No fill pattern currently set");
+    Object tex = fillPattern.ensureTexture(ctx, true, true);
+    ctx.fillTriangles(topTransform(), xys, sxys, indices, tex, 1);
+    return this;
+  }
+
+  @Override
   public Surface restore() {
     Asserts.checkState(transformStack.size() > 1, "Unbalanced save/restore");
     transformStack.remove(transformStack.size() - 1);

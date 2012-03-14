@@ -118,13 +118,12 @@ public abstract class GLContext {
                           float sx, float sy, float sw, float sh, float alpha) {
     texShader.prepare(tex, alpha);
     checkGLError("drawTexture texture prepared");
-    sx /= texWidth;
-    sw /= texWidth;
-    sy /= texHeight;
-    sh /= texHeight;
-    texShader.addQuad(local, dx, dy, sx, sy,
-                      dx + dw, dy, sx + sw, sy,
-                      dx, dy + dh, sx, sy + sh,
+    sx /= texWidth; sy /= texHeight;
+    sw /= texWidth; sh /= texHeight;
+    texShader.addQuad(local,
+                      dx,      dy,      sx,      sy,
+                      dx + dw, dy,      sx + sw, sy,
+                      dx,      dy + dh, sx,      sy + sh,
                       dx + dw, dy + dh, sx + sw, sy + sh);
     checkGLError("drawTexture end");
   }
@@ -135,10 +134,11 @@ public abstract class GLContext {
     checkGLError("fillRect tex prepared");
     float sx = dx / texWidth, sy = dy / texHeight;
     float sw = dw / texWidth, sh = dh / texHeight;
-    texShader.addQuad(local, dx, dy, sx, sy,
-                      dx + dw, dy, sx + sw, sy,
-                      dx, dy + dh, sx, sy + sh,
-                      dx + dw, dy + sy, sx + sw, sy + sh);
+    texShader.addQuad(local,
+                      dx,      dy,      sx,      sy,
+                      dx + dw, dy,      sx + sw, sy,
+                      dx,      dy + dh, sx,      sy + sh,
+                      dx + dw, dy + dh, sx + sw, sy + sh);
     checkGLError("fillRect tex end");
   }
 
@@ -146,8 +146,11 @@ public abstract class GLContext {
                        int color, float alpha) {
     colorShader.prepare(color, alpha);
     checkGLError("fillRect color prepared");
-    colorShader.addQuad(local, dx, dy, dx + dw, dy,
-                        dx, dy + dh, dx + dw, dy + dh);
+    colorShader.addQuad(local,
+                        dx,      dy,
+                        dx + dw, dy,
+                        dx,      dy + dh,
+                        dx + dw, dy + dh);
     checkGLError("fillRect color end");
   }
 
@@ -156,7 +159,8 @@ public abstract class GLContext {
                        float texWidth, float texHeight, Object tex, float alpha) {
     texShader.prepare(tex, alpha);
     checkGLError("fillQuad tex prepared");
-    texShader.addQuad(local, x1, y1, x1/texWidth, y1/texHeight,
+    texShader.addQuad(local,
+                      x1, y1, x1/texWidth, y1/texHeight,
                       x2, y2, x2/texWidth, y2/texHeight,
                       x3, y3, x3/texWidth, y3/texHeight,
                       x4, y4, x4/texWidth, y4/texHeight);
@@ -169,6 +173,30 @@ public abstract class GLContext {
     checkGLError("fillQuad color prepared");
     colorShader.addQuad(local, x1, y1, x2, y2, x3, y3, x4, y4);
     checkGLError("fillQuad color end");
+  }
+
+  public void fillTriangles(InternalTransform local, float[] xys, int[] indices,
+                            float texWidth, float texHeight, Object tex, float alpha) {
+    texShader.prepare(tex, alpha);
+    checkGLError("fillTris tex prepared");
+    texShader.addTriangles(local, xys, texWidth, texHeight, indices);
+    checkGLError("fillTris tex end");
+  }
+
+  public void fillTriangles(InternalTransform local, float[] xys, int[] indices,
+                            int color, float alpha) {
+    colorShader.prepare(color, alpha);
+    checkGLError("fillTris color prepared");
+    colorShader.addTriangles(local, xys, 1, 1, indices);
+    checkGLError("fillTris color end");
+  }
+
+  public void fillTriangles(InternalTransform local, float[] xys, float[] sxys, int[] indices,
+                            Object tex, float alpha) {
+    texShader.prepare(tex, alpha);
+    checkGLError("fillTris tex prepared");
+    texShader.addTriangles(local, xys, sxys, indices);
+    checkGLError("fillTris tex end");
   }
 
   public void flush() {

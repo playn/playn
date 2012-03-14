@@ -74,6 +74,27 @@ public class CanvasSurface implements Surface {
   }
 
   @Override
+  public Surface fillTriangles(float[] xys, int[] indices) {
+    Path path = PlayN.graphics().createPath();
+    for (int ii = 0; ii < indices.length; ii += 3) {
+      int a = 2*indices[ii], b = 2*indices[ii+1], c = 2*indices[ii+2];
+      path.moveTo(xys[a], xys[a+1]);
+      path.lineTo(xys[b], xys[b+1]);
+      path.lineTo(xys[c], xys[c+1]);
+      path.close();
+    }
+    canvas.fillPath(path);
+    return this;
+  }
+
+  @Override
+  public Surface fillTriangles(float[] xys, float[] sxys, int[] indices) {
+    // canvas-based surfaces can't handle texture coordinates, so ignore them; the caller has been
+    // warned of this sub-optimal fallback behavior in this method's javadocs
+    return fillTriangles(xys, indices);
+  }
+
+  @Override
   public int height() {
     return canvas.height();
   }
