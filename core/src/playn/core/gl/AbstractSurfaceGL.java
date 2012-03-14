@@ -103,8 +103,10 @@ abstract class AbstractSurfaceGL implements Surface {
 
     if (fillPattern != null) {
       Object tex = fillPattern.ensureTexture(ctx, true, true);
-      ctx.fillQuad(topTransform(), qx1, qy1, qx2, qy2, qx3, qy3, qx4, qy4,
-                   fillPattern.width(), fillPattern.height(), tex, 1);
+      if (tex != null) {
+        ctx.fillQuad(topTransform(), qx1, qy1, qx2, qy2, qx3, qy3, qx4, qy4,
+                     fillPattern.width(), fillPattern.height(), tex, 1);
+      }
     } else {
       ctx.fillQuad(topTransform(), qx1, qy1, qx2, qy2, qx3, qy3, qx4, qy4, fillColor, 1);
     }
@@ -117,8 +119,10 @@ abstract class AbstractSurfaceGL implements Surface {
 
     if (fillPattern != null) {
       Object tex = fillPattern.ensureTexture(ctx, true, true);
-      ctx.fillRect(topTransform(), x, y, width, height,
-                   fillPattern.width(), fillPattern.height(), tex, 1);
+      if (tex != null) {
+        ctx.fillRect(topTransform(), x, y, width, height,
+                     fillPattern.width(), fillPattern.height(), tex, 1);
+      }
     } else {
       ctx.fillRect(topTransform(), x, y, width, height, fillColor, 1);
     }
@@ -131,8 +135,10 @@ abstract class AbstractSurfaceGL implements Surface {
 
     if (fillPattern != null) {
       Object tex = fillPattern.ensureTexture(ctx, true, true);
-      ctx.fillTriangles(topTransform(), xys, indices,
-                        fillPattern.width(), fillPattern.height(), tex, 1);
+      if (tex != null) {
+        ctx.fillTriangles(topTransform(), xys, indices,
+                          fillPattern.width(), fillPattern.height(), tex, 1);
+      }
     } else {
       ctx.fillTriangles(topTransform(), xys, indices, fillColor, 1);
     }
@@ -146,7 +152,9 @@ abstract class AbstractSurfaceGL implements Surface {
     if (fillPattern == null)
       throw new IllegalStateException("No fill pattern currently set");
     Object tex = fillPattern.ensureTexture(ctx, true, true);
-    ctx.fillTriangles(topTransform(), xys, sxys, indices, tex, 1);
+    if (tex != null) {
+      ctx.fillTriangles(topTransform(), xys, sxys, indices, tex, 1);
+    }
     return this;
   }
 
