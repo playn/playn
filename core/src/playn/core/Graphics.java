@@ -81,8 +81,9 @@ public interface Graphics {
       int colors[], float positions[]);
 
   /**
-   * Creates a path object that may be used with {@link Canvas} drawing methods.
+   * @deprecated Use {@link Canvas#createPath}.
    */
+  @Deprecated
   Path createPath();
 
   /**

@@ -114,7 +114,7 @@ public abstract class HtmlGraphics implements Graphics {
     return new HtmlGradient(gradient);
   }
 
-  @Override
+  @Override @Deprecated
   public Path createPath() {
     return new HtmlPath();
   }

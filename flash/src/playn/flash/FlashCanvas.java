@@ -52,6 +52,11 @@ class FlashCanvas implements Canvas {
   }
 
   @Override
+  public Path createPath() {
+    return new FlashPath();
+  }
+
+  @Override
   public Canvas drawImage(Image img, float x, float y) {
     Asserts.checkArgument(img instanceof FlashImage);
     dirty = true;

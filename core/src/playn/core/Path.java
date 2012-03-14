@@ -16,7 +16,7 @@
 package playn.core;
 
 /**
- * A path object created by {@link Graphics#createPath()}.
+ * A path object created by {@link Canvas#createPath}.
  */
 public interface Path {
 

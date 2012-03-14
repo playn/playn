@@ -148,7 +148,7 @@ class FlashGraphics implements Graphics {
     return new FlashGradient();
   }
 
-  @Override
+  @Override @Deprecated
   public Path createPath() {
     return new FlashPath();
   }

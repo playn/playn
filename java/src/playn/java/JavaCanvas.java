@@ -76,6 +76,11 @@ class JavaCanvas implements Canvas {
   }
 
   @Override
+  public Path createPath() {
+    return new JavaPath();
+  }
+
+  @Override
   public Canvas drawImage(Image img, float x, float y) {
     Asserts.checkArgument(img instanceof JavaImage);
     JavaImage jimg = (JavaImage) img;

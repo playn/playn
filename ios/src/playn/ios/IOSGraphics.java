@@ -73,7 +73,7 @@ public class IOSGraphics extends GraphicsGL {
     return new IOSGradient.Linear(x0, y0, x1, y1, colors, positions);
   }
 
-  @Override
+  @Override @Deprecated
   public Path createPath() {
     return new IOSPath();
   }

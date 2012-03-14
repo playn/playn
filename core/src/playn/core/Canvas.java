@@ -151,6 +151,11 @@ public interface Canvas {
   Canvas clip(Path clipPath);
 
   /**
+   * Creates a path object.
+   */
+  Path createPath();
+
+  /**
    * Draws an image at the specified location.
    *
    * @param dx the destination x

@@ -75,7 +75,7 @@ public class CanvasSurface implements Surface {
 
   @Override
   public Surface fillTriangles(float[] xys, int[] indices) {
-    Path path = PlayN.graphics().createPath();
+    Path path = canvas.createPath();
     for (int ii = 0; ii < indices.length; ii += 3) {
       int a = 2*indices[ii], b = 2*indices[ii+1], c = 2*indices[ii+2];
       path.moveTo(xys[a], xys[a+1]);

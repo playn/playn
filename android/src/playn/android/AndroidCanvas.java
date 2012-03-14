@@ -60,6 +60,11 @@ class AndroidCanvas implements Canvas {
   }
 
   @Override
+  public Path createPath() {
+    return new AndroidPath();
+  }
+
+  @Override
   public Canvas drawImage(Image img, float x, float y) {
     drawImage(img, x, y, img.width(), img.height());
     return this;

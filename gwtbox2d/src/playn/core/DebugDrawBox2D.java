@@ -114,7 +114,7 @@ public class DebugDrawBox2D extends DebugDraw {
 
     setFillColor(color);
     setStrokeColor(color);
-    Path path = graphics().createPath();
+    Path path = canvas.createPath();
     for (int i = 0; i < vertexCount; i++) {
       getWorldToScreenToOut(vertices[i], tempVec1);
       if (i == 0) {

@@ -119,6 +119,11 @@ public class IOSCanvas implements Canvas
   }
 
   @Override
+  public Path createPath() {
+    return new IOSPath();
+  }
+
+  @Override
   public Canvas drawImage(Image image, float dx, float dy) {
     return drawImage(image, dx, dy, image.width(), image.height());
   }

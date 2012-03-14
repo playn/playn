@@ -71,6 +71,11 @@ class HtmlCanvas implements Canvas {
   }
 
   @Override
+  public Path createPath() {
+    return new HtmlPath();
+  }
+
+  @Override
   public Canvas drawImage(Image img, float x, float y) {
     Asserts.checkArgument(img instanceof HtmlImage);
     ctx.drawImage(((HtmlImage) img).img, x, y);

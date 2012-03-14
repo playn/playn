@@ -74,7 +74,7 @@ class AndroidGraphics extends GraphicsGL {
     return new AndroidGradient(gradient);
   }
 
-  @Override
+  @Override @Deprecated
   public Path createPath() {
     return new AndroidPath();
   }

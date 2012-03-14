@@ -122,7 +122,7 @@ public class JavaGraphics implements Graphics {
     return JavaGradient.createLinear(x0, y0, x1, y1, positions, colors);
   }
 
-  @Override
+  @Override @Deprecated
   public Path createPath() {
     return new JavaPath();
   }
