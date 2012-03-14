@@ -42,8 +42,10 @@ public class HtmlGLContext extends GLContext
   private WebGLFramebuffer lastFBuf;
   int screenWidth, screenHeight;
 
-  private GLShader.Texture texShader;
-  private GLShader.Color colorShader;
+  private GLShader.Texture texQuadShader = new HtmlQuadShader.Texture(this);
+  private GLShader.Texture texTrisShader = new HtmlIndexedTrisShader.Texture(this);
+  private GLShader.Color colorQuadShader = new HtmlQuadShader.Color(this);
+  private GLShader.Color colorTrisShader = new HtmlIndexedTrisShader.Color(this);
 
   // Debug counters.
   // private int texCount;
@@ -70,9 +72,6 @@ public class HtmlGLContext extends GLContext
 
     // try basic GL operations to detect failure cases early
     tryBasicGLCalls();
-
-    this.texShader = new HtmlGLShader.Texture(this);
-    this.colorShader = new HtmlGLShader.Color(this);
   }
 
   void paint(LayerGL rootLayer) {
@@ -184,19 +183,19 @@ public class HtmlGLContext extends GLContext
 
   @Override
   protected GLShader.Texture quadTexShader() {
-    return texShader;
+    return texQuadShader;
   }
   @Override
   protected GLShader.Texture trisTexShader() {
-    return texShader;
+    return texTrisShader;
   }
   @Override
   protected GLShader.Color quadColorShader() {
-    return colorShader;
+    return colorQuadShader;
   }
   @Override
   protected GLShader.Color trisColorShader() {
-    return colorShader;
+    return colorTrisShader;
   }
 
   private void tryBasicGLCalls() throws RuntimeException {
