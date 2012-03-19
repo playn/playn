@@ -145,7 +145,7 @@ public class AndroidAssets extends AbstractAssets {
     }
 
     @Override
-    public void addCallback(ResourceCallback<Sound> callback) {
+    public void addCallback(ResourceCallback<? super Sound> callback) {
       callback.error(exception);
     }
   }

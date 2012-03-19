@@ -40,5 +40,5 @@ public interface Image {
    * already loaded, the callback will be notified immediately. The callback is
    * discarded once the image is loaded.
    */
-  void addCallback(ResourceCallback<Image> callback);
+  void addCallback(ResourceCallback<? super Image> callback);
 }

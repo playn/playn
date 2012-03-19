@@ -58,7 +58,7 @@ public class FlashCanvasImage extends FlashImage implements CanvasImage {
    * @see playn.core.Image#addCallback(playn.core.ResourceCallback)
    */
   @Override
-  public void addCallback(ResourceCallback<Image> callback) {
+  public void addCallback(ResourceCallback<? super Image> callback) {
     callback.done(this);
   }
 

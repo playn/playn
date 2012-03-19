@@ -21,8 +21,7 @@ public abstract class AbstractAssets implements Assets {
   private int successCount = 0;
   private int errorsCount = 0;
 
-  @SuppressWarnings("rawtypes")
-  private ResourceCallback callback = new ResourceCallback() {
+  private ResourceCallback<Object> callback = new ResourceCallback<Object>() {
     @Override
     public void done(Object resource) {
       ++successCount;
@@ -34,7 +33,6 @@ public abstract class AbstractAssets implements Assets {
     }
   };
 
-  @SuppressWarnings("unchecked")
   @Override
   public final Image getImage(String path) {
     incrementRequestCount();

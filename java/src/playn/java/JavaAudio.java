@@ -45,7 +45,7 @@ class JavaAudio implements Audio {
         return false;
       }
       @Override
-      public void addCallback(ResourceCallback<Sound> callback) {
+      public void addCallback(ResourceCallback<? super Sound> callback) {
         callback.done(this);
       }
     };

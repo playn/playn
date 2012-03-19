@@ -39,7 +39,7 @@ class JavaCanvasImage extends JavaImage implements CanvasImage {
   }
 
   @Override
-  public void addCallback(ResourceCallback<Image> callback) {
+  public void addCallback(ResourceCallback<? super Image> callback) {
     callback.done(this);
   }
 }

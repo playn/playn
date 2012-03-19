@@ -73,7 +73,7 @@ class IOSSound implements Sound
   }
 
   @Override
-  public void addCallback(ResourceCallback<Sound> callback) {
+  public void addCallback(ResourceCallback<? super Sound> callback) {
     if (player != null) {
       // non-null players are always ready
       callback.done(this);

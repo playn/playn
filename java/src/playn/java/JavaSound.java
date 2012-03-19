@@ -37,7 +37,7 @@ class JavaSound implements Sound {
   private Clip clip;
   private boolean looping;
 
-  private List<ResourceCallback<Sound>> callbacks;
+  private List<ResourceCallback<? super Sound>> callbacks;
 
   JavaSound(String name, final InputStream inputStream) {
     this.name = name;
@@ -46,7 +46,7 @@ class JavaSound implements Sound {
       public void run () {
         init(inputStream);
         if (callbacks != null) {
-          for (ResourceCallback<Sound> callback : callbacks) {
+          for (ResourceCallback<? super Sound> callback : callbacks) {
             callback.done(JavaSound.this);
           }
           callbacks = null;
@@ -138,12 +138,12 @@ class JavaSound implements Sound {
   }
 
   @Override
-  public void addCallback(ResourceCallback<Sound> callback) {
+  public void addCallback(ResourceCallback<? super Sound> callback) {
     if (clip != null) {
       callback.done(this);
     } else {
       if (callbacks == null) {
-        callbacks = new ArrayList<ResourceCallback<Sound>>();
+        callbacks = new ArrayList<ResourceCallback<? super Sound>>();
       }
       callbacks.add(callback);
     }

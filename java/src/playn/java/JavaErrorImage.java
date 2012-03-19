@@ -35,7 +35,7 @@ class JavaErrorImage extends JavaImage {
   }
 
   @Override
-  public void addCallback(ResourceCallback<Image> callback) {
+  public void addCallback(ResourceCallback<? super Image> callback) {
     callback.error(exception != null ? exception : new RuntimeException("Error loading image"));
   }
 

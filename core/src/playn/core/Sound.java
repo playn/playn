@@ -60,5 +60,5 @@ public interface Sound {
    * already loaded the callback will be notified immediately. The callback is
    * discarded once the sound is loaded.
    */
-  void addCallback(ResourceCallback<Sound> callback);
+  void addCallback(ResourceCallback<? super Sound> callback);
 }

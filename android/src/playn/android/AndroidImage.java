@@ -37,7 +37,7 @@ class AndroidImage extends ImageGL implements AndroidGLContext.Refreshable {
   }
 
   @Override
-  public void addCallback(ResourceCallback<Image> callback) {
+  public void addCallback(ResourceCallback<? super Image> callback) {
     // we're always ready immediately
     callback.done(this);
   }

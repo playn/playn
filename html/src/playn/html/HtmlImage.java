@@ -57,7 +57,7 @@ class HtmlImage extends ImageGL {
   }
 
   @Override
-  public void addCallback(final ResourceCallback<Image> callback) {
+  public void addCallback(final ResourceCallback<? super Image> callback) {
     if (isReady()) {
       callback.done(this);
     } else {

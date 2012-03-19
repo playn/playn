@@ -27,7 +27,8 @@ import flash.display.BitmapData;
 
 @FlashImport({"flash.display.Loader", "flash.events.Event", "flash.net.URLRequest"})
 class FlashImage implements Image {
-  private List<ResourceCallback<Image>> callbacks = new ArrayList<ResourceCallback<Image>>();
+  private List<ResourceCallback<? super Image>> callbacks =
+    new ArrayList<ResourceCallback<? super Image>>();
 
   private BitmapData imageData = null;
   FlashImage(String url) {
@@ -60,10 +61,7 @@ class FlashImage implements Image {
   }
 
   private void runCallbacks(boolean success) {
-    Iterator<ResourceCallback<Image>> it = callbacks.iterator();
-    while (it.hasNext()) {
-      ResourceCallback<Image> cb = it.next();
-      it.remove();
+    for (ResourceCallback<? super Image> cb : callbacks) {
       if (success) {
         cb.done(this);
       } else {
@@ -87,7 +85,7 @@ class FlashImage implements Image {
    * @see playn.core.Image#addCallback(playn.core.ResourceCallback)
    */
   @Override
-  public void addCallback(ResourceCallback<Image> callback) {
+  public void addCallback(ResourceCallback<? super Image> callback) {
     callbacks.add(callback);
     if (isReady()) {
       runCallbacks(true);

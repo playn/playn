@@ -17,13 +17,13 @@ package playn.core;
 import java.util.ArrayList;
 
 public abstract class AbstractSound implements Sound {
-  private ArrayList<ResourceCallback<Sound>> resourceCallbacks;
+  private ArrayList<ResourceCallback<? super Sound>> resourceCallbacks;
 
   private Boolean soundLoaded; // null indicates result not yet known
 
 
   @Override
-  public final void addCallback(ResourceCallback<Sound> callback) {
+  public final void addCallback(ResourceCallback<? super Sound> callback) {
     if (soundLoaded != null) {
       if (soundLoaded) {
         callback.done(AbstractSound.this);
@@ -33,7 +33,7 @@ public abstract class AbstractSound implements Sound {
       return;
     }
     if (resourceCallbacks == null) {
-      resourceCallbacks = new ArrayList<ResourceCallback<Sound>>();
+      resourceCallbacks = new ArrayList<ResourceCallback<? super Sound>>();
     }
     resourceCallbacks.add(callback);
   }
@@ -42,7 +42,7 @@ public abstract class AbstractSound implements Sound {
     if (resourceCallbacks == null) {
       return;
     }
-    for (ResourceCallback<Sound> callback : resourceCallbacks) {
+    for (ResourceCallback<? super Sound> callback : resourceCallbacks) {
       callback.error(err);
     }
     resourceCallbacks.clear();
@@ -52,7 +52,7 @@ public abstract class AbstractSound implements Sound {
     if (resourceCallbacks == null) {
       return;
     }
-    for (ResourceCallback<Sound> callback : resourceCallbacks) {
+    for (ResourceCallback<? super Sound> callback : resourceCallbacks) {
       callback.done(AbstractSound.this);
     }
     resourceCallbacks.clear();
