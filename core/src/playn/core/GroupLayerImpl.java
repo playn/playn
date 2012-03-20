@@ -19,6 +19,8 @@ package playn.core;
 import java.util.List;
 import java.util.ArrayList;
 
+import pythagoras.f.Point;
+
 /**
  * Provides implementations for per-platform concrete {@link GroupLayer}s. Because of single
  * inheritance (and lack of traits) we have to delegate this implementation rather than provide an
@@ -56,6 +58,11 @@ public class GroupLayerImpl<L extends AbstractLayer>
     children.add(index, child);
     child.setParent(self);
     child.onAdd();
+
+    // if this child is active, we need to become active
+    if (child.interactive())
+      self.setInteractive(true);
+
     return index;
   }
 
@@ -68,6 +75,9 @@ public class GroupLayerImpl<L extends AbstractLayer>
     children.add(index, child);
     child.setParent(self);
     child.onAdd();
+    // if this child is active, we need to become active
+    if (child.interactive())
+      self.setInteractive(true);
   }
 
   public void remove(GroupLayer self, L child) {
@@ -110,6 +120,30 @@ public class GroupLayerImpl<L extends AbstractLayer>
     for (L child : children) {
       child.onRemove();
     }
+  }
+
+  public Layer hitTest(GroupLayer self, Point point) {
+    float x = point.x, y = point.y;
+    boolean sawInteractiveChild = false;
+    // we check back to front as children are ordered "lowest" first
+    for (int ii = children.size()-1; ii > 0; ii--) {
+      L child = children.get(ii);
+      if (!child.visible() || !child.interactive()) continue; // ignore invisible children
+      // note that we saw an interactive child
+      sawInteractiveChild = true;
+      // transform the point into the child's coordinate system
+      child.transform().inverseTransform(point.set(x, y), point);
+      point.x += child.originX();
+      point.y += child.originY();
+      Layer l = child.hitTest(point);
+      if (l != null)
+        return l;
+    }
+    // if we saw no interactive children, clear our own interactive flag; this lazily deactivates
+    // this group after its interactive children have been deactivated or removed
+    if (!sawInteractiveChild)
+      self.setInteractive(false);
+    return null;
   }
 
   /**

@@ -20,6 +20,8 @@ import playn.core.InternalTransform;
 import playn.core.Layer;
 import playn.core.ParentLayer;
 
+import pythagoras.f.Point;
+
 public class GroupLayerGL extends LayerGL implements GroupLayer, ParentLayer {
 
   private GroupLayerImpl<LayerGL> impl = new GroupLayerImpl<LayerGL>();
@@ -82,6 +84,11 @@ public class GroupLayerGL extends LayerGL implements GroupLayer, ParentLayer {
   public void onRemove() {
     super.onRemove();
     impl.onRemove(this);
+  }
+
+  @Override
+  public Layer hitTest(Point p) {
+    return impl.hitTest(this, p);
   }
 
   @Override

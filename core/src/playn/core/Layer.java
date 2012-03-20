@@ -69,6 +69,23 @@ public interface Layer {
   void setVisible(boolean visible);
 
   /**
+   * Returns true if this layer reacts to clicks and touches. If a layer is interactive, it will
+   * respond to {@link #hitTest}, which forms the basis for the click and touch processing provided
+   * by {@link Pointer#addListener}, {@link Touch#addListener} and {@link Mouse#addListener}.
+   */
+  boolean interactive();
+
+  /**
+   * Configures this layer as reactive to clicks and touches, or not. Note that a layer's
+   * interactivity is automatically activated when a listener is added to the layer (or to a child
+   * of a {@link GroupLayer}) via {@link Pointer#addListener}, etc. Also a {@link GroupLayer} will
+   * be made non-interactive automatically if an event is dispatched to it and it discovers that it
+   * has no interactive children. Manual management of interactivity is thus generally only useful
+   * for "leaf" nodes in the scene graph.
+   */
+  void setInteractive(boolean interactive);
+
+  /**
    * Return the global alpha value for this layer.
    * <p>
    * The global alpha value for a layer controls the opacity of the layer but does not affect the
@@ -171,6 +188,20 @@ public interface Layer {
    * @param angle angle to rotate, in radians
    */
   void setRotation(float angle);
+
+  /**
+   * Tests whether the supplied (layer relative) point "hits" this layer or any of its children. By
+   * default a hit is any point that falls in a layer's bounding box. A group layer checks its
+   * children for hits.
+   *
+   * <p>Note that this method mutates the supplied point. If a layer is hit, the point will contain
+   * the original point as translated into that layer's coordinate system. If no layer is hit, the
+   * point will be changed to an undefined value.</p>
+   *
+   * @return this layer if it was the hit layer, a child of this layer if a child of this layer was
+   * hit, or null if neither this layer, nor its children were hit.
+   */
+  Layer hitTest(Point p);
 
   /**
    * Interface for {@link Layer}s containing explicit sizes.
