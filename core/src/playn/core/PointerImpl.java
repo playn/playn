@@ -31,7 +31,7 @@ public abstract class PointerImpl implements Pointer {
   }
 
   @Override
-  public Connection addListener(Layer.HasSize layer, Listener listener) {
+  public Connection addListener(Layer layer, Listener listener) {
     return ((AbstractLayer) layer).addInteractor(Listener.class, listener);
   }
 

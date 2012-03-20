@@ -86,7 +86,7 @@ class HtmlGroupLayerCanvas extends HtmlLayerCanvas implements GroupLayer, Parent
   }
 
   @Override
-  public Layer hitTest(Point p) {
+  public Layer hitTestDefault(Point p) {
     return impl.hitTest(this, p);
   }
 

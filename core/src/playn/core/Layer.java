@@ -35,6 +35,15 @@ import pythagoras.f.Transform;
  */
 public interface Layer {
 
+  /** Used to customize a layer's hit testing mechanism. */
+  public interface HitTester {
+    /** Returns {@code layer}, or a child of {@code layer} if the supplied coordinate (which is in
+     * {@code layer}'s coordinate system) hits {@code layer}, or one of its children. This allows a
+     * layer to customize the default hit testing approach, which is to simply check whether the
+     * point intersects a layer's bounds. See {@link Layer#hitTest}. */
+    Layer hitTest (Layer layer, Point p);
+  }
+
   /**
    * Destroys this layer, removing it from its parent layer. Any resources associated with this
    * layer are freed, and it cannot be reused after being destroyed. Destroying a layer that has
@@ -202,6 +211,19 @@ public interface Layer {
    * hit, or null if neither this layer, nor its children were hit.
    */
   Layer hitTest(Point p);
+
+  /**
+   * Like {@link #hitTest} except that it ignores a configured {@link HitTester}. This allows one
+   * to configure a hit tester which checks custom properties and then falls back on the default
+   * hit testing implementation.
+   */
+  Layer hitTestDefault(Point p);
+
+  /**
+   * Configures a custom hit tester for this layer. May also be called with null to clear out any
+   * custom hit tester.
+   */
+  void setHitTester (HitTester tester);
 
   /**
    * Interface for {@link Layer}s containing explicit sizes.

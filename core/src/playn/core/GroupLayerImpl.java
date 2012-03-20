@@ -126,11 +126,11 @@ public class GroupLayerImpl<L extends AbstractLayer>
     float x = point.x, y = point.y;
     boolean sawInteractiveChild = false;
     // we check back to front as children are ordered "lowest" first
-    for (int ii = children.size()-1; ii > 0; ii--) {
+    for (int ii = children.size()-1; ii >= 0; ii--) {
       L child = children.get(ii);
-      if (!child.visible() || !child.interactive()) continue; // ignore invisible children
-      // note that we saw an interactive child
-      sawInteractiveChild = true;
+      if (!child.interactive()) continue; // ignore non-interactive children
+      sawInteractiveChild = true; // note that we saw an interactive child
+      if (!child.visible()) continue; // ignore invisible children
       // transform the point into the child's coordinate system
       child.transform().inverseTransform(point.set(x, y), point);
       point.x += child.originX();

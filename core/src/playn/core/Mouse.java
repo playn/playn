@@ -226,5 +226,5 @@ public interface Mouse {
    * listener on the layer, or manually call {@link Layer#setInteractive} after removing the last
    * listener.</p>
    */
-  Connection addListener(Layer.HasSize layer, Listener listener);
+  Connection addListener(Layer layer, Listener listener);
 }

@@ -62,6 +62,7 @@ public abstract class AbstractLayer implements Layer {
   protected float depth;
   protected int flags;
   protected Interactor<?> rootInteractor;
+  protected HitTester hitTester;
 
   protected AbstractLayer() {
     this(new StockInternalTransform());
@@ -183,7 +184,17 @@ public abstract class AbstractLayer implements Layer {
 
   @Override
   public Layer hitTest(Point p) {
+    return (hitTester == null) ? hitTestDefault(p) : hitTester.hitTest(this, p);
+  }
+
+  @Override
+  public Layer hitTestDefault(Point p) {
     return (p.x >= 0 && p.y >= 0 && p.x < width() && p.y < height()) ? this : null;
+  }
+
+  @Override
+  public void setHitTester (HitTester tester) {
+    hitTester = tester;
   }
 
   @Override

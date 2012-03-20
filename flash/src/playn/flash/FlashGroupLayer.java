@@ -106,7 +106,7 @@ public class FlashGroupLayer extends FlashLayer implements GroupLayer, ParentLay
   }
 
   @Override
-  public Layer hitTest(Point p) {
+  public Layer hitTestDefault(Point p) {
     return impl.hitTest(this, p);
   }
 

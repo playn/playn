@@ -87,7 +87,7 @@ public class GroupLayerGL extends LayerGL implements GroupLayer, ParentLayer {
   }
 
   @Override
-  public Layer hitTest(Point p) {
+  public Layer hitTestDefault(Point p) {
     return impl.hitTest(this, p);
   }
 
