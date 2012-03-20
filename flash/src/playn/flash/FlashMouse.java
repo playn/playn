@@ -19,71 +19,43 @@ import flash.events.MouseEvent;
 import flash.display.Sprite;
 
 import playn.core.PlayN;
-import playn.core.Mouse;
+import playn.core.MouseImpl;
 
-class FlashMouse implements Mouse {
-
-  private Listener listener;
+class FlashMouse extends MouseImpl {
 
   FlashMouse() {
     // Mouse handlers.
     FlashPlatform.captureEvent(Sprite.MOUSEDOWN, new EventHandler<MouseEvent>() {
       @Override
       public void handleEvent(MouseEvent nativeEvent) {
-        if (listener != null) {
-          ButtonEvent.Impl event = new ButtonEvent.Impl(PlayN.currentTime(),
-              nativeEvent.getStageX(), nativeEvent.getStageY(), getMouseButton(nativeEvent));
-          listener.onMouseDown(event);
-          if (event.getPreventDefault()) {
-            nativeEvent.preventDefault();
-          }
-        }
+        float x = nativeEvent.getStageX(), y = nativeEvent.getStageY();
+        if (onMouseDown(new ButtonEvent.Impl(PlayN.currentTime(), x, y, getMouseButton(nativeEvent))))
+          nativeEvent.preventDefault();
       }
     });
     FlashPlatform.captureEvent(Sprite.MOUSEUP, new EventHandler<MouseEvent>() {
       @Override
       public void handleEvent(MouseEvent nativeEvent) {
-        if (listener != null) {
-          ButtonEvent.Impl event = new ButtonEvent.Impl(PlayN.currentTime(),
-              nativeEvent.getStageX(), nativeEvent.getStageY(), getMouseButton(nativeEvent));
-          listener.onMouseUp(event);
-          if (event.getPreventDefault()) {
-            nativeEvent.preventDefault();
-          }
-        }
+        float x = nativeEvent.getStageX(), y = nativeEvent.getStageY();
+        if (onMouseUp(new ButtonEvent.Impl(PlayN.currentTime(), x, y, getMouseButton(nativeEvent))))
+          nativeEvent.preventDefault();
       }
     });
     FlashPlatform.captureEvent(Sprite.MOUSEMOVE, new EventHandler<MouseEvent>() {
       @Override
       public void handleEvent(MouseEvent nativeEvent) {
-        if (listener != null) {
-          MotionEvent.Impl event = new MotionEvent.Impl(PlayN.currentTime(),
-              nativeEvent.getStageX(), nativeEvent.getStageY());
-          listener.onMouseMove(event);
-          if (event.getPreventDefault()) {
-            nativeEvent.preventDefault();
-          }
-        }
+        float x = nativeEvent.getStageX(), y = nativeEvent.getStageY();
+        if (onMouseMove(new MotionEvent.Impl(PlayN.currentTime(), x, y)))
+          nativeEvent.preventDefault();
       }
     });
   }
 
-  @Override
-  public void setListener(Listener listener) {
-    this.listener = listener;
-  }
-
-  /**
-   * Return the {@link Mouse} button given a {@link MouseEvent}
-   *
-   * @param e MouseEvent
-   * @return {@link Mouse} button corresponding to the event
-   */
   protected static int getMouseButton(MouseEvent e) {
 //    if (e.isButtonDown()) {
-      return Mouse.BUTTON_LEFT;
+      return BUTTON_LEFT;
 //    } else {
-//      return Mouse.BUTTON_RIGHT;
+//      return BUTTON_RIGHT;
 //    }
   }
 }

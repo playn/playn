@@ -23,114 +23,66 @@ import java.awt.event.MouseWheelListener;
 
 import javax.swing.JComponent;
 
-import playn.core.Mouse;
+import playn.core.MouseImpl;
 
-class JavaMouse implements Mouse {
-
-  private Listener listener;
+class JavaMouse extends MouseImpl {
 
   JavaMouse(JComponent frame) {
     frame.addMouseMotionListener(new MouseMotionListener() {
       @Override
-      public void mouseDragged(MouseEvent nativeEvent) {
-        // mouseMoved(MouseEvent) does not fire when dragged
-        if (listener != null) {
-          MotionEvent.Impl event = new MotionEvent.Impl(nativeEvent.getWhen(), nativeEvent.getX(),
-              nativeEvent.getY());
-          listener.onMouseMove(event);
-          if (event.getPreventDefault()) {
-            nativeEvent.consume();
-          }
-        }
+      public void mouseDragged(MouseEvent ev) {
+        if (onMouseMove(new MotionEvent.Impl(ev.getWhen(), ev.getX(), ev.getY())))
+          ev.consume();
       }
 
       @Override
-      public void mouseMoved(MouseEvent nativeEvent) {
-        if (listener != null) {
-          MotionEvent.Impl event = new MotionEvent.Impl(nativeEvent.getWhen(), nativeEvent.getX(),
-              nativeEvent.getY());
-          listener.onMouseMove(event);
-          if (event.getPreventDefault()) {
-            nativeEvent.consume();
-          }
-        }
+      public void mouseMoved(MouseEvent ev) {
+        if (onMouseMove(new MotionEvent.Impl(ev.getWhen(), ev.getX(), ev.getY())))
+          ev.consume();
       }
     });
 
     frame.addMouseListener(new MouseListener() {
       @Override
-      public void mouseClicked(MouseEvent e) {
+      public void mouseClicked(MouseEvent ev) {
       }
 
       @Override
-      public void mouseEntered(MouseEvent e) {
+      public void mouseEntered(MouseEvent ev) {
       }
 
       @Override
-      public void mouseExited(MouseEvent e) {
+      public void mouseExited(MouseEvent ev) {
       }
 
       @Override
-      public void mousePressed(MouseEvent nativeEvent) {
-        if (listener != null) {
-          ButtonEvent.Impl event = new ButtonEvent.Impl(nativeEvent.getWhen(), nativeEvent.getX(),
-              nativeEvent.getY(), getMouseButton(nativeEvent));
-          listener.onMouseDown(event);
-          if (event.getPreventDefault()) {
-            nativeEvent.consume();
-          }
-        }
+      public void mousePressed(MouseEvent ev) {
+        if (onMouseDown(new ButtonEvent.Impl(ev.getWhen(), ev.getX(), ev.getY(), getButton(ev))))
+          ev.consume();
       }
 
       @Override
-      public void mouseReleased(MouseEvent nativeEvent) {
-        if (listener != null) {
-          ButtonEvent.Impl event = new ButtonEvent.Impl(nativeEvent.getWhen(), nativeEvent.getX(),
-              nativeEvent.getY(), getMouseButton(nativeEvent));
-          listener.onMouseUp(event);
-          if (event.getPreventDefault()) {
-            nativeEvent.consume();
-          }
-        }
+      public void mouseReleased(MouseEvent ev) {
+        if (onMouseUp(new ButtonEvent.Impl(ev.getWhen(), ev.getX(), ev.getY(), getButton(ev))))
+          ev.consume();
       }
     });
 
     frame.addMouseWheelListener(new MouseWheelListener() {
       @Override
-      public void mouseWheelMoved(MouseWheelEvent nativeEvent) {
-        if (listener != null) {
-          WheelEvent.Impl event = new WheelEvent.Impl(nativeEvent.getWhen(),
-              nativeEvent.getWheelRotation());
-          listener.onMouseWheelScroll(event);
-          if (event.getPreventDefault()) {
-            nativeEvent.consume();
-          }
-        }
+      public void mouseWheelMoved(MouseWheelEvent ev) {
+        if (onMouseWheelScroll(new WheelEvent.Impl(ev.getWhen(), ev.getWheelRotation())))
+          ev.consume();
       }
     });
   }
 
-  @Override
-  public void setListener(Listener listener) {
-    this.listener = listener;
-  }
-
-  /**
-   * Return the {@link Mouse} button given a {@link MouseEvent}
-   *
-   * @param e MouseEvent
-   * @return {@link Mouse} button corresponding to the event
-   */
-  protected static int getMouseButton(MouseEvent e) {
-    switch (e.getButton()) {
-      case (MouseEvent.BUTTON1):
-        return Mouse.BUTTON_LEFT;
-      case (MouseEvent.BUTTON2):
-        return Mouse.BUTTON_MIDDLE;
-      case (MouseEvent.BUTTON3):
-        return Mouse.BUTTON_RIGHT;
-      default:
-        return e.getButton();
+  protected static int getButton(MouseEvent ev) {
+    switch (ev.getButton()) {
+    case (MouseEvent.BUTTON1): return BUTTON_LEFT;
+    case (MouseEvent.BUTTON2): return BUTTON_MIDDLE;
+    case (MouseEvent.BUTTON3): return BUTTON_RIGHT;
+    default:                   return ev.getButton();
     }
   }
 }

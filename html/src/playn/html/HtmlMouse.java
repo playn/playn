@@ -17,97 +17,75 @@ import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.NativeEvent;
 
 import playn.core.PlayN;
-import playn.core.Mouse;
+import playn.core.MouseImpl;
 
-class HtmlMouse extends HtmlInput implements Mouse {
+class HtmlMouse extends MouseImpl {
   private Listener listener;
-  boolean inDragSequence = false; // true when we are in a drag sequence (after mouse down but before mouse up)
+  // true when we are in a drag sequence (after mouse down but before mouse up)
+  boolean inDragSequence = false;
 
   HtmlMouse(final Element rootElement) {
     // capture mouse down on the root element, only.
-    captureEvent(rootElement, "mousedown", new EventHandler() {
+    HtmlInput.captureEvent(rootElement, "mousedown", new EventHandler() {
       @Override
-      public void handleEvent(NativeEvent nativeEvent) {
-        if (listener != null) {
-          inDragSequence = true;
-
-          ButtonEvent.Impl event = new ButtonEvent.Impl(PlayN.currentTime(), getRelativeX(
-              nativeEvent, rootElement), getRelativeY(nativeEvent, rootElement),
-              getMouseButton(nativeEvent));
-          listener.onMouseDown(event);
-          if (event.getPreventDefault()) {
-            nativeEvent.preventDefault();
-          }
-        }
+      public void handleEvent(NativeEvent ev) {
+        inDragSequence = true;
+        float x = HtmlInput.getRelativeX(ev, rootElement);
+        float y = HtmlInput.getRelativeY(ev, rootElement);
+        if (onMouseDown(new ButtonEvent.Impl(PlayN.currentTime(), x, y, getMouseButton(ev))))
+          ev.preventDefault();
       }
     });
 
     // capture mouse up anywhere on the page as long as we are in a drag sequence
-    capturePageEvent("mouseup", new EventHandler() {
+    HtmlInput.capturePageEvent("mouseup", new EventHandler() {
       @Override
-      public void handleEvent(NativeEvent nativeEvent) {
-        if (listener != null && inDragSequence) {
+      public void handleEvent(NativeEvent ev) {
+        if (inDragSequence) {
           inDragSequence = false;
-
-          ButtonEvent.Impl event = new ButtonEvent.Impl(PlayN.currentTime(), getRelativeX(
-              nativeEvent, rootElement), getRelativeY(nativeEvent, rootElement),
-              getMouseButton(nativeEvent));
-          listener.onMouseUp(event);
-          if (event.getPreventDefault()) {
-            nativeEvent.preventDefault();
-          }
+          float x = HtmlInput.getRelativeX(ev, rootElement);
+          float y = HtmlInput.getRelativeY(ev, rootElement);
+          if (onMouseUp(new ButtonEvent.Impl(PlayN.currentTime(), x, y, getMouseButton(ev))))
+            ev.preventDefault();
         }
       }
     });
 
     // capture mouse move anywhere on the page that fires only if we are in a drag sequence
-    capturePageEvent("mousemove", new EventHandler() {
+    HtmlInput.capturePageEvent("mousemove", new EventHandler() {
       @Override
-      public void handleEvent(NativeEvent nativeEvent) {
-        if (listener != null && inDragSequence) {
-          MotionEvent.Impl event = new MotionEvent.Impl(PlayN.currentTime(), getRelativeX(
-              nativeEvent, rootElement), getRelativeY(nativeEvent, rootElement));
-          listener.onMouseMove(event);
-          if (event.getPreventDefault()) {
-            nativeEvent.preventDefault();
-          }
+      public void handleEvent(NativeEvent ev) {
+        if (inDragSequence) {
+          float x = HtmlInput.getRelativeX(ev, rootElement);
+          float y = HtmlInput.getRelativeY(ev, rootElement);
+          if (onMouseMove(new MotionEvent.Impl(PlayN.currentTime(), x, y)))
+            ev.preventDefault();
         }
       }
     });
 
     // capture mouse move on the root element that fires only if we are not in a drag sequence
     // (the page-level event listener will handle the firing when we are in a drag sequence)
-    captureEvent(rootElement, "mousemove", new EventHandler() {
+    HtmlInput.captureEvent(rootElement, "mousemove", new EventHandler() {
       @Override
-      public void handleEvent(NativeEvent nativeEvent) {
-        if (listener != null && !inDragSequence) {
-          MotionEvent.Impl event = new MotionEvent.Impl(PlayN.currentTime(), getRelativeX(
-              nativeEvent, rootElement), getRelativeY(nativeEvent, rootElement));
-          listener.onMouseMove(event);
-          if (event.getPreventDefault()) {
-            nativeEvent.preventDefault();
-          }
+      public void handleEvent(NativeEvent ev) {
+        if (!inDragSequence) {
+          float x = HtmlInput.getRelativeX(ev, rootElement);
+          float y = HtmlInput.getRelativeY(ev, rootElement);
+          if (onMouseMove(new MotionEvent.Impl(PlayN.currentTime(), x, y)))
+            ev.preventDefault();
         }
       }
     });
 
-    captureEvent(rootElement, getMouseWheelEvent(), new EventHandler() {
+    HtmlInput.captureEvent(rootElement, getMouseWheelEvent(), new EventHandler() {
       @Override
-      public void handleEvent(NativeEvent nativeEvent) {
-        if (listener != null) {
-          WheelEvent.Impl event = new WheelEvent.Impl(PlayN.currentTime(), getMouseWheelVelocity(nativeEvent));
-          listener.onMouseWheelScroll(event);
-          if (event.getPreventDefault()) {
-            nativeEvent.preventDefault();
-          }
-        }
+      public void handleEvent(NativeEvent ev) {
+        if (onMouseWheelScroll(new WheelEvent.Impl(PlayN.currentTime(),
+                                                   getMouseWheelVelocity(ev))))
+          ev.preventDefault();
       }
     });
-  }
-
-  @Override
-  public void setListener(Listener listener) {
-    this.listener = listener;
   }
 
   /**
@@ -158,22 +136,12 @@ class HtmlMouse extends HtmlInput implements Mouse {
     }
   }-*/;
 
-  /**
-   * Return the {@link Mouse} button given a {@link NativeEvent}
-   *
-   * @param evt Native event
-   * @return {@link Mouse} button corresponding to the event
-   */
   protected static int getMouseButton(NativeEvent evt) {
     switch (evt.getButton()) {
-      case (NativeEvent.BUTTON_LEFT):
-        return Mouse.BUTTON_LEFT;
-      case (NativeEvent.BUTTON_MIDDLE):
-        return Mouse.BUTTON_MIDDLE;
-      case (NativeEvent.BUTTON_RIGHT):
-        return Mouse.BUTTON_RIGHT;
-      default:
-        return evt.getButton();
+    case (NativeEvent.BUTTON_LEFT):   return BUTTON_LEFT;
+    case (NativeEvent.BUTTON_MIDDLE): return BUTTON_MIDDLE;
+    case (NativeEvent.BUTTON_RIGHT):  return BUTTON_RIGHT;
+    default:                          return evt.getButton();
     }
   }
 }
