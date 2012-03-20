@@ -15,39 +15,25 @@
  */
 package playn.android;
 
-import playn.core.Pointer;
+import playn.core.PointerImpl;
 
-class AndroidPointer implements Pointer {
-  // True when we are in a drag sequence (after pointer start but before pointer
-  // end)
+class AndroidPointer extends PointerImpl {
+  // true when we are in a drag sequence (after pointer start but before pointer end)
   private boolean inDragSequence = false;
-  private Listener listener;
 
-  @Override
-  public synchronized void setListener(Listener listener) {
-    this.listener = listener;
+  // the methods below are called from the GL render thread
+  void onPointerStart(Event.Impl event) {
+    inDragSequence = true;
+    onPointerStart(event, false);
   }
 
-  /*
-   * The methods below are called from the GL render thread
-   */
-  void onPointerStart(Event event) {
-    if (listener != null) {
-      inDragSequence = true;
-      listener.onPointerStart(event);
-    }
+  void onPointerDrag(Event.Impl event) {
+    if (inDragSequence)
+      onPointerDrag(event, false);
   }
 
-  void onPointerDrag(Event event) {
-    if (listener != null) {
-      if (inDragSequence) listener.onPointerDrag(event);
-    }
-  }
-
-  void onPointerEnd(Event event) {
-    if (listener != null) {
-      inDragSequence = false;
-      listener.onPointerEnd(event);
-    }
+  void onPointerEnd(Event.Impl event) {
+    inDragSequence = false;
+    onPointerEnd(event, false);
   }
 }

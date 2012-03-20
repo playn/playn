@@ -21,25 +21,16 @@ import java.awt.event.MouseMotionListener;
 
 import javax.swing.JComponent;
 
-import playn.core.Pointer;
+import playn.core.PointerImpl;
 
-// TODO(pdr): add touch support.
-class JavaPointer implements Pointer {
-
-  private Listener listener;
+class JavaPointer extends PointerImpl {
 
   JavaPointer(JComponent frame) {
     frame.addMouseMotionListener(new MouseMotionListener() {
       @Override
       public void mouseDragged(MouseEvent nativeEvent) {
-        if (listener != null) {
-          Event.Impl event = new Event.Impl(nativeEvent.getWhen(), nativeEvent.getX(),
-              nativeEvent.getY(), false);
-          listener.onPointerDrag(event);
-          if (event.getPreventDefault()) {
-            nativeEvent.consume();
-          }
-        }
+        if (onPointerDrag(toEvent(nativeEvent), false))
+          nativeEvent.consume();
       }
 
       @Override
@@ -62,32 +53,19 @@ class JavaPointer implements Pointer {
 
       @Override
       public void mousePressed(MouseEvent nativeEvent) {
-        if (listener != null) {
-          Event.Impl event = new Event.Impl(nativeEvent.getWhen(), nativeEvent.getX(),
-              nativeEvent.getY(), false);
-          listener.onPointerStart(event);
-          if (event.getPreventDefault()) {
-            nativeEvent.consume();
-          }
-        }
+        if (onPointerStart(toEvent(nativeEvent), false))
+          nativeEvent.consume();
       }
 
       @Override
       public void mouseReleased(MouseEvent nativeEvent) {
-        if (listener != null) {
-          Event.Impl event = new Event.Impl(nativeEvent.getWhen(), nativeEvent.getX(),
-              nativeEvent.getY(), false);
-          listener.onPointerEnd(event);
-          if (event.getPreventDefault()) {
-            nativeEvent.consume();
-          }
-        }
+        if (onPointerEnd(toEvent(nativeEvent), false))
+          nativeEvent.consume();
       }
     });
   }
 
-  @Override
-  public void setListener(Listener listener) {
-    this.listener = listener;
+  protected static Event.Impl toEvent(MouseEvent nativeEvent) {
+    return new Event.Impl(nativeEvent.getWhen(), nativeEvent.getX(), nativeEvent.getY(), false);
   }
 }

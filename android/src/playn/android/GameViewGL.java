@@ -192,7 +192,7 @@ public class GameViewGL extends GLSurfaceView implements SurfaceHolder.Callback 
     });
   }
 
-  void onPointerStart(final Pointer.Event event) {
+  void onPointerStart(final Pointer.Event.Impl event) {
     queueEvent(new Runnable() {
       @Override
       public void run() {
@@ -201,7 +201,7 @@ public class GameViewGL extends GLSurfaceView implements SurfaceHolder.Callback 
     });
   }
 
-  void onPointerDrag(final Pointer.Event event) {
+  void onPointerDrag(final Pointer.Event.Impl event) {
     queueEvent(new Runnable() {
       @Override
       public void run() {
@@ -210,7 +210,7 @@ public class GameViewGL extends GLSurfaceView implements SurfaceHolder.Callback 
     });
   }
 
-  void onPointerEnd(final Pointer.Event event) {
+  void onPointerEnd(final Pointer.Event.Impl event) {
     queueEvent(new Runnable() {
       @Override
       public void run() {

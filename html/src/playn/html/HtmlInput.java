@@ -32,7 +32,7 @@ abstract class HtmlInput {
    * rootElement) {@see #getRelativeX(NativeEvent, Element)} and {@see
    * #getRelativeY(NativeEvent, Element)}.
    */
-  protected void capturePageEvent(String eventName, final EventHandler handler) {
+  static void capturePageEvent(String eventName, final EventHandler handler) {
     HtmlPlatform.captureEvent(eventName, new EventHandler() {
       @Override
       public void handleEvent(NativeEvent evt) {
@@ -44,7 +44,7 @@ abstract class HtmlInput {
   /**
    * Capture events that occur on the target element only.
    */
-  protected void captureEvent(final Element elem, String eventName, final EventHandler handler) {
+  static void captureEvent(final Element elem, String eventName, final EventHandler handler) {
     // register regular event handler on the element
     HtmlPlatform.captureEvent(elem, eventName, handler);
   }
@@ -56,7 +56,7 @@ abstract class HtmlInput {
    * @param target the element whose coordinate system is to be used
    * @return the relative x-position
    */
-  protected static float getRelativeX(NativeEvent e, Element target) {
+  static float getRelativeX(NativeEvent e, Element target) {
     return e.getClientX() - target.getAbsoluteLeft() + target.getScrollLeft()
         + target.getOwnerDocument().getScrollLeft();
   }
@@ -68,7 +68,7 @@ abstract class HtmlInput {
    * @param target the element whose coordinate system is to be used
    * @return the relative y-position
    */
-  protected static float getRelativeY(NativeEvent e, Element target) {
+  static float getRelativeY(NativeEvent e, Element target) {
     return e.getClientY() - target.getAbsoluteTop() + target.getScrollTop()
         + target.getOwnerDocument().getScrollTop();
   }

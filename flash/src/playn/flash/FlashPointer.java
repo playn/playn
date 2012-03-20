@@ -19,11 +19,10 @@ import flash.events.MouseEvent;
 import flash.display.Sprite;
 
 import playn.core.PlayN;
-import playn.core.Pointer;
+import playn.core.PointerImpl;
 
-class FlashPointer implements Pointer {
+class FlashPointer extends PointerImpl {
 
-  private Listener listener;
   private boolean mouseDown;
 
   FlashPointer() {
@@ -32,49 +31,28 @@ class FlashPointer implements Pointer {
       @Override
       public void handleEvent(MouseEvent nativeEvent) {
         mouseDown = true;
-        if (listener != null) {
-          Event.Impl event = new Event.Impl(PlayN.currentTime(), nativeEvent.getStageX(),
-              nativeEvent.getStageY(), false);
-          listener.onPointerStart(event);
-          if (event.getPreventDefault()) {
-            nativeEvent.preventDefault();
-          }
-        }
+        if (onPointerStart(toEvent(nativeEvent), false))
+          nativeEvent.preventDefault();
       }
     });
     FlashPlatform.captureEvent(Sprite.MOUSEUP, new EventHandler<MouseEvent>() {
       @Override
       public void handleEvent(MouseEvent nativeEvent) {
         mouseDown = false;
-        if (listener != null) {
-          Event.Impl event = new Event.Impl(PlayN.currentTime(), nativeEvent.getStageX(),
-              nativeEvent.getStageY(), false);
-          listener.onPointerEnd(event);
-          if (event.getPreventDefault()) {
-            nativeEvent.preventDefault();
-          }
-        }
+        if (onPointerEnd(toEvent(nativeEvent), false))
+          nativeEvent.preventDefault();
       }
     });
     FlashPlatform.captureEvent(Sprite.MOUSEMOVE, new EventHandler<MouseEvent>() {
       @Override
       public void handleEvent(MouseEvent nativeEvent) {
-        if (listener != null) {
-          if (mouseDown) {
-            Event.Impl event = new Event.Impl(PlayN.currentTime(), nativeEvent.getStageX(),
-                nativeEvent.getStageY(), false);
-            listener.onPointerDrag(event);
-            if (event.getPreventDefault()) {
-              nativeEvent.preventDefault();
-            }
-          }
-        }
+        if (mouseDown && onPointerDrag(toEvent(nativeEvent), false))
+          nativeEvent.preventDefault();
       }
     });
   }
 
-  @Override
-  public void setListener(Listener listener) {
-    this.listener = listener;
+  protected static Event.Impl toEvent(MouseEvent event) {
+    return new Event.Impl(PlayN.currentTime(), event.getStageX(), event.getStageY(), false);
   }
 }

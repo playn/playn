@@ -92,17 +92,29 @@ public class Events {
   /** The base for all events with pointer position. */
   public interface Position extends Input {
     /**
-     * The x-coordinate associated with this event.
+     * The screen x-coordinate associated with this event.
      */
     float x();
 
     /**
-     * The y-coordinate associated with this event.
+     * The screen y-coordinate associated with this event.
      */
     float y();
 
+    /**
+     * The x-coordinate associated with this event transformed into the receiving layer's
+     * coordinate system. See {@link Pointer#addListener}, etc.
+     */
+    float localX();
+
+    /**
+     * The y-coordinate associated with this event transformed into the receiving layer's
+     * coordinate system. See {@link Pointer#addListener}, etc.
+     */
+    float localY();
+
     abstract class Impl extends Input.Impl implements Position {
-      private final float x, y;
+      private final float x, y, localX, localY;
 
       @Override
       public float x() {
@@ -114,10 +126,26 @@ public class Events {
         return y;
       }
 
+      @Override
+      public float localX() {
+        return localX;
+      }
+
+      @Override
+      public float localY() {
+        return localY;
+      }
+
       protected Impl(double time, float x, float y) {
+        this(time, x, y, x, y);
+      }
+
+      protected Impl(double time, float x, float y, float localX, float localY) {
         super(time);
         this.x = x;
         this.y = y;
+        this.localX = localX;
+        this.localY = localY;
       }
 
       @Override
