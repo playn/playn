@@ -30,11 +30,6 @@ public class MouseImpl implements Mouse {
     this.listener = listener;
   }
 
-  @Override
-  public Connection addListener(Layer layer, Listener listener) {
-    return ((AbstractLayer) layer).addInteractor(Listener.class, listener);
-  }
-
   protected boolean onMouseDown(ButtonEvent.Impl event) {
     boolean preventDefault = false;
     if (listener != null) {

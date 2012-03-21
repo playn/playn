@@ -30,11 +30,6 @@ public abstract class PointerImpl implements Pointer {
     this.listener = listener;
   }
 
-  @Override
-  public Connection addListener(Layer layer, Listener listener) {
-    return ((AbstractLayer) layer).addInteractor(Listener.class, listener);
-  }
-
   protected boolean onPointerStart(Event.Impl event, boolean preventDefault) {
     if (listener != null) {
       event.setPreventDefault(preventDefault);

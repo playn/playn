@@ -44,7 +44,7 @@ class LayerClickTest extends Test {
     layer1.setRotation(FloatMath.PI/8);
     layer1.setTranslation(50, 50);
     graphics().rootLayer().add(layer1);
-    pointer().addListener(layer1, new Pointer.Listener() {
+    layer1.addListener(new Pointer.Listener() {
       public void onPointerStart(Pointer.Event event) {
         _lstart = layer1.transform().translation();
         _pstart = new Vector(event.x(), event.y());
@@ -64,7 +64,7 @@ class LayerClickTest extends Test {
     layer2.setRotation(FloatMath.PI/4);
     layer2.setTranslation(150, 50);
     graphics().rootLayer().add(layer2);
-    pointer().addListener(layer2, new Pointer.Listener() {
+    layer2.addListener(new Pointer.Listener() {
       public void onPointerStart(Pointer.Event event) {
         _lstart = layer2.transform().translation();
         _pstart = new Vector(event.x(), event.y());
@@ -83,7 +83,7 @@ class LayerClickTest extends Test {
     layer3.setRotation(-FloatMath.PI/4);
     layer3.setTranslation(50, 150);
     graphics().rootLayer().add(layer3);
-    pointer().addListener(layer3, new Pointer.Listener() {
+    layer3.addListener(new Pointer.Listener() {
       public void onPointerStart(Pointer.Event event) {
         _lstart = layer3.transform().translation();
         _pstart = new Vector(event.x(), event.y());

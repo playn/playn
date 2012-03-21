@@ -203,28 +203,4 @@ public interface Mouse {
    * <code>null</code> will cause mouse events to stop being fired.
    */
   void setListener(Listener listener);
-
-  /**
-   * Registers a listener with this layer that will be notified if a mouse event happens within the
-   * bounds of the listener. Events dispatched to this listener will have their {@link
-   * Event#localX} and {@link Event#localY} values set to the coordinates of the mouse as
-   * transformed into the layer's coordinate system. {@link Event#x} and {@link Event#y} will
-   * always contain the screen (global) coordinates of the mouse.
-   *
-   * <p>Note that mouse wheel events are not dispatched to individual layers, as they lack
-   * coordinates. If a game wishes to determine the layer over which the mouse is hovering when
-   * wheel events are dispatched, it can register a global mouse-movement handler to track the
-   * position of the mouse, and use the latest position to determine which layer is under the mouse
-   * at the time of wheeling.</p>
-   *
-   * <p>When a listener is added to a layer, the layer in question and all of its parents are
-   * marked as interactive. Interactive layers intercept mice events. When all listeners are
-   * removed from a layer (including Pointer and Touch listeners), the layer will be marked
-   * non-interactive. It's parents are lazily marked non-interactive as it is discovered that they
-   * have no interactive children. Thus if you require that a layer continue to intercept mouse
-   * events to prevent them from being dispatched to layers "below" it, you must register a NOOP
-   * listener on the layer, or manually call {@link Layer#setInteractive} after removing the last
-   * listener.</p>
-   */
-  Connection addListener(Layer layer, Listener listener);
 }

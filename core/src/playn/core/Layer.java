@@ -226,6 +226,45 @@ public interface Layer {
   void setHitTester (HitTester tester);
 
   /**
+   * Registers a listener with this layer that will be notified if a click/touch event happens
+   * within its bounds. Events dispatched to this listener will have their {@link Event#localX} and
+   * {@link Event#localY} values set to the coordinates of the click/touch as transformed into this
+   * layer's coordinate system. {@link Event#x} and {@link Event#y} will always contain the screen
+   * (global) coordinates of the click/touch.
+   *
+   * <p>When a listener is added, the layer and all of its parents are marked as interactive.
+   * Interactive layers intercept touches/clicks. When all listeners are disconnected (including
+   * Mouse and Touch listeners), the layer will be marked non-interactive. Its parents are lazily
+   * marked non-interactive as it is discovered that they have no interactive children. Thus if you
+   * require that a layer continue to intercept click/touch events to prevent them from being
+   * dispatched to layers "below" it, you must register a NOOP listener on the layer, or manually
+   * call {@link #setInteractive} after removing the last listener.</p>
+   */
+  Connection addListener(Pointer.Listener listener);
+
+  /**
+   * Registers a listener with this layer that will be notified if a mouse event happens within its
+   * bounds. Events dispatched to this listener will have their {@link Event#localX} and {@link
+   * Event#localY} values set to the coordinates of the mouse as transformed into this layer's
+   * coordinate system. {@link Event#x} and {@link Event#y} will always contain the screen (global)
+   * coordinates of the mouse.
+   *
+   * <p>Note that mouse wheel events are not dispatched, as they lack coordinates. If a game wishes
+   * to determine the layer over which the mouse is hovering when wheel events are dispatched, it
+   * can register a global mouse-movement handler to track the position of the mouse, and use the
+   * latest position to determine which layer is under the mouse at the time of wheeling.</p>
+   *
+   * <p>When a listener is added, the layer and all of its parents are marked as interactive.
+   * Interactive layers intercept mice events. When all listeners are disconnected (including
+   * Pointer and Touch listeners), the layer will be marked non-interactive. Its parents are lazily
+   * marked non-interactive as it is discovered that they have no interactive children. Thus if you
+   * require that a layer continue to intercept mouse events to prevent them from being dispatched
+   * to layers "below" it, you must register a NOOP listener on the layer, or manually call {@link
+   * #setInteractive} after removing the last listener.</p>
+   */
+  Connection addListener(Mouse.Listener listener);
+
+  /**
    * Interface for {@link Layer}s containing explicit sizes.
    */
   public interface HasSize extends Layer {

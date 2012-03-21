@@ -207,6 +207,16 @@ public abstract class AbstractLayer implements Layer {
     return parent;
   }
 
+  @Override
+  public Connection addListener(Pointer.Listener listener) {
+    return addInteractor(Pointer.Listener.class, listener);
+  }
+
+  @Override
+  public Connection addListener(Mouse.Listener listener) {
+    return addInteractor(Mouse.Listener.class, listener);
+  }
+
   // width() and height() exist so that we can share hitTest among all layer implementations;
   // GroupLayer, which does not have a size, overrides hitTest to properly test its children;
   // (non-Clipped) ImmediateLayer inherits this "no size" and always returns null for hitTest
@@ -229,7 +239,39 @@ public abstract class AbstractLayer implements Layer {
     this.parent = parent;
   }
 
-  public <L> Connection addInteractor(Class<L> listenerType, L listener) {
+  protected boolean isSet(Flag flag) {
+    return (flags & flag.bitmask) != 0;
+  }
+
+  protected void setFlag(Flag flag, boolean active) {
+    if (active) {
+      flags |= flag.bitmask;
+    } else {
+      flags &= ~flag.bitmask;
+    }
+  }
+
+  <L> void interact(Class<L> listenerType, Interaction<L> interaction) {
+    interact(listenerType, interaction, rootInteractor);
+  }
+
+  // dispatch interactions recursively, so as to dispatch in the order they were added; we assume
+  // one will not have such a large number of listeners registered on a single layer that this will
+  // blow the stack; note that this also avoids issues with interactor modifications during
+  // dispatch: we essentially build a list of interactors to which to dispatch on the stack, before
+  // dispatching to any interactors; if an interactor is added or removed during dispatch, it
+  // neither affects, nor conflicts with, the current dispatch
+  private <L> void interact(Class<L> type, Interaction<L> interaction, Interactor<?> current) {
+    if (current == null)
+      return;
+    interact(type, interaction, current.next);
+    if (current.listenerType == type) {
+      @SuppressWarnings("unchecked") L listener = (L)current.listener;
+      interaction.interact(listener);
+    }
+  }
+
+  private <L> Connection addInteractor(Class<L> listenerType, L listener) {
     final Interactor<L> newint = new Interactor<L>(listenerType, listener, rootInteractor);
     rootInteractor = newint;
     // note that we (and our parents) are now interactive
@@ -244,42 +286,10 @@ public abstract class AbstractLayer implements Layer {
     };
   }
 
-  public <L> void interact(Class<L> listenerType, Interaction<L> interaction) {
-    interact(listenerType, interaction, rootInteractor);
-  }
-
-  // dispatch interactions recursively, so as to dispatch in the order they were added; we assume
-  // one will not have such a large number of listeners registered on a single layer that this will
-  // blow the stack; note that this also avoids issues with interactor modifications during
-  // dispatch: we essentially build a list of interactors to which to dispatch on the stack, before
-  // dispatching to any interactors; if an interactor is added or removed during dispatch, it
-  // neither affects, nor conflicts with, the current dispatch
-  protected <L> void interact(Class<L> type, Interaction<L> interaction, Interactor<?> current) {
-    if (current == null)
-      return;
-    interact(type, interaction, current.next);
-    if (current.listenerType == type) {
-      @SuppressWarnings("unchecked") L listener = (L)current.listener;
-      interaction.interact(listener);
-    }
-  }
-
-  protected Interactor<?> removeInteractor(Interactor<?> current, Interactor<?> target) {
+  private Interactor<?> removeInteractor(Interactor<?> current, Interactor<?> target) {
     if (current == target)
       return current.next;
     current.next = removeInteractor(current.next, target);
     return current;
-  }
-
-  protected boolean isSet(Flag flag) {
-    return (flags & flag.bitmask) != 0;
-  }
-
-  protected void setFlag(Flag flag, boolean active) {
-    if (active) {
-      flags |= flag.bitmask;
-    } else {
-      flags &= ~flag.bitmask;
-    }
   }
 }
