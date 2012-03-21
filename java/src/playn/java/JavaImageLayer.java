@@ -171,6 +171,8 @@ class JavaImageLayer extends JavaLayer implements ImageLayer {
       canvas.drawImage(cachedImage, 0, 0);
     } else if (sourceRectSet) {
       canvas.drawImage(image, 0, 0, dw, dh, sx, sy, sw, sh);
+    } else if (widthSet || heightSet) {
+      canvas.drawImage(image, 0, 0, dw, dh);
     } else {
       canvas.drawImage(image, 0, 0);
     }
