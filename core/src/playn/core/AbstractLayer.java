@@ -287,6 +287,8 @@ public abstract class AbstractLayer implements Layer {
   }
 
   private Interactor<?> removeInteractor(Interactor<?> current, Interactor<?> target) {
+    if (current == null)
+      return null;
     if (current == target)
       return current.next;
     current.next = removeInteractor(current.next, target);
