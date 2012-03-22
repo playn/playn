@@ -338,7 +338,7 @@ public interface Layer {
      */
     public static Point layerToParent(Layer layer, Layer parent, float x, float y) {
       Point into = new Point(x, y);
-      return layerToParent(layer, parent, into.set(x, y), into);
+      return layerToParent(layer, parent, into, into);
     }
 
     /**
@@ -367,9 +367,22 @@ public interface Layer {
      * into {@code into}, which is returned for convenience.
      */
     public static Point parentToLayer(Layer layer, IPoint point, Point into) {
-      into = layer.transform().inverseTransform(point, into);
+      layer.transform().inverseTransform(point, into);
       into.x += layer.originX();
       into.y += layer.originY();
+      return into;
+    }
+
+    /**
+     * Converts the supplied point from coordinates relative to the specified parent to coordinates
+     * relative to the specified child layer. The results are stored into {@code into}, which is
+     * returned for convenience.
+     */
+    public static Point parentToLayer(Layer parent, Layer layer, IPoint point, Point into) {
+      Layer immediateParent = layer.parent();
+      if (immediateParent != parent)
+        point = parentToLayer(parent, immediateParent, point, into);
+      parentToLayer(layer, point, into);
       return into;
     }
 
