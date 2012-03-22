@@ -72,6 +72,11 @@ class HtmlGroupLayerDom extends HtmlLayerDom implements GroupLayer, ParentLayer 
   }
 
   @Override
+  public void addAt(Layer layer, float tx, float ty) {
+    impl.addAt(this, layer, tx, ty);
+  }
+
+  @Override
   public void remove(Layer layer) {
     Asserts.checkArgument(layer instanceof HtmlLayerDom);
     HtmlLayerDom hlayer = (HtmlLayerDom) layer;

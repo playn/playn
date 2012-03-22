@@ -66,6 +66,11 @@ public class GroupLayerImpl<L extends AbstractLayer>
     return index;
   }
 
+  public void addAt(GroupLayer self, Layer layer, float tx, float ty) {
+    layer.transform().setTranslation(tx, ty);
+    self.add(layer);
+  }
+
   // TODO: remove this when GroupLayer.add(int,Layer) is removed
   public void add(GroupLayer self, int index, L child) {
     // remove the child from any existing parent, preventing multiple parents

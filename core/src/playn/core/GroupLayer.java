@@ -37,6 +37,17 @@ public interface GroupLayer extends Layer {
   void add(Layer layer);
 
   /**
+   * Adds the supplied layer to this group layer, adjusting its translation (relative to this group
+   * layer) to the supplied values. This is equivalent to:
+   * <pre>{@code
+   * layer.transform().setTranslation(tx, ty);
+   * group.add(layer);
+   * }</pre>
+   * but is such a common operation that this helper method is provided.
+   */
+  void addAt(Layer layer, float tx, float ty);
+
+  /**
    * @deprecated Use {@link Layer#setDepth} to manage render order.
    */
   @Deprecated

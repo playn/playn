@@ -48,6 +48,11 @@ public class GroupLayerGL extends LayerGL implements GroupLayer, ParentLayer {
   }
 
   @Override
+  public void addAt(Layer layer, float tx, float ty) {
+    impl.addAt(this, layer, tx, ty);
+  }
+
+  @Override
   public void remove(Layer layer) {
     Asserts.checkArgument(layer instanceof LayerGL);
     impl.remove(this, (LayerGL) layer);

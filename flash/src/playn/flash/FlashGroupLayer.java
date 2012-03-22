@@ -63,6 +63,11 @@ public class FlashGroupLayer extends FlashLayer implements GroupLayer, ParentLay
   }
 
   @Override
+  public void addAt(Layer layer, float tx, float ty) {
+    impl.addAt(this, layer, tx, ty);
+  }
+
+  @Override
   public void remove(Layer layer) {
     impl.remove(this, (FlashLayer) layer);
     container().removeChild(display(layer));

@@ -47,6 +47,11 @@ class HtmlGroupLayerCanvas extends HtmlLayerCanvas implements GroupLayer, Parent
   }
 
   @Override
+  public void addAt(Layer layer, float tx, float ty) {
+    impl.addAt(this, layer, tx, ty);
+  }
+
+  @Override
   public void remove(Layer layer) {
     Asserts.checkArgument(layer instanceof HtmlLayerCanvas);
     impl.remove(this, (HtmlLayerCanvas) layer);
