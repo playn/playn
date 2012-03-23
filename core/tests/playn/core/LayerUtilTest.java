@@ -135,5 +135,9 @@ public class LayerUtilTest {
     public int size() {
       return impl.children.size();
     }
+    @Override
+    public void addAt (Layer layer, float tx, float ty) {
+      impl.addAt(this, layer, tx, ty);
+    }
   }
 }

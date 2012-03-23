@@ -122,5 +122,9 @@ public class GroupLayerImplTest {
     public void depthChanged(Layer layer, float oldDepth) {
       impl.depthChanged(this, layer, oldDepth);
     }
+    @Override
+    public void addAt (Layer layer, float tx, float ty) {
+      impl.addAt(this, layer, tx, ty);
+    }
   }
 }
