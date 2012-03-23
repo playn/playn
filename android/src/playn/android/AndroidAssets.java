@@ -47,7 +47,10 @@ public class AndroidAssets extends AbstractAssets {
   }
 
   public void setPathPrefix(String prefix) {
-    pathPrefix = prefix;
+    if (prefix.startsWith("/") || prefix.endsWith("/")) {
+      throw new IllegalArgumentException("Prefix must not start or end with '/'.");
+    }
+    pathPrefix = (prefix.length() == 0) ? prefix : (prefix + "/");
   }
 
   /**
@@ -55,10 +58,9 @@ public class AndroidAssets extends AbstractAssets {
    * {@link IOException} in case of failure.
    */
   private InputStream openAsset(String path) throws IOException {
-    // Insert a slash to make this consistent with the Java asset manager
-    InputStream is = getClass().getClassLoader().getResourceAsStream(pathPrefix + "/" + path);
+    InputStream is = getClass().getClassLoader().getResourceAsStream(pathPrefix + path);
     if (is == null)
-      throw new IOException("Unable to loader resource: " + path);
+      throw new IOException("Unable to load resource: " + pathPrefix + path);
     return is;
   }
 
