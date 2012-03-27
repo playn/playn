@@ -128,7 +128,7 @@ public interface Keyboard {
   }
 
   /** Enumerates the different mobile keyboard types that can be requested.
-   * See {@link #showKeyboard}. */
+   * See {@link #getText}. */
   public static enum TextType {
     DEFAULT, NUMBER, EMAIL, URL;
   };
