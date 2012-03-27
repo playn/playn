@@ -86,7 +86,9 @@ class IOSAssets implements Assets
     } catch (Throwable t) {
       callback.error(t);
     } finally {
-      reader.Close();
+      if (reader != null) {
+        reader.Close();
+      }
     }
   }
 
