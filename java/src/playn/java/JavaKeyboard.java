@@ -17,17 +17,21 @@ package playn.java;
 
 import playn.core.Key;
 import playn.core.Keyboard;
+import playn.core.util.Callback;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 
 class JavaKeyboard implements Keyboard {
 
   private Listener listener;
+  private JFrame frame;
 
   JavaKeyboard(JFrame frame) {
+    this.frame = frame;
     frame.addKeyListener(new KeyListener() {
       @Override
       public void keyPressed(KeyEvent nativeEvent) {
@@ -72,6 +76,18 @@ class JavaKeyboard implements Keyboard {
   @Override
   public void setListener(Listener listener) {
     this.listener = listener;
+  }
+
+  @Override
+  public boolean hasHardwareKeyboard() {
+    return true;
+  }
+
+  @Override
+  public void getText(TextType textType, String label, String initVal, Callback<String> callback) {
+    Object result = JOptionPane.showInputDialog(
+      frame, label, "", JOptionPane.QUESTION_MESSAGE, null, null, initVal);
+    callback.onSuccess((String) result);
   }
 
   private static Key keyForCode(int keyCode) {

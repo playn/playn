@@ -16,6 +16,7 @@
 package playn.android;
 
 import playn.core.Keyboard;
+import playn.core.util.Callback;
 
 public class AndroidKeyboard implements Keyboard {
   private Listener listener;
@@ -23,6 +24,16 @@ public class AndroidKeyboard implements Keyboard {
   @Override
   public synchronized void setListener(Listener listener) {
     this.listener = listener;
+  }
+
+  @Override
+  public boolean hasHardwareKeyboard() {
+    return false; // TODO: return true for devices that have a hardware keyboard
+  }
+
+  @Override
+  public void getText(TextType textType, String label, String initVal, Callback<String> callback) {
+    callback.onFailure(new UnsupportedOperationException("Not yet implemented."));
   }
 
   /*

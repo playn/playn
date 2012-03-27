@@ -21,6 +21,7 @@ import com.google.gwt.event.dom.client.KeyCodes;
 import playn.core.Key;
 import playn.core.Keyboard;
 import playn.core.PlayN;
+import playn.core.util.Callback;
 
 class HtmlKeyboard implements Keyboard {
 
@@ -73,6 +74,16 @@ class HtmlKeyboard implements Keyboard {
   @Override
   public void setListener(Listener listener) {
     this.listener = listener;
+  }
+
+  @Override
+  public boolean hasHardwareKeyboard() {
+    return true; // TODO: check whether we're on a mobile device or not
+  }
+
+  @Override
+  public void getText(TextType textType, String label, String initVal, Callback<String> callback) {
+    callback.onFailure(new UnsupportedOperationException("Not yet implemented."));
   }
 
   private static Key keyForCode(int keyCode) {

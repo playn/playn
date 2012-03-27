@@ -21,6 +21,7 @@ import flash.ui.Keyboard;
 
 import playn.core.Key;
 import playn.core.PlayN;
+import playn.core.util.Callback;
 
 class FlashKeyboard implements playn.core.Keyboard {
 
@@ -67,6 +68,16 @@ class FlashKeyboard implements playn.core.Keyboard {
   @Override
   public void setListener(Listener listener) {
     this.listener = listener;
+  }
+
+  @Override
+  public boolean hasHardwareKeyboard() {
+    return true; // TODO: check whether we're on a mobile device or not
+  }
+
+  @Override
+  public void getText(TextType textType, String label, String initVal, Callback<String> callback) {
+    callback.onFailure(new UnsupportedOperationException("Not yet implemented."));
   }
 
   private static Key keyForCode(int keyCode) {
