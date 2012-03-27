@@ -23,7 +23,7 @@ class IOSKeyboard implements Keyboard
 {
   @Override
   public void setListener(Listener listener) {
-    PlayN.log().warn("Keyboard not (currently) supported on iOS.");
+    PlayN.log().warn("iOS cannot generate keyboard events. Use Keyboard.getText() instead");
   }
 
   @Override
