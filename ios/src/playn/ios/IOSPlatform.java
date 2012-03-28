@@ -103,7 +103,7 @@ public class IOSPlatform implements Platform {
    */
   public void setSupportedOrientations(boolean portrait, boolean landscapeRight,
                                        boolean upsideDown, boolean landscapeLeft) {
-    graphics.ctx.setSupportedOrientations(portrait, landscapeRight, upsideDown, landscapeLeft);
+    graphics.setSupportedOrientations(portrait, landscapeRight, upsideDown, landscapeLeft);
   }
 
   @Override

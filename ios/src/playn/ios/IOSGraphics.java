@@ -15,11 +15,17 @@
  */
 package playn.ios;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import cli.MonoTouch.CoreGraphics.CGBitmapContext;
 import cli.MonoTouch.CoreGraphics.CGColorSpace;
 import cli.MonoTouch.CoreGraphics.CGImageAlphaInfo;
+import cli.MonoTouch.UIKit.UIDeviceOrientation;
 import cli.System.Drawing.RectangleF;
 import cli.System.Runtime.InteropServices.Marshal;
+
+import pythagoras.f.FloatMath;
 
 import playn.core.CanvasImage;
 import playn.core.Font;
@@ -27,8 +33,10 @@ import playn.core.Game;
 import playn.core.Gradient;
 import playn.core.GroupLayer;
 import playn.core.Image;
+import playn.core.InternalTransform;
 import playn.core.Path;
 import playn.core.Pattern;
+import playn.core.StockInternalTransform;
 import playn.core.TextFormat;
 import playn.core.TextLayout;
 import playn.core.gl.GLContext;
@@ -46,6 +54,10 @@ public class IOSGraphics extends GraphicsGL {
 
   private final GroupLayerGL rootLayer;
   private final int screenWidth, screenHeight;
+
+  InternalTransform rootTransform = StockInternalTransform.IDENTITY;
+  private Set<Integer> supportedOrients = new HashSet<Integer>();
+  private boolean invertSizes;
 
   // a scratch bitmap context used for measuring text
   private static final int S_SIZE = 10;
@@ -100,22 +112,22 @@ public class IOSGraphics extends GraphicsGL {
 
   @Override
   public int screenHeight() {
-    return screenHeight;
+    return invertSizes ? screenWidth : screenHeight;
   }
 
   @Override
   public int screenWidth() {
-    return screenWidth;
+    return invertSizes ? screenHeight : screenWidth;
   }
 
   @Override
   public int height() {
-    return ctx.viewHeight;
+    return invertSizes ? ctx.viewWidth : ctx.viewHeight;
   }
 
   @Override
   public int width() {
-    return ctx.viewWidth;
+    return invertSizes ? ctx.viewHeight : ctx.viewWidth;
   }
 
   @Override
@@ -133,10 +145,53 @@ public class IOSGraphics extends GraphicsGL {
     return ctx;
   }
 
+  void setSupportedOrientations(boolean portrait, boolean landscapeRight,
+                                boolean upsideDown, boolean landscapeLeft) {
+    supportedOrients.clear();
+    if (portrait)
+      supportedOrients.add(UIDeviceOrientation.Portrait);
+    if (landscapeRight)
+      supportedOrients.add(UIDeviceOrientation.LandscapeRight);
+    if (landscapeLeft)
+      supportedOrients.add(UIDeviceOrientation.LandscapeLeft);
+    if (upsideDown)
+      supportedOrients.add(UIDeviceOrientation.PortraitUpsideDown);
+  }
+
+  boolean setOrientation(UIDeviceOrientation orientation) {
+    if (!supportedOrients.contains(orientation.Value))
+      return false;
+    switch (orientation.Value) {
+    case UIDeviceOrientation.Portrait:
+      rootTransform = StockInternalTransform.IDENTITY;
+      invertSizes = false;
+      break;
+    case UIDeviceOrientation.PortraitUpsideDown:
+      rootTransform = new StockInternalTransform();
+      rootTransform.translate(-ctx.viewWidth, -ctx.viewHeight);
+      rootTransform.scale(-1, -1);
+      invertSizes = false;
+      break;
+    case UIDeviceOrientation.LandscapeLeft:
+      rootTransform = new StockInternalTransform();
+      rootTransform.rotate(FloatMath.PI/2);
+      rootTransform.translate(0, -ctx.viewWidth);
+      invertSizes = true;
+      break;
+    case UIDeviceOrientation.LandscapeRight:
+      rootTransform = new StockInternalTransform();
+      rootTransform.rotate(-FloatMath.PI/2);
+      rootTransform.translate(-ctx.viewHeight, 0);
+      invertSizes = true;
+      break;
+    }
+    return true;
+  }
+
   void paint(Game game, float alpha) {
     ctx.processPending();
     ctx.bindFramebuffer();
     game.paint(alpha); // run the game's custom painting code
-    ctx.paintLayers(rootLayer);
+    ctx.paintLayers(rootTransform, rootLayer);
   }
 }
