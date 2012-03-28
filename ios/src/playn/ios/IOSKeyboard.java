@@ -15,6 +15,15 @@
  */
 package playn.ios;
 
+import cli.MonoTouch.UIKit.UIAlertView;
+import cli.MonoTouch.UIKit.UIAlertViewStyle;
+import cli.MonoTouch.UIKit.UIColor;
+import cli.MonoTouch.UIKit.UIKeyboardType;
+import cli.MonoTouch.UIKit.UIReturnKeyType;
+import cli.MonoTouch.UIKit.UITextAutocapitalizationType;
+import cli.MonoTouch.UIKit.UITextAutocorrectionType;
+import cli.MonoTouch.UIKit.UITextField;
+import cli.System.Drawing.RectangleF;
 import playn.core.Keyboard;
 import playn.core.PlayN;
 import playn.core.util.Callback;
@@ -33,6 +42,38 @@ class IOSKeyboard implements Keyboard
 
   @Override
   public void getText(TextType textType, String label, String initVal, Callback<String> callback) {
-    callback.onFailure(new UnsupportedOperationException("Not yet implemented."));
+    UIAlertView view = new UIAlertView(new RectangleF(12f, 45f, 260f, 25f));
+    view.set_Title(label);
+    view.AddButton("Cancel");
+    view.AddButton("OK");
+    view.set_AlertViewStyle(UIAlertViewStyle.wrap(UIAlertViewStyle.PlainTextInput));
+
+    UITextField field = view.GetTextField(0);
+    field.set_UserInteractionEnabled(true);
+    field.set_BackgroundColor(UIColor.get_White());
+    field.set_ReturnKeyType(UIReturnKeyType.wrap(UIReturnKeyType.Done));
+
+    switch (textType) {
+    case NUMBER:
+        field.set_KeyboardType(UIKeyboardType.wrap(UIKeyboardType.NumberPad));
+        break;
+    case EMAIL:
+        field.set_KeyboardType(UIKeyboardType.wrap(UIKeyboardType.EmailAddress));
+        break;
+    case URL:
+        field.set_KeyboardType(UIKeyboardType.wrap(UIKeyboardType.Url));
+        break;
+    case DEFAULT:
+        field.set_KeyboardType(UIKeyboardType.wrap(UIKeyboardType.Default));
+        break;
+    }
+
+    // TODO: Customize these per getText() call?
+    field.set_AutocorrectionType(UITextAutocorrectionType.wrap(UITextAutocorrectionType.No));
+    field.set_AutocapitalizationType(
+        UITextAutocapitalizationType.wrap(UITextAutocapitalizationType.None));
+    field.set_SecureTextEntry(false); // TODO: if nothing else, can do this one as a TextType
+
+    view.Show();
   }
 }
