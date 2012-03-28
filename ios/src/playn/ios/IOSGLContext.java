@@ -15,9 +15,6 @@
  */
 package playn.ios;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import cli.System.Drawing.RectangleF;
 import cli.System.IntPtr;
 import cli.System.Runtime.InteropServices.Marshal;
@@ -30,11 +27,8 @@ import cli.MonoTouch.UIKit.UIImage;
 import cli.OpenTK.Graphics.ES20.All;
 import cli.OpenTK.Graphics.ES20.GL;
 
-import pythagoras.f.FloatMath;
-
 import playn.core.InternalTransform;
 import playn.core.PlayN;
-import playn.core.StockInternalTransform;
 import playn.core.gl.GLContext;
 import playn.core.gl.GLShader;
 import playn.core.gl.GroupLayerGL;
@@ -47,8 +41,6 @@ class IOSGLContext extends GLContext
 
   int fbufWidth, fbufHeight;
   private int lastFrameBuffer;
-  private InternalTransform rootTransform = StockInternalTransform.IDENTITY;
-  private Set<Integer> supportedOrients = new HashSet<Integer>();
 
   private GLShader.Texture texShader;
   private GLShader.Color colorShader;
@@ -60,45 +52,6 @@ class IOSGLContext extends GLContext
 
   void init() {
     reinitGL();
-  }
-
-  void setSupportedOrientations(boolean portrait, boolean landscapeRight,
-                                boolean upsideDown, boolean landscapeLeft) {
-    supportedOrients.clear();
-    if (portrait)
-      supportedOrients.add(UIDeviceOrientation.Portrait);
-    if (landscapeRight)
-      supportedOrients.add(UIDeviceOrientation.LandscapeRight);
-    if (landscapeLeft)
-      supportedOrients.add(UIDeviceOrientation.LandscapeLeft);
-    if (upsideDown)
-      supportedOrients.add(UIDeviceOrientation.PortraitUpsideDown);
-  }
-
-  boolean setOrientation(UIDeviceOrientation orientation) {
-    if (!supportedOrients.contains(orientation.Value))
-      return false;
-    switch (orientation.Value) {
-    case UIDeviceOrientation.Portrait:
-      rootTransform = StockInternalTransform.IDENTITY;
-      break;
-    case UIDeviceOrientation.PortraitUpsideDown:
-      rootTransform = new StockInternalTransform();
-      rootTransform.translate(-viewWidth, -viewHeight);
-      rootTransform.scale(-1, -1);
-      break;
-    case UIDeviceOrientation.LandscapeLeft:
-      rootTransform = new StockInternalTransform();
-      rootTransform.rotate(FloatMath.PI/2);
-      rootTransform.translate(0, -viewWidth);
-      break;
-    case UIDeviceOrientation.LandscapeRight:
-      rootTransform = new StockInternalTransform();
-      rootTransform.rotate(-FloatMath.PI/2);
-      rootTransform.translate(-viewHeight, 0);
-      break;
-    }
-    return true;
   }
 
   @Override
@@ -244,7 +197,7 @@ class IOSGLContext extends GLContext
                   All.wrap(All.UnsignedByte), data);
   }
 
-  void paintLayers(GroupLayerGL rootLayer) {
+  void paintLayers(InternalTransform rootTransform, GroupLayerGL rootLayer) {
     checkGLError("updateLayers start");
     bindFramebuffer();
     GL.Clear(All.ColorBufferBit | All.DepthBufferBit); // clear to transparent

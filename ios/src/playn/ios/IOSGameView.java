@@ -168,7 +168,7 @@ class IOSGameView extends iPhoneOSGameView
   }
 
   private void OnOrientationChange(UIDeviceOrientation orientation) {
-    if (IOSPlatform.instance.graphics().ctx.setOrientation(orientation)) {
+    if (IOSPlatform.instance.graphics().setOrientation(orientation)) {
       // TODO: notify the app of the orientation change
     }
   }
