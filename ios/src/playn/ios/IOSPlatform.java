@@ -257,7 +257,7 @@ public class IOSPlatform implements Platform {
     if (!orients.isSupported(orientation))
       return; // ignore unsupported (or Unknown) orientations
     graphics.setOrientation(orientation);
-    app.SetStatusBarOrientation(ORIENT_MAP.get(orientation), false);
+    app.SetStatusBarOrientation(ORIENT_MAP.get(orientation), true);
     // TODO: notify the game of the orientation change
   }
 
