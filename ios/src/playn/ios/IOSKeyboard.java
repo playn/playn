@@ -44,15 +44,13 @@ class IOSKeyboard implements Keyboard
   @Override
   public void getText(TextType textType, String label, String initVal,
       final Callback<String> callback) {
-    UIAlertView view = new UIAlertView(new RectangleF(12f, 45f, 260f, 25f));
+    UIAlertView view = new UIAlertView();
     view.set_Title(label);
     view.AddButton("Cancel");
     view.AddButton("OK");
     view.set_AlertViewStyle(UIAlertViewStyle.wrap(UIAlertViewStyle.PlainTextInput));
 
     final UITextField field = view.GetTextField(0);
-    field.set_UserInteractionEnabled(true);
-    field.set_BackgroundColor(UIColor.get_White());
     field.set_ReturnKeyType(UIReturnKeyType.wrap(UIReturnKeyType.Done));
 
     switch (textType) {
