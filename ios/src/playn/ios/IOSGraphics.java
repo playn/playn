@@ -155,14 +155,14 @@ public class IOSGraphics extends GraphicsGL {
       break;
     case UIDeviceOrientation.LandscapeLeft:
       rootTransform = new StockInternalTransform();
-      rootTransform.rotate(-FloatMath.PI/2);
-      rootTransform.translate(-ctx.viewHeight, 0);
+      rootTransform.rotate(FloatMath.PI/2);
+      rootTransform.translate(0, -ctx.viewWidth);
       invertSizes = true;
       break;
     case UIDeviceOrientation.LandscapeRight:
       rootTransform = new StockInternalTransform();
-      rootTransform.rotate(FloatMath.PI/2);
-      rootTransform.translate(0, -ctx.viewWidth);
+      rootTransform.rotate(-FloatMath.PI/2);
+      rootTransform.translate(-ctx.viewHeight, 0);
       invertSizes = true;
       break;
     }

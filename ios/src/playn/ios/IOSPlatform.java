@@ -316,9 +316,10 @@ public class IOSPlatform implements Platform {
                    UIInterfaceOrientation.wrap(UIInterfaceOrientation.Portrait));
     ORIENT_MAP.put(UIDeviceOrientation.wrap(UIDeviceOrientation.PortraitUpsideDown),
                    UIInterfaceOrientation.wrap(UIInterfaceOrientation.PortraitUpsideDown));
+    // nb: these are swapped, because of some cracksmoking at Apple
     ORIENT_MAP.put(UIDeviceOrientation.wrap(UIDeviceOrientation.LandscapeLeft),
-                   UIInterfaceOrientation.wrap(UIInterfaceOrientation.LandscapeLeft));
-    ORIENT_MAP.put(UIDeviceOrientation.wrap(UIDeviceOrientation.LandscapeRight),
                    UIInterfaceOrientation.wrap(UIInterfaceOrientation.LandscapeRight));
+    ORIENT_MAP.put(UIDeviceOrientation.wrap(UIDeviceOrientation.LandscapeRight),
+                   UIInterfaceOrientation.wrap(UIInterfaceOrientation.LandscapeLeft));
   }
 }
