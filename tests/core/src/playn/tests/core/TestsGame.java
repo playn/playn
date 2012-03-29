@@ -25,8 +25,6 @@ import static playn.core.PlayN.*;
 
 public class TestsGame implements Game {
   Test[] tests = new Test[] {
-    new GetTextTest(),
-    new LayerClickTest(),
     new SurfaceTest(),
     new CanvasTest(),
     new ImmediateTest(),
@@ -34,6 +32,8 @@ public class TestsGame implements Game {
     new AlphaLayerTest(),
     new DepthTest(),
     new ClearBackgroundTest(),
+    new LayerClickTest(),
+    new GetTextTest(),
     /*new YourTest(),*/
   };
   int currentTest;
