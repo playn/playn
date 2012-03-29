@@ -8,22 +8,20 @@ using playn.tests.core;
 
 namespace playn.tests.ios
 {
-	[Register ("AppDelegate")]
-	public partial class AppDelegate : UIApplicationDelegate
-	{
-		public override bool FinishedLaunching (UIApplication app, NSDictionary options)
-		{
-			IOSPlatform.register(app);
-		    PlayN.run(new TestsGame());
-    		return true;
-		}
-	}
+  [Register ("AppDelegate")]
+  public partial class AppDelegate : UIApplicationDelegate {
+    public override bool FinishedLaunching (UIApplication app, NSDictionary options) {
+      // app.SetStatusBarHidden(true, true);
+      IOSPlatform p = IOSPlatform.register(app);
+      p.setSupportedOrientations(true, true, true, true);
+      PlayN.run(new TestsGame());
+      return true;
+    }
+  }
 
-	public class Application
-	{
-		static void Main (string[] args)
-		{
-			UIApplication.Main (args, null, "AppDelegate");
-		}
-	}
+  public class Application {
+    static void Main (string[] args) {
+      UIApplication.Main (args, null, "AppDelegate");
+    }
+  }
 }
