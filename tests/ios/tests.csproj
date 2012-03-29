@@ -64,7 +64,7 @@
       <HintPath>tests-core.dll</HintPath>
     </Reference>
     <Reference Include="IKVM.OpenJDK.Core">
-      <HintPath>..\..\..\..\projects\ikvm-monotouch\bin\IKVM.OpenJDK.Core.dll</HintPath>
+      <HintPath>..\..\..\ikvm-monotouch\bin\IKVM.OpenJDK.Core.dll</HintPath>
     </Reference>
     <Reference Include="Mono.Data.Sqlite" />
     <Reference Include="System.Data" />
@@ -95,5 +95,6 @@
     <Content Include="..\core\src\playn\tests\resources\images\tile.png">
       <Link>images\tile.png</Link>
     </Content>
+    <Content Include="touch-icon-57x57.png" />
   </ItemGroup>
 </Project>
