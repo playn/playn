@@ -47,7 +47,7 @@ class IOSGameView extends iPhoneOSGameView
     set_LayerRetainsBacking(false);
     // TODO: figure out twisty maze of Retina scale bullshit
     set_ContentScaleFactor(scale);
-    // set_MultipleTouchEnabled(true);
+    set_MultipleTouchEnabled(true);
     set_AutoResize(false);
     set_LayerColorFormat(EAGLColorFormat.RGBA8);
     // TODO: support OpenGL ES 1.1?
