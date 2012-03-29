@@ -12,7 +12,7 @@ namespace playn.tests.ios
   public partial class AppDelegate : UIApplicationDelegate {
     public override bool FinishedLaunching (UIApplication app, NSDictionary options) {
       app.SetStatusBarHidden(true, true);
-      IOSPlatform.register(app, IOSPlatform.SupportedOrients.LANDSCAPES);
+      IOSPlatform.register(app, IOSPlatform.SupportedOrients.ALL);
       PlayN.run(new TestsGame());
       return true;
     }

@@ -25,8 +25,8 @@ import static playn.core.PlayN.*;
 
 public class TestsGame implements Game {
   Test[] tests = new Test[] {
-    new SurfaceTest(),
-    new CanvasTest(),
+    // new SurfaceTest(),
+    // new CanvasTest(),
     new ImmediateTest(),
     new ImageTypeTest(),
     new AlphaLayerTest(),

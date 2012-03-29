@@ -15,12 +15,13 @@
  */
 package playn.ios;
 
+import cli.System.Drawing.RectangleF;
+import cli.System.Runtime.InteropServices.Marshal;
+
 import cli.MonoTouch.CoreGraphics.CGBitmapContext;
 import cli.MonoTouch.CoreGraphics.CGColorSpace;
 import cli.MonoTouch.CoreGraphics.CGImageAlphaInfo;
 import cli.MonoTouch.UIKit.UIDeviceOrientation;
-import cli.System.Drawing.RectangleF;
-import cli.System.Runtime.InteropServices.Marshal;
 
 import pythagoras.f.FloatMath;
 
@@ -142,6 +143,7 @@ public class IOSGraphics extends GraphicsGL {
   }
 
   void setOrientation(UIDeviceOrientation orientation) {
+    ctx.orient = orientation.Value;
     switch (orientation.Value) {
     case UIDeviceOrientation.Portrait:
       rootTransform = StockInternalTransform.IDENTITY;

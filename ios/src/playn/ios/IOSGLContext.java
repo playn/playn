@@ -22,6 +22,7 @@ import cli.System.Runtime.InteropServices.Marshal;
 import cli.MonoTouch.CoreGraphics.CGBitmapContext;
 import cli.MonoTouch.CoreGraphics.CGImage;
 import cli.MonoTouch.CoreGraphics.CGImageAlphaInfo;
+import cli.MonoTouch.UIKit.UIDeviceOrientation;
 import cli.MonoTouch.UIKit.UIImage;
 import cli.OpenTK.Graphics.ES20.All;
 import cli.OpenTK.Graphics.ES20.GL;
@@ -38,7 +39,7 @@ class IOSGLContext extends GLContext
 
   public int viewWidth, viewHeight;
 
-  int fbufWidth, fbufHeight;
+  int fbufWidth, fbufHeight, orient;
   private int lastFrameBuffer;
 
   private GLShader.Texture texShader;
@@ -112,7 +113,21 @@ class IOSGLContext extends GLContext
   @Override
   public void startClipped(int x, int y, int width, int height) {
     flush(); // flush any pending unclipped calls
-    GL.Scissor(x, fbufHeight-y-height, width, height);
+    switch (orient) {
+    default:
+    case UIDeviceOrientation.Portrait:
+      GL.Scissor(x, fbufHeight-y-height, width, height);
+      break;
+    case UIDeviceOrientation.PortraitUpsideDown:
+      GL.Scissor(x-width, fbufHeight-y, width, height);
+      break;
+    case UIDeviceOrientation.LandscapeLeft:
+      GL.Scissor(x-width, fbufHeight-y-height, width, height);
+      break;
+    case UIDeviceOrientation.LandscapeRight:
+      GL.Scissor(x, fbufHeight-y, width, height);
+      break;
+    }
     GL.Enable(All.wrap(All.ScissorTest));
   }
 
