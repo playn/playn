@@ -82,7 +82,7 @@ public class IOSPlatform implements Platform {
 
     instance = this;
     audio = new IOSAudio();
-    graphics = new IOSGraphics(app, bounds, scale);
+    graphics = new IOSGraphics(bounds, scale);
     json = new JsonImpl();
     keyboard = new IOSKeyboard();
     net = new IOSNet();

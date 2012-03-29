@@ -21,9 +21,7 @@ import java.util.Set;
 import cli.MonoTouch.CoreGraphics.CGBitmapContext;
 import cli.MonoTouch.CoreGraphics.CGColorSpace;
 import cli.MonoTouch.CoreGraphics.CGImageAlphaInfo;
-import cli.MonoTouch.UIKit.UIApplication;
 import cli.MonoTouch.UIKit.UIDeviceOrientation;
-import cli.MonoTouch.UIKit.UIInterfaceOrientation;
 import cli.System.Drawing.RectangleF;
 import cli.System.Runtime.InteropServices.Marshal;
 
@@ -69,10 +67,7 @@ public class IOSGraphics extends GraphicsGL {
 
   final IOSGLContext ctx;
 
-  private UIApplication app;
-
-  public IOSGraphics(UIApplication app, RectangleF bounds, float scale) {
-    this.app = app;
+  public IOSGraphics(RectangleF bounds, float scale) {
     screenWidth = (int)(bounds.get_Width() * scale);
     screenHeight = (int)(bounds.get_Height() * scale);
     ctx = new IOSGLContext(screenWidth, screenHeight);
@@ -190,7 +185,6 @@ public class IOSGraphics extends GraphicsGL {
       invertSizes = true;
       break;
     }
-    app.SetStatusBarOrientation(UIInterfaceOrientation.wrap(orientation.Value), false);
     return true;
   }
 
