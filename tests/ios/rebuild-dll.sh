@@ -1,7 +1,7 @@
 #!/bin/sh
 
 if [ -z "$IKVM_HOME" ]; then
-    IKVM_HOME=$HOME/projects/ikvm-monotouch
+    IKVM_HOME=../../../ikvm-monotouch
 fi
 MAVEN_REPO=$HOME/.m2/repository
 export MONO_PATH=/Developer/MonoTouch/usr/lib/mono/2.1
