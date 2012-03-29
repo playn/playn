@@ -22,11 +22,9 @@ import java.util.Map;
 
 import cli.System.Drawing.RectangleF;
 
-import cli.MonoTouch.Foundation.NSSet;
 import cli.MonoTouch.Foundation.NSUrl;
 import cli.MonoTouch.UIKit.UIApplication;
 import cli.MonoTouch.UIKit.UIDeviceOrientation;
-import cli.MonoTouch.UIKit.UIEvent;
 import cli.MonoTouch.UIKit.UIInterfaceOrientation;
 import cli.MonoTouch.UIKit.UIScreen;
 import cli.MonoTouch.UIKit.UIViewController;
@@ -142,9 +140,7 @@ public class IOSPlatform implements Platform {
     storage = new IOSStorage();
 
     mainWindow = new UIWindow(bounds);
-    IOSViewController ctrl = new IOSViewController();
-    ctrl.Add(gameView = new IOSGameView(bounds, scale));
-    mainWindow.set_RootViewController(ctrl);
+    mainWindow.Add(gameView = new IOSGameView(bounds, scale));
 
     // configure our orientation to a supported default, a notification will come in later that
     // will adjust us to the devices current orientation
@@ -308,36 +304,6 @@ public class IOSPlatform implements Platform {
   void queueAction(Runnable r) {
     synchronized (pendingActions) {
       pendingActions.add(r);
-    }
-  }
-
-  protected class IOSViewController extends UIViewController {
-    @Override
-    public void TouchesBegan(NSSet touches, UIEvent event) {
-      super.TouchesBegan(touches, event);
-      touch().onTouchesBegan(touches, event);
-      pointer().onTouchesBegan(touches, event);
-    }
-
-    @Override
-    public void TouchesMoved(NSSet touches, UIEvent event) {
-      super.TouchesMoved(touches, event);
-      touch().onTouchesMoved(touches, event);
-      pointer().onTouchesMoved(touches, event);
-    }
-
-    @Override
-    public void TouchesEnded(NSSet touches, UIEvent event) {
-      super.TouchesEnded(touches, event);
-      touch().onTouchesEnded(touches, event);
-      pointer().onTouchesEnded(touches, event);
-    }
-
-    @Override
-    public void TouchesCancelled(NSSet touches, UIEvent event) {
-      super.TouchesCancelled(touches, event);
-      touch().onTouchesCancelled(touches, event);
-      pointer().onTouchesCancelled(touches, event);
     }
   }
 

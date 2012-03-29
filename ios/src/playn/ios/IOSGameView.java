@@ -26,9 +26,11 @@ import cli.MonoTouch.CoreAnimation.CAEAGLLayer;
 import cli.MonoTouch.Foundation.ExportAttribute;
 import cli.MonoTouch.Foundation.NSNotification;
 import cli.MonoTouch.Foundation.NSNotificationCenter;
+import cli.MonoTouch.Foundation.NSSet;
 import cli.MonoTouch.OpenGLES.EAGLColorFormat;
 import cli.MonoTouch.OpenGLES.EAGLRenderingAPI;
 import cli.MonoTouch.UIKit.UIDevice;
+import cli.MonoTouch.UIKit.UIEvent;
 
 import playn.core.PlayN;
 
@@ -134,6 +136,34 @@ class IOSGameView extends iPhoneOSGameView
   @Override
   protected void OnWindowStateChanged(EventArgs e) {
     super.OnWindowStateChanged(e);
+  }
+
+  @Override
+  public void TouchesBegan(NSSet touches, UIEvent event) {
+    super.TouchesBegan(touches, event);
+    IOSPlatform.instance.touch().onTouchesBegan(touches, event);
+    IOSPlatform.instance.pointer().onTouchesBegan(touches, event);
+  }
+
+  @Override
+  public void TouchesMoved(NSSet touches, UIEvent event) {
+    super.TouchesMoved(touches, event);
+    IOSPlatform.instance.touch().onTouchesMoved(touches, event);
+    IOSPlatform.instance.pointer().onTouchesMoved(touches, event);
+  }
+
+  @Override
+  public void TouchesEnded(NSSet touches, UIEvent event) {
+    super.TouchesEnded(touches, event);
+    IOSPlatform.instance.touch().onTouchesEnded(touches, event);
+    IOSPlatform.instance.pointer().onTouchesEnded(touches, event);
+  }
+
+  @Override
+  public void TouchesCancelled(NSSet touches, UIEvent event) {
+    super.TouchesCancelled(touches, event);
+    IOSPlatform.instance.touch().onTouchesCancelled(touches, event);
+    IOSPlatform.instance.pointer().onTouchesCancelled(touches, event);
   }
 
   @ExportAttribute.Annotation("layerClass")
