@@ -17,10 +17,8 @@ package playn.ios;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import cli.System.Drawing.RectangleF;
 
@@ -47,8 +45,52 @@ import playn.core.json.JsonImpl;
  */
 public class IOSPlatform implements Platform {
 
+  /** Defines the orientations supported by your app. */
+  public enum SupportedOrients {
+    /** Suports portrait and portrait upside down orients. */
+    PORTRAITS(UIDeviceOrientation.Portrait) {
+      @Override
+      public boolean isSupported(UIDeviceOrientation orient) {
+        return ((orient.Value == UIDeviceOrientation.Portrait) ||
+                (orient.Value == UIDeviceOrientation.PortraitUpsideDown));
+      }
+    },
+
+    /** Suports landscape left and right orients. */
+    LANDSCAPES(UIDeviceOrientation.LandscapeLeft) {
+      @Override
+      public boolean isSupported(UIDeviceOrientation orient) {
+        return ((orient.Value == UIDeviceOrientation.LandscapeLeft) ||
+                (orient.Value == UIDeviceOrientation.LandscapeRight));
+      }
+    },
+
+    /** Suports both portrait and landscape orients. */
+    ALL(UIDeviceOrientation.Portrait) {
+      @Override
+      public boolean isSupported(UIDeviceOrientation orient) {
+        return ((orient.Value == UIDeviceOrientation.Portrait) ||
+                (orient.Value == UIDeviceOrientation.PortraitUpsideDown) ||
+                (orient.Value == UIDeviceOrientation.LandscapeLeft) ||
+                (orient.Value == UIDeviceOrientation.LandscapeRight));
+      }
+    };
+
+    public final UIDeviceOrientation defaultOrient;
+
+    public abstract boolean isSupported(UIDeviceOrientation orient);
+
+    SupportedOrients(int defaultOrient) {
+      this.defaultOrient = UIDeviceOrientation.wrap(defaultOrient);
+    }
+  };
+
   public static IOSPlatform register(UIApplication app) {
-    IOSPlatform platform = new IOSPlatform(app);
+    return register(app, SupportedOrients.PORTRAITS);
+  }
+
+  public static IOSPlatform register(UIApplication app, SupportedOrients orients) {
+    IOSPlatform platform = new IOSPlatform(app, orients);
     PlayN.setPlatform(platform);
     return platform;
   }
@@ -70,15 +112,17 @@ public class IOSPlatform implements Platform {
   private Game game;
   private float accum, alpha;
 
+  private final SupportedOrients orients;
   private final UIApplication app;
   private final UIWindow mainWindow;
   private final IOSGameView gameView;
 
-  private Set<Integer> supportedOrients = new HashSet<Integer>();
   private final List<Runnable> pendingActions = new ArrayList<Runnable>();
 
-  private IOSPlatform(UIApplication app) {
+  private IOSPlatform(UIApplication app, SupportedOrients orients) {
     this.app = app;
+    this.orients = orients;
+
     RectangleF bounds = UIScreen.get_MainScreen().get_Bounds();
     float scale = 1f; // TODO: UIScreen.get_MainScreen().get_Scale();
 
@@ -101,22 +145,10 @@ public class IOSPlatform implements Platform {
     IOSViewController ctrl = new IOSViewController();
     ctrl.Add(gameView = new IOSGameView(bounds, scale));
     mainWindow.set_RootViewController(ctrl);
-  }
 
-  /**
-   * Configures the orientations supported by your game.
-   */
-  public void setSupportedOrientations(boolean portrait, boolean landscapeRight,
-                                       boolean upsideDown, boolean landscapeLeft) {
-    supportedOrients.clear();
-    if (portrait)
-      supportedOrients.add(UIDeviceOrientation.Portrait);
-    if (landscapeRight)
-      supportedOrients.add(UIDeviceOrientation.LandscapeRight);
-    if (landscapeLeft)
-      supportedOrients.add(UIDeviceOrientation.LandscapeLeft);
-    if (upsideDown)
-      supportedOrients.add(UIDeviceOrientation.PortraitUpsideDown);
+    // configure our orientation to a supported default, a notification will come in later that
+    // will adjust us to the devices current orientation
+    onOrientationChange(orients.defaultOrient);
   }
 
   @Override
@@ -222,7 +254,7 @@ public class IOSPlatform implements Platform {
   }
 
   void onOrientationChange(UIDeviceOrientation orientation) {
-    if (!supportedOrients.contains(orientation.Value))
+    if (!orients.isSupported(orientation))
       return; // ignore unsupported (or Unknown) orientations
     graphics.setOrientation(orientation);
     app.SetStatusBarOrientation(ORIENT_MAP.get(orientation), false);
