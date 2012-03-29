@@ -22,7 +22,6 @@ import cli.System.Runtime.InteropServices.GCHandleType;
 import cli.OpenTK.Graphics.ES20.All;
 import cli.OpenTK.Graphics.ES20.GL;
 
-import playn.core.InternalTransform;
 import playn.core.PlayN;
 import playn.core.gl.GLShader;
 import playn.core.gl.IndexedTrisShader;

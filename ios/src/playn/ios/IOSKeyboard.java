@@ -25,7 +25,6 @@ import cli.MonoTouch.UIKit.UITextAutocapitalizationType;
 import cli.MonoTouch.UIKit.UITextAutocorrectionType;
 import cli.MonoTouch.UIKit.UITextField;
 import cli.System.Drawing.RectangleF;
-import cli.System.EventArgs;
 import playn.core.Keyboard;
 import playn.core.PlayN;
 import playn.core.util.Callback;

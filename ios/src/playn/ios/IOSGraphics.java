@@ -15,9 +15,6 @@
  */
 package playn.ios;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import cli.MonoTouch.CoreGraphics.CGBitmapContext;
 import cli.MonoTouch.CoreGraphics.CGColorSpace;
 import cli.MonoTouch.CoreGraphics.CGImageAlphaInfo;
@@ -56,7 +53,6 @@ public class IOSGraphics extends GraphicsGL {
   private final int screenWidth, screenHeight;
 
   InternalTransform rootTransform = StockInternalTransform.IDENTITY;
-  private Set<Integer> supportedOrients = new HashSet<Integer>();
   private boolean invertSizes;
 
   // a scratch bitmap context used for measuring text
@@ -145,22 +141,7 @@ public class IOSGraphics extends GraphicsGL {
     return ctx;
   }
 
-  void setSupportedOrientations(boolean portrait, boolean landscapeRight,
-                                boolean upsideDown, boolean landscapeLeft) {
-    supportedOrients.clear();
-    if (portrait)
-      supportedOrients.add(UIDeviceOrientation.Portrait);
-    if (landscapeRight)
-      supportedOrients.add(UIDeviceOrientation.LandscapeRight);
-    if (landscapeLeft)
-      supportedOrients.add(UIDeviceOrientation.LandscapeLeft);
-    if (upsideDown)
-      supportedOrients.add(UIDeviceOrientation.PortraitUpsideDown);
-  }
-
-  boolean setOrientation(UIDeviceOrientation orientation) {
-    if (!supportedOrients.contains(orientation.Value))
-      return false;
+  void setOrientation(UIDeviceOrientation orientation) {
     switch (orientation.Value) {
     case UIDeviceOrientation.Portrait:
       rootTransform = StockInternalTransform.IDENTITY;
@@ -174,18 +155,17 @@ public class IOSGraphics extends GraphicsGL {
       break;
     case UIDeviceOrientation.LandscapeLeft:
       rootTransform = new StockInternalTransform();
-      rootTransform.rotate(FloatMath.PI/2);
-      rootTransform.translate(0, -ctx.viewWidth);
-      invertSizes = true;
-      break;
-    case UIDeviceOrientation.LandscapeRight:
-      rootTransform = new StockInternalTransform();
       rootTransform.rotate(-FloatMath.PI/2);
       rootTransform.translate(-ctx.viewHeight, 0);
       invertSizes = true;
       break;
+    case UIDeviceOrientation.LandscapeRight:
+      rootTransform = new StockInternalTransform();
+      rootTransform.rotate(FloatMath.PI/2);
+      rootTransform.translate(0, -ctx.viewWidth);
+      invertSizes = true;
+      break;
     }
-    return true;
   }
 
   void paint(Game game, float alpha) {

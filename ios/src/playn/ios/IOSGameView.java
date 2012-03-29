@@ -26,12 +26,9 @@ import cli.MonoTouch.CoreAnimation.CAEAGLLayer;
 import cli.MonoTouch.Foundation.ExportAttribute;
 import cli.MonoTouch.Foundation.NSNotification;
 import cli.MonoTouch.Foundation.NSNotificationCenter;
-import cli.MonoTouch.Foundation.NSSet;
 import cli.MonoTouch.OpenGLES.EAGLColorFormat;
 import cli.MonoTouch.OpenGLES.EAGLRenderingAPI;
 import cli.MonoTouch.UIKit.UIDevice;
-import cli.MonoTouch.UIKit.UIDeviceOrientation;
-import cli.MonoTouch.UIKit.UIEvent;
 
 import playn.core.PlayN;
 
@@ -61,7 +58,7 @@ class IOSGameView extends iPhoneOSGameView
       new cli.System.Action$$00601_$$$_Lcli__MonoTouch__Foundation__NSNotification_$$$$_(new cli.System.Action$$00601_$$$_Lcli__MonoTouch__Foundation__NSNotification_$$$$_.Method() {
         @Override
         public void Invoke(NSNotification nf) {
-          OnOrientationChange(UIDevice.get_CurrentDevice().get_Orientation());
+          IOSPlatform.instance.onOrientationChange(UIDevice.get_CurrentDevice().get_Orientation());
         }}));
   }
 
@@ -137,40 +134,6 @@ class IOSGameView extends iPhoneOSGameView
   @Override
   protected void OnWindowStateChanged(EventArgs e) {
     super.OnWindowStateChanged(e);
-  }
-
-  @Override
-  public void TouchesBegan(NSSet touches, UIEvent event) {
-    super.TouchesBegan(touches, event);
-    IOSPlatform.instance.touch().onTouchesBegan(touches, event);
-    IOSPlatform.instance.pointer().onTouchesBegan(touches, event);
-  }
-
-  @Override
-  public void TouchesMoved(NSSet touches, UIEvent event) {
-    super.TouchesMoved(touches, event);
-    IOSPlatform.instance.touch().onTouchesMoved(touches, event);
-    IOSPlatform.instance.pointer().onTouchesMoved(touches, event);
-  }
-
-  @Override
-  public void TouchesEnded(NSSet touches, UIEvent event) {
-    super.TouchesEnded(touches, event);
-    IOSPlatform.instance.touch().onTouchesEnded(touches, event);
-    IOSPlatform.instance.pointer().onTouchesEnded(touches, event);
-  }
-
-  @Override
-  public void TouchesCancelled(NSSet touches, UIEvent event) {
-    super.TouchesCancelled(touches, event);
-    IOSPlatform.instance.touch().onTouchesCancelled(touches, event);
-    IOSPlatform.instance.pointer().onTouchesCancelled(touches, event);
-  }
-
-  private void OnOrientationChange(UIDeviceOrientation orientation) {
-    if (IOSPlatform.instance.graphics().setOrientation(orientation)) {
-      // TODO: notify the app of the orientation change
-    }
   }
 
   @ExportAttribute.Annotation("layerClass")

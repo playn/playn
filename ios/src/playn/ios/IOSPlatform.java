@@ -16,15 +16,23 @@
 package playn.ios;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
+import cli.System.Drawing.RectangleF;
+
+import cli.MonoTouch.Foundation.NSSet;
 import cli.MonoTouch.Foundation.NSUrl;
 import cli.MonoTouch.UIKit.UIApplication;
+import cli.MonoTouch.UIKit.UIDeviceOrientation;
+import cli.MonoTouch.UIKit.UIEvent;
+import cli.MonoTouch.UIKit.UIInterfaceOrientation;
 import cli.MonoTouch.UIKit.UIScreen;
 import cli.MonoTouch.UIKit.UIViewController;
 import cli.MonoTouch.UIKit.UIWindow;
-import cli.System.DateTime;
-import cli.System.Drawing.RectangleF;
 
 import playn.core.Game;
 import playn.core.Json;
@@ -40,11 +48,7 @@ import playn.core.json.JsonImpl;
 public class IOSPlatform implements Platform {
 
   public static IOSPlatform register(UIApplication app) {
-    return register(app, null);
-  }
-
-  public static IOSPlatform register(UIApplication app, UIViewController ctrl) {
-    IOSPlatform platform = new IOSPlatform(app, ctrl);
+    IOSPlatform platform = new IOSPlatform(app);
     PlayN.setPlatform(platform);
     return platform;
   }
@@ -70,9 +74,10 @@ public class IOSPlatform implements Platform {
   private final UIWindow mainWindow;
   private final IOSGameView gameView;
 
+  private Set<Integer> supportedOrients = new HashSet<Integer>();
   private final List<Runnable> pendingActions = new ArrayList<Runnable>();
 
-  private IOSPlatform(UIApplication app, UIViewController ctrl) {
+  private IOSPlatform(UIApplication app) {
     this.app = app;
     RectangleF bounds = UIScreen.get_MainScreen().get_Bounds();
     float scale = 1f; // TODO: UIScreen.get_MainScreen().get_Scale();
@@ -93,9 +98,9 @@ public class IOSPlatform implements Platform {
     storage = new IOSStorage();
 
     mainWindow = new UIWindow(bounds);
-    if (ctrl != null)
-      mainWindow.set_RootViewController(ctrl);
-    mainWindow.Add(gameView = new IOSGameView(bounds, scale));
+    IOSViewController ctrl = new IOSViewController();
+    ctrl.Add(gameView = new IOSGameView(bounds, scale));
+    mainWindow.set_RootViewController(ctrl);
   }
 
   /**
@@ -103,7 +108,15 @@ public class IOSPlatform implements Platform {
    */
   public void setSupportedOrientations(boolean portrait, boolean landscapeRight,
                                        boolean upsideDown, boolean landscapeLeft) {
-    graphics.setSupportedOrientations(portrait, landscapeRight, upsideDown, landscapeLeft);
+    supportedOrients.clear();
+    if (portrait)
+      supportedOrients.add(UIDeviceOrientation.Portrait);
+    if (landscapeRight)
+      supportedOrients.add(UIDeviceOrientation.LandscapeRight);
+    if (landscapeLeft)
+      supportedOrients.add(UIDeviceOrientation.LandscapeLeft);
+    if (upsideDown)
+      supportedOrients.add(UIDeviceOrientation.PortraitUpsideDown);
   }
 
   @Override
@@ -155,7 +168,11 @@ public class IOSPlatform implements Platform {
 
   @Override
   public Mouse mouse() {
-    return null;
+    return new Mouse() {
+      public void setListener(Listener listener) {
+        log().warn("Mouse not supported on iOS.");
+      }
+    };
   }
 
   @Override
@@ -202,6 +219,14 @@ public class IOSPlatform implements Platform {
   @Override
   public Type type() {
     return Type.IOS;
+  }
+
+  void onOrientationChange(UIDeviceOrientation orientation) {
+    if (!supportedOrients.contains(orientation.Value))
+      return; // ignore unsupported (or Unknown) orientations
+    graphics.setOrientation(orientation);
+    app.SetStatusBarOrientation(ORIENT_MAP.get(orientation), false);
+    // TODO: notify the game of the orientation change
   }
 
   void update(float delta) {
@@ -252,5 +277,48 @@ public class IOSPlatform implements Platform {
     synchronized (pendingActions) {
       pendingActions.add(r);
     }
+  }
+
+  protected class IOSViewController extends UIViewController {
+    @Override
+    public void TouchesBegan(NSSet touches, UIEvent event) {
+      super.TouchesBegan(touches, event);
+      touch().onTouchesBegan(touches, event);
+      pointer().onTouchesBegan(touches, event);
+    }
+
+    @Override
+    public void TouchesMoved(NSSet touches, UIEvent event) {
+      super.TouchesMoved(touches, event);
+      touch().onTouchesMoved(touches, event);
+      pointer().onTouchesMoved(touches, event);
+    }
+
+    @Override
+    public void TouchesEnded(NSSet touches, UIEvent event) {
+      super.TouchesEnded(touches, event);
+      touch().onTouchesEnded(touches, event);
+      pointer().onTouchesEnded(touches, event);
+    }
+
+    @Override
+    public void TouchesCancelled(NSSet touches, UIEvent event) {
+      super.TouchesCancelled(touches, event);
+      touch().onTouchesCancelled(touches, event);
+      pointer().onTouchesCancelled(touches, event);
+    }
+  }
+
+  protected static final Map<UIDeviceOrientation,UIInterfaceOrientation> ORIENT_MAP =
+    new HashMap<UIDeviceOrientation,UIInterfaceOrientation>();
+  static {
+    ORIENT_MAP.put(UIDeviceOrientation.wrap(UIDeviceOrientation.Portrait),
+                   UIInterfaceOrientation.wrap(UIInterfaceOrientation.Portrait));
+    ORIENT_MAP.put(UIDeviceOrientation.wrap(UIDeviceOrientation.PortraitUpsideDown),
+                   UIInterfaceOrientation.wrap(UIInterfaceOrientation.PortraitUpsideDown));
+    ORIENT_MAP.put(UIDeviceOrientation.wrap(UIDeviceOrientation.LandscapeLeft),
+                   UIInterfaceOrientation.wrap(UIInterfaceOrientation.LandscapeLeft));
+    ORIENT_MAP.put(UIDeviceOrientation.wrap(UIDeviceOrientation.LandscapeRight),
+                   UIInterfaceOrientation.wrap(UIInterfaceOrientation.LandscapeRight));
   }
 }
