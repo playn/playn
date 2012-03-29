@@ -50,7 +50,11 @@ class IOSFont extends AbstractFont
 
   IOSFont(String name, Style style, float size) {
     super(name, style, size);
-    ctFont = new CTFont(getVariant(name, style), size);
+    ctFont = new CTFont(iosName(), size);
+  }
+
+  String iosName() {
+    return getVariant(name, style);
   }
 
   private static String getVariant(String name, Style style) {

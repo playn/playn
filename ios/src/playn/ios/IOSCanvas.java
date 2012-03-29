@@ -185,7 +185,13 @@ public class IOSCanvas implements Canvas
 
   @Override
   public Canvas drawText(String text, float x, float y) {
-    bctx.ShowTextAtPoint(x, y, text);
+    bctx.SaveState();
+    bctx.TranslateCTM(x, y + IOSGraphics.defaultFont.ctFont.get_DescentMetric());
+    bctx.ScaleCTM(1, -1);
+    bctx.SelectFont(IOSGraphics.defaultFont.iosName(), IOSGraphics.defaultFont.size(),
+                    CGTextEncoding.wrap(CGTextEncoding.MacRoman));
+    bctx.ShowTextAtPoint(0, 0, text);
+    bctx.RestoreState();
     isDirty = true;
     return this;
   }
