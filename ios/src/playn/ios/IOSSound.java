@@ -35,36 +35,35 @@ class IOSSound implements Sound
     NSError[] error = new NSError[1];
     player = AVAudioPlayer.FromUrl(NSUrl.FromFilename(path), error);
     if (error[0] != null) {
-        PlayN.log().warn("Error loading sound [" + path + ", " + error[0] + "]");
-        return;
+      PlayN.log().warn("Error loading sound [" + path + ", " + error[0] + "]");
+      return;
     }
     player.PrepareToPlay();
   }
 
   @Override
   public boolean play() {
-    Asserts.check(player != null, "Playing a null player");
+    if (player == null) return false;
     player.set_CurrentTime(0);
     return player.Play();
   }
 
   @Override
   public void stop() {
-    Asserts.check(player != null, "Stopping a null player");
-    player.Pause();
-    player.set_CurrentTime(0);
+    if (player != null) {
+      player.Pause();
+      player.set_CurrentTime(0);
+    }
   }
 
   @Override
   public void setLooping(boolean looping) {
-    Asserts.check(player != null, "Setting looping on a null player");
-    player.set_NumberOfLoops(looping ? -1 : 0);
+    if (player != null) player.set_NumberOfLoops(looping ? -1 : 0);
   }
 
   @Override
   public void setVolume(float volume) {
-    Asserts.check(player != null, "Setting volume on a null player");
-    player.set_Volume(volume);
+    if (player != null) player.set_Volume(volume);
   }
 
   @Override
@@ -74,10 +73,8 @@ class IOSSound implements Sound
 
   @Override
   public void addCallback(ResourceCallback<? super Sound> callback) {
-    if (player != null) {
-      // non-null players are always ready
-      callback.done(this);
-    }
+    // non-null players are always ready
+    if (player != null) callback.done(this);
   }
 
   public void dispose() {
