@@ -116,7 +116,9 @@ public class AndroidGLShader extends IndexedTrisShader
 
   private static final int VERTEX_SIZE = 10; // 10 floats per vertex
   private static final int START_VERTS = 16*4;
+  private static final int EXPAND_VERTS = 16*4;
   private static final int START_ELEMS = 6*START_VERTS/4;
+  private static final int EXPAND_ELEMS = 6*EXPAND_VERTS/4;
   private static final int FLOAT_SIZE_BYTES = 4;
   private static final int SHORT_SIZE_BYTES = 2;
   private static final int VERTEX_STRIDE = VERTEX_SIZE * FLOAT_SIZE_BYTES;
@@ -271,12 +273,18 @@ public class AndroidGLShader extends IndexedTrisShader
   }
 
   private void expandVerts(int vertCount) {
-    vertexData = ByteBuffer.allocateDirect(vertCount * VERTEX_STRIDE).order(
+    int newVerts = vertexData.capacity() / VERTEX_SIZE;
+    while (newVerts < vertCount)
+      newVerts += EXPAND_VERTS;
+    vertexData = ByteBuffer.allocateDirect(newVerts * VERTEX_STRIDE).order(
       ByteOrder.nativeOrder()).asFloatBuffer();
   }
 
   private void expandElems(int elemCount) {
-    elementData = ByteBuffer.allocateDirect(elemCount * SHORT_SIZE_BYTES).order(
+    int newElems = elementData.capacity();
+    while (newElems < elemCount)
+      newElems += EXPAND_ELEMS;
+    elementData = ByteBuffer.allocateDirect(newElems * SHORT_SIZE_BYTES).order(
       ByteOrder.nativeOrder()).asShortBuffer();
   }
 

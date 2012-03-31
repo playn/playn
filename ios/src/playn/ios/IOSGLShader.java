@@ -105,7 +105,9 @@ public class IOSGLShader extends IndexedTrisShader {
 
   private static final int VERTEX_SIZE = 10; // 10 floats per vertex
   private static final int START_VERTS = 4*16;
+  private static final int EXPAND_VERTS = 4*16;
   private static final int START_ELEMS = 6*START_VERTS/4;
+  private static final int EXPAND_ELEMS = 6*EXPAND_VERTS/4;
   private static final int SIZEOF_FLOAT = 4;
   private static final int VERTEX_STRIDE = VERTEX_SIZE * SIZEOF_FLOAT;
 
@@ -228,16 +230,22 @@ public class IOSGLShader extends IndexedTrisShader {
   }
 
   private void expandVerts(int vertCount) {
+    int newVerts = vertexData.length / VERTEX_SIZE;
+    while (newVerts < vertCount)
+      newVerts += EXPAND_VERTS;
     if (vertexHandle != null)
       vertexHandle.Free();
-    vertexData = new float[VERTEX_SIZE * vertCount];
+    vertexData = new float[VERTEX_SIZE * newVerts];
     vertexHandle = GCHandle.Alloc(vertexData, GCHandleType.wrap(GCHandleType.Pinned));
   }
 
   private void expandElems(int elemCount) {
+    int newElems = elementData.length;
+    while (newElems < elemCount)
+      newElems += EXPAND_ELEMS;
     if (elementHandle != null)
       elementHandle.Free();
-    elementData = new short[elemCount];
+    elementData = new short[newElems];
     elementHandle = GCHandle.Alloc(elementData, GCHandleType.wrap(GCHandleType.Pinned));
   }
 

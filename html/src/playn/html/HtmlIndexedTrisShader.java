@@ -76,7 +76,9 @@ abstract class HtmlIndexedTrisShader extends IndexedTrisShader {
   }
 
   private static final int START_VERTS = 16*4;
+  private static final int EXPAND_VERTS = 16*4;
   private static final int START_ELEMS = 6*START_VERTS/4;
+  private static final int EXPAND_ELEMS = 6*EXPAND_VERTS/4;
 
   private Float32Array vertexData;
   private Uint16Array elementData;
@@ -140,10 +142,16 @@ abstract class HtmlIndexedTrisShader extends IndexedTrisShader {
   }
 
   private void expandVerts(int vertCount) {
+    int newVerts = vertexData.getLength() / HtmlShaderCore.VERTEX_SIZE;
+    while (newVerts < vertCount)
+      newVerts += EXPAND_VERTS;
     vertexData = Float32Array.create(HtmlShaderCore.VERTEX_SIZE * vertCount);
   }
 
   private void expandElems(int elemCount) {
+    int newElems = elementData.getLength();
+    while (newElems < elemCount)
+      newElems += EXPAND_ELEMS;
     elementData = Uint16Array.create(elemCount);
   }
 }
