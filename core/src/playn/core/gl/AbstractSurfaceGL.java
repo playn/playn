@@ -52,8 +52,7 @@ abstract class AbstractSurfaceGL implements Surface {
 
   @Override
   public Surface drawImage(Image image, float x, float y) {
-    drawImage(image, x, y, image.width(), image.height());
-    return this;
+    return drawImage(image, x, y, image.width(), image.height());
   }
 
   @Override
@@ -83,8 +82,7 @@ abstract class AbstractSurfaceGL implements Surface {
 
   @Override
   public Surface drawImageCentered(Image img, float x, float y) {
-    drawImage(img, x - img.width()/2, y - img.height()/2);
-    return this;
+    return drawImage(img, x - img.width()/2, y - img.height()/2);
   }
 
   @Override
