@@ -273,7 +273,7 @@ public class AndroidGLShader extends IndexedTrisShader
   }
 
   private void expandVerts(int vertCount) {
-    int newVerts = vertexData.capacity() / VERTEX_SIZE;
+    int newVerts = vertexData == null ? 0 : vertexData.capacity() / VERTEX_SIZE;
     while (newVerts < vertCount)
       newVerts += EXPAND_VERTS;
     vertexData = ByteBuffer.allocateDirect(newVerts * VERTEX_STRIDE).order(
@@ -281,7 +281,7 @@ public class AndroidGLShader extends IndexedTrisShader
   }
 
   private void expandElems(int elemCount) {
-    int newElems = elementData.capacity();
+    int newElems = elementData == null ? 0 : elementData.capacity();
     while (newElems < elemCount)
       newElems += EXPAND_ELEMS;
     elementData = ByteBuffer.allocateDirect(newElems * SHORT_SIZE_BYTES).order(
