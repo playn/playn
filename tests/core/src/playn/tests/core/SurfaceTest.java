@@ -3,12 +3,19 @@
 
 package playn.tests.core;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import playn.core.ImmediateLayer;
-import playn.core.Surface;
 import playn.core.Pattern;
+import playn.core.Surface;
+import playn.core.SurfaceLayer;
 import static playn.core.PlayN.*;
 
 public class SurfaceTest extends Test {
+
+  private List<SurfaceLayer> dots = new ArrayList<SurfaceLayer>();
+
   @Override
   public String getName() {
     return "SurfaceTest";
@@ -44,6 +51,30 @@ public class SurfaceTest extends Test {
       }
     });
     graphics().rootLayer().add(unclipped);
+
+    // draw some randomly jiggling dots in the right half of the screen
+    float hwidth = graphics().width()/2, height = graphics().height();
+    for (int ii = 0; ii < 10; ii++) {
+      SurfaceLayer dot = graphics().createSurfaceLayer(10, 10);
+      dot.surface().setFillColor(0xFFFF0000);
+      dot.surface().fillRect(0, 0, 10, 10);
+      dot.setTranslation(hwidth + random()*hwidth, random()*height);
+      dots.add(dot);
+      System.err.println("Created dot at " + dot.transform());
+      graphics().rootLayer().add(dot);
+    }
+  }
+
+  @Override
+  public void paint(float alpha) {
+    super.paint(alpha);
+
+    float hwidth = graphics().width()/2, height = graphics().height();
+    for (SurfaceLayer dot : dots) {
+      if (random() > 0.95) {
+        dot.setTranslation(hwidth + random()*hwidth, random()*height);
+      }
+    }
   }
 
   void drawLine(Surface surf, float x1, float y1, float x2, float y2, float width) {
