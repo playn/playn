@@ -123,7 +123,11 @@ public class AndroidPlatform implements Platform {
 
   @Override
   public Mouse mouse() {
-    return null;
+    return new Mouse() {
+      public void setListener(Listener listener) {
+        log().warn("Mouse not supported on Android.");
+      }
+    };
   }
 
   @Override
