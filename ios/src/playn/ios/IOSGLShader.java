@@ -230,7 +230,7 @@ public class IOSGLShader extends IndexedTrisShader {
   }
 
   private void expandVerts(int vertCount) {
-    int newVerts = vertexData.length / VERTEX_SIZE;
+    int newVerts = (vertexData == null) ? 0 : vertexData.length / VERTEX_SIZE;
     while (newVerts < vertCount)
       newVerts += EXPAND_VERTS;
     if (vertexHandle != null)
@@ -240,7 +240,7 @@ public class IOSGLShader extends IndexedTrisShader {
   }
 
   private void expandElems(int elemCount) {
-    int newElems = elementData.length;
+    int newElems = (elementData == null) ? 0 : elementData.length;
     while (newElems < elemCount)
       newElems += EXPAND_ELEMS;
     if (elementHandle != null)
