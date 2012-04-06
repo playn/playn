@@ -21,11 +21,9 @@ import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
 /**
- * Platform-independent interface and values for
- * OpenGL ES 2.0, based on the official JOGL
- * GL2ES2 interface.
+ * Platform-independent interface and values for OpenGL ES 2.0, based on the official JOGL GL2ES2
+ * interface.
  */
-
 public interface GL20 {
   public static final int GL_ACTIVE_TEXTURE                          = 0x84E0;
   public static final int GL_DEPTH_BUFFER_BIT                        = 0x00000100;
@@ -53,7 +51,7 @@ public interface GL20 {
   public static final int GL_SRC_ALPHA_SATURATE                      = 0x0308;
   public static final int GL_FUNC_ADD                                = 0x8006;
   public static final int GL_BLEND_EQUATION                          = 0x8009;
-  public static final int GL_BLEND_EQUATION_RGB                      = 0x8009;   /* same as BLEND_EQUATION */
+  public static final int GL_BLEND_EQUATION_RGB                      = 0x8009; /* == BLEND_EQUATION */
   public static final int GL_BLEND_EQUATION_ALPHA                    = 0x883D;
   public static final int GL_FUNC_SUBTRACT                           = 0x800A;
   public static final int GL_FUNC_REVERSE_SUBTRACT                   = 0x800B;
@@ -165,26 +163,26 @@ public interface GL20 {
   public static final int GL_UNSIGNED_SHORT_4_4_4_4                  = 0x8033;
   public static final int GL_UNSIGNED_SHORT_5_5_5_1                  = 0x8034;
   public static final int GL_UNSIGNED_SHORT_5_6_5                    = 0x8363;
-  public static final int GL_FRAGMENT_SHADER                           = 0x8B30;
-  public static final int GL_VERTEX_SHADER                             = 0x8B31;
-  public static final int GL_MAX_VERTEX_ATTRIBS                        = 0x8869;
-  public static final int GL_MAX_VERTEX_UNIFORM_VECTORS                = 0x8DFB;
-  public static final int GL_MAX_VARYING_VECTORS                       = 0x8DFC;
-  public static final int GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS          = 0x8B4D;
-  public static final int GL_MAX_VERTEX_TEXTURE_IMAGE_UNITS            = 0x8B4C;
-  public static final int GL_MAX_TEXTURE_IMAGE_UNITS                   = 0x8872;
-  public static final int GL_MAX_FRAGMENT_UNIFORM_VECTORS              = 0x8DFD;
-  public static final int GL_SHADER_TYPE                               = 0x8B4F;
-  public static final int GL_DELETE_STATUS                             = 0x8B80;
-  public static final int GL_LINK_STATUS                               = 0x8B82;
-  public static final int GL_VALIDATE_STATUS                           = 0x8B83;
-  public static final int GL_ATTACHED_SHADERS                          = 0x8B85;
-  public static final int GL_ACTIVE_UNIFORMS                           = 0x8B86;
-  public static final int GL_ACTIVE_UNIFORM_MAX_LENGTH                 = 0x8B87;
-  public static final int GL_ACTIVE_ATTRIBUTES                         = 0x8B89;
-  public static final int GL_ACTIVE_ATTRIBUTE_MAX_LENGTH               = 0x8B8A;
-  public static final int GL_SHADING_LANGUAGE_VERSION                  = 0x8B8C;
-  public static final int GL_CURRENT_PROGRAM                           = 0x8B8D;
+  public static final int GL_FRAGMENT_SHADER                         = 0x8B30;
+  public static final int GL_VERTEX_SHADER                           = 0x8B31;
+  public static final int GL_MAX_VERTEX_ATTRIBS                      = 0x8869;
+  public static final int GL_MAX_VERTEX_UNIFORM_VECTORS              = 0x8DFB;
+  public static final int GL_MAX_VARYING_VECTORS                     = 0x8DFC;
+  public static final int GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS        = 0x8B4D;
+  public static final int GL_MAX_VERTEX_TEXTURE_IMAGE_UNITS          = 0x8B4C;
+  public static final int GL_MAX_TEXTURE_IMAGE_UNITS                 = 0x8872;
+  public static final int GL_MAX_FRAGMENT_UNIFORM_VECTORS            = 0x8DFD;
+  public static final int GL_SHADER_TYPE                             = 0x8B4F;
+  public static final int GL_DELETE_STATUS                           = 0x8B80;
+  public static final int GL_LINK_STATUS                             = 0x8B82;
+  public static final int GL_VALIDATE_STATUS                         = 0x8B83;
+  public static final int GL_ATTACHED_SHADERS                        = 0x8B85;
+  public static final int GL_ACTIVE_UNIFORMS                         = 0x8B86;
+  public static final int GL_ACTIVE_UNIFORM_MAX_LENGTH               = 0x8B87;
+  public static final int GL_ACTIVE_ATTRIBUTES                       = 0x8B89;
+  public static final int GL_ACTIVE_ATTRIBUTE_MAX_LENGTH             = 0x8B8A;
+  public static final int GL_SHADING_LANGUAGE_VERSION                = 0x8B8C;
+  public static final int GL_CURRENT_PROGRAM                         = 0x8B8D;
   public static final int GL_NEVER                                   = 0x0200;
   public static final int GL_LESS                                    = 0x0201;
   public static final int GL_EQUAL                                   = 0x0202;
@@ -274,15 +272,15 @@ public interface GL20 {
   public static final int GL_FLOAT_MAT4                              = 0x8B5C;
   public static final int GL_SAMPLER_2D                              = 0x8B5E;
   public static final int GL_SAMPLER_CUBE                            = 0x8B60;
-  public static final int GL_VERTEX_ATTRIB_ARRAY_ENABLED                 = 0x8622;
-  public static final int GL_VERTEX_ATTRIB_ARRAY_SIZE                    = 0x8623;
-  public static final int GL_VERTEX_ATTRIB_ARRAY_STRIDE                  = 0x8624;
-  public static final int GL_VERTEX_ATTRIB_ARRAY_TYPE                    = 0x8625;
-  public static final int GL_VERTEX_ATTRIB_ARRAY_NORMALIZED              = 0x886A;
-  public static final int GL_VERTEX_ATTRIB_ARRAY_POINTER                 = 0x8645;
-  public static final int GL_VERTEX_ATTRIB_ARRAY_BUFFER_BINDING          = 0x889F;
-  public static final int GL_IMPLEMENTATION_COLOR_READ_TYPE            = 0x8B9A;
-  public static final int GL_IMPLEMENTATION_COLOR_READ_FORMAT          = 0x8B9B;
+  public static final int GL_VERTEX_ATTRIB_ARRAY_ENABLED             = 0x8622;
+  public static final int GL_VERTEX_ATTRIB_ARRAY_SIZE                = 0x8623;
+  public static final int GL_VERTEX_ATTRIB_ARRAY_STRIDE              = 0x8624;
+  public static final int GL_VERTEX_ATTRIB_ARRAY_TYPE                = 0x8625;
+  public static final int GL_VERTEX_ATTRIB_ARRAY_NORMALIZED          = 0x886A;
+  public static final int GL_VERTEX_ATTRIB_ARRAY_POINTER             = 0x8645;
+  public static final int GL_VERTEX_ATTRIB_ARRAY_BUFFER_BINDING      = 0x889F;
+  public static final int GL_IMPLEMENTATION_COLOR_READ_TYPE          = 0x8B9A;
+  public static final int GL_IMPLEMENTATION_COLOR_READ_FORMAT        = 0x8B9B;
   public static final int GL_COMPILE_STATUS                          = 0x8B81;
   public static final int GL_INFO_LOG_LENGTH                         = 0x8B84;
   public static final int GL_SHADER_SOURCE_LENGTH                    = 0x8B88;
@@ -322,7 +320,7 @@ public interface GL20 {
   public static final int GL_NONE                                    = 0;
   public static final int GL_FRAMEBUFFER_COMPLETE                    = 0x8CD5;
   public static final int GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT       = 0x8CD6;
-  public static final int GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT          = 0x8CD7;
+  public static final int GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT = 0x8CD7;
   public static final int GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS       = 0x8CD9;
   public static final int GL_FRAMEBUFFER_UNSUPPORTED                 = 0x8CDD;
   public static final int GL_FRAMEBUFFER_BINDING                     = 0x8CA6;
@@ -350,18 +348,17 @@ public interface GL20 {
 
   public void glBlendColor(float red, float green, float blue, float alpha);
 
-  public void glBlendEquation(int mode) throws RuntimeException;
+  public void glBlendEquation(int mode);
 
-  public void glBlendEquationSeparate(int modeRGB, int modeAlpha) throws RuntimeException;
+  public void glBlendEquationSeparate(int modeRGB, int modeAlpha);
 
   public void glBlendFunc(int sfactor, int dfactor);
 
-  public void glBlendFuncSeparate(int srcRGB, int dstRGB, int srcAlpha, int dstAlpha)
-      throws RuntimeException;
+  public void glBlendFuncSeparate(int srcRGB, int dstRGB, int srcAlpha, int dstAlpha);
 
-  public void glBufferData(int target, long size, Buffer data, int usage);
+  public void glBufferData(int target, int size, Buffer data, int usage);
 
-  public void glBufferSubData(int target, long offset, long size, Buffer data);
+  public void glBufferSubData(int target, int offset, int size, Buffer data);
 
   public int glCheckFramebufferStatus(int target);
 
@@ -383,25 +380,25 @@ public interface GL20 {
       int height, int border, int imageSize, Buffer data);
 
   public void glCompressedTexImage2D(int arg0, int arg1, int arg2, int arg3, int arg4, int arg5,
-      int arg6, long arg7) throws RuntimeException;
+      int arg6, int arg7);
 
   public void glCompressedTexImage3D(int arg0, int arg1, int arg2, int arg3, int arg4, int arg5,
       int arg6, int arg7, Buffer arg8);
 
   public void glCompressedTexImage3D(int arg0, int arg1, int arg2, int arg3, int arg4, int arg5,
-      int arg6, int arg7, long arg8) throws RuntimeException;
+      int arg6, int arg7, int arg8);
 
   public void glCompressedTexSubImage2D(int target, int level, int xoffset, int yoffset, int width,
       int height, int format, int imageSize, Buffer data);
 
   public void glCompressedTexSubImage2D(int arg0, int arg1, int arg2, int arg3, int arg4, int arg5,
-      int arg6, int arg7, long arg8) throws RuntimeException;
+      int arg6, int arg7, int arg8);
 
   public void glCompressedTexSubImage3D(int arg0, int arg1, int arg2, int arg3, int arg4, int arg5,
-      int arg6, int arg7, int arg8, int arg9, Buffer arg10) throws RuntimeException;
+      int arg6, int arg7, int arg8, int arg9, Buffer arg10);
 
   public void glCompressedTexSubImage3D(int arg0, int arg1, int arg2, int arg3, int arg4, int arg5,
-      int arg6, int arg7, int arg8, int arg9, long arg10) throws RuntimeException;
+      int arg6, int arg7, int arg8, int arg9, int arg10);
 
   public void glCopyTexImage2D(int target, int level, int internalformat, int x, int y, int width,
       int height, int border);
@@ -410,7 +407,7 @@ public interface GL20 {
       int width, int height);
 
   public void glCopyTexSubImage3D(int arg0, int arg1, int arg2, int arg3, int arg4, int arg5,
-      int arg6, int arg7, int arg8) throws RuntimeException;
+      int arg6, int arg7, int arg8);
 
   public int glCreateProgram();
 
@@ -455,8 +452,6 @@ public interface GL20 {
   public void glDrawArrays(int mode, int first, int count);
 
   public void glDrawElements(int mode, int count, int type, Buffer indices);
-
-  public void glDrawElements(int mode, int count, int type, long offset);
 
   public void glDrawElements(int mode, int count, int type, int offset);
 
@@ -522,7 +517,7 @@ public interface GL20 {
 
   public void glGetBooleanv(int pname, ByteBuffer params);
 
-  public int glGetBoundBuffer(int arg0) throws RuntimeException;
+  public int glGetBoundBuffer(int arg0);
 
   public void glGetBufferParameteriv(int target, int pname, int[] params, int offset);
 
@@ -545,10 +540,9 @@ public interface GL20 {
   public void glGetIntegerv(int pname, IntBuffer params);
 
   public void glGetProgramBinary(int arg0, int arg1, int[] arg2, int arg3, int[] arg4, int arg5,
-      Buffer arg6) throws RuntimeException;
+      Buffer arg6);
 
-  public void glGetProgramBinary(int arg0, int arg1, IntBuffer arg2, IntBuffer arg3, Buffer arg4)
-      throws RuntimeException;
+  public void glGetProgramBinary(int arg0, int arg1, IntBuffer arg2, IntBuffer arg3, Buffer arg4);
 
   public void glGetProgramInfoLog(int program, int bufsize, int[] length, int lengthOffset,
       byte[] infolog, int infologOffset);
@@ -639,18 +633,18 @@ public interface GL20 {
 
   public void glLinkProgram(int program);
 
-  public ByteBuffer glMapBuffer(int arg0, int arg1) throws RuntimeException;
+  public ByteBuffer glMapBuffer(int arg0, int arg1);
 
   public void glPixelStorei(int pname, int param);
 
   public void glPolygonOffset(float factor, float units);
 
-  public void glProgramBinary(int arg0, int arg1, Buffer arg2, int arg3) throws RuntimeException;
+  public void glProgramBinary(int arg0, int arg1, Buffer arg2, int arg3);
 
   public void glReadPixels(int x, int y, int width, int height, int format, int type, Buffer pixels);
 
   public void glReadPixels(int x, int y, int width, int height, int format, int type,
-      long pixelsBufferOffset) throws RuntimeException;
+      int pixelsBufferOffset);
 
   public void glReleaseShaderCompiler();
 
@@ -687,13 +681,13 @@ public interface GL20 {
       int border, int format, int type, Buffer pixels);
 
   public void glTexImage2D(int arg0, int arg1, int arg2, int arg3, int arg4, int arg5, int arg6,
-      int arg7, long arg8);
+      int arg7, int arg8);
 
   public void glTexImage3D(int arg0, int arg1, int arg2, int arg3, int arg4, int arg5, int arg6,
-      int arg7, int arg8, Buffer arg9) throws RuntimeException;
+      int arg7, int arg8, Buffer arg9);
 
   public void glTexImage3D(int arg0, int arg1, int arg2, int arg3, int arg4, int arg5, int arg6,
-      int arg7, int arg8, long arg9) throws RuntimeException;
+      int arg7, int arg8, int arg9);
 
   public void glTexParameterf(int target, int pname, float param);
 
@@ -711,13 +705,13 @@ public interface GL20 {
       int height, int format, int type, Buffer pixels);
 
   public void glTexSubImage2D(int arg0, int arg1, int arg2, int arg3, int arg4, int arg5, int arg6,
-      int arg7, long arg8) throws RuntimeException;
+      int arg7, int arg8);
 
   public void glTexSubImage3D(int arg0, int arg1, int arg2, int arg3, int arg4, int arg5, int arg6,
-      int arg7, int arg8, int arg9, Buffer arg10) throws RuntimeException;
+      int arg7, int arg8, int arg9, Buffer arg10);
 
   public void glTexSubImage3D(int arg0, int arg1, int arg2, int arg3, int arg4, int arg5, int arg6,
-      int arg7, int arg8, int arg9, long arg10) throws RuntimeException;
+      int arg7, int arg8, int arg9, int arg10);
 
   public void glUniform1f(int location, float x);
 
@@ -782,7 +776,7 @@ public interface GL20 {
 
   public void glUniformMatrix4fv(int location, int count, boolean transpose, FloatBuffer value);
 
-  public boolean glUnmapBuffer(int arg0) throws RuntimeException;
+  public boolean glUnmapBuffer(int arg0);
 
   public void glUseProgram(int program);
 
@@ -816,9 +810,6 @@ public interface GL20 {
       Buffer ptr);
 
   public void glVertexAttribPointer(int indx, int size, int type, boolean normalized, int stride,
-      long ptr);
-
-  public void glVertexAttribPointer(int indx, int size, int type, boolean normalized, int stride,
       int ptr);
 
   public void glViewport(int x, int y, int width, int height);
@@ -828,5 +819,4 @@ public interface GL20 {
   public boolean isExtensionAvailable(String extension);
 
   public boolean isFunctionAvailable(String function);
-
 }

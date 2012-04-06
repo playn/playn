@@ -100,14 +100,14 @@ public class AndroidGL20 implements GL20 {
   }
 
   @Override
-  public void glBufferData(int target, long size, Buffer data, int usage) {
-    GLES20.glBufferData(target, (int) size, data, usage);
+  public void glBufferData(int target, int size, Buffer data, int usage) {
+    GLES20.glBufferData(target, size, data, usage);
 
   }
 
   @Override
-  public void glBufferSubData(int target, long offset, long size, Buffer data) {
-    GLES20.glBufferSubData(target, (int) offset, (int) size, data);
+  public void glBufferSubData(int target, int offset, int size, Buffer data) {
+    GLES20.glBufferSubData(target, offset, size, data);
 
   }
 
@@ -163,8 +163,8 @@ public class AndroidGL20 implements GL20 {
 
   @Override
   public void glCompressedTexImage2D(int arg0, int arg1, int arg2, int arg3, int arg4, int arg5,
-      int arg6, long arg7) throws RuntimeException {
-    throw new RuntimeException("glCompressedTexImage2D(int, int, int, int, int, int, int, long)"
+      int arg6, int arg7) throws RuntimeException {
+    throw new RuntimeException("glCompressedTexImage2D(int, int, int, int, int, int, int, int)"
         + "not supported.");
   }
 
@@ -176,7 +176,7 @@ public class AndroidGL20 implements GL20 {
 
   @Override
   public void glCompressedTexImage3D(int arg0, int arg1, int arg2, int arg3, int arg4, int arg5,
-      int arg6, int arg7, long arg8) throws RuntimeException {
+      int arg6, int arg7, int arg8) throws RuntimeException {
     throw new RuntimeException("glCompressedTexImage3D not supported.");
   }
 
@@ -189,9 +189,9 @@ public class AndroidGL20 implements GL20 {
 
   @Override
   public void glCompressedTexSubImage2D(int arg0, int arg1, int arg2, int arg3, int arg4, int arg5,
-      int arg6, int arg7, long arg8) throws RuntimeException {
+      int arg6, int arg7, int arg8) throws RuntimeException {
     throw new RuntimeException(
-        "glCompressedSubTexImage2D(int, int, int, int, int, int, int, int, long)"
+        "glCompressedSubTexImage2D(int, int, int, int, int, int, int, int, int)"
             + "not supported.");
   }
 
@@ -203,7 +203,7 @@ public class AndroidGL20 implements GL20 {
 
   @Override
   public void glCompressedTexSubImage3D(int arg0, int arg1, int arg2, int arg3, int arg4, int arg5,
-      int arg6, int arg7, int arg8, int arg9, long arg10) throws RuntimeException {
+      int arg6, int arg7, int arg8, int arg9, int arg10) throws RuntimeException {
     throw new RuntimeException("glCompressedTexSubImage3D not supported.");
   }
 
@@ -334,11 +334,6 @@ public class AndroidGL20 implements GL20 {
   @Override
   public void glDrawElements(int mode, int count, int type, Buffer indices) {
     GLES20.glDrawElements(mode, count, type, indices);
-  }
-
-  @Override
-  public void glDrawElements(int mode, int count, int type, long offset) {
-    glDrawElements(mode, count, type, (int) offset);
   }
 
   @Override
@@ -815,7 +810,7 @@ public class AndroidGL20 implements GL20 {
 
   @Override
   public void glReadPixels(int x, int y, int width, int height, int format, int type,
-      long pixelsBufferOffset) throws RuntimeException {
+      int pixelsBufferOffset) throws RuntimeException {
     throw new RuntimeException(
         "Not supported.  Please call glReadPixels(int, int, int, int, int, int, Buffer) instead");
   }
@@ -917,7 +912,7 @@ public class AndroidGL20 implements GL20 {
 
   @Override
   public void glTexImage2D(int arg0, int arg1, int arg2, int arg3, int arg4, int arg5, int arg6,
-      int arg7, long arg8) {
+      int arg7, int arg8) {
 
   }
 
@@ -929,7 +924,7 @@ public class AndroidGL20 implements GL20 {
 
   @Override
   public void glTexImage3D(int arg0, int arg1, int arg2, int arg3, int arg4, int arg5, int arg6,
-      int arg7, int arg8, long arg9) throws RuntimeException {
+      int arg7, int arg8, int arg9) throws RuntimeException {
     throw new RuntimeException("glTexImage3D not supported!");
   }
 
@@ -971,9 +966,9 @@ public class AndroidGL20 implements GL20 {
 
   @Override
   public void glTexSubImage2D(int arg0, int arg1, int arg2, int arg3, int arg4, int arg5, int arg6,
-      int arg7, long arg8) throws RuntimeException {
+      int arg7, int arg8) throws RuntimeException {
     throw new RuntimeException("glTexSubImage2D(int, int, int, int, int, int,"
-        + " int, int, long) not supported.");
+        + " int, int, int) not supported.");
   }
 
   @Override
@@ -985,7 +980,7 @@ public class AndroidGL20 implements GL20 {
 
   @Override
   public void glTexSubImage3D(int arg0, int arg1, int arg2, int arg3, int arg4, int arg5, int arg6,
-      int arg7, int arg8, int arg9, long arg10) throws RuntimeException {
+      int arg7, int arg8, int arg9, int arg10) throws RuntimeException {
     throw new RuntimeException("glTexSubImage3D not supported!");
 
   }
@@ -1223,12 +1218,6 @@ public class AndroidGL20 implements GL20 {
   public void glVertexAttribPointer(int indx, int size, int type, boolean normalized, int stride,
       Buffer ptr) {
     GLES20.glVertexAttribPointer(indx, size, type, normalized, stride, ptr);
-  }
-
-  @Override
-  public void glVertexAttribPointer(int indx, int size, int type, boolean normalized, int stride,
-      long ptr) {
-    glVertexAttribPointer(indx, size, type, normalized, stride, (int) ptr);
   }
 
   @Override
