@@ -36,15 +36,15 @@ public class ArrayBufferView extends JavaScriptObject {
   }-*/;
 
   /**
-   * The offset of this ArrayBufferView from the start of its ArrayBuffer, in
-   * bytes, as fixed at construction time.
+   * The length of the ArrayBufferView in bytes, as fixed at construction time.
    */
   public final native int getByteLength() /*-{
     return this.byteLength;
   }-*/;
 
   /**
-   * The length of the ArrayBufferView in bytes, as fixed at construction time.
+   * The offset of this ArrayBufferView from the start of its ArrayBuffer, in
+   * bytes, as fixed at construction time.
    */
   public final native int getByteOffset() /*-{
     return this.byteOffset;

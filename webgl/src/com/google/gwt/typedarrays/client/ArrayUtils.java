@@ -49,7 +49,7 @@ public class ArrayUtils {
   }
 
   public static JsArrayInteger toJsArray(int[] data) {
-    JsArrayInteger jsan = (JsArrayInteger) JsArrayNumber.createArray();
+    JsArrayInteger jsan = (JsArrayInteger) JsArrayInteger.createArray();
     int len = data.length;
     for (int i = len - 1; i >= 0; i--) {
       jsan.set(i, data[i]);

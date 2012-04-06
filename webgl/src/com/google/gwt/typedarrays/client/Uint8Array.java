@@ -25,7 +25,7 @@ import com.google.gwt.core.client.JsArrayInteger;
  */
 public class Uint8Array extends ArrayBufferView {
 
-  public static final int BYTES_PER_ELEMENT = 2;
+  public static final int BYTES_PER_ELEMENT = 1;
 
   /**
    * @see #create(ArrayBuffer, int, int)
@@ -37,8 +37,7 @@ public class Uint8Array extends ArrayBufferView {
   /**
    * @see #create(ArrayBuffer, int, int)
    */
-  public static final native Uint8Array create(ArrayBuffer buffer,
-      int byteOffset) /*-{
+  public static final native Uint8Array create(ArrayBuffer buffer, int byteOffset) /*-{
     return new Uint8Array(buffer, byteOffset);
   }-*/;
 
@@ -62,8 +61,7 @@ public class Uint8Array extends ArrayBufferView {
    * the byteOffset must be a multiple of the element size of the specific type,
    * or an INDEX_SIZE_ERR exception is raised.
    */
-  public static final native Uint8Array create(ArrayBuffer buffer,
-      int byteOffset, int length) /*-{
+  public static final native Uint8Array create(ArrayBuffer buffer, int byteOffset, int length) /*-{
     return new Uint8Array(buffer, byteOffset, length);
   }-*/;
 
