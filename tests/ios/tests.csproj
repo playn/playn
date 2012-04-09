@@ -60,8 +60,8 @@
     <Reference Include="System.Core" />
     <Reference Include="monotouch" />
     <Reference Include="OpenTK" />
-    <Reference Include="tests-core">
-      <HintPath>tests-core.dll</HintPath>
+    <Reference Include="playn-tests-ios">
+      <HintPath>bin\playn-tests-ios-1.2-SNAPSHOT.dll</HintPath>
     </Reference>
     <Reference Include="IKVM.OpenJDK.Core">
       <HintPath>..\..\..\ikvm-monotouch\bin\IKVM.OpenJDK.Core.dll</HintPath>

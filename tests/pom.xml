@@ -23,6 +23,7 @@
     <module>flash</module>
 -->
     <module>android</module>
+    <module>ios</module>
   </modules>
 
   <build>

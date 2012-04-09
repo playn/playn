@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>com.googlecode.playn</groupId>
+    <artifactId>playn-tests</artifactId>
+    <version>1.2-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>playn-tests-ios</artifactId>
+  <name>PlayN Tests iOS</name>
+  <packaging>dll</packaging>
+
+  <dependencies>
+    <dependency>
+      <groupId>com.googlecode.playn</groupId>
+      <artifactId>playn-tests-core</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.googlecode.playn</groupId>
+      <artifactId>playn-ios</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <!-- use bin as that's where MonoDevelop puts its build bits -->
+    <directory>bin</directory>
+    <plugins>
+      <plugin>
+        <groupId>com.samskivert</groupId>
+        <artifactId>ikvm-maven-plugin</artifactId>
+        <version>1.1</version>
+        <!-- this lets Maven know that we define 'packaging: dll' -->
+        <extensions>true</extensions>
+        <configuration>
+          <ikvmArgs>
+            <ikvmArg>-debug</ikvmArg>
+          </ikvmArgs>
+          <dlls>
+            <dll>System.Data.dll</dll>
+            <dll>OpenTK.dll</dll>
+            <dll>monotouch.dll</dll>
+            <dll>Mono.Data.Sqlite.dll</dll>
+          </dlls>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>
