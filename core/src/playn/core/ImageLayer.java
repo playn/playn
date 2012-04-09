@@ -72,6 +72,12 @@ public interface ImageLayer extends Layer.HasSize {
   void setSourceRect(float sx, float sy, float sw, float sh);
 
   /**
+   * Fills in the given values with the source rectangle information: sx, sy, ws, sh. If no
+   * source rect was set, returns the image bounds.
+   */
+  void sourceRect (float[] values);
+
+  /**
    * TODO
    */
   void setWidth(float width);

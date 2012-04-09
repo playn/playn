@@ -216,6 +216,24 @@ public class FlashImageLayer extends FlashLayer implements ImageLayer {
   }
 
   /* (non-Javadoc)
+   * @see playn.core.ImageLayer#sourceRect(float[])
+   */
+  @Override
+  public void sourceRect (float[] values) {
+    if (sourceRect != null) {
+      values[0] = sourceRect.getX();
+      values[1] = sourceRect.getY();
+      values[2] = sourceRect.getWidth();
+      values[3] = sourceRect.getHeight();
+    } else {
+      values[0] = 0;
+      values[1] = 0;
+      values[2] = image.width();
+      values[3] = image.height();
+    }
+  }
+
+  /* (non-Javadoc)
    * @see playn.core.ImageLayer#setWidth(float)
    */
   @Override

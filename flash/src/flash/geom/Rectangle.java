@@ -28,6 +28,14 @@ final public class Rectangle extends JavaScriptObject {
     return new flash.geom.Rectangle(sx, sy, sw, sh);
   }-*/;
 
+  public native int getX() /*-{
+    return this.x;
+  }-*/;
+
+  public native int getY() /*-{
+    return this.y;
+  }-*/;
+
   public native int getWidth() /*-{
     return this.width;
   }-*/;

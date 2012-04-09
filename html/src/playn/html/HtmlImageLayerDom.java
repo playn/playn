@@ -145,6 +145,21 @@ class HtmlImageLayerDom extends HtmlLayerDom implements ImageLayer {
   }
 
   @Override
+  public void sourceRect(float[] values) {
+    if (sourceRectSet) {
+      values[0] = sx;
+      values[1] = sy;
+      values[2] = sw;
+      values[3] = sh;
+    } else {
+      values[0] = 0;
+      values[1] = 0;
+      values[2] = htmlImage.width();
+      values[3] = htmlImage.height();
+    }
+  }
+
+  @Override
   public void setWidth(float width) {
     Asserts.checkArgument(width > 0, "Width must be > 0");
 
