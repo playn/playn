@@ -219,7 +219,7 @@ public class FlashImageLayer extends FlashLayer implements ImageLayer {
    * @see playn.core.ImageLayer#sourceRect(float[])
    */
   @Override
-  public void sourceRect (float[] values) {
+  public void sourceRect(float[] values) {
     if (sourceRect != null) {
       values[0] = sourceRect.getX();
       values[1] = sourceRect.getY();

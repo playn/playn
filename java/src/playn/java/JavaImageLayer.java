@@ -115,7 +115,7 @@ class JavaImageLayer extends JavaLayer implements ImageLayer {
   }
 
   @Override
-  public void sourceRect (float[] values) {
+  public void sourceRect(float[] values) {
     if (sourceRectSet) {
       values[0] = sx;
       values[1] = sy;
