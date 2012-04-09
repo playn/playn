@@ -4,16 +4,16 @@ using MonoTouch.UIKit;
 
 using playn.ios;
 using playn.core;
-using playn.tests.core;
+using ${package}.core;
 
-namespace playn.tests.ios
+namespace ${package}
 {
   [Register ("AppDelegate")]
   public partial class AppDelegate : UIApplicationDelegate {
     public override bool FinishedLaunching (UIApplication app, NSDictionary options) {
       app.SetStatusBarHidden(true, true);
-      IOSPlatform.register(app, IOSPlatform.SupportedOrients.ALL);
-      PlayN.run(new TestsGame());
+      IOSPlatform.register(app, IOSPlatform.SupportedOrients.PORTRAITS);
+      PlayN.run(new ${JavaGameClassName}());
       return true;
     }
   }

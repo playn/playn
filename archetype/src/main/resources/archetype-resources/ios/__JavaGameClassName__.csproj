@@ -60,8 +60,8 @@
     <Reference Include="System.Core" />
     <Reference Include="monotouch" />
     <Reference Include="OpenTK" />
-    <Reference Include="${artifactId}">
-      <HintPath>bin\${artifactId}-${version}.dll</HintPath>
+    <Reference Include="${artifactId}-${version}">
+      <HintPath>bin\\${artifactId}-${version}.dll</HintPath>
     </Reference>
     <Reference Include="IKVM.OpenJDK.Core">
       <HintPath>..\..\..\ikvm-monotouch\bin\IKVM.OpenJDK.Core.dll</HintPath>
@@ -77,7 +77,7 @@
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
-    <Content Include="..\core\src\main\java\resources\images\bg.png">
+    <Content Include="resources\images\bg.png">
       <Link>images\bg.png</Link>
     </Content>
     <Content Include="touch-icon-57x57.png" />
