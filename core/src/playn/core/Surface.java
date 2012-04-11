@@ -66,6 +66,14 @@ public interface Surface {
   Surface setTransform(float m11, float m12, float m21, float m22, float dx, float dy);
 
   /**
+   * Set the global alpha value to be used for all rendering.
+   * <p>Values outside the range [0,1] will be clamped to the range [0,1].</p>
+   *
+   * @param alpha value in range [0,1] where 0 is transparent and 1 is opaque.
+   */
+  Surface setAlpha(float alpha);
+
+  /**
    * Sets the color to be used for fill operations. This replaces any existing fill gradient or
    * pattern.
    */

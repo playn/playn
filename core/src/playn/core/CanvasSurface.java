@@ -124,6 +124,12 @@ public class CanvasSurface implements Surface {
   }
 
   @Override
+  public Surface setAlpha(float alpha) {
+    canvas.setAlpha(alpha);
+    return this;
+  }
+
+  @Override
   public Surface setFillColor(int color) {
     canvas.setFillColor(color);
     canvas.setStrokeColor(color);

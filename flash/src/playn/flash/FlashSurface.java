@@ -135,6 +135,12 @@ public class FlashSurface implements Surface {
   }
 
   @Override
+  public Surface setAlpha(float alpha) {
+    context2d.setGlobalAlpha(alpha);
+    return this;
+  }
+
+  @Override
   public Surface setFillColor(int color) {
     context2d.setFillStyle("rgba("
                            + ((color >> 16) & 0xff) + ","

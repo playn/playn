@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import playn.core.ImmediateLayer;
+import playn.core.Image;
 import playn.core.Pattern;
 import playn.core.Surface;
 import playn.core.SurfaceLayer;
@@ -35,6 +36,7 @@ public class SurfaceTest extends Test {
       public float apply (float x) { return (float)Math.sin(x/20)*50; }
     });
     final Pattern pattern = graphics().createPattern(assets().getImage("images/tile.png"));
+    final Image pea = assets().getImage("images/pea.png");
 
     ImmediateLayer unclipped = graphics().createImmediateLayer(new ImmediateLayer.Renderer() {
       public void render (Surface surf) {
@@ -42,9 +44,20 @@ public class SurfaceTest extends Test {
         drawLine(surf, 80, 100, 130, 50, 10);
         drawLine(surf, 10, 120, 130, 180, 10);
 
+        // do some rendering with alpha
+        surf.setFillColor(0xFF0000FF);
+        surf.fillRect(10, 200, 100, 50);
+        surf.setAlpha(0.5f);
+        surf.setFillColor(0xFFFF0000);
+        surf.fillRect(10, 200, 50, 50);
+        surf.drawImage(pea, 65, 205);
+        surf.fillRect(10, 260, 50, 50);
+        surf.drawImage(pea, 65, 265);
+        surf.setAlpha(1f);
+
+        // fill some shapes with patterns
         surf.setFillPattern(pattern);
         surf.fillRect(200, 50, 100, 100);
-
         // use same fill pattern for the triangles
         surf.translate(200, 220);
         surf.fillTriangles(verts, indices);
