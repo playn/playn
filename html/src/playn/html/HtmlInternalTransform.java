@@ -312,7 +312,7 @@ public class HtmlInternalTransform extends AbstractTransform implements Internal
 
   @Override
   public Transform clone() {
-    return new HtmlInternalTransform(matrix);
+    return new HtmlInternalTransform(Float32Array.create(matrix));
   }
 
   @Override
