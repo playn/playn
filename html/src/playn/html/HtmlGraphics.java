@@ -38,6 +38,7 @@ import playn.core.Path;
 import playn.core.Pattern;
 import playn.core.TextFormat;
 import playn.core.TextLayout;
+import playn.core.gl.GL20;
 
 public abstract class HtmlGraphics implements Graphics {
 
@@ -164,6 +165,11 @@ public abstract class HtmlGraphics implements Graphics {
   public void setSize(int width, int height) {
     rootElement.getStyle().setWidth(width, Unit.PX);
     rootElement.getStyle().setHeight(height, Unit.PX);
+  }
+
+  @Override
+  public GL20 gl20() {
+    throw new UnsupportedOperationException();
   }
 
   HtmlFontMetrics getFontMetrics(Font font) {

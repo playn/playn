@@ -15,6 +15,8 @@
  */
 package playn.core;
 
+import playn.core.gl.GL20;
+
 /**
  * Main 2D graphics interface. This interface can be used to create and load
  * graphics objects used with {@link Canvas}.
@@ -135,4 +137,12 @@ public interface Graphics {
    * Sets the size of the drawable surface, in pixels.
    */
   void setSize(int width, int height);
+
+  /**
+   * <b>WARNING</b>: this is a totally experimental, untested feature. It only works on Android. It
+   * may change completely. Consider yourself warned.
+   *
+   * <p> Returns a reference to the GL context. </p>
+   */
+  GL20 gl20();
 }

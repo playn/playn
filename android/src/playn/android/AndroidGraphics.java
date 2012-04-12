@@ -34,6 +34,7 @@ import playn.core.Path;
 import playn.core.Pattern;
 import playn.core.TextFormat;
 import playn.core.TextLayout;
+import playn.core.gl.GL20;
 import playn.core.gl.GLContext;
 import playn.core.gl.GraphicsGL;
 import playn.core.gl.GroupLayerGL;
@@ -158,6 +159,11 @@ class AndroidGraphics extends GraphicsGL {
   @Override
   public void setSize(int width, int height) {
     setSize(width, height, true);
+  }
+
+  @Override
+  public GL20 gl20() {
+    return ctx.gl20;
   }
 
   @Override

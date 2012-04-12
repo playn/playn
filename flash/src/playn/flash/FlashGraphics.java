@@ -24,18 +24,19 @@ import playn.core.Asserts;
 import playn.core.CanvasImage;
 import playn.core.CanvasLayer;
 import playn.core.Font;
-import playn.core.PlayN;
 import playn.core.Gradient;
 import playn.core.Graphics;
 import playn.core.GroupLayer;
 import playn.core.Image;
-import playn.core.ImmediateLayer;
 import playn.core.ImageLayer;
+import playn.core.ImmediateLayer;
 import playn.core.Path;
 import playn.core.Pattern;
+import playn.core.PlayN;
 import playn.core.SurfaceLayer;
 import playn.core.TextFormat;
 import playn.core.TextLayout;
+import playn.core.gl.GL20;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -200,6 +201,11 @@ class FlashGraphics implements Graphics {
   @Override
   public void setSize(int width, int height) {
     ctx.resize(width, height);
+  }
+
+  @Override
+  public GL20 gl20() {
+    throw new UnsupportedOperationException();
   }
 
   public void updateLayers() {

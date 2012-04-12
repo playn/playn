@@ -37,6 +37,7 @@ import playn.core.Pattern;
 import playn.core.StockInternalTransform;
 import playn.core.TextFormat;
 import playn.core.TextLayout;
+import playn.core.gl.GL20;
 import playn.core.gl.GLContext;
 import playn.core.gl.GraphicsGL;
 import playn.core.gl.GroupLayerGL;
@@ -135,6 +136,11 @@ public class IOSGraphics extends GraphicsGL {
   @Override
   public void setSize(int width, int height) {
     // setSize(width, height, true);
+  }
+
+  @Override
+  public GL20 gl20() {
+    throw new UnsupportedOperationException();
   }
 
   @Override

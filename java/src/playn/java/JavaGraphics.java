@@ -33,6 +33,7 @@ import playn.core.Pattern;
 import playn.core.SurfaceLayer;
 import playn.core.TextFormat;
 import playn.core.TextLayout;
+import playn.core.gl.GL20;
 import static playn.core.PlayN.*;
 
 import java.awt.Component;
@@ -178,6 +179,11 @@ public class JavaGraphics implements Graphics {
   public void setSize(int width, int height) {
     component.setPreferredSize(new Dimension(width, height));
     frame.pack();
+  }
+
+  @Override
+  public GL20 gl20() {
+    throw new UnsupportedOperationException();
   }
 
   protected Map<String,java.awt.Font> _fonts = new HashMap<String,java.awt.Font>();
