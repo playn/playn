@@ -30,7 +30,9 @@ class IOSLog implements Log
 
   @Override
   public void debug(String msg, Throwable e) {
-    debug(msg + ": " + e.getMessage());
+    debug(msg);
+    if (e != null)
+      e.printStackTrace();
   }
 
   @Override
@@ -40,7 +42,9 @@ class IOSLog implements Log
 
   @Override
   public void info(String msg, Throwable e) {
-    info(msg + ": " + e.getMessage());
+    info(msg);
+    if (e != null)
+      e.printStackTrace();
   }
 
   @Override
@@ -50,7 +54,9 @@ class IOSLog implements Log
 
   @Override
   public void warn(String msg, Throwable e) {
-    warn(msg + ": " + e.getMessage());
+    warn(msg);
+    if (e != null)
+      e.printStackTrace();
   }
 
   @Override
@@ -60,6 +66,8 @@ class IOSLog implements Log
 
   @Override
   public void error(String msg, Throwable e) {
-    error(msg + ": " + e.getMessage());
+    error(msg);
+    if (e != null)
+      e.printStackTrace();
   }
 }
