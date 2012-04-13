@@ -21,9 +21,6 @@ import com.google.gwt.typedarrays.client.ArrayBuffer;
 import com.google.gwt.typedarrays.client.ArrayBufferView;
 import com.google.gwt.typedarrays.client.Int8Array;
 
-import com.google.gwt.corp.compatibility.Endianness;
-import com.google.gwt.corp.compatibility.Numbers;
-
 /**
  * DirectByteBuffer, DirectReadWriteByteBuffer and DirectReadOnlyHeapByteBuffer compose the
  * implementation of direct byte buffers.

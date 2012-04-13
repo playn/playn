@@ -17,9 +17,6 @@
 
 package java.nio;
 
-import com.google.gwt.corp.compatibility.Endianness;
-import com.google.gwt.corp.compatibility.StringToByteBuffer;
-
 /** A buffer for bytes.
  * <p> A byte buffer can be created in either one of the following ways: </p>
  * <ul>
@@ -29,8 +26,7 @@ import com.google.gwt.corp.compatibility.StringToByteBuffer;
  * <li>{@link #wrap(byte[]) Wrap} an existing byte array to create a new buffer.</li>
  * </ul>
  */
-public abstract class ByteBuffer extends Buffer
-  implements Comparable<ByteBuffer>, StringToByteBuffer {
+public abstract class ByteBuffer extends Buffer implements Comparable<ByteBuffer> {
 
     /** Creates a byte buffer based on a newly allocated byte array.
      *
@@ -795,7 +791,7 @@ public abstract class ByteBuffer extends Buffer
         return buf.toString();
     }
 
-    public ByteBuffer stringToByteBuffer (String s) {
-        return new StringByteBuffer(s);
-    }
+//    public ByteBuffer stringToByteBuffer (String s) {
+//        return new StringByteBuffer(s);
+//    }
 }

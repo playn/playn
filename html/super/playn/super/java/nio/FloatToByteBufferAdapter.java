@@ -29,7 +29,7 @@ package java.nio;
  * Buffer, thus has its own position and limit.</li>
  * </ul>
  * </p> */
-final class FloatToByteBufferAdapter extends FloatBuffer implements playn.html.ByteBufferWrapper {
+final class FloatToByteBufferAdapter extends FloatBuffer {
 // implements DirectBuffer {
 
     static FloatBuffer wrap (ByteBuffer byteBuffer) {

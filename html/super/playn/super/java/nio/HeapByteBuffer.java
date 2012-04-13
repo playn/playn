@@ -17,9 +17,6 @@
 
 package java.nio;
 
-import com.google.gwt.corp.compatibility.Endianness;
-import com.google.gwt.corp.compatibility.Numbers;
-
 /**
  * HeapByteBuffer, ReadWriteHeapByteBuffer and ReadOnlyHeapByteBuffer compose the implementation of
  * array based byte buffers.
