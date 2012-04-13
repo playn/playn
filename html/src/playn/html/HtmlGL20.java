@@ -87,11 +87,8 @@ public final class HtmlGL20 implements playn.core.gl.GL20 {
   private WebGLBuffer boundElementArrayBuffer;
   private WebGLBuffer requestedElementArrayBuffer;
 
-  HtmlGL20(CanvasElement canvas, WebGLContextAttributes attributes) {
-    gl = WebGLRenderingContext.getContext(canvas, attributes);
-    if (gl == null) {
-      throw new UnsupportedOperationException("WebGL N/A");
-    }
+  HtmlGL20(WebGLRenderingContext gl) {
+    this.gl = gl;
 
     webGLObjects.push(null);
     webGLObjectTypes.push(WebGLObjectType.NULL.ordinal());
