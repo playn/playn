@@ -36,7 +36,6 @@ import playn.core.util.Buffers;
 
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayInteger;
-import com.google.gwt.dom.client.CanvasElement;
 import com.google.gwt.typedarrays.client.ArrayBufferView;
 import com.google.gwt.typedarrays.client.Float32Array;
 import com.google.gwt.typedarrays.client.Int16Array;
@@ -45,7 +44,6 @@ import com.google.gwt.typedarrays.client.Int8Array;
 import com.google.gwt.typedarrays.client.Uint16Array;
 import com.google.gwt.typedarrays.client.Uint8Array;
 import com.google.gwt.webgl.client.WebGLBuffer;
-import com.google.gwt.webgl.client.WebGLContextAttributes;
 import com.google.gwt.webgl.client.WebGLFramebuffer;
 import com.google.gwt.webgl.client.WebGLObject;
 import com.google.gwt.webgl.client.WebGLProgram;
@@ -61,7 +59,6 @@ import com.google.gwt.webgl.client.WebGLUniformLocation;
  *
  * @author Stefan Haustein
  */
-@SuppressWarnings("unchecked")
 public final class HtmlGL20 implements playn.core.gl.GL20 {
 
   static final int VERTEX_ATTRIB_ARRAY_COUNT = 5; //  position, color, texture0, texture1, normals
@@ -78,6 +75,7 @@ public final class HtmlGL20 implements playn.core.gl.GL20 {
   private VertexAttribArrayState[] vertexAttribArrayState =
     new VertexAttribArrayState[VERTEX_ATTRIB_ARRAY_COUNT];
 
+  @SuppressWarnings("unchecked")
   private JsArray<WebGLObject> webGLObjects = (JsArray<WebGLObject>) JsArray.createArray();
   private JsArrayInteger webGLObjectTypes = (JsArrayInteger) JsArrayInteger.createArray();
 
