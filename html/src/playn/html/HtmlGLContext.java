@@ -28,6 +28,7 @@ import com.google.gwt.webgl.client.WebGLTexture;
 import static com.google.gwt.webgl.client.WebGLRenderingContext.*;
 
 import playn.core.InternalTransform;
+import playn.core.PlayN;
 import playn.core.gl.GLContext;
 import playn.core.gl.GLShader;
 import playn.core.gl.LayerGL;
@@ -179,7 +180,12 @@ public class HtmlGLContext extends GLContext
 
   @Override
   public void checkGLError(String op) {
-    // error checking? we don't need no steenking error checking!
+    if (HtmlUrlParameters.checkGLErrors) {
+      int error;
+      while ((error = gl.getError()) != NO_ERROR) {
+        PlayN.log().error(op + ": glError " + error);
+      }
+    }
   }
 
   @Override

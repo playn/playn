@@ -82,4 +82,9 @@ public interface HtmlUrlParameters {
     static final String WEBAUDIO = "webaudio";
     static final String PARAM_NAME = "gwt-voices";
   }
+
+  /**
+   * Enable GL error checking with {@code glerrors=check}.
+   */
+  public static boolean checkGLErrors = "check".equals(Window.Location.getParameter("glerrors"));
 }
