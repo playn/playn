@@ -69,7 +69,12 @@ public class HtmlGLContext extends GLContext
     // try basic GL operations to detect failure cases early
     tryBasicGLCalls();
 
+    if (HtmlUrlParameters.checkGLErrors) {
+      PlayN.log().debug("GL error checking enabled.");
+    }
+
     if (HtmlUrlParameters.quadShader) {
+      PlayN.log().debug("Using quad-at-a-time shaders for quads.");
       texQuadShader = new HtmlQuadShader.Texture(this);
       colorQuadShader = new HtmlQuadShader.Color(this);
     } else {
