@@ -27,10 +27,12 @@ import flash.display.BitmapData;
 
 @FlashImport({"flash.display.Loader", "flash.events.Event", "flash.net.URLRequest"})
 class FlashImage implements Image {
+
   private List<ResourceCallback<? super Image>> callbacks =
     new ArrayList<ResourceCallback<? super Image>>();
 
   private BitmapData imageData = null;
+
   FlashImage(String url) {
     scheduleLoad(url);
   }
@@ -39,9 +41,6 @@ class FlashImage implements Image {
     this.imageData = data;
   }
 
-  /**
-   * @param url
-   */
   private native void scheduleLoad(String url) /*-{
      var loader = new Loader();
      var self = this;
@@ -56,8 +55,35 @@ class FlashImage implements Image {
   }-*/;
 
   @Override
+  public int width() {
+    return imageData == null ? 0 : imageData.getWidth();
+  }
+
+  @Override
   public int height() {
     return imageData == null ? 0 : imageData.getHeight();
+  }
+
+  @Override
+  public boolean isReady() {
+    return imageData != null;
+  }
+
+  @Override
+  public void addCallback(ResourceCallback<? super Image> callback) {
+    callbacks.add(callback);
+    if (isReady()) {
+      runCallbacks(true);
+    }
+  }
+
+  @Override
+  public Region subImage(float x, float y, float width, float height) {
+    return new FlashImageRegion(this, x, y, width, height);
+  }
+
+  BitmapData bitmapData() {
+    return imageData;
   }
 
   private void runCallbacks(boolean success) {
@@ -69,34 +95,5 @@ class FlashImage implements Image {
       }
     }
     callbacks.clear();
-  }
-
-  @Override
-  public int width() {
-    return imageData == null ? 0 : imageData.getWidth();
-  }
-
-  @Override
-  public boolean isReady() {
-    return imageData != null;
-  }
-
-  /* (non-Javadoc)
-   * @see playn.core.Image#addCallback(playn.core.ResourceCallback)
-   */
-  @Override
-  public void addCallback(ResourceCallback<? super Image> callback) {
-    callbacks.add(callback);
-    if (isReady()) {
-      runCallbacks(true);
-    }
-  }
-
-  /**
-   * @return
-   */
-  BitmapData bitmapData() {
-    // TODO Auto-generated method stub
-    return imageData;
   }
 }

@@ -24,6 +24,7 @@ import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.TexturePaint;
 import java.awt.geom.AffineTransform;
 
 class JavaCanvasState {
@@ -93,8 +94,10 @@ class JavaCanvasState {
     if (fillGradient != null) {
       gfx.setPaint(fillGradient.paint);
     } else if (fillPattern != null) {
-      fillPattern.updateSize();
-      gfx.setPaint(fillPattern.paint);
+      TexturePaint paint = fillPattern.paint();
+      if (paint != null) {
+        gfx.setPaint(paint);
+      }
     } else {
       gfx.setPaint(convertColor(fillColor));
     }

@@ -82,45 +82,31 @@ class JavaCanvas implements Canvas {
 
   @Override
   public Canvas drawImage(Image img, float x, float y) {
-    Asserts.checkArgument(img instanceof JavaImage);
-    JavaImage jimg = (JavaImage) img;
-
-    currentState().prepareFill(gfx);
-    int dx = (int) x, dy = (int) y, w = jimg.width(), h = jimg.height();
-    gfx.drawImage(jimg.img, dx, dy, dx + w, dy + h, 0, 0, w, h, null);
-    return this;
+    int w = img.width(), h = img.height();
+    return drawImage(img, x, y, w, h, 0, 0, w, h);
   }
 
   @Override
   public Canvas drawImageCentered(Image img, float x, float y) {
-    drawImage(img, x - img.width()/2, y - img.height()/2);
-    return this;
+    return drawImage(img, x - img.width()/2, y - img.height()/2);
   }
 
   @Override
   public Canvas drawImage(Image img, float x, float y, float w, float h) {
     Asserts.checkArgument(img instanceof JavaImage);
     JavaImage jimg = (JavaImage) img;
-
-    // For non-integer scaling, we have to use AffineTransform.
-    AffineTransform tx = new AffineTransform(w / jimg.width(), 0f, 0f, h / jimg.height(), x, y);
-
     currentState().prepareFill(gfx);
-    gfx.drawImage(jimg.img, tx, null);
+    jimg.draw(gfx, x, y, w, h);
     return this;
   }
 
   @Override
   public Canvas drawImage(Image img, float dx, float dy, float dw, float dh,
-                        float sx, float sy, float sw, float sh) {
+                          float sx, float sy, float sw, float sh) {
     Asserts.checkArgument(img instanceof JavaImage);
     JavaImage jimg = (JavaImage) img;
-
-    // TODO: use AffineTransform here as well?
-
     currentState().prepareFill(gfx);
-    gfx.drawImage(jimg.img, (int)dx, (int)dy, (int)(dx + dw), (int)(dy + dh),
-                  (int)sx, (int)sy, (int)(sx + sw), (int)(sy + sh), null);
+    jimg.draw(gfx, dx, dy, dw, dh, sx, sy, sw, sh);
     return this;
   }
 

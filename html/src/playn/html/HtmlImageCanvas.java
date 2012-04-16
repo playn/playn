@@ -1,5 +1,5 @@
 /**
- * Copyright 2010 The PlayN Authors
+ * Copyright 2012 The PlayN Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
@@ -15,30 +15,21 @@
  */
 package playn.html;
 
-import playn.core.Canvas;
-import playn.core.CanvasImage;
-import playn.core.gl.GLContext;
+import com.google.gwt.dom.client.CanvasElement;
+import com.google.gwt.dom.client.ImageElement;
 
-class HtmlCanvasImage extends HtmlImage implements CanvasImage {
+class HtmlImageCanvas extends HtmlImage {
 
-  private HtmlCanvas canvas;
+  HtmlImageCanvas(CanvasElement img) {
+    super(img);
+  }
 
-  public HtmlCanvasImage(HtmlCanvas canvas) {
-    super(canvas.canvas());
-    this.canvas = canvas;
+  HtmlImageCanvas(ImageElement img) {
+    super(img);
   }
 
   @Override
-  public Canvas canvas() {
-    return canvas;
-  }
-
-  @Override
-  public Object ensureTexture(GLContext ctx, boolean repeatX, boolean repeatY) {
-    if (canvas.dirty()) {
-      canvas.clearDirty();
-      clearTexture(ctx);
-    }
-    return super.ensureTexture(ctx, repeatX, repeatY);
+  public Region subImage(float x, float y, float width, float height) {
+    return new HtmlImageRegionCanvas(this, x, y, width, height);
   }
 }

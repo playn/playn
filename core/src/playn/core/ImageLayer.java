@@ -23,27 +23,7 @@ public interface ImageLayer extends Layer.HasSize {
   /**
    * TODO
    */
-  void clearHeight();
-
-  /**
-   * TODO
-   */
-  void clearSourceRect();
-
-  /**
-   * TODO
-   */
-  void clearWidth();
-
-  /**
-   * TODO
-   */
   Image image();
-
-  /**
-   * TODO
-   */
-  void setHeight(float height);
 
   /**
    * TODO
@@ -66,16 +46,8 @@ public interface ImageLayer extends Layer.HasSize {
 
   /**
    * TODO
-   *
-   * TODO(jgw): This cannot work at the same time as repeat. Need to document this clearly.
    */
-  void setSourceRect(float sx, float sy, float sw, float sh);
-
-  /**
-   * Fills in the given values with the source rectangle information: sx, sy, ws, sh. If no
-   * source rect was set, returns the image bounds.
-   */
-  void sourceRect(float[] values);
+  void setSize(float width, float height);
 
   /**
    * TODO
@@ -85,5 +57,27 @@ public interface ImageLayer extends Layer.HasSize {
   /**
    * TODO
    */
-  void setSize(float width, float height);
+  void setHeight(float height);
+
+  /**
+   * TODO
+   */
+  void clearHeight();
+
+  /**
+   * TODO
+   */
+  void clearWidth();
+
+  /**
+   * @deprecated Use {@link Image#subImage}.
+   */
+  @Deprecated
+  void setSourceRect(float sx, float sy, float sw, float sh);
+
+  /**
+   * @deprecated Use {@link Image#subImage}.
+   */
+  @Deprecated
+  void clearSourceRect();
 }

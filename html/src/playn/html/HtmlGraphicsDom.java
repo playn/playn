@@ -15,9 +15,11 @@ package playn.html;
 
 import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.Element;
+import com.google.gwt.dom.client.ImageElement;
 import com.google.gwt.dom.client.Style.Overflow;
 import com.google.gwt.dom.client.Style.Unit;
 
+import playn.core.CanvasImage;
 import playn.core.CanvasLayer;
 import playn.core.GroupLayer;
 import playn.core.Image;
@@ -35,6 +37,11 @@ class HtmlGraphicsDom extends HtmlGraphics {
     rootElement.appendChild(div);
 
     rootLayer = new HtmlGroupLayerDom(div);
+  }
+
+  @Override
+  public CanvasImage createImage(int w, int h) {
+    return new HtmlCanvasImageCanvas(new HtmlCanvas(w, h));
   }
 
   @Override @Deprecated
@@ -94,6 +101,11 @@ class HtmlGraphicsDom extends HtmlGraphics {
   @Override
   public int width() {
     return rootLayer.element().getOffsetWidth();
+  }
+
+  @Override
+  HtmlImage createImage(ImageElement img) {
+    return new HtmlImageDom(img);
   }
 
   @Override

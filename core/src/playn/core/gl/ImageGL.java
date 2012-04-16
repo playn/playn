@@ -1,5 +1,5 @@
 /**
- * Copyright 2010 The PlayN Authors
+ * Copyright 2010-2012 The PlayN Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@ package playn.core.gl;
 
 import playn.core.Asserts;
 import playn.core.Image;
+import playn.core.InternalTransform;
 import playn.core.Pattern;
 
 public abstract class ImageGL implements Image {
@@ -26,6 +27,11 @@ public abstract class ImageGL implements Image {
 
   /** Our texture and repeatable texture handles. */
   protected Object tex, reptex;
+
+  @Override
+  public Region subImage(float x, float y, float width, float height) {
+    return new ImageRegionGL(this, x, y, width, height);
+  }
 
   /**
    * Creates a texture for this image (if one does not already exist) and returns it. May return
@@ -77,6 +83,47 @@ public abstract class ImageGL implements Image {
     if (--refs == 0) {
       clearTexture(ctx);
     }
+  }
+
+  /**
+   * Draws this image with the supplied transform in the specified target dimensions.
+   */
+  void draw(GLContext ctx, InternalTransform xform, float dx, float dy, float dw, float dh,
+            boolean repeatX, boolean repeatY, float alpha) {
+    Object tex = ensureTexture(ctx, repeatX, repeatY);
+    if (tex != null) {
+      float sw = repeatX ? dw : width(), sh = repeatY ? dh : height();
+      ctx.drawTexture(tex, texWidth(repeatX), texHeight(repeatY), xform,
+                      dx, dy, dw, dh, x(), y(), sw, sh, alpha);
+    }
+  }
+
+  /**
+   * The x offset into our source image at which this image's region starts.
+   */
+  protected float x() {
+    return 0;
+  }
+
+  /**
+   * The y offset into our source image at which this image's region starts.
+   */
+  protected float y() {
+    return 0;
+  }
+
+  /**
+   * Returns the width of our underlying texture image.
+   */
+  protected float texWidth(boolean repeatX) {
+    return width();
+  }
+
+  /**
+   * Returns the height of our underlying texture image.
+   */
+  protected float texHeight(boolean repeatY) {
+    return height();
   }
 
   /**

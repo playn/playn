@@ -130,7 +130,7 @@ public class JavaGraphics implements Graphics {
 
   @Override
   public Pattern createPattern(Image img) {
-    return JavaPattern.create((JavaImage) img);
+    return new JavaPattern((JavaImage) img);
   }
 
   @Override

@@ -15,6 +15,8 @@
  */
 package playn.html;
 
+import com.google.gwt.canvas.dom.client.CanvasPattern;
+import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.dom.client.CanvasElement;
 import com.google.gwt.dom.client.ImageElement;
 import com.google.gwt.dom.client.NativeEvent;
@@ -84,5 +86,31 @@ class HtmlImage extends ImageGL {
   @Override
   protected void updateTexture(GLContext ctx, Object tex) {
     ((HtmlGLContext)ctx).updateTexture((WebGLTexture)tex, img);
+  }
+
+  // TODO: override this in HtmlImageRegionCanvas and create tileable copy of our image
+  CanvasPattern createPattern(Context2d ctx, boolean repeatX, boolean repeatY) {
+    Context2d.Repetition repeat;
+    if (repeatX) {
+      if (repeatY) {
+        repeat = Context2d.Repetition.REPEAT;
+      } else {
+        repeat = Context2d.Repetition.REPEAT_X;
+      }
+    } else if (repeatY) {
+      repeat = Context2d.Repetition.REPEAT_Y;
+    } else {
+      return null;
+    }
+    return ctx.createPattern(img, repeat);
+  }
+
+  void draw(Context2d ctx, float x, float y, float width, float height) {
+    draw(ctx, 0, 0, width(), height(), x, y, width, height);
+  }
+
+  void draw(Context2d ctx, float sx, float sy, float sw, float sh,
+            float dx, float dy, float dw, float dh) {
+    ctx.drawImage(img, sx, sy, sw, sh, dx, dy, dw, dh);
   }
 }

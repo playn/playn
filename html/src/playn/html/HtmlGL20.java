@@ -847,7 +847,7 @@ public final class HtmlGL20 implements playn.core.gl.GL20 {
 
   @Override
   public int glGetUniformLocation(int program, String name) {
-    return createObject(gl.getUniformLocation((WebGLProgram) getProgram(program), name),
+    return createObject(gl.getUniformLocation(getProgram(program), name),
                         WebGLObjectType.UNIFORM_LOCATION);
   }
 
@@ -924,7 +924,7 @@ public final class HtmlGL20 implements playn.core.gl.GL20 {
 
   @Override
   public void glShaderSource(int shader, String string) {
-    gl.shaderSource((WebGLShader) getShader(shader), string);
+    gl.shaderSource(getShader(shader), string);
   }
 
   @Override

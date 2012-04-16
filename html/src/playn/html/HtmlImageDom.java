@@ -1,5 +1,5 @@
 /**
- * Copyright 2010 The PlayN Authors
+ * Copyright 2012 The PlayN Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
@@ -13,27 +13,18 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package playn.java;
+package playn.html;
 
-import playn.core.Pattern;
+import com.google.gwt.dom.client.ImageElement;
 
-import java.awt.TexturePaint;
-import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
-
-class JavaPattern implements Pattern {
-
-  private JavaImage img;
-  private TexturePaint paint;
-
-  JavaPattern(JavaImage img) {
-    this.img = img;
+class HtmlImageDom extends HtmlImage
+{
+  HtmlImageDom(ImageElement img) {
+    super(img);
   }
 
-  TexturePaint paint () {
-    if (paint == null && img.isReady()) {
-      paint = img.createTexture(img.width(), img.height());
-    }
-    return paint;
+  @Override
+  public Region subImage(float x, float y, float width, float height) {
+    throw new UnsupportedOperationException();
   }
 }

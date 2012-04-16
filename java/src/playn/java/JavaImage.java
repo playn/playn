@@ -1,5 +1,5 @@
 /**
- * Copyright 2010 The PlayN Authors
+ * Copyright 2010-2012 The PlayN Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,13 +15,18 @@
  */
 package playn.java;
 
+import java.awt.Graphics2D;
+import java.awt.TexturePaint;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 
+import playn.core.Asserts;
 import playn.core.Image;
 
 abstract class JavaImage implements Image {
 
-  BufferedImage img;
+  protected BufferedImage img;
 
   JavaImage(BufferedImage img) {
     this.img = img;
@@ -40,5 +45,31 @@ abstract class JavaImage implements Image {
   @Override
   public boolean isReady() {
     return (img != null);
+  }
+
+  @Override
+  public Region subImage(float sx, float sy, float swidth, float sheight) {
+    Asserts.checkArgument(sx >= 0 && sy >= 0 && swidth > 0 && sheight > 0 &&
+                          (sx + swidth) <= width() && (sy + sheight) <= height(),
+                          "Invalid bounds for subimage [image=" + width() + "x" + height() +
+                          ", subImage=" + swidth + "x" + sheight + "+" + sx + "+" + sy + "]");
+    return new JavaImageRegion(this, sx, sy, swidth, sheight);
+  }
+
+  TexturePaint createTexture(float width, float height) {
+    return new TexturePaint(img, new Rectangle2D.Float(0, 0, width, height));
+  }
+
+  void draw(Graphics2D gfx, float x, float y, float w, float h) {
+    // For non-integer scaling, we have to use AffineTransform.
+    AffineTransform tx = new AffineTransform(w / width(), 0f, 0f, h / height(), x, y);
+    gfx.drawImage(img, tx, null);
+  }
+
+  void draw(Graphics2D gfx, float dx, float dy, float dw, float dh,
+            float sx, float sy, float sw, float sh) {
+    // TODO: use AffineTransform here as well?
+    gfx.drawImage(img, (int)dx, (int)dy, (int)(dx + dw), (int)(dy + dh),
+                  (int)sx, (int)sy, (int)(sx + sw), (int)(sy + sh), null);
   }
 }

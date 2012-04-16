@@ -77,16 +77,13 @@ class HtmlCanvas implements Canvas {
 
   @Override
   public Canvas drawImage(Image img, float x, float y) {
-    Asserts.checkArgument(img instanceof HtmlImage);
-    ctx.drawImage(((HtmlImage) img).img, x, y);
-    dirty = true;
-    return this;
+    return drawImage(img, x, y, img.width(), img.height());
   }
 
   @Override
   public Canvas drawImage(Image img, float x, float y, float w, float h) {
     Asserts.checkArgument(img instanceof HtmlImage);
-    ctx.drawImage(((HtmlImage) img).img, x, y, w, h);
+    ((HtmlImage) img).draw(ctx, x, y, w, h);
     dirty = true;
     return this;
   }
@@ -95,8 +92,7 @@ class HtmlCanvas implements Canvas {
   public Canvas drawImage(Image img, float dx, float dy, float dw, float dh,
       float sx, float sy, float sw, float sh) {
     Asserts.checkArgument(img instanceof HtmlImage);
-    ctx.drawImage(((HtmlImage) img).img, sx, sy, sw, sh, dx,
-        dy, dw, dh);
+    ((HtmlImage) img).draw(ctx, sx, sy, sw, sh, dx, dy, dw, dh);
     dirty = true;
     return this;
   }

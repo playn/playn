@@ -112,7 +112,7 @@ public class HtmlPlatform implements Platform {
   // initialization, before we have called PlayN.setPlatform
   static HtmlLog log = GWT.create(HtmlLog.class);
 
-  private HtmlAssets assets = GWT.create(HtmlAssets.class);
+  private HtmlAssets assets;
   private HtmlAudio audio = new HtmlAudio();
   private HtmlRegularExpression regularExpression = new HtmlRegularExpression();
   private Game game;
@@ -174,6 +174,7 @@ public class HtmlPlatform implements Platform {
         graphics = new HtmlGraphicsCanvas();
       }
 
+      assets = new HtmlAssets(graphics);
       pointer = new HtmlPointer(graphics.rootElement());
       mouse = new HtmlMouse(graphics.rootElement());
       touch = new HtmlTouch(graphics.rootElement());

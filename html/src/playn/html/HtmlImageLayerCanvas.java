@@ -1,12 +1,12 @@
 /**
  * Copyright 2010 The PlayN Authors
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -17,7 +17,6 @@ package playn.html;
 
 import com.google.gwt.canvas.dom.client.CanvasPattern;
 import com.google.gwt.canvas.dom.client.Context2d;
-import com.google.gwt.canvas.dom.client.Context2d.Repetition;
 
 import playn.core.Asserts;
 import playn.core.Image;
@@ -27,8 +26,6 @@ class HtmlImageLayerCanvas extends HtmlLayerCanvas implements ImageLayer {
 
   private float width, height;
   private boolean widthSet, heightSet;
-  private float sx, sy, sw, sh;
-  private boolean sourceRectSet;
   private boolean repeatX, repeatY;
 
   private HtmlImage img;
@@ -48,9 +45,11 @@ class HtmlImageLayerCanvas extends HtmlLayerCanvas implements ImageLayer {
     heightSet = false;
   }
 
-  @Override
+  @Override @Deprecated
   public void clearSourceRect() {
-    sourceRectSet = false;
+    if (img instanceof Image.Region) {
+      setImage(((Image.Region) img).parent());
+    }
   }
 
   @Override
@@ -80,42 +79,17 @@ class HtmlImageLayerCanvas extends HtmlLayerCanvas implements ImageLayer {
 
   @Override
   public void setRepeatX(boolean repeat) {
-    Asserts.checkArgument(!repeat || !sourceRectSet, "Cannot repeat when source rect is used");
-
     repeatX = repeat;
   }
 
   @Override
   public void setRepeatY(boolean repeat) {
-    Asserts.checkArgument(!repeat || !sourceRectSet, "Cannot repeat when source rect is used");
-
     repeatY = repeat;
   }
 
-  @Override
+  @Override @Deprecated
   public void setSourceRect(float sx, float sy, float sw, float sh) {
-    Asserts.checkState(!repeatX && !repeatY, "Cannot use source rect when repeating x or y");
-
-    sourceRectSet = true;
-    this.sx = sx;
-    this.sy = sy;
-    this.sw = sw;
-    this.sh = sh;
-  }
-
-  @Override
-  public void sourceRect(float[] values) {
-    if (sourceRectSet) {
-      values[0] = sx;
-      values[1] = sy;
-      values[2] = sw;
-      values[3] = sh;
-    } else {
-      values[0] = 0;
-      values[1] = 0;
-      values[2] = img.width();
-      values[3] = img.height();
-    }
+    setImage(img.subImage(sx, sy, sw, sh));
   }
 
   @Override
@@ -141,27 +115,21 @@ class HtmlImageLayerCanvas extends HtmlLayerCanvas implements ImageLayer {
   public void paint(Context2d ctx, float parentAlpha) {
     if (!visible()) return;
 
-    float width = widthSet ? this.width : img.img.getWidth();
-    float height = heightSet ? this.height : img.img.getHeight();
-
     ctx.save();
     transform(ctx);
-
     ctx.setGlobalAlpha(parentAlpha * alpha);
-    if (sourceRectSet) {
-      ctx.drawImage(img.img, sx, sy, sw, sh, 0, 0, width, height);
-    } else {
-      if (repeatX || repeatY) {
-        updatePattern(ctx);
 
-        ctx.setFillStyle(pattern);
-        ctx.beginPath();
-        ctx.rect(0, 0, width, height);
-        ctx.scale(repeatX ? 1 : width / img.width(), repeatY ? 1 : height / img.height());
-        ctx.fill();
-      } else {
-        ctx.drawImage(img.img, 0, 0, width, height);
-      }
+    float width = width();
+    float height = height();
+    if (repeatX || repeatY) {
+      updatePattern(ctx);
+      ctx.setFillStyle(pattern);
+      ctx.beginPath();
+      ctx.rect(0, 0, width, height);
+      ctx.scale(repeatX ? 1 : width / img.width(), repeatY ? 1 : height / img.height());
+      ctx.fill();
+    } else {
+      img.draw(ctx, 0, 0, width, height);
     }
 
     ctx.restore();
@@ -170,21 +138,13 @@ class HtmlImageLayerCanvas extends HtmlLayerCanvas implements ImageLayer {
   @Override
   public float width() {
     Asserts.checkNotNull(img, "Image must not be null");
-    if (widthSet) {
-      return width;
-    } else {
-      return img.width();
-    }
+    return widthSet ? width : img.width();
   }
 
   @Override
   public float height() {
     Asserts.checkNotNull(img, "Image must not be null");
-    if (heightSet) {
-      return height;
-    } else {
-      return img.height();
-    }
+    return heightSet ? height : img.height();
   }
 
   @Override
@@ -201,22 +161,7 @@ class HtmlImageLayerCanvas extends HtmlLayerCanvas implements ImageLayer {
     if ((repeatX == patternRepeatX) && (repeatY == patternRepeatY)) {
       return;
     }
-
-    Repetition repeat;
-    if (repeatX) {
-      if (repeatY) {
-        repeat = Repetition.REPEAT;
-      } else {
-        repeat = Repetition.REPEAT_X;
-      }
-    } else if (repeatY) {
-      repeat = Repetition.REPEAT_Y;
-    } else {
-      pattern = null;
-      return;
-    }
-
-    pattern = ctx.createPattern(img.img, repeat);
+    pattern = img.createPattern(ctx, repeatX, repeatY);
     patternRepeatX = repeatX;
     patternRepeatY = repeatY;
   }

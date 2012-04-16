@@ -99,11 +99,6 @@ public abstract class HtmlGraphics implements Graphics {
   }
 
   @Override
-  public CanvasImage createImage(int w, int h) {
-    return new HtmlCanvasImage(new HtmlCanvas(w, h));
-  }
-
-  @Override
   public Gradient createLinearGradient(float x0, float y0, float x1, float y1,
       int[] colors, float[] positions) {
     Asserts.checkArgument(colors.length == positions.length);
@@ -171,6 +166,8 @@ public abstract class HtmlGraphics implements Graphics {
   public GL20 gl20() {
     throw new UnsupportedOperationException();
   }
+
+  abstract HtmlImage createImage(ImageElement img);
 
   HtmlFontMetrics getFontMetrics(Font font) {
     HtmlFontMetrics metrics = fontMetrics.get(font);

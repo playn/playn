@@ -1,11 +1,11 @@
 /**
  * Copyright 2010 The PlayN Authors
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  * in compliance with the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software distributed under the License
  * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
  * or implied. See the License for the specific language governing permissions and limitations under
@@ -13,17 +13,19 @@
  */
 package playn.html;
 
+import com.google.gwt.canvas.dom.client.Context2d;
+import com.google.gwt.dom.client.CanvasElement;
+import com.google.gwt.dom.client.Document;
+import com.google.gwt.dom.client.Element;
+import com.google.gwt.dom.client.ImageElement;
+
+import playn.core.CanvasImage;
 import playn.core.CanvasLayer;
 import playn.core.GroupLayer;
 import playn.core.Image;
 import playn.core.ImageLayer;
 import playn.core.ImmediateLayer;
 import playn.core.SurfaceLayer;
-
-import com.google.gwt.canvas.dom.client.Context2d;
-import com.google.gwt.dom.client.CanvasElement;
-import com.google.gwt.dom.client.Document;
-import com.google.gwt.dom.client.Element;
 
 class HtmlGraphicsCanvas extends HtmlGraphics {
 
@@ -36,6 +38,11 @@ class HtmlGraphicsCanvas extends HtmlGraphics {
     rootElement.appendChild(canvas);
     ctx = canvas.getContext2d();
     rootLayer = new HtmlGroupLayerCanvas();
+  }
+
+  @Override
+  public CanvasImage createImage(int w, int h) {
+    return new HtmlCanvasImageCanvas(new HtmlCanvas(w, h));
   }
 
   @Override @Deprecated
@@ -99,6 +106,11 @@ class HtmlGraphicsCanvas extends HtmlGraphics {
   @Override
   Element rootElement() {
     return canvas;
+  }
+
+  @Override
+  HtmlImage createImage(ImageElement img) {
+    return new HtmlImageCanvas(img);
   }
 
   @Override

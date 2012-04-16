@@ -22,8 +22,6 @@ public class ImageLayerGL extends LayerGL implements ImageLayer {
 
   private float width, height;
   private boolean widthSet, heightSet;
-  private float sx, sy, sw, sh;
-  private boolean sourceRectSet;
   private boolean repeatX, repeatY;
   private ImageGL img;
 
@@ -47,9 +45,11 @@ public class ImageLayerGL extends LayerGL implements ImageLayer {
     heightSet = false;
   }
 
-  @Override
+  @Override @Deprecated
   public void clearSourceRect() {
-    sourceRectSet = false;
+    if (img instanceof Image.Region) {
+      setImage(((Image.Region) img).parent());
+    }
   }
 
   @Override
@@ -85,39 +85,17 @@ public class ImageLayerGL extends LayerGL implements ImageLayer {
 
   @Override
   public void setRepeatX(boolean repeat) {
-    Asserts.checkArgument(!repeat || !sourceRectSet, "Cannot repeat when source rect is used");
     repeatX = repeat;
   }
 
   @Override
   public void setRepeatY(boolean repeat) {
-    Asserts.checkArgument(!repeat || !sourceRectSet, "Cannot repeat when source rect is used");
     repeatY = repeat;
   }
 
-  @Override
+  @Override @Deprecated
   public void setSourceRect(float sx, float sy, float sw, float sh) {
-    Asserts.checkState(!repeatX && !repeatY, "Cannot use source rect when repeating x or y");
-    sourceRectSet = true;
-    this.sx = sx;
-    this.sy = sy;
-    this.sw = sw;
-    this.sh = sh;
-  }
-
-  @Override
-  public void sourceRect(float[] values) {
-    if (sourceRectSet) {
-      values[0] = sx;
-      values[1] = sy;
-      values[2] = sw;
-      values[3] = sh;
-    } else {
-      values[0] = 0;
-      values[1] = 0;
-      values[2] = img.width();
-      values[3] = img.height();
-    }
+    setImage(img.subImage(sx, sy, sw, sh));
   }
 
   @Override
@@ -143,42 +121,20 @@ public class ImageLayerGL extends LayerGL implements ImageLayer {
   public void paint(InternalTransform parentTransform, float parentAlpha) {
     if (!visible()) return;
 
-    // TODO(jgw): Assert exclusive source-rect vs. repeat.
-
-    Object tex = img.ensureTexture(ctx, repeatX, repeatY);
-    if (tex != null) {
-      InternalTransform xform = localTransform(parentTransform);
-      float childAlpha = parentAlpha * alpha;
-      float iwidth = img.width(), iheight = img.height();
-      float width = widthSet ? this.width : iwidth;
-      float height = heightSet ? this.height : iheight;
-
-      if (sourceRectSet) {
-        ctx.drawTexture(tex, iwidth, iheight, xform, 0, 0, width, height, sx, sy, sw, sh, childAlpha);
-      } else {
-        ctx.drawTexture(tex, iwidth, iheight, xform, width, height, repeatX, repeatY, childAlpha);
-      }
-    }
+    img.draw(ctx, localTransform(parentTransform), 0, 0, width(), height(), repeatX, repeatY,
+             parentAlpha * alpha);
   }
 
   @Override
   public float width() {
     Asserts.checkNotNull(img, "Image must not be null");
-    if (widthSet) {
-      return width;
-    } else {
-      return img.width();
-    }
+    return widthSet ? width : img.width();
   }
 
   @Override
   public float height() {
     Asserts.checkNotNull(img, "Image must not be null");
-    if (heightSet) {
-      return height;
-    } else {
-      return img.height();
-    }
+    return heightSet ? height : img.height();
   }
 
   @Override

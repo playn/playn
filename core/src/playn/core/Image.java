@@ -41,4 +41,29 @@ public interface Image {
    * discarded once the image is loaded.
    */
   void addCallback(ResourceCallback<? super Image> callback);
+
+  /**
+   * A subregion of an image. See {@link Image#subImage}.
+   */
+  public interface Region extends Image {
+    /**
+     * The x offset of this subimage into its parent image.
+     */
+    float x();
+
+    /**
+     * The y offset of this subimage into its parent image.
+     */
+    float y();
+
+    /**
+     * The image of which this subimage is part.
+     */
+    Image parent();
+  }
+
+  /**
+   * Returns an image that draws the specified sub-region of this image.
+   */
+  Region subImage(float x, float y, float width, float height);
 }

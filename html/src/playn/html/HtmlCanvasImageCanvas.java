@@ -13,27 +13,22 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package playn.java;
+package playn.html;
 
-import playn.core.Pattern;
+import playn.core.Canvas;
+import playn.core.CanvasImage;
 
-import java.awt.TexturePaint;
-import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
+class HtmlCanvasImageCanvas extends HtmlImageCanvas implements CanvasImage {
 
-class JavaPattern implements Pattern {
+  private HtmlCanvas canvas;
 
-  private JavaImage img;
-  private TexturePaint paint;
-
-  JavaPattern(JavaImage img) {
-    this.img = img;
+  public HtmlCanvasImageCanvas(HtmlCanvas canvas) {
+    super(canvas.canvas());
+    this.canvas = canvas;
   }
 
-  TexturePaint paint () {
-    if (paint == null && img.isReady()) {
-      paint = img.createTexture(img.width(), img.height());
-    }
-    return paint;
+  @Override
+  public Canvas canvas() {
+    return canvas;
   }
 }
