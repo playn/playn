@@ -53,7 +53,8 @@ public class HtmlAssets extends AbstractCachingAssets {
     pathPrefix = prefix;
   }
 
-  private Map<String, AutoClientBundleWithLookup> clientBundles = new HashMap<String, AutoClientBundleWithLookup>();
+  private Map<String, AutoClientBundleWithLookup> clientBundles =
+    new HashMap<String, AutoClientBundleWithLookup>();
 
   public void addClientBundle(String regExp, AutoClientBundleWithLookup clientBundle) {
     clientBundles.put(regExp, clientBundle);

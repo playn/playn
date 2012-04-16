@@ -28,7 +28,6 @@ import com.google.gwt.webgl.client.WebGLTexture;
 import static com.google.gwt.webgl.client.WebGLRenderingContext.*;
 
 import playn.core.InternalTransform;
-import playn.core.PlayN;
 import playn.core.gl.GLContext;
 import playn.core.gl.GLShader;
 import playn.core.gl.LayerGL;
@@ -70,11 +69,11 @@ public class HtmlGLContext extends GLContext
     tryBasicGLCalls();
 
     if (HtmlUrlParameters.checkGLErrors) {
-      PlayN.log().debug("GL error checking enabled.");
+      HtmlPlatform.log.debug("GL error checking enabled.");
     }
 
     if (HtmlUrlParameters.quadShader) {
-      PlayN.log().debug("Using quad-at-a-time shaders for quads.");
+      HtmlPlatform.log.debug("Using quad-at-a-time shaders for quads.");
       texQuadShader = new HtmlQuadShader.Texture(this);
       colorQuadShader = new HtmlQuadShader.Color(this);
     } else {
@@ -193,7 +192,7 @@ public class HtmlGLContext extends GLContext
     if (HtmlUrlParameters.checkGLErrors) {
       int error;
       while ((error = gl.getError()) != NO_ERROR) {
-        PlayN.log().error(op + ": glError " + error);
+        HtmlPlatform.log.error(op + ": glError " + error);
       }
     }
   }

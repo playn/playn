@@ -13,9 +13,7 @@
  */
 package playn.html;
 
-import static playn.core.PlayN.*;
 import playn.core.Analytics;
-import playn.core.PlayN;
 
 public class HtmlAnalytics implements Analytics {
 
@@ -30,14 +28,14 @@ public class HtmlAnalytics implements Analytics {
 
   public void init() {
     random = HtmlUrlParameters.Analytics.getRandom();
-    log().debug("Analytics random = " + random);
+    HtmlPlatform.log.debug("Analytics random = " + random);
   }
 
   @Override
   public void logEvent(Category category, String action) {
     float sampleRate = category.getSampleRate();
     boolean shouldLog = shouldLogEvent(sampleRate);
-    PlayN.log().debug(
+    HtmlPlatform.log.debug(
         "Analytics#logEvent(sampleRate=" + sampleRate + ", category=" + category + ", action="
             + action + ") => " + (shouldLog ? "Logging" : "NOT logging"));
     if (shouldLog) {
@@ -49,7 +47,7 @@ public class HtmlAnalytics implements Analytics {
   public void logEvent(Category category, String action, String label, int value) {
     float sampleRate = category.getSampleRate();
     boolean shouldLog = shouldLogEvent(sampleRate);
-    PlayN.log().debug(
+    HtmlPlatform.log.debug(
         "Analytics#logEvent(sampleRate=" + sampleRate + ", category=" + category + ", action="
             + action + ", label=" + label + ", value=" + value + ") => "
             + (shouldLog ? "Logging" : "NOT logging"));

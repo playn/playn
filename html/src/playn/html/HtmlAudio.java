@@ -13,14 +13,13 @@
  */
 package playn.html;
 
-import playn.core.Audio;
-import playn.core.PlayN;
-
 import com.allen_sauer.gwt.voices.client.FlashSound;
 import com.allen_sauer.gwt.voices.client.Sound;
 import com.allen_sauer.gwt.voices.client.SoundController;
 import com.allen_sauer.gwt.voices.client.ui.FlashMovie;
 import com.google.gwt.dom.client.Element;
+
+import playn.core.Audio;
 
 /**
  * This class is temporarily public, in order to expose {@link #isFlash9AudioPluginMissing()}, to
@@ -34,24 +33,23 @@ public class HtmlAudio implements Audio {
   /**
    * Borrowed form com.allen_sauer.gwt.voices.client.WebAudioSound#createAudioContext()
    */
-  private static native Element maybeCreateAudioContext()
-  /*-{
-   try {
-       return new AudioContext();
-     } catch (ignore) {
-     }
-   
-     try {
-       return new webkitAudioContext();
-     } catch (ignore) {
-     }
-   
-     return null;
-   }-*/;
+  private static native Element maybeCreateAudioContext() /*-{
+    try {
+      return new AudioContext();
+    } catch (ignore) {
+    }
+
+    try {
+      return new webkitAudioContext();
+    } catch (ignore) {
+    }
+
+    return null;
+  }-*/;
 
   @SuppressWarnings("deprecation")
   public void init() {
-    PlayN.log().debug("Preferred sound type(s): " + soundController.getPreferredSoundType());
+    HtmlPlatform.log.debug("Preferred sound type(s): " + soundController.getPreferredSoundType());
 
     // Attempt to create Web Audio API audio context
     audioContext = maybeCreateAudioContext();
@@ -59,7 +57,7 @@ public class HtmlAudio implements Audio {
 
   HtmlSound createSound(String url) {
     Sound sound = soundController.createSound("audio/mpeg", url);
-    // PlayN.log().debug(sound.getClass().getName() + " " + sound.getUrl());
+    // HtmlPlatform.log.debug(sound.getClass().getName() + " " + sound.getUrl());
     return new HtmlSound(sound);
   }
 
@@ -82,9 +80,9 @@ public class HtmlAudio implements Audio {
   }
 
   public boolean isFlash9AudioPluginMissingImpl() {
-    PlayN.log().debug(
+    HtmlPlatform.log.debug(
         "FlashMovie.isExternalInterfaceSupported: " + FlashMovie.isExternalInterfaceSupported());
-    PlayN.log().debug("FlashMovie.getMajorVersion: " + FlashMovie.getMajorVersion());
+    HtmlPlatform.log.debug("FlashMovie.getMajorVersion: " + FlashMovie.getMajorVersion());
     if (FlashMovie.isExternalInterfaceSupported() && FlashMovie.getMajorVersion() >= 9) {
       // Flash plugin operational and is at least version 9
       return false;

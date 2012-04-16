@@ -31,7 +31,6 @@ import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
-import playn.core.PlayN;
 import playn.core.util.Buffers;
 
 import com.google.gwt.core.client.JsArray;
@@ -335,7 +334,7 @@ public final class HtmlGL20 implements playn.core.gl.GL20 {
     gl.bufferData(ELEMENT_ARRAY_BUFFER, getTypedArray(indices, type, count * getTypeSize(type)),
                   STREAM_DRAW);
 //    if ("ModelPart".equals(debugInfo)) {
-//      PlayN.log().info("drawElements f. ModelPart; count: " + count);
+//      HtmlPlatform.log.info("drawElements f. ModelPart; count: " + count);
 //    }
     gl.drawElements(mode, count, type, 0);
   }
@@ -358,8 +357,7 @@ public final class HtmlGL20 implements playn.core.gl.GL20 {
 
   @Override
   public void glFinish() {
-    PlayN.log().info("glFinish()");
-
+//    HtmlPlatform.log.info("glFinish()");
     gl.finish();
   }
 
@@ -441,7 +439,7 @@ public final class HtmlGL20 implements playn.core.gl.GL20 {
 
     VertexAttribArrayState data = vertexAttribArrayState[arrayId];
 
-//    PlayN.log().info("glVertexAttribPointer Data size: " + nioBuffer.remaining());
+//    HtmlPlatform.log.info("glVertexAttribPointer Data size: " + nioBuffer.remaining());
     useNioBuffer |= 1 << arrayId;
     data.nioBuffer = nioBuffer;
     data.nioBufferPosition = nioBuffer.position();
@@ -503,7 +501,7 @@ public final class HtmlGL20 implements playn.core.gl.GL20 {
 
   @Override
   public void glFlush() {
-//    PlayN.log().info("glFlush");
+//    HtmlPlatform.log.info("glFlush");
     gl.flush();
   }
 

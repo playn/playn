@@ -108,6 +108,10 @@ public class HtmlPlatform implements Platform {
     return agentInfo;
   }
 
+  // Provide a static logging instance so that it can be used by other subsystems during
+  // initialization, before we have called PlayN.setPlatform
+  static HtmlLog log = GWT.create(HtmlLog.class);
+
   private HtmlAssets assets = GWT.create(HtmlAssets.class);
   private HtmlAudio audio = new HtmlAudio();
   private HtmlRegularExpression regularExpression = new HtmlRegularExpression();
@@ -115,7 +119,6 @@ public class HtmlPlatform implements Platform {
   private HtmlGraphics graphics;
   private HtmlJson json = new HtmlJson();
   private HtmlKeyboard keyboard = new HtmlKeyboard();
-  private HtmlLog log;
   private HtmlNet net = new HtmlNet();
   private HtmlPointer pointer;
   private HtmlMouse mouse;
@@ -130,8 +133,6 @@ public class HtmlPlatform implements Platform {
 
   // Non-instantiable.
   private HtmlPlatform(Mode mode) {
-    // Setup logging first, so it can be used by other subsystems
-    log = GWT.create(HtmlLog.class);
     if (!GWT.isProdMode()) {
       log.info("You are running in GWT Development Mode. "
           + "For optimal performance you may want to use an alternative method. "
