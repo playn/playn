@@ -87,4 +87,9 @@ public interface HtmlUrlParameters {
    * Enable GL error checking with {@code glerrors=check}.
    */
   public static boolean checkGLErrors = "check".equals(Window.Location.getParameter("glerrors"));
+
+  /**
+   * Enable quad-at-a-time shader with {@code glshader=quad}.
+   */
+  public static boolean quadShader = "quad".equals(Window.Location.getParameter("glshader"));
 }

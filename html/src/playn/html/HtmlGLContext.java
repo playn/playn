@@ -69,9 +69,14 @@ public class HtmlGLContext extends GLContext
     // try basic GL operations to detect failure cases early
     tryBasicGLCalls();
 
-    texQuadShader = new HtmlQuadShader.Texture(this);
+    if (HtmlUrlParameters.quadShader) {
+      texQuadShader = new HtmlQuadShader.Texture(this);
+      colorQuadShader = new HtmlQuadShader.Color(this);
+    } else {
+      texQuadShader = new HtmlIndexedTrisShader.Texture(this);
+      colorQuadShader = new HtmlIndexedTrisShader.Color(this);
+    }
     texTrisShader = new HtmlIndexedTrisShader.Texture(this);
-    colorQuadShader = new HtmlQuadShader.Color(this);
     colorTrisShader = new HtmlIndexedTrisShader.Color(this);
 
     gl.disable(CULL_FACE);
