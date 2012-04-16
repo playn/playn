@@ -35,7 +35,7 @@ import playn.core.gl.GroupLayerGL;
 
 class IOSGLContext extends GLContext
 {
-  public static final boolean CHECK_ERRORS = true;
+  public static final boolean CHECK_ERRORS = false;
 
   public int viewWidth, viewHeight;
 
@@ -211,10 +211,16 @@ class IOSGLContext extends GLContext
                   All.wrap(All.UnsignedByte), data);
   }
 
+  void preparePaint() {
+    checkGLError("preparePaint start");
+    bindFramebuffer();
+    GL.Clear(All.ColorBufferBit | All.DepthBufferBit); // clear to transparent
+    checkGLError("preparePaint end");
+  }
+
   void paintLayers(InternalTransform rootTransform, GroupLayerGL rootLayer) {
     checkGLError("updateLayers start");
     bindFramebuffer();
-    GL.Clear(All.ColorBufferBit | All.DepthBufferBit); // clear to transparent
     rootLayer.paint(rootTransform, 1); // paint all the layers
     checkGLError("updateLayers end");
     useShader(null); // guarantee a flush

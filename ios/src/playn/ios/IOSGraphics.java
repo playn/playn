@@ -178,7 +178,7 @@ public class IOSGraphics extends GraphicsGL {
 
   void paint(Game game, float alpha) {
     ctx.processPending();
-    ctx.bindFramebuffer();
+    ctx.preparePaint();
     game.paint(alpha); // run the game's custom painting code
     ctx.paintLayers(rootTransform, rootLayer);
   }

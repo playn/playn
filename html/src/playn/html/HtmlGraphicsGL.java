@@ -116,8 +116,13 @@ class HtmlGraphicsGL extends HtmlGraphics {
   }
 
   @Override
-  void paintLayers() {
+  void preparePaint() {
     ctx.processPending();
+    ctx.preparePaint();
+  }
+
+  @Override
+  void paintLayers() {
     ctx.paint(rootLayer);
   }
 

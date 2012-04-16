@@ -199,5 +199,7 @@ public abstract class HtmlGraphics implements Graphics {
 
   abstract Element rootElement();
 
+  abstract void preparePaint();
+
   abstract void paintLayers();
 }

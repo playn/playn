@@ -86,18 +86,18 @@ public class AndroidGLContext extends GLContext
     }
   }
 
-  void paintLayers(GroupLayerGL rootLayer) {
-    // Bind the default frameBuffer (the SurfaceView's Surface)
-    checkGLError("updateLayers Start");
-
-    bindFramebuffer();
-
+  void preparePaint() {
     // Clear to transparent
+    bindFramebuffer();
     gl20.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
-    // Paint all the layers
-    rootLayer.paint(StockInternalTransform.IDENTITY, 1);
-    checkGLError("updateLayers");
+  }
 
+  void paintLayers(GroupLayerGL rootLayer) {
+    checkGLError("updateLayers start");
+    // Paint all the layers
+    bindFramebuffer();
+    rootLayer.paint(StockInternalTransform.IDENTITY, 1);
+    checkGLError("updateLayers end");
     // Guarantee a flush
     useShader(null);
   }

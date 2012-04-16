@@ -97,6 +97,11 @@ class HtmlGraphicsDom extends HtmlGraphics {
   }
 
   @Override
+  void preparePaint() {
+    // noop!
+  }
+
+  @Override
   void paintLayers() {
     rootLayer.update();
   }

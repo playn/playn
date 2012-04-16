@@ -217,18 +217,18 @@ public class JavaPlatform implements Platform {
 
           float paintDelta = (float)(now - lastPaintTime);
           if (isPaintDirty || paintDelta > FRAME_TIME) {
+            int width = component.getWidth();
+            int height = component.getHeight();
+            JavaCanvas canvas = new JavaCanvas((Graphics2D) g, width, height);
+            canvas.clear();
+
             if (updateRate == 0) {
               game.paint(0);
             } else {
               game.paint(accum / updateRate);
             }
 
-            int width = component.getWidth();
-            int height = component.getHeight();
-            JavaCanvas canvas = new JavaCanvas((Graphics2D) g, width, height);
-            canvas.clear();
             graphics.rootLayer().paint(canvas);
-
             lastPaintTime = now;
           }
         }

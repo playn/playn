@@ -90,15 +90,16 @@ public class HtmlGLContext extends GLContext
     gl.pixelStorei(UNPACK_PREMULTIPLY_ALPHA_WEBGL, ONE);
   }
 
-  void paint(LayerGL rootLayer) {
-    bindFramebuffer();
-
+  void preparePaint() {
     // Clear to transparent.
+    bindFramebuffer();
     clear(0, 0, 0, 0);
+  }
 
+  void paint(LayerGL rootLayer) {
     // Paint all the layers.
+    bindFramebuffer();
     rootLayer.paint(HtmlInternalTransform.IDENTITY, 1);
-
     // Guarantee a flush.
     useShader(null);
   }

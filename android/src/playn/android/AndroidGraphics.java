@@ -185,7 +185,7 @@ class AndroidGraphics extends GraphicsGL {
 
   void preparePaint() {
     ctx.processPending();
-    ctx.bindFramebuffer();
+    ctx.preparePaint();
   }
 
   void paintLayers() {

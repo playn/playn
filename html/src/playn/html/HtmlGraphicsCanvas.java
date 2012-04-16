@@ -101,8 +101,13 @@ class HtmlGraphicsCanvas extends HtmlGraphics {
     return canvas;
   }
 
-  void paintLayers() {
+  @Override
+  void preparePaint() {
     ctx.clearRect(0, 0, width(), height());
+  }
+
+  @Override
+  void paintLayers() {
     rootLayer.paint(ctx, 1);
     ctx.setGlobalAlpha(1);
   }

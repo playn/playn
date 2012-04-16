@@ -300,6 +300,7 @@ public class HtmlPlatform implements Platform {
           }
         }
 
+        graphics.preparePaint();
         game.paint(accum / updateRate);
         graphics.paintLayers();
       }
