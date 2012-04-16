@@ -37,15 +37,16 @@ import playn.core.gl.LayerGL;
  */
 public class HtmlGLContext extends GLContext
 {
-  public final WebGLRenderingContext gl;
-  private final CanvasElement canvas;
-  private WebGLFramebuffer lastFBuf;
+  final WebGLRenderingContext gl;
   int screenWidth, screenHeight;
 
-  private GLShader.Texture texQuadShader = new HtmlQuadShader.Texture(this);
-  private GLShader.Texture texTrisShader = new HtmlIndexedTrisShader.Texture(this);
-  private GLShader.Color colorQuadShader = new HtmlQuadShader.Color(this);
-  private GLShader.Color colorTrisShader = new HtmlIndexedTrisShader.Color(this);
+  private final CanvasElement canvas;
+  private final GLShader.Texture texQuadShader;
+  private final GLShader.Texture texTrisShader;
+  private final GLShader.Color colorQuadShader;
+  private final GLShader.Color colorTrisShader;
+
+  private WebGLFramebuffer lastFBuf;
 
   // Debug counters.
   // private int texCount;
@@ -57,21 +58,26 @@ public class HtmlGLContext extends GLContext
     // this machine.
     this.gl = WebGLRenderingContext.getContext(canvas, null);
     // Some systems seem to have a problem where they return a valid context, but it's in an error
-    // static initially. We give up and fall back to dom/canvas in this case, because nothing seems
-    // to work properly.
+    // state initially. We give up and fall back to Canvas in this case, because nothing seems to
+    // work properly.
     if (gl == null || gl.getError() != NO_ERROR) {
       throw new RuntimeException("GL context not created [err=" +
                                  (gl == null ? "null" : gl.getError()) + "]");
     }
+
+    // try basic GL operations to detect failure cases early
+    tryBasicGLCalls();
+
+    texQuadShader = new HtmlQuadShader.Texture(this);
+    texTrisShader = new HtmlIndexedTrisShader.Texture(this);
+    colorQuadShader = new HtmlQuadShader.Color(this);
+    colorTrisShader = new HtmlIndexedTrisShader.Color(this);
 
     gl.disable(CULL_FACE);
     gl.enable(BLEND);
     gl.blendEquation(FUNC_ADD);
     gl.blendFunc(ONE, ONE_MINUS_SRC_ALPHA);
     gl.pixelStorei(UNPACK_PREMULTIPLY_ALPHA_WEBGL, ONE);
-
-    // try basic GL operations to detect failure cases early
-    tryBasicGLCalls();
   }
 
   void paint(LayerGL rootLayer) {
