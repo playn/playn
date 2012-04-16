@@ -78,7 +78,7 @@ abstract class HtmlQuadShader implements GLShader
 
     WebGLRenderingContext gl = core().flush();
     gl.bufferData(ARRAY_BUFFER, vertexData, STREAM_DRAW);
-    gl.drawArrays(TRIANGLE_STRIP, 0, vertexOffset);
+    gl.drawArrays(TRIANGLE_STRIP, 0, vertexOffset/HtmlShaderCore.VERTEX_SIZE);
     vertexOffset = 0;
   }
 
