@@ -8,6 +8,7 @@ object PlayNBuild extends Build {
       crossPaths   := false,
       scalaVersion := "2.9.1",
       javacOptions ++= Seq("-Xlint", "-Xlint:-serial", "-source", "1.6", "-target", "1.6"),
+      javaOptions ++= Seq("-ea"),
       fork in Compile := true,
       autoScalaLibrary := false, // no scala-library dependency
       publishArtifact in (Compile, packageDoc) := false, // no scaladocs; it fails
