@@ -23,6 +23,7 @@ import java.awt.image.BufferedImage;
 
 import playn.core.Asserts;
 import playn.core.Image;
+import playn.core.Pattern;
 
 abstract class JavaImage implements Image {
 
@@ -54,6 +55,11 @@ abstract class JavaImage implements Image {
                           "Invalid bounds for subimage [image=" + width() + "x" + height() +
                           ", subImage=" + swidth + "x" + sheight + "+" + sx + "+" + sy + "]");
     return new JavaImageRegion(this, sx, sy, swidth, sheight);
+  }
+
+  @Override
+  public Pattern toPattern() {
+    return new JavaPattern(this);
   }
 
   TexturePaint createTexture(float width, float height) {

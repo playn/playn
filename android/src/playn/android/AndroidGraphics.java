@@ -80,10 +80,9 @@ class AndroidGraphics extends GraphicsGL {
     return new AndroidPath();
   }
 
-  @Override
+  @Override @Deprecated
   public Pattern createPattern(Image img) {
-    Asserts.checkArgument(img instanceof AndroidImage);
-    return new AndroidPattern((AndroidImage) img);
+    return img.toPattern();
   }
 
   @Override

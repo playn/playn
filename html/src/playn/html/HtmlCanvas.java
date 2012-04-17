@@ -220,7 +220,7 @@ class HtmlCanvas implements Canvas {
   @Override
   public Canvas setFillPattern(Pattern pattern) {
     Asserts.checkArgument(pattern instanceof HtmlPattern);
-    ctx.setFillStyle(((HtmlPattern) pattern).pattern);
+    ctx.setFillStyle(((HtmlPattern) pattern).pattern(ctx));
     return this;
   }
 

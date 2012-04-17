@@ -66,4 +66,9 @@ public interface Image {
    * Returns an image that draws the specified sub-region of this image.
    */
   Region subImage(float x, float y, float width, float height);
+
+  /**
+   * Creates a {@link Pattern} that can be used to use this image as a fill in a canvas.
+   */
+  Pattern toPattern();
 }

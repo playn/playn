@@ -25,6 +25,8 @@ import playn.core.Image;
 import playn.core.ResourceCallback;
 import flash.display.BitmapData;
 
+import playn.core.Pattern;
+
 @FlashImport({"flash.display.Loader", "flash.events.Event", "flash.net.URLRequest"})
 class FlashImage implements Image {
 
@@ -80,6 +82,11 @@ class FlashImage implements Image {
   @Override
   public Region subImage(float x, float y, float width, float height) {
     return new FlashImageRegion(this, x, y, width, height);
+  }
+
+  @Override
+  public Pattern toPattern() {
+    return new FlashPattern(this);
   }
 
   BitmapData bitmapData() {

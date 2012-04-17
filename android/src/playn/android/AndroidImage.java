@@ -18,6 +18,7 @@ package playn.android;
 import android.graphics.Bitmap;
 
 import playn.core.Image;
+import playn.core.Pattern;
 import playn.core.ResourceCallback;
 import playn.core.gl.GLContext;
 import playn.core.gl.ImageGL;
@@ -69,6 +70,11 @@ class AndroidImage extends ImageGL implements AndroidGLContext.Refreshable {
   @Override
   public boolean isReady() {
     return true;
+  }
+
+  @Override
+  public Pattern toPattern() {
+    return new AndroidPattern(this);
   }
 
   @Override

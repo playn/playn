@@ -18,6 +18,7 @@ package playn.ios;
 import cli.MonoTouch.CoreGraphics.CGImage;
 
 import playn.core.Image;
+import playn.core.Pattern;
 import playn.core.ResourceCallback;
 import playn.core.gl.ImageGL;
 
@@ -41,6 +42,11 @@ abstract class IOSAbstractImage extends ImageGL implements Image
   @Override
   public void addCallback(ResourceCallback<? super Image> callback) {
     callback.done(this); // we're always ready
+  }
+
+  @Override
+  public Pattern toPattern() {
+    return new IOSPattern(this);
   }
 
   @Override

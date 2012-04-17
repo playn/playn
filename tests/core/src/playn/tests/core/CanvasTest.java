@@ -68,7 +68,7 @@ public class CanvasTest extends Test {
 
     addTestCanvas(100, 100, "images/tile.png", new ImageDrawer() {
       public void draw(Canvas canvas, Image tile) {
-        canvas.setFillPattern(graphics().createPattern(tile));
+        canvas.setFillPattern(tile.toPattern());
         canvas.fillRect(0, 0, 100, 100);
       }
     });

@@ -23,6 +23,7 @@ import com.google.gwt.dom.client.NativeEvent;
 import com.google.gwt.webgl.client.WebGLTexture;
 
 import playn.core.Image;
+import playn.core.Pattern;
 import playn.core.ResourceCallback;
 import playn.core.gl.GLContext;
 import playn.core.gl.ImageGL;
@@ -81,6 +82,11 @@ class HtmlImage extends ImageGL {
   @Override
   public boolean isReady() {
     return isComplete(this.img);
+  }
+
+  @Override
+  public Pattern toPattern() {
+    return new HtmlPattern(this);
   }
 
   @Override

@@ -128,9 +128,9 @@ public class JavaGraphics implements Graphics {
     return new JavaPath();
   }
 
-  @Override
+  @Override @Deprecated
   public Pattern createPattern(Image img) {
-    return new JavaPattern((JavaImage) img);
+    return img.toPattern();
   }
 
   @Override

@@ -19,7 +19,6 @@ import java.util.HashMap;
 import com.google.gwt.canvas.dom.client.CanvasGradient;
 import com.google.gwt.canvas.dom.client.CanvasPattern;
 import com.google.gwt.canvas.dom.client.Context2d;
-import com.google.gwt.canvas.dom.client.Context2d.Repetition;
 import com.google.gwt.canvas.dom.client.CssColor;
 import com.google.gwt.dom.client.CanvasElement;
 import com.google.gwt.dom.client.Document;
@@ -115,13 +114,9 @@ public abstract class HtmlGraphics implements Graphics {
     return new HtmlPath();
   }
 
-  @Override
+  @Override @Deprecated
   public Pattern createPattern(Image image) {
-    Asserts.checkArgument(image instanceof HtmlImage);
-    HtmlImage htmlImage = (HtmlImage) image;
-    ImageElement elem = htmlImage.img.cast();
-    CanvasPattern pattern = dummyCtx.createPattern(elem, Repetition.REPEAT);
-    return new HtmlPattern(htmlImage, pattern);
+    return image.toPattern();
   }
 
   @Override

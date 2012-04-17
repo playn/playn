@@ -35,7 +35,7 @@ public class SurfaceTest extends Test {
     tessellateCurve(0, 40*(float)Math.PI, verts, indices, new F() {
       public float apply (float x) { return (float)Math.sin(x/20)*50; }
     });
-    final Pattern pattern = graphics().createPattern(assets().getImage("images/tile.png"));
+    final Pattern pattern = assets().getImage("images/tile.png").toPattern();
     final Image pea = assets().getImage("images/pea.png");
 
     ImmediateLayer unclipped = graphics().createImmediateLayer(new ImmediateLayer.Renderer() {

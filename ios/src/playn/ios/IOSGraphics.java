@@ -88,9 +88,9 @@ public class IOSGraphics extends GraphicsGL {
     return new IOSPath();
   }
 
-  @Override
+  @Override @Deprecated
   public Pattern createPattern(Image image) {
-    return new IOSPattern((IOSAbstractImage) image);
+    return image.toPattern();
   }
 
   @Override

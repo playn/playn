@@ -154,10 +154,9 @@ class FlashGraphics implements Graphics {
     return new FlashPath();
   }
 
-  @Override
+  @Override @Deprecated
   public Pattern createPattern(Image img) {
-    Asserts.checkArgument(img instanceof FlashImage);
-    return new FlashPattern(img);
+    return img.toPattern();
   }
 
   @Override

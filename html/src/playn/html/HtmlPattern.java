@@ -16,18 +16,25 @@
 package playn.html;
 
 import com.google.gwt.canvas.dom.client.CanvasPattern;
+import com.google.gwt.canvas.dom.client.Context2d;
 
 import playn.core.gl.GLPattern;
 import playn.core.gl.ImageGL;
 
 class HtmlPattern implements GLPattern {
 
-  final HtmlImage image;
-  final CanvasPattern pattern;
+  private final HtmlImage image;
+  private CanvasPattern pattern;
 
-  HtmlPattern(HtmlImage image, CanvasPattern pattern) {
+  HtmlPattern(HtmlImage image) {
     this.image = image;
-    this.pattern = pattern;
+  }
+
+  public CanvasPattern pattern(Context2d ctx) {
+    if (pattern == null) {
+      pattern = ctx.createPattern(image.img, Context2d.Repetition.REPEAT);
+    }
+    return pattern;
   }
 
   @Override

@@ -18,6 +18,7 @@ package playn.core.gl;
 import pythagoras.f.MathUtil;
 
 import playn.core.Image;
+import playn.core.Pattern;
 import playn.core.ResourceCallback;
 
 public class ImageRegionGL extends ImageGL implements Image.Region {
@@ -101,6 +102,11 @@ public class ImageRegionGL extends ImageGL implements Image.Region {
         callback.error(err);
       }
     });
+  }
+
+  @Override
+  public Pattern toPattern() {
+    throw new UnsupportedOperationException("TODO");
   }
 
   @Override

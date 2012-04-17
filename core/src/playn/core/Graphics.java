@@ -89,9 +89,9 @@ public interface Graphics {
   Path createPath();
 
   /**
-   * Creates a repeated image fill pattern to be used with {@link Canvas}
-   * drawing methods.
+   * @deprecated Use {@link Image#toPattern}.
    */
+  @Deprecated
   Pattern createPattern(Image img);
 
   /**
