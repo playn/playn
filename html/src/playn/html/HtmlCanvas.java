@@ -29,6 +29,12 @@ import playn.core.TextLayout;
 
 class HtmlCanvas implements Canvas {
 
+  interface Drawable {
+    void draw(Context2d ctx, float x, float y, float width, float height);
+    void draw(Context2d ctx, float sx, float sy, float sw, float sh,
+              float dx, float dy, float dw, float dh);
+  }
+
   private final CanvasElement canvas;
   private final Context2d ctx;
   private final int width, height;
@@ -82,8 +88,8 @@ class HtmlCanvas implements Canvas {
 
   @Override
   public Canvas drawImage(Image img, float x, float y, float w, float h) {
-    Asserts.checkArgument(img instanceof HtmlImage);
-    ((HtmlImage) img).draw(ctx, x, y, w, h);
+    Asserts.checkArgument(img instanceof Drawable);
+    ((Drawable) img).draw(ctx, x, y, w, h);
     dirty = true;
     return this;
   }
@@ -91,8 +97,8 @@ class HtmlCanvas implements Canvas {
   @Override
   public Canvas drawImage(Image img, float dx, float dy, float dw, float dh,
       float sx, float sy, float sw, float sh) {
-    Asserts.checkArgument(img instanceof HtmlImage);
-    ((HtmlImage) img).draw(ctx, sx, sy, sw, sh, dx, dy, dw, dh);
+    Asserts.checkArgument(img instanceof Drawable);
+    ((Drawable) img).draw(ctx, sx, sy, sw, sh, dx, dy, dw, dh);
     dirty = true;
     return this;
   }

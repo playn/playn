@@ -28,11 +28,6 @@ public abstract class ImageGL implements Image {
   /** Our texture and repeatable texture handles. */
   protected Object tex, reptex;
 
-  @Override
-  public Region subImage(float x, float y, float width, float height) {
-    return new ImageRegionGL(this, x, y, width, height);
-  }
-
   /**
    * Creates a texture for this image (if one does not already exist) and returns it. May return
    * null if the underlying image data is not yet ready.

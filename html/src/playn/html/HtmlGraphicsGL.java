@@ -16,9 +16,7 @@ package playn.html;
 import com.google.gwt.dom.client.CanvasElement;
 import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.Element;
-import com.google.gwt.dom.client.ImageElement;
 
-import playn.core.CanvasImage;
 import playn.core.CanvasLayer;
 import playn.core.GroupLayer;
 import playn.core.Image;
@@ -51,11 +49,6 @@ class HtmlGraphicsGL extends HtmlGraphics {
       rootElement.removeChild(canvas);
       throw re;
     }
-  }
-
-  @Override
-  public CanvasImage createImage(int w, int h) {
-    return new HtmlCanvasImageGL(new HtmlCanvas(w, h));
   }
 
   @Override @Deprecated
@@ -120,11 +113,6 @@ class HtmlGraphicsGL extends HtmlGraphics {
   @Override
   public GL20 gl20() {
     return gl20;
-  }
-
-  @Override
-  HtmlImage createImage(ImageElement img) {
-    return new HtmlImage(img);
   }
 
   @Override

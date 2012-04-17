@@ -40,6 +40,12 @@ import playn.core.TextLayout;
  */
 public class IOSCanvas implements Canvas
 {
+  interface Drawable {
+    void draw(CGBitmapContext bctx, float dx, float dy, float dw, float dh);
+    void draw(CGBitmapContext bctx, float sx, float sy, float sw, float sh,
+              float dx, float dy, float dw, float dh);
+  }
+
   private final int width, height;
 
   private boolean isDirty;
@@ -135,15 +141,7 @@ public class IOSCanvas implements Canvas
 
   @Override
   public Canvas drawImage(Image image, float dx, float dy, float dw, float dh) {
-    CGImage cgImage = ((IOSAbstractImage) image).cgImage();
-    // pesky fiddling to cope with the fact that UIImages are flipped; TODO: make sure drawing a
-    // canvas image on a canvas image does the right thing
-    dy += dh;
-    bctx.TranslateCTM(dx, dy);
-    bctx.ScaleCTM(1, -1);
-    bctx.DrawImage(new RectangleF(0, 0, dw, dh), cgImage);
-    bctx.ScaleCTM(1, -1);
-    bctx.TranslateCTM(-dx, -dy);
+    ((Drawable) image).draw(bctx, dx, dy, dw, dh);
     isDirty = true;
     return this;
   }
@@ -151,19 +149,7 @@ public class IOSCanvas implements Canvas
   @Override
   public Canvas drawImage(Image image, float dx, float dy, float dw, float dh,
                           float sx, float sy, float sw, float sh) {
-    CGImage cgImage = ((IOSAbstractImage) image).cgImage();
-    float iw = cgImage.get_Width(), ih = cgImage.get_Height();
-    float scaleX = dw/sw, scaleY = dh/sh;
-
-    // pesky fiddling to cope with the fact that UIImages are flipped; TODO: make sure drawing a
-    // canvas image on a canvas image does the right thing
-    bctx.SaveState();
-    bctx.TranslateCTM(dx, dy+dh);
-    bctx.ScaleCTM(1, -1);
-    bctx.ClipToRect(new RectangleF(0, 0, dw, dh));
-    bctx.TranslateCTM(-sx*scaleX, -(ih-(sy+sh))*scaleY);
-    bctx.DrawImage(new RectangleF(0, 0, iw*scaleX, ih*scaleY), cgImage);
-    bctx.RestoreState();
+    ((Drawable) image).draw(bctx, dx, dy, dw, dh, sx, sy, sw, sh);
     isDirty = true;
     return this;
   }

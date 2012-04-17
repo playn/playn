@@ -78,6 +78,11 @@ class AndroidImage extends ImageGL implements AndroidGLContext.Refreshable {
   }
 
   @Override
+  public Region subImage(float x, float y, float width, float height) {
+    return new AndroidImageRegion(ctx, this, x, y, width, height);
+  }
+
+  @Override
   protected void updateTexture(GLContext ctx, Object tex) {
     this.ctx.updateTexture((Integer)tex, bitmap);
   }

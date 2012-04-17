@@ -17,22 +17,29 @@ package playn.html;
 
 import com.google.gwt.canvas.dom.client.CanvasPattern;
 import com.google.gwt.canvas.dom.client.Context2d;
+import com.google.gwt.dom.client.ImageElement;
 
 import playn.core.gl.GLPattern;
 import playn.core.gl.ImageGL;
 
 class HtmlPattern implements GLPattern {
 
-  private final HtmlImage image;
+  private final ImageGL image;
+  private final ImageElement patimg;
   private CanvasPattern pattern;
 
   HtmlPattern(HtmlImage image) {
+    this(image, image.img);
+  }
+
+  HtmlPattern(ImageGL image, ImageElement patimg) {
     this.image = image;
+    this.patimg = patimg;
   }
 
   public CanvasPattern pattern(Context2d ctx) {
     if (pattern == null) {
-      pattern = ctx.createPattern(image.img, Context2d.Repetition.REPEAT);
+      pattern = ctx.createPattern(patimg, Context2d.Repetition.REPEAT);
     }
     return pattern;
   }

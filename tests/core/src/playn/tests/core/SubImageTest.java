@@ -24,6 +24,7 @@ public class SubImageTest extends Test {
 
   @Override
   public void init() {
+    // draw subimages of a simple static image
     Image pea = assets().getImage("images/pea.png");
     fragment(pea, 10, 10);
 
@@ -33,7 +34,6 @@ public class SubImageTest extends Test {
     Canvas canvas = cimg.canvas();
     canvas.setFillColor(0xFF99CCFF);
     canvas.fillCircle(r, r, r);
-
     fragment(cimg, 200, 10);
 
     // tile a sub-image, oh my!
@@ -43,6 +43,21 @@ public class SubImageTest extends Test {
     tiled.setRepeatY(true);
     tiled.setSize(100, 100);
     graphics().rootLayer().addAt(tiled, 10, 150);
+
+    // draw a subimage to a canvas
+    float phw = pw/2, phh = ph/2;
+    CanvasImage split = graphics().createImage(pea.width(), pea.height());
+    split.canvas().drawImage(pea.subImage(0, 0, phw, phh), phw, phh);
+    split.canvas().drawImage(pea.subImage(phw, 0, phw, phh), 0, phh);
+    split.canvas().drawImage(pea.subImage(0, phh, phw, phh), phw, 0);
+    split.canvas().drawImage(pea.subImage(phw, phh, phw, phh), 0, 0);
+    graphics().rootLayer().addAt(graphics().createImageLayer(split), 130, 150);
+
+    // use a subimage as a fill pattern
+    CanvasImage pat = graphics().createImage(100, 100);
+    pat.canvas().setFillPattern(pea.subImage(0, phw/2, pw, phw).toPattern());
+    pat.canvas().fillRect(0, 0, 100, 100);
+    graphics().rootLayer().addAt(graphics().createImageLayer(pat), 10, 270);
   }
 
   protected void fragment (Image image, float ox, float oy) {

@@ -43,7 +43,12 @@ public class IOSImage extends IOSAbstractImage
   }
 
   @Override
-  CGImage cgImage() {
+  public Region subImage(float x, float y, float width, float height) {
+    return new IOSImageRegion(this, x, y, width, height);
+  }
+
+  @Override
+  protected CGImage cgImage() {
     return image.get_CGImage();
   }
 

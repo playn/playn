@@ -21,11 +21,11 @@ import playn.core.Image;
 import playn.core.Pattern;
 import playn.core.ResourceCallback;
 
-public class ImageRegionGL extends ImageGL implements Image.Region {
+public abstract class ImageRegionGL extends ImageGL implements Image.Region {
 
-  private ImageGL parent;
-  private float x, y;
-  private int width, height;
+  protected final ImageGL parent;
+  protected final float x, y;
+  protected final int width, height;
 
   public ImageRegionGL(ImageGL parent, float x, float y, float width, float height) {
     this.parent = parent;
@@ -102,11 +102,6 @@ public class ImageRegionGL extends ImageGL implements Image.Region {
         callback.error(err);
       }
     });
-  }
-
-  @Override
-  public Pattern toPattern() {
-    throw new UnsupportedOperationException("TODO");
   }
 
   @Override

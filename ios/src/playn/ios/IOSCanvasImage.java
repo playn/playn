@@ -60,7 +60,7 @@ public class IOSCanvasImage extends IOSAbstractImage implements CanvasImage
   }
 
   @Override
-  CGImage cgImage() {
+  protected CGImage cgImage() {
     return canvas.cgImage();
   }
 

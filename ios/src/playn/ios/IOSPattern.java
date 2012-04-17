@@ -16,8 +16,6 @@
 package playn.ios;
 
 import cli.MonoTouch.CoreGraphics.CGColor;
-import cli.MonoTouch.UIKit.UIColor;
-import cli.MonoTouch.UIKit.UIImage;
 
 import playn.core.gl.GLPattern;
 import playn.core.gl.ImageGL;
@@ -25,12 +23,11 @@ import playn.core.gl.ImageGL;
 class IOSPattern implements GLPattern
 {
   CGColor colorWithPattern;
-  IOSAbstractImage image;
+  private ImageGL image;
 
-  IOSPattern(IOSAbstractImage image) {
+  IOSPattern(ImageGL image, CGColor colorWithPattern) {
     this.image = image;
-    // this is a circuitous route, but I'm not savvy enough to find a more direct one
-    this.colorWithPattern = UIColor.FromPatternImage(new UIImage(image.cgImage())).get_CGColor();
+    this.colorWithPattern = colorWithPattern;
   }
 
   @Override

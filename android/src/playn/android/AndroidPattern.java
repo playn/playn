@@ -15,6 +15,7 @@
  */
 package playn.android;
 
+import android.graphics.Bitmap;
 import android.graphics.BitmapShader;
 import android.graphics.Shader;
 
@@ -28,8 +29,12 @@ class AndroidPattern implements Pattern, GLPattern {
   final BitmapShader shader;
 
   AndroidPattern(AndroidImage image) {
+    this(image, image.bitmap());
+  }
+
+  AndroidPattern(AndroidImage image, Bitmap bitmap) {
     this.image = image;
-    shader = new BitmapShader(image.bitmap(), Shader.TileMode.REPEAT, Shader.TileMode.REPEAT);
+    this.shader = new BitmapShader(bitmap, Shader.TileMode.REPEAT, Shader.TileMode.REPEAT);
   }
 
   @Override

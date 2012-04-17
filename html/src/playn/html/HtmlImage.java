@@ -18,9 +18,12 @@ package playn.html;
 import com.google.gwt.canvas.dom.client.CanvasPattern;
 import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.dom.client.CanvasElement;
+import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.ImageElement;
 import com.google.gwt.dom.client.NativeEvent;
 import com.google.gwt.webgl.client.WebGLTexture;
+
+import pythagoras.f.MathUtil;
 
 import playn.core.Image;
 import playn.core.Pattern;
@@ -28,7 +31,7 @@ import playn.core.ResourceCallback;
 import playn.core.gl.GLContext;
 import playn.core.gl.ImageGL;
 
-class HtmlImage extends ImageGL {
+class HtmlImage extends ImageGL implements HtmlCanvas.Drawable {
 
   private static native boolean isComplete(ImageElement img) /*-{
     return img.complete;
@@ -86,7 +89,24 @@ class HtmlImage extends ImageGL {
 
   @Override
   public Pattern toPattern() {
+    // TODO: if we're not ready, this will go haywire, should we except? log a warning?
     return new HtmlPattern(this);
+  }
+
+  @Override
+  public Region subImage(float x, float y, float width, float height) {
+    return new HtmlImageRegion(this, x, y, width, height);
+  }
+
+  @Override
+  public void draw(Context2d ctx, float x, float y, float width, float height) {
+    draw(ctx, 0, 0, width(), height(), x, y, width, height);
+  }
+
+  @Override
+  public void draw(Context2d ctx, float sx, float sy, float sw, float sh,
+            float dx, float dy, float dw, float dh) {
+    ctx.drawImage(img, sx, sy, sw, sh, dx, dy, dw, dh);
   }
 
   @Override
@@ -111,12 +131,11 @@ class HtmlImage extends ImageGL {
     return ctx.createPattern(img, repeat);
   }
 
-  void draw(Context2d ctx, float x, float y, float width, float height) {
-    draw(ctx, 0, 0, width(), height(), x, y, width, height);
-  }
-
-  void draw(Context2d ctx, float sx, float sy, float sw, float sh,
-            float dx, float dy, float dw, float dh) {
-    ctx.drawImage(img, sx, sy, sw, sh, dx, dy, dw, dh);
+  ImageElement subImageElement(float x, float y, float width, float height) {
+    CanvasElement canvas = Document.get().createElement("canvas").<CanvasElement>cast();
+    canvas.setWidth(MathUtil.iceil(width));
+    canvas.setHeight(MathUtil.iceil(height));
+    canvas.getContext2d().drawImage(img, x, y, width, height, 0, 0, width, height);
+    return canvas.cast();
   }
 }

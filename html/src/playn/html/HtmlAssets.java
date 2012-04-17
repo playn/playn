@@ -56,12 +56,6 @@ public class HtmlAssets extends AbstractCachingAssets {
   private Map<String, AutoClientBundleWithLookup> clientBundles =
     new HashMap<String, AutoClientBundleWithLookup>();
 
-  private HtmlGraphics graphics;
-
-  public HtmlAssets(HtmlGraphics graphics) {
-    this.graphics = graphics;
-  }
-
   public void addClientBundle(String regExp, AutoClientBundleWithLookup clientBundle) {
     clientBundles.put(regExp, clientBundle);
   }
@@ -261,7 +255,7 @@ public class HtmlAssets extends AbstractCachingAssets {
      */
     setCrossOrigin(img, "anonymous");
     img.setSrc(url);
-    return graphics.createImage(img);
+    return new HtmlImage(img);
   }
 
   /**

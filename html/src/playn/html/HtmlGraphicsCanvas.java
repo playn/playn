@@ -17,9 +17,7 @@ import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.dom.client.CanvasElement;
 import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.Element;
-import com.google.gwt.dom.client.ImageElement;
 
-import playn.core.CanvasImage;
 import playn.core.CanvasLayer;
 import playn.core.GroupLayer;
 import playn.core.Image;
@@ -38,11 +36,6 @@ class HtmlGraphicsCanvas extends HtmlGraphics {
     rootElement.appendChild(canvas);
     ctx = canvas.getContext2d();
     rootLayer = new HtmlGroupLayerCanvas();
-  }
-
-  @Override
-  public CanvasImage createImage(int w, int h) {
-    return new HtmlCanvasImageCanvas(new HtmlCanvas(w, h));
   }
 
   @Override @Deprecated
@@ -106,11 +99,6 @@ class HtmlGraphicsCanvas extends HtmlGraphics {
   @Override
   Element rootElement() {
     return canvas;
-  }
-
-  @Override
-  HtmlImage createImage(ImageElement img) {
-    return new HtmlImageCanvas(img);
   }
 
   @Override
