@@ -15,6 +15,7 @@
  */
 package playn.android;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -25,8 +26,11 @@ import playn.core.Sound;
 
 class AndroidAudio implements Audio {
   private List<AndroidSound> sounds = new ArrayList<AndroidSound>();
+  private File cacheDir;
 
-  public AndroidAudio() { }
+  public AndroidAudio(GameActivity activity) {
+    cacheDir = activity.getFilesDir();
+  }
 
   Sound createSound(String path, InputStream in) throws IOException {
     String extension = path.substring(path.lastIndexOf('.'));
@@ -39,7 +43,7 @@ class AndroidAudio implements Audio {
      * have written, so we'll use it here regardless of format.
      */
     try {
-      sound = new AndroidCompressedSound(in, extension);
+      sound = new AndroidCompressedSound(cacheDir, in, extension);
       sounds.add(sound);
     }catch (IOException e) {
       sound = null;

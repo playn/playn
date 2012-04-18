@@ -23,8 +23,8 @@ class AndroidCanvasImage extends AndroidImage implements CanvasImage {
 
   private final AndroidCanvas canvas;
 
-  AndroidCanvasImage(AndroidGLContext ctx, int width, int height, boolean alpha) {
-    super(ctx, AndroidPlatform.instance.graphics().createBitmap(width, height, alpha));
+  AndroidCanvasImage(AndroidGraphics graphics, int width, int height, boolean alpha) {
+    super(graphics.ctx, graphics.createBitmap(width, height, alpha));
     this.canvas = new AndroidCanvas(bitmap());
   }
 

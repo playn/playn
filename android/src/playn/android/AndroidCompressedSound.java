@@ -38,8 +38,8 @@ public class AndroidCompressedSound extends AndroidSound {
   private int position;
   private MediaPlayer mp;
 
-  public AndroidCompressedSound(InputStream in, String extension) throws IOException {
-    cachedFile = new File(AndroidPlatform.instance.activity.getFilesDir(), "sound-" + Integer.toHexString(hashCode())
+  public AndroidCompressedSound(File cacheDir, InputStream in, String extension) throws IOException {
+    cachedFile = new File(cacheDir, "sound-" + Integer.toHexString(hashCode())
         + extension);
     try {
       FileOutputStream out = new FileOutputStream(cachedFile);

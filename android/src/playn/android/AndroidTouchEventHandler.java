@@ -119,7 +119,6 @@ class AndroidTouchEventHandler {
    * @return Processed array of {@link AndroidTouchEventImpl}s which share a preventDefault state.
    */
   private Touch.Event[] parseMotionEvent(MotionEvent event, boolean[] preventDefault) {
-    calculateOffsets();
     int eventPointerCount = event.getPointerCount();
     Touch.Event[] touches = new Touch.Event[eventPointerCount];
     double time = event.getEventTime();
@@ -137,8 +136,7 @@ class AndroidTouchEventHandler {
     return touches;
   }
 
-  void calculateOffsets() {
-    Graphics graphics = AndroidPlatform.instance.graphics();
+  void calculateOffsets(AndroidGraphics graphics) {
     xScreenOffset = -(graphics.screenWidth() - graphics.width()) / 2;
     yScreenOffset = -(graphics.screenHeight() - graphics.height()) / 2;
   }

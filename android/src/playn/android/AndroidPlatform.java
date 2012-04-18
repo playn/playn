@@ -28,16 +28,15 @@ import playn.core.json.JsonImpl;
 public class AndroidPlatform implements Platform {
   public static final boolean DEBUG_LOGS = true;
 
-  static AndroidPlatform instance;
-  private static AndroidGL20 gl20;
-
-  public static void register(AndroidGL20 _gl20, GameActivity activity) {
-    gl20 = _gl20;
-    PlayN.setPlatform(new AndroidPlatform(activity));
+  public static AndroidPlatform register(AndroidGL20 gl20, GameActivity activity) {
+    AndroidPlatform platform = new AndroidPlatform(activity, gl20);
+    PlayN.setPlatform(platform);
+    return platform;
   }
 
   Game game;
   GameActivity activity;
+  private final AndroidGL20 gl20;
 
   private AndroidAudio audio;
   private AndroidGraphics graphics;
@@ -52,19 +51,20 @@ public class AndroidPlatform implements Platform {
   private AndroidAssets assets;
   private AndroidAnalytics analytics;
 
-  protected AndroidPlatform(GameActivity activity) {
-    instance = this;
+  protected AndroidPlatform(GameActivity activity, AndroidGL20 gl20) {
     this.activity = activity;
-    audio = new AndroidAudio();
-    graphics = new AndroidGraphics(gl20);
+    this.gl20 = gl20;
+
+    audio = new AndroidAudio(activity);
+    touchHandler = new AndroidTouchEventHandler(activity.gameView());
+    graphics = new AndroidGraphics(activity, gl20, touchHandler);
     json = new JsonImpl();
     keyboard = new AndroidKeyboard();
     log = new AndroidLog();
     net = new AndroidNet();
     pointer = new AndroidPointer();
     touch = new AndroidTouch();
-    touchHandler = new AndroidTouchEventHandler(activity.gameView());
-    assets = new AndroidAssets(activity.getAssets());
+    assets = new AndroidAssets(activity.getAssets(), graphics, audio);
     analytics = new AndroidAnalytics();
     storage = new AndroidStorage(activity);
   }

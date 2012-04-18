@@ -30,26 +30,22 @@ import android.view.SurfaceHolder;
 public class GameViewGL extends GLSurfaceView implements SurfaceHolder.Callback {
   private static volatile int contextId = 1;
 
-  public final AndroidGL20 gl20;
+  AndroidPlatform platform;
+
+  private final AndroidGL20 gl20;
   private final AndroidRendererGL renderer;
   private final SurfaceHolder holder;
   private GameLoop loop;
   private final GameActivity activity;
-  private AndroidGraphics gfx;
-  private AndroidKeyboard keyboard;
-  private AndroidPointer pointer;
-  private AndroidTouch touch;
-  private boolean gameInitialized = false;
   private boolean gameSizeSet = false; // Set by AndroidGraphics
 
   private class AndroidRendererGL implements Renderer {
-
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
       contextId++;
       // EGLContext lost, so surfaces need to be rebuilt and redrawn.
-      if (gfx != null) {
-        gfx.ctx.onSurfaceCreated();
+      if (platform != null) {
+        platform.graphics().ctx.onSurfaceCreated();
       }
     }
 
@@ -62,16 +58,12 @@ public class GameViewGL extends GLSurfaceView implements SurfaceHolder.Callback 
 
     @Override
     public void onDrawFrame(GL10 gl) {
-      // Wait until onDrawFrame to make sure all the metrics
-      // are in place at this point.
+      // Wait until onDrawFrame to make sure all the metrics are in place at this point.
+      boolean gameInitialized = (platform != null);
       if (!gameInitialized) {
-        AndroidPlatform.register(gl20, activity);
-        gfx = AndroidPlatform.instance.graphics();
-        keyboard = AndroidPlatform.instance.keyboard();
-        pointer = AndroidPlatform.instance.pointer();
-        touch = AndroidPlatform.instance.touch();
+        platform = AndroidPlatform.register(gl20, activity);
         activity.main();
-        loop = new GameLoop();
+        loop = new GameLoop(platform);
         loop.start();
         gameInitialized = true;
       }
@@ -81,8 +73,8 @@ public class GameViewGL extends GLSurfaceView implements SurfaceHolder.Callback 
     }
 
     void onPause() {
-      if (gfx != null) {
-        gfx.ctx.onSurfaceLost();
+      if (platform != null) {
+        platform.graphics().ctx.onSurfaceLost();
       }
     }
   }
@@ -106,7 +98,6 @@ public class GameViewGL extends GLSurfaceView implements SurfaceHolder.Callback 
   @Override
   public void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
     // Default to filling all the available space when the game is first loads
-    Platform platform = activity.platform();
     if (platform != null && gameSizeSet) {
       int width = platform.graphics().width();
       int height = platform.graphics().height();
@@ -169,7 +160,7 @@ public class GameViewGL extends GLSurfaceView implements SurfaceHolder.Callback 
     queueEvent(new Runnable() {
       @Override
       public void run() {
-        keyboard.onKeyDown(event);
+        platform.keyboard().onKeyDown(event);
       }
     });
   }
@@ -178,7 +169,7 @@ public class GameViewGL extends GLSurfaceView implements SurfaceHolder.Callback 
     queueEvent(new Runnable() {
       @Override
       public void run() {
-        keyboard.onKeyTyped(event);
+        platform.keyboard().onKeyTyped(event);
       }
     });
   }
@@ -187,7 +178,7 @@ public class GameViewGL extends GLSurfaceView implements SurfaceHolder.Callback 
     queueEvent(new Runnable() {
       @Override
       public void run() {
-        keyboard.onKeyUp(event);
+        platform.keyboard().onKeyUp(event);
       }
     });
   }
@@ -196,7 +187,7 @@ public class GameViewGL extends GLSurfaceView implements SurfaceHolder.Callback 
     queueEvent(new Runnable() {
       @Override
       public void run() {
-        pointer.onPointerStart(event);
+        platform.pointer().onPointerStart(event);
       }
     });
   }
@@ -205,7 +196,7 @@ public class GameViewGL extends GLSurfaceView implements SurfaceHolder.Callback 
     queueEvent(new Runnable() {
       @Override
       public void run() {
-        pointer.onPointerDrag(event);
+        platform.pointer().onPointerDrag(event);
       }
     });
   }
@@ -214,7 +205,7 @@ public class GameViewGL extends GLSurfaceView implements SurfaceHolder.Callback 
     queueEvent(new Runnable() {
       @Override
       public void run() {
-        pointer.onPointerEnd(event);
+        platform.pointer().onPointerEnd(event);
       }
     });
   }
@@ -223,7 +214,7 @@ public class GameViewGL extends GLSurfaceView implements SurfaceHolder.Callback 
     queueEvent(new Runnable() {
       @Override
       public void run() {
-        touch.onTouchStart(touches);
+        platform.touch().onTouchStart(touches);
       }
     });
   }
@@ -232,7 +223,7 @@ public class GameViewGL extends GLSurfaceView implements SurfaceHolder.Callback 
     queueEvent(new Runnable() {
       @Override
       public void run() {
-        touch.onTouchMove(touches);
+        platform.touch().onTouchMove(touches);
       }
     });
   }
@@ -241,7 +232,7 @@ public class GameViewGL extends GLSurfaceView implements SurfaceHolder.Callback 
     queueEvent(new Runnable() {
       @Override
       public void run() {
-        touch.onTouchEnd(touches);
+        platform.touch().onTouchEnd(touches);
       }
     });
   }

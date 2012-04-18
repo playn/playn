@@ -24,7 +24,7 @@ public class GameLoop implements Runnable {
   private static final int MAX_DELTA = 100;
 
   private AtomicBoolean running = new AtomicBoolean();
-  private AndroidGraphics gfx;
+  private final AndroidPlatform platform;
 
   private long timeOffset = System.currentTimeMillis();
 
@@ -35,15 +35,15 @@ public class GameLoop implements Runnable {
   private float totalTime;
   private int framesPainted;
 
-  public GameLoop() {
-    gfx = AndroidPlatform.instance.graphics();
+  public GameLoop(AndroidPlatform platform) {
+    this.platform = platform;
   }
 
   public void start() {
     if (!running.get()) {
       if (AndroidPlatform.DEBUG_LOGS)
         log().debug("Starting game loop");
-      this.updateRate = AndroidPlatform.instance.game.updateRate();
+      this.updateRate = platform.game.updateRate();
       running.set(true);
     }
   }
@@ -67,12 +67,12 @@ public class GameLoop implements Runnable {
     lastTime = now;
 
     if (updateRate == 0) {
-      AndroidPlatform.instance.update(delta);
+      platform.update(delta);
       accum = 0;
     } else {
       accum += delta;
       while (accum >= updateRate) {
-        AndroidPlatform.instance.update(updateRate);
+        platform.update(updateRate);
         accum -= updateRate;
       }
     }
@@ -101,8 +101,8 @@ public class GameLoop implements Runnable {
   }
 
   protected void paint(float paintAlpha) {
-    gfx.preparePaint();
-    AndroidPlatform.instance.game.paint(paintAlpha); // Run the game's custom painting code
-    gfx.paintLayers(); // Paint the scene graph
+    platform.graphics().preparePaint();
+    platform.game.paint(paintAlpha); // Run the game's custom painting code
+    platform.graphics().paintLayers(); // Paint the scene graph
   }
 }

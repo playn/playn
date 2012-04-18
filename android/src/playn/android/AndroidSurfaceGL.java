@@ -34,9 +34,11 @@ public class AndroidSurfaceGL extends SurfaceGL
   implements AndroidGLContext.Refreshable
 {
   private File cachedPixels;
+  private final File cacheDir;
 
-  AndroidSurfaceGL(AndroidGLContext ctx, int width, int height) {
+  AndroidSurfaceGL(File cacheDir, AndroidGLContext ctx, int width, int height) {
     super(ctx, width, height);
+    this.cacheDir = cacheDir;
     ctx.addRefreshable(this);
   }
 
@@ -78,8 +80,7 @@ public class AndroidSurfaceGL extends SurfaceGL
       ByteBuffer pixelBuffer = ByteBuffer.allocate(width * height * 4);
       actx.gl20.glReadPixels(0, 0, width, height, GL20.GL_RGBA, GL20.GL_UNSIGNED_BYTE, pixelBuffer);
       try {
-        cachedPixels = new File(AndroidPlatform.instance.activity.getCacheDir(),
-                                "surface-" + Integer.toHexString(hashCode()));
+        cachedPixels = new File(cacheDir, "surface-" + Integer.toHexString(hashCode()));
         FileOutputStream out = new FileOutputStream(cachedPixels);
         out.write(pixelBuffer.array());
         out.close();

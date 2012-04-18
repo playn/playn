@@ -127,7 +127,7 @@ public abstract class GameActivity extends Activity {
   }
 
   protected AndroidPlatform platform() {
-    return AndroidPlatform.instance;
+    return gameView.platform;
   }
 
   protected Context context() {
@@ -208,7 +208,7 @@ public abstract class GameActivity extends Activity {
    */
   @Override
   public boolean onTouchEvent(MotionEvent event) {
-    return AndroidPlatform.instance.touchEventHandler().onMotionEvent(event);
+    return platform().touchEventHandler().onMotionEvent(event);
   }
 
   // TODO: uncomment the remaining key codes when we upgrade to latest Android jars
