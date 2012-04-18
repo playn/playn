@@ -52,7 +52,7 @@ public class AndroidPlatform implements Platform {
   private AndroidAssets assets;
   private AndroidAnalytics analytics;
 
-  private AndroidPlatform(GameActivity activity) {
+  protected AndroidPlatform(GameActivity activity) {
     instance = this;
     this.activity = activity;
     audio = new AndroidAudio();

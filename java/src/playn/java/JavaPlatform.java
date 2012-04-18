@@ -77,7 +77,7 @@ public class JavaPlatform implements Platform {
   private int updateRate = 0;
   private Analytics analytics = new JavaAnalytics();
 
-  private JavaPlatform() {
+  protected JavaPlatform() {
     ensureFrame();
     graphics = new JavaGraphics(frame, component);
     keyboard = new JavaKeyboard(frame);

@@ -53,6 +53,7 @@ public class FlashPlatform implements Platform {
   private static final float MAX_DELTA = 100;
   private static FlashPlatform platform;
 
+  // TODO: why is this not created in register()?
   static {
     platform = new FlashPlatform();
   }
@@ -68,7 +69,6 @@ public class FlashPlatform implements Platform {
       handler.@playn.flash.EventHandler::handleEvent(Lflash/events/Event;)(e);
     }, capture);
   }-*/;
-
 
   private FlashAssets assets = new FlashAssets();
   private FlashAudio audio;
@@ -87,8 +87,7 @@ public class FlashPlatform implements Platform {
   private Storage storage;
   private Analytics analytics;
 
-  // Non-instantiable.
-  public FlashPlatform() {
+  protected FlashPlatform() {
   }
 
   public void init() {

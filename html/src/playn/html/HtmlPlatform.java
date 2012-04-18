@@ -131,8 +131,7 @@ public class HtmlPlatform implements Platform {
 
   private static AgentInfo agentInfo = computeAgentInfo();
 
-  // Non-instantiable.
-  private HtmlPlatform(Mode mode) {
+  protected HtmlPlatform(Mode mode) {
     if (!GWT.isProdMode()) {
       log.info("You are running in GWT Development Mode. "
           + "For optimal performance you may want to use an alternative method. "

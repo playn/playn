@@ -117,7 +117,7 @@ public class IOSPlatform implements Platform {
 
   private final List<Runnable> pendingActions = new ArrayList<Runnable>();
 
-  private IOSPlatform(UIApplication app, SupportedOrients orients) {
+  protected IOSPlatform(UIApplication app, SupportedOrients orients) {
     this.app = app;
     this.orients = orients;
 
