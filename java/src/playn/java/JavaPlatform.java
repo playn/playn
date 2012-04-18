@@ -85,7 +85,7 @@ public class JavaPlatform implements Platform {
     mouse = new JavaMouse(component);
   }
 
-  private void init() {
+  protected void init() {
     storage.init();
   }
 

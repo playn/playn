@@ -14,6 +14,7 @@
 package playn.java;
 
 import java.awt.EventQueue;
+import java.awt.image.BufferedImage;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -82,7 +83,7 @@ public class JavaAssets extends AbstractAssets {
   @Override
   protected Image doGetImage(String path) {
     try {
-      return new JavaStaticImage(ImageIO.read(requireResource(pathPrefix + path)));
+      return createImage(ImageIO.read(requireResource(pathPrefix + path)));
     } catch (Exception e) {
       PlayN.log().warn("Could not load image at " + pathPrefix + path, e);
       return new JavaErrorImage(e);
@@ -112,6 +113,10 @@ public class JavaAssets extends AbstractAssets {
         }
       }
     });
+  }
+
+  protected JavaImage createImage(BufferedImage source) {
+    return new JavaStaticImage(source);
   }
 
   protected URL requireResource(String path) throws FileNotFoundException {

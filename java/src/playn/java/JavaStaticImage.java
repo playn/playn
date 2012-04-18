@@ -22,11 +22,11 @@ import java.util.List;
 import playn.core.Image;
 import playn.core.ResourceCallback;
 
-class JavaStaticImage extends JavaImage {
+public class JavaStaticImage extends JavaImage {
 
   private List<ResourceCallback<? super Image>> callbacks;
 
-  JavaStaticImage(final BufferedImage img) {
+  public JavaStaticImage(final BufferedImage img) {
     super(null);
     JavaAssets.doResourceAction(new Runnable() {
       public void run () {
