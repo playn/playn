@@ -18,16 +18,16 @@ package playn.ios;
 import cli.MonoTouch.AVFoundation.AVAudioPlayer;
 import cli.MonoTouch.Foundation.NSError;
 import cli.MonoTouch.Foundation.NSUrl;
+
 import playn.core.Asserts;
 import playn.core.PlayN;
 import playn.core.ResourceCallback;
-
 import playn.core.Sound;
 
 /**
  * An implementation of Sound using the AVAudioPlayer.
  */
-class IOSSound implements Sound
+public class IOSSound implements Sound
 {
   private AVAudioPlayer player;
 

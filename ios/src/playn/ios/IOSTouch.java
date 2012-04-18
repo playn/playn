@@ -28,9 +28,14 @@ import pythagoras.f.Point;
 
 import playn.core.Touch;
 
-class IOSTouch implements Touch
+public class IOSTouch implements Touch
 {
   private Listener listener;
+  private final IOSGraphics graphics;
+
+  public IOSTouch(IOSGraphics graphics) {
+    this.graphics = graphics;
+  }
 
   @Override
   public void setListener(Listener listener) {
@@ -68,8 +73,7 @@ class IOSTouch implements Touch
         UITouch touch = (UITouch) obj;
         PointF loc = touch.LocationInView(touch.get_View());
         // transform the point based on our current orientation
-        IOSPlatform.instance.graphics().rootTransform.inverseTransform(
-          _scratch.set(loc.get_X(), loc.get_Y()), _scratch);
+        graphics.rootTransform.inverseTransform(_scratch.set(loc.get_X(), loc.get_Y()), _scratch);
         // TODO: sort out what to do about lack of ID
         events[_idx] = new Touch.Event.Impl(touch.get_Timestamp(), _scratch.x, _scratch.y, 0);
       }

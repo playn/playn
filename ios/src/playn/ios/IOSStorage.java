@@ -33,7 +33,7 @@ import java.util.List;
 import playn.core.PlayN;
 import playn.core.Storage;
 
-class IOSStorage implements Storage
+public class IOSStorage implements Storage
 {
   private static final String STORAGE_FILE_NAME = "playn.db";
   private static final String STORAGE_SCHEMA =
@@ -41,7 +41,7 @@ class IOSStorage implements Storage
 
   private SqliteConnection conn;
 
-  IOSStorage() {
+  public IOSStorage() {
     String docDir = Environment.GetFolderPath(SpecialFolder.wrap(SpecialFolder.Personal));
     String db = Path.Combine(docDir, STORAGE_FILE_NAME);
     boolean needCreate = !File.Exists(db);

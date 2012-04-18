@@ -32,13 +32,13 @@ import cli.System.Drawing.RectangleF;
 import playn.core.TextFormat;
 import playn.core.TextLayout;
 
-abstract class IOSTextLayout implements TextLayout {
+public abstract class IOSTextLayout implements TextLayout {
 
   protected final IOSGraphics gfx;
   protected final TextFormat format;
   protected final IOSFont font;
 
-  static IOSTextLayout create(IOSGraphics gfx, String text, TextFormat format) {
+  public static IOSTextLayout create(IOSGraphics gfx, String text, TextFormat format) {
     // normalize newlines in the text (Windows: CRLF -> LF, Mac OS pre-X: CR -> LF)
     text = text.replace("\r\n", "\n").replace('\r', '\n');
 

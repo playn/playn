@@ -19,7 +19,7 @@ import cli.System.Console;
 
 import playn.core.Log;
 
-class IOSLog implements Log
+public class IOSLog implements Log
 {
   // TODO: stack traces
 

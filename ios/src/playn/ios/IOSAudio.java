@@ -18,9 +18,8 @@ package playn.ios;
 import playn.core.Audio;
 import playn.core.Sound;
 
-class IOSAudio implements Audio
+public class IOSAudio implements Audio
 {
-
   Sound createSound (String path) {
     return new IOSSound(path);
   }

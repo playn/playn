@@ -22,7 +22,7 @@ import cli.MonoTouch.CoreText.CTFont;
 
 import playn.core.AbstractFont;
 
-class IOSFont extends AbstractFont
+public class IOSFont extends AbstractFont
 {
   /**
    * Registers a font for use when a bold, italic or bold italic variant is requested. iOS does not
@@ -48,7 +48,7 @@ class IOSFont extends AbstractFont
 
   final CTFont ctFont;
 
-  IOSFont(String name, Style style, float size) {
+  public IOSFont(String name, Style style, float size) {
     super(name, style, size);
     ctFont = new CTFont(iosName(), size);
   }

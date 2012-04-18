@@ -22,17 +22,17 @@ import cli.System.Drawing.PointF;
 
 import playn.core.Gradient;
 
-abstract class IOSGradient implements Gradient
+public abstract class IOSGradient implements Gradient
 {
   private static final CGGradientDrawingOptions gdOptions = CGGradientDrawingOptions.wrap(
     CGGradientDrawingOptions.DrawsBeforeStartLocation|CGGradientDrawingOptions.DrawsAfterEndLocation);
 
   final CGGradient cgGradient;
 
-  static class Linear extends IOSGradient {
+  public static class Linear extends IOSGradient {
     final PointF start, end;
 
-    Linear(float x0, float y0, float x1, float y1, int[] colors, float[] positions) {
+    public Linear(float x0, float y0, float x1, float y1, int[] colors, float[] positions) {
       super(colors, positions);
       this.start = new PointF(x0, y0);
       this.end = new PointF(x1, y1);
@@ -44,11 +44,11 @@ abstract class IOSGradient implements Gradient
     }
   }
 
-  static class Radial extends IOSGradient {
+  public static class Radial extends IOSGradient {
     final PointF center;
     final float r;
 
-    Radial(float x, float y, float r, int[] colors, float[] positions) {
+    public Radial(float x, float y, float r, int[] colors, float[] positions) {
       super(colors, positions);
       this.center = new PointF(x, y);
       this.r = r;

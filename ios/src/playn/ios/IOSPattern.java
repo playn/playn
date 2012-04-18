@@ -20,12 +20,12 @@ import cli.MonoTouch.CoreGraphics.CGColor;
 import playn.core.gl.GLPattern;
 import playn.core.gl.ImageGL;
 
-class IOSPattern implements GLPattern
+public class IOSPattern implements GLPattern
 {
   CGColor colorWithPattern;
   private ImageGL image;
 
-  IOSPattern(ImageGL image, CGColor colorWithPattern) {
+  public IOSPattern(ImageGL image, CGColor colorWithPattern) {
     this.image = image;
     this.colorWithPattern = colorWithPattern;
   }

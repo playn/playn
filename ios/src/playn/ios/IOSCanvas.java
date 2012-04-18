@@ -54,7 +54,7 @@ public class IOSCanvas implements Canvas
 
   private LinkedList<IOSCanvasState> states = new LinkedList<IOSCanvasState>();
 
-  IOSCanvas(int width, int height) {
+  public IOSCanvas(int width, int height) {
     this.width = width;
     this.height = height;
     states.addFirst(new IOSCanvasState());

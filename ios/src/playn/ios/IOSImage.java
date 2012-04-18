@@ -27,7 +27,7 @@ public class IOSImage extends IOSAbstractImage
 {
   private final UIImage image;
 
-  IOSImage (IOSGLContext ctx, UIImage image) {
+  public IOSImage (IOSGLContext ctx, UIImage image) {
     super(ctx);
     this.image = image;
   }

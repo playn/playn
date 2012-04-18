@@ -20,7 +20,7 @@ import cli.System.Drawing.PointF;
 
 import playn.core.Path;
 
-class IOSPath implements Path
+public class IOSPath implements Path
 {
   CGPath cgPath = new CGPath();
 

@@ -34,15 +34,17 @@ import cli.MonoTouch.UIKit.UIEvent;
 
 import playn.core.PlayN;
 
-class IOSGameView extends iPhoneOSGameView
+public class IOSGameView extends iPhoneOSGameView
 {
   private static final float MAX_DELTA = 100;
 
   private DateTime lastUpdate = DateTime.get_Now();
+  private final IOSPlatform platform;
   private final float scale;
 
-  public IOSGameView(RectangleF bounds, float scale) {
+  public IOSGameView(IOSPlatform platform, RectangleF bounds, float scale) {
     super(bounds);
+    this.platform = platform;
     this.scale = scale;
 
     // TODO: I assume we want to manually manage loss of EGL context
@@ -60,7 +62,8 @@ class IOSGameView extends iPhoneOSGameView
       new cli.System.Action$$00601_$$$_Lcli__MonoTouch__Foundation__NSNotification_$$$$_(new cli.System.Action$$00601_$$$_Lcli__MonoTouch__Foundation__NSNotification_$$$$_.Method() {
         @Override
         public void Invoke(NSNotification nf) {
-          IOSPlatform.instance.onOrientationChange(UIDevice.get_CurrentDevice().get_Orientation());
+          IOSGameView.this.platform.onOrientationChange(
+            UIDevice.get_CurrentDevice().get_Orientation());
         }}));
   }
 
@@ -74,7 +77,7 @@ class IOSGameView extends iPhoneOSGameView
   protected void CreateFrameBuffer() {
     super.CreateFrameBuffer();
     // now that we're loaded, initialize the GL subsystem
-    IOSPlatform.instance.graphics().ctx.init();
+    platform.graphics().ctx.init();
   }
 
   @Override
@@ -104,7 +107,7 @@ class IOSGameView extends iPhoneOSGameView
     super.OnRenderFrame(e);
 
     MakeCurrent();
-    IOSPlatform.instance.paint();
+    platform.paint();
     SwapBuffers();
   }
 
@@ -125,7 +128,7 @@ class IOSGameView extends iPhoneOSGameView
     DateTime now = DateTime.get_Now();
     float delta = Math.min(MAX_DELTA, (now.get_Ticks() - lastUpdate.get_Ticks())/10000f);
     lastUpdate = now;
-    IOSPlatform.instance.update(delta);
+    platform.update(delta);
   }
 
   @Override
@@ -141,29 +144,29 @@ class IOSGameView extends iPhoneOSGameView
   @Override
   public void TouchesBegan(NSSet touches, UIEvent event) {
     super.TouchesBegan(touches, event);
-    IOSPlatform.instance.touch().onTouchesBegan(touches, event);
-    IOSPlatform.instance.pointer().onTouchesBegan(touches, event);
+    platform.touch().onTouchesBegan(touches, event);
+    platform.pointer().onTouchesBegan(touches, event);
   }
 
   @Override
   public void TouchesMoved(NSSet touches, UIEvent event) {
     super.TouchesMoved(touches, event);
-    IOSPlatform.instance.touch().onTouchesMoved(touches, event);
-    IOSPlatform.instance.pointer().onTouchesMoved(touches, event);
+    platform.touch().onTouchesMoved(touches, event);
+    platform.pointer().onTouchesMoved(touches, event);
   }
 
   @Override
   public void TouchesEnded(NSSet touches, UIEvent event) {
     super.TouchesEnded(touches, event);
-    IOSPlatform.instance.touch().onTouchesEnded(touches, event);
-    IOSPlatform.instance.pointer().onTouchesEnded(touches, event);
+    platform.touch().onTouchesEnded(touches, event);
+    platform.pointer().onTouchesEnded(touches, event);
   }
 
   @Override
   public void TouchesCancelled(NSSet touches, UIEvent event) {
     super.TouchesCancelled(touches, event);
-    IOSPlatform.instance.touch().onTouchesCancelled(touches, event);
-    IOSPlatform.instance.pointer().onTouchesCancelled(touches, event);
+    platform.touch().onTouchesCancelled(touches, event);
+    platform.pointer().onTouchesCancelled(touches, event);
   }
 
   @ExportAttribute.Annotation("layerClass")

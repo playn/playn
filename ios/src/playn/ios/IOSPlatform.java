@@ -93,8 +93,6 @@ public class IOSPlatform implements Platform {
     return platform;
   }
 
-  static IOSPlatform instance;
-
   private IOSAudio audio;
   private IOSGraphics graphics;
   private Json json;
@@ -127,20 +125,19 @@ public class IOSPlatform implements Platform {
     // create log first so that other services can use it during initialization
     log = new IOSLog();
 
-    instance = this;
     audio = new IOSAudio();
     graphics = new IOSGraphics(bounds, scale);
     json = new JsonImpl();
     keyboard = new IOSKeyboard();
-    net = new IOSNet();
-    pointer = new IOSPointer();
-    touch = new IOSTouch();
-    assets = new IOSAssets();
+    net = new IOSNet(this);
+    pointer = new IOSPointer(graphics);
+    touch = new IOSTouch(graphics);
+    assets = new IOSAssets(graphics, audio);
     analytics = new IOSAnalytics();
     storage = new IOSStorage();
 
     mainWindow = new UIWindow(bounds);
-    mainWindow.Add(gameView = new IOSGameView(bounds, scale));
+    mainWindow.Add(gameView = new IOSGameView(this, bounds, scale));
 
     // configure our orientation to a supported default, a notification will come in later that
     // will adjust us to the devices current orientation

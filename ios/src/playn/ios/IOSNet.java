@@ -25,8 +25,14 @@ import cli.System.Net.WebResponse;
 import playn.core.Net;
 import playn.core.util.Callback;
 
-class IOSNet implements Net
+public class IOSNet implements Net
 {
+  private final IOSPlatform platform;
+
+  public IOSNet(IOSPlatform platform) {
+    this.platform = platform;
+  }
+
   @Override
   public void get(String url, Callback<String> callback) {
     final WebRequest req = WebRequest.Create(url);
@@ -61,7 +67,7 @@ class IOSNet implements Net
           WebResponse rsp = req.EndGetResponse(result);
           reader = new StreamReader(rsp.GetResponseStream());
           final String data = reader.ReadToEnd();
-          IOSPlatform.instance.queueAction(new Runnable() {
+          platform.queueAction(new Runnable() {
             public void run () {
               callback.onSuccess(data);
             }
@@ -77,7 +83,7 @@ class IOSNet implements Net
   }
 
   private void queueFailure (final Callback<?> callback, final Throwable t) {
-    IOSPlatform.instance.queueAction(new Runnable() {
+    platform.queueAction(new Runnable() {
       public void run () {
         callback.onFailure(t);
       }

@@ -29,7 +29,7 @@ import playn.core.Keyboard;
 import playn.core.PlayN;
 import playn.core.util.Callback;
 
-class IOSKeyboard implements Keyboard
+public class IOSKeyboard implements Keyboard
 {
   @Override
   public void setListener(Listener listener) {

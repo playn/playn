@@ -29,7 +29,7 @@ import playn.core.gl.ImageGL;
 /**
  * Provides some shared bits for {@link IOSImage} and {@link IOSCanvasImage}.
  */
-abstract class IOSAbstractImage extends ImageGL implements Image, IOSCanvas.Drawable
+public abstract class IOSAbstractImage extends ImageGL implements Image, IOSCanvas.Drawable
 {
   protected final IOSGLContext ctx;
 

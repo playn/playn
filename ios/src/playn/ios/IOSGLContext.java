@@ -33,7 +33,7 @@ import playn.core.gl.GLContext;
 import playn.core.gl.GLShader;
 import playn.core.gl.GroupLayerGL;
 
-class IOSGLContext extends GLContext
+public class IOSGLContext extends GLContext
 {
   public static final boolean CHECK_ERRORS = false;
 
@@ -45,12 +45,12 @@ class IOSGLContext extends GLContext
   private GLShader.Texture texShader;
   private GLShader.Color colorShader;
 
-  IOSGLContext(int screenWidth, int screenHeight) {
+  public IOSGLContext(int screenWidth, int screenHeight) {
     fbufWidth = viewWidth = screenWidth;
     fbufHeight = viewHeight = screenHeight;
   }
 
-  void init() {
+  public void init() {
     reinitGL();
   }
 

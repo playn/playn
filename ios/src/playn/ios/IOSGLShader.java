@@ -32,7 +32,7 @@ public class IOSGLShader extends IndexedTrisShader {
     private int uTexture, uAlpha, lastTex;
     private float lastAlpha;
 
-    Texture(IOSGLContext ctx) {
+    public Texture(IOSGLContext ctx) {
       super(ctx, TEX_FRAG_SHADER);
       uTexture = GL.GetUniformLocation(program, "u_Texture");
       uAlpha = GL.GetUniformLocation(program, "u_Alpha");
@@ -68,7 +68,7 @@ public class IOSGLShader extends IndexedTrisShader {
     private int uColor, uAlpha, lastColor;
     private float lastAlpha;
 
-    Color(IOSGLContext ctx) {
+    public Color(IOSGLContext ctx) {
       super(ctx, COLOR_FRAG_SHADER);
       uColor = GL.GetUniformLocation(program, "u_Color");
       uAlpha = GL.GetUniformLocation(program, "u_Alpha");
