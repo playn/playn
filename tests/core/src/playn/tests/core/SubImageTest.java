@@ -3,11 +3,13 @@
 
 package playn.tests.core;
 
-import playn.core.GroupLayer;
 import playn.core.Canvas;
 import playn.core.CanvasImage;
+import playn.core.GroupLayer;
 import playn.core.Image;
 import playn.core.ImageLayer;
+import playn.core.ImmediateLayer;
+import playn.core.Surface;
 import static playn.core.PlayN.*;
 
 public class SubImageTest extends Test {
@@ -36,16 +38,17 @@ public class SubImageTest extends Test {
     canvas.fillCircle(r, r, r);
     fragment(cimg, 200, 10);
 
+    float pw = pea.width(), ph = pea.height(), phw = pw/2, phh = ph/2;
+    final Image.Region peamid = pea.subImage(0, phh/2, pw, phh);
+
     // tile a sub-image, oh my!
-    float pw = pea.width(), ph = pea.height();
-    ImageLayer tiled = graphics().createImageLayer(pea.subImage(0, ph/4, pw, ph/2));
+    ImageLayer tiled = graphics().createImageLayer(peamid);
     tiled.setRepeatX(true);
     tiled.setRepeatY(true);
     tiled.setSize(100, 100);
     graphics().rootLayer().addAt(tiled, 10, 150);
 
     // draw a subimage to a canvas
-    float phw = pw/2, phh = ph/2;
     CanvasImage split = graphics().createImage(pea.width(), pea.height());
     split.canvas().drawImage(pea.subImage(0, 0, phw, phh), phw, phh);
     split.canvas().drawImage(pea.subImage(phw, 0, phw, phh), 0, phh);
@@ -55,12 +58,23 @@ public class SubImageTest extends Test {
 
     // use a subimage as a fill pattern
     CanvasImage pat = graphics().createImage(100, 100);
-    pat.canvas().setFillPattern(pea.subImage(0, phw/2, pw, phw).toPattern());
+    pat.canvas().setFillPattern(peamid.toPattern());
     pat.canvas().fillRect(0, 0, 100, 100);
     graphics().rootLayer().addAt(graphics().createImageLayer(pat), 10, 270);
+
+    // draw a subimage in an immediate layer
+    ImmediateLayer imm = graphics().createImmediateLayer(new ImmediateLayer.Renderer() {
+      public void render(Surface surf) {
+        surf.drawImage(peamid, 0, 0);
+        surf.drawImage(peamid, peamid.width(), 0);
+        surf.drawImage(peamid, 0, peamid.height());
+        surf.drawImage(peamid, peamid.width(), peamid.height());
+      }
+    });
+    graphics().rootLayer().addAt(imm, 130, 200);
   }
 
-  protected void fragment (Image image, float ox, float oy) {
+  protected void fragment(Image image, float ox, float oy) {
     int hw = image.width()/2, hh = image.height()/2;
     Image ul = image.subImage(0, 0, hw, hh);
     Image ur = image.subImage(hw, 0, hw, hh);
@@ -85,7 +99,7 @@ public class SubImageTest extends Test {
     graphics().rootLayer().addAt(group, ox, oy);
   }
 
-  protected ImageLayer scaleLayer (ImageLayer layer, float scale) {
+  protected ImageLayer scaleLayer(ImageLayer layer, float scale) {
     layer.setScale(scale);
     return layer;
   }

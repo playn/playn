@@ -94,6 +94,18 @@ public abstract class ImageGL implements Image {
   }
 
   /**
+   * Draws this image with the supplied transform, and source and target dimensions.
+   */
+  void draw(GLContext ctx, InternalTransform xform, float dx, float dy, float dw, float dh,
+            float sx, float sy, float sw, float sh, float alpha) {
+    Object tex = ensureTexture(ctx, false, false);
+    if (tex != null) {
+      ctx.drawTexture(tex, texWidth(false), texHeight(false), xform,
+                      dx, dy, dw, dh, x()+sx, y()+sy, sw, sh, alpha);
+    }
+  }
+
+  /**
    * The x offset into our source image at which this image's region starts.
    */
   protected float x() {
