@@ -217,49 +217,29 @@ public class Settings {
 	 * A body cannot sleep if its angular velocity is above this tolerance.
 	 */
 	public static float angularSleepTolerance = (2.0f / 180.0f * PI);
-
-	/**
-	 * Defines our friction mixing law.
-	 */
-	public static Mixer frictionMixer = new Mixer () {
-		public float mix (float friction1, float friction2) {
-			return MathUtils.sqrt(friction1 * friction2);
-		}
-	};
-
-	/**
-	 * Defines our restitution mixing law.
-	 */
-	public static Mixer restitutionMixer = new Mixer () {
-		public float mix (float restitution1, float restitution2) {
-			return restitution1 > restitution2 ? restitution1 : restitution2;
-		}
-	};
 	
 	/**
-	 * Friction mixing law. Feel free to customize this by setting frictionMixer.
+	 * Friction mixing law. Feel free to customize this.
+	 * TODO djm: add customization
 	 * 
 	 * @param friction1
 	 * @param friction2
 	 * @return
 	 */
 	public static final float mixFriction(float friction1, float friction2) {
-		return frictionMixer.mix(friction1, friction2);
+		return MathUtils.sqrt(friction1 * friction2);
 	}
 	
 	/**
-	 * Restitution mixing law. Feel free to customize this by setting restitutionMixer.
+	 * Restitution mixing law. Feel free to customize this.
+	 * TODO djm: add customization
 	 * 
 	 * @param restitution1
 	 * @param restitution2
 	 * @return
 	 */
 	public static final float mixRestitution(float restitution1, float restitution2) {
-		return restitutionMixer.mix(restitution1, restitution2);
-	}
-
-	public static interface Mixer {
-		float mix (float val1, float val2);
+		return restitution1 > restitution2 ? restitution1 : restitution2;
 	}
 
 	/**
