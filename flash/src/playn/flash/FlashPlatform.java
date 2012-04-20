@@ -109,12 +109,6 @@ public class FlashPlatform implements Platform {
     return assets;
   }
 
-  /** @deprecated Use {@link #assets}. */
-  @Deprecated
-  public FlashAssets assetManager() {
-    return assets;
-  }
-
   @Override
   public Audio audio() {
     return audio;

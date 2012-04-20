@@ -195,12 +195,6 @@ public class HtmlPlatform implements Platform {
     return assets;
   }
 
-  /** @deprecated Use {@link #assets}. */
-  @Deprecated
-  public HtmlAssets assetManager() {
-    return assets;
-  }
-
   @Override
   public Audio audio() {
     return audio;

@@ -150,12 +150,6 @@ public class JavaPlatform implements Platform {
     return assets;
   }
 
-  /** @deprecated Use {@link #assets}. */
-  @Deprecated
-  public JavaAssets assetManager() {
-    return assets;
-  }
-
   @Override
   public float random() {
     return (float) Math.random();

@@ -74,12 +74,6 @@ public class AndroidPlatform implements Platform {
     return assets;
   }
 
-  /** @deprecated Use {@link #assets}. */
-  @Deprecated
-  public AndroidAssets assetManager() {
-    return assets;
-  }
-
   @Override
   public AndroidAnalytics analytics() {
     return analytics;

@@ -91,15 +91,6 @@ public class PlayN {
   }
 
   /**
-   * Returns the {@link Assets} service.
-   * @deprecated Use {@link #assets}.
-   */
-  @Deprecated
-  public static Assets assetManager() {
-    return platform.assets();
-  }
-
-  /**
    * Returns the {@link Json} service.
    */
   public static Json json() {
