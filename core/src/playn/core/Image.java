@@ -47,12 +47,12 @@ public interface Image {
    */
   public interface Region extends Image {
     /**
-     * The x offset of this subimage into its parent image.
+     * The x offset (in pixels) of this subimage into its parent image.
      */
     float x();
 
     /**
-     * The y offset of this subimage into its parent image.
+     * The y offset (in pixels) of this subimage into its parent image.
      */
     float y();
 
@@ -64,6 +64,10 @@ public interface Image {
 
   /**
    * Returns an image that draws the specified sub-region of this image.
+   * @param x the x offset (in pixels) of the subimage.
+   * @param y the y offset (in pixels) of the subimage.
+   * @param width the width (in pixels) of the subimage.
+   * @param height the height (in pixels) of the subimage.
    */
   Region subImage(float x, float y, float width, float height);
 
