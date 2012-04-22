@@ -56,7 +56,6 @@
     <gwt.outputstyle>PRETTY</gwt.outputstyle>
     <gwt.modulesuffix />
     <gwt.inplace>false</gwt.inplace>
-    <gwt.soyc>false</gwt.soyc>
     <gwt.xdisable>true</gwt.xdisable>
     <gwt.draft>false</gwt.draft>
     <gwt.workers />
@@ -105,7 +104,6 @@
             <disableCastChecking>${gwt.xdisable}</disableCastChecking>
             <disableClassMetadata>${gwt.xdisable}</disableClassMetadata>
             <disableRunAsync>true</disableRunAsync>
-            <soyc>${gwt.soyc}</soyc>
             <localWorkers>${gwt.workers}</localWorkers>
             <extraJvmArgs>-Xmx256m</extraJvmArgs>
             <modules>
@@ -242,7 +240,6 @@
         <gwt.loglevel>ERROR</gwt.loglevel>
         <gwt.outputstyle>OBF</gwt.outputstyle>
         <gwt.xdisable>true</gwt.xdisable>
-        <gwt.soyc>true</gwt.soyc>
       </properties>
     </profile>
 
