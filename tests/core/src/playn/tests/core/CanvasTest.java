@@ -21,6 +21,7 @@ import playn.core.Image;
 import playn.core.ImageLayer;
 import playn.core.Layer;
 import playn.core.ResourceCallback;
+import playn.core.Path;
 import static playn.core.PlayN.*;
 
 public class CanvasTest extends Test {
@@ -120,6 +121,26 @@ public class CanvasTest extends Test {
 
     timeImg = graphics().createImage(100, 100);
     addTestLayer(100, 100, graphics().createImageLayer(timeImg));
+
+    addTestCanvas(100, 100, new Drawer() {
+      public void draw(Canvas canvas) {
+        Path path = canvas.createPath();
+        path.moveTo(10, 0);
+        path.lineTo(90, 0);
+        path.arcTo(10, 100, 10);
+        path.lineTo(100, 90);
+        path.arcTo(10, 90, 100);
+        path.lineTo(10, 100);
+        path.arcTo(10, 0, 90);
+        path.lineTo(0, 10);
+        path.arcTo(10, 0, 10);
+        path.close();
+        canvas.setFillGradient(graphics().createLinearGradient(
+                                 0, 0, 100, 100, new int[] { 0xFF0000FF, 0xFF00FF00 },
+                                 new float[] { 0, 1 }));
+        canvas.fillPath(path);
+      }
+    });
   }
 
   @Override

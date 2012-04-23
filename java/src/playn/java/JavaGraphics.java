@@ -38,18 +38,22 @@ import static playn.core.PlayN.*;
 
 public class JavaGraphics extends GraphicsGL {
 
+  private final int DEFAULT_WIDTH = 640;
+  private final int DEFAULT_HEIGHT = 480;
+
   private final GroupLayerGL rootLayer;
-  private int width, height;
+  private int width = DEFAULT_WIDTH, height = DEFAULT_HEIGHT;
   private final JavaGLContext ctx;
 
   JavaGraphics() throws LWJGLException {
+    // set the display mode to the default width/height before creating the display, otherwise
+    // LWJGL will create a full-screen window and then we'll resize it to our small window which
+    // causes annoying flashing
+    Display.setDisplayMode(new DisplayMode(DEFAULT_WIDTH, DEFAULT_HEIGHT));
     Display.create();
-    ctx = new JavaGLContext(640, 480);
+    ctx = new JavaGLContext(DEFAULT_WIDTH, DEFAULT_HEIGHT);
 
     this.rootLayer = new GroupLayerGL(ctx);
-
-    // TODO(jgw): This 640x480 stuff can't be right.
-    setSize(640, 480);
   }
 
   /**
@@ -142,8 +146,7 @@ public class JavaGraphics extends GraphicsGL {
       Display.setDisplayMode(new DisplayMode(width, height));
       ctx.setSize(width, height);
     } catch (LWJGLException e) {
-      // TODO(jgw): fatal error.
-      e.printStackTrace();
+      throw new RuntimeException(e);
     }
   }
 
