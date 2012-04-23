@@ -20,11 +20,7 @@ import java.awt.TexturePaint;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 
-import pythagoras.f.MathUtil;
-
-import playn.core.Image;
 import playn.core.Pattern;
-import playn.core.ResourceCallback;
 import playn.core.gl.ImageRegionGL;
 
 public class JavaImageRegion extends ImageRegionGL implements JavaCanvas.Drawable {

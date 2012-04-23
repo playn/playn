@@ -22,17 +22,12 @@ import org.lwjgl.LWJGLException;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
 
-import playn.core.Asserts;
 import playn.core.CanvasImage;
 import playn.core.Font;
 import playn.core.Gradient;
-import playn.core.Graphics;
 import playn.core.Image;
-import playn.core.ImageLayer;
-import playn.core.ImmediateLayer;
 import playn.core.Path;
 import playn.core.Pattern;
-import playn.core.SurfaceLayer;
 import playn.core.TextFormat;
 import playn.core.TextLayout;
 import playn.core.gl.GL20;
@@ -40,11 +35,6 @@ import playn.core.gl.GLContext;
 import playn.core.gl.GraphicsGL;
 import playn.core.gl.GroupLayerGL;
 import static playn.core.PlayN.*;
-
-import java.awt.Component;
-import java.awt.Dimension;
-
-import javax.swing.JFrame;
 
 public class JavaGraphics extends GraphicsGL {
 
