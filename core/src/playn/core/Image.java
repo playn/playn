@@ -77,17 +77,15 @@ public interface Image {
   Pattern toPattern();
 
   /**
-   * Extracts pixel data from a rectangular area of this image. 
-   * This method may perform poorly, in particular on HTML and Flash
-   * platforms - avoid using this if possible. 
-   * 
-   * The returned pixel format is 
-   * (alpha << 24 | red << 16 | green << 8 | blue),
-   * where alpha, red, green and blue are the corresponding channel 
-   * values, ranging from 0 to 255 inclusive. 
-   * 
+   * Extracts pixel data from a rectangular area of this image. This method may perform poorly, in
+   * particular on HTML and Flash platforms - avoid using this if possible.
+   *
+   * The returned pixel format is {@code (alpha << 24 | red << 16 | green << 8 | blue)}, where
+   * alpha, red, green and blue are the corresponding channel values, ranging from 0 to 255
+   * inclusive.
+   *
    * Currently not implemented for iOS.
-   * 
+   *
    * @param startX x-coordinate of the upper left corner of the area.
    * @param startY y-coordinate of the upper left corner of the area.
    * @param width width of the area.
@@ -96,5 +94,6 @@ public interface Image {
    * @param offset fill start offset in rgbArray.
    * @param scanSize number of pixels in a row in rgbArray.
    */
-  void getRgb(int startX, int startY, int width, int height, int[] rgbArray, int offset, int scanSize);
+  void getRgb(int startX, int startY, int width, int height, int[] rgbArray,
+              int offset, int scanSize);
 }

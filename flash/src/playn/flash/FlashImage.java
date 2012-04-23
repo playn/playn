@@ -89,6 +89,17 @@ class FlashImage implements Image {
     return new FlashPattern(this);
   }
 
+  @Override
+  public void getRgb(int startX, int startY, int width, int height, int[] rgbArray, int offset,
+                     int scanSize) {
+    for (int y = 0; y < height; y++) {
+      for (int x = 0; x < width; x++) {
+        rgbArray[offset + x] = imageData.getPixel32(startX + x, startY + y);
+      }
+      offset += scanSize;
+    }
+  }
+
   BitmapData bitmapData() {
     return imageData;
   }
@@ -102,17 +113,5 @@ class FlashImage implements Image {
       }
     }
     callbacks.clear();
-  }
-
-  @Override
-  public void getRgb(int startX, int startY, int width, int height,
-      int[] rgbArray, int offset, int scanSize) {
-    for (int y = 0; y < height; y++) {
-      for (int x = 0; x < width; x++) {
-        rgbArray[offset + x] = imageData.getPixel32(startX + x, startY + y);
-      }
-      offset += scanSize;
-    }
-    
   }
 }

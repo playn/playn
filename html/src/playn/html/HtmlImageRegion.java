@@ -20,8 +20,8 @@ import com.google.gwt.canvas.dom.client.Context2d;
 import playn.core.Pattern;
 import playn.core.gl.ImageRegionGL;
 
-class HtmlImageRegion extends ImageRegionGL implements HtmlCanvas.Drawable
-{
+class HtmlImageRegion extends ImageRegionGL implements HtmlCanvas.Drawable {
+
   public HtmlImageRegion(HtmlImage parent, float x, float y, float width, float height) {
     super(parent, x, y, width, height);
   }
@@ -29,6 +29,12 @@ class HtmlImageRegion extends ImageRegionGL implements HtmlCanvas.Drawable
   @Override
   public Pattern toPattern() {
     return new HtmlPattern(this, ((HtmlImage) parent).subImageElement(x, y, width, height));
+  }
+
+  @Override
+  public void getRgb(int startX, int startY, int width, int height, int[] rgbArray, int offset,
+                     int scanSize) {
+    parent.getRgb(startX + (int) x, startY + (int) y, width, height, rgbArray, offset, scanSize);
   }
 
   @Override
@@ -40,11 +46,5 @@ class HtmlImageRegion extends ImageRegionGL implements HtmlCanvas.Drawable
   public void draw(Context2d ctx, float sx, float sy, float sw, float sh,
                    float dx, float dy, float dw, float dh) {
     ((HtmlImage) parent).draw(ctx, this.x+sx, this.y+sy, sw, sh, dx, dy, dw, dh);
-  }
-
-  @Override
-  public void getRgb(int startX, int startY, int width, int height,
-      int[] rgbArray, int offset, int scanSize) {
-    parent.getRgb(startX + (int) x, startY + (int) y, width, height, rgbArray, offset, scanSize);
   }
 }

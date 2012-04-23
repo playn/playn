@@ -49,20 +49,20 @@ public abstract class IOSAbstractImage extends ImageGL implements Image, IOSCanv
   }
 
   @Override
+  public Region subImage(float x, float y, float width, float height) {
+    return new IOSImageRegion(this, x, y, width, height);
+  }
+
+  @Override
   public Pattern toPattern() {
     // this is a circuitous route, but I'm not savvy enough to find a more direct one
     return new IOSPattern(this, UIColor.FromPatternImage(new UIImage(cgImage())).get_CGColor());
   }
 
   @Override
-  public void getRgb(int startX, int startY, int width, int height, int[] rgbArray,
-                     int offset, int scanSize) {
+  public void getRgb(int startX, int startY, int width, int height, int[] rgbArray, int offset,
+                     int scanSize) {
     throw new UnsupportedOperationException("getRgb() not yet supported on iOS");
-  }
-
-  @Override
-  public Region subImage(float x, float y, float width, float height) {
-    return new IOSImageRegion(this, x, y, width, height);
   }
 
   @Override

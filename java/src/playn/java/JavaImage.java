@@ -66,6 +66,12 @@ abstract class JavaImage extends ImageGL implements JavaCanvas.Drawable {
   }
 
   @Override
+  public void getRgb(int startX, int startY, int width, int height, int[] rgbArray, int offset,
+                     int scanSize) {
+    img.getRGB(startX, startY, width, height, rgbArray, offset, scanSize);
+  }
+
+  @Override
   public void draw(Graphics2D gfx, float x, float y, float w, float h) {
     // For non-integer scaling, we have to use AffineTransform.
     AffineTransform tx = new AffineTransform(w / width(), 0f, 0f, h / height(), x, y);
@@ -78,11 +84,6 @@ abstract class JavaImage extends ImageGL implements JavaCanvas.Drawable {
     // TODO: use AffineTransform here as well?
     gfx.drawImage(img, (int)dx, (int)dy, (int)(dx + dw), (int)(dy + dh),
                   (int)sx, (int)sy, (int)(sx + sw), (int)(sy + sh), null);
-  }
-
-  @Override
-  public void getRgb(int startX, int startY, int width, int height, int[] rgbArray, int offset, int scanSize) {
-    img.getRGB(startX, startY, width, height, rgbArray, offset, scanSize);
   }
 
   @Override

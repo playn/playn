@@ -33,6 +33,12 @@ public class JavaImageRegion extends ImageRegionGL implements JavaCanvas.Drawabl
   }
 
   @Override
+  public void getRgb(int startX, int startY, int width, int height, int[] rgbArray, int offset,
+                     int scanSize) {
+    parent.getRgb(startX + (int) x, startY + (int) y, width, height, rgbArray, offset, scanSize);
+  }
+
+  @Override
   public void draw(Graphics2D gfx, float x, float y, float w, float h) {
     draw(gfx, x, y, w, h, 0, 0, width, height);
   }
@@ -45,11 +51,5 @@ public class JavaImageRegion extends ImageRegionGL implements JavaCanvas.Drawabl
 
   JavaImageRegion(JavaImage parent, float sx, float sy, float swidth, float sheight) {
     super(parent, sx, sy, swidth, sheight);
-  }
-
-  @Override
-  public void getRgb(int startX, int startY, int width, int height, int[] rgbArray,
-                     int offset, int scanSize) {
-    parent.getRgb(startX + (int) x, startY + (int) y, width, height, rgbArray, offset, scanSize);
   }
 }

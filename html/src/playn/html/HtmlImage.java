@@ -27,6 +27,7 @@ import com.google.gwt.webgl.client.WebGLTexture;
 
 import pythagoras.f.MathUtil;
 
+import playn.core.Asserts;
 import playn.core.Image;
 import playn.core.Pattern;
 import playn.core.ResourceCallback;
@@ -44,8 +45,8 @@ class HtmlImage extends ImageGL implements HtmlCanvas.Drawable {
   }-*/;
 
   ImageElement img;
-  // Used internally for getRGB
-  CanvasElement canvas;
+  CanvasElement canvas; // Used internally for getRGB
+
   HtmlImage(CanvasElement img) {
     this.canvas = img;
     fakeComplete(img);
@@ -93,8 +94,38 @@ class HtmlImage extends ImageGL implements HtmlCanvas.Drawable {
 
   @Override
   public Pattern toPattern() {
-    // TODO: if we're not ready, this will go haywire, should we except? log a warning?
+    Asserts.checkState(isReady(), "Cannot toPattern() a non-ready image");
     return new HtmlPattern(this);
+  }
+
+  @Override
+  public void getRgb(int startX, int startY, int width, int height, int[] rgbArray, int offset,
+                     int scanSize) {
+    Asserts.checkState(isReady(), "Cannot getRgb() a non-ready image");
+
+    if (canvas == null) {
+        canvas = img.getOwnerDocument().createCanvasElement();
+        canvas.setHeight(img.getHeight());
+        canvas.setWidth(img.getWidth());
+        canvas.getContext2d().drawImage(img, 0, 0);
+        // img.getOwnerDocument().getBody().appendChild(canvas);
+    }
+
+    Context2d ctx = canvas.getContext2d();
+    ImageData imageData = ctx.getImageData(startX, startY, width, height);
+    CanvasPixelArray pixelData = imageData.getData();
+    int i = 0;
+    int dst = offset;
+    for (int y = 0; y < height; y++) {
+        for (int x = 0; x < width; x ++) {
+          int r = pixelData.get(i++);
+          int g = pixelData.get(i++);
+          int b = pixelData.get(i++);
+          int a = pixelData.get(i++);
+          rgbArray [dst + x] = a << 24 | r << 16 | g << 8 | b;
+        }
+        dst += scanSize;
+    }
   }
 
   @Override
@@ -141,34 +172,5 @@ class HtmlImage extends ImageGL implements HtmlCanvas.Drawable {
     canvas.setHeight(MathUtil.iceil(height));
     canvas.getContext2d().drawImage(img, x, y, width, height, 0, 0, width, height);
     return canvas.cast();
-  }
-
-  @Override
-  public void getRgb(int startX, int startY, int width, int height, int[] rgbArray, int offset, int scanSize) {
-    if (!isReady()) {
-        throw new IllegalStateException("Image not ready");
-    }
-    if (canvas == null) {
-        canvas = img.getOwnerDocument().createCanvasElement();
-        canvas.setHeight(img.getHeight());
-        canvas.setWidth(img.getWidth());
-        canvas.getContext2d().drawImage(img, 0, 0);
-       // img.getOwnerDocument().getBody().appendChild(canvas);
-    }
-    Context2d ctx = canvas.getContext2d();
-    ImageData imageData = ctx.getImageData(startX, startY, width, height);
-    CanvasPixelArray pixelData = imageData.getData();
-    int i = 0;
-    int dst = offset;
-    for (int y = 0; y < height; y++) {
-        for (int x = 0; x < width; x ++) {
-          int r = pixelData.get(i++);
-          int g = pixelData.get(i++);
-          int b = pixelData.get(i++);
-          int a = pixelData.get(i++);
-          rgbArray [dst + x] = a << 24 | r << 16 | g << 8 | b; 
-        }
-        dst += scanSize;
-    }
   }
 }

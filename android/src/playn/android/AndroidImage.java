@@ -24,6 +24,7 @@ import playn.core.gl.GLContext;
 import playn.core.gl.ImageGL;
 
 class AndroidImage extends ImageGL implements AndroidGLContext.Refreshable {
+
   private final AndroidGLContext ctx;
   private final Bitmap bitmap;
 
@@ -73,13 +74,19 @@ class AndroidImage extends ImageGL implements AndroidGLContext.Refreshable {
   }
 
   @Override
+  public Region subImage(float x, float y, float width, float height) {
+    return new AndroidImageRegion(ctx, this, x, y, width, height);
+  }
+
+  @Override
   public Pattern toPattern() {
     return new AndroidPattern(this);
   }
 
   @Override
-  public Region subImage(float x, float y, float width, float height) {
-    return new AndroidImageRegion(ctx, this, x, y, width, height);
+  public void getRgb(int startX, int startY, int width, int height, int[] rgbArray, int offset,
+                     int scanSize) {
+    bitmap.getPixels(rgbArray, offset, scanSize, startX, startY, width, height);
   }
 
   @Override
@@ -93,11 +100,5 @@ class AndroidImage extends ImageGL implements AndroidGLContext.Refreshable {
       ctx.queueDestroyTexture(tex);
     if (reptex != null)
       ctx.queueDeleteFramebuffer(reptex);
-  }
-
-  @Override
-  public void getRgb(int startX, int startY, int width, int height,
-      int[] rgbArray, int offset, int scanSize) {
-    bitmap.getPixels(rgbArray, offset, scanSize, startX, startY, width, height);
   }
 }

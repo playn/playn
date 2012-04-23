@@ -39,6 +39,12 @@ public class IOSImageRegion extends ImageRegionGL implements IOSCanvas.Drawable
   }
 
   @Override
+  public void getRgb(int startX, int startY, int width, int height, int[] rgbArray, int offset,
+                     int scanSize) {
+    throw new UnsupportedOperationException("getRgb() not yet supported on iOS");
+  }
+
+  @Override
   public void draw(CGBitmapContext bctx, float dx, float dy, float dw, float dh) {
     ((IOSAbstractImage) parent).draw(bctx, dx, dy, dw, dh, x, y, width, height);
   }
@@ -47,11 +53,5 @@ public class IOSImageRegion extends ImageRegionGL implements IOSCanvas.Drawable
   public void draw(CGBitmapContext bctx, float dx, float dy, float dw, float dh,
                    float sx, float sy, float sw, float sh) {
     ((IOSAbstractImage) parent).draw(bctx, dx, dy, dw, dh, x+sx, y+sy, sw, sh);
-  }
-
-  @Override
-  public void getRgb(int startX, int startY, int width, int height,
-      int[] rgbArray, int offset, int scanSize) {
-    throw new UnsupportedOperationException("getRgb() not yet supported on iOS");
   }
 }
