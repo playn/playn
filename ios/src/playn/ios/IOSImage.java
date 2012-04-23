@@ -60,7 +60,7 @@ public class IOSImage extends IOSAbstractImage
   @Override
   public void getRgb(int startX, int startY, int width, int height,
       int[] rgbArray, int offset, int scanSize) {
-    throw new UnsupportedOperationException("getRgb not yet supported on iOS");
+    throw new UnsupportedOperationException("getRgb() not yet supported on iOS");
   }
   
   
