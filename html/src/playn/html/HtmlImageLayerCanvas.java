@@ -89,7 +89,8 @@ class HtmlImageLayerCanvas extends HtmlLayerCanvas implements ImageLayer {
 
   @Override @Deprecated
   public void setSourceRect(float sx, float sy, float sw, float sh) {
-    setImage(img.subImage(sx, sy, sw, sh));
+    Image source = (img instanceof Image.Region) ? ((Image.Region)img).parent() : img;
+    setImage(source.subImage(sx, sy, sw, sh));
   }
 
   @Override

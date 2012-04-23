@@ -102,7 +102,8 @@ class JavaImageLayer extends JavaLayer implements ImageLayer {
 
   @Override @Deprecated
   public void setSourceRect(float sx, float sy, float sw, float sh) {
-    setImage(image.subImage(sx, sy, sw, sh));
+    Image source = (image instanceof Image.Region) ? ((Image.Region)image).parent() : image;
+    setImage(source.subImage(sx, sy, sw, sh));
   }
 
   @Override
