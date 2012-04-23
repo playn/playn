@@ -20,8 +20,6 @@ import android.graphics.Bitmap;
 import pythagoras.f.MathUtil;
 
 import playn.core.Image;
-import playn.core.Pattern;
-import playn.core.gl.ImageRegionGL;
 
 class AndroidImageRegion extends AndroidImage implements Image.Region {
 

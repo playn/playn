@@ -48,4 +48,10 @@ public class IOSImageRegion extends ImageRegionGL implements IOSCanvas.Drawable
                    float sx, float sy, float sw, float sh) {
     ((IOSAbstractImage) parent).draw(bctx, dx, dy, dw, dh, x+sx, y+sy, sw, sh);
   }
+
+  @Override
+  public void getRgb(int startX, int startY, int width, int height,
+      int[] rgbArray, int offset, int scanSize) {
+    throw new UnsupportedOperationException("getRgb() not yet supported on iOS");
+  }
 }

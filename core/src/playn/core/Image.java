@@ -75,4 +75,6 @@ public interface Image {
    * Creates a {@link Pattern} that can be used to use this image as a fill in a canvas.
    */
   Pattern toPattern();
+
+  void getRgb(int startX, int startY, int width, int height, int[] rgbArray, int offset, int scanSize);
 }

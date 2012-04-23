@@ -41,4 +41,10 @@ class HtmlImageRegion extends ImageRegionGL implements HtmlCanvas.Drawable
                    float dx, float dy, float dw, float dh) {
     ((HtmlImage) parent).draw(ctx, this.x+sx, this.y+sy, sw, sh, dx, dy, dw, dh);
   }
+
+  @Override
+  public void getRgb(int startX, int startY, int width, int height,
+      int[] rgbArray, int offset, int scanSize) {
+    parent.getRgb(startX + (int) x, startY + (int) y, width, height, rgbArray, offset, scanSize);
+  }
 }

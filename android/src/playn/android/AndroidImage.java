@@ -94,4 +94,10 @@ class AndroidImage extends ImageGL implements AndroidGLContext.Refreshable {
     if (reptex != null)
       ctx.queueDeleteFramebuffer(reptex);
   }
+
+  @Override
+  public void getRgb(int startX, int startY, int width, int height,
+      int[] rgbArray, int offset, int scanSize) {
+    bitmap.getPixels(rgbArray, offset, scanSize, startX, startY, width, height);
+  }
 }

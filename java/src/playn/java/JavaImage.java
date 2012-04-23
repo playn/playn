@@ -81,6 +81,11 @@ abstract class JavaImage extends ImageGL implements JavaCanvas.Drawable {
   }
 
   @Override
+  public void getRgb(int startX, int startY, int width, int height, int[] rgbArray, int offset, int scanSize) {
+    img.getRGB(startX, startY, width, height, rgbArray, offset, scanSize);
+  }
+
+  @Override
   protected void updateTexture(GLContext ctx, Object tex) {
     Asserts.checkState(img != null);
     ((JavaGLContext) ctx).updateTexture((Integer) tex, img);
