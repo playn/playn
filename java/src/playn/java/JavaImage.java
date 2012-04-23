@@ -22,10 +22,11 @@ import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 
 import playn.core.Asserts;
-import playn.core.Image;
 import playn.core.Pattern;
+import playn.core.gl.GLContext;
+import playn.core.gl.ImageGL;
 
-abstract class JavaImage implements Image {
+abstract class JavaImage extends ImageGL implements JavaCanvas.Drawable {
 
   protected BufferedImage img;
 
@@ -59,23 +60,29 @@ abstract class JavaImage implements Image {
 
   @Override
   public Pattern toPattern() {
-    return new JavaPattern(this);
+    Asserts.checkState(isReady(), "Cannot generate a pattern from unready image.");
+    Rectangle2D rect = new Rectangle2D.Float(0, 0, width(), height());
+    return new JavaPattern(this, new TexturePaint(img, rect));
   }
 
-  TexturePaint createTexture(float width, float height) {
-    return new TexturePaint(img, new Rectangle2D.Float(0, 0, width, height));
-  }
-
-  void draw(Graphics2D gfx, float x, float y, float w, float h) {
+  @Override
+  public void draw(Graphics2D gfx, float x, float y, float w, float h) {
     // For non-integer scaling, we have to use AffineTransform.
     AffineTransform tx = new AffineTransform(w / width(), 0f, 0f, h / height(), x, y);
     gfx.drawImage(img, tx, null);
   }
 
-  void draw(Graphics2D gfx, float dx, float dy, float dw, float dh,
-            float sx, float sy, float sw, float sh) {
+  @Override
+  public void draw(Graphics2D gfx, float dx, float dy, float dw, float dh,
+                   float sx, float sy, float sw, float sh) {
     // TODO: use AffineTransform here as well?
     gfx.drawImage(img, (int)dx, (int)dy, (int)(dx + dw), (int)(dy + dh),
                   (int)sx, (int)sy, (int)(sx + sw), (int)(sy + sh), null);
+  }
+
+  @Override
+  protected void updateTexture(GLContext ctx, Object tex) {
+    Asserts.checkState(img != null);
+    ((JavaGLContext) ctx).updateTexture((Integer) tex, img);
   }
 }

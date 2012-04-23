@@ -16,13 +16,14 @@
 package playn.java;
 
 import java.awt.Color;
-import java.awt.Frame;
 import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.font.FontRenderContext;
 import java.awt.font.LineBreakMeasurer;
 import java.awt.font.TextAttribute;
 import java.awt.font.TextLayout;
 import java.awt.geom.Rectangle2D;
+import java.awt.image.*;
 import java.text.AttributedString;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,12 +32,15 @@ import playn.core.TextFormat;
 
 class JavaTextLayout implements playn.core.TextLayout {
 
+  private static BufferedImage dummyImage = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
+  private static FontRenderContext dummyFontContext = createDummyFRC();
+
   private float width, height;
   private TextFormat format;
   private List<TextLayout> layouts = new ArrayList<TextLayout>();
   private Color textColor, altColor;
 
-  public JavaTextLayout (Frame frame, String text, TextFormat format) {
+  public JavaTextLayout(String text, TextFormat format) {
     this.format = format;
 
     // convert our colors to Java-land
@@ -54,17 +58,9 @@ class JavaTextLayout implements playn.core.TextLayout {
     if (format.font != null) {
       astring.addAttribute(TextAttribute.FONT, ((JavaFont)format.font).jfont);
     }
-    FontRenderContext fctx;
-    Graphics2D gfx = (Graphics2D)frame.getGraphics();
-    try {
-      fctx = gfx.getFontRenderContext();
-    } finally {
-      gfx.dispose();
-      gfx = null;
-    }
 
     if (format.shouldWrap() || text.indexOf('\n') != -1) {
-      LineBreakMeasurer measurer = new LineBreakMeasurer(astring.getIterator(), fctx);
+      LineBreakMeasurer measurer = new LineBreakMeasurer(astring.getIterator(), dummyFontContext);
       char eol = '\n'; // TODO: platform line endings?
       int lastPos = text.length();
       while (measurer.getPosition() < lastPos) {
@@ -75,7 +71,7 @@ class JavaTextLayout implements playn.core.TextLayout {
         layouts.add(measurer.nextLayout(format.wrapWidth, nextRet, false));
       }
     } else {
-      layouts.add(new TextLayout(astring.getIterator(), fctx));
+      layouts.add(new TextLayout(astring.getIterator(), dummyFontContext));
     }
 
     // compute our width and height
@@ -185,5 +181,11 @@ class JavaTextLayout implements playn.core.TextLayout {
   float getWidth(Rectangle2D bounds) {
     // if our text includes a negative inset, that needs to be tacked onto the width
     return (float)(Math.max(-bounds.getX(), 0) + bounds.getWidth());
+  }
+
+  private static FontRenderContext createDummyFRC () {
+    Graphics2D gfx = dummyImage.createGraphics();
+    gfx.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+    return gfx.getFontRenderContext();
   }
 }

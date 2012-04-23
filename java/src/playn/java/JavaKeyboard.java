@@ -15,62 +15,22 @@
  */
 package playn.java;
 
-import playn.core.Key;
-import playn.core.Keyboard;
-import playn.core.util.Callback;
-
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
-class JavaKeyboard implements Keyboard {
+import org.lwjgl.LWJGLException;
+import org.lwjgl.input.Keyboard;
+
+import playn.core.Key;
+import playn.core.util.Callback;
+
+class JavaKeyboard implements playn.core.Keyboard {
 
   private Listener listener;
   private JFrame frame;
 
-  JavaKeyboard(JFrame frame) {
-    this.frame = frame;
-    frame.addKeyListener(new KeyListener() {
-      @Override
-      public void keyPressed(KeyEvent nativeEvent) {
-        if (listener != null) {
-          Event.Impl event = new Event.Impl(
-            nativeEvent.getWhen(), keyForCode(nativeEvent.getKeyCode()));
-          listener.onKeyDown(event);
-          if (event.getPreventDefault()) {
-            nativeEvent.consume();
-          }
-        }
-      }
-
-      @Override
-      public void keyReleased(KeyEvent nativeEvent) {
-        if (listener != null) {
-          Event.Impl event = new Event.Impl(
-            nativeEvent.getWhen(), keyForCode(nativeEvent.getKeyCode()));
-          listener.onKeyUp(event);
-          if (event.getPreventDefault()) {
-            nativeEvent.consume();
-          }
-        }
-      }
-
-      @Override
-      public void keyTyped(KeyEvent nativeEvent) {
-        if (listener != null) {
-          if (!Character.isISOControl(nativeEvent.getKeyChar())) {
-            TypedEvent.Impl event = new TypedEvent.Impl(
-              nativeEvent.getWhen(), nativeEvent.getKeyChar());
-            listener.onKeyTyped(event);
-            if (event.getPreventDefault()) {
-              nativeEvent.consume();
-            }
-          }
-        }
-      }
-    });
+  JavaKeyboard() throws LWJGLException {
+    Keyboard.create();
   }
 
   @Override
@@ -90,197 +50,131 @@ class JavaKeyboard implements Keyboard {
     callback.onSuccess((String) result);
   }
 
-  private static Key keyForCode(int keyCode) {
-    switch (keyCode) {
-    case KeyEvent.VK_ENTER: return Key.ENTER;
-    case KeyEvent.VK_BACK_SPACE: return Key.BACKSPACE;
-    case KeyEvent.VK_TAB: return Key.TAB;
-    // case KeyEvent.VK_CANCEL: return Key.;
-    case KeyEvent.VK_CLEAR: return Key.CLEAR;
-    case KeyEvent.VK_SHIFT: return Key.SHIFT;
-    case KeyEvent.VK_CONTROL: return Key.CONTROL;
-    case KeyEvent.VK_ALT: return Key.ALT;
-    case KeyEvent.VK_PAUSE: return Key.PAUSE;
-    case KeyEvent.VK_CAPS_LOCK: return Key.CAPS_LOCK;
-    case KeyEvent.VK_ESCAPE: return Key.ESCAPE;
-    case KeyEvent.VK_SPACE: return Key.SPACE;
-    case KeyEvent.VK_PAGE_UP: return Key.PAGE_UP;
-    case KeyEvent.VK_PAGE_DOWN: return Key.PAGE_DOWN;
-    case KeyEvent.VK_END: return Key.END;
-    case KeyEvent.VK_HOME: return Key.HOME;
-    case KeyEvent.VK_LEFT: return Key.LEFT;
-    case KeyEvent.VK_UP: return Key.UP;
-    case KeyEvent.VK_RIGHT: return Key.RIGHT;
-    case KeyEvent.VK_DOWN: return Key.DOWN;
-    case KeyEvent.VK_COMMA: return Key.COMMA;
-    case KeyEvent.VK_MINUS: return Key.MINUS;
-    case KeyEvent.VK_PERIOD: return Key.PERIOD;
-    case KeyEvent.VK_SLASH: return Key.SLASH;
-    case KeyEvent.VK_0: return Key.K0;
-    case KeyEvent.VK_1: return Key.K1;
-    case KeyEvent.VK_2: return Key.K2;
-    case KeyEvent.VK_3: return Key.K3;
-    case KeyEvent.VK_4: return Key.K4;
-    case KeyEvent.VK_5: return Key.K5;
-    case KeyEvent.VK_6: return Key.K6;
-    case KeyEvent.VK_7: return Key.K7;
-    case KeyEvent.VK_8: return Key.K8;
-    case KeyEvent.VK_9: return Key.K9;
-    case KeyEvent.VK_SEMICOLON: return Key.SEMICOLON;
-    case KeyEvent.VK_EQUALS: return Key.EQUALS;
-    case KeyEvent.VK_A: return Key.A;
-    case KeyEvent.VK_B: return Key.B;
-    case KeyEvent.VK_C: return Key.C;
-    case KeyEvent.VK_D: return Key.D;
-    case KeyEvent.VK_E: return Key.E;
-    case KeyEvent.VK_F: return Key.F;
-    case KeyEvent.VK_G: return Key.G;
-    case KeyEvent.VK_H: return Key.H;
-    case KeyEvent.VK_I: return Key.I;
-    case KeyEvent.VK_J: return Key.J;
-    case KeyEvent.VK_K: return Key.K;
-    case KeyEvent.VK_L: return Key.L;
-    case KeyEvent.VK_M: return Key.M;
-    case KeyEvent.VK_N: return Key.N;
-    case KeyEvent.VK_O: return Key.O;
-    case KeyEvent.VK_P: return Key.P;
-    case KeyEvent.VK_Q: return Key.Q;
-    case KeyEvent.VK_R: return Key.R;
-    case KeyEvent.VK_S: return Key.S;
-    case KeyEvent.VK_T: return Key.T;
-    case KeyEvent.VK_U: return Key.U;
-    case KeyEvent.VK_V: return Key.V;
-    case KeyEvent.VK_W: return Key.W;
-    case KeyEvent.VK_X: return Key.X;
-    case KeyEvent.VK_Y: return Key.Y;
-    case KeyEvent.VK_Z: return Key.Z;
-    case KeyEvent.VK_OPEN_BRACKET: return Key.LEFT_BRACKET;
-    case KeyEvent.VK_BACK_SLASH: return Key.BACKSLASH;
-    case KeyEvent.VK_CLOSE_BRACKET: return Key.RIGHT_BRACKET;
-    case KeyEvent.VK_NUMPAD0: return Key.NP0;
-    case KeyEvent.VK_NUMPAD1: return Key.NP1;
-    case KeyEvent.VK_NUMPAD2: return Key.NP2;
-    case KeyEvent.VK_NUMPAD3: return Key.NP3;
-    case KeyEvent.VK_NUMPAD4: return Key.NP4;
-    case KeyEvent.VK_NUMPAD5: return Key.NP5;
-    case KeyEvent.VK_NUMPAD6: return Key.NP6;
-    case KeyEvent.VK_NUMPAD7: return Key.NP7;
-    case KeyEvent.VK_NUMPAD8: return Key.NP8;
-    case KeyEvent.VK_NUMPAD9: return Key.NP9;
-    case KeyEvent.VK_MULTIPLY: return Key.NP_MULTIPLY;
-    case KeyEvent.VK_ADD: return Key.NP_ADD;
-    // case KeyEvent.VK_SEPARATOR: return Key.NP_SEPARATOR;
-    case KeyEvent.VK_SUBTRACT: return Key.NP_SUBTRACT;
-    case KeyEvent.VK_DECIMAL: return Key.NP_DECIMAL;
-    case KeyEvent.VK_DIVIDE: return Key.NP_DIVIDE;
-    case KeyEvent.VK_DELETE: return Key.DELETE;
-    case KeyEvent.VK_NUM_LOCK: return Key.NP_NUM_LOCK;
-    case KeyEvent.VK_SCROLL_LOCK: return Key.SCROLL_LOCK;
-    case KeyEvent.VK_F1: return Key.F1;
-    case KeyEvent.VK_F2: return Key.F2;
-    case KeyEvent.VK_F3: return Key.F3;
-    case KeyEvent.VK_F4: return Key.F4;
-    case KeyEvent.VK_F5: return Key.F5;
-    case KeyEvent.VK_F6: return Key.F6;
-    case KeyEvent.VK_F7: return Key.F7;
-    case KeyEvent.VK_F8: return Key.F8;
-    case KeyEvent.VK_F9: return Key.F9;
-    case KeyEvent.VK_F10: return Key.F10;
-    case KeyEvent.VK_F11: return Key.F11;
-    case KeyEvent.VK_F12: return Key.F12;
-    // case KeyEvent.VK_F13: return Key.F13;
-    // case KeyEvent.VK_F14: return Key.F14;
-    // case KeyEvent.VK_F15: return Key.F15;
-    // case KeyEvent.VK_F16: return Key.F16;
-    // case KeyEvent.VK_F17: return Key.F17;
-    // case KeyEvent.VK_F18: return Key.F18;
-    // case KeyEvent.VK_F19: return Key.F19;
-    // case KeyEvent.VK_F20: return Key.F20;
-    // case KeyEvent.VK_F21: return Key.F21;
-    // case KeyEvent.VK_F22: return Key.F22;
-    // case KeyEvent.VK_F23: return Key.F23;
-    // case KeyEvent.VK_F24: return Key.F24;
-    case KeyEvent.VK_PRINTSCREEN: return Key.PRINT_SCREEN;
-    case KeyEvent.VK_INSERT: return Key.INSERT;
-    // case KeyEvent.VK_HELP: return Key.HELP;
-    case KeyEvent.VK_META: return Key.META;
-    case KeyEvent.VK_BACK_QUOTE: return Key.BACKQUOTE;
-    case KeyEvent.VK_QUOTE: return Key.QUOTE;
-    case KeyEvent.VK_KP_UP: return Key.NP_UP;
-    case KeyEvent.VK_KP_DOWN: return Key.NP_DOWN;
-    case KeyEvent.VK_KP_LEFT: return Key.NP_LEFT;
-    case KeyEvent.VK_KP_RIGHT: return Key.NP_RIGHT;
-    // case KeyEvent.VK_DEAD_GRAVE: return Key.;
-    // case KeyEvent.VK_DEAD_ACUTE: return Key.;
-    // case KeyEvent.VK_DEAD_CIRCUMFLEX: return Key.;
-    // case KeyEvent.VK_DEAD_TILDE: return Key.;
-    // case KeyEvent.VK_DEAD_MACRON: return Key.;
-    // case KeyEvent.VK_DEAD_BREVE: return Key.;
-    // case KeyEvent.VK_DEAD_ABOVEDOT: return Key.;
-    // case KeyEvent.VK_DEAD_DIAERESIS: return Key.;
-    // case KeyEvent.VK_DEAD_ABOVERING: return Key.;
-    // case KeyEvent.VK_DEAD_DOUBLEACUTE: return Key.;
-    // case KeyEvent.VK_DEAD_CARON: return Key.;
-    // case KeyEvent.VK_DEAD_CEDILLA: return Key.;
-    // case KeyEvent.VK_DEAD_OGONEK: return Key.;
-    // case KeyEvent.VK_DEAD_IOTA: return Key.;
-    // case KeyEvent.VK_DEAD_VOICED_SOUND: return Key.;
-    // case KeyEvent.VK_DEAD_SEMIVOICED_SOUND: return Key.;
-    case KeyEvent.VK_AMPERSAND: return Key.AMPERSAND;
-    case KeyEvent.VK_ASTERISK: return Key.ASTERISK;
-    case KeyEvent.VK_QUOTEDBL: return Key.DOUBLE_QUOTE;
-    case KeyEvent.VK_LESS: return Key.LESS;
-    case KeyEvent.VK_GREATER: return Key.GREATER;
-    case KeyEvent.VK_BRACELEFT: return Key.LEFT_BRACE;
-    case KeyEvent.VK_BRACERIGHT: return Key.RIGHT_BRACE;
-    case KeyEvent.VK_AT: return Key.AT;
-    case KeyEvent.VK_COLON: return Key.COLON;
-    case KeyEvent.VK_CIRCUMFLEX: return Key.CIRCUMFLEX;
-    case KeyEvent.VK_DOLLAR: return Key.DOLLAR;
-    // case KeyEvent.VK_EURO_SIGN: return Key.;
-    case KeyEvent.VK_EXCLAMATION_MARK: return Key.BANG;
-    // case KeyEvent.VK_INVERTED_EXCLAMATION_MARK: return Key.;
-    case KeyEvent.VK_LEFT_PARENTHESIS: return Key.LEFT_PAREN;
-    case KeyEvent.VK_NUMBER_SIGN: return Key.HASH;
-    case KeyEvent.VK_PLUS: return Key.PLUS;
-    case KeyEvent.VK_RIGHT_PARENTHESIS: return Key.RIGHT_PAREN;
-    case KeyEvent.VK_UNDERSCORE: return Key.UNDERSCORE;
-    case KeyEvent.VK_WINDOWS: return Key.WINDOWS;
-    case KeyEvent.VK_CONTEXT_MENU: return Key.MENU;
-    // case KeyEvent.VK_FINAL: return Key.;
-    // case KeyEvent.VK_CONVERT: return Key.;
-    // case KeyEvent.VK_NONCONVERT: return Key.;
-    // case KeyEvent.VK_ACCEPT: return Key.;
-    // case KeyEvent.VK_MODECHANGE: return Key.;
-    // case KeyEvent.VK_KANA: return Key.;
-    // case KeyEvent.VK_KANJI: return Key.;
-    // case KeyEvent.VK_ALPHANUMERIC: return Key.;
-    // case KeyEvent.VK_KATAKANA: return Key.;
-    // case KeyEvent.VK_HIRAGANA: return Key.;
-    // case KeyEvent.VK_FULL_WIDTH: return Key.;
-    // case KeyEvent.VK_HALF_WIDTH: return Key.;
-    // case KeyEvent.VK_ROMAN_CHARACTERS: return Key.;
-    // case KeyEvent.VK_ALL_CANDIDATES: return Key.;
-    // case KeyEvent.VK_PREVIOUS_CANDIDATE: return Key.;
-    // case KeyEvent.VK_CODE_INPUT: return Key.;
-    // case KeyEvent.VK_JAPANESE_KATAKANA: return Key.;
-    // case KeyEvent.VK_JAPANESE_HIRAGANA: return Key.;
-    // case KeyEvent.VK_JAPANESE_ROMAN: return Key.;
-    // case KeyEvent.VK_KANA_LOCK: return Key.;
-    // case KeyEvent.VK_INPUT_METHOD_ON_OFF: return Key.;
-    // case KeyEvent.VK_CUT: return Key.;
-    // case KeyEvent.VK_COPY: return Key.;
-    // case KeyEvent.VK_PASTE: return Key.;
-    // case KeyEvent.VK_UNDO: return Key.;
-    // case KeyEvent.VK_AGAIN: return Key.;
-    // case KeyEvent.VK_FIND: return Key.;
-    // case KeyEvent.VK_PROPS: return Key.;
-    // case KeyEvent.VK_STOP: return Key.;
-    // case KeyEvent.VK_COMPOSE: return Key.;
-    // case KeyEvent.VK_ALT_GRAPH: return Key.;
-    // case KeyEvent.VK_BEGIN: return Key.;
-    case KeyEvent.VK_UNDEFINED: return Key.UNKNOWN;
-    default: return Key.UNKNOWN;
+  void update() {
+    while (Keyboard.next()) {
+      if (listener == null) {
+        continue;
+      }
+
+      double time = (double) (Keyboard.getEventNanoseconds() / 1000);
+      int keyCode = Keyboard.getEventKey();
+
+      if (Keyboard.getEventKeyState()) {
+        listener.onKeyDown(new playn.core.Keyboard.Event.Impl(time, translateKey(keyCode)));
+        listener.onKeyTyped(new playn.core.Keyboard.TypedEvent.Impl(time, Keyboard.getEventCharacter()));
+      } else {
+        listener.onKeyUp(new playn.core.Keyboard.Event.Impl(time, translateKey(keyCode)));
+      }
     }
+  }
+
+  private Key translateKey(int keyCode) {
+    // TODO(jgw): Confirm that these mappings are correct.
+    switch (keyCode) {
+      case 0x01 : return Key.ESCAPE          ;
+      case 0x02 : return Key.K1              ;
+      case 0x03 : return Key.K2              ;
+      case 0x04 : return Key.K3              ;
+      case 0x05 : return Key.K4              ;
+      case 0x06 : return Key.K5              ;
+      case 0x07 : return Key.K6              ;
+      case 0x08 : return Key.K7              ;
+      case 0x09 : return Key.K8              ;
+      case 0x0A : return Key.K9              ;
+      case 0x0B : return Key.K0              ;
+      case 0x0C : return Key.MINUS           ;
+      case 0x0D : return Key.EQUALS          ;
+      case 0x0E : return Key.BACKSPACE       ;
+      case 0x0F : return Key.TAB             ;
+      case 0x10 : return Key.Q               ;
+      case 0x11 : return Key.W               ;
+      case 0x12 : return Key.E               ;
+      case 0x13 : return Key.R               ;
+      case 0x14 : return Key.T               ;
+      case 0x15 : return Key.Y               ;
+      case 0x16 : return Key.U               ;
+      case 0x17 : return Key.I               ;
+      case 0x18 : return Key.O               ;
+      case 0x19 : return Key.P               ;
+      case 0x1A : return Key.LEFT_BRACKET    ;
+      case 0x1B : return Key.RIGHT_BRACKET   ;
+      case 0x1C : return Key.ENTER           ;
+      case 0x1D : return Key.CONTROL         ;
+      case 0x1E : return Key.A               ;
+      case 0x1F : return Key.S               ;
+      case 0x20 : return Key.D               ;
+      case 0x21 : return Key.F               ;
+      case 0x22 : return Key.G               ;
+      case 0x23 : return Key.H               ;
+      case 0x24 : return Key.J               ;
+      case 0x25 : return Key.K               ;
+      case 0x26 : return Key.L               ;
+      case 0x27 : return Key.SEMICOLON       ;
+      case 0x28 : return Key.QUOTE           ;
+      case 0x2A : return Key.SHIFT           ;
+      case 0x2B : return Key.BACKSLASH       ;
+      case 0x2C : return Key.Z               ;
+      case 0x2D : return Key.X               ;
+      case 0x2E : return Key.C               ;
+      case 0x2F : return Key.V               ;
+      case 0x30 : return Key.B               ;
+      case 0x31 : return Key.N               ;
+      case 0x32 : return Key.M               ;
+      case 0x33 : return Key.COMMA           ;
+      case 0x34 : return Key.PERIOD          ;
+      case 0x35 : return Key.SLASH           ;
+      case 0x36 : return Key.SHIFT           ;
+      case 0x37 : return Key.MULTIPLY        ;
+      case 0x38 : return Key.MENU            ;
+      case 0x39 : return Key.SPACE           ;
+      case 0x3A : return Key.CAPS_LOCK       ;
+      case 0x3B : return Key.F1              ;
+      case 0x3C : return Key.F2              ;
+      case 0x3D : return Key.F3              ;
+      case 0x3E : return Key.F4              ;
+      case 0x3F : return Key.F5              ;
+      case 0x40 : return Key.F6              ;
+      case 0x41 : return Key.F7              ;
+      case 0x42 : return Key.F8              ;
+      case 0x43 : return Key.F9              ;
+      case 0x44 : return Key.F10             ;
+      case 0x45 : return Key.NP_NUM_LOCK     ;
+      case 0x46 : return Key.SCROLL_LOCK     ;
+      case 0x47 : return Key.NP7             ;
+      case 0x48 : return Key.NP8             ;
+      case 0x49 : return Key.NP9             ;
+      case 0x4A : return Key.NP_SUBTRACT     ;
+      case 0x4B : return Key.NP4             ;
+      case 0x4C : return Key.NP5             ;
+      case 0x4D : return Key.NP6             ;
+      case 0x4E : return Key.NP_ADD          ;
+      case 0x4F : return Key.NP1             ;
+      case 0x50 : return Key.NP2             ;
+      case 0x51 : return Key.NP3             ;
+      case 0x52 : return Key.NP0             ;
+      case 0x53 : return Key.NP_DECIMAL      ;
+      case 0x57 : return Key.F11             ;
+      case 0x58 : return Key.F12             ;
+      case 0x90 : return Key.CIRCUMFLEX      ;
+      case 0x91 : return Key.AT              ;
+      case 0x92 : return Key.COLON           ;
+      case 0x93 : return Key.UNDERSCORE      ;
+      case 0xB7 : return Key.SYSRQ           ;
+      case 0xC5 : return Key.PAUSE           ;
+      case 0xC7 : return Key.HOME            ;
+      case 0xC8 : return Key.UP              ;
+      case 0xC9 : return Key.PAGE_UP         ;
+      case 0xCB : return Key.LEFT            ;
+      case 0xCD : return Key.RIGHT           ;
+      case 0xCF : return Key.END             ;
+      case 0xD0 : return Key.DOWN            ;
+      case 0xD1 : return Key.PAGE_DOWN       ;
+      case 0xD2 : return Key.INSERT          ;
+      case 0xD3 : return Key.DELETE          ;
+      case 0xDB : return Key.META            ;
+      case 0xDE : return Key.POWER           ;
+    }
+
+    return null;
   }
 }

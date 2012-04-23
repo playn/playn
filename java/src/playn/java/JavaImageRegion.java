@@ -18,89 +18,36 @@ package playn.java;
 import java.awt.Graphics2D;
 import java.awt.TexturePaint;
 import java.awt.geom.Rectangle2D;
+import java.awt.image.BufferedImage;
 
 import pythagoras.f.MathUtil;
 
 import playn.core.Image;
+import playn.core.Pattern;
 import playn.core.ResourceCallback;
+import playn.core.gl.ImageRegionGL;
 
-public class JavaImageRegion extends JavaImage implements Image.Region {
-
-  private final JavaImage parent;
-  private final float sx, sy;
-  private final int swidth, sheight;
+public class JavaImageRegion extends ImageRegionGL implements JavaCanvas.Drawable {
 
   @Override
-  public float x() {
-    return sx;
+  public Pattern toPattern() {
+    BufferedImage subImage = ((JavaImage)parent).img.getSubimage((int)x, (int)y, width(), height());
+    Rectangle2D rect = new Rectangle2D.Float(0, 0, width, height);
+    return new JavaPattern(this, new TexturePaint(subImage, rect));
   }
 
   @Override
-  public float y() {
-    return sy;
+  public void draw(Graphics2D gfx, float x, float y, float w, float h) {
+    draw(gfx, x, y, w, h, 0, 0, width, height);
   }
 
   @Override
-  public int width() {
-    return swidth;
-  }
-
-  @Override
-  public int height() {
-    return sheight;
-  }
-
-  @Override
-  public Image parent() {
-    return parent;
-  }
-
-  @Override
-  public boolean isReady() {
-    return parent.isReady();
-  }
-
-  @Override
-  public void addCallback(final ResourceCallback<? super Image> callback) {
-    parent.addCallback(new ResourceCallback<Image>() {
-      public void done(Image image) {
-        callback.done(JavaImageRegion.this);
-      }
-      public void error(Throwable err) {
-        callback.error(err);
-      }
-    });
-  }
-
-  @Override
-  public Region subImage(float x, float y, float width, float height) {
-    // TODO: clamp swidth, sheight to our bounds?
-    return parent.subImage(sx+x, sy+y, width, height);
+  public void draw(Graphics2D gfx, float dx, float dy, float dw, float dh,
+                   float x, float y, float w, float h) {
+    ((JavaImage)parent).draw(gfx, dx, dy, dw, dh, this.x+x, this.y+y, w, h);
   }
 
   JavaImageRegion(JavaImage parent, float sx, float sy, float swidth, float sheight) {
-    super(null);
-    this.parent = parent;
-    this.sx = sx;
-    this.sy = sy;
-    this.swidth = MathUtil.iceil(swidth);
-    this.sheight = MathUtil.iceil(sheight);
-  }
-
-  @Override
-  TexturePaint createTexture(float width, float height) {
-    return new TexturePaint(parent.img.getSubimage((int)sx, (int)sy, swidth, sheight),
-                            new Rectangle2D.Float(0, 0, width, height));
-  }
-
-  @Override
-  void draw(Graphics2D gfx, float x, float y, float w, float h) {
-    draw(gfx, x, y, w, h, 0, 0, swidth, sheight);
-  }
-
-  @Override
-  void draw(Graphics2D gfx, float dx, float dy, float dw, float dh,
-            float x, float y, float w, float h) {
-    parent.draw(gfx, dx, dy, dw, dh, sx+x, sy+y, w, h);
+    super(parent, sx, sy, swidth, sheight);
   }
 }

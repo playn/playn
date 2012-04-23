@@ -28,6 +28,7 @@ public class JavaStaticImage extends JavaImage {
 
   public JavaStaticImage(final BufferedImage img) {
     super(null);
+
     JavaAssets.doResourceAction(new Runnable() {
       public void run () {
         JavaStaticImage.this.img = img;

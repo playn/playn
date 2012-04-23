@@ -15,25 +15,23 @@
  */
 package playn.java;
 
-import playn.core.Pattern;
-
 import java.awt.TexturePaint;
-import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
 
-class JavaPattern implements Pattern {
+import playn.core.gl.GLPattern;
+import playn.core.gl.ImageGL;
 
-  private JavaImage img;
-  private TexturePaint paint;
+class JavaPattern implements GLPattern {
 
-  JavaPattern(JavaImage img) {
-    this.img = img;
+  private final ImageGL image;
+  final TexturePaint paint;
+
+  JavaPattern(ImageGL image, TexturePaint paint) {
+    this.image = image;
+    this.paint = paint;
   }
 
-  TexturePaint paint () {
-    if (paint == null && img.isReady()) {
-      paint = img.createTexture(img.width(), img.height());
-    }
-    return paint;
+  @Override
+  public ImageGL image() {
+    return image;
   }
 }

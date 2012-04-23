@@ -46,6 +46,7 @@ object PlayNBuild extends Build {
         unmanagedResourceDirectories in Compile <+= baseDirectory / "src",
         excludeFilter in unmanagedResources ~= { _ || "*.java" }
       )
+      case "tests-java" => LWJGLPlugin.lwjglSettings
       case _ => Nil
     }
   }

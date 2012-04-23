@@ -1,5 +1,5 @@
 /**
- * Copyright 2010 The PlayN Authors
+ * Copyright 2012 The PlayN Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,13 +18,15 @@ package playn.java;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.lwjgl.LWJGLException;
+import org.lwjgl.opengl.Display;
+import org.lwjgl.opengl.DisplayMode;
+
 import playn.core.Asserts;
 import playn.core.CanvasImage;
-import playn.core.CanvasLayer;
 import playn.core.Font;
 import playn.core.Gradient;
 import playn.core.Graphics;
-import playn.core.GroupLayer;
 import playn.core.Image;
 import playn.core.ImageLayer;
 import playn.core.ImmediateLayer;
@@ -34,6 +36,9 @@ import playn.core.SurfaceLayer;
 import playn.core.TextFormat;
 import playn.core.TextLayout;
 import playn.core.gl.GL20;
+import playn.core.gl.GLContext;
+import playn.core.gl.GraphicsGL;
+import playn.core.gl.GroupLayerGL;
 import static playn.core.PlayN.*;
 
 import java.awt.Component;
@@ -41,16 +46,20 @@ import java.awt.Dimension;
 
 import javax.swing.JFrame;
 
-public class JavaGraphics implements Graphics {
+public class JavaGraphics extends GraphicsGL {
 
-  private final Component component;
-  private final JavaGroupLayer rootLayer;
-  private final JFrame frame;
+  private final GroupLayerGL rootLayer;
+  private int width, height;
+  private final JavaGLContext ctx;
 
-  JavaGraphics(JFrame frame, Component component) {
-    this.frame = frame;
-    this.component = component;
-    this.rootLayer = new JavaGroupLayer();
+  JavaGraphics() throws LWJGLException {
+    Display.create();
+    ctx = new JavaGLContext(640, 480);
+
+    this.rootLayer = new GroupLayerGL(ctx);
+
+    // TODO(jgw): This 640x480 stuff can't be right.
+    setSize(640, 480);
   }
 
   /**
@@ -70,45 +79,8 @@ public class JavaGraphics implements Graphics {
     }
   }
 
-  @Override @Deprecated
-  public CanvasLayer createCanvasLayer(int width, int height) {
-    return new JavaCanvasLayer(width, height);
-  }
-
   @Override
-  public GroupLayer createGroupLayer() {
-    return new JavaGroupLayer();
-  }
-
-  @Override
-  public ImageLayer createImageLayer() {
-    return new JavaImageLayer();
-  }
-
-  @Override
-  public ImageLayer createImageLayer(Image image) {
-    Asserts.checkArgument(image instanceof JavaImage);
-    return new JavaImageLayer((JavaImage) image);
-  }
-
-  @Override
-  public SurfaceLayer createSurfaceLayer(int width, int height) {
-    return new JavaSurfaceLayer(width, height);
-  }
-
-  @Override
-  public ImmediateLayer.Clipped createImmediateLayer(
-      int width, int height, ImmediateLayer.Renderer renderer) {
-    return new JavaImmediateLayer.Clipped(width, height, renderer);
-  }
-
-  @Override
-  public ImmediateLayer createImmediateLayer(ImmediateLayer.Renderer renderer) {
-    return new JavaImmediateLayer(renderer);
-  }
-
-  @Override
-  public JavaGroupLayer rootLayer() {
+  public GroupLayerGL rootLayer() {
     return rootLayer;
   }
 
@@ -150,35 +122,48 @@ public class JavaGraphics implements Graphics {
 
   @Override
   public TextLayout layoutText(String text, TextFormat format) {
-    return new JavaTextLayout(frame, text, format);
+    return new JavaTextLayout(text, format);
   }
 
   @Override
   public int screenWidth() {
-    // TODO: Do we actually want to return the true screen width?
-    return component.getWidth();
+    return Display.getDesktopDisplayMode().getWidth();
   }
 
   @Override
   public int screenHeight() {
-    // TODO: Do we actually want to return the true screen height?
-    return component.getHeight();
+    return Display.getDesktopDisplayMode().getHeight();
   }
 
   @Override
   public int width() {
-    return component.getWidth();
+    return width;
   }
 
   @Override
   public int height() {
-    return component.getHeight();
+    return height;
   }
 
   @Override
   public void setSize(int width, int height) {
-    component.setPreferredSize(new Dimension(width, height));
-    frame.pack();
+    try {
+      this.width = width; this.height = height;
+      Display.setDisplayMode(new DisplayMode(width, height));
+      ctx.setSize(width, height);
+    } catch (LWJGLException e) {
+      // TODO(jgw): fatal error.
+      e.printStackTrace();
+    }
+  }
+
+  @Override
+  protected GLContext ctx() {
+    return ctx;
+  }
+
+  void paintLayers() {
+    ctx.paintLayers(rootLayer);
   }
 
   @Override

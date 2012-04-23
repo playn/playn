@@ -15,57 +15,36 @@
  */
 package playn.java;
 
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
-
-import javax.swing.JComponent;
+import org.lwjgl.LWJGLException;
+import org.lwjgl.input.Mouse;
 
 import playn.core.PointerImpl;
 
 class JavaPointer extends PointerImpl {
 
-  JavaPointer(JComponent frame) {
-    frame.addMouseMotionListener(new MouseMotionListener() {
-      @Override
-      public void mouseDragged(MouseEvent nativeEvent) {
-        if (onPointerDrag(toEvent(nativeEvent), false))
-          nativeEvent.consume();
-      }
+  private boolean mouseDown;
 
-      @Override
-      public void mouseMoved(MouseEvent e) {
-      }
-    });
-
-    frame.addMouseListener(new MouseListener() {
-      @Override
-      public void mouseClicked(MouseEvent e) {
-      }
-
-      @Override
-      public void mouseEntered(MouseEvent e) {
-      }
-
-      @Override
-      public void mouseExited(MouseEvent e) {
-      }
-
-      @Override
-      public void mousePressed(MouseEvent nativeEvent) {
-        if (onPointerStart(toEvent(nativeEvent), false))
-          nativeEvent.consume();
-      }
-
-      @Override
-      public void mouseReleased(MouseEvent nativeEvent) {
-        if (onPointerEnd(toEvent(nativeEvent), false))
-          nativeEvent.consume();
-      }
-    });
+  JavaPointer() throws LWJGLException {
+    Mouse.create();
   }
 
-  protected static Event.Impl toEvent(MouseEvent nativeEvent) {
-    return new Event.Impl(nativeEvent.getWhen(), nativeEvent.getX(), nativeEvent.getY(), false);
+  void onMouseDown(double time, int x, int y) {
+    onPointerStart(new Event.Impl(time, x, y, false), false);
+    mouseDown = true;
+  }
+
+  void onMouseUp(double time, int x, int y) {
+    onPointerEnd(new Event.Impl(time, x, y, false), false);
+    mouseDown = false;
+  }
+
+  void onMouseMove(double time, int x, int y) {
+    if (mouseDown) {
+      onPointerDrag(new Event.Impl(time, x, y, false), false);
+    }
+  }
+
+  void update() {
+    // Do nothing -- JavaMouse takes care of pointer events.
   }
 }

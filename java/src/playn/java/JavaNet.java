@@ -72,6 +72,10 @@ public class JavaNet implements Net {
     }
   }
 
+  void update() {
+    // TODO(jgw): This will become useful when we add websockets.
+  }
+
   // Super-simple url-cleanup: assumes it either starts with "http", or that
   // it's an absolute path on the current server.
   private String canonicalizeUrl(String url) {

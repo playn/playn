@@ -149,7 +149,7 @@ class JavaImageLayer extends JavaLayer implements ImageLayer {
         cachedImage = (JavaCanvasImage) graphics().createImage((int) dw, (int) dh);
         float anchorWidth = repeatX ? image.width() : dw;
         float anchorHeight = repeatY ? image.height() : dh;
-        TexturePaint tpaint = image.createTexture(anchorWidth, anchorHeight);
+        TexturePaint tpaint = ((JavaPattern) image.toPattern()).paint;
         ((JavaCanvas) cachedImage.canvas()).gfx.setPaint(tpaint);
         ((JavaCanvas) cachedImage.canvas()).gfx.fill(new Rectangle2D.Float(0, 0, dw, dh));
         dirty = false;

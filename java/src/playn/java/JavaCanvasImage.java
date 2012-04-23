@@ -15,12 +15,15 @@
  */
 package playn.java;
 
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 
 import playn.core.Canvas;
 import playn.core.CanvasImage;
 import playn.core.Image;
 import playn.core.ResourceCallback;
+import playn.core.gl.GLContext;
 
 class JavaCanvasImage extends JavaImage implements CanvasImage {
 
@@ -33,7 +36,9 @@ class JavaCanvasImage extends JavaImage implements CanvasImage {
   @Override
   public Canvas canvas() {
     if (canvas == null) {
-      canvas = new JavaCanvas(img.createGraphics(), width(), height());
+      Graphics2D gfx = img.createGraphics();
+      gfx.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+      canvas = new JavaCanvas(gfx, width(), height());
     }
     return canvas;
   }
@@ -41,5 +46,16 @@ class JavaCanvasImage extends JavaImage implements CanvasImage {
   @Override
   public void addCallback(ResourceCallback<? super Image> callback) {
     callback.done(this);
+  }
+
+  @Override
+  public Object ensureTexture(GLContext ctx, boolean repeatX, boolean repeatY) {
+    // if we have a canvas, and it's dirty, force the recreation of our texture which will obtain
+    // the latest canvas data
+    if (canvas.dirty()) {
+      canvas.clearDirty();
+      clearTexture(ctx);
+    }
+    return super.ensureTexture(ctx, repeatX, repeatY);
   }
 }

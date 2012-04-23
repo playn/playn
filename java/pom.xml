@@ -19,6 +19,18 @@
     </dependency>
 
     <dependency>
+      <groupId>org.lwjgl.lwjgl</groupId>
+      <artifactId>lwjgl</artifactId>
+      <version>${lwjgl.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.lwjgl.lwjgl</groupId>
+      <artifactId>lwjgl_util</artifactId>
+      <version>${lwjgl.version}</version>
+    </dependency>
+
+    <dependency>
       <groupId>jlayer</groupId>
       <artifactId>mp3spi</artifactId>
       <version>1.9.5</version>
@@ -41,5 +53,28 @@
   <build>
     <sourceDirectory>src</sourceDirectory>
     <testSourceDirectory>tests</testSourceDirectory>
+
+    <plugins>
+      <plugin>
+        <groupId>com.googlecode.mavennatives</groupId>
+        <artifactId>maven-nativedependencies-plugin</artifactId>
+        <version>0.0.6</version>
+        <executions>
+          <execution>
+            <id>unpacknatives</id>
+            <phase>generate-resources</phase>
+            <goals> <goal>copy</goal> </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <argLine>-Djava.library.path=${basedir}/target/natives</argLine>
+        </configuration>
+      </plugin>
+    </plugins>
   </build>
 </project>
+

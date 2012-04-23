@@ -94,7 +94,7 @@ class JavaCanvasState {
     if (fillGradient != null) {
       gfx.setPaint(fillGradient.paint);
     } else if (fillPattern != null) {
-      TexturePaint paint = fillPattern.paint();
+      TexturePaint paint = fillPattern.paint;
       if (paint != null) {
         gfx.setPaint(paint);
       }
