@@ -21,14 +21,6 @@
       <version>${project.version}</version>
     </dependency>
 
-    <!-- needed because Android uses the same JSON code as playn-java;
-         that should be factored into a library shared by both backends -->
-    <dependency>
-      <groupId>com.googlecode.playn</groupId>
-      <artifactId>playn-java</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-
     <dependency>
       <groupId>com.google.android</groupId>
       <artifactId>android</artifactId>
