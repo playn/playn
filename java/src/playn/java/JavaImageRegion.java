@@ -46,9 +46,10 @@ public class JavaImageRegion extends ImageRegionGL implements JavaCanvas.Drawabl
   JavaImageRegion(JavaImage parent, float sx, float sy, float swidth, float sheight) {
     super(parent, sx, sy, swidth, sheight);
   }
-  
+
   @Override
-  public void getRgb(int startX, int startY, int width, int height, int[] rgbArray, int offset, int scanSize) {
-    parent.getRgb(startX + (int) sx, startY + (int) sy, width, height, rgbArray, offset, scanSize);
+  public void getRgb(int startX, int startY, int width, int height, int[] rgbArray,
+                     int offset, int scanSize) {
+    parent.getRgb(startX + (int) x, startY + (int) y, width, height, rgbArray, offset, scanSize);
   }
 }

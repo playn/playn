@@ -55,6 +55,12 @@ public abstract class IOSAbstractImage extends ImageGL implements Image, IOSCanv
   }
 
   @Override
+  public void getRgb(int startX, int startY, int width, int height, int[] rgbArray,
+                     int offset, int scanSize) {
+    throw new UnsupportedOperationException("getRgb() not yet supported on iOS");
+  }
+
+  @Override
   public Region subImage(float x, float y, float width, float height) {
     return new IOSImageRegion(this, x, y, width, height);
   }

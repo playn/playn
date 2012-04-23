@@ -56,12 +56,4 @@ public class IOSImage extends IOSAbstractImage
   protected void updateTexture(GLContext ctx, Object tex) {
     this.ctx.updateTexture((Integer)tex, image);
   }
-
-  @Override
-  public void getRgb(int startX, int startY, int width, int height,
-      int[] rgbArray, int offset, int scanSize) {
-    throw new UnsupportedOperationException("getRgb() not yet supported on iOS");
-  }
-  
-  
 }
