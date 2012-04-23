@@ -51,8 +51,7 @@ public class JavaGraphics extends GraphicsGL {
     // causes annoying flashing
     Display.setDisplayMode(new DisplayMode(DEFAULT_WIDTH, DEFAULT_HEIGHT));
     Display.create();
-    ctx = new JavaGLContext(DEFAULT_WIDTH, DEFAULT_HEIGHT);
-
+    this.ctx = new JavaGLContext(DEFAULT_WIDTH, DEFAULT_HEIGHT);
     this.rootLayer = new GroupLayerGL(ctx);
   }
 
