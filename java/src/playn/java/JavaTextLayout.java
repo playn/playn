@@ -32,7 +32,6 @@ import playn.core.TextFormat;
 
 class JavaTextLayout implements playn.core.TextLayout {
 
-  private static BufferedImage dummyImage = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
   private static FontRenderContext dummyFontContext = createDummyFRC();
 
   private float width, height;
@@ -184,7 +183,7 @@ class JavaTextLayout implements playn.core.TextLayout {
   }
 
   private static FontRenderContext createDummyFRC () {
-    Graphics2D gfx = dummyImage.createGraphics();
+    Graphics2D gfx = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB).createGraphics();
     gfx.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
     return gfx.getFontRenderContext();
   }
