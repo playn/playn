@@ -34,13 +34,14 @@
       <plugin>
         <groupId>com.samskivert</groupId>
         <artifactId>ikvm-maven-plugin</artifactId>
-        <version>1.1</version>
+        <version>1.1.1</version>
         <!-- this lets Maven know that we define 'packaging: dll' -->
         <extensions>true</extensions>
         <configuration>
           <ikvmArgs>
             <ikvmArg>-debug</ikvmArg>
           </ikvmArgs>
+          <createStub>true</createStub>
           <dlls>
             <dll>OpenTK.dll</dll>
             <dll>monotouch.dll</dll>
