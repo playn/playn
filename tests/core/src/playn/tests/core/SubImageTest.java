@@ -27,8 +27,8 @@ public class SubImageTest extends Test {
   @Override
   public void init() {
     // draw subimages of a simple static image
-    Image pea = assets().getImage("images/pea.png");
-    fragment(pea, 10, 10);
+    Image orange = assets().getImage("images/orange.png");
+    fragment(orange, 10, 10);
 
     // create a canvas image and draw subimages of that
     int r = 50;
@@ -38,44 +38,44 @@ public class SubImageTest extends Test {
     canvas.fillCircle(r, r, r);
     fragment(cimg, 200, 10);
 
-    float pw = pea.width(), ph = pea.height(), phw = pw/2, phh = ph/2;
-    final Image.Region peamid = pea.subImage(0, phh/2, pw, phh);
+    float pw = orange.width(), ph = orange.height(), phw = pw/2, phh = ph/2;
+    final Image.Region orangemid = orange.subImage(0, phh/2, pw, phh);
 
     // tile a sub-image, oh my!
-    ImageLayer tiled = graphics().createImageLayer(peamid);
+    ImageLayer tiled = graphics().createImageLayer(orangemid);
     tiled.setRepeatX(true);
     tiled.setRepeatY(true);
     tiled.setSize(100, 100);
     graphics().rootLayer().addAt(tiled, 10, 150);
 
     // draw a subimage to a canvas
-    CanvasImage split = graphics().createImage(pea.width(), pea.height());
-    split.canvas().drawImage(pea.subImage(0, 0, phw, phh), phw, phh);
-    split.canvas().drawImage(pea.subImage(phw, 0, phw, phh), 0, phh);
-    split.canvas().drawImage(pea.subImage(0, phh, phw, phh), phw, 0);
-    split.canvas().drawImage(pea.subImage(phw, phh, phw, phh), 0, 0);
+    CanvasImage split = graphics().createImage(orange.width(), orange.height());
+    split.canvas().drawImage(orange.subImage(0, 0, phw, phh), phw, phh);
+    split.canvas().drawImage(orange.subImage(phw, 0, phw, phh), 0, phh);
+    split.canvas().drawImage(orange.subImage(0, phh, phw, phh), phw, 0);
+    split.canvas().drawImage(orange.subImage(phw, phh, phw, phh), 0, 0);
     graphics().rootLayer().addAt(graphics().createImageLayer(split), 130, 150);
 
     // use a subimage as a fill pattern
     CanvasImage pat = graphics().createImage(100, 100);
-    pat.canvas().setFillPattern(peamid.toPattern());
+    pat.canvas().setFillPattern(orangemid.toPattern());
     pat.canvas().fillRect(0, 0, 100, 100);
     graphics().rootLayer().addAt(graphics().createImageLayer(pat), 10, 270);
 
     // draw a subimage in an immediate layer
     ImmediateLayer imm = graphics().createImmediateLayer(new ImmediateLayer.Renderer() {
       public void render(Surface surf) {
-        surf.drawImage(peamid, 0, 0);
-        surf.drawImage(peamid, peamid.width(), 0);
-        surf.drawImage(peamid, 0, peamid.height());
-        surf.drawImage(peamid, peamid.width(), peamid.height());
+        surf.drawImage(orangemid, 0, 0);
+        surf.drawImage(orangemid, orangemid.width(), 0);
+        surf.drawImage(orangemid, 0, orangemid.height());
+        surf.drawImage(orangemid, orangemid.width(), orangemid.height());
       }
     });
     graphics().rootLayer().addAt(imm, 130, 200);
   }
 
   protected void fragment(Image image, float ox, float oy) {
-    int hw = image.width()/2, hh = image.height()/2;
+    float hw = image.width()/2f, hh = image.height()/2f;
     Image ul = image.subImage(0, 0, hw, hh);
     Image ur = image.subImage(hw, 0, hw, hh);
     Image ll = image.subImage(0, hh, hw, hh);

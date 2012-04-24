@@ -13,6 +13,9 @@
  */
 package playn.core.gl;
 
+import pythagoras.f.MathUtil;
+
+import playn.core.Asserts;
 import playn.core.InternalTransform;
 import playn.core.PlayN;
 import playn.core.StockInternalTransform;
@@ -24,21 +27,67 @@ public abstract class GLContext {
   private Object penderLock = new Object();
 
   private GLShader curShader;
+  private Object lastFramebuffer;
+
+  /** The (actual screen pixel) width and height of our default frame buffer. */
+  protected int defaultFbufWidth, defaultFbufHeight;
+
+  /** The (actual screen pixel) width and height of our current frame buffer. */
+  protected int curFbufWidth, curFbufHeight;
+
+  /** The (logical pixel) width and height of our view. */
+  public int viewWidth, viewHeight;
+
+  /** The scale factor for HiDPI mode, or 1 if HDPI mode is not enabled. */
+  public final float scaleFactor;
+
+  /**
+   * Sets the view width to the specified width and height (in pixels). The framebuffer will
+   * potentially be larger than this size if a HiDPI scale factor is in effect.
+   */
+  public void setSize (int width, int height) {
+    viewWidth = width;
+    viewHeight = height;
+    curFbufWidth = defaultFbufWidth = scaledCeil(width);
+    curFbufHeight = defaultFbufHeight = scaledCeil(height);
+    viewWasResized();
+  }
+
+  /** Returns the supplied length scaled by our scale factor. */
+  public float scaled(float length) {
+    return scaleFactor*length;
+  }
+
+  /** Returns the supplied length scaled by our scale factor and rounded up. */
+  public int scaledCeil(float length) {
+    return MathUtil.iceil(scaled(length));
+  }
+
+  /** Returns the supplied length scaled by our scale factor and rounded down. */
+  public int scaledFloor(float length) {
+    return MathUtil.ifloor(scaled(length));
+  }
+
+  /** Returns the supplied length inverse scaled by our scale factor. */
+  public float invScaled(float length) {
+    return length/scaleFactor;
+  }
+
+  /** Returns the supplied length inverse scaled by our scale factor and rounded up. */
+  public int invScaledCeil(float length) {
+    return MathUtil.iceil(invScaled(length));
+  }
+
+  /** Returns the supplied length inverse scaled by our scale factor and rounded down. */
+  public int invScaledFloor(float length) {
+    return MathUtil.ifloor(invScaled(length));
+  }
 
   /** Creates a framebuffer that will render into the supplied texture. */
   public abstract Object createFramebuffer(Object tex);
 
   /** Deletes the supplied frame buffer (which will have come from {@link #createFramebuffer}). */
   public abstract void deleteFramebuffer(Object fbuf);
-
-  /** Binds the supplied frame buffer.
-   * @param width the width of the backing texture.
-   * @param height the height of the backing texture.
-   */
-  public abstract void bindFramebuffer(Object fbuf, int width, int height);
-
-  /** Binds the default framebuffer. */
-  public abstract void bindFramebuffer();
 
   /** Creates a texture with the specified repeat behavior. */
   public abstract Object createTexture(boolean repeatX, boolean repeatY);
@@ -98,6 +147,18 @@ public abstract class GLContext {
     return new StockInternalTransform();
   }
 
+  public void bindFramebuffer(Object fbuf, int width, int height) {
+    if ((lastFramebuffer == null && fbuf != null) || !fbuf.equals(lastFramebuffer)) {
+      checkGLError("bindFramebuffer");
+      flush();
+      bindFramebufferImpl(lastFramebuffer = fbuf, curFbufWidth = width, curFbufHeight = height);
+    }
+  }
+
+  public void bindFramebuffer() {
+    bindFramebuffer(defaultFrameBuffer(), defaultFbufWidth, defaultFbufHeight);
+  }
+
   public void drawTexture(Object tex, float texWidth, float texHeight, InternalTransform local,
                           float dw, float dh, boolean repeatX, boolean repeatY, float alpha) {
     drawTexture(tex, texWidth, texHeight, local, 0, 0, dw, dh, repeatX, repeatY, alpha);
@@ -114,7 +175,7 @@ public abstract class GLContext {
                           float dx, float dy, float dw, float dh,
                           float sx, float sy, float sw, float sh, float alpha) {
     GLShader.Texture shader = quadTexShader();
-    shader.prepare(tex, alpha);
+    shader.prepare(tex, alpha, curFbufWidth, curFbufHeight);
     checkGLError("drawTexture texture prepared");
     sx /= texWidth; sy /= texHeight;
     sw /= texWidth; sh /= texHeight;
@@ -129,7 +190,7 @@ public abstract class GLContext {
   public void fillRect(InternalTransform local, float dx, float dy, float dw, float dh,
                        float texWidth, float texHeight, Object tex, float alpha) {
     GLShader.Texture shader = quadTexShader();
-    shader.prepare(tex, alpha);
+    shader.prepare(tex, alpha, curFbufWidth, curFbufHeight);
     checkGLError("fillRect tex prepared");
     float sx = dx / texWidth, sy = dy / texHeight;
     float sw = dw / texWidth, sh = dh / texHeight;
@@ -144,7 +205,7 @@ public abstract class GLContext {
   public void fillRect(InternalTransform local, float dx, float dy, float dw, float dh,
                        int color, float alpha) {
     GLShader.Color shader = quadColorShader();
-    shader.prepare(color, alpha);
+    shader.prepare(color, alpha, curFbufWidth, curFbufHeight);
     checkGLError("fillRect color prepared");
     shader.addQuad(local,
                    dx,      dy,
@@ -158,7 +219,7 @@ public abstract class GLContext {
                        float x3, float y3, float x4, float y4,
                        float texWidth, float texHeight, Object tex, float alpha) {
     GLShader.Texture shader = quadTexShader();
-    shader.prepare(tex, alpha);
+    shader.prepare(tex, alpha, curFbufWidth, curFbufHeight);
     checkGLError("fillQuad tex prepared");
     shader.addQuad(local,
                    x1, y1, x1/texWidth, y1/texHeight,
@@ -171,7 +232,7 @@ public abstract class GLContext {
   public void fillQuad(InternalTransform local, float x1, float y1, float x2, float y2,
                        float x3, float y3, float x4, float y4, int color, float alpha) {
     GLShader.Color shader = quadColorShader();
-    shader.prepare(color, alpha);
+    shader.prepare(color, alpha, curFbufWidth, curFbufHeight);
     checkGLError("fillQuad color prepared");
     shader.addQuad(local, x1, y1, x2, y2, x3, y3, x4, y4);
     checkGLError("fillQuad color end");
@@ -180,7 +241,7 @@ public abstract class GLContext {
   public void fillTriangles(InternalTransform local, float[] xys, int[] indices,
                             float texWidth, float texHeight, Object tex, float alpha) {
     GLShader.Texture shader = trisTexShader();
-    shader.prepare(tex, alpha);
+    shader.prepare(tex, alpha, curFbufWidth, curFbufHeight);
     checkGLError("fillTris tex prepared");
     shader.addTriangles(local, xys, texWidth, texHeight, indices);
     checkGLError("fillTris tex end");
@@ -189,7 +250,7 @@ public abstract class GLContext {
   public void fillTriangles(InternalTransform local, float[] xys, int[] indices,
                             int color, float alpha) {
     GLShader.Color shader = trisColorShader();
-    shader.prepare(color, alpha);
+    shader.prepare(color, alpha, curFbufWidth, curFbufHeight);
     checkGLError("fillTris color prepared");
     shader.addTriangles(local, xys, 1, 1, indices);
     checkGLError("fillTris color end");
@@ -198,7 +259,7 @@ public abstract class GLContext {
   public void fillTriangles(InternalTransform local, float[] xys, float[] sxys, int[] indices,
                             Object tex, float alpha) {
     GLShader.Texture shader = trisTexShader();
-    shader.prepare(tex, alpha);
+    shader.prepare(tex, alpha, curFbufWidth, curFbufHeight);
     checkGLError("fillTris tex prepared");
     shader.addTriangles(local, xys, sxys, indices);
     checkGLError("fillTris tex end");
@@ -224,9 +285,31 @@ public abstract class GLContext {
     return true;
   }
 
+  protected GLContext(float scaleFactor) {
+    Asserts.checkArgument(scaleFactor >= 1, "Scale factor cannot be less than one.");
+    this.scaleFactor = scaleFactor;
+  }
+
+  protected void viewWasResized () {
+    bindFramebufferImpl(defaultFrameBuffer(), defaultFbufWidth, defaultFbufHeight);
+  }
+
+  /**
+   * Returns the default framebuffer.
+   */
+  protected abstract Object defaultFrameBuffer();
+
+  /**
+   * Binds the specified framebuffer and sets the viewport to the specified dimensions.
+   */
+  protected abstract void bindFramebufferImpl(Object fbuf, int width, int height);
+
   protected abstract GLShader.Texture quadTexShader();
+
   protected abstract GLShader.Texture trisTexShader();
+
   protected abstract GLShader.Color quadColorShader();
+
   protected abstract GLShader.Color trisColorShader();
 
   private void queuePender(Runnable action) {

@@ -19,8 +19,8 @@ import playn.core.InternalTransform;
 
 public class SurfaceGL extends AbstractSurfaceGL {
 
-  protected final int width;
-  protected final int height;
+  protected final int width, height;
+  protected int texWidth, texHeight;
   protected Object tex, fbuf;
 
   protected SurfaceGL(GLContext ctx, int width, int height) {
@@ -28,6 +28,7 @@ public class SurfaceGL extends AbstractSurfaceGL {
     this.width = width;
     this.height = height;
     createTexture();
+    scale(ctx.scaleFactor, ctx.scaleFactor);
   }
 
   @Override
@@ -52,7 +53,9 @@ public class SurfaceGL extends AbstractSurfaceGL {
   }
 
   protected void createTexture() {
-    tex = ctx.createTexture(width, height, false, false);
+    texWidth = ctx.scaledCeil(width);
+    texHeight = ctx.scaledCeil(height);
+    tex = ctx.createTexture(texWidth, texHeight, false, false);
     fbuf = ctx.createFramebuffer(tex);
     ctx.clear(0, 0, 0, 0);
   }
@@ -66,7 +69,7 @@ public class SurfaceGL extends AbstractSurfaceGL {
 
   @Override
   protected void bindFramebuffer() {
-    ctx.bindFramebuffer(fbuf, width, height);
+    ctx.bindFramebuffer(fbuf, texWidth, texHeight);
   }
 
   @Override

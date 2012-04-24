@@ -29,10 +29,6 @@ class JavaKeyboard implements playn.core.Keyboard {
   private Listener listener;
   private JFrame frame;
 
-  JavaKeyboard() throws LWJGLException {
-    Keyboard.create();
-  }
-
   @Override
   public void setListener(Listener listener) {
     this.listener = listener;
@@ -48,6 +44,10 @@ class JavaKeyboard implements playn.core.Keyboard {
     Object result = JOptionPane.showInputDialog(
       frame, label, "", JOptionPane.QUESTION_MESSAGE, null, null, initVal);
     callback.onSuccess((String) result);
+  }
+
+  void init() throws LWJGLException {
+    Keyboard.create();
   }
 
   void update() {

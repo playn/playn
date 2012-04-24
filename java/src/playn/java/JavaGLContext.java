@@ -13,10 +13,6 @@
  */
 package playn.java;
 
-import static org.lwjgl.opengl.EXTFramebufferObject.*;
-import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.opengl.GL12.*;
-
 import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -33,6 +29,15 @@ import java.awt.image.WritableRaster;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
+import org.lwjgl.LWJGLException;
+import org.lwjgl.opengl.Display;
+import org.lwjgl.opengl.DisplayMode;
+import static org.lwjgl.opengl.EXTFramebufferObject.*;
+import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL12.*;
+
+import pythagoras.f.MathUtil;
+
 import playn.core.Asserts;
 import playn.core.StockInternalTransform;
 import playn.core.gl.GLContext;
@@ -45,50 +50,24 @@ import static playn.core.PlayN.*;
  */
 class JavaGLContext extends GLContext {
 
-  // Debug
-  public static final boolean CHECK_ERRORS = true;
+  public static final boolean CHECK_ERRORS = Boolean.getBoolean("playn.glerrors");
 
-  int viewWidth, viewHeight;
-  int fbufWidth, fbufHeight;
-  private int lastFrameBuffer;
-
+  private StockInternalTransform rootXform;
   private GLShader.Texture texShader;
   private GLShader.Color colorShader;
 
-  JavaGLContext(int screenWidth, int screenHeight) {
-    this.viewWidth = screenWidth;
-    this.viewHeight = screenHeight;
-    reinitGL();
-  }
-
-  void setSize(int width, int height) {
-    fbufWidth = viewWidth = width;
-    fbufHeight = viewHeight = height;
-    bindFramebuffer(0, width, height, true);
-  }
-
-  void paintLayers(GroupLayerGL rootLayer) {
-    // Bind the default frameBuffer (the SurfaceView's Surface)
-    checkGLError("updateLayers Start");
-
-    bindFramebuffer();
-
-    // Clear to transparent
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    // Paint all the layers
-    rootLayer.paint(StockInternalTransform.IDENTITY, 1);
-    checkGLError("updateLayers");
-
-    // Guarantee a flush
-    useShader(null);
+  JavaGLContext(float scaleFactor, int screenWidth, int screenHeight) {
+    super(scaleFactor);
+    setSize(screenWidth, screenHeight);
+    // create our root transform with our scale factor
+    rootXform = new StockInternalTransform();
+    rootXform.uniformScale(scaleFactor);
   }
 
   @Override
   public Object createFramebuffer(Object tex) {
     // Generate the framebuffer and attach the texture
     int fbuf = glGenFramebuffersEXT();
-
     glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbuf);
     glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D,
                               (Integer) tex, 0);
@@ -98,29 +77,6 @@ class JavaGLContext extends GLContext {
   @Override
   public void deleteFramebuffer(Object fbuf) {
     glDeleteFramebuffersEXT((Integer) fbuf);
-  }
-
-  @Override
-  public void bindFramebuffer(Object fbuf, int width, int height) {
-    bindFramebuffer((Integer)fbuf, width, height, false);
-  }
-
-  @Override
-  public void bindFramebuffer() {
-    bindFramebuffer(0, viewWidth, viewHeight, false);
-  }
-
-  void bindFramebuffer(int frameBuffer, int width, int height, boolean force) {
-    if (force || lastFrameBuffer != frameBuffer) {
-      checkGLError("bindFramebuffer");
-      flush();
-
-      lastFrameBuffer = frameBuffer;
-      glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, frameBuffer);
-      glViewport(0, 0, width, height);
-      fbufWidth = width;
-      fbufHeight = height;
-    }
   }
 
   @Override
@@ -151,7 +107,7 @@ class JavaGLContext extends GLContext {
   @Override
   public void startClipped(int x, int y, int width, int height) {
     flush(); // flush any pending unclipped calls
-    glScissor(x, fbufHeight - y - height, width, height);
+    glScissor(x, curFbufHeight - y - height, width, height);
     glEnable(GL_SCISSOR_TEST);
   }
 
@@ -178,6 +134,28 @@ class JavaGLContext extends GLContext {
   }
 
   @Override
+  protected void viewWasResized() {
+    try {
+      Display.setDisplayMode(new DisplayMode(defaultFbufWidth, defaultFbufHeight));
+    } catch (LWJGLException e) {
+      throw new RuntimeException(e);
+    }
+    if (Display.isCreated())
+      super.viewWasResized();
+  }
+
+  @Override
+  protected Object defaultFrameBuffer() {
+    return 0;
+  }
+
+  @Override
+  protected void bindFramebufferImpl(Object fbuf, int width, int height) {
+    glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, (Integer) fbuf);
+    glViewport(0, 0, width, height);
+  }
+
+  @Override
   protected GLShader.Texture quadTexShader() {
     return texShader;
   }
@@ -192,6 +170,39 @@ class JavaGLContext extends GLContext {
   @Override
   protected GLShader.Color trisColorShader() {
     return colorShader;
+  }
+
+  void initGL() {
+    try {
+      Display.create();
+      super.viewWasResized();
+      glDisable(GL_CULL_FACE);
+      glEnable(GL_BLEND);
+      glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+      glClearColor(0, 0, 0, 1);
+      texShader = new JavaGLShader.Texture(this);
+      colorShader = new JavaGLShader.Color(this);
+      checkGLError("initGL");
+    } catch (LWJGLException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  void paintLayers(GroupLayerGL rootLayer) {
+    // Bind the default frameBuffer (the SurfaceView's Surface)
+    checkGLError("updateLayers Start");
+
+    bindFramebuffer();
+
+    // Clear to transparent
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    // Paint all the layers
+    rootLayer.paint(rootXform, 1);
+    checkGLError("updateLayers");
+
+    // Guarantee a flush
+    useShader(null);
   }
 
   void updateTexture(int texture, BufferedImage image) {
@@ -230,16 +241,6 @@ class JavaGLContext extends GLContext {
     imageBuffer.flip();
 
     return imageBuffer;
-  }
-
-  private void reinitGL() {
-    glDisable(GL_CULL_FACE);
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-    glClearColor(0, 0, 0, 1);
-    texShader = new JavaGLShader.Texture(this);
-    colorShader = new JavaGLShader.Color(this);
-    checkGLError("reinitGL");
   }
 
   private static BufferedImage copyAs(BufferedImage image, int type) {

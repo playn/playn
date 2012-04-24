@@ -19,7 +19,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-
 import javax.imageio.ImageIO;
 
 import com.google.common.base.Charsets;
@@ -39,6 +38,8 @@ public class JavaAssets extends AbstractAssets {
   /** Makes asset loading asynchronous to mimic the behavior of the HTML backend. */
   private static final boolean asyncLoad = Boolean.getBoolean("playn.java.asyncLoad");
 
+  private final JavaGraphics graphics;
+  private final JavaAudio audio;
   private String pathPrefix = "";
 
   static void doResourceAction(Runnable action) {
@@ -46,6 +47,11 @@ public class JavaAssets extends AbstractAssets {
       EventQueue.invokeLater(action);
     else
       action.run();
+  }
+
+  public JavaAssets (JavaGraphics graphics, JavaAudio audio) {
+    this.graphics = graphics;
+    this.audio = audio;
   }
 
   /**
@@ -83,10 +89,10 @@ public class JavaAssets extends AbstractAssets {
   @Override
   protected Image doGetImage(String path) {
     try {
-      return createImage(ImageIO.read(requireResource(pathPrefix + path)));
+      return graphics.createStaticImage(ImageIO.read(requireScaledResource(pathPrefix + path)));
     } catch (Exception e) {
       PlayN.log().warn("Could not load image at " + pathPrefix + path, e);
-      return new JavaErrorImage(e);
+      return graphics.createErrorImage(e);
     }
   }
 
@@ -96,9 +102,9 @@ public class JavaAssets extends AbstractAssets {
     InputStream in = getClass().getClassLoader().getResourceAsStream(pathPrefix + path);
     if (in == null) {
       PlayN.log().warn("Could not find sound " + pathPrefix + path);
-      return ((JavaAudio) PlayN.audio()).createNoopSound();
+      return audio.createNoopSound();
     } else {
-      return ((JavaAudio) PlayN.audio()).createSound(path, in);
+      return audio.createSound(path, in);
     }
   }
 
@@ -115,8 +121,19 @@ public class JavaAssets extends AbstractAssets {
     });
   }
 
-  protected JavaImage createImage(BufferedImage source) {
-    return new JavaStaticImage(source);
+  protected URL requireScaledResource(String path) throws FileNotFoundException {
+    String scaledPath = graphics.adjustImagePath(path);
+    try {
+      return requireResource(scaledPath);
+    } catch (FileNotFoundException fnfe) {
+      // fall through try the unscaled version (if it differs from the default path)
+      if (!scaledPath.equals(path)) {
+        PlayN.log().info("Could not find " + scaledPath + " falling back to unscaled image.");
+        return requireResource(path);
+      } else {
+        throw fnfe;
+      }
+    }
   }
 
   protected URL requireResource(String path) throws FileNotFoundException {

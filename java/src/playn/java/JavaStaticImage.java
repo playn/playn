@@ -26,8 +26,8 @@ public class JavaStaticImage extends JavaImage {
 
   private List<ResourceCallback<? super Image>> callbacks;
 
-  public JavaStaticImage(final BufferedImage img) {
-    super(null);
+  public JavaStaticImage(JavaGLContext ctx, final BufferedImage img) {
+    super(ctx, null);
 
     JavaAssets.doResourceAction(new Runnable() {
       public void run () {

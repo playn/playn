@@ -19,12 +19,20 @@ import org.lwjgl.LWJGLException;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 
+import pythagoras.f.Point;
+
 import playn.core.MouseImpl;
 import playn.core.PlayN;
 
 class JavaMouse extends MouseImpl {
 
-  JavaMouse() throws LWJGLException {
+  private final JavaGraphics graphics;
+
+  public JavaMouse(JavaGraphics graphics) {
+    this.graphics = graphics;
+  }
+
+  void init() throws LWJGLException {
     Mouse.create();
   }
 
@@ -34,22 +42,22 @@ class JavaMouse extends MouseImpl {
     while (Mouse.next()) {
       double time = (double) (Mouse.getEventNanoseconds() / 1000);
       int btn = getButton(Mouse.getEventButton());
-      int x = Mouse.getEventX();
-      int y = Display.getHeight() - Mouse.getEventY() - 1;
+      Point m = new Point(Mouse.getEventX(), Display.getHeight() - Mouse.getEventY() - 1);
+      graphics.transformMouse(m);
 
       if (btn != -1) {
         if (Mouse.getEventButtonState()) {
-          onMouseDown(new ButtonEvent.Impl(time, x, y, btn));
-          pointer.onMouseDown(time, x, y);
+          onMouseDown(new ButtonEvent.Impl(time, m.x, m.y, btn));
+          pointer.onMouseDown(time, m.x, m.y);
         } else {
-          onMouseUp(new ButtonEvent.Impl(time, x, y, btn));
-          pointer.onMouseUp(time, x, y);
+          onMouseUp(new ButtonEvent.Impl(time, m.x, m.y, btn));
+          pointer.onMouseUp(time, m.x, m.y);
         }
       } else if (Mouse.getEventDWheel() != 0) {
         onMouseWheelScroll(new WheelEvent.Impl(time, Mouse.getEventDWheel()));
       } else {
-        onMouseMove(new MotionEvent.Impl(time, x, y));
-        pointer.onMouseMove(time, x, y);
+        onMouseMove(new MotionEvent.Impl(time, m.x, m.y));
+        pointer.onMouseMove(time, m.x, m.y);
       }
     }
   }

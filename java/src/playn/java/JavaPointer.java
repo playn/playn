@@ -15,30 +15,23 @@
  */
 package playn.java;
 
-import org.lwjgl.LWJGLException;
-import org.lwjgl.input.Mouse;
-
 import playn.core.PointerImpl;
 
 class JavaPointer extends PointerImpl {
 
   private boolean mouseDown;
 
-  JavaPointer() throws LWJGLException {
-    Mouse.create();
-  }
-
-  void onMouseDown(double time, int x, int y) {
+  void onMouseDown(double time, float x, float y) {
     onPointerStart(new Event.Impl(time, x, y, false), false);
     mouseDown = true;
   }
 
-  void onMouseUp(double time, int x, int y) {
+  void onMouseUp(double time, float x, float y) {
     onPointerEnd(new Event.Impl(time, x, y, false), false);
     mouseDown = false;
   }
 
-  void onMouseMove(double time, int x, int y) {
+  void onMouseMove(double time, float x, float y) {
     if (mouseDown) {
       onPointerDrag(new Event.Impl(time, x, y, false), false);
     }

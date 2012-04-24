@@ -24,19 +24,20 @@ import playn.core.ResourceCallback;
 
 class JavaErrorImage extends JavaImage {
 
-  private Exception exception;
+  private final Exception exception;
 
-  public JavaErrorImage(Exception assetLoadException) {
+  public JavaErrorImage(JavaGLContext ctx, Exception assetLoadException) {
     // the caller will be notified that this image failed to load, but we also create an error
     // image so that subsequent attempts to use this image won't result in numerous follow-on
     // errors when the caller attempts to call width/height/etc.
-    super(createErrorImage(100, 100));
-    this.exception = assetLoadException;
+    super(ctx, createErrorImage(100, 100));
+    this.exception = assetLoadException != null ? assetLoadException :
+      new RuntimeException("Error loading image");
   }
 
   @Override
   public void addCallback(ResourceCallback<? super Image> callback) {
-    callback.error(exception != null ? exception : new RuntimeException("Error loading image"));
+    callback.error(exception);
   }
 
   private static BufferedImage createErrorImage(int width, int height) {

@@ -36,7 +36,7 @@ public class SurfaceTest extends Test {
       public float apply (float x) { return (float)Math.sin(x/20)*50; }
     });
     final Pattern pattern = assets().getImage("images/tile.png").toPattern();
-    final Image pea = assets().getImage("images/pea.png");
+    final Image orange = assets().getImage("images/orange.png");
 
     ImmediateLayer unclipped = graphics().createImmediateLayer(new ImmediateLayer.Renderer() {
       public void render (Surface surf) {
@@ -50,9 +50,9 @@ public class SurfaceTest extends Test {
         surf.setAlpha(0.5f);
         surf.setFillColor(0xFFFF0000);
         surf.fillRect(10, 200, 50, 50);
-        surf.drawImage(pea, 65, 205);
+        surf.drawImage(orange, 65, 205);
         surf.fillRect(10, 260, 50, 50);
-        surf.drawImage(pea, 65, 265);
+        surf.drawImage(orange, 65, 265);
         surf.setAlpha(1f);
 
         // fill some shapes with patterns

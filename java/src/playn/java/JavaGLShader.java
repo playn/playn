@@ -54,9 +54,9 @@ public class JavaGLShader extends IndexedTrisShader {
     }
 
     @Override
-    public void prepare(Object texObj, float alpha) {
+    public void prepare(Object texObj, float alpha, int fbufWidth, int fbufHeight) {
       ctx.checkGLError("textureShader.prepare start");
-      if (super.prepare()) {
+      if (super.prepare(fbufWidth, fbufHeight)) {
         glActiveTexture(GL_TEXTURE0);
         glUniform1i(uTexture, 0);
       }
@@ -86,9 +86,9 @@ public class JavaGLShader extends IndexedTrisShader {
     }
 
     @Override
-    public void prepare(int color, float alpha) {
+    public void prepare(int color, float alpha, int fbufWidth, int fbufHeight) {
       ctx.checkGLError("colorShader.prepare start");
-      super.prepare();
+      super.prepare(fbufWidth, fbufHeight);
 
       ctx.checkGLError("colorShader.prepare super called");
 
@@ -153,15 +153,14 @@ public class JavaGLShader extends IndexedTrisShader {
     expandElems(START_ELEMS);
   }
 
-  protected boolean prepare() {
+  protected boolean prepare(int fbufWidth, int fbufHeight) {
     if (ctx.useShader(this) && glIsProgram(program)) {
       glUseProgram(program);
       ctx.checkGLError("Shader.prepare useProgram");
       // Couldn't get glUniform2fv to work for whatever reason.
-      glUniform2f(uScreenSizeLoc, ctx.fbufWidth, ctx.fbufHeight);
+      glUniform2f(uScreenSizeLoc, fbufWidth, fbufHeight);
 
-      ctx.checkGLError("Shader.prepare uScreenSizeLoc vector set to " +
-          ctx.fbufWidth + " " + ctx.fbufHeight);
+      ctx.checkGLError("Shader.prepare uScreenSizeLoc vector set to " + fbufWidth + " " + fbufHeight);
 
       glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
       glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementBuffer);

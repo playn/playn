@@ -92,17 +92,17 @@ public class CanvasTest extends Test {
       }
     });
 
-    addTestCanvas(100, 100, "images/pea.png", new ImageDrawer() {
-      public void draw(Canvas canvas, Image pea) {
+    addTestCanvas(100, 100, "images/orange.png", new ImageDrawer() {
+      public void draw(Canvas canvas, Image orange) {
         canvas.setFillColor(0xFF99CCFF);
         canvas.fillRect(0, 0, 100, 100);
 
         // draw an image normally, scaled, cropped, cropped and scaled, etc.
         float half = 37/2f;
-        canvas.drawImage(pea, 10, 10);
-        canvas.drawImage(pea, 55, 10, 37, 37, half, half, half, half);
-        canvas.drawImage(pea, 10, 55, 37, 37, half, 0, half, half);
-        canvas.drawImage(pea, 55, 55, 37, 37, half, half/2, half, half);
+        canvas.drawImage(orange, 10, 10);
+        canvas.drawImage(orange, 55, 10, 37, 37, half, half, half, half);
+        canvas.drawImage(orange, 10, 55, 37, 37, half, 0, half, half);
+        canvas.drawImage(orange, 55, 55, 37, 37, half, half/2, half, half);
       }
     });
 

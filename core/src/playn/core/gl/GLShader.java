@@ -24,12 +24,12 @@ public interface GLShader
 {
   /** Defines the interface to the texture shader. */
   interface Texture extends GLShader {
-    void prepare(Object tex, float alpha);
+    void prepare(Object tex, float alpha, int fbufWidth, int fbufHeight);
   }
 
   /** Defines the interface to the color shader. */
   interface Color extends GLShader {
-    void prepare(int color, float alpha);
+    void prepare(int color, float alpha, int fbufWidth, int fbufHeight);
   }
 
   /**

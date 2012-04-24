@@ -101,7 +101,7 @@ class JavaCanvas implements Canvas {
   @Override
   public Canvas drawImage(Image img, float x, float y) {
     int w = img.width(), h = img.height();
-    return drawImage(img, x, y, w, h, 0, 0, w, h);
+    return drawImage(img, x, y, w, h);
   }
 
   @Override

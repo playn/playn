@@ -17,6 +17,7 @@ package playn.java;
 
 import java.io.IOException;
 
+import org.lwjgl.LWJGLException;
 import org.lwjgl.opengl.Display;
 
 import playn.core.Analytics;
@@ -50,44 +51,52 @@ public class JavaPlatform implements Platform {
   private static JavaPlatform instance;
 
   public static JavaPlatform register() {
+    String sfprop = System.getProperty("playn.scaleFactor");
+    if (sfprop != null) {
+      try {
+        return register(Float.parseFloat(sfprop));
+      } catch (Exception e) {
+        System.err.println("Invalid scaleFactor supplied '" + sfprop + "': " + e);
+        // fall through and register with scale factor 1
+      }
+    }
+    return register(1);
+  }
+
+  public static JavaPlatform register(float scaleFactor) {
     // Guard against multiple-registration. This can happen when running tests in maven.
     if (instance != null) {
       return instance;
     }
 
-    instance = new JavaPlatform();
+    instance = new JavaPlatform(scaleFactor);
     PlayN.setPlatform(instance);
     instance.init();
     return instance;
   }
 
-  private JavaRegularExpression regularExpression = new JavaRegularExpression();
+  private JavaAnalytics analytics = new JavaAnalytics();
   private JavaAudio audio = new JavaAudio();
-  private JavaGraphics graphics;
-  private Json json = new JsonImpl();
-  private JavaKeyboard keyboard;
   private JavaLog log = new JavaLog();
   private JavaNet net = new JavaNet();
-  private JavaPointer pointer;
-  private JavaMouse mouse;
+  private JavaRegularExpression regex = new JavaRegularExpression();
   private JavaStorage storage = new JavaStorage();
-  private JavaAssets assets = new JavaAssets();
-  private Analytics analytics = new JavaAnalytics();
+  private JsonImpl json = new JsonImpl();
+  private JavaKeyboard keyboard = new JavaKeyboard();
+  private JavaPointer pointer = new JavaPointer();
+  private JavaGraphics graphics;
+  private JavaMouse mouse;
+  private JavaAssets assets;
 
   private int updateRate = 0;
   private float accum = updateRate;
   private double lastUpdateTime;
   private double lastPaintTime;
 
-  protected JavaPlatform() {
-    try {
-      graphics = new JavaGraphics();
-      keyboard = new JavaKeyboard();
-      pointer = new JavaPointer();
-      mouse = new JavaMouse();
-    } catch (Throwable e) {
-      throw new RuntimeException("Unrecoverable initialization error", e);
-    }
+  public JavaPlatform(float scaleFactor) {
+    graphics = new JavaGraphics(scaleFactor);
+    mouse = new JavaMouse(graphics);
+    assets = new JavaAssets(graphics, audio);
   }
 
   protected void init() {
@@ -164,6 +173,16 @@ public class JavaPlatform implements Platform {
   public void run(final Game game) {
     this.updateRate = game.updateRate();
 
+    try {
+      // initialize LWJGL (and show the display) now that the game has been initialized
+      graphics.init();
+      // now that the display is initialized we can init our mouse and keyboard
+      mouse.init();
+      keyboard.init();
+    } catch (LWJGLException e) {
+      throw new RuntimeException("Unrecoverable initialization error", e);
+    }
+
     game.init();
 
     while (!Display.isCloseRequested()) {
@@ -224,7 +243,7 @@ public class JavaPlatform implements Platform {
 
   @Override
   public RegularExpression regularExpression() {
-    return regularExpression;
+    return regex;
   }
 
   @Override

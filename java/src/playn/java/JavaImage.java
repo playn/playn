@@ -28,20 +28,22 @@ import playn.core.gl.ImageGL;
 
 abstract class JavaImage extends ImageGL implements JavaCanvas.Drawable {
 
+  protected final JavaGLContext ctx;
   protected BufferedImage img;
 
-  JavaImage(BufferedImage img) {
+  JavaImage(JavaGLContext ctx, BufferedImage img) {
+    this.ctx = ctx;
     this.img = img;
   }
 
   @Override
   public int width() {
-    return img.getWidth();
+    return ctx.invScaledCeil(img.getWidth());
   }
 
   @Override
   public int height() {
-    return img.getHeight();
+    return ctx.invScaledCeil(img.getHeight());
   }
 
   @Override
@@ -73,17 +75,26 @@ abstract class JavaImage extends ImageGL implements JavaCanvas.Drawable {
 
   @Override
   public void draw(Graphics2D gfx, float x, float y, float w, float h) {
-    // For non-integer scaling, we have to use AffineTransform.
-    AffineTransform tx = new AffineTransform(w / width(), 0f, 0f, h / height(), x, y);
+    // using img.getWidth/Height here accounts for ctx.scaleFactor
+    AffineTransform tx = new AffineTransform(w / img.getWidth(), 0f, 0f,
+                                             h / img.getHeight(), x, y);
     gfx.drawImage(img, tx, null);
   }
 
   @Override
   public void draw(Graphics2D gfx, float dx, float dy, float dw, float dh,
                    float sx, float sy, float sw, float sh) {
-    // TODO: use AffineTransform here as well?
-    gfx.drawImage(img, (int)dx, (int)dy, (int)(dx + dw), (int)(dy + dh),
-                  (int)sx, (int)sy, (int)(sx + sw), (int)(sy + sh), null);
+    // adjust our source rect to account for the scale factor
+    sx *= ctx.scaleFactor;
+    sy *= ctx.scaleFactor;
+    sw *= ctx.scaleFactor;
+    sh *= ctx.scaleFactor;
+    // now render the image through a clip and with a scaling transform, so that only the desired
+    // source rect is rendered, and is rendered into the desired target region
+    float scaleX = dw/sw, scaleY = dh/sh;
+    gfx.setClip(new Rectangle2D.Float(dx, dy, dw, dh));
+    gfx.drawImage(img, new AffineTransform(scaleX, 0f, 0f, scaleY, dx-sx*scaleX, dy-sy*scaleY), null);
+    gfx.setClip(null);
   }
 
   @Override

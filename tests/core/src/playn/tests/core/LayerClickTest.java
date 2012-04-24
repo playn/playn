@@ -37,9 +37,9 @@ class LayerClickTest extends Test {
 
   @Override
   public void init() {
-    Image pea = assets().getImage("images/pea.png");
+    Image orange = assets().getImage("images/orange.png");
 
-    final ImageLayer layer1 = graphics().createImageLayer(pea);
+    final ImageLayer layer1 = graphics().createImageLayer(orange);
     layer1.setScale(2);
     layer1.setRotation(FloatMath.PI/8);
     layer1.setTranslation(50, 50);
@@ -59,7 +59,7 @@ class LayerClickTest extends Test {
       protected Vector _lstart, _pstart;
     });
 
-    final ImageLayer layer2 = graphics().createImageLayer(pea);
+    final ImageLayer layer2 = graphics().createImageLayer(orange);
     layer2.setScale(1.5f);
     layer2.setRotation(FloatMath.PI/4);
     layer2.setTranslation(150, 50);
@@ -79,7 +79,7 @@ class LayerClickTest extends Test {
       protected Vector _lstart, _pstart;
     });
 
-    final ImageLayer layer3 = graphics().createImageLayer(pea);
+    final ImageLayer layer3 = graphics().createImageLayer(orange);
     layer3.setRotation(-FloatMath.PI/4);
     layer3.setTranslation(50, 150);
     graphics().rootLayer().add(layer3);
