@@ -26,9 +26,8 @@ class AndroidPath implements playn.core.Path {
   }
 
   @Override
-  public void arcTo(float radius, float x, float y) {
-    // TODO: convert this.
-    path.lineTo(x, y);
+  public void bezierTo(float c1x, float c1y, float c2x, float c2y, float x, float y) {
+    path.cubicTo(c1x, c1y, c2x, c2y, x, y);
   }
 
   @Override

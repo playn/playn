@@ -18,8 +18,10 @@ package playn.java;
 import playn.core.Path;
 
 import java.awt.Graphics2D;
+import java.awt.geom.Arc2D;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Path2D;
+import java.awt.geom.Point2D;
 
 class JavaPath implements Path, JavaCanvasState.Clipper {
 
@@ -51,9 +53,8 @@ class JavaPath implements Path, JavaCanvasState.Clipper {
   }
 
   @Override
-  public void arcTo(float radius, float x, float y) {
-    // TODO: convert this form to one that Arc2D accepts.
-    path.lineTo(x, y);
+  public void bezierTo(float c1x, float c1y, float c2x, float c2y, float x, float y) {
+    path.curveTo(c1x, c1y, c2x, c2y, x, y);
   }
 
   @Override

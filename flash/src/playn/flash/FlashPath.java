@@ -25,7 +25,7 @@ import playn.core.Path;
  */
 public class FlashPath implements Path {
 
-  private static final int CMD_ARC = 3;
+  private static final int CMD_BEZIER = 3;
   private static final int CMD_CLOSE = 4;
   private static final int CMD_LINE = 1;
   private static final int CMD_MOVE = 0;
@@ -34,9 +34,12 @@ public class FlashPath implements Path {
   private JsArrayNumber list = JsArrayNumber.createArray().cast();
 
   @Override
-  public void arcTo(float radius, float x, float y) {
-    list.push(CMD_ARC);
-    list.push(radius);
+  public void bezierTo(float c1x, float c1y, float c2x, float c2y, float x, float y) {
+    list.push(CMD_BEZIER);
+    list.push(c1x);
+    list.push(c1y);
+    list.push(c2x);
+    list.push(c2y);
     list.push(x);
     list.push(y);
   }
@@ -101,12 +104,12 @@ public class FlashPath implements Path {
           ctx.quadraticCurveTo(cpx, cpy, x, y);
           break;
         }
-        case CMD_ARC: {
-          double curX = x, curY = 0;
-          double radius = list.get(i++);
+        case CMD_BEZIER: {
+          double c1x = list.get(i++), c1y = list.get(i++);
+          double c2x = list.get(i++), c2y = list.get(i++);
           x = list.get(i++);
           y = list.get(i++);
-          ctx.arcTo(curX, curY, x, y, radius);
+          ctx.bezierCurveTo(c1x, c1y, c2x, c2y, x, y);
           break;
         }
         case CMD_CLOSE: {
@@ -164,11 +167,12 @@ public class FlashPath implements Path {
           path.quadraticCurveTo(cpx, cpy, x, y);
           break;
         }
-        case CMD_ARC: {
-          float radius = (float) list.get(i++);
+        case CMD_BEZIER: {
+          float c1x = (float) list.get(i++), c1y = (float) list.get(i++);
+          float c2x = (float) list.get(i++), c2y = (float) list.get(i++);
           x = (float) list.get(i++);
           y = (float) list.get(i++);
-          path.arcTo(x, y, radius);
+          path.bezierTo(c1x, c1y, c2x, c2y, x, y);
           break;
         }
         case CMD_CLOSE: {

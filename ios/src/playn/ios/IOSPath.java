@@ -16,7 +16,6 @@
 package playn.ios;
 
 import cli.MonoTouch.CoreGraphics.CGPath;
-import cli.System.Drawing.PointF;
 
 import playn.core.Path;
 
@@ -51,9 +50,8 @@ public class IOSPath implements Path
   }
 
   @Override
-  public void arcTo(float radius, float x, float y) {
-    PointF cur = cgPath.get_CurrentPoint();
-    cgPath.AddArcToPoint(cur.get_X(), cur.get_Y(), x, y, radius);
+  public void bezierTo(float c1x, float c1y, float c2x, float c2y, float x, float y) {
+    cgPath.AddCurveToPoint(c1x, c1y, c2x, c2y, x, y);
   }
 
   protected void finalize() {

@@ -124,16 +124,17 @@ public class CanvasTest extends Test {
 
     addTestCanvas(100, 100, new Drawer() {
       public void draw(Canvas canvas) {
+        // draw a rounded rect with bezier curves
         Path path = canvas.createPath();
         path.moveTo(10, 0);
         path.lineTo(90, 0);
-        path.arcTo(10, 100, 10);
+        path.bezierTo(95, 0, 100, 5, 100, 10);
         path.lineTo(100, 90);
-        path.arcTo(10, 90, 100);
+        path.bezierTo(100, 95, 95, 100, 90, 100);
         path.lineTo(10, 100);
-        path.arcTo(10, 0, 90);
+        path.bezierTo(5, 100, 0, 95, 0, 90);
         path.lineTo(0, 10);
-        path.arcTo(10, 0, 10);
+        path.bezierTo(0, 5, 5, 0, 10, 0);
         path.close();
         canvas.setFillGradient(graphics().createLinearGradient(
                                  0, 0, 100, 100, new int[] { 0xFF0000FF, 0xFF00FF00 },

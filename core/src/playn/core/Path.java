@@ -49,10 +49,10 @@ public interface Path {
   void quadraticCurveTo(float cpx, float cpy, float x, float y);
 
   /**
-   * Adds an arc to the path, from the current position to the specified target,
-   * with the specified radius.
+   * Adds a bezier curve to the path, from the current position to the specified target, using the
+   * supplied control points.
    */
-  void arcTo(float radius, float x, float y);
+  void bezierTo(float c1x, float c1y, float c2x, float c2y, float x, float y);
 
   // TODO(jgw): fill rules (HTML Canvas doesn't seem to have anything)
   // Android has [inverse] winding, even-odd
