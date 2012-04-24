@@ -149,6 +149,14 @@ class AndroidCanvas implements Canvas {
   }
 
   @Override
+  public Canvas fillRoundRect(float x, float y, float width, float height, float radius) {
+    rectf.set(x, y, width, height);
+    canvas.drawRoundRect(rectf, radius, radius, currentState().prepareFill());
+    dirty = true;
+    return this;
+  }
+
+  @Override
   public int height() {
     return canvas.getHeight();
   }
@@ -278,6 +286,14 @@ class AndroidCanvas implements Canvas {
     float right = left + width;
     float bottom = top + height;
     canvas.drawRect(left, top, right, bottom, currentState().prepareStroke());
+    dirty = true;
+    return this;
+  }
+
+  @Override
+  public Canvas strokeRoundRect(float x, float y, float width, float height, float radius) {
+    rectf.set(x, y, width, height);
+    canvas.drawRoundRect(rectf, radius, radius, currentState().prepareStroke());
     dirty = true;
     return this;
   }

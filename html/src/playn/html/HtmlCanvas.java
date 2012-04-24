@@ -170,6 +170,14 @@ class HtmlCanvas implements Canvas {
   }
 
   @Override
+  public Canvas fillRoundRect(float x, float y, float w, float h, float radius) {
+    addRoundRectPath(x, y, width, height, radius);
+    ctx.fill();
+    dirty = true;
+    return this;
+  }
+
+  @Override
   public final int height() {
     return height;
   }
@@ -292,6 +300,14 @@ class HtmlCanvas implements Canvas {
   }
 
   @Override
+  public Canvas strokeRoundRect(float x, float y, float w, float h, float radius) {
+    addRoundRectPath(x, y, width, height, radius);
+    ctx.stroke();
+    dirty = true;
+    return this;
+  }
+
+  @Override
   public Canvas transform(float m11, float m12, float m21, float m22, float dx,
       float dy) {
     ctx.transform(m11, m12, m21, m22, dx, dy);
@@ -319,6 +335,17 @@ class HtmlCanvas implements Canvas {
 
   boolean dirty() {
     return dirty;
+  }
+
+  private void addRoundRectPath(float x, float y, float width, float height, float radius) {
+    float midx = x + width/2, midy = y + height/2, maxx = x + width, maxy = y + height;
+    ctx.beginPath();
+    ctx.moveTo(x, midy);
+    ctx.arcTo(x, y, midx, y, radius);
+    ctx.arcTo(maxx, y, maxx, midy, radius);
+    ctx.arcTo(maxx, maxy, midx, maxy, radius);
+    ctx.arcTo(x, maxy, x, midy, radius);
+    ctx.closePath();
   }
 
   private String convertComposite(Canvas.Composite composite) {

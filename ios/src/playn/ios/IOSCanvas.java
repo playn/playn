@@ -232,6 +232,20 @@ public class IOSCanvas implements Canvas
   }
 
   @Override
+  public Canvas fillRoundRect(float x, float y, float width, float height, float radius) {
+    addRoundRectPath(x, y, width, height, radius);
+    IOSGradient gradient = currentState().gradient;
+    if (gradient == null) {
+      bctx.FillPath();
+    } else {
+      bctx.Clip();
+      gradient.fill(bctx);
+    }
+    isDirty = true;
+    return this;
+  }
+
+  @Override
   public Canvas restore() {
     states.removeFirst();
     bctx.RestoreState();
@@ -349,6 +363,14 @@ public class IOSCanvas implements Canvas
   }
 
   @Override
+  public Canvas strokeRoundRect(float x, float y, float width, float height, float radius) {
+    addRoundRectPath(x, y, width, height, radius);
+    bctx.StrokePath();
+    isDirty = true;
+    return this;
+  }
+
+  @Override
   public Canvas transform(float m11, float m12, float m21, float m22, float dx, float dy) {
     // TODO
     return this;
@@ -358,6 +380,17 @@ public class IOSCanvas implements Canvas
   public Canvas translate(float x, float y) {
     bctx.TranslateCTM(x, y);
     return this;
+  }
+
+  private void addRoundRectPath(float x, float y, float width, float height, float radius) {
+    float midx = x + width/2, midy = y + height/2, maxx = x + width, maxy = y + height;
+    bctx.BeginPath();
+    bctx.MoveTo(x, midy);
+    bctx.AddArcToPoint(x, y, midx, y, radius);
+    bctx.AddArcToPoint(maxx, y, maxx, midy, radius);
+    bctx.AddArcToPoint(maxx, maxy, midx, maxy, radius);
+    bctx.AddArcToPoint(x, maxy, x, midy, radius);
+    bctx.ClosePath();
   }
 
   private IOSCanvasState currentState() {

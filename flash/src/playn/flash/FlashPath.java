@@ -113,7 +113,7 @@ public class FlashPath implements Path {
           break;
         }
         case CMD_CLOSE: {
-          ctx.close();
+          ctx.closePath();
           break;
         }
 

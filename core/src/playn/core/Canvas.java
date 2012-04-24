@@ -238,6 +238,17 @@ public interface Canvas {
   Canvas fillRect(float x, float y, float width, float height);
 
   /**
+   * Fills the specified rounded rectangle.
+   *
+   * @param x the x coordinate of the upper left of the rounded rectangle.
+   * @param y the y coordinate of the upper left of the rounded rectangle.
+   * @param width the width of the rounded rectangle.
+   * @param height the width of the rounded rectangle.
+   * @param radius the radius of the circle to use for the corner.
+   */
+  Canvas fillRoundRect(float x, float y, float width, float height, float radius);
+
+  /**
    * The height of this canvas.
    */
   int height();
@@ -354,6 +365,17 @@ public interface Canvas {
    * Strokes the specified rectangle.
    */
   Canvas strokeRect(float x, float y, float width, float height);
+
+  /**
+   * Strokes the specified rounded rectangle.
+   *
+   * @param x the x coordinate of the upper left of the rounded rectangle.
+   * @param y the y coordinate of the upper left of the rounded rectangle.
+   * @param width the width of the rounded rectangle.
+   * @param height the width of the rounded rectangle.
+   * @param radius the radius of the circle to use for the corner.
+   */
+  Canvas strokeRoundRect(float x, float y, float width, float height, float radius);
 
   /**
    * Multiplies the current transformation matrix by the given matrix.

@@ -29,6 +29,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
 import java.awt.geom.Rectangle2D;
+import java.awt.geom.RoundRectangle2D;
 import java.util.Deque;
 import java.util.LinkedList;
 
@@ -48,6 +49,7 @@ class JavaCanvas implements Canvas {
   private Ellipse2D.Float ellipse = new Ellipse2D.Float();
   private Line2D.Float line = new Line2D.Float();
   private Rectangle2D.Float rect = new Rectangle2D.Float();
+  private RoundRectangle2D.Float roundRect = new RoundRectangle2D.Float();
 
   JavaCanvas(Graphics2D graphics, int width, int height) {
     this.gfx = graphics;
@@ -190,6 +192,15 @@ class JavaCanvas implements Canvas {
   }
 
   @Override
+  public Canvas fillRoundRect(float x, float y, float width, float height, float radius) {
+    currentState().prepareFill(gfx);
+    roundRect.setRoundRect(x, y, width, height, radius, radius);
+    gfx.fill(roundRect);
+    isDirty = true;
+    return this;
+  }
+
+  @Override
   public int height() {
     return height;
   }
@@ -321,6 +332,15 @@ class JavaCanvas implements Canvas {
     currentState().prepareStroke(gfx);
     rect.setRect(x, y, width, height);
     gfx.draw(rect);
+    isDirty = true;
+    return this;
+  }
+
+  @Override
+  public Canvas strokeRoundRect(float x, float y, float width, float height, float radius) {
+    currentState().prepareStroke(gfx);
+    roundRect.setRoundRect(x, y, width, height, radius, radius);
+    gfx.draw(roundRect);
     isDirty = true;
     return this;
   }

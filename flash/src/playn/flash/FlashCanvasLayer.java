@@ -215,6 +215,10 @@ public class FlashCanvasLayer extends FlashLayer implements CanvasLayer {
       this.strokeText(text, x, y);
     }-*/;
 
+    public native void arcTo(double curX, double curY, double x, double y, double radius)  /*-{
+      this.arcTo(curX, curY, x, y, radius);
+    }-*/;
+
     public native void bezierCurveTo(double c1x, double c1y, double c2x, double c2y,
                                      double x, double y)  /*-{
       this.bezierCurveTo(c1x, c1y, c2x, c2y, x, y);
@@ -225,7 +229,7 @@ public class FlashCanvasLayer extends FlashLayer implements CanvasLayer {
       this.quadraticCurveTo(cpx, cpy, x, y);
     }-*/;
 
-    public native void close() /*-{
+    public native void closePath() /*-{
       this.closePath();
     }-*/;
 

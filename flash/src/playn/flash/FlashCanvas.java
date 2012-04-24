@@ -107,6 +107,14 @@ class FlashCanvas implements Canvas {
   }
 
   @Override
+  public Canvas fillRoundRect(float x, float y, float w, float h, float radius) {
+    addRoundRectPath(x, y, width, height, radius);
+    context2d.fill();
+    dirty = true;
+    return this;
+  }
+
+  @Override
   public Canvas drawText(String text, float x, float y) {
     context2d.strokeText(text, x, y);
     context2d.fillText(text, x, y);
@@ -126,7 +134,7 @@ class FlashCanvas implements Canvas {
     dirty = true;
     context2d.beginPath();
     context2d.arc(x, y, radius, 0, (float) (Math.PI*2), true);
-    context2d.close();
+    context2d.closePath();
     context2d.fill();
     return this;
   }
@@ -266,6 +274,14 @@ class FlashCanvas implements Canvas {
   }
 
   @Override
+  public Canvas strokeRoundRect(float x, float y, float w, float h, float radius) {
+    addRoundRectPath(x, y, width, height, radius);
+    context2d.stroke();
+    dirty = true;
+    return this;
+  }
+
+  @Override
   public Canvas transform(float m11, float m12, float m21, float m22, float dx,
       float dy) {
     context2d.transform(m11, m12, m21, m22, dx, dy);
@@ -283,15 +299,6 @@ class FlashCanvas implements Canvas {
     return width;
   }
 
-
-  void clearDirty() {
-    dirty = false;
-  }
-
-  boolean dirty() {
-    return dirty;
-  }
-
   public void quadraticCurveTo(float cpx, float cpy, float x, float y) {
      context2d.quadraticCurveTo(cpx, cpy, x, y);
   }
@@ -305,7 +312,7 @@ class FlashCanvas implements Canvas {
   }
 
   public void close() {
-    context2d.close();
+    context2d.closePath();
   }
 
   public BitmapData bitmapData() {
@@ -314,5 +321,24 @@ class FlashCanvas implements Canvas {
 
   public Context2d getContext2d() {
     return context2d;
+  }
+
+  void clearDirty() {
+    dirty = false;
+  }
+
+  boolean dirty() {
+    return dirty;
+  }
+
+  private void addRoundRectPath(float x, float y, float width, float height, float radius) {
+    float midx = x + width/2, midy = y + height/2, maxx = x + width, maxy = y + height;
+    context2d.beginPath();
+    context2d.moveTo(x, midy);
+    context2d.arcTo(x, y, midx, y, radius);
+    context2d.arcTo(maxx, y, maxx, midy, radius);
+    context2d.arcTo(maxx, maxy, midx, maxy, radius);
+    context2d.arcTo(x, maxy, x, midy, radius);
+    context2d.closePath();
   }
 }

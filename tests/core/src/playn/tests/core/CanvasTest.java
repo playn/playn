@@ -142,6 +142,16 @@ public class CanvasTest extends Test {
         canvas.fillPath(path);
       }
     });
+
+    addTestCanvas(100, 100, new Drawer() {
+      public void draw(Canvas canvas) {
+        // draw a rounded rect directly
+        canvas.setFillGradient(graphics().createLinearGradient(
+                                 0, 0, 100, 100, new int[] { 0xFF0000FF, 0xFF00FF00 },
+                                 new float[] { 0, 1 }));
+        canvas.fillRoundRect(0, 0, 100, 100, 10);
+      }
+    });
   }
 
   @Override
