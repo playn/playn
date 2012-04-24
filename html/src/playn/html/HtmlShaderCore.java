@@ -41,8 +41,8 @@ class HtmlShaderCore {
       uAlpha = gl.getUniformLocation(program, "u_Alpha");
     }
 
-    public void prepare(GLShader shader, Object texObj, float alpha) {
-      boolean wasntAlreadyActive = prepare(shader);
+    public void prepare(GLShader shader, Object texObj, float alpha, int fbufWidth, int fbufHeight) {
+      boolean wasntAlreadyActive = prepare(shader, fbufWidth, fbufHeight);
       if (wasntAlreadyActive) {
         gl.activeTexture(TEXTURE0);
         gl.uniform1i(uTexture, 0);
@@ -77,8 +77,8 @@ class HtmlShaderCore {
       uAlpha = gl.getUniformLocation(program, "u_Alpha");
     }
 
-    public void prepare(GLShader shader, int color, float alpha) {
-      boolean wasntAlreadyActive = prepare(shader);
+    public void prepare(GLShader shader, int color, float alpha, int fbufWidth, int fbufHeight) {
+      boolean wasntAlreadyActive = prepare(shader, fbufWidth, fbufHeight);
       if (wasntAlreadyActive || color != lastColor || alpha != lastAlpha) {
         shader.flush();
         gl.uniform1f(uAlpha, alpha);
@@ -132,12 +132,12 @@ class HtmlShaderCore {
     vertexBuffer = gl.createBuffer();
   }
 
-  protected boolean prepare(GLShader shader) {
+  protected boolean prepare(GLShader shader, int fbufWidth, int fbufHeight) {
     if (!ctx.useShader(shader))
       return false;
 
     gl.useProgram(program);
-    gl.uniform2fv(uScreenSizeLoc, new float[] { ctx.screenWidth, ctx.screenHeight });
+    gl.uniform2fv(uScreenSizeLoc, new float[] { fbufWidth, fbufHeight });
     bindBuffers();
 
     gl.enableVertexAttribArray(aMatrix);

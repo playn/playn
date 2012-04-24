@@ -97,7 +97,7 @@ class HtmlGraphicsGL extends HtmlGraphics {
     super.setSize(width, height);
     canvas.setWidth(width);
     canvas.setHeight(height);
-    ctx.bindFramebuffer(null, width, height, true);
+    ctx.setSize(width, height);
   }
 
   @Override

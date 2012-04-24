@@ -45,10 +45,6 @@ public class AndroidGLContext extends GLContext
 
   public static final boolean CHECK_ERRORS = false;
 
-  public int viewWidth, viewHeight;
-  int fbufWidth, fbufHeight;
-  private int lastFrameBuffer;
-
   private GLShader.Texture texShader;
   private GLShader.Color colorShader;
 
@@ -60,17 +56,11 @@ public class AndroidGLContext extends GLContext
   // Debug
   private int texCount;
 
-  AndroidGLContext(AndroidGL20 gfx, int screenWidth, int screenHeight) {
+  AndroidGLContext(float scaleFactor, AndroidGL20 gfx, int screenWidth, int screenHeight) {
+    super(scaleFactor);
     gl20 = gfx;
-    fbufWidth = viewWidth = screenWidth;
-    fbufHeight = viewHeight = screenHeight;
+    setSize(screenWidth, screenHeight);
     reinitGL();
-  }
-
-  void setSize(int width, int height) {
-    viewWidth = width;
-    viewHeight = height;
-    bindFramebuffer(0, width, height, true);
   }
 
   void onSurfaceCreated() {
@@ -128,29 +118,6 @@ public class AndroidGLContext extends GLContext
   }
 
   @Override
-  public void bindFramebuffer(Object fbuf, int width, int height) {
-    bindFramebuffer((Integer)fbuf, width, height, false);
-  }
-
-  @Override
-  public void bindFramebuffer() {
-    bindFramebuffer(0, viewWidth, viewHeight, false);
-  }
-
-  void bindFramebuffer(int frameBuffer, int width, int height, boolean force) {
-    if (force || lastFrameBuffer != frameBuffer) {
-      checkGLError("bindFramebuffer");
-      flush();
-
-      lastFrameBuffer = frameBuffer;
-      gl20.glBindFramebuffer(GL20.GL_FRAMEBUFFER, frameBuffer);
-      gl20.glViewport(0, 0, width, height);
-      fbufWidth = width;
-      fbufHeight = height;
-    }
-  }
-
-  @Override
   public Integer createTexture(boolean repeatX, boolean repeatY) {
     int[] texId = new int[1];
     gl20.glGenTextures(1, texId, 0);
@@ -186,7 +153,7 @@ public class AndroidGLContext extends GLContext
   @Override
   public void startClipped(int x, int y, int width, int height) {
     flush(); // flush any pending unclipped calls
-    gl20.glScissor(x, fbufHeight-y-height, width, height);
+    gl20.glScissor(x, curFbufHeight-y-height, width, height);
     gl20.glEnable(GL20.GL_SCISSOR_TEST);
   }
 
@@ -210,6 +177,17 @@ public class AndroidGLContext extends GLContext
         log().error(this.getClass().getName() + " -- " + op + ": glError " + error);
       }
     }
+  }
+
+  @Override
+  protected Object defaultFrameBuffer() {
+    return 0;
+  }
+
+  @Override
+  protected void bindFramebufferImpl(Object frameBuffer, int width, int height) {
+    gl20.glBindFramebuffer(GL20.GL_FRAMEBUFFER, (Integer) frameBuffer);
+    gl20.glViewport(0, 0, width, height);
   }
 
   @Override

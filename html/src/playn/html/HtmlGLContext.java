@@ -38,7 +38,6 @@ import playn.core.gl.LayerGL;
 public class HtmlGLContext extends GLContext
 {
   final WebGLRenderingContext gl;
-  int screenWidth, screenHeight;
 
   private final CanvasElement canvas;
   private final GLShader.Texture texQuadShader;
@@ -52,6 +51,7 @@ public class HtmlGLContext extends GLContext
   // private int texCount;
 
   HtmlGLContext(CanvasElement canvas) throws RuntimeException {
+    super(1); // no HiDPI on the interwebs
     this.canvas = canvas;
 
     // Try to create a context. If this returns null, then the browser doesn't support WebGL on
@@ -113,30 +113,8 @@ public class HtmlGLContext extends GLContext
   }
 
   @Override
-  public void bindFramebuffer(Object fbuf, int width, int height) {
-    bindFramebuffer((WebGLFramebuffer) fbuf, width, height, false);
-  }
-
-  @Override
   public void deleteFramebuffer(Object fbuf) {
     gl.deleteFramebuffer((WebGLFramebuffer) fbuf);
-  }
-
-  @Override
-  public void bindFramebuffer() {
-    bindFramebuffer(null, canvas.getWidth(), canvas.getHeight(), false);
-  }
-
-  void bindFramebuffer(WebGLFramebuffer fbuf, int width, int height, boolean force) {
-    if (force || lastFBuf != fbuf) {
-      flush();
-
-      lastFBuf = fbuf;
-      gl.bindFramebuffer(FRAMEBUFFER, fbuf);
-      gl.viewport(0, 0, width, height);
-      screenWidth = width;
-      screenHeight = height;
-    }
   }
 
   @Override
@@ -172,7 +150,7 @@ public class HtmlGLContext extends GLContext
   @Override
   public void startClipped(int x, int y, int width, int height) {
     flush(); // flush any pending unclipped calls
-    gl.scissor(x, screenHeight-y-height, width, height);
+    gl.scissor(x, curFbufHeight-y-height, width, height);
     gl.enable(SCISSOR_TEST);
   }
 
@@ -201,6 +179,17 @@ public class HtmlGLContext extends GLContext
   @Override
   public InternalTransform createTransform() {
     return new HtmlInternalTransform();
+  }
+
+  @Override
+  protected Object defaultFrameBuffer() {
+    return null;
+  }
+
+  @Override
+  protected void bindFramebufferImpl(Object fbuf, int width, int height) {
+    gl.bindFramebuffer(FRAMEBUFFER, (WebGLFramebuffer) fbuf);
+    gl.viewport(0, 0, width, height);
   }
 
   @Override

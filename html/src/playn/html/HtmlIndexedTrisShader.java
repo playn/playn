@@ -41,8 +41,8 @@ abstract class HtmlIndexedTrisShader extends IndexedTrisShader {
     }
 
     @Override
-    public void prepare(Object texObj, float alpha) {
-      core.prepare(this, texObj, alpha);
+    public void prepare(Object texObj, float alpha, int fbufWidth, int fbufHeight) {
+      core.prepare(this, texObj, alpha, fbufWidth, fbufHeight);
     }
 
     @Override
@@ -65,8 +65,8 @@ abstract class HtmlIndexedTrisShader extends IndexedTrisShader {
     }
 
     @Override
-    public void prepare(int color, float alpha) {
-      core.prepare(this, color, alpha);
+    public void prepare(int color, float alpha, int fbufWidth, int fbufHeight) {
+      core.prepare(this, color, alpha, fbufWidth, fbufHeight);
     }
 
     @Override

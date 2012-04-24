@@ -65,7 +65,8 @@ class AndroidGraphics extends GraphicsGL {
       screenWidth = startingScreenWidth;
     if (startingScreenHeight != 0)
       screenHeight = startingScreenHeight;
-    ctx = new AndroidGLContext(gfx, screenWidth, screenHeight);
+    // TODO: determine scale factor automatically?
+    ctx = new AndroidGLContext(1, gfx, screenWidth, screenHeight);
     gameView = activity.gameView();
     rootLayer = new GroupLayerGL(ctx);
   }

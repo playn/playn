@@ -37,17 +37,14 @@ public class IOSGLContext extends GLContext
 {
   public static final boolean CHECK_ERRORS = false;
 
-  public int viewWidth, viewHeight;
-
-  int fbufWidth, fbufHeight, orient;
-  private int lastFrameBuffer;
+  int orient;
 
   private GLShader.Texture texShader;
   private GLShader.Color colorShader;
 
-  public IOSGLContext(int screenWidth, int screenHeight) {
-    fbufWidth = viewWidth = screenWidth;
-    fbufHeight = viewHeight = screenHeight;
+  public IOSGLContext(float scaleFactor, int screenWidth, int screenHeight) {
+    super(scaleFactor);
+    setSize(screenWidth, screenHeight);
   }
 
   public void init() {
@@ -70,16 +67,6 @@ public class IOSGLContext extends GLContext
   @Override
   public void deleteFramebuffer(Object fbuf) {
     GL.DeleteFramebuffers(1, new int[] { (Integer) fbuf });
-  }
-
-  @Override
-  public void bindFramebuffer(Object fbuf, int width, int height) {
-    bindFramebuffer((Integer)fbuf, width, height, false);
-  }
-
-  @Override
-  public void bindFramebuffer() {
-    bindFramebuffer(0, viewWidth, viewHeight, false);
   }
 
   @Override
@@ -116,16 +103,16 @@ public class IOSGLContext extends GLContext
     switch (orient) {
     default:
     case UIDeviceOrientation.Portrait:
-      GL.Scissor(x, fbufHeight-y-height, width, height);
+      GL.Scissor(x, curFbufHeight-y-height, width, height);
       break;
     case UIDeviceOrientation.PortraitUpsideDown:
-      GL.Scissor(x-width, fbufHeight-y, width, height);
+      GL.Scissor(x-width, curFbufHeight-y, width, height);
       break;
     case UIDeviceOrientation.LandscapeLeft:
-      GL.Scissor(x-width, fbufHeight-y-height, width, height);
+      GL.Scissor(x-width, curFbufHeight-y-height, width, height);
       break;
     case UIDeviceOrientation.LandscapeRight:
-      GL.Scissor(x, fbufHeight-y, width, height);
+      GL.Scissor(x, curFbufHeight-y, width, height);
       break;
     }
     GL.Enable(All.wrap(All.ScissorTest));
@@ -154,6 +141,17 @@ public class IOSGLContext extends GLContext
   }
 
   @Override
+  protected Object defaultFrameBuffer() {
+    return 0;
+  }
+
+  @Override
+  protected void bindFramebufferImpl(Object frameBuffer, int width, int height) {
+    GL.BindFramebuffer(All.wrap(All.Framebuffer), (Integer) frameBuffer);
+    GL.Viewport(0, 0, width, height);
+  }
+
+  @Override
   protected GLShader.Texture quadTexShader() {
     return texShader;
   }
@@ -168,19 +166,6 @@ public class IOSGLContext extends GLContext
   @Override
   protected GLShader.Color trisColorShader() {
     return colorShader;
-  }
-
-  void bindFramebuffer(int frameBuffer, int width, int height, boolean force) {
-    if (force || lastFrameBuffer != frameBuffer) {
-      checkGLError("bindFramebuffer");
-      flush();
-
-      lastFrameBuffer = frameBuffer;
-      GL.BindFramebuffer(All.wrap(All.Framebuffer), frameBuffer);
-      GL.Viewport(0, 0, width, height);
-      fbufWidth = width;
-      fbufHeight = height;
-    }
   }
 
   void updateTexture(int tex, UIImage image) {

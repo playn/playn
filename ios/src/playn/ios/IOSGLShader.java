@@ -45,9 +45,9 @@ public class IOSGLShader extends IndexedTrisShader {
     }
 
     @Override
-    public void prepare(Object texObj, float alpha) {
+    public void prepare(Object texObj, float alpha, int fbufWidth, int fbufHeight) {
       ctx.checkGLError("textureShader.prepare start");
-      if (super.prepare()) {
+      if (super.prepare(fbufWidth, fbufHeight)) {
         GL.ActiveTexture(All.wrap(All.Texture0));
         GL.Uniform1(uTexture, 0);
       }
@@ -75,9 +75,9 @@ public class IOSGLShader extends IndexedTrisShader {
     }
 
     @Override
-    public void prepare(int color, float alpha) {
+    public void prepare(int color, float alpha, int fbufWidth, int fbufHeight) {
       ctx.checkGLError("colorShader.prepare start");
-      super.prepare();
+      super.prepare(fbufWidth, fbufHeight);
 
       ctx.checkGLError("colorShader.prepare super called");
 
@@ -143,15 +143,15 @@ public class IOSGLShader extends IndexedTrisShader {
     elementBuffer = buffers[1];
   }
 
-  protected boolean prepare() {
+  protected boolean prepare(int fbufWidth, int fbufHeight) {
     if (!ctx.useShader(this))
       return false;
 
     GL.UseProgram(program);
     ctx.checkGLError("Shader.prepare useProgram");
 
-    GL.Uniform2(uScreenSizeLoc, (float)ctx.fbufWidth, (float)ctx.fbufHeight);
-    // ctx.checkGLError("Shader.prepare uScreenSizeLoc set to " + viewWidth + " " + viewHeight);
+    GL.Uniform2(uScreenSizeLoc, (float)fbufWidth, (float)fbufHeight);
+    // ctx.checkGLError("Shader.prepare uScreenSizeLoc set to " + fbufWidth + " " + fbufHeight);
 
     GL.BindBuffer(All.wrap(All.ArrayBuffer), vertexBuffer);
     GL.BindBuffer(All.wrap(All.ElementArrayBuffer), elementBuffer);

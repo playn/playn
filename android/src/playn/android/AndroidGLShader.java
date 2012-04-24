@@ -50,9 +50,9 @@ public class AndroidGLShader extends IndexedTrisShader
     }
 
     @Override
-    public void prepare(Object texObj, float alpha) {
+    public void prepare(Object texObj, float alpha, int fbufWidth, int fbufHeight) {
       ctx.checkGLError("textureShader.prepare start");
-      if (super.prepare()) {
+      if (super.prepare(fbufWidth, fbufHeight)) {
         gl20.glActiveTexture(GL20.GL_TEXTURE0);
         gl20.glUniform1i(uTexture, 0);
       }
@@ -82,9 +82,9 @@ public class AndroidGLShader extends IndexedTrisShader
     }
 
     @Override
-    public void prepare(int color, float alpha) {
+    public void prepare(int color, float alpha, int fbufWidth, int fbufHeight) {
       ctx.checkGLError("colorShader.prepare start");
-      super.prepare();
+      super.prepare(fbufWidth, fbufHeight);
 
       ctx.checkGLError("colorShader.prepare super called");
 
@@ -153,15 +153,14 @@ public class AndroidGLShader extends IndexedTrisShader
     expandElems(START_ELEMS);
   }
 
-  protected boolean prepare() {
+  protected boolean prepare(int fbufWidth, int fbufHeight) {
     if (ctx.useShader(this) && gl20.glIsProgram(program)) {
       gl20.glUseProgram(program);
       ctx.checkGLError("Shader.prepare useProgram");
       // Couldn't get glUniform2fv to work for whatever reason.
-      gl20.glUniform2f(uScreenSizeLoc, ctx.fbufWidth, ctx.fbufHeight);
+      gl20.glUniform2f(uScreenSizeLoc, fbufWidth, fbufHeight);
 
-      ctx.checkGLError("Shader.prepare uScreenSizeLoc vector set to " +
-                       ctx.fbufWidth + " " + ctx.fbufHeight);
+      ctx.checkGLError("Shader.prepare uScreenSizeLoc vector set to " + fbufWidth + " " + fbufHeight);
 
       gl20.glBindBuffer(GL20.GL_ARRAY_BUFFER, vertexBuffer);
       gl20.glBindBuffer(GL20.GL_ELEMENT_ARRAY_BUFFER, elementBuffer);
