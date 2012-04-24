@@ -29,9 +29,6 @@ public class JavaImageRegion extends ImageRegionGL implements JavaCanvas.Drawabl
   public Pattern toPattern() {
     JavaImage jparent = (JavaImage)parent;
     // we have to account for the scale factor when extracting our subimage
-    System.err.println(width() + "x" + height() + "+" + x + "+" + y);
-    System.err.println(jparent.ctx.scaledCeil(width()) + "x" + jparent.ctx.scaledCeil(height()) +
-                       "+" + jparent.ctx.scaledFloor(x) + "+" + jparent.ctx.scaledFloor(y));
     BufferedImage subImage = jparent.img.getSubimage(
       jparent.ctx.scaledFloor(x), jparent.ctx.scaledFloor(y),
       jparent.ctx.scaledCeil(width()), jparent.ctx.scaledCeil(height()));
@@ -58,6 +55,5 @@ public class JavaImageRegion extends ImageRegionGL implements JavaCanvas.Drawabl
 
   JavaImageRegion(JavaImage parent, float sx, float sy, float swidth, float sheight) {
     super(parent, sx, sy, swidth, sheight);
-    System.err.println("Subimage " + swidth + "x" + sheight + "+" + sx + "+" + sy);
   }
 }
