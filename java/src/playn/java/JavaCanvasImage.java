@@ -27,19 +27,17 @@ import playn.core.gl.GLContext;
 
 class JavaCanvasImage extends JavaImage implements CanvasImage {
 
-  private JavaCanvas canvas;
+  private final JavaCanvas canvas;
 
   JavaCanvasImage(int width, int height) {
     super(new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB));
+    Graphics2D gfx = img.createGraphics();
+    gfx.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+    canvas = new JavaCanvas(gfx, width(), height());
   }
 
   @Override
   public Canvas canvas() {
-    if (canvas == null) {
-      Graphics2D gfx = img.createGraphics();
-      gfx.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-      canvas = new JavaCanvas(gfx, width(), height());
-    }
     return canvas;
   }
 
