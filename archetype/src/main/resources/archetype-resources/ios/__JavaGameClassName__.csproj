@@ -60,8 +60,8 @@
     <Reference Include="System.Core" />
     <Reference Include="monotouch" />
     <Reference Include="OpenTK" />
-    <Reference Include="${artifactId}-${version}">
-      <HintPath>bin\\${artifactId}-${version}.dll</HintPath>
+    <Reference Include="${artifactId}">
+      <HintPath>bin\\${artifactId}.dll</HintPath>
     </Reference>
     <Reference Include="IKVM.OpenJDK.Core">
       <HintPath>..\..\..\ikvm-monotouch\bin\IKVM.OpenJDK.Core.dll</HintPath>
