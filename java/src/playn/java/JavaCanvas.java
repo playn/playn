@@ -194,7 +194,7 @@ class JavaCanvas implements Canvas {
   @Override
   public Canvas fillRoundRect(float x, float y, float width, float height, float radius) {
     currentState().prepareFill(gfx);
-    roundRect.setRoundRect(x, y, width, height, radius, radius);
+    roundRect.setRoundRect(x, y, width, height, radius*2, radius*2);
     gfx.fill(roundRect);
     isDirty = true;
     return this;
@@ -339,7 +339,7 @@ class JavaCanvas implements Canvas {
   @Override
   public Canvas strokeRoundRect(float x, float y, float width, float height, float radius) {
     currentState().prepareStroke(gfx);
-    roundRect.setRoundRect(x, y, width, height, radius, radius);
+    roundRect.setRoundRect(x, y, width, height, radius*2, radius*2);
     gfx.draw(roundRect);
     isDirty = true;
     return this;
