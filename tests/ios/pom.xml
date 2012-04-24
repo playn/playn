@@ -28,6 +28,9 @@
   <build>
     <!-- use bin as that's where MonoDevelop puts its build bits -->
     <directory>bin</directory>
+    <!-- omit the version from the dll name so that we don't have to keep
+         updating the csproj file when we do PlayN releases -->
+    <finalName>${artifactId}</finalName>
     <plugins>
       <plugin>
         <groupId>com.samskivert</groupId>

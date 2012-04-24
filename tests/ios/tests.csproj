@@ -61,7 +61,7 @@
     <Reference Include="monotouch" />
     <Reference Include="OpenTK" />
     <Reference Include="playn-tests-ios">
-      <HintPath>bin\playn-tests-ios-1.2-SNAPSHOT.dll</HintPath>
+      <HintPath>bin\playn-tests-ios.dll</HintPath>
     </Reference>
     <Reference Include="IKVM.OpenJDK.Core">
       <HintPath>..\..\..\ikvm-monotouch\bin\IKVM.OpenJDK.Core.dll</HintPath>
