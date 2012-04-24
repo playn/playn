@@ -30,7 +30,7 @@
     <directory>bin</directory>
     <!-- omit the version from the dll name so that we don't have to keep
          updating the csproj file when we do PlayN releases -->
-    <finalName>${artifactId}</finalName>
+    <finalName>${project.artifactId}</finalName>
     <plugins>
       <plugin>
         <groupId>com.samskivert</groupId>

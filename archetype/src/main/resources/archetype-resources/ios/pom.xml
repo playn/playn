@@ -31,7 +31,7 @@
     <!-- use bin as that's where MonoDevelop puts its build bits -->
     <directory>bin</directory>
     <!-- omit the version from the dll name so it doesn't change with releases -->
-    <finalName>${artifactId}</finalName>
+    <finalName>${project.artifactId}</finalName>
     <plugins>
       <plugin>
         <groupId>com.samskivert</groupId>
