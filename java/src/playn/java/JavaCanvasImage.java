@@ -19,8 +19,6 @@ import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 
-import pythagoras.f.MathUtil;
-
 import playn.core.Canvas;
 import playn.core.CanvasImage;
 import playn.core.Image;
@@ -32,8 +30,7 @@ class JavaCanvasImage extends JavaImage implements CanvasImage {
   private final JavaCanvas canvas;
 
   JavaCanvasImage(JavaGLContext ctx, int width, int height) {
-    super(ctx, new BufferedImage(MathUtil.iceil(ctx.scaleFactor*width),
-                                 MathUtil.iceil(ctx.scaleFactor*height),
+    super(ctx, new BufferedImage(ctx.scaledCeil(width), ctx.scaledCeil(height),
                                  BufferedImage.TYPE_INT_ARGB));
     Graphics2D gfx = img.createGraphics();
     gfx.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
