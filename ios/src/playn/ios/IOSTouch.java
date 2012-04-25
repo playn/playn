@@ -24,7 +24,7 @@ import cli.MonoTouch.Foundation.NSSetEnumerator;
 import cli.MonoTouch.UIKit.UIEvent;
 import cli.MonoTouch.UIKit.UITouch;
 
-import pythagoras.f.Point;
+import pythagoras.f.IPoint;
 
 import playn.core.Touch;
 
@@ -72,13 +72,12 @@ public class IOSTouch implements Touch
       public void Invoke (NSObject obj, boolean[] stop) {
         UITouch touch = (UITouch) obj;
         PointF loc = touch.LocationInView(touch.get_View());
-        // transform the point based on our current orientation
-        graphics.rootTransform.inverseTransform(_scratch.set(loc.get_X(), loc.get_Y()), _scratch);
+        // transform the point based on our current orientation and scale
+        IPoint xloc = graphics.transformTouch(loc.get_X(), loc.get_Y());
         // TODO: sort out what to do about lack of ID
-        events[_idx] = new Touch.Event.Impl(touch.get_Timestamp(), _scratch.x, _scratch.y, 0);
+        events[_idx] = new Touch.Event.Impl(touch.get_Timestamp(), xloc.x(), xloc.y(), 0);
       }
       private int _idx = 0;
-      private Point _scratch = new Point();
     }));
     return events;
   }

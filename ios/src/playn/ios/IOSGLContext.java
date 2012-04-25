@@ -33,8 +33,8 @@ import playn.core.gl.GLContext;
 import playn.core.gl.GLShader;
 import playn.core.gl.GroupLayerGL;
 
-public class IOSGLContext extends GLContext
-{
+public class IOSGLContext extends GLContext {
+
   public static final boolean CHECK_ERRORS = false;
 
   int orient;
@@ -102,6 +102,7 @@ public class IOSGLContext extends GLContext
       GL.Scissor(x, curFbufHeight-y, width, height);
       break;
     }
+    checkGLError("GL.Scissor");
     GL.Enable(All.wrap(All.ScissorTest));
   }
 

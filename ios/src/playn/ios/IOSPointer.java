@@ -23,7 +23,7 @@ import cli.MonoTouch.Foundation.NSSetEnumerator;
 import cli.MonoTouch.UIKit.UIEvent;
 import cli.MonoTouch.UIKit.UITouch;
 
-import pythagoras.f.Point;
+import pythagoras.f.IPoint;
 
 import playn.core.PlayN;
 import playn.core.PointerImpl;
@@ -58,12 +58,11 @@ public class IOSPointer extends PointerImpl
       public void Invoke (NSObject obj, boolean[] stop) {
         UITouch touch = (UITouch) obj;
         PointF loc = touch.LocationInView(touch.get_View());
-        // transform the point based on our current orientation
-        graphics.rootTransform.inverseTransform(_scratch.set(loc.get_X(), loc.get_Y()), _scratch);
-        eventw[0] = new Event.Impl(touch.get_Timestamp(), _scratch.x, _scratch.y, true);
+        // transform the point based on our current orientation and scale
+        IPoint xloc = graphics.transformTouch(loc.get_X(), loc.get_Y());
+        eventw[0] = new Event.Impl(touch.get_Timestamp(), xloc.x(), xloc.y(), true);
         stop[0] = true;
       }
-      private Point _scratch = new Point();
     }));
     return eventw[0];
   }

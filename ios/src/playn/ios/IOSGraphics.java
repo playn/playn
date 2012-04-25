@@ -24,6 +24,8 @@ import cli.MonoTouch.CoreGraphics.CGImageAlphaInfo;
 import cli.MonoTouch.UIKit.UIDeviceOrientation;
 
 import pythagoras.f.FloatMath;
+import pythagoras.f.IPoint;
+import pythagoras.f.Point;
 
 import playn.core.CanvasImage;
 import playn.core.Font;
@@ -53,8 +55,8 @@ public class IOSGraphics extends GraphicsGL {
 
   private final GroupLayerGL rootLayer;
   private final int screenWidth, screenHeight;
-
-  InternalTransform rootTransform = StockInternalTransform.IDENTITY;
+  private final Point touchTemp = new Point();
+  private InternalTransform rootTransform;
   private boolean invertSizes;
 
   // a scratch bitmap context used for measuring text
@@ -70,6 +72,8 @@ public class IOSGraphics extends GraphicsGL {
     screenHeight = (int)bounds.get_Height();
     ctx = new IOSGLContext(scale, screenWidth, screenHeight);
     rootLayer = new GroupLayerGL(ctx);
+    rootTransform = new StockInternalTransform();
+    rootTransform.uniformScale(ctx.scaleFactor);
   }
 
   @Override
@@ -150,30 +154,33 @@ public class IOSGraphics extends GraphicsGL {
 
   void setOrientation(UIDeviceOrientation orientation) {
     ctx.orient = orientation.Value;
+    rootTransform = new StockInternalTransform();
+    rootTransform.uniformScale(ctx.scaleFactor);
     switch (orientation.Value) {
     case UIDeviceOrientation.Portrait:
-      rootTransform = StockInternalTransform.IDENTITY;
       invertSizes = false;
       break;
     case UIDeviceOrientation.PortraitUpsideDown:
-      rootTransform = new StockInternalTransform();
       rootTransform.translate(-ctx.viewWidth, -ctx.viewHeight);
       rootTransform.scale(-1, -1);
       invertSizes = false;
       break;
     case UIDeviceOrientation.LandscapeLeft:
-      rootTransform = new StockInternalTransform();
       rootTransform.rotate(FloatMath.PI/2);
       rootTransform.translate(0, -ctx.viewWidth);
       invertSizes = true;
       break;
     case UIDeviceOrientation.LandscapeRight:
-      rootTransform = new StockInternalTransform();
       rootTransform.rotate(-FloatMath.PI/2);
       rootTransform.translate(-ctx.viewHeight, 0);
       invertSizes = true;
       break;
     }
+  }
+
+  IPoint transformTouch(float x, float y) {
+    return rootTransform.inverseTransform(
+      touchTemp.set(x*ctx.scaleFactor, y*ctx.scaleFactor), touchTemp);
   }
 
   void paint(Game game, float alpha) {

@@ -79,12 +79,9 @@ public class IOSGLShader extends IndexedTrisShader {
       ctx.checkGLError("colorShader.prepare start");
       super.prepare(fbufWidth, fbufHeight);
 
-      ctx.checkGLError("colorShader.prepare super called");
-
       if (color == lastColor && alpha == lastAlpha)
         return;
       flush();
-
       ctx.checkGLError("colorShader.prepare flushed");
 
       GL.Uniform1(uAlpha, alpha);
@@ -150,7 +147,7 @@ public class IOSGLShader extends IndexedTrisShader {
     GL.UseProgram(program);
     ctx.checkGLError("Shader.prepare useProgram");
 
-    GL.Uniform2(uScreenSizeLoc, fbufWidth/ctx.scaleFactor, fbufHeight/ctx.scaleFactor);
+    GL.Uniform2(uScreenSizeLoc, (float)fbufWidth, (float)fbufHeight);
     // ctx.checkGLError("Shader.prepare uScreenSizeLoc set to " + fbufWidth + " " + fbufHeight);
 
     GL.BindBuffer(All.wrap(All.ArrayBuffer), vertexBuffer);
