@@ -28,7 +28,7 @@ class HtmlImageLayerCanvas extends HtmlLayerCanvas implements ImageLayer {
   private boolean widthSet, heightSet;
   private boolean repeatX, repeatY;
 
-  private HtmlImage img;
+  private Image img;
   private CanvasPattern pattern;
   private boolean patternRepeatX;
   private boolean patternRepeatY;
@@ -72,9 +72,8 @@ class HtmlImageLayerCanvas extends HtmlLayerCanvas implements ImageLayer {
 
   @Override
   public void setImage(Image img) {
-    Asserts.checkArgument(img instanceof HtmlImage);
-
-    this.img = (HtmlImage) img;
+    Asserts.checkArgument(img instanceof HtmlCanvas.Drawable);
+    this.img = img;
   }
 
   @Override
@@ -114,7 +113,7 @@ class HtmlImageLayerCanvas extends HtmlLayerCanvas implements ImageLayer {
 
   @Override
   public void paint(Context2d ctx, float parentAlpha) {
-    if (!visible()) return;
+    if (!visible() || !img.isReady()) return;
 
     ctx.save();
     transform(ctx);
@@ -130,7 +129,7 @@ class HtmlImageLayerCanvas extends HtmlLayerCanvas implements ImageLayer {
       ctx.scale(repeatX ? 1 : width / img.width(), repeatY ? 1 : height / img.height());
       ctx.fill();
     } else {
-      img.draw(ctx, 0, 0, width, height);
+      ((HtmlCanvas.Drawable) img).draw(ctx, 0, 0, width, height);
     }
 
     ctx.restore();
@@ -162,7 +161,7 @@ class HtmlImageLayerCanvas extends HtmlLayerCanvas implements ImageLayer {
     if ((repeatX == patternRepeatX) && (repeatY == patternRepeatY)) {
       return;
     }
-    pattern = img.createPattern(ctx, repeatX, repeatY);
+    pattern = ((HtmlPattern) img.toPattern()).pattern(ctx, repeatX, repeatY);
     patternRepeatX = repeatX;
     patternRepeatY = repeatY;
   }

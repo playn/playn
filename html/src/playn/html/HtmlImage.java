@@ -149,23 +149,6 @@ class HtmlImage extends ImageGL implements HtmlCanvas.Drawable {
     ((HtmlGLContext)ctx).updateTexture((WebGLTexture)tex, img);
   }
 
-  // TODO: override this in HtmlImageRegionCanvas and create tileable copy of our image
-  CanvasPattern createPattern(Context2d ctx, boolean repeatX, boolean repeatY) {
-    Context2d.Repetition repeat;
-    if (repeatX) {
-      if (repeatY) {
-        repeat = Context2d.Repetition.REPEAT;
-      } else {
-        repeat = Context2d.Repetition.REPEAT_X;
-      }
-    } else if (repeatY) {
-      repeat = Context2d.Repetition.REPEAT_Y;
-    } else {
-      return null;
-    }
-    return ctx.createPattern(img, repeat);
-  }
-
   ImageElement subImageElement(float x, float y, float width, float height) {
     CanvasElement canvas = Document.get().createElement("canvas").<CanvasElement>cast();
     canvas.setWidth(MathUtil.iceil(width));

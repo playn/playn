@@ -38,10 +38,23 @@ class HtmlPattern implements GLPattern {
   }
 
   public CanvasPattern pattern(Context2d ctx) {
-    if (pattern == null) {
-      pattern = ctx.createPattern(patimg, Context2d.Repetition.REPEAT);
+    return pattern(ctx, true, true);
+  }
+
+  public CanvasPattern pattern(Context2d ctx, boolean repeatX, boolean repeatY) {
+    Context2d.Repetition repeat;
+    if (repeatX) {
+      if (repeatY) {
+        repeat = Context2d.Repetition.REPEAT;
+      } else {
+        repeat = Context2d.Repetition.REPEAT_X;
+      }
+    } else if (repeatY) {
+      repeat = Context2d.Repetition.REPEAT_Y;
+    } else {
+      return null;
     }
-    return pattern;
+    return ctx.createPattern(patimg, repeat);
   }
 
   @Override
