@@ -25,14 +25,14 @@ public abstract class ImageRegionGL extends ImageGL implements Image.Region {
 
   protected final ImageGL parent;
   protected final float x, y;
-  protected final int width, height;
+  protected final float width, height;
 
   public ImageRegionGL(ImageGL parent, float x, float y, float width, float height) {
     this.parent = parent;
     this.x = x;
     this.y = y;
-    this.width = MathUtil.iceil(width);
-    this.height = MathUtil.iceil(height);
+    this.width = width;
+    this.height = height;
   }
 
   @Override
@@ -74,12 +74,12 @@ public abstract class ImageRegionGL extends ImageGL implements Image.Region {
 
   @Override
   public int width() {
-    return width;
+    return (int) width;
   }
 
   @Override
   public int height() {
-    return height;
+    return (int) height;
   }
 
   @Override
@@ -112,12 +112,12 @@ public abstract class ImageRegionGL extends ImageGL implements Image.Region {
 
   @Override
   protected float texWidth(boolean repeatX) {
-    return repeatX ? width() : parent.texWidth(repeatX);
+    return repeatX ? width : parent.texWidth(repeatX);
   }
 
   @Override
   protected float texHeight(boolean repeatY) {
-    return repeatY ? height() : parent.texHeight(repeatY);
+    return repeatY ? height : parent.texHeight(repeatY);
   }
 
   @Override
@@ -149,7 +149,7 @@ public abstract class ImageRegionGL extends ImageGL implements Image.Region {
     ctx.bindFramebuffer(fbuf, width, height);
     ctx.clear(0, 0, 0, 0);
     ctx.drawTexture(tex, texWidth(false), texHeight(false), ctx.createTransform(),
-                    0, height, width, -height, x(), y(), width(), height(), 1);
+                    0, height, width, -height, this.x, this.y, this.width, this.height, 1);
 
     // we no longer need this framebuffer; rebind the default framebuffer and delete ours
     ctx.bindFramebuffer();
