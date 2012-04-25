@@ -129,14 +129,17 @@ public abstract class ImageRegionGL extends ImageGL implements Image.Region {
     if (reptex != null)
       return;
 
+    int scaledWidth = ctx.scaledCeil(this.width);
+    int scaledHeight = ctx.scaledCeil(this.height);
+
     // GL requires pow2 on axes that repeat
-    int width = GLUtil.nextPowerOfTwo(width()), height = GLUtil.nextPowerOfTwo(height());
+    int width = GLUtil.nextPowerOfTwo(scaledWidth), height = GLUtil.nextPowerOfTwo(scaledHeight);
 
     // width/height == 0 => already a power of two.
     if (width == 0)
-      width = width();
+      width = scaledWidth;
     if (height == 0)
-      height = height();
+      height = scaledHeight;
 
     // our source image is our parent's texture
     Object tex = parent.ensureTexture(ctx, false, false);

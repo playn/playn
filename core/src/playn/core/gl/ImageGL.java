@@ -149,15 +149,18 @@ public abstract class ImageGL implements Image {
     if (reptex != null)
       return;
 
+    int scaledWidth = ctx.scaledCeil(width());
+    int scaledHeight = ctx.scaledCeil(height());
+
     // GL requires pow2 on axes that repeat
-    int width = GLUtil.nextPowerOfTwo(width()), height = GLUtil.nextPowerOfTwo(height());
+    int width = GLUtil.nextPowerOfTwo(scaledWidth), height = GLUtil.nextPowerOfTwo(scaledHeight);
 
     // TODO: if width/height > platform_max_size, repeatedly scale by 0.5 until within bounds
     // platform_max_size = 1024 for iOS, GL10.GL_MAX_TEXTURE_SIZE on android, etc.
 
     // no need to scale if our source data is already a power of two
     if ((width == 0) && (height == 0)) {
-      reptex = ctx.createTexture(width(), height(), repeatX, repeatY);
+      reptex = ctx.createTexture(scaledWidth, scaledHeight, repeatX, repeatY);
       updateTexture(ctx, reptex);
       return;
     }
@@ -167,9 +170,9 @@ public abstract class ImageGL implements Image {
 
     // width/height == 0 => already a power of two.
     if (width == 0)
-      width = width();
+      width = scaledWidth;
     if (height == 0)
-      height = height();
+      height = scaledHeight;
 
     // create our texture and point a new framebuffer at it
     reptex = ctx.createTexture(width, height, repeatX, repeatY);
