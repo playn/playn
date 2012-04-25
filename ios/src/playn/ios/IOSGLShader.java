@@ -86,17 +86,14 @@ public class IOSGLShader extends IndexedTrisShader {
 
       GL.Uniform1(uAlpha, alpha);
       lastAlpha = alpha;
-      setColor(color);
-      ctx.checkGLError("colorShader.prepare end");
-    }
 
-    private void setColor(int color) {
       float a = (float) ((color >> 24) & 0xff) / 255;
       float r = (float) ((color >> 16) & 0xff) / 255;
       float g = (float) ((color >> 8) & 0xff) / 255;
       float b = (float) ((color >> 0) & 0xff) / 255;
       GL.Uniform4(uColor, r, g, b, a);
       lastColor = color;
+      ctx.checkGLError("colorShader.prepare end");
     }
   }
 

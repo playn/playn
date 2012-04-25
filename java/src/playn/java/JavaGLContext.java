@@ -242,16 +242,4 @@ public class JavaGLContext extends GLContext {
 
     return imageBuffer;
   }
-
-  private static BufferedImage copyAs(BufferedImage image, int type) {
-    BufferedImage copy = new BufferedImage(image.getWidth(), image.getHeight(), type);
-    if (copy.getColorModel().hasAlpha()) {
-      Graphics2D g = copy.createGraphics();
-      g.setComposite(AlphaComposite.getInstance(AlphaComposite.CLEAR, 0.0f));
-      g.fillRect(0, 0, copy.getWidth(), copy.getHeight());
-      g.dispose();
-    }
-    copy.getGraphics().drawImage(image, 0, 0, null);
-    return copy;
-  }
 }

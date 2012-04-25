@@ -71,12 +71,10 @@ public class JavaGLShader extends IndexedTrisShader {
       lastTex = tex;
       ctx.checkGLError("textureShader.prepare end");
     }
-
   }
 
   static class Color extends JavaGLShader implements GLShader.Color {
     private int uColor, uAlpha, lastColor;
-    private FloatBuffer colors = FloatBuffer.allocate(4);
     private float lastAlpha;
 
     Color(JavaGLContext ctx) {
@@ -90,31 +88,22 @@ public class JavaGLShader extends IndexedTrisShader {
       ctx.checkGLError("colorShader.prepare start");
       super.prepare(fbufWidth, fbufHeight);
 
-      ctx.checkGLError("colorShader.prepare super called");
-
       if (color == lastColor && alpha == lastAlpha)
         return;
       flush();
-
       ctx.checkGLError("colorShader.prepare flushed");
 
       glUniform1f(uAlpha, alpha);
       lastAlpha = alpha;
-      setColor(color);
-      ctx.checkGLError("colorShader.prepare end");
-    }
 
-    private void setColor(int color) {
-      float[] colorsArray = colors.array();
-      colorsArray[3] = (float) ((color >> 24) & 0xff) / 255;
-      colorsArray[0] = (float) ((color >> 16) & 0xff) / 255;
-      colorsArray[1] = (float) ((color >> 8) & 0xff) / 255;
-      colorsArray[2] = (float) ((color >> 0) & 0xff) / 255;
-      // Still can't work out how to use glUniform4fv without generating a
-      // glError, so passing the array through as individual floats
-      glUniform4f(uColor, colorsArray[0], colorsArray[1], colorsArray[2], colorsArray[3]);
-
+      float a = (float) ((color >> 24) & 0xff) / 255;
+      float r = (float) ((color >> 16) & 0xff) / 255;
+      float g = (float) ((color >> 8) & 0xff) / 255;
+      float b = (float) ((color >> 0) & 0xff) / 255;
+      glUniform4f(uColor, r, g, b, a);
       lastColor = color;
+
+      ctx.checkGLError("colorShader.prepare end");
     }
   }
 
@@ -157,14 +146,12 @@ public class JavaGLShader extends IndexedTrisShader {
     if (ctx.useShader(this) && glIsProgram(program)) {
       glUseProgram(program);
       ctx.checkGLError("Shader.prepare useProgram");
-      // Couldn't get glUniform2fv to work for whatever reason.
-      glUniform2f(uScreenSizeLoc, fbufWidth, fbufHeight);
 
-      ctx.checkGLError("Shader.prepare uScreenSizeLoc vector set to " + fbufWidth + " " + fbufHeight);
+      glUniform2f(uScreenSizeLoc, fbufWidth, fbufHeight);
+      // ctx.checkGLError("Shader.prepare uScreenSizeLoc set to " + fbufWidth + " " + fbufHeight);
 
       glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
       glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementBuffer);
-
       ctx.checkGLError("Shader.prepare BindBuffer");
 
       glEnableVertexAttribArray(aMatrix);
@@ -172,7 +159,6 @@ public class JavaGLShader extends IndexedTrisShader {
       glEnableVertexAttribArray(aPosition);
       if (aTexture != -1)
         glEnableVertexAttribArray(aTexture);
-
       ctx.checkGLError("Shader.prepare AttribArrays enabled");
 
       glVertexAttribPointer(aMatrix, 4, GL_FLOAT, false, VERTEX_STRIDE, 0);
@@ -194,13 +180,10 @@ public class JavaGLShader extends IndexedTrisShader {
     ctx.checkGLError("Shader.flush");
 
     vertexData.position(0);
-    // FloatBuffer slicedVertexData = vertexData.slice(); // vertexOffset * FLOAT_SIZE_BYTES
     glBufferData(GL_ARRAY_BUFFER, vertexData, GL_STREAM_DRAW);
-
-    // ShortBuffer slicedElementData = elementData.slice(); // elementOffset * SHORT_SIZE_BYTES
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, elementData, GL_STREAM_DRAW);
-
     ctx.checkGLError("Shader.flush BufferData");
+
     glDrawElements(GL_TRIANGLES, elementOffset, GL_UNSIGNED_SHORT, 0);
     vertexOffset = elementOffset = 0;
     ctx.checkGLError("Shader.flush DrawElements");
@@ -221,11 +204,6 @@ public class JavaGLShader extends IndexedTrisShader {
     }
     return vertIdx;
   }
-
-  // @Override
-  // protected void addVertex(InternalTransform local, float dx, float dy) {
-  //   buildVertex(local, dx, dy, 0, 0);
-  // }
 
   @Override
   protected void addVertex(float m00, float m01, float m10, float m11, float tx, float ty,
@@ -281,10 +259,8 @@ public class JavaGLShader extends IndexedTrisShader {
   }
 
   private int loadShader(int type, final String shaderSource) {
-    int shader;
-
     // Create the shader object
-    shader = glCreateShader(type);
+    int shader = glCreateShader(type);
     if (shader == 0)
       return 0;
 
