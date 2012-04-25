@@ -89,12 +89,15 @@ class JavaTextLayout implements playn.core.TextLayout {
 
   @Override
   public float width() {
-    return width;
+    // reserve a pixel on the left and right to make antialiasing work better
+    return width + 2*PAD;
   }
 
   @Override
   public float height() {
-    return height;
+    // reserve a pixel only on the top to make antialising work better; nearly no fonts jam up
+    // against the bottom, so reserving a pixel down there just makes things look misaligned
+    return height + PAD;
   }
 
   @Override
@@ -169,7 +172,7 @@ class JavaTextLayout implements playn.core.TextLayout {
       // box size and render this text layout into it at (0,0) and nothing will get cut off)
       float rx = (float)-bounds.getX() + format.align.getX(getWidth(bounds), width);
       yoff += layout.getAscent();
-      layout.draw(gfx, x + rx, y + yoff);
+      layout.draw(gfx, x + rx + PAD, y + yoff + PAD);
       if (layout != layouts.get(0)) {
         yoff += layout.getLeading(); // add interline spacing
       }
@@ -187,4 +190,8 @@ class JavaTextLayout implements playn.core.TextLayout {
     gfx.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
     return gfx.getFontRenderContext();
   }
+
+  // this is used to reserve one pixel of padding around the top and sides of our rendered text
+  // which makes antialising work much more nicely
+  private final float PAD = 1;
 }
