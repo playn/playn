@@ -70,7 +70,11 @@ public class SurfaceTest extends Test {
     for (int ii = 0; ii < 10; ii++) {
       SurfaceLayer dot = graphics().createSurfaceLayer(10, 10);
       dot.surface().setFillColor(0xFFFF0000);
-      dot.surface().fillRect(0, 0, 10, 10);
+      dot.surface().fillRect(0, 0, 5, 5);
+      dot.surface().fillRect(5, 5, 5, 5);
+      dot.surface().setFillColor(0xFF0000FF);
+      dot.surface().fillRect(5, 0, 5, 5);
+      dot.surface().fillRect(0, 5, 5, 5);
       dot.setTranslation(hwidth + random()*hwidth, random()*height);
       dots.add(dot);
       System.err.println("Created dot at " + dot.transform());

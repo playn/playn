@@ -35,7 +35,7 @@ public class DepthTest extends Test {
   public void init() {
     GroupLayer rootLayer = graphics().rootLayer();
 
-    CanvasImage image = graphics().createImage(250, 20);
+    CanvasImage image = graphics().createImage(250, 25);
     image.canvas().drawText(rootLayer.getClass().getName(), 0, 15);
     ImageLayer info = graphics().createImageLayer(image);
     info.setTranslation(5, 5);
