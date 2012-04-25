@@ -15,7 +15,6 @@
  */
 package playn.core.gl;
 
-import pythagoras.f.MathUtil;
 import pythagoras.f.Point;
 import pythagoras.f.Vector;
 
@@ -79,8 +78,7 @@ public class ImmediateLayerGL extends LayerGL implements ImmediateLayer {
     protected void render(InternalTransform xform) {
       xform.transform(pos.set(0, 0), pos);
       xform.transform(size.set(width, height), size);
-      ctx.startClipped(MathUtil.ifloor(pos.x), MathUtil.ifloor(pos.y),
-                       MathUtil.iceil(size.x), MathUtil.iceil(size.y));
+      ctx.startClipped((int) pos.x, (int) pos.y, (int) Math.abs(size.x), (int) Math.abs(size.y));
       try {
         super.render(xform);
       } finally {
