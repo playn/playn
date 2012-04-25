@@ -15,6 +15,7 @@
  */
 package playn.ios;
 
+import cli.System.IO.File;
 import cli.System.IO.FileAccess;
 import cli.System.IO.FileMode;
 import cli.System.IO.FileShare;
@@ -60,8 +61,11 @@ public class IOSAssets implements Assets
 
   @Override
   public Image getImage(String path) {
-    PlayN.log().debug("Loading image " + path);
     String fullPath = Path.Combine(pathPrefix, path);
+    String scaledPath = graphics.adjustImagePath(fullPath);
+    if (File.Exists(scaledPath))
+      fullPath = scaledPath;
+    PlayN.log().debug("Loading image: " + fullPath);
     try {
       Stream stream = new FileStream(fullPath, FileMode.wrap(FileMode.Open),
                                      FileAccess.wrap(FileAccess.Read),
@@ -69,7 +73,7 @@ public class IOSAssets implements Assets
       NSData data = NSData.FromStream(stream);
       return createImage(graphics.ctx, UIImage.LoadFromData(data));
     } catch (Throwable t) {
-      PlayN.log().warn("Failed to load image: " + path + " [full=" + fullPath + "]", t);
+      PlayN.log().warn("Failed to load image: " + fullPath, t);
       return createImage(graphics.ctx, new UIImage());
     }
   }

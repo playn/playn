@@ -120,7 +120,7 @@ public class IOSPlatform implements Platform {
     this.orients = orients;
 
     RectangleF bounds = UIScreen.get_MainScreen().get_Bounds();
-    float scale = 1f; // TODO: UIScreen.get_MainScreen().get_Scale();
+    float scale = UIScreen.get_MainScreen().get_Scale();
 
     // create log first so that other services can use it during initialization
     log = new IOSLog();

@@ -150,7 +150,7 @@ public class IOSGLShader extends IndexedTrisShader {
     GL.UseProgram(program);
     ctx.checkGLError("Shader.prepare useProgram");
 
-    GL.Uniform2(uScreenSizeLoc, (float)fbufWidth, (float)fbufHeight);
+    GL.Uniform2(uScreenSizeLoc, fbufWidth/ctx.scaleFactor, fbufHeight/ctx.scaleFactor);
     // ctx.checkGLError("Shader.prepare uScreenSizeLoc set to " + fbufWidth + " " + fbufHeight);
 
     GL.BindBuffer(All.wrap(All.ArrayBuffer), vertexBuffer);

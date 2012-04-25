@@ -30,7 +30,7 @@ public class IOSCanvasImage extends IOSAbstractImage implements CanvasImage
 
   public IOSCanvasImage(IOSGLContext ctx, int width, int height) {
     super(ctx);
-    canvas = new IOSCanvas(width, height);
+    canvas = new IOSCanvas(ctx, width, height);
   }
 
   @Override
@@ -66,6 +66,6 @@ public class IOSCanvasImage extends IOSAbstractImage implements CanvasImage
 
   @Override
   protected void updateTexture(GLContext ctx, Object tex) {
-    this.ctx.updateTexture((Integer)tex, width(), height(), canvas.data());
+    this.ctx.updateTexture((Integer)tex, canvas.texWidth(), canvas.texHeight(), canvas.data());
   }
 }

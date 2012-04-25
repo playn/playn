@@ -81,12 +81,17 @@ public abstract class IOSAbstractImage extends ImageGL implements Image, IOSCanv
   @Override
   public void draw(CGBitmapContext bctx, float dx, float dy, float dw, float dh,
                    float sx, float sy, float sw, float sh) {
+    // adjust our source rect to account for the scale factor
+    sx *= ctx.scaleFactor;
+    sy *= ctx.scaleFactor;
+    sw *= ctx.scaleFactor;
+    sh *= ctx.scaleFactor;
+
     CGImage cgImage = cgImage();
     float iw = cgImage.get_Width(), ih = cgImage.get_Height();
     float scaleX = dw/sw, scaleY = dh/sh;
 
-    // pesky fiddling to cope with the fact that UIImages are flipped; TODO: make sure drawing a
-    // canvas image on a canvas image does the right thing
+    // pesky fiddling to cope with the fact that UIImages are flipped
     bctx.SaveState();
     bctx.TranslateCTM(dx, dy+dh);
     bctx.ScaleCTM(1, -1);

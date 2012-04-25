@@ -40,12 +40,10 @@ public class IOSGameView extends iPhoneOSGameView
 
   private DateTime lastUpdate = DateTime.get_Now();
   private final IOSPlatform platform;
-  private final float scale;
 
   public IOSGameView(IOSPlatform platform, RectangleF bounds, float scale) {
     super(bounds);
     this.platform = platform;
-    this.scale = scale;
 
     // TODO: I assume we want to manually manage loss of EGL context
     set_LayerRetainsBacking(false);

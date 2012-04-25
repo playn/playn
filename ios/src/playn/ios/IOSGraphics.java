@@ -66,8 +66,8 @@ public class IOSGraphics extends GraphicsGL {
   final IOSGLContext ctx;
 
   public IOSGraphics(RectangleF bounds, float scale) {
-    screenWidth = (int)(bounds.get_Width() * scale);
-    screenHeight = (int)(bounds.get_Height() * scale);
+    screenWidth = (int)bounds.get_Width();
+    screenHeight = (int)bounds.get_Height();
     ctx = new IOSGLContext(scale, screenWidth, screenHeight);
     rootLayer = new GroupLayerGL(ctx);
   }

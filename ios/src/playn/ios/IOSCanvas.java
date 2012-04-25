@@ -47,6 +47,7 @@ public class IOSCanvas implements Canvas
   }
 
   private final int width, height;
+  private final int texWidth, texHeight;
 
   private boolean isDirty;
   private IntPtr data;
@@ -54,22 +55,24 @@ public class IOSCanvas implements Canvas
 
   private LinkedList<IOSCanvasState> states = new LinkedList<IOSCanvasState>();
 
-  public IOSCanvas(int width, int height) {
+  public IOSCanvas(IOSGLContext ctx, int width, int height) {
     this.width = width;
     this.height = height;
     states.addFirst(new IOSCanvasState());
 
     // create our raw image data
-    data = Marshal.AllocHGlobal(width * height * 4);
+    texWidth = ctx.scaledCeil(width);
+    texHeight = ctx.scaledCeil(height);
+    data = Marshal.AllocHGlobal(texWidth * texHeight * 4);
 
     // create the bitmap context via which we'll render into it
     bctx = new CGBitmapContext(
-      data, width, height, 8, 4 * width, IOSGraphics.colorSpace,
+      data, texWidth, texHeight, 8, 4 * texWidth, IOSGraphics.colorSpace,
       CGImageAlphaInfo.wrap(CGImageAlphaInfo.PremultipliedLast));
 
-    // // CG coordinate system is OpenGL-style (0,0 in lower left); so we flip it
-    bctx.TranslateCTM(0, height);
-    bctx.ScaleCTM(1, -1);
+    // CG coordinate system is OpenGL-style (0,0 in lower left); so we flip it
+    bctx.TranslateCTM(0, ctx.scaled(height));
+    bctx.ScaleCTM(ctx.scaleFactor, -ctx.scaleFactor);
 
     // clear the canvas to start
     clear();
@@ -77,6 +80,14 @@ public class IOSCanvas implements Canvas
 
   public IntPtr data() {
     return data;
+  }
+
+  public int texWidth() {
+    return texWidth;
+  }
+
+  public int texHeight() {
+    return texHeight;
   }
 
   public CGImage cgImage() {
