@@ -84,7 +84,10 @@ public abstract class GLContext {
   }
 
   /** Creates a framebuffer that will render into the supplied texture. */
-  public abstract Object createFramebuffer(Object tex);
+  public Object createFramebuffer(Object tex) {
+    flush();
+    return createFramebufferImpl(tex);
+  }
 
   /** Deletes the supplied frame buffer (which will have come from {@link #createFramebuffer}). */
   public abstract void deleteFramebuffer(Object fbuf);
@@ -298,6 +301,11 @@ public abstract class GLContext {
    * Returns the default framebuffer.
    */
   protected abstract Object defaultFrameBuffer();
+
+  /**
+   * Creates a framebuffer that will render into the supplied texture.
+   */
+  protected abstract Object createFramebufferImpl(Object tex);
 
   /**
    * Binds the specified framebuffer and sets the viewport to the specified dimensions.

@@ -99,20 +99,6 @@ public class AndroidGLContext extends GLContext
   }
 
   @Override
-  public Integer createFramebuffer(Object tex) {
-    // Generate the framebuffer and attach the texture
-    int[] fbufBuffer = new int[1];
-    gl20.glGenFramebuffers(1, fbufBuffer, 0);
-
-    int fbuf = fbufBuffer[0];
-    gl20.glBindFramebuffer(GL20.GL_FRAMEBUFFER, fbuf);
-    gl20.glFramebufferTexture2D(GL20.GL_FRAMEBUFFER, GL20.GL_COLOR_ATTACHMENT0,
-                                GL20.GL_TEXTURE_2D, (Integer) tex, 0);
-
-    return fbuf;
-  }
-
-  @Override
   public void deleteFramebuffer(Object fbuf) {
     gl20.glDeleteFramebuffers(1, new int[] {(Integer) fbuf}, 0);
   }
@@ -182,6 +168,19 @@ public class AndroidGLContext extends GLContext
   @Override
   protected Object defaultFrameBuffer() {
     return 0;
+  }
+
+  @Override
+  protected Integer createFramebufferImpl(Object tex) {
+    // Generate the framebuffer and attach the texture
+    int[] fbufBuffer = new int[1];
+    gl20.glGenFramebuffers(1, fbufBuffer, 0);
+
+    int fbuf = fbufBuffer[0];
+    gl20.glBindFramebuffer(GL20.GL_FRAMEBUFFER, fbuf);
+    gl20.glFramebufferTexture2D(GL20.GL_FRAMEBUFFER, GL20.GL_COLOR_ATTACHMENT0,
+                                GL20.GL_TEXTURE_2D, (Integer) tex, 0);
+    return fbuf;
   }
 
   @Override

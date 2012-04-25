@@ -65,16 +65,6 @@ class JavaGLContext extends GLContext {
   }
 
   @Override
-  public Object createFramebuffer(Object tex) {
-    // Generate the framebuffer and attach the texture
-    int fbuf = glGenFramebuffersEXT();
-    glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbuf);
-    glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D,
-                              (Integer) tex, 0);
-    return fbuf;
-  }
-
-  @Override
   public void deleteFramebuffer(Object fbuf) {
     glDeleteFramebuffersEXT((Integer) fbuf);
   }
@@ -147,6 +137,16 @@ class JavaGLContext extends GLContext {
   @Override
   protected Object defaultFrameBuffer() {
     return 0;
+  }
+
+  @Override
+  protected Object createFramebufferImpl(Object tex) {
+    // Generate the framebuffer and attach the texture
+    int fbuf = glGenFramebuffersEXT();
+    glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbuf);
+    glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D,
+                              (Integer) tex, 0);
+    return fbuf;
   }
 
   @Override

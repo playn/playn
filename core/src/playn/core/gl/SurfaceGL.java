@@ -20,13 +20,15 @@ import playn.core.InternalTransform;
 public class SurfaceGL extends AbstractSurfaceGL {
 
   protected final int width, height;
-  protected int texWidth, texHeight;
+  protected final int texWidth, texHeight;
   protected Object tex, fbuf;
 
   protected SurfaceGL(GLContext ctx, int width, int height) {
     super(ctx);
     this.width = width;
     this.height = height;
+    this.texWidth = ctx.scaledCeil(width);
+    this.texHeight = ctx.scaledCeil(height);
     createTexture();
     scale(ctx.scaleFactor, ctx.scaleFactor);
   }
@@ -53,8 +55,6 @@ public class SurfaceGL extends AbstractSurfaceGL {
   }
 
   protected void createTexture() {
-    texWidth = ctx.scaledCeil(width);
-    texHeight = ctx.scaledCeil(height);
     tex = ctx.createTexture(texWidth, texHeight, false, false);
     fbuf = ctx.createFramebuffer(tex);
     ctx.clear(0, 0, 0, 0);

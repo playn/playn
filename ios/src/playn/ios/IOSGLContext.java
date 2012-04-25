@@ -52,19 +52,6 @@ public class IOSGLContext extends GLContext
   }
 
   @Override
-  public Integer createFramebuffer(Object tex) {
-    int[] fbufw = new int[1];
-    GL.GenFramebuffers(1, fbufw);
-
-    int fbuf = fbufw[0];
-    GL.BindFramebuffer(All.wrap(All.Framebuffer), fbuf);
-    GL.FramebufferTexture2D(All.wrap(All.Framebuffer), All.wrap(All.ColorAttachment0),
-                            All.wrap(All.Texture2D), (Integer) tex, 0);
-
-    return fbuf;
-  }
-
-  @Override
   public void deleteFramebuffer(Object fbuf) {
     GL.DeleteFramebuffers(1, new int[] { (Integer) fbuf });
   }
@@ -143,6 +130,18 @@ public class IOSGLContext extends GLContext
   @Override
   protected Object defaultFrameBuffer() {
     return 0;
+  }
+
+  @Override
+  protected Integer createFramebufferImpl(Object tex) {
+    int[] fbufw = new int[1];
+    GL.GenFramebuffers(1, fbufw);
+
+    int fbuf = fbufw[0];
+    GL.BindFramebuffer(All.wrap(All.Framebuffer), fbuf);
+    GL.FramebufferTexture2D(All.wrap(All.Framebuffer), All.wrap(All.ColorAttachment0),
+                            All.wrap(All.Texture2D), (Integer) tex, 0);
+    return fbuf;
   }
 
   @Override

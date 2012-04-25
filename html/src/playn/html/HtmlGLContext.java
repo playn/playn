@@ -105,14 +105,6 @@ public class HtmlGLContext extends GLContext
   }
 
   @Override
-  public Object createFramebuffer(Object tex) {
-    WebGLFramebuffer fbuf = gl.createFramebuffer();
-    gl.bindFramebuffer(FRAMEBUFFER, fbuf);
-    gl.framebufferTexture2D(FRAMEBUFFER, COLOR_ATTACHMENT0, TEXTURE_2D, (WebGLTexture) tex, 0);
-    return fbuf;
-  }
-
-  @Override
   public void deleteFramebuffer(Object fbuf) {
     gl.deleteFramebuffer((WebGLFramebuffer) fbuf);
   }
@@ -184,6 +176,14 @@ public class HtmlGLContext extends GLContext
   @Override
   protected Object defaultFrameBuffer() {
     return null;
+  }
+
+  @Override
+  protected Object createFramebufferImpl(Object tex) {
+    WebGLFramebuffer fbuf = gl.createFramebuffer();
+    gl.bindFramebuffer(FRAMEBUFFER, fbuf);
+    gl.framebufferTexture2D(FRAMEBUFFER, COLOR_ATTACHMENT0, TEXTURE_2D, (WebGLTexture) tex, 0);
+    return fbuf;
   }
 
   @Override
