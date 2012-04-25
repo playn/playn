@@ -111,6 +111,12 @@ public abstract class ImageRegionGL extends ImageGL implements Image.Region {
   }
 
   @Override
+  public Image transform(BitmapTransformer xform) {
+    throw new UnsupportedOperationException(
+      "Cannot transform subimages. Transform the parent and then obtain a subimage of that.");
+  }
+
+  @Override
   protected float texWidth(boolean repeatX) {
     return repeatX ? width : parent.texWidth(repeatX);
   }

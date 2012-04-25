@@ -100,6 +100,11 @@ class FlashImage implements Image {
     }
   }
 
+  @Override
+  public Image transform(BitmapTransformer xform) {
+    return new FlashImage(((FlashBitmapTransformer) xform).transform(imageData));
+  }
+
   BitmapData bitmapData() {
     return imageData;
   }

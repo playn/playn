@@ -22,6 +22,7 @@ import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 
 import playn.core.Asserts;
+import playn.core.Image;
 import playn.core.Pattern;
 import playn.core.gl.GLContext;
 import playn.core.gl.ImageGL;
@@ -71,6 +72,11 @@ abstract class JavaImage extends ImageGL implements JavaCanvas.Drawable {
   public void getRgb(int startX, int startY, int width, int height, int[] rgbArray, int offset,
                      int scanSize) {
     img.getRGB(startX, startY, width, height, rgbArray, offset, scanSize);
+  }
+
+  @Override
+  public Image transform(BitmapTransformer xform) {
+    return new JavaStaticImage(ctx, ((JavaBitmapTransformer) xform).transform(img));
   }
 
   @Override

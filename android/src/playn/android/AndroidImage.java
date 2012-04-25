@@ -90,6 +90,11 @@ class AndroidImage extends ImageGL implements AndroidGLContext.Refreshable {
   }
 
   @Override
+  public Image transform(BitmapTransformer xform) {
+    return new AndroidImage(ctx, ((AndroidBitmapTransformer) xform).transform(bitmap));
+  }
+
+  @Override
   protected void updateTexture(GLContext ctx, Object tex) {
     this.ctx.updateTexture((Integer)tex, bitmap);
   }

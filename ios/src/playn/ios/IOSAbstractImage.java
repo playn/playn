@@ -102,6 +102,11 @@ public abstract class IOSAbstractImage extends ImageGL implements Image, IOSCanv
   }
 
   @Override
+  public Image transform(BitmapTransformer xform) {
+    return new IOSImage(ctx, new UIImage(((IOSBitmapTransformer) xform).transform(cgImage())));
+  }
+
+  @Override
   protected void finalize() {
     if (tex != null)
       ctx.queueDestroyTexture(tex);

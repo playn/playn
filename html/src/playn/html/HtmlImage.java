@@ -145,6 +145,11 @@ class HtmlImage extends ImageGL implements HtmlCanvas.Drawable {
   }
 
   @Override
+  public Image transform(BitmapTransformer xform) {
+    return new HtmlImage(((HtmlBitmapTransformer) xform).transform(img));
+  }
+
+  @Override
   protected void updateTexture(GLContext ctx, Object tex) {
     ((HtmlGLContext)ctx).updateTexture((WebGLTexture)tex, img);
   }

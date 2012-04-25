@@ -20,6 +20,10 @@ package playn.core;
  */
 public interface Image {
 
+  /** Used with {@link #transform}. */
+  public interface BitmapTransformer {
+  }
+
   /**
    * This image's width in pixels.
    */
@@ -96,4 +100,11 @@ public interface Image {
    */
   void getRgb(int startX, int startY, int width, int height, int[] rgbArray,
               int offset, int scanSize);
+
+  /**
+   * Generates a new image from this image's bitmap, using a bitmap transformer created for the
+   * platform in use. See {@link JavaBitmapTransformer} and {@code IOSBitmapTransformer}. This does
+   * not work on sub-images.
+   */
+  Image transform(BitmapTransformer xform);
 }

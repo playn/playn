@@ -51,4 +51,9 @@ public class JavaStaticImage extends JavaImage {
       callbacks.add(callback);
     }
   }
+
+  @Override
+  public Image transform(BitmapTransformer xform) {
+    return new JavaStaticImage(ctx, ((JavaBitmapTransformer) xform).transform(img));
+  }
 }
