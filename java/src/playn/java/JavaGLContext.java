@@ -48,7 +48,7 @@ import static playn.core.PlayN.*;
 /**
  * Implements the GL context via LWJGL bindings.
  */
-class JavaGLContext extends GLContext {
+public class JavaGLContext extends GLContext {
 
   public static final boolean CHECK_ERRORS = Boolean.getBoolean("playn.glerrors");
 

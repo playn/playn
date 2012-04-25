@@ -22,7 +22,7 @@ import java.io.InputStream;
 import playn.core.Audio;
 import playn.core.Sound;
 
-class JavaAudio implements Audio {
+public class JavaAudio implements Audio {
 
   Sound createSound(String name, InputStream in) {
     return new JavaSound(name, in);
