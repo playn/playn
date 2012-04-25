@@ -35,13 +35,16 @@ public class ImageTypeTest extends Test {
   static String imageGroundTruthSrc = "images/imagetypetest_expected.png";
 
   Image image1;
-  Image imageGroundTruth;
+
   ImageLayer imageLayer1;
   SurfaceLayer surfaceLayer1;
   ImageLayer canvasLayer1;
+
   ImageLayer imageLayer2;
   SurfaceLayer surfaceLayer2;
   ImageLayer canvasLayer2;
+
+  Image imageGroundTruth;
   ImageLayer groundTruthLayer;
 
   @Override
@@ -57,6 +60,7 @@ public class ImageTypeTest extends Test {
   @Override
   public void init() {
     rootLayer = graphics().rootLayer();
+
     // add a half white, half blue background
     SurfaceLayer bg = graphics().createSurfaceLayer((int) (4 * width), (int) (4 * height));
     bg.surface().setFillColor(Color.rgb(255, 255, 255));
@@ -85,19 +89,13 @@ public class ImageTypeTest extends Test {
         canvasLayer2 = graphics().createImageLayer(canvas2);
 
         // add layers to the rootLayer
-        imageLayer1.transform().translate(offset, offset);
-        rootLayer.add(imageLayer1);
-        surfaceLayer1.transform().translate(offset + width, offset);
-        rootLayer.add(surfaceLayer1);
-        canvasLayer1.transform().translate(offset + 2 * width, offset);
-        rootLayer.add(canvasLayer1);
+        rootLayer.addAt(imageLayer1, offset, offset);
+        rootLayer.addAt(surfaceLayer1, offset + width, offset);
+        rootLayer.addAt(canvasLayer1, offset + 2 * width, offset);
 
-        imageLayer2.transform().translate(offset, offset + 2 * height);
-        rootLayer.add(imageLayer2);
-        surfaceLayer2.transform().translate(offset + width, offset + 2 * height);
-        rootLayer.add(surfaceLayer2);
-        canvasLayer2.transform().translate(offset + 2 * width, offset + 2 * height);
-        rootLayer.add(canvasLayer2);
+        rootLayer.addAt(imageLayer2, offset, offset + 2 * height);
+        rootLayer.addAt(surfaceLayer2, offset + width, offset + 2 * height);
+        rootLayer.addAt(canvasLayer2, offset + 2 * width, offset + 2 * height);
       }
 
       @Override
@@ -112,8 +110,7 @@ public class ImageTypeTest extends Test {
       @Override
       public void done(Image image) {
         groundTruthLayer = graphics().createImageLayer(image);
-        groundTruthLayer.transform().translate(3 * width, 0);
-        rootLayer.add(groundTruthLayer);
+        rootLayer.addAt(groundTruthLayer, 3 * width, 0);
       }
 
       @Override
