@@ -77,24 +77,17 @@
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
-    <Content Include="..\core\src\playn\tests\resources\images\alphalayertest.png">
-      <Link>images\alphalayertest.png</Link>
-    </Content>
-    <Content Include="..\core\src\playn\tests\resources\images\alphalayertest_expected.png">
-      <Link>images\alphalayertest_expected.png</Link>
-    </Content>
-    <Content Include="..\core\src\playn\tests\resources\images\imagetypetest.png">
-      <Link>images\imagetypetest.png</Link>
-    </Content>
-    <Content Include="..\core\src\playn\tests\resources\images\imagetypetest_expected.png">
-      <Link>images\imagetypetest_expected.png</Link>
-    </Content>
-    <Content Include="..\core\src\playn\tests\resources\images\pea.png">
-      <Link>images\pea.png</Link>
-    </Content>
-    <Content Include="..\core\src\playn\tests\resources\images\tile.png">
-      <Link>images\tile.png</Link>
-    </Content>
+    <Content Include="images\alphalayertest.png" />
+    <Content Include="images\alphalayertest@2x.png" />
+    <Content Include="images\alphalayertest_expected.png" />
+    <Content Include="images\alphalayertest_expected@2x.png" />
+    <Content Include="images\imagetypetest.png" />
+    <Content Include="images\imagetypetest@2x.png" />
+    <Content Include="images\imagetypetest_expected.png" />
+    <Content Include="images\imagetypetest_expected@2x.png" />
+    <Content Include="images\orange.png" />
+    <Content Include="images\orange@2x.png" />
+    <Content Include="images\tile.png" />
     <Content Include="touch-icon-57x57.png" />
   </ItemGroup>
 </Project>
