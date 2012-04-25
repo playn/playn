@@ -144,9 +144,10 @@ public class GroupLayerImpl<L extends AbstractLayer>
       if (l != null)
         return l;
     }
-    // if we saw no interactive children, clear our own interactive flag; this lazily deactivates
-    // this group after its interactive children have been deactivated or removed
-    if (!sawInteractiveChild)
+    // if we saw no interactive children and we don't have listeners registered directly on this
+    // group, clear our own interactive flag; this lazily deactivates this group after its
+    // interactive children have been deactivated or removed
+    if (!sawInteractiveChild && !((AbstractLayer)self).hasInteractors())
       self.setInteractive(false);
     return null;
   }

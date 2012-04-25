@@ -255,6 +255,10 @@ public abstract class AbstractLayer implements Layer {
     interact(listenerType, interaction, rootInteractor);
   }
 
+  boolean hasInteractors() {
+    return rootInteractor != null;
+  }
+
   // dispatch interactions recursively, so as to dispatch in the order they were added; we assume
   // one will not have such a large number of listeners registered on a single layer that this will
   // blow the stack; note that this also avoids issues with interactor modifications during
