@@ -131,20 +131,15 @@ public class JavaGraphics extends GraphicsGL {
 
   @Override
   public GL20 gl20() {
-    throw new UnsupportedOperationException();
+    if (gl == null) {
+      gl = new JavaGL20();
+    }
+    return gl;
   }
 
   @Override
   protected GLContext ctx() {
     return ctx;
-  }
-
-  @Override
-  public GL20 gl20() {
-    if (gl == null) {
-      gl = new JavaGL20();
-    }
-    return gl;
   }
 
   protected JavaImage createStaticImage(BufferedImage source) {
