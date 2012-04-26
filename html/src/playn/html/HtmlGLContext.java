@@ -73,7 +73,6 @@ public class HtmlGLContext extends GLContext
     }
 
     if (HtmlUrlParameters.quadShader) {
-      HtmlPlatform.log.debug("Using quad-at-a-time shaders for quads.");
       texQuadShader = new HtmlQuadShader.Texture(this);
       colorQuadShader = new HtmlQuadShader.Color(this);
     } else {
