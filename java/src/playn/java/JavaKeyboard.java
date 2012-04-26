@@ -61,7 +61,9 @@ class JavaKeyboard implements playn.core.Keyboard {
 
       if (Keyboard.getEventKeyState()) {
         listener.onKeyDown(new playn.core.Keyboard.Event.Impl(time, translateKey(keyCode)));
-        listener.onKeyTyped(new playn.core.Keyboard.TypedEvent.Impl(time, Keyboard.getEventCharacter()));
+        char keyChar = Keyboard.getEventCharacter();
+        if (!Character.isISOControl(keyChar))
+          listener.onKeyTyped(new playn.core.Keyboard.TypedEvent.Impl(time, keyChar));
       } else {
         listener.onKeyUp(new playn.core.Keyboard.Event.Impl(time, translateKey(keyCode)));
       }
