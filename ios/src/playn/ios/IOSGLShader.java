@@ -47,20 +47,20 @@ public class IOSGLShader extends IndexedTrisShader {
     @Override
     public void prepare(Object texObj, float alpha, int fbufWidth, int fbufHeight) {
       ctx.checkGLError("textureShader.prepare start");
-      if (super.prepare(fbufWidth, fbufHeight)) {
+      boolean wasntAlreadyActive = super.prepare(fbufWidth, fbufHeight);
+      if (wasntAlreadyActive) {
         GL.ActiveTexture(All.wrap(All.Texture0));
         GL.Uniform1(uTexture, 0);
       }
 
       int tex = (Integer) texObj;
-      if (tex == lastTex && alpha == lastAlpha)
-        return;
-      flush();
-
-      GL.Uniform1(uAlpha, alpha);
-      lastAlpha = alpha;
-      lastTex = tex;
-      ctx.checkGLError("textureShader.prepare end");
+      if (wasntAlreadyActive || tex != lastTex || alpha != lastAlpha) {
+        flush();
+        GL.Uniform1(uAlpha, alpha);
+        lastAlpha = alpha;
+        lastTex = tex;
+        ctx.checkGLError("textureShader.prepare end");
+      }
     }
   }
 
@@ -77,23 +77,19 @@ public class IOSGLShader extends IndexedTrisShader {
     @Override
     public void prepare(int color, float alpha, int fbufWidth, int fbufHeight) {
       ctx.checkGLError("colorShader.prepare start");
-      super.prepare(fbufWidth, fbufHeight);
-
-      if (color == lastColor && alpha == lastAlpha)
-        return;
-      flush();
-      ctx.checkGLError("colorShader.prepare flushed");
-
-      GL.Uniform1(uAlpha, alpha);
-      lastAlpha = alpha;
-
-      float a = (float) ((color >> 24) & 0xff) / 255;
-      float r = (float) ((color >> 16) & 0xff) / 255;
-      float g = (float) ((color >> 8) & 0xff) / 255;
-      float b = (float) ((color >> 0) & 0xff) / 255;
-      GL.Uniform4(uColor, r, g, b, a);
-      lastColor = color;
-      ctx.checkGLError("colorShader.prepare end");
+      boolean wasntAlreadyActive = super.prepare(fbufWidth, fbufHeight);
+      if (wasntAlreadyActive || color != lastColor || alpha != lastAlpha) {
+        flush();
+        GL.Uniform1(uAlpha, alpha);
+        lastAlpha = alpha;
+        float a = (float) ((color >> 24) & 0xff) / 255;
+        float r = (float) ((color >> 16) & 0xff) / 255;
+        float g = (float) ((color >> 8) & 0xff) / 255;
+        float b = (float) ((color >> 0) & 0xff) / 255;
+        GL.Uniform4(uColor, r, g, b, a);
+        lastColor = color;
+        ctx.checkGLError("colorShader.prepare end");
+      }
     }
   }
 
