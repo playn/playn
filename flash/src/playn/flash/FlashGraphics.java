@@ -203,6 +203,11 @@ class FlashGraphics implements Graphics {
   }
 
   @Override
+  public float scaleFactor() {
+    return 1;
+  }
+
+  @Override
   public GL20 gl20() {
     throw new UnsupportedOperationException();
   }

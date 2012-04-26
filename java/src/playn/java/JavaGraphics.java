@@ -130,6 +130,11 @@ public class JavaGraphics extends GraphicsGL {
   }
 
   @Override
+  public float scaleFactor() {
+    return ctx.scaleFactor;
+  }
+
+  @Override
   public GL20 gl20() {
     if (gl == null) {
       gl = new JavaGL20();

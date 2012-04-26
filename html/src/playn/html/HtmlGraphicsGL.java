@@ -111,6 +111,11 @@ class HtmlGraphicsGL extends HtmlGraphics {
   }
 
   @Override
+  public float scaleFactor() {
+    return ctx.scaleFactor;
+  }
+
+  @Override
   public GL20 gl20() {
     return gl20;
   }

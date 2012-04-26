@@ -139,6 +139,13 @@ public interface Graphics {
   void setSize(int width, int height);
 
   /**
+   * Returns the display scale factor. This will be 1 except on HiDPI devices that have been
+   * configured to use HiDPI mode, where it will probably be 2, but could be some other scale
+   * depending on how things were configured when initializing the platform.
+   */
+  float scaleFactor();
+
+  /**
    * <b>WARNING</b>: this is a totally experimental, untested feature. It only works on Android. It
    * may change completely. Consider yourself warned.
    *
