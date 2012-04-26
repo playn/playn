@@ -50,7 +50,9 @@ public class TestsGame implements Game {
         @Override
         public void onMouseDown(Mouse.ButtonEvent event) {
           if (event.button() == Mouse.BUTTON_RIGHT)
-            nextTest();
+            advanceTest(1);
+          else if (event.button() == Mouse.BUTTON_MIDDLE)
+            advanceTest(-1);
         }
       });
     } catch (UnsupportedOperationException e) {
@@ -59,24 +61,25 @@ public class TestsGame implements Game {
     try {
       touch().setListener(new Touch.Adapter() {
         public void onTouchStart(Touch.Event[] touches) {
-          if (touches.length > 1)
-            nextTest();
+          if (touches.length > 2)
+            advanceTest(-1);
+          else if (touches.length > 1)
+            advanceTest(1);
         }
       });
     } catch (UnsupportedOperationException e) {
       // no support for touch; no problem
     }
 
-    currentTest = -1;
-    nextTest();
+    advanceTest(currentTest = 0);
   }
 
   Test currentTest() {
     return tests[currentTest];
   }
 
-  void nextTest() {
-    currentTest = (currentTest + 1) % tests.length;
+  void advanceTest(int delta) {
+    currentTest = (currentTest + tests.length + delta) % tests.length;
 
     // setup root layer for next test
     graphics().rootLayer().clear();
