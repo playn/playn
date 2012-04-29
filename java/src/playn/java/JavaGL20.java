@@ -42,7 +42,7 @@ import org.lwjgl.opengl.GL41;
  * shaders and OpenGL ES shaders will not be 100% compatible. Some glGetXXX
  * methods are not implemented.
  * 
- * Based on LIBGDX code by mzechncer. Some code from LWJGL's GLES20.java
+ * Based on LIBGDX code by mzechner. Some code from LWJGL's GLES20.java
  * 
  * @author mzechner
  */
@@ -55,56 +55,21 @@ final class JavaGL20 implements playn.core.gl.GL20 {
 
 	private void setIntBuffer(final int[] source, final int offset,
 			final int length) {
-		// New length logic based on getBufferByteOffset in APIUtil
-		final int cap = intBuffer.capacity();
-		if (cap < length) {
-			int newLength = cap << 1;
-			while (newLength < length)
-				newLength <<= 1;
-
-			intBuffer = BufferUtils.createIntBuffer(newLength);
-		} else {
-			intBuffer.position(0);
-		}
-
-		// Always set limit.
-		intBuffer.limit(length);
+		resizeByteBuffer(length);
 		intBuffer.put(source, offset, length);
 		intBuffer.rewind();
 	}
 
 	private void setFloatBuffer(final float[] source, final int offset,
 			final int length) {
-		final int cap = floatBuffer.capacity();
-		if (cap < length) {
-			int newLength = cap << 1;
-			while (newLength < length)
-				newLength <<= 1;
-
-			floatBuffer = BufferUtils.createFloatBuffer(newLength);
-		} else {
-			floatBuffer.position(0);
-		}
-
-		floatBuffer.limit(length);
+		resizeFloatBuffer(length);
 		floatBuffer.put(source, offset, length);
 		floatBuffer.rewind();
 	}
 
 	private void setByteBuffer(final byte[] source, final int offset,
 			final int length) {
-		final int cap = byteBuffer.capacity();
-		if (cap < length) {
-			int newLength = cap << 1;
-			while (newLength < length)
-				newLength <<= 1;
-
-			byteBuffer = BufferUtils.createByteBuffer(newLength);
-		} else {
-			byteBuffer.position(0);
-		}
-
-		byteBuffer.limit(length);
+		resizeByteBuffer(length);
 		byteBuffer.put(source, offset, length);
 		byteBuffer.rewind();
 	}
