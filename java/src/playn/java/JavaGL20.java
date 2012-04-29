@@ -241,12 +241,12 @@ final class JavaGL20 implements playn.core.gl.GL20 {
 
 	@Override public void glCompressedTexImage2D (int target, int level, int internalformat, int width, int height, int border,
 		int imageSize, Buffer data) {
-		throw new RuntimeException("not implemented");
+		throw new UnsupportedOperationException("not implemented");
 	}
 
 	@Override public void glCompressedTexSubImage2D (int target, int level, int xoffset, int yoffset, int width, int height, int format,
 		int imageSize, Buffer data) {
-		throw new RuntimeException("not implemented");
+		throw new UnsupportedOperationException("not implemented");
 	}
 
 	@Override
@@ -971,12 +971,12 @@ final class JavaGL20 implements playn.core.gl.GL20 {
 
 	@Override
 	public String getPlatformGLExtensions() {
-		throw new RuntimeException("NYI - not in LWJGL.");
+		throw new UnsupportedOperationException("NYI - not in LWJGL.");
 	}
 
 	@Override
 	public int getSwapInterval() {
-		throw new RuntimeException("NYI - not in LWJGL.");
+		throw new UnsupportedOperationException("NYI - not in LWJGL.");
 	}
 
 	@Override
@@ -988,7 +988,7 @@ final class JavaGL20 implements playn.core.gl.GL20 {
 	public void glCompressedTexImage2D(int target, int level,
 			int internalformat, int width, int height, int border,
 			int data_imageSize, int data) {
-      throw new RuntimeException("NYI");
+      throw new UnsupportedOperationException("NYI");
       
     }
 
@@ -1212,7 +1212,7 @@ final class JavaGL20 implements playn.core.gl.GL20 {
 
 	@Override
 	public int glGetBoundBuffer(int arg0) {
-		throw new RuntimeException(
+		throw new UnsupportedOperationException(
 				"glGetBoundBuffer not supported in GLES 2.0 or LWJGL.");
 	}
 
@@ -1354,19 +1354,19 @@ final class JavaGL20 implements playn.core.gl.GL20 {
 	@Override
 	public void glGetShaderPrecisionFormat(int shadertype, int precisiontype,
 			int[] range, int rangeOffset, int[] precision, int precisionOffset) {
-		throw new RuntimeException("NYI");
+		throw new UnsupportedOperationException("NYI");
 	}
 
 	@Override
 	public void glGetShaderSource(int shader, int bufsize, int[] length,
 			int lengthOffset, byte[] source, int sourceOffset) {
-	    throw new RuntimeException("NYI");	      
+	    throw new UnsupportedOperationException("NYI");	      
 	}
 
 	@Override
 	public void glGetShaderSource(int shader, int bufsize, IntBuffer length,
 			ByteBuffer source) {
-	    throw new RuntimeException("NYI");
+	    throw new UnsupportedOperationException("NYI");
 	}
 
 	@Override
@@ -1425,12 +1425,12 @@ final class JavaGL20 implements playn.core.gl.GL20 {
 
 	@Override
 	public boolean glIsVBOArrayEnabled() {
-		throw new RuntimeException("NYI - not in LWJGL.");
+		throw new UnsupportedOperationException("NYI - not in LWJGL.");
 	}
 
 	@Override
 	public boolean glIsVBOElementEnabled() {
-		throw new RuntimeException("NYI - not in LWJGL.");
+		throw new UnsupportedOperationException("NYI - not in LWJGL.");
 	}
 
 	@Override
@@ -1448,14 +1448,14 @@ final class JavaGL20 implements playn.core.gl.GL20 {
 	@Override
 	public void glReadPixels(int x, int y, int width, int height, int format,
 			int type, int pixelsBufferOffset) {
-      throw new RuntimeException("NYI");
+      throw new UnsupportedOperationException("NYI");
       
 	}
 
 	@Override
 	public void glShaderBinary(int n, int[] shaders, int offset,
 			int binaryformat, Buffer binary, int length) {
-      throw new RuntimeException("NYI");
+      throw new UnsupportedOperationException("NYI");
       
 	}
 
@@ -1476,7 +1476,7 @@ final class JavaGL20 implements playn.core.gl.GL20 {
 	@Override
 	public void glTexImage2D(int arg0, int arg1, int arg2, int arg3, int arg4,
 			int arg5, int arg6, int arg7, int arg8) {
-      throw new RuntimeException("NYI");
+      throw new UnsupportedOperationException("NYI");
       
 	}
 
@@ -1484,7 +1484,7 @@ final class JavaGL20 implements playn.core.gl.GL20 {
 	public void glTexImage3D(int arg0, int arg1, int arg2, int arg3, int arg4,
 			int arg5, int arg6, int arg7, int arg8, Buffer arg9) {
 		if (!(arg9 instanceof ByteBuffer))
-			throw new RuntimeException("Buffer must be a ByteBuffer.");
+			throw new UnsupportedOperationException("Buffer must be a ByteBuffer.");
 		GL12.glTexImage3D(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8,
 				(ByteBuffer) arg9);
 	}
@@ -1514,7 +1514,7 @@ final class JavaGL20 implements playn.core.gl.GL20 {
 	@Override
 	public void glTexSubImage2D(int arg0, int arg1, int arg2, int arg3,
 			int arg4, int arg5, int arg6, int arg7, int arg8) {
-      throw new RuntimeException("NYI");
+      throw new UnsupportedOperationException("NYI");
       
 	}
 
@@ -1637,16 +1637,16 @@ final class JavaGL20 implements playn.core.gl.GL20 {
 
 	@Override
 	public boolean hasGLSL() {
-		throw new RuntimeException("NYI - not in LWJGL.");
+		throw new UnsupportedOperationException("NYI - not in LWJGL.");
 	}
 
 	@Override
 	public boolean isExtensionAvailable(String extension) {
-		throw new RuntimeException("NYI - not in LWJGL.");
+		throw new UnsupportedOperationException("NYI - not in LWJGL.");
 	}
 
 	@Override
 	public boolean isFunctionAvailable(String function) {
-		throw new RuntimeException("NYI - not in LWJGL.");
+		throw new UnsupportedOperationException("NYI - not in LWJGL.");
 	}
 }
