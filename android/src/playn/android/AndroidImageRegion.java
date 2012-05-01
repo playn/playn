@@ -16,37 +16,41 @@
 package playn.android;
 
 import android.graphics.Bitmap;
+import android.graphics.Rect;
+import android.graphics.RectF;
 
 import pythagoras.f.MathUtil;
 
-import playn.core.Image;
+import playn.core.Pattern;
+import playn.core.gl.ImageRegionGL;
 
-class AndroidImageRegion extends AndroidImage implements Image.Region {
+class AndroidImageRegion extends ImageRegionGL implements AndroidCanvas.Drawable {
 
-  private final AndroidImage parent;
-  private final float x, y;
-
-  public AndroidImageRegion(AndroidGLContext ctx, AndroidImage parent,
-                            float x, float y, float width, float height) {
-    super(ctx, Bitmap.createBitmap(parent.bitmap(), MathUtil.ifloor(x), MathUtil.ifloor(y),
-                                   MathUtil.iceil(width), MathUtil.iceil(height)));
-    this.parent = parent;
-    this.x = x;
-    this.y = y;
+  public AndroidImageRegion(AndroidImage parent, float x, float y, float width, float height) {
+    super(parent, x, y, width, height);
   }
 
   @Override
-  public float x() {
-    return x;
+  public void getRgb(int startX, int startY, int width, int height, int[] rgbArray, int offset,
+                     int scanSize) {
+    bitmap().getPixels(rgbArray, offset, scanSize, startX + (int)x, startY + (int)y, width, height);
   }
 
   @Override
-  public float y() {
-    return y;
+  public Pattern toPattern() {
+    int ix = MathUtil.ifloor(x), iy = MathUtil.ifloor(y);
+    int iw = MathUtil.iceil(width), ih = MathUtil.iceil(height);
+    return new AndroidPattern(this, Bitmap.createBitmap(bitmap(), ix, iy, iw, ih));
   }
 
   @Override
-  public Image parent() {
-    return parent;
+  public Bitmap bitmap() {
+    return ((AndroidImage) parent).bitmap();
+  }
+
+  @Override
+  public void prepDraw(Rect rect, RectF rectf, float dx, float dy, float dw, float dh,
+                       float sx, float sy, float sw, float sh) {
+    ((AndroidImage) parent).prepDraw(rect, rectf, dx, dy, dw, dh, x+sx, y+sy, sw, sh);
   }
 }

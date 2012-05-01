@@ -16,6 +16,8 @@
 package playn.android;
 
 import android.graphics.Bitmap;
+import android.graphics.Rect;
+import android.graphics.RectF;
 
 import playn.core.Image;
 import playn.core.Pattern;
@@ -23,7 +25,7 @@ import playn.core.ResourceCallback;
 import playn.core.gl.GLContext;
 import playn.core.gl.ImageGL;
 
-class AndroidImage extends ImageGL implements AndroidGLContext.Refreshable {
+class AndroidImage extends ImageGL implements AndroidGLContext.Refreshable, AndroidCanvas.Drawable {
 
   private final AndroidGLContext ctx;
   private final Bitmap bitmap;
@@ -32,10 +34,6 @@ class AndroidImage extends ImageGL implements AndroidGLContext.Refreshable {
     this.ctx = ctx;
     this.bitmap = bitmap;
     ctx.addRefreshable(this);
-  }
-
-  Bitmap bitmap() {
-    return bitmap;
   }
 
   @Override
@@ -75,7 +73,7 @@ class AndroidImage extends ImageGL implements AndroidGLContext.Refreshable {
 
   @Override
   public Region subImage(float x, float y, float width, float height) {
-    return new AndroidImageRegion(ctx, this, x, y, width, height);
+    return new AndroidImageRegion(this, x, y, width, height);
   }
 
   @Override
@@ -92,6 +90,18 @@ class AndroidImage extends ImageGL implements AndroidGLContext.Refreshable {
   @Override
   public Image transform(BitmapTransformer xform) {
     return new AndroidImage(ctx, ((AndroidBitmapTransformer) xform).transform(bitmap));
+  }
+
+  @Override
+  public Bitmap bitmap() {
+    return bitmap;
+  }
+
+  @Override
+  public void prepDraw(Rect rect, RectF rectf, float dx, float dy, float dw, float dh,
+                       float sx, float sy, float sw, float sh) {
+    rect.set((int) sx, (int) sy, (int) (sx + sw), (int) (sy + sh));
+    rectf.set(dx, dy, dx + dw, dy + dh);
   }
 
   @Override

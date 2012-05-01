@@ -31,6 +31,13 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 
 class AndroidCanvas implements Canvas {
+
+  interface Drawable {
+    Bitmap bitmap();
+    void prepDraw(Rect rect, RectF rectf, float dx, float dy, float dw, float dh,
+                  float sx, float sy, float sw, float sh);
+  }
+
   private static Matrix m = new Matrix();
   private static Rect rect = new Rect();
   private static RectF rectf = new RectF();
@@ -77,12 +84,11 @@ class AndroidCanvas implements Canvas {
   }
 
   @Override
-  public Canvas drawImage(Image img, float dx, float dy, float dw, float dh, float sx, float sy,
-      float sw, float sh) {
-    Asserts.checkArgument(img instanceof AndroidImage);
-    rect.set((int) sx, (int) sy, (int) (sx + sw), (int) (sy + sh));
-    rectf.set(dx, dy, dx + dw, dy + dh);
-    canvas.drawBitmap(((AndroidImage) img).bitmap(), rect, rectf, currentState().prepareImage());
+  public Canvas drawImage(Image img, float dx, float dy, float dw, float dh,
+                          float sx, float sy, float sw, float sh) {
+    Asserts.checkArgument(img instanceof Drawable);
+    ((Drawable) img).prepDraw(rect, rectf, dx, dy, dw, dh, sx, sy, sw, sh);
+    canvas.drawBitmap(((Drawable) img).bitmap(), rect, rectf, currentState().prepareImage());
     dirty = true;
     return this;
   }

@@ -25,14 +25,14 @@ import playn.core.gl.ImageGL;
 
 class AndroidPattern implements Pattern, GLPattern {
 
-  private final AndroidImage image;
+  private final ImageGL image;
   final BitmapShader shader;
 
   AndroidPattern(AndroidImage image) {
     this(image, image.bitmap());
   }
 
-  AndroidPattern(AndroidImage image, Bitmap bitmap) {
+  AndroidPattern(ImageGL image, Bitmap bitmap) {
     this.image = image;
     this.shader = new BitmapShader(bitmap, Shader.TileMode.REPEAT, Shader.TileMode.REPEAT);
   }
