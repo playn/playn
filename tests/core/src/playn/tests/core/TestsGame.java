@@ -61,9 +61,11 @@ public class TestsGame implements Game {
     try {
       touch().setListener(new Touch.Adapter() {
         public void onTouchStart(Touch.Event[] touches) {
-          if (touches.length > 2)
+          // android doesn't bundle multiple touches into a single event, instead we'll get a
+          // separate event array with a single event with a touch with id > 0
+          if (touches.length > 2 || touches[0].id() > 1)
             advanceTest(-1);
-          else if (touches.length > 1)
+          else if (touches.length > 1 || touches[0].id() > 0)
             advanceTest(1);
         }
       });
