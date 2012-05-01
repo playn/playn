@@ -38,8 +38,8 @@ import playn.core.TextLayout;
 /**
  * Implements {@link Canvas}.
  */
-public class IOSCanvas implements Canvas
-{
+public class IOSCanvas implements Canvas {
+
   interface Drawable {
     void draw(CGBitmapContext bctx, float dx, float dy, float dw, float dh);
     void draw(CGBitmapContext bctx, float sx, float sy, float sw, float sh,
