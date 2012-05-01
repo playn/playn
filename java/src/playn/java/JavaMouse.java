@@ -40,7 +40,7 @@ class JavaMouse extends MouseImpl {
     JavaPointer pointer = (JavaPointer) PlayN.pointer();
 
     while (Mouse.next()) {
-      double time = (double) (Mouse.getEventNanoseconds() / 1000);
+      double time = (double) (Mouse.getEventNanoseconds() / 1000000);
       int btn = getButton(Mouse.getEventButton());
       Point m = new Point(Mouse.getEventX(), Display.getHeight() - Mouse.getEventY() - 1);
       graphics.transformMouse(m);
