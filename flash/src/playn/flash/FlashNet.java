@@ -15,7 +15,6 @@
  */
 package playn.flash;
 
-import flash.gwt.FlashImport;
 import playn.core.Net;
 import playn.core.PlayN;
 import playn.core.ResourceCallback;

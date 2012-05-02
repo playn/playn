@@ -15,7 +15,6 @@
  */
 package playn.html;
 
-import com.google.gwt.canvas.dom.client.CanvasPattern;
 import com.google.gwt.canvas.dom.client.CanvasPixelArray;
 import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.canvas.dom.client.ImageData;

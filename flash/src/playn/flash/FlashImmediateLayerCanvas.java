@@ -15,7 +15,6 @@
  */
 package playn.flash;
 
-import com.google.gwt.canvas.dom.client.Context2d;
 import playn.core.CanvasSurface;
 import playn.core.ImmediateLayer;
 

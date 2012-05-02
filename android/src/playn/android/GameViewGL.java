@@ -19,7 +19,6 @@ import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
 import playn.core.Keyboard;
-import playn.core.Platform;
 import playn.core.Pointer;
 import playn.core.Touch;
 import android.content.Context;

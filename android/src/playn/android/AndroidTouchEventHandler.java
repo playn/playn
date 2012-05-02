@@ -15,7 +15,6 @@
  */
 package playn.android;
 
-import playn.core.Graphics;
 import playn.core.Pointer;
 import playn.core.Touch;
 import android.view.MotionEvent;

@@ -97,7 +97,7 @@ class FlashTextLayout implements TextLayout {
     configContext(ctx);
 
     if (format.effect instanceof TextFormat.Effect.Shadow) {
-      TextFormat.Effect.Shadow seffect = (TextFormat.Effect.Shadow)format.effect;
+//      TextFormat.Effect.Shadow seffect = (TextFormat.Effect.Shadow)format.effect;
 //      ctx.setShadowColor(FlashGraphics.cssColorString(seffect.shadowColor));
 //      ctx.setShadowOffsetX(seffect.shadowOffsetX);
 //      ctx.setShadowOffsetY(seffect.shadowOffsetY);

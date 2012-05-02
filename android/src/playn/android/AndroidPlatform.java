@@ -36,7 +36,6 @@ public class AndroidPlatform implements Platform {
 
   Game game;
   GameActivity activity;
-  private final AndroidGL20 gl20;
 
   private AndroidAudio audio;
   private AndroidGraphics graphics;
@@ -53,7 +52,6 @@ public class AndroidPlatform implements Platform {
 
   protected AndroidPlatform(GameActivity activity, AndroidGL20 gl20) {
     this.activity = activity;
-    this.gl20 = gl20;
 
     audio = new AndroidAudio(activity);
     touchHandler = new AndroidTouchEventHandler(activity.gameView());
@@ -64,7 +62,7 @@ public class AndroidPlatform implements Platform {
     net = new AndroidNet();
     pointer = new AndroidPointer();
     touch = new AndroidTouch();
-    assets = new AndroidAssets(activity.getAssets(), graphics, audio);
+    assets = new AndroidAssets(graphics, audio);
     analytics = new AndroidAnalytics();
     storage = new AndroidStorage(activity);
   }

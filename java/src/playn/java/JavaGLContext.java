@@ -13,9 +13,7 @@
  */
 package playn.java;
 
-import java.awt.AlphaComposite;
 import java.awt.Color;
-import java.awt.Graphics2D;
 import java.awt.Graphics;
 import java.awt.Transparency;
 import java.awt.color.ColorSpace;
@@ -35,8 +33,6 @@ import org.lwjgl.opengl.DisplayMode;
 import static org.lwjgl.opengl.EXTFramebufferObject.*;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL12.*;
-
-import pythagoras.f.MathUtil;
 
 import playn.core.Asserts;
 import playn.core.StockInternalTransform;

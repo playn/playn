@@ -13,9 +13,6 @@
  */
 package playn.java;
 
-import playn.core.Sound;
-import playn.core.ResourceCallback;
-
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,8 +25,8 @@ import javax.sound.sampled.LineUnavailableException;
 
 import playn.core.Asserts;
 import playn.core.PlayN;
-import playn.core.Sound;
 import playn.core.ResourceCallback;
+import playn.core.Sound;
 
 class JavaSound implements Sound {
 

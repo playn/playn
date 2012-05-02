@@ -26,7 +26,6 @@ class HtmlPattern implements GLPattern {
 
   private final ImageGL image;
   private final ImageElement patimg;
-  private CanvasPattern pattern;
 
   HtmlPattern(HtmlImage image) {
     this(image, image.img);

@@ -28,7 +28,6 @@ class JavaImageLayer extends JavaLayer implements ImageLayer {
 
   private float width, height;
   private boolean widthSet, heightSet;
-  private float sx, sy, sw, sh;
   private boolean repeatX, repeatY;
 
   private JavaImage image;
@@ -147,8 +146,8 @@ class JavaImageLayer extends JavaLayer implements ImageLayer {
       if (dirty) {
         // repaint repeated image onto cached image
         cachedImage = (JavaCanvasImage) graphics().createImage((int) dw, (int) dh);
-        float anchorWidth = repeatX ? image.width() : dw;
-        float anchorHeight = repeatY ? image.height() : dh;
+        // float anchorWidth = repeatX ? image.width() : dw;
+        // float anchorHeight = repeatY ? image.height() : dh;
         TexturePaint tpaint = ((JavaPattern) image.toPattern()).paint;
         ((JavaCanvas) cachedImage.canvas()).gfx.setPaint(tpaint);
         ((JavaCanvas) cachedImage.canvas()).gfx.fill(new Rectangle2D.Float(0, 0, dw, dh));

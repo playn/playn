@@ -15,7 +15,6 @@ package playn.flash;
 
 import com.google.gwt.canvas.dom.client.CssColor;
 
-import com.google.gwt.dom.client.Style;
 import flash.display.StageAlign;
 import flash.display.StageScaleMode;
 import flash.display.Sprite;

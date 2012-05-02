@@ -31,7 +31,6 @@ import playn.core.AbstractAssets;
 import playn.core.Image;
 import playn.core.ResourceCallback;
 import playn.core.Sound;
-import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
@@ -39,13 +38,11 @@ import android.util.Log;
 
 public class AndroidAssets extends AbstractAssets {
 
-  private final AssetManager assets;
   private final AndroidGraphics graphics;
   private final AndroidAudio audio;
   private String pathPrefix = null;
 
-  AndroidAssets(AssetManager assets, AndroidGraphics graphics, AndroidAudio audio) {
-    this.assets = assets;
+  AndroidAssets(AndroidGraphics graphics, AndroidAudio audio) {
     this.graphics = graphics;
     this.audio = audio;
   }

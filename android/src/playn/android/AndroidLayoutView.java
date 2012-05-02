@@ -15,7 +15,6 @@
  */
 package playn.android;
 
-import android.app.Activity;
 import android.util.Log;
 import android.view.Gravity;
 import android.widget.LinearLayout;

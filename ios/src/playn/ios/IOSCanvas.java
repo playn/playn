@@ -26,13 +26,10 @@ import cli.System.Runtime.InteropServices.Marshal;
 import cli.MonoTouch.CoreGraphics.*;
 
 import playn.core.Canvas;
-import playn.core.Canvas.LineCap;
-import playn.core.Canvas.LineJoin;
 import playn.core.Gradient;
 import playn.core.Image;
 import playn.core.Path;
 import playn.core.Pattern;
-import playn.core.PlayN;
 import playn.core.TextLayout;
 
 /**

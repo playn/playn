@@ -18,19 +18,17 @@ package playn.ios;
 import cli.MonoTouch.UIKit.UIAlertView;
 import cli.MonoTouch.UIKit.UIAlertViewStyle;
 import cli.MonoTouch.UIKit.UIButtonEventArgs;
-import cli.MonoTouch.UIKit.UIColor;
 import cli.MonoTouch.UIKit.UIKeyboardType;
 import cli.MonoTouch.UIKit.UIReturnKeyType;
 import cli.MonoTouch.UIKit.UITextAutocapitalizationType;
 import cli.MonoTouch.UIKit.UITextAutocorrectionType;
 import cli.MonoTouch.UIKit.UITextField;
-import cli.System.Drawing.RectangleF;
 import playn.core.Keyboard;
 import playn.core.PlayN;
 import playn.core.util.Callback;
 
-public class IOSKeyboard implements Keyboard
-{
+public class IOSKeyboard implements Keyboard {
+
   @Override
   public void setListener(Listener listener) {
     PlayN.log().warn("iOS cannot generate keyboard events. Use Keyboard.getText() instead");

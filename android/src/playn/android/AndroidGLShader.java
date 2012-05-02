@@ -23,7 +23,6 @@ import java.nio.ShortBuffer;
 
 import android.util.Log;
 
-import playn.core.InternalTransform;
 import playn.core.gl.GL20;
 import playn.core.gl.GLShader;
 import playn.core.gl.IndexedTrisShader;
@@ -71,7 +70,6 @@ public class AndroidGLShader extends IndexedTrisShader
 
   static class Color extends AndroidGLShader implements GLShader.Color {
     private int uColor, uAlpha, lastColor;
-    private FloatBuffer colors = FloatBuffer.allocate(4);
     private float lastAlpha;
 
     Color(AndroidGLContext ctx) {

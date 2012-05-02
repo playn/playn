@@ -18,7 +18,6 @@ package playn.flash;
 import flash.gwt.FlashImport;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import playn.core.Image;

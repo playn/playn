@@ -24,7 +24,6 @@ import android.graphics.RadialGradient;
 import android.graphics.Shader.TileMode;
 import android.view.View;
 
-import playn.core.Asserts;
 import playn.core.CanvasImage;
 import playn.core.Font;
 import playn.core.Gradient;

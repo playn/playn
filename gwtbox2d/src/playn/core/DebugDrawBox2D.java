@@ -6,7 +6,6 @@ import org.jbox2d.common.OBBViewportTransform;
 import org.jbox2d.common.Transform;
 import org.jbox2d.common.Vec2;
 
-import static playn.core.PlayN.graphics;
 import static playn.core.PlayN.log;
 
 public class DebugDrawBox2D extends DebugDraw {

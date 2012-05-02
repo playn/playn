@@ -25,11 +25,10 @@ import cli.MonoTouch.UIKit.UITouch;
 
 import pythagoras.f.IPoint;
 
-import playn.core.PlayN;
 import playn.core.PointerImpl;
 
-public class IOSPointer extends PointerImpl
-{
+public class IOSPointer extends PointerImpl {
+
   private final IOSGraphics graphics;
 
   public IOSPointer(IOSGraphics graphics) {

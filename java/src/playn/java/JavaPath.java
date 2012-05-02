@@ -18,10 +18,8 @@ package playn.java;
 import playn.core.Path;
 
 import java.awt.Graphics2D;
-import java.awt.geom.Arc2D;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Path2D;
-import java.awt.geom.Point2D;
 
 class JavaPath implements Path, JavaCanvasState.Clipper {
 

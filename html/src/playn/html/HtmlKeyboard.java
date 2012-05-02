@@ -235,7 +235,7 @@ class HtmlKeyboard implements Keyboard {
   private static final int KEY_Z = 90;
   private static final int KEY_LEFT_WINDOW_KEY = 91;
   private static final int KEY_RIGHT_WINDOW_KEY = 92;
-  private static final int KEY_SELECT_KEY = 93;
+  // private static final int KEY_SELECT_KEY = 93;
   private static final int KEY_NUMPAD0 = 96;
   private static final int KEY_NUMPAD1 = 97;
   private static final int KEY_NUMPAD2 = 98;

@@ -19,11 +19,11 @@ package playn.tests.core;
 import pythagoras.f.FloatMath;
 
 import playn.core.Color;
-import playn.core.GroupLayer;
 import playn.core.SurfaceLayer;
 import static playn.core.PlayN.*;
 
 public class ClearBackgroundTest extends Test {
+
   private float time;
   private SurfaceLayer square;
   static int width = 100;

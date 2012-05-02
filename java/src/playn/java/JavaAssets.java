@@ -14,7 +14,6 @@
 package playn.java;
 
 import java.awt.EventQueue;
-import java.awt.image.BufferedImage;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;

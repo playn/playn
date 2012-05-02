@@ -42,7 +42,7 @@ public abstract class IOSTextLayout implements TextLayout {
     // normalize newlines in the text (Windows: CRLF -> LF, Mac OS pre-X: CR -> LF)
     text = text.replace("\r\n", "\n").replace('\r', '\n');
 
-    IOSFont font = (format.font == null) ? gfx.defaultFont : (IOSFont) format.font;
+    IOSFont font = (format.font == null) ? IOSGraphics.defaultFont : (IOSFont) format.font;
     CTStringAttributes attribs = new CTStringAttributes();
     attribs.set_Font(font.ctFont);
     attribs.set_ForegroundColorFromContext(true);

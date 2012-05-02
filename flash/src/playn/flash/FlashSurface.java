@@ -19,11 +19,11 @@ package playn.flash;
 import playn.core.Asserts;
 import playn.core.Surface;
 import playn.core.Image;
-import playn.core.PlayN;
 import playn.core.Pattern;
 import playn.flash.FlashCanvasLayer.Context2d;
 
 public class FlashSurface implements Surface {
+
   private final int width, height;
   private boolean dirty = true;
   private final Context2d context2d;

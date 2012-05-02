@@ -17,7 +17,6 @@ import java.util.Map;
 import java.util.HashMap;
 
 import com.google.gwt.canvas.dom.client.CanvasGradient;
-import com.google.gwt.canvas.dom.client.CanvasPattern;
 import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.canvas.dom.client.CssColor;
 import com.google.gwt.dom.client.CanvasElement;

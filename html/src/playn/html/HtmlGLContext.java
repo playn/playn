@@ -35,24 +35,20 @@ import playn.core.gl.LayerGL;
 /**
  * Implements {@link GLContext} via WebGL.
  */
-public class HtmlGLContext extends GLContext
-{
+public class HtmlGLContext extends GLContext {
+
   final WebGLRenderingContext gl;
 
-  private final CanvasElement canvas;
   private final GLShader.Texture texQuadShader;
   private final GLShader.Texture texTrisShader;
   private final GLShader.Color colorQuadShader;
   private final GLShader.Color colorTrisShader;
-
-  private WebGLFramebuffer lastFBuf;
 
   // Debug counters.
   // private int texCount;
 
   HtmlGLContext(CanvasElement canvas) throws RuntimeException {
     super(1); // no HiDPI on the interwebs
-    this.canvas = canvas;
 
     // Try to create a context. If this returns null, then the browser doesn't support WebGL on
     // this machine.

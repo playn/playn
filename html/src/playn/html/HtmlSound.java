@@ -15,13 +15,6 @@
  */
 package playn.html;
 
-import static com.allen_sauer.gwt.voices.client.Sound.LoadState.LOAD_STATE_NOT_SUPPORTED;
-import static com.allen_sauer.gwt.voices.client.Sound.LoadState.LOAD_STATE_SUPPORT_NOT_KNOWN;
-import static com.allen_sauer.gwt.voices.client.Sound.LoadState.LOAD_STATE_SUPPORTED_AND_READY;
-import static com.allen_sauer.gwt.voices.client.Sound.LoadState.LOAD_STATE_SUPPORTED_MAYBE_READY;
-import static com.allen_sauer.gwt.voices.client.Sound.LoadState.LOAD_STATE_SUPPORTED_NOT_READY;
-import static com.allen_sauer.gwt.voices.client.Sound.LoadState.LOAD_STATE_UNINITIALIZED;
-
 import com.allen_sauer.gwt.voices.client.handler.PlaybackCompleteEvent;
 import com.allen_sauer.gwt.voices.client.handler.SoundHandler;
 import com.allen_sauer.gwt.voices.client.handler.SoundLoadStateChangeEvent;

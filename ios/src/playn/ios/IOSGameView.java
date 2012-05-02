@@ -32,10 +32,8 @@ import cli.MonoTouch.OpenGLES.EAGLRenderingAPI;
 import cli.MonoTouch.UIKit.UIDevice;
 import cli.MonoTouch.UIKit.UIEvent;
 
-import playn.core.PlayN;
+public class IOSGameView extends iPhoneOSGameView {
 
-public class IOSGameView extends iPhoneOSGameView
-{
   private static final float MAX_DELTA = 100;
 
   private DateTime lastUpdate = DateTime.get_Now();

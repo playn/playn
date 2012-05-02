@@ -27,7 +27,6 @@ import cli.MonoTouch.UIKit.UIApplication;
 import cli.MonoTouch.UIKit.UIDeviceOrientation;
 import cli.MonoTouch.UIKit.UIInterfaceOrientation;
 import cli.MonoTouch.UIKit.UIScreen;
-import cli.MonoTouch.UIKit.UIViewController;
 import cli.MonoTouch.UIKit.UIWindow;
 
 import playn.core.Game;
@@ -45,7 +44,7 @@ public class IOSPlatform implements Platform {
 
   /** Defines the orientations supported by your app. */
   public enum SupportedOrients {
-    /** Suports portrait and portrait upside down orients. */
+    /** Supports portrait and portrait upside down orients. */
     PORTRAITS(UIDeviceOrientation.Portrait) {
       @Override
       public boolean isSupported(UIDeviceOrientation orient) {
@@ -54,7 +53,7 @@ public class IOSPlatform implements Platform {
       }
     },
 
-    /** Suports landscape left and right orients. */
+    /** Supports landscape left and right orients. */
     LANDSCAPES(UIDeviceOrientation.LandscapeLeft) {
       @Override
       public boolean isSupported(UIDeviceOrientation orient) {
@@ -63,7 +62,7 @@ public class IOSPlatform implements Platform {
       }
     },
 
-    /** Suports both portrait and landscape orients. */
+    /** Supports both portrait and landscape orients. */
     ALL(UIDeviceOrientation.Portrait) {
       @Override
       public boolean isSupported(UIDeviceOrientation orient) {
