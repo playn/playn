@@ -18,6 +18,7 @@ package playn.core.gl;
 import java.util.ArrayList;
 import java.util.List;
 
+import pythagoras.f.FloatMath;
 import pythagoras.f.MathUtil;
 
 import playn.core.Asserts;
@@ -82,24 +83,33 @@ abstract class AbstractSurfaceGL implements Surface {
   public Surface drawLine(float x0, float y0, float x1, float y1, float width) {
     bindFramebuffer();
 
-    float dx = x1 - x0, dy = y1 - y0;
-    float len = (float) Math.sqrt(dx * dx + dy * dy);
-    dx = dx * (width / 2) / len;
-    dy = dy * (width / 2) / len;
+    // swap the line end points if x1 is less than x0
+    if (x1 < x0) {
+      float temp = x0;
+      x0 = x1;
+      x1 = temp;
+      temp = y0;
+      y0 = y1;
+      y1 = temp;
+    }
 
-    float qx1 = x0 - dy, qy1 = y0 + dx;
-    float qx2 = x0 + dy, qy2 = y0 - dx;
-    float qx3 = x1 - dy, qy3 = y1 + dx;
-    float qx4 = x1 + dy, qy4 = y1 - dx;
+    float dx = x1 - x0, dy = y1 - y0;
+    float length = FloatMath.sqrt(dx * dx + dy * dy);
+    float wx = dx * (width / 2) / length;
+    float wy = dy * (width / 2) / length;
+
+    InternalTransform t = topTransform().clone();
+    t.setRotation(FloatMath.atan2(dy, dx));
+    t.setTranslation(t.tx() + x0 + wy, t.ty() + y0 - wx);
 
     if (fillPattern != null) {
       Object tex = fillPattern.ensureTexture(ctx, true, true);
       if (tex != null) {
-        ctx.fillQuad(topTransform(), qx1, qy1, qx2, qy2, qx3, qy3, qx4, qy4,
+        ctx.fillQuad(t, 0, 0, length, 0, 0, width, length, width,
                      fillPattern.width(), fillPattern.height(), tex, alpha);
       }
     } else {
-      ctx.fillQuad(topTransform(), qx1, qy1, qx2, qy2, qx3, qy3, qx4, qy4, fillColor, alpha);
+      ctx.fillQuad(t, 0, 0, length, 0, 0, width, length, width, fillColor, alpha);
     }
     return this;
   }
