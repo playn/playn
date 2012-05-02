@@ -49,4 +49,9 @@ public interface InternalTransform extends Transform {
    */
   InternalTransform concatenate(float m00, float m01, float m10, float m11, float tx, float ty,
       float originX, float originY);
+
+  /**
+   * Returns a copy of this transform.
+   */
+  InternalTransform clone();
 }

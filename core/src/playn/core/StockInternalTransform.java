@@ -24,6 +24,13 @@ public class StockInternalTransform extends AffineTransform implements InternalT
   /** The identity transform, don't modify it! */
   public static final StockInternalTransform IDENTITY = new StockInternalTransform();
 
+  public StockInternalTransform() {
+  }
+
+  public StockInternalTransform(float m00, float m01, float m10, float m11, float tx, float ty) {
+    super(m00, m01, m10, m11, tx, ty);
+  }
+
   @Override
   public float m00() {
     return m00;
@@ -64,5 +71,10 @@ public class StockInternalTransform extends AffineTransform implements InternalT
     Transforms.multiply(this, m00, m01, m10, m11, tx - originX, ty - originY, this);
     translate(-originX, -originY);
     return this;
+  }
+
+  @Override
+  public InternalTransform clone () {
+    return new StockInternalTransform(m00, m01, m10, m11, tx, ty);
   }
 }
