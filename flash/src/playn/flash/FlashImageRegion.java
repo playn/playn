@@ -26,7 +26,7 @@ import playn.core.Image;
 class FlashImageRegion extends FlashImage implements Image.Region {
 
   private final FlashImage parent;
-  private final float x, y;
+  private float x, y;
 
   public FlashImageRegion(FlashImage parent, float x, float y, float width, float height) {
     super(crop(parent.bitmapData(), x, y, width, height));
@@ -43,6 +43,14 @@ class FlashImageRegion extends FlashImage implements Image.Region {
   @Override
   public float y () {
     return y;
+  }
+
+  @Override
+  public void setBounds(float x, float y, float width, float height) {
+    // with a slowness!
+    imageData = crop(parent.bitmapData(), x, y, width, height);
+    this.x = x;
+    this.y = y;
   }
 
   @Override

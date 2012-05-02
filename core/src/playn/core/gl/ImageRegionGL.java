@@ -21,8 +21,8 @@ import playn.core.ResourceCallback;
 public abstract class ImageRegionGL extends ImageGL implements Image.Region {
 
   protected final ImageGL parent;
-  protected final float x, y;
-  protected final float width, height;
+  protected float x, y;
+  protected float width, height;
 
   public ImageRegionGL(ImageGL parent, float x, float y, float width, float height) {
     this.parent = parent;
@@ -77,6 +77,14 @@ public abstract class ImageRegionGL extends ImageGL implements Image.Region {
   @Override
   public int height() {
     return (int) height;
+  }
+
+  @Override
+  public void setBounds(float x, float y, float width, float height) {
+    this.x = x;
+    this.y = y;
+    this.width = width;
+    this.height = height;
   }
 
   @Override

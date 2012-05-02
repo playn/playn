@@ -61,6 +61,13 @@ public interface Image {
     float y();
 
     /**
+     * Updates this region's bounds in its parent image. If you need a rapidly changing region of
+     * an image, this can be more efficient than repeatedly creating new subimages as it creates no
+     * garbage to be collected.
+     */
+    void setBounds(float x, float y, float width, float height);
+
+    /**
      * The image of which this subimage is part.
      */
     Image parent();

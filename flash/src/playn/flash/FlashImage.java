@@ -32,7 +32,7 @@ class FlashImage implements Image {
   private List<ResourceCallback<? super Image>> callbacks =
     new ArrayList<ResourceCallback<? super Image>>();
 
-  private BitmapData imageData = null;
+  protected BitmapData imageData = null;
 
   FlashImage(String url) {
     scheduleLoad(url);

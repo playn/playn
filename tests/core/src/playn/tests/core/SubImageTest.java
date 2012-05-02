@@ -3,6 +3,8 @@
 
 package playn.tests.core;
 
+import pythagoras.f.FloatMath;
+
 import playn.core.Canvas;
 import playn.core.CanvasImage;
 import playn.core.GroupLayer;
@@ -13,6 +15,9 @@ import playn.core.Surface;
 import static playn.core.PlayN.*;
 
 public class SubImageTest extends Test {
+
+  private float elapsed;
+  private Image.Region osci;
 
   @Override
   public String getName() {
@@ -72,6 +77,17 @@ public class SubImageTest extends Test {
       }
     });
     graphics().rootLayer().addAt(imm, 130, 200);
+
+    // draw a subimage whose bounds oscillate
+    osci = orange.subImage(0, 0, orange.width(), orange.height());
+    graphics().rootLayer().addAt(graphics().createImageLayer(osci), 150, 300);
+  }
+
+  @Override
+  public void update(float delta) {
+    elapsed += delta;
+    float osciCurWidth = Math.abs(FloatMath.sin(elapsed/1000)) * osci.parent().width();
+    osci.setBounds(0, 0, osciCurWidth, osci.parent().height());
   }
 
   protected void fragment(Image image, float ox, float oy) {
