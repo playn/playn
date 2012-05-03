@@ -32,6 +32,7 @@ import cli.MonoTouch.UIKit.UIWindow;
 import playn.core.Game;
 import playn.core.Json;
 import playn.core.Mouse;
+import playn.core.MouseStub;
 import playn.core.Platform;
 import playn.core.PlayN;
 import playn.core.RegularExpression;
@@ -144,6 +145,11 @@ public class IOSPlatform implements Platform {
   }
 
   @Override
+  public Type type() {
+    return Type.IOS;
+  }
+
+  @Override
   public IOSAssets assets() {
     return assets;
   }
@@ -184,19 +190,8 @@ public class IOSPlatform implements Platform {
   }
 
   @Override
-  public void openURL(String url) {
-    if (!app.OpenUrl(new NSUrl(url))) {
-      log().warn("Failed to open URL: " + url);
-    }
-  }
-
-  @Override
   public Mouse mouse() {
-    return new Mouse() {
-      public void setListener(Listener listener) {
-        log().warn("Mouse not supported on iOS.");
-      }
-    };
+    return new MouseStub();
   }
 
   @Override
@@ -220,17 +215,6 @@ public class IOSPlatform implements Platform {
   }
 
   @Override
-  public void run(Game game) {
-    this.game = game;
-    // start the main game loop (TODO: support 0 update rate)
-    gameView.Run(1000d / game.updateRate());
-    // make our main window visible
-    mainWindow.MakeKeyAndVisible();
-    // initialize the game and start things off
-    game.init();
-  }
-
-  @Override
   public IOSStorage storage() {
     return storage;
   }
@@ -241,8 +225,21 @@ public class IOSPlatform implements Platform {
   }
 
   @Override
-  public Type type() {
-    return Type.IOS;
+  public void openURL(String url) {
+    if (!app.OpenUrl(new NSUrl(url))) {
+      log().warn("Failed to open URL: " + url);
+    }
+  }
+
+  @Override
+  public void run(Game game) {
+    this.game = game;
+    // start the main game loop (TODO: support 0 update rate)
+    gameView.Run(1000d / game.updateRate());
+    // make our main window visible
+    mainWindow.MakeKeyAndVisible();
+    // initialize the game and start things off
+    game.init();
   }
 
   void onOrientationChange(UIDeviceOrientation orientation) {

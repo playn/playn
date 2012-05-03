@@ -199,6 +199,12 @@ public interface Mouse {
   }
 
   /**
+   * Returns true if the underlying platform supports mouse interaction. If this method returns
+   * false, listeners may still be registered with this service but they will never be notified.
+   */
+  boolean hasMouse();
+
+  /**
    * Sets the listener that will receive mouse events. Setting the listener to
    * <code>null</code> will cause mouse events to stop being fired.
    */

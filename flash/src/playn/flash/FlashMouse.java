@@ -29,7 +29,8 @@ class FlashMouse extends MouseImpl {
       @Override
       public void handleEvent(MouseEvent nativeEvent) {
         float x = nativeEvent.getStageX(), y = nativeEvent.getStageY();
-        if (onMouseDown(new ButtonEvent.Impl(PlayN.currentTime(), x, y, getMouseButton(nativeEvent))))
+        if (onMouseDown(new ButtonEvent.Impl(PlayN.currentTime(), x, y,
+                                             getMouseButton(nativeEvent))))
           nativeEvent.preventDefault();
       }
     });
@@ -49,6 +50,11 @@ class FlashMouse extends MouseImpl {
           nativeEvent.preventDefault();
       }
     });
+  }
+
+  @Override
+  public boolean hasMouse() {
+    return true; // TODO: return correct value on mobile Flash
   }
 
   protected static int getMouseButton(MouseEvent e) {

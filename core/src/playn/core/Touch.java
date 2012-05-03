@@ -124,6 +124,12 @@ public interface Touch {
   }
 
   /**
+   * Returns true if the underlying platform supports touch interaction. If this method returns
+   * false, listeners may still be registered with this service but they will never be notified.
+   */
+  boolean hasTouch();
+
+  /**
    * Sets the listener that will receive touch events. Setting the listener to
    * <code>null</code> will cause touch events to stop being fired.
    */

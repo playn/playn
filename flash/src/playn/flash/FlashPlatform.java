@@ -18,29 +18,26 @@ package playn.flash;
 import com.google.gwt.core.client.Duration;
 import com.google.gwt.core.client.JavaScriptObject;
 
-import playn.core.Touch;
-
 import flash.events.Event;
-
-import playn.core.Storage;
-
 import flash.display.Sprite;
-
 import flash.events.EventType;
 
 import playn.core.Analytics;
 import playn.core.Audio;
-import playn.core.PlayN;
 import playn.core.Game;
 import playn.core.Graphics;
 import playn.core.Json;
 import playn.core.Keyboard;
 import playn.core.Log;
+import playn.core.Mouse;
 import playn.core.Net;
 import playn.core.Platform;
+import playn.core.PlayN;
 import playn.core.Pointer;
-import playn.core.Mouse;
 import playn.core.RegularExpression;
+import playn.core.Storage;
+import playn.core.Touch;
+import playn.core.TouchStub;
 import playn.core.json.JsonImpl;
 import playn.html.HtmlRegularExpression;
 
@@ -49,6 +46,7 @@ public class FlashPlatform implements Platform {
   static final int DEFAULT_WIDTH = 640;
   static final int DEFAULT_HEIGHT = 480;
 
+  private static final int FPS_COUNTER_MAX = 300;
   private static final int LOG_FREQ = 2500;
   private static final float MAX_DELTA = 100;
   private static FlashPlatform platform;
@@ -105,6 +103,11 @@ public class FlashPlatform implements Platform {
   }
 
   @Override
+  public Analytics analytics() {
+    return analytics;
+  }
+
+  @Override
   public FlashAssets assets() {
     return assets;
   }
@@ -152,7 +155,7 @@ public class FlashPlatform implements Platform {
   @Override
   public Touch touch() {
     // TODO(pdr): need to implement this.
-    throw new UnsupportedOperationException("Touch is not yet supported on the Flash platform");
+    return new TouchStub();
   }
 
   @Override
@@ -166,17 +169,18 @@ public class FlashPlatform implements Platform {
   }
 
   @Override
+  public Storage storage() {
+    return storage;
+  }
+
+  @Override
   public void openURL(String url) {
       //TODO: implement
   }
 
-  private static int FPS_COUNTER_MAX = 300;
   @Override
   public void run(final Game game) {
-
-
     final int updateRate = game.updateRate();
-
     this.game = game;
 
     // Game loop.
@@ -236,7 +240,7 @@ public class FlashPlatform implements Platform {
     return Type.FLASH;
   }
 
-    private void requestAnimationFrame(final TimerCallback callback) {
+  private void requestAnimationFrame(final TimerCallback callback) {
     //  http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/flash/display/DisplayObject.html#event:enterFrame
     FlashPlatform.captureEvent(Sprite.ENTERFRAME, new EventHandler<Event>() {
       @Override
@@ -245,8 +249,7 @@ public class FlashPlatform implements Platform {
         callback.fire();
       }
     });
-
-    }
+  }
 
   private native int setInterval(TimerCallback callback, int ms) /*-{
     return $wnd.setInterval(function() { callback.@playn.flash.TimerCallback::fire()(); }, ms);
@@ -261,14 +264,4 @@ public class FlashPlatform implements Platform {
       eventHandler.@playn.flash.EventHandler::handleEvent(Lflash/events/Event;)(arg);
     });
   }-*/;
-
-  @Override
-  public Storage storage() {
-    return storage;
-  }
-
-  @Override
-  public Analytics analytics() {
-    return analytics;
-  }
 }

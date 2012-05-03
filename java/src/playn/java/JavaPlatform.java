@@ -34,9 +34,11 @@ import playn.core.Pointer;
 import playn.core.RegularExpression;
 import playn.core.Storage;
 import playn.core.Touch;
+import playn.core.TouchStub;
 import playn.core.json.JsonImpl;
 
 public class JavaPlatform implements Platform {
+
   // Maximum delta time to consider between update() calls (in milliseconds). If the delta between
   // two update()s is greater than MAX_DELTA, we clamp to MAX_DELTA.
   private static final float MAX_DELTA = 100;
@@ -99,8 +101,18 @@ public class JavaPlatform implements Platform {
     assets = new JavaAssets(graphics, audio);
   }
 
-  protected void init() {
-    storage.init();
+  /**
+   * Sets the title of the window.
+   *
+   * @param title the window title
+   */
+  public void setTitle(String title) {
+    Display.setTitle(title);
+  }
+
+  @Override
+  public Type type() {
+    return Type.JAVA;
   }
 
   @Override
@@ -145,8 +157,7 @@ public class JavaPlatform implements Platform {
 
   @Override
   public Touch touch() {
-    // TODO(pdr): need to implement this.
-    throw new UnsupportedOperationException("Touch is not yet supported on the Java platform");
+    return new TouchStub();
   }
 
   @Override
@@ -165,8 +176,30 @@ public class JavaPlatform implements Platform {
   }
 
   @Override
+  public RegularExpression regularExpression() {
+    return regex;
+  }
+
+  @Override
   public float random() {
     return (float) Math.random();
+  }
+
+  @Override
+  public double time() {
+    return System.currentTimeMillis();
+  }
+
+  @Override
+  public void openURL(String url) {
+    System.out.println("Opening url: " + url);
+    String browser = "chrome ";
+    if (System.getProperty("os.name", "-").contains("indows"))
+      browser = "rundll32 url.dll,FileProtocolHandler ";
+    try {
+      Runtime.getRuntime().exec(browser + url);
+    } catch (IOException e) {
+    }
   }
 
   @Override
@@ -231,39 +264,7 @@ public class JavaPlatform implements Platform {
     System.exit(0);
   }
 
-  @Override
-  public double time() {
-    return System.currentTimeMillis();
-  }
-
-  @Override
-  public Type type() {
-    return Type.JAVA;
-  }
-
-  @Override
-  public RegularExpression regularExpression() {
-    return regex;
-  }
-
-  @Override
-  public void openURL(String url) {
-    System.out.println("Opening url: " + url);
-    String browser = "chrome ";
-    if (System.getProperty("os.name", "-").contains("indows"))
-      browser = "rundll32 url.dll,FileProtocolHandler ";
-    try {
-      Runtime.getRuntime().exec(browser + url);
-    } catch (IOException e) {
-    }
-  }
-
-  /**
-   * Sets the title of the window.
-   *
-   * @param title the window title
-   */
-  public void setTitle(String title) {
-    Display.setTitle(title);
+  protected void init() {
+    storage.init();
   }
 }

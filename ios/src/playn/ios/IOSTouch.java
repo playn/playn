@@ -28,13 +28,18 @@ import pythagoras.f.IPoint;
 
 import playn.core.Touch;
 
-public class IOSTouch implements Touch
-{
+public class IOSTouch implements Touch {
+
   private Listener listener;
   private final IOSGraphics graphics;
 
   public IOSTouch(IOSGraphics graphics) {
     this.graphics = graphics;
+  }
+
+  @Override
+  public boolean hasTouch() {
+    return true;
   }
 
   @Override

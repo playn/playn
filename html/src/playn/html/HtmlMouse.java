@@ -20,6 +20,7 @@ import playn.core.PlayN;
 import playn.core.MouseImpl;
 
 class HtmlMouse extends MouseImpl {
+
   private Listener listener;
   // true when we are in a drag sequence (after mouse down but before mouse up)
   boolean inDragSequence = false;
@@ -88,10 +89,15 @@ class HtmlMouse extends MouseImpl {
     });
   }
 
+  @Override
+  public native boolean hasMouse() /*-{
+    return ('onmousedown' in $doc.documentElement) &&
+      ($wnd.navigator.userAgent.match(/ipad|iphone|android/i) == null);
+  }-*/;
+
   /**
    * Return the mouse wheel velocity for the event
    */
-
   private static native float getMouseWheelVelocity(NativeEvent evt) /*-{
     var delta = 0.0;
     var agentInfo = @playn.html.HtmlPlatform::agentInfo()();

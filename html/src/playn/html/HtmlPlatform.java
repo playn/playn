@@ -87,6 +87,37 @@ public class HtmlPlatform implements Platform {
     return platform;
   }
 
+  /**
+   * Sets the title of the browser's window or tab.
+   *
+   * @param title the window title
+   */
+  public void setTitle(String title) {
+    Window.setTitle(title);
+  }
+
+  /**
+   * Sets the {@code cursor} CSS property.
+   *
+   * @param cursor the {@link Cursor} to use, or null to hide the cursor.
+   */
+  public static void setCursor(Cursor cursor) {
+    Element rootElement = ((HtmlGraphics) PlayN.graphics()).rootElement();
+    if (cursor == null) {
+      rootElement.getStyle().setProperty("cursor", "none");
+    } else {
+      rootElement.getStyle().setCursor(cursor);
+    }
+  }
+
+  /**
+   * Disable the right-click context menu.
+   */
+  public static void disableRightClickContextMenu() {
+    Element rootElement = ((HtmlGraphics) PlayN.graphics()).rootElement();
+    disableRightClickImpl(rootElement);
+  }
+
   static native void addEventListener(JavaScriptObject target, String name, EventHandler handler,
       boolean capture) /*-{
     target.addEventListener(name, function(e) {
@@ -306,6 +337,14 @@ public class HtmlPlatform implements Platform {
     return Duration.currentTimeMillis();
   }
 
+  /**
+   * @see playn.core.Platform#openURL(java.lang.String)
+   */
+  @Override
+  public void openURL(String url) {
+    Window.open(url, "_blank", "");
+  }
+
   @Override
   public Type type() {
     return Type.HTML;
@@ -358,56 +397,6 @@ public class HtmlPlatform implements Platform {
       isWindows: userAgent.indexOf("win") != -1
     };
   }-*/;
-
-  /**
-   * Gets the URL's parameter of the specified name. Note that if multiple parameters have been
-   * specified with the same name, the last one will be returned.
-   *
-   * @param name the name of the URL's parameter
-   * @return the value of the URL's parameter
-   */
-  public String getUrlParameter(String name) {
-    return Window.Location.getParameter(name);
-  }
-
-  /**
-   * @see playn.core.Platform#openURL(java.lang.String)
-   */
-  @Override
-  public void openURL(String url) {
-    Window.open(url, "_blank", "");
-  }
-
-  /**
-   * Sets the title of the browser's window or tab.
-   *
-   * @param title the window title
-   */
-  public void setTitle(String title) {
-    Window.setTitle(title);
-  }
-
-  /**
-   * Sets the {@code cursor} CSS property.
-   *
-   * @param cursor the {@link Cursor} to use, or null to hide the cursor.
-   */
-  public static void setCursor(Cursor cursor) {
-    Element rootElement = ((HtmlGraphics) PlayN.graphics()).rootElement();
-    if (cursor == null) {
-      rootElement.getStyle().setProperty("cursor", "none");
-    } else {
-      rootElement.getStyle().setCursor(cursor);
-    }
-  }
-
-  /**
-   * Disable the right-click context menu.
-   */
-  public static void disableRightClickContextMenu() {
-    Element rootElement = ((HtmlGraphics) PlayN.graphics()).rootElement();
-    disableRightClickImpl(rootElement);
-  }
 
   /**
    * Return true if the browser supports WebGL

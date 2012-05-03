@@ -21,6 +21,11 @@ public class AndroidTouch implements Touch {
   private Listener listener;
 
   @Override
+  public boolean hasTouch() {
+    return true;
+  }
+
+  @Override
   public synchronized void setListener(Listener listener) {
     this.listener = listener;
   }

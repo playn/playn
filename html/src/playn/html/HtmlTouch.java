@@ -21,8 +21,10 @@ import playn.core.PlayN;
 import playn.core.Touch;
 
 class HtmlTouch extends HtmlInput implements Touch {
+
   private Listener listener;
-  boolean inTouchSequence = false; // true when we are in a touch sequence (after touch start but before touch end)
+  // true when we are in a touch sequence (after touch start but before touch end)
+  boolean inTouchSequence = false;
 
   /**
    * Special implementation of Event.Impl for keeping track of changes to preventDefault
@@ -138,6 +140,12 @@ class HtmlTouch extends HtmlInput implements Touch {
       }
     });
   }
+
+  @Override
+  public native boolean hasTouch() /*-{
+    return ('ontouchstart' in $doc.documentElement) ||
+      ($wnd.navigator.userAgent.match(/ipad|iphone|android/i) != null);
+  }-*/;
 
   @Override
   public void setListener(Listener listener) {

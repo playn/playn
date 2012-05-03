@@ -26,6 +26,11 @@ public class MouseImpl implements Mouse {
   private AbstractLayer activeLayer;
 
   @Override
+  public boolean hasMouse() {
+    return true;
+  }
+
+  @Override
   public void setListener(Listener listener) {
     this.listener = listener;
   }

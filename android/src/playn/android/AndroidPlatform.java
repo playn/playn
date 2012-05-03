@@ -21,11 +21,13 @@ import android.net.Uri;
 import playn.core.Game;
 import playn.core.Json;
 import playn.core.Mouse;
+import playn.core.MouseStub;
 import playn.core.Platform;
 import playn.core.PlayN;
 import playn.core.json.JsonImpl;
 
 public class AndroidPlatform implements Platform {
+
   public static final boolean DEBUG_LOGS = true;
 
   public static AndroidPlatform register(AndroidGL20 gl20, GameActivity activity) {
@@ -115,11 +117,7 @@ public class AndroidPlatform implements Platform {
 
   @Override
   public Mouse mouse() {
-    return new Mouse() {
-      public void setListener(Listener listener) {
-        log().warn("Mouse not supported on Android.");
-      }
-    };
+    return new MouseStub();
   }
 
   @Override
