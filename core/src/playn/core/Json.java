@@ -13,7 +13,9 @@
  */
 package playn.core;
 
+import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
 
 import playn.core.json.JsonParserException;
 import playn.core.json.JsonSink;
@@ -67,6 +69,71 @@ public interface Json {
      * <code>next</code>.
      */
     Iterator<T> iterator();
+
+    /**
+     * Contains utility methods for creating typed arrays to supply as the default when fetching
+     * optional typed arrays from your JSON model. For example:
+     * <pre>{@code
+     * Json.TypedArray<Integer> sizes = json.getArray(
+     *   "sizes", Integer.class, Json.TypedArray.Util.create(3, 5, 9));
+     * }</pre>
+     */
+    public static class Util {
+
+      /** Creates a typed array using {@code data}} as its backing data. */
+      public static TypedArray<Boolean> create (Boolean... data) {
+        return Util.<Boolean>toArray(data);
+      }
+
+      /** Creates a typed array using {@code data}} as its backing data. */
+      public static TypedArray<Integer> create (Integer... data) {
+        return Util.<Integer>toArray(data);
+      }
+
+      /** Creates a typed array using {@code data}} as its backing data. */
+      public static TypedArray<Float> create (Float... data) {
+        return Util.<Float>toArray(data);
+      }
+
+      /** Creates a typed array using {@code data}} as its backing data. */
+      public static TypedArray<Double> create (Double... data) {
+        return Util.<Double>toArray(data);
+      }
+
+      /** Creates a typed array using {@code data}} as its backing data. */
+      public static TypedArray<String> create (String... data) {
+        return Util.<String>toArray(data);
+      }
+
+      /** Creates a typed array using {@code data}} as its backing data. */
+      public static TypedArray<Json.Object> create (Json.Object... data) {
+        return Util.<Json.Object>toArray(data);
+      }
+
+      /** Creates a typed array using {@code data}} as its backing data. */
+      public static TypedArray<Json.Array> create (Json.Array... data) {
+        return Util.<Json.Array>toArray(data);
+      }
+
+      private static <T> TypedArray<T> toArray (final java.lang.Object[] data) {
+        return new TypedArray<T>() {
+          public int length() {
+            return data.length;
+          }
+          public T get(int index) {
+            @SuppressWarnings("unchecked") T value = (T)data[index];
+            return value;
+          }
+          public T get(int index, T dflt) {
+            return (index < 0 || index >= data.length) ? dflt : get(index);
+          }
+          public Iterator<T> iterator() {
+            @SuppressWarnings("unchecked") List<T> list = (List<T>)Arrays.asList(data);
+            return list.iterator();
+          }
+        };
+      }
+    }
   }
 
   /**
@@ -160,7 +227,7 @@ public interface Json {
      * Gets an array at the given index that assumes its values are of the given json type, or
      * <code>null</code> if there is no value at this index.
      *
-     * @param jsonType one of Json.Object, Boolean, Integer, Double, or String
+     * @param jsonType one of Json.Object, Json.Array, Boolean, Integer, Float, Double, or String
      *
      * @throws IllegalArgumentException if jsonType is of an invalid type.
      */
@@ -305,7 +372,7 @@ public interface Json {
      * Gets an array at the given key that assumes its values are of the given json type, or
      * <code>null</code> if there is no value at this key.
      *
-     * @param jsonType one of Json.Object, Boolean, Integer, Double, or String
+     * @param jsonType one of Json.Object, Json.Array, Boolean, Integer, Float, Double, or String
      *
      * @throws IllegalArgumentException if jsonType is of an invalid type.
      */
@@ -315,7 +382,7 @@ public interface Json {
      * Gets an array at the given key that assumes its values are of the given json type, or the
      * default if there is no value at this key.
      *
-     * @param jsonType one of Json.Object, Boolean, Integer, Double, or String
+     * @param jsonType one of Json.Object, Json.Array, Boolean, Integer, Float, Double, or String
      * @param dflt An existing typed array
      *
      * @throws IllegalArgumentException if jsonType is of an invalid type.
