@@ -126,7 +126,7 @@ public class PlayN {
   }
 
   /**
-   * Returns the {@link Mouse} input service (if supported, null otherwise).
+   * Returns the {@link Mouse} input service.
    */
   public static Mouse mouse() {
     return platform.mouse();
@@ -140,7 +140,7 @@ public class PlayN {
   }
 
   /**
-   * Returns the {@link Touch} input service (if supported, null otherwise).
+   * Returns the {@link Touch} input service.
    */
   public static Touch touch() {
     return platform.touch();
