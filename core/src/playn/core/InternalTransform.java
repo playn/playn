@@ -51,6 +51,11 @@ public interface InternalTransform extends Transform {
       float originX, float originY);
 
   /**
+   * Pre-concatenates the supplied layer transform onto this transform.
+   */
+  InternalTransform preConcatenate(InternalTransform other);
+
+  /**
    * Returns a copy of this transform.
    */
   InternalTransform clone();

@@ -74,6 +74,13 @@ public class StockInternalTransform extends AffineTransform implements InternalT
   }
 
   @Override
+  public InternalTransform preConcatenate(InternalTransform other) {
+    Transforms.multiply(other.m00(), other.m01(), other.m10(), other.m11(), other.tx(), other.ty(),
+                        this, this);
+    return this;
+  }
+
+  @Override
   public InternalTransform clone () {
     return new StockInternalTransform(m00, m01, m10, m11, tx, ty);
   }

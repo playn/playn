@@ -20,6 +20,7 @@ import java.util.List;
 
 import pythagoras.f.FloatMath;
 import pythagoras.f.MathUtil;
+import pythagoras.f.Transforms;
 
 import playn.core.Asserts;
 import playn.core.Image;
@@ -98,18 +99,19 @@ abstract class AbstractSurfaceGL implements Surface {
     float wx = dx * (width / 2) / length;
     float wy = dy * (width / 2) / length;
 
-    InternalTransform t = topTransform().clone();
-    t.setRotation(FloatMath.atan2(dy, dx));
-    t.setTranslation(t.tx() + x0 + wy, t.ty() + y0 - wx);
+    InternalTransform l = ctx.createTransform();
+    l.setRotation(FloatMath.atan2(dy, dx));
+    l.setTranslation(x0 + wy, y0 - wx);
+    l.preConcatenate(topTransform());
 
     if (fillPattern != null) {
       Object tex = fillPattern.ensureTexture(ctx, true, true);
       if (tex != null) {
-        ctx.fillQuad(t, 0, 0, length, 0, 0, width, length, width,
+        ctx.fillQuad(l, 0, 0, length, 0, 0, width, length, width,
                      fillPattern.width(), fillPattern.height(), tex, alpha);
       }
     } else {
-      ctx.fillQuad(t, 0, 0, length, 0, 0, width, length, width, fillColor, alpha);
+      ctx.fillQuad(l, 0, 0, length, 0, 0, width, length, width, fillColor, alpha);
     }
     return this;
   }

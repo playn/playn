@@ -373,6 +373,12 @@ public class HtmlInternalTransform extends AbstractTransform implements Internal
     return this;
   }
 
+  @Override
+  public InternalTransform preConcatenate(InternalTransform other) {
+    multiply(other.m00(), other.m01(), other.m10(), other.m11(), other.tx(), other.ty(), this, this);
+    return this;
+  }
+
   // private bits
 
   private Float32Array matrix;
