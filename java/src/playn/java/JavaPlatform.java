@@ -78,19 +78,19 @@ public class JavaPlatform implements Platform {
     return instance;
   }
 
-  private JavaAnalytics analytics = new JavaAnalytics();
-  private JavaAudio audio = new JavaAudio();
-  private JavaLog log = new JavaLog();
-  private JavaNet net = new JavaNet();
-  private JavaRegularExpression regex = new JavaRegularExpression();
-  private JavaStorage storage = new JavaStorage();
-  private JsonImpl json = new JsonImpl();
-  private JavaKeyboard keyboard = new JavaKeyboard();
-  private JavaPointer pointer = new JavaPointer();
-  private JavaGraphics graphics;
-  private JavaMouse mouse;
-  private JavaAssets assets;
-  private RunQueue runQueue = new RunQueue(log);
+  private final JavaAnalytics analytics = new JavaAnalytics();
+  private final JavaAudio audio = new JavaAudio();
+  private final JavaLog log = new JavaLog();
+  private final JavaNet net = new JavaNet(this);
+  private final JavaRegularExpression regex = new JavaRegularExpression();
+  private final JavaStorage storage = new JavaStorage();
+  private final JsonImpl json = new JsonImpl();
+  private final JavaKeyboard keyboard = new JavaKeyboard();
+  private final JavaPointer pointer = new JavaPointer();
+  private final JavaGraphics graphics;
+  private final JavaMouse mouse;
+  private final JavaAssets assets;
+  private final RunQueue runQueue = new RunQueue(log);
 
   private int updateRate = 0;
   private float accum = updateRate;

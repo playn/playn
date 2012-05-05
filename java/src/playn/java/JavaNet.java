@@ -29,47 +29,60 @@ import java.net.URL;
 public class JavaNet implements Net {
 
   private static final int BUF_SIZE = 4096;
+  private final JavaPlatform platform;
 
-  @Override
-  public void get(String urlStr, Callback<String> callback) {
-    // TODO: Make this non-blocking so that it doesn't differ from the html
-    // version's behavior.
-    try {
-      URL url = new URL(canonicalizeUrl(urlStr));
-      InputStream stream = url.openStream();
-      InputStreamReader reader = new InputStreamReader(stream);
-
-      callback.onSuccess(readFully(reader));
-    } catch (MalformedURLException e) {
-      callback.onFailure(e);
-    } catch (IOException e) {
-      callback.onFailure(e);
-    }
+  public JavaNet(JavaPlatform platform) {
+    this.platform = platform;
   }
 
   @Override
-  public void post(String urlStr, String data, Callback<String> callback) {
-    // TODO: Make this non-blocking so that it doesn't differ from the html
-    // version's behavior.
-    try {
-      URL url = new URL(canonicalizeUrl(urlStr));
-      HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-      conn.setRequestMethod("POST");
-      conn.setDoOutput(true);
-      conn.setDoInput(true);
-      conn.setAllowUserInteraction(false);
-      conn.setRequestProperty("Content-type", "text/xml; charset=UTF-8");
+  public void get(final String urlStr, final Callback<String> callback) {
+    new Thread("JavaNet.get(" + urlStr + ")") {
+      @Override
+      public void run() {
+        try {
+          URL url = new URL(canonicalizeUrl(urlStr));
+          InputStream stream = url.openStream();
+          InputStreamReader reader = new InputStreamReader(stream);
 
-      conn.connect();
-      conn.getOutputStream().write(data.getBytes("UTF-8"));
-      conn.getOutputStream().close();
-      callback.onSuccess(readFully(new InputStreamReader(conn.getInputStream())));
-      conn.disconnect();
-    } catch (MalformedURLException e) {
-      callback.onFailure(e);
-    } catch (IOException e) {
-      callback.onFailure(e);
-    }
+          notifySuccess(callback, readFully(reader));
+
+        } catch (MalformedURLException e) {
+          notifyFailure(callback, e);
+        } catch (IOException e) {
+          notifyFailure(callback, e);
+        }
+      }
+    }.start();
+  }
+
+  @Override
+  public void post(final String urlStr, final String data, final Callback<String> callback) {
+    new Thread("JavaNet.post(" + urlStr + ")") {
+      public void run() {
+        try {
+          URL url = new URL(canonicalizeUrl(urlStr));
+          HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+          conn.setRequestMethod("POST");
+          conn.setDoOutput(true);
+          conn.setDoInput(true);
+          conn.setAllowUserInteraction(false);
+          conn.setRequestProperty("Content-type", "text/xml; charset=UTF-8");
+
+          conn.connect();
+          conn.getOutputStream().write(data.getBytes("UTF-8"));
+          conn.getOutputStream().close();
+          String result = readFully(new InputStreamReader(conn.getInputStream()));
+          conn.disconnect();
+          notifySuccess(callback, result);
+
+        } catch (MalformedURLException e) {
+          notifyFailure(callback, e);
+        } catch (IOException e) {
+          notifyFailure(callback, e);
+        }
+      }
+    }.start();
   }
 
   void update() {
@@ -98,5 +111,21 @@ public class JavaNet implements Net {
       result.append(buf, 0, len);
     }
     return result.toString();
+  }
+
+  private void notifySuccess(final Callback<String> callback, final String result) {
+    platform.invokeLater(new Runnable() {
+      public void run() {
+        callback.onSuccess(result);
+      }
+    });
+  }
+
+  private void notifyFailure(final Callback<String> callback, final Throwable cause) {
+    platform.invokeLater(new Runnable() {
+      public void run() {
+        callback.onFailure(cause);
+      }
+    });
   }
 }
