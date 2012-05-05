@@ -56,8 +56,9 @@ public class AndroidGLContext extends GLContext
   // Debug
   private int texCount;
 
-  AndroidGLContext(float scaleFactor, AndroidGL20 gfx, int screenWidth, int screenHeight) {
-    super(scaleFactor);
+  AndroidGLContext(AndroidPlatform platform, float scaleFactor, AndroidGL20 gfx,
+                   int screenWidth, int screenHeight) {
+    super(platform, scaleFactor);
     gl20 = gfx;
     setSize(screenWidth, screenHeight);
     reinitGL();

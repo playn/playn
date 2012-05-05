@@ -55,7 +55,7 @@ class AndroidGraphics extends GraphicsGL {
   private int screenWidth, screenHeight;
   private boolean sizeSetManually = false;
 
-  public AndroidGraphics(GameActivity activity, AndroidGL20 gfx,
+  public AndroidGraphics(AndroidPlatform platform, GameActivity activity, AndroidGL20 gfx,
                          AndroidTouchEventHandler touchHandler) {
     this.activity = activity;
     this.touchHandler = touchHandler;
@@ -65,7 +65,7 @@ class AndroidGraphics extends GraphicsGL {
     if (startingScreenHeight != 0)
       screenHeight = startingScreenHeight;
     // TODO: determine scale factor automatically?
-    ctx = new AndroidGLContext(1, gfx, screenWidth, screenHeight);
+    ctx = new AndroidGLContext(platform, 1, gfx, screenWidth, screenHeight);
     gameView = activity.gameView();
     rootLayer = new GroupLayerGL(ctx);
   }
@@ -195,7 +195,6 @@ class AndroidGraphics extends GraphicsGL {
   }
 
   void preparePaint() {
-    ctx.processPending();
     ctx.preparePaint();
   }
 

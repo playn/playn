@@ -67,10 +67,10 @@ public class IOSGraphics extends GraphicsGL {
 
   final IOSGLContext ctx;
 
-  public IOSGraphics(RectangleF bounds, float scale) {
+  public IOSGraphics(IOSPlatform platform, RectangleF bounds, float scale) {
     screenWidth = (int)bounds.get_Width();
     screenHeight = (int)bounds.get_Height();
-    ctx = new IOSGLContext(scale, screenWidth, screenHeight);
+    ctx = new IOSGLContext(platform, scale, screenWidth, screenHeight);
     rootLayer = new GroupLayerGL(ctx);
     rootTransform = new StockInternalTransform();
     rootTransform.uniformScale(ctx.scaleFactor);
@@ -189,7 +189,6 @@ public class IOSGraphics extends GraphicsGL {
   }
 
   void paint(Game game, float alpha) {
-    ctx.processPending();
     ctx.preparePaint();
     game.paint(alpha); // run the game's custom painting code
     ctx.paintLayers(rootTransform, rootLayer);

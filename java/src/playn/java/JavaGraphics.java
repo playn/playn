@@ -46,8 +46,8 @@ public class JavaGraphics extends GraphicsGL {
   private final JavaGLContext ctx;
   private JavaGL20 gl;
 
-  public JavaGraphics(float scaleFactor) {
-    this.ctx = new JavaGLContext(scaleFactor, DEFAULT_WIDTH, DEFAULT_HEIGHT);
+  public JavaGraphics(JavaPlatform platform, float scaleFactor) {
+    this.ctx = new JavaGLContext(platform, scaleFactor, DEFAULT_WIDTH, DEFAULT_HEIGHT);
     this.rootLayer = new GroupLayerGL(ctx);
   }
 

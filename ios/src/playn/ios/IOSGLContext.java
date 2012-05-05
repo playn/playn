@@ -42,8 +42,8 @@ public class IOSGLContext extends GLContext {
   private GLShader.Texture texShader;
   private GLShader.Color colorShader;
 
-  public IOSGLContext(float scaleFactor, int screenWidth, int screenHeight) {
-    super(scaleFactor);
+  public IOSGLContext(IOSPlatform platform, float scaleFactor, int screenWidth, int screenHeight) {
+    super(platform, scaleFactor);
     setSize(screenWidth, screenHeight);
   }
 

@@ -145,8 +145,7 @@ public class GameViewGL extends GLSurfaceView implements SurfaceHolder.Callback 
   @Override
   public void onPause() {
     queueEvent(new Runnable() {
-      // This method will be called on the rendering
-      // thread:
+      // This method will be called on the rendering thread:
       @Override
       public void run() {
         renderer.onPause();

@@ -17,15 +17,13 @@ import pythagoras.f.MathUtil;
 
 import playn.core.Asserts;
 import playn.core.InternalTransform;
+import playn.core.Platform;
 import playn.core.PlayN;
 import playn.core.StockInternalTransform;
 
 public abstract class GLContext {
 
-  // a queue of pending actions to execute on the GL thread
-  private Pender penders = null;
-  private Object penderLock = new Object();
-
+  private final Platform platform;
   private GLShader curShader;
   private Object lastFramebuffer;
 
@@ -116,20 +114,9 @@ public abstract class GLContext {
   /** NOOP except when debugging, checks and logs whether any GL errors have occurred. */
   public abstract void checkGLError(String op);
 
-  /** Processes any pending GL actions. Should be called once per frame. */
-  public void processPending() {
-    Pender head;
-    synchronized (penderLock) {
-      head = penders;
-      penders = null;
-    }
-    if (head != null)
-      head.process();
-  }
-
   /** Queues a texture to be destroyed on the GL thread. */
   public void queueDestroyTexture(final Object tex) {
-    queuePender(new Runnable() {
+    platform.invokeLater(new Runnable() {
       public void run() {
         destroyTexture(tex);
       }
@@ -138,7 +125,7 @@ public abstract class GLContext {
 
   /** Queues a framebuffer to be destroyed on the GL thread. */
   public void queueDeleteFramebuffer(final Object fbuf) {
-    queuePender(new Runnable() {
+    platform.invokeLater(new Runnable() {
       public void run() {
         deleteFramebuffer(fbuf);
       }
@@ -288,9 +275,10 @@ public abstract class GLContext {
     return true;
   }
 
-  protected GLContext(float scaleFactor) {
+  protected GLContext(Platform platform, float scaleFactor) {
     Asserts.checkArgument(scaleFactor >= 1, "Scale factor cannot be less than one.");
     this.scaleFactor = scaleFactor;
+    this.platform = platform;
   }
 
   protected void viewWasResized () {
@@ -319,30 +307,4 @@ public abstract class GLContext {
   protected abstract GLShader.Color quadColorShader();
 
   protected abstract GLShader.Color trisColorShader();
-
-  private void queuePender(Runnable action) {
-    synchronized (penderLock) {
-      penders = new Pender(action, penders);
-    }
-  }
-
-  private static class Pender {
-    public final Runnable action;
-    public final Pender next;
-
-    public Pender(Runnable action, Pender next) {
-      this.action = action;
-      this.next = next;
-    }
-
-    public void process() {
-      if (next != null)
-        next.process();
-      try {
-        action.run();
-      } catch (Throwable t) {
-        PlayN.log().warn("Pending GL action choked.", t);
-      }
-    }
-  }
 }

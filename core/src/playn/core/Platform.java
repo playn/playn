@@ -31,6 +31,8 @@ public interface Platform {
 
   void openURL(String url);
 
+  void invokeLater(Runnable runnable);
+
   Audio audio();
 
   Graphics graphics();

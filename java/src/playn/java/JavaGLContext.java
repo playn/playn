@@ -52,8 +52,8 @@ class JavaGLContext extends GLContext {
   private GLShader.Texture texShader;
   private GLShader.Color colorShader;
 
-  JavaGLContext(float scaleFactor, int screenWidth, int screenHeight) {
-    super(scaleFactor);
+  JavaGLContext(JavaPlatform platform, float scaleFactor, int screenWidth, int screenHeight) {
+    super(platform, scaleFactor);
     setSize(screenWidth, screenHeight);
     // create our root transform with our scale factor
     rootXform = new StockInternalTransform();

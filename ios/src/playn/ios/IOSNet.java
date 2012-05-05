@@ -25,8 +25,8 @@ import cli.System.Net.WebResponse;
 import playn.core.Net;
 import playn.core.util.Callback;
 
-public class IOSNet implements Net
-{
+public class IOSNet implements Net {
+
   private final IOSPlatform platform;
 
   public IOSNet(IOSPlatform platform) {
@@ -67,7 +67,7 @@ public class IOSNet implements Net
           WebResponse rsp = req.EndGetResponse(result);
           reader = new StreamReader(rsp.GetResponseStream());
           final String data = reader.ReadToEnd();
-          platform.queueAction(new Runnable() {
+          platform.invokeLater(new Runnable() {
             public void run () {
               callback.onSuccess(data);
             }
@@ -83,7 +83,7 @@ public class IOSNet implements Net
   }
 
   private void queueFailure (final Callback<?> callback, final Throwable t) {
-    platform.queueAction(new Runnable() {
+    platform.invokeLater(new Runnable() {
       public void run () {
         callback.onFailure(t);
       }

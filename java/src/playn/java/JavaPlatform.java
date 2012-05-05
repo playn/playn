@@ -36,6 +36,7 @@ import playn.core.Storage;
 import playn.core.Touch;
 import playn.core.TouchStub;
 import playn.core.json.JsonImpl;
+import playn.core.util.RunQueue;
 
 public class JavaPlatform implements Platform {
 
@@ -89,6 +90,7 @@ public class JavaPlatform implements Platform {
   private JavaGraphics graphics;
   private JavaMouse mouse;
   private JavaAssets assets;
+  private RunQueue runQueue = new RunQueue(log);
 
   private int updateRate = 0;
   private float accum = updateRate;
@@ -96,7 +98,7 @@ public class JavaPlatform implements Platform {
   private double lastPaintTime;
 
   public JavaPlatform(float scaleFactor) {
-    graphics = new JavaGraphics(scaleFactor);
+    graphics = new JavaGraphics(this, scaleFactor);
     mouse = new JavaMouse(graphics);
     assets = new JavaAssets(graphics, audio);
   }
@@ -203,6 +205,11 @@ public class JavaPlatform implements Platform {
   }
 
   @Override
+  public void invokeLater(Runnable runnable) {
+    runQueue.add(runnable);
+  }
+
+  @Override
   public void run(final Game game) {
     this.updateRate = game.updateRate();
 
@@ -224,6 +231,9 @@ public class JavaPlatform implements Platform {
       keyboard.update();
       pointer.update();
       net.update();
+
+      // Execute any pending runnables.
+      runQueue.execute();
 
       // Game loop.
       double now = time();

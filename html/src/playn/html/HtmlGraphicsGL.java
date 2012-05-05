@@ -37,11 +37,11 @@ class HtmlGraphicsGL extends HtmlGraphics {
   private final HtmlGL20 gl20;
   private final GroupLayerGL rootLayer;
 
-  HtmlGraphicsGL() throws RuntimeException {
+  HtmlGraphicsGL(HtmlPlatform platform) throws RuntimeException {
     canvas = Document.get().createCanvasElement();
     rootElement.appendChild(canvas);
     try {
-      ctx = new HtmlGLContext(canvas);
+      ctx = new HtmlGLContext(platform, canvas);
       gl20 = new HtmlGL20(ctx.gl);
       rootLayer = new GroupLayerGL(ctx);
     } catch (RuntimeException re) {
@@ -122,7 +122,6 @@ class HtmlGraphicsGL extends HtmlGraphics {
 
   @Override
   void preparePaint() {
-    ctx.processPending();
     ctx.preparePaint();
   }
 

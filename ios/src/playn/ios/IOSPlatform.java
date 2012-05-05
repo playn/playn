@@ -15,9 +15,7 @@
  */
 package playn.ios;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import cli.System.Drawing.RectangleF;
@@ -37,6 +35,7 @@ import playn.core.Platform;
 import playn.core.PlayN;
 import playn.core.RegularExpression;
 import playn.core.json.JsonImpl;
+import playn.core.util.RunQueue;
 
 /**
  * Provides access to all the PlayN services on iOS.
@@ -93,17 +92,18 @@ public class IOSPlatform implements Platform {
     return platform;
   }
 
-  private IOSAudio audio;
-  private IOSGraphics graphics;
-  private Json json;
-  private IOSKeyboard keyboard;
-  private IOSLog log;
-  private IOSNet net;
-  private IOSPointer pointer;
-  private IOSStorage storage;
-  private IOSTouch touch;
-  private IOSAssets assets;
-  private IOSAnalytics analytics;
+  private final IOSAudio audio;
+  private final IOSGraphics graphics;
+  private final Json json;
+  private final IOSKeyboard keyboard;
+  private final IOSLog log;
+  private final IOSNet net;
+  private final IOSPointer pointer;
+  private final IOSStorage storage;
+  private final IOSTouch touch;
+  private final IOSAssets assets;
+  private final IOSAnalytics analytics;
+  private final RunQueue runQueue;
 
   private Game game;
   private float accum, alpha;
@@ -112,8 +112,6 @@ public class IOSPlatform implements Platform {
   private final UIApplication app;
   private final UIWindow mainWindow;
   private final IOSGameView gameView;
-
-  private final List<Runnable> pendingActions = new ArrayList<Runnable>();
 
   protected IOSPlatform(UIApplication app, SupportedOrients orients) {
     this.app = app;
@@ -126,7 +124,7 @@ public class IOSPlatform implements Platform {
     log = new IOSLog();
 
     audio = new IOSAudio();
-    graphics = new IOSGraphics(bounds, scale);
+    graphics = new IOSGraphics(this, bounds, scale);
     json = new JsonImpl();
     keyboard = new IOSKeyboard();
     net = new IOSNet(this);
@@ -135,6 +133,7 @@ public class IOSPlatform implements Platform {
     assets = new IOSAssets(graphics, audio);
     analytics = new IOSAnalytics();
     storage = new IOSStorage();
+    runQueue = new RunQueue(log);
 
     mainWindow = new UIWindow(bounds);
     mainWindow.Add(gameView = new IOSGameView(this, bounds, scale));
@@ -232,6 +231,11 @@ public class IOSPlatform implements Platform {
   }
 
   @Override
+  public void invokeLater(Runnable runnable) {
+    runQueue.add(runnable);
+  }
+
+  @Override
   public void run(Game game) {
     this.game = game;
     // start the main game loop (TODO: support 0 update rate)
@@ -253,23 +257,8 @@ public class IOSPlatform implements Platform {
   void update(float delta) {
     // log.debug("Update " + delta);
 
-    // process any pending actions
-    List<Runnable> actions = null;
-    synchronized (pendingActions) {
-      if (!pendingActions.isEmpty()) {
-        actions = new ArrayList<Runnable>(pendingActions);
-        pendingActions.clear();
-      }
-    }
-    if (actions != null) {
-      for (Runnable action : actions) {
-        try {
-          action.run();
-        } catch (Exception e) {
-          log().warn("Pending action failed", e);
-        }
-      }
-    }
+    // process pending actions
+    runQueue.execute();
 
     // perform the game updates
     float updateRate = game.updateRate();
@@ -291,13 +280,6 @@ public class IOSPlatform implements Platform {
   void paint() {
     // log.debug("Paint " + alpha);
     graphics.paint(game, alpha);
-  }
-
-  /** Queues an action to be executed before the next {@link #update}. */
-  void queueAction(Runnable r) {
-    synchronized (pendingActions) {
-      pendingActions.add(r);
-    }
   }
 
   protected static final Map<UIDeviceOrientation,UIInterfaceOrientation> ORIENT_MAP =

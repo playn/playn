@@ -38,6 +38,13 @@ public class PlayN {
   }
 
   /**
+   * Returns the platform {@link Platform.Type}.
+   */
+  public static Platform.Type platformType() {
+    return platform.type();
+  }
+
+  /**
    * Returns the current time, as a double value in millis since January 1, 1970, 00:00:00 GMT.
    *
    * <p> This is equivalent to the standard JRE {@code new Date().getTime();}, but it slightly
@@ -63,10 +70,11 @@ public class PlayN {
   }
 
   /**
-   * Returns the platform {@link Platform.Type}.
+   * Queues the supplied runnable for invocation on the game thread prior to the next call to
+   * {@link Game#update}.
    */
-  public static Platform.Type platformType() {
-    return platform.type();
+  public static void invokeLater(Runnable runnable) {
+    platform.invokeLater(runnable);
   }
 
   /**

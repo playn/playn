@@ -47,8 +47,8 @@ public class HtmlGLContext extends GLContext {
   // Debug counters.
   // private int texCount;
 
-  HtmlGLContext(CanvasElement canvas) throws RuntimeException {
-    super(1); // no HiDPI on the interwebs
+  HtmlGLContext(HtmlPlatform platform, CanvasElement canvas) throws RuntimeException {
+    super(platform, 1); // no HiDPI on the interwebs
 
     // Try to create a context. If this returns null, then the browser doesn't support WebGL on
     // this machine.

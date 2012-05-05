@@ -25,6 +25,7 @@ import playn.core.MouseStub;
 import playn.core.Platform;
 import playn.core.PlayN;
 import playn.core.json.JsonImpl;
+import playn.core.util.RunQueue;
 
 public class AndroidPlatform implements Platform {
 
@@ -39,25 +40,26 @@ public class AndroidPlatform implements Platform {
   Game game;
   GameActivity activity;
 
-  private AndroidAudio audio;
-  private AndroidGraphics graphics;
-  private Json json;
-  private AndroidKeyboard keyboard;
-  private AndroidLog log;
-  private AndroidNet net;
-  private AndroidPointer pointer;
-  private AndroidStorage storage;
-  private AndroidTouch touch;
-  private AndroidTouchEventHandler touchHandler;
-  private AndroidAssets assets;
-  private AndroidAnalytics analytics;
+  private final AndroidAudio audio;
+  private final AndroidGraphics graphics;
+  private final Json json;
+  private final AndroidKeyboard keyboard;
+  private final AndroidLog log;
+  private final AndroidNet net;
+  private final AndroidPointer pointer;
+  private final AndroidStorage storage;
+  private final AndroidTouch touch;
+  private final AndroidTouchEventHandler touchHandler;
+  private final AndroidAssets assets;
+  private final AndroidAnalytics analytics;
+  private final RunQueue runQueue;
 
   protected AndroidPlatform(GameActivity activity, AndroidGL20 gl20) {
     this.activity = activity;
 
     audio = new AndroidAudio(activity);
     touchHandler = new AndroidTouchEventHandler(activity.gameView());
-    graphics = new AndroidGraphics(activity, gl20, touchHandler);
+    graphics = new AndroidGraphics(this, activity, gl20, touchHandler);
     json = new JsonImpl();
     keyboard = new AndroidKeyboard();
     log = new AndroidLog();
@@ -67,6 +69,7 @@ public class AndroidPlatform implements Platform {
     assets = new AndroidAssets(graphics, audio);
     analytics = new AndroidAnalytics();
     storage = new AndroidStorage(activity);
+    runQueue = new RunQueue(log);
   }
 
   @Override
@@ -113,6 +116,11 @@ public class AndroidPlatform implements Platform {
   public void openURL(String url) {
     Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
     activity.startActivity(browserIntent);
+  }
+
+  @Override
+  public void invokeLater(Runnable runnable) {
+    runQueue.add(runnable);
   }
 
   @Override
@@ -166,6 +174,7 @@ public class AndroidPlatform implements Platform {
   }
 
   void update(float delta) {
+    runQueue.execute();
     if (game != null) {
       game.update(delta);
     }

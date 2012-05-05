@@ -36,6 +36,7 @@ import playn.core.Pointer;
 import playn.core.Mouse;
 import playn.core.Touch;
 import playn.core.RegularExpression;
+import playn.core.util.RunQueue;
 import playn.html.HtmlUrlParameters.Renderer;
 
 public class HtmlPlatform implements Platform {
@@ -141,22 +142,23 @@ public class HtmlPlatform implements Platform {
 
   // Provide a static logging instance so that it can be used by other subsystems during
   // initialization, before we have called PlayN.setPlatform
-  static HtmlLog log = GWT.create(HtmlLog.class);
+  static final HtmlLog log = GWT.create(HtmlLog.class);
 
-  private HtmlAssets assets = new HtmlAssets();
-  private HtmlAudio audio = new HtmlAudio();
-  private HtmlRegularExpression regularExpression = new HtmlRegularExpression();
+  private final HtmlAssets assets = new HtmlAssets();
+  private final HtmlAudio audio = new HtmlAudio();
+  private final HtmlRegularExpression regularExpression = new HtmlRegularExpression();
+  private final HtmlGraphics graphics;
+  private final HtmlJson json = new HtmlJson();
+  private final HtmlKeyboard keyboard = new HtmlKeyboard();
+  private final HtmlNet net = new HtmlNet();
+  private final HtmlPointer pointer;
+  private final HtmlMouse mouse;
+  private final HtmlTouch touch;
+  private final HtmlStorage storage = new HtmlStorage();
+  private final HtmlAnalytics analytics = new HtmlAnalytics();
+  private final RunQueue runQueue = new RunQueue(log);
+
   private Game game;
-  private HtmlGraphics graphics;
-  private HtmlJson json = new HtmlJson();
-  private HtmlKeyboard keyboard = new HtmlKeyboard();
-  private HtmlNet net = new HtmlNet();
-  private HtmlPointer pointer;
-  private HtmlMouse mouse;
-  private HtmlTouch touch;
-  private HtmlStorage storage = new HtmlStorage();
-  private HtmlAnalytics analytics = new HtmlAnalytics();
-
   private TimerCallback paintCallback;
   private TimerCallback updateCallback;
 
@@ -175,43 +177,16 @@ public class HtmlPlatform implements Platform {
      * our own exceptions here.
      */
     try {
-      try {
-        if (mode == null) {
-          mode = Renderer.requestedMode();
-        }
-
-        switch (mode) {
-          case AUTODETECT:
-            graphics = hasGLSupport() ? new HtmlGraphicsGL() : new HtmlGraphicsCanvas();
-            break;
-          case CANVAS:
-            graphics = new HtmlGraphicsCanvas();
-            break;
-          case DOM:
-            graphics = new HtmlGraphicsDom();
-            break;
-          case WEBGL:
-            graphics = new HtmlGraphicsGL();
-            break;
-        }
-
-      // HtmlGraphicsGL ctor throws a runtime exception if the context creation fails.
-      } catch (RuntimeException e) {
-        log().info("Failed to create GL context (" + e.getMessage() + "). Falling back.");
-        graphics = new HtmlGraphicsCanvas();
-      } catch (Throwable t) {
-        log().info("GL context creation failed with an unknown error." + t);
-        graphics = new HtmlGraphicsCanvas();
-      }
-
+      graphics = createGraphics(mode != null ? mode : Renderer.requestedMode());
       pointer = new HtmlPointer(graphics.rootElement());
       mouse = new HtmlMouse(graphics.rootElement());
       touch = new HtmlTouch(graphics.rootElement());
-
       graphics.setSize(HtmlPlatform.DEFAULT_WIDTH, HtmlPlatform.DEFAULT_HEIGHT);
+
     } catch (Throwable e) {
       log.error("init()", e);
       Window.alert("failed to init(): " + e.getMessage());
+      throw new RuntimeException(e);
     }
   }
 
@@ -306,6 +281,10 @@ public class HtmlPlatform implements Platform {
       @Override
       public void fire() {
         requestAnimationFrame(paintCallback);
+
+        // process pending actions
+        runQueue.execute();
+
         double now = time();
         float delta = (float) (now - lastTime);
         if (delta > MAX_DELTA) {
@@ -346,8 +325,37 @@ public class HtmlPlatform implements Platform {
   }
 
   @Override
+  public void invokeLater(Runnable runnable) {
+    runQueue.add(runnable);
+  }
+
+  @Override
   public Type type() {
     return Type.HTML;
+  }
+
+  private HtmlGraphics createGraphics(Mode mode) {
+    try {
+      switch (mode) {
+      case CANVAS:
+        return new HtmlGraphicsCanvas();
+      case DOM:
+        return new HtmlGraphicsDom();
+      case WEBGL:
+        return new HtmlGraphicsGL(this);
+      default:
+      case AUTODETECT:
+        return hasGLSupport() ? new HtmlGraphicsGL(this) : new HtmlGraphicsCanvas();
+      }
+
+    // HtmlGraphicsGL ctor throws a runtime exception if the context creation fails.
+    } catch (RuntimeException e) {
+      log().info("Failed to create GL context (" + e.getMessage() + "). Falling back.");
+    } catch (Throwable t) {
+      log().info("GL context creation failed with an unknown error." + t);
+    }
+
+    return new HtmlGraphicsCanvas();
   }
 
   private native JavaScriptObject getWindow() /*-{

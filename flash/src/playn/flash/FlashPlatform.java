@@ -39,6 +39,7 @@ import playn.core.Storage;
 import playn.core.Touch;
 import playn.core.TouchStub;
 import playn.core.json.JsonImpl;
+import playn.core.util.RunQueue;
 import playn.html.HtmlRegularExpression;
 
 public class FlashPlatform implements Platform {
@@ -51,14 +52,10 @@ public class FlashPlatform implements Platform {
   private static final float MAX_DELTA = 100;
   private static FlashPlatform platform;
 
-  // TODO: why is this not created in register()?
-  static {
-    platform = new FlashPlatform();
-  }
-
   public static FlashPlatform register() {
+    if (platform == null)
+      platform = new FlashPlatform();
     PlayN.setPlatform(platform);
-    platform.init();
     return platform;
   }
 
@@ -68,27 +65,25 @@ public class FlashPlatform implements Platform {
     }, capture);
   }-*/;
 
-  private FlashAssets assets = new FlashAssets();
-  private FlashAudio audio;
-  private HtmlRegularExpression regularExpression;
-  private Game game;
-  private FlashGraphics graphics;
-  private Json json;
-  private FlashKeyboard keyboard;
-  private FlashLog log;
-  private FlashNet net;
-  private FlashPointer pointer;
-  private FlashMouse mouse;
+  private final FlashAssets assets = new FlashAssets();
+  private final FlashAudio audio;
+  private final HtmlRegularExpression regularExpression;
+  private final FlashGraphics graphics;
+  private final Json json;
+  private final FlashKeyboard keyboard;
+  private final FlashLog log;
+  private final FlashNet net;
+  private final FlashPointer pointer;
+  private final FlashMouse mouse;
+  private final RunQueue runQueue;
 
+  private Game game;
   private TimerCallback paintCallback;
   private TimerCallback updateCallback;
   private Storage storage;
   private Analytics analytics;
 
   protected FlashPlatform() {
-  }
-
-  public void init() {
     log = new FlashLog();
     regularExpression = new HtmlRegularExpression();
     net = new FlashNet();
@@ -100,6 +95,7 @@ public class FlashPlatform implements Platform {
     graphics = new FlashGraphics();
     storage = new FlashStorage();
     analytics = new FlashAnalytics();
+    runQueue = new RunQueue(log);
   }
 
   @Override
@@ -179,6 +175,11 @@ public class FlashPlatform implements Platform {
   }
 
   @Override
+  public void invokeLater(Runnable runnable) {
+    runQueue.add(runnable);
+  }
+
+  @Override
   public void run(final Game game) {
     final int updateRate = game.updateRate();
     this.game = game;
@@ -192,6 +193,9 @@ public class FlashPlatform implements Platform {
 
       @Override
       public void fire() {
+        // process pending actions
+        runQueue.execute();
+
         double now = time();
         if (frameCounter == 0) {
           frameCounterStart = now;
