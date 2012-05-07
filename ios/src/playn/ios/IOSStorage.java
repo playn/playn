@@ -33,8 +33,8 @@ import java.util.List;
 import playn.core.PlayN;
 import playn.core.Storage;
 
-public class IOSStorage implements Storage
-{
+public class IOSStorage implements Storage {
+
   private static final String STORAGE_FILE_NAME = "playn.db";
   private static final String STORAGE_SCHEMA =
     "CREATE TABLE Data (DataKey ntext PRIMARY KEY, DataValue ntext NOT NULL)";
@@ -42,14 +42,20 @@ public class IOSStorage implements Storage
   private SqliteConnection conn;
 
   public IOSStorage() {
-    String docDir = Environment.GetFolderPath(SpecialFolder.wrap(SpecialFolder.Personal));
-    String db = Path.Combine(docDir, STORAGE_FILE_NAME);
-    boolean needCreate = !File.Exists(db);
-    if (needCreate)
-      SqliteConnection.CreateFile(db);
-    conn = new SqliteConnection("Data Source=" + db);
-    if (needCreate)
-      executeUpdate(createCommand(STORAGE_SCHEMA));
+    String dbDir = null;
+    try {
+      dbDir = Environment.GetFolderPath(SpecialFolder.wrap(SpecialFolder.Personal));
+      String db = Path.Combine(dbDir, STORAGE_FILE_NAME);
+      boolean needCreate = !File.Exists(db);
+      if (needCreate)
+        SqliteConnection.CreateFile(db);
+      conn = new SqliteConnection("Data Source=" + db);
+      if (needCreate)
+        executeUpdate(createCommand(STORAGE_SCHEMA));
+    } catch (Throwable t) {
+      throw new RuntimeException(
+        "Failed to initialize storage [dbDir=" + dbDir + "]: " + t.getMessage());
+    }
   }
 
   @Override
