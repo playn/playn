@@ -17,8 +17,8 @@ package playn.ios;
 
 import playn.core.Analytics;
 
-public class IOSAnalytics implements Analytics
-{
+public class IOSAnalytics implements Analytics {
+
   @Override
   public void logEvent(Category category, String action) {
     throw new RuntimeException("TODO");

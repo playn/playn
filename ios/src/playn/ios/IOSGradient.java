@@ -22,10 +22,11 @@ import cli.System.Drawing.PointF;
 
 import playn.core.Gradient;
 
-public abstract class IOSGradient implements Gradient
-{
+public abstract class IOSGradient implements Gradient {
+
   private static final CGGradientDrawingOptions gdOptions = CGGradientDrawingOptions.wrap(
-    CGGradientDrawingOptions.DrawsBeforeStartLocation|CGGradientDrawingOptions.DrawsAfterEndLocation);
+    CGGradientDrawingOptions.DrawsBeforeStartLocation|
+    CGGradientDrawingOptions.DrawsAfterEndLocation);
 
   final CGGradient cgGradient;
 

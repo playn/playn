@@ -34,8 +34,8 @@ import playn.core.PlayN;
 import playn.core.ResourceCallback;
 import playn.core.Sound;
 
-public class IOSAssets implements Assets
-{
+public class IOSAssets implements Assets {
+
   private String pathPrefix = "";
   private final IOSGraphics graphics;
   private final IOSAudio audio;

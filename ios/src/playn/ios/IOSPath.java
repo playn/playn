@@ -19,8 +19,8 @@ import cli.MonoTouch.CoreGraphics.CGPath;
 
 import playn.core.Path;
 
-public class IOSPath implements Path
-{
+public class IOSPath implements Path {
+
   CGPath cgPath = new CGPath();
 
   @Override

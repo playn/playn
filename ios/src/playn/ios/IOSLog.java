@@ -19,9 +19,7 @@ import cli.System.Console;
 
 import playn.core.Log;
 
-public class IOSLog implements Log
-{
-  // TODO: stack traces
+public class IOSLog implements Log {
 
   @Override
   public void debug(String msg) {

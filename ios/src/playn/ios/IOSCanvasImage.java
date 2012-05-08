@@ -24,8 +24,8 @@ import playn.core.gl.GLContext;
 /**
  * Provides {@link Canvas} rendering into an image.
  */
-public class IOSCanvasImage extends IOSAbstractImage implements CanvasImage
-{
+public class IOSCanvasImage extends IOSAbstractImage implements CanvasImage {
+
   private final IOSCanvas canvas;
 
   public IOSCanvasImage(IOSGLContext ctx, int width, int height) {

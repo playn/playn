@@ -18,8 +18,8 @@ package playn.ios;
 /**
  * Maintains canvas state that is not maintained via CGContext.
  */
-public class IOSCanvasState
-{
+public class IOSCanvasState {
+
   IOSGradient gradient;
 
   public IOSCanvasState() {

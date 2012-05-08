@@ -23,8 +23,8 @@ import playn.core.gl.GLContext;
 /**
  * Implements {@link Image} based on a static bitmap.
  */
-public class IOSImage extends IOSAbstractImage
-{
+public class IOSImage extends IOSAbstractImage {
+
   private final UIImage image;
 
   public IOSImage (IOSGLContext ctx, UIImage image) {

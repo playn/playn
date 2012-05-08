@@ -20,8 +20,8 @@ import cli.MonoTouch.CoreGraphics.CGColor;
 import playn.core.gl.GLPattern;
 import playn.core.gl.ImageGL;
 
-public class IOSPattern implements GLPattern
-{
+public class IOSPattern implements GLPattern {
+
   CGColor colorWithPattern;
   private ImageGL image;
 

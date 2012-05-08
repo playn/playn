@@ -24,8 +24,8 @@ import cli.System.Drawing.RectangleF;
 import playn.core.Pattern;
 import playn.core.gl.ImageRegionGL;
 
-public class IOSImageRegion extends ImageRegionGL implements IOSCanvas.Drawable
-{
+public class IOSImageRegion extends ImageRegionGL implements IOSCanvas.Drawable {
+
   public IOSImageRegion(IOSAbstractImage parent, float x, float y, float width, float height) {
     super(parent, x, y, width, height);
   }
