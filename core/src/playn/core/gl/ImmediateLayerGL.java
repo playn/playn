@@ -100,6 +100,11 @@ public class ImmediateLayerGL extends LayerGL implements ImmediateLayer {
     });
   }
 
+  @Override
+  public Renderer renderer () {
+      return renderer;
+  }
+
   protected ImmediateLayerGL(GLContext ctx, Renderer renderer, ImmediateSurfaceGL surface) {
     super(ctx);
     this.surface = surface;

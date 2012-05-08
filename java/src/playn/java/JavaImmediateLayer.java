@@ -70,6 +70,11 @@ class JavaImmediateLayer extends JavaLayer implements ImmediateLayer {
   }
 
   @Override
+  public Renderer renderer () {
+      return renderer;
+  }
+
+  @Override
   void paint(JavaCanvas canvas) {
     if (!visible()) return;
 

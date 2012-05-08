@@ -69,6 +69,11 @@ class HtmlImmediateLayerCanvas extends HtmlLayerCanvas implements ImmediateLayer
     this(renderer, new CanvasSurface(new HtmlCanvas(ctx, graphics().width(), graphics().height())));
   }
 
+  @Override
+  public Renderer renderer () {
+      return renderer;
+  }
+
   protected HtmlImmediateLayerCanvas(Renderer renderer, CanvasSurface surf) {
     this.renderer = renderer;
     this.surf = surf;

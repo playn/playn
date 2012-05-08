@@ -36,4 +36,6 @@ public interface ImmediateLayer extends Layer {
      * @param surface a surface object that represents the frame buffer. */
     void render(Surface surface);
   }
+
+  Renderer renderer ();
 }

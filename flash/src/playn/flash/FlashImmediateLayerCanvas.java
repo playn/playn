@@ -68,6 +68,11 @@ class FlashImmediateLayerCanvas extends FlashCanvasLayer implements ImmediateLay
     this(renderer, new CanvasSurface(new FlashCanvas(graphics().width(), graphics().height(), ctx)));
   }
 
+  @Override
+  public Renderer renderer () {
+      return renderer;
+  }
+
   protected FlashImmediateLayerCanvas(Renderer renderer, CanvasSurface surf) {
     super(surf.width(), surf.height());
     this.renderer = renderer;
