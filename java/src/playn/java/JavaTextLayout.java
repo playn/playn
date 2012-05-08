@@ -15,6 +15,7 @@
  */
 package playn.java;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
@@ -133,35 +134,42 @@ class JavaTextLayout implements playn.core.TextLayout {
         sy = 0;
       }
       gfx.setColor(altColor);
-      paintOnce(gfx, x + sx, y + sy);
+      paintOnce(gfx, x + sx, y + sy, false);
       gfx.setColor(textColor);
-      paintOnce(gfx, x + tx, y + ty);
+      paintOnce(gfx, x + tx, y + ty, false);
 
-    } else if (format.effect instanceof TextFormat.Effect.Outline) {
-      // you might think that we could render TextLayout.getOutline() but the results are hideous;
-      // this expensive but functional approach is way better looking
+    } else if (format.effect instanceof TextFormat.Effect.PixelOutline) {
       gfx.setColor(altColor);
-      paintOnce(gfx, x+0, y+0);
-      paintOnce(gfx, x+0, y+1);
-      paintOnce(gfx, x+0, y+2);
-      paintOnce(gfx, x+1, y+0);
-      paintOnce(gfx, x+1, y+2);
-      paintOnce(gfx, x+2, y+0);
-      paintOnce(gfx, x+2, y+1);
-      paintOnce(gfx, x+2, y+2);
+      paintOnce(gfx, x+0, y+0, false);
+      paintOnce(gfx, x+0, y+1, false);
+      paintOnce(gfx, x+0, y+2, false);
+      paintOnce(gfx, x+1, y+0, false);
+      paintOnce(gfx, x+1, y+2, false);
+      paintOnce(gfx, x+2, y+0, false);
+      paintOnce(gfx, x+2, y+1, false);
+      paintOnce(gfx, x+2, y+2, false);
 
       gfx.setColor(textColor);
-      paintOnce(gfx, x+1, y+1);
+      paintOnce(gfx, x+1, y+1, false);
+
+    } else if (format.effect instanceof TextFormat.Effect.VectorOutline) {
+      TextFormat.Effect.VectorOutline effect = (TextFormat.Effect.VectorOutline)format.effect;
+      gfx.setColor(textColor);
+      paintOnce(gfx, x, y, false);
+
+      gfx.setColor(altColor);
+      gfx.setStroke(new BasicStroke(effect.strokeWidth));
+      paintOnce(gfx, x, y, true);
 
     } else {
       gfx.setColor(textColor);
-      paintOnce(gfx, x, y);
+      paintOnce(gfx, x, y, false);
     }
 
     gfx.setColor(ocolor);
   }
 
-  void paintOnce(Graphics2D gfx, float x, float y) {
+  void paintOnce(Graphics2D gfx, float x, float y, boolean outline) {
     float yoff = 0;
     for (TextLayout layout : layouts) {
       Rectangle2D bounds = layout.getBounds();
@@ -172,7 +180,14 @@ class JavaTextLayout implements playn.core.TextLayout {
       // box size and render this text layout into it at (0,0) and nothing will get cut off)
       float rx = (float)-bounds.getX() + format.align.getX(getWidth(bounds), width);
       yoff += layout.getAscent();
-      layout.draw(gfx, x + rx + PAD, y + yoff + PAD);
+      float sx = x + rx + PAD, sy = y + yoff + PAD;
+      if (outline) {
+        gfx.translate(sx, sy);
+        gfx.draw(layout.getOutline(null));
+        gfx.translate(-sx, -sy);
+      } else {
+        layout.draw(gfx, sx, sy);
+      }
       if (layout != layouts.get(0)) {
         yoff += layout.getLeading(); // add interline spacing
       }

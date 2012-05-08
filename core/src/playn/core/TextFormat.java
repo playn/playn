@@ -62,9 +62,20 @@ public class TextFormat {
       return new Shadow(shadowColor, shadowOffsetX, shadowOffsetY);
     }
 
-    /** Creates an outline effect as specified. */
+    /** @deprecated Use {@link #pixelOutline}. */
+    @Deprecated
     public static Effect outline (int outlineColor) {
-      return new Outline(outlineColor);
+      return new PixelOutline(outlineColor);
+    }
+
+    /** Creates a pixel outline effect as specified. */
+    public static Effect pixelOutline (int outlineColor) {
+      return new PixelOutline(outlineColor);
+    }
+
+    /** Creates a vector outline effect as specified. */
+    public static Effect vectorOutline (int outlineColor, float strokeWidth) {
+      return new VectorOutline(outlineColor, strokeWidth);
     }
 
     /** Contains metadata for the shadow effect. */
@@ -106,12 +117,12 @@ public class TextFormat {
       }
     }
 
-    /** Contains metadata for the outline effect. */
-    public static final class Outline extends Effect {
+    /** Contains metadata for the pixel outline effect. */
+    public static final class PixelOutline extends Effect {
       /** The color of the outline (as {@code 0xAARRGGBB}). */
       public final int outlineColor;
 
-      public Outline (int outlineColor) {
+      public PixelOutline (int outlineColor) {
         this.outlineColor = outlineColor;
       }
 
@@ -130,7 +141,40 @@ public class TextFormat {
 
       @Override
       public String toString() {
-        return "outline [color=" + Integer.toHexString(outlineColor) + "]";
+        return "poutline [color=" + Integer.toHexString(outlineColor) + "]";
+      }
+    }
+
+    /** Contains metadata for the vector outline effect. */
+    public static final class VectorOutline extends Effect {
+      /** The color of the outline (as {@code 0xAARRGGBB}). */
+      public final int outlineColor;
+
+      /** The width of the outline stroke. */
+      public final float strokeWidth;
+
+      public VectorOutline (int outlineColor, float strokeWidth) {
+        this.outlineColor = outlineColor;
+        this.strokeWidth = strokeWidth;
+      }
+
+      @Override
+      public float adjustWidth (float width) {
+        return width + strokeWidth;
+      }
+      @Override
+      public float adjustHeight (float height) {
+        return height + strokeWidth;
+      }
+      @Override
+      public Integer getAltColor () {
+        return outlineColor;
+      }
+
+      @Override
+      public String toString() {
+        return "voutline [color=" + Integer.toHexString(outlineColor) +
+          ", width=" + strokeWidth + "]";
       }
     }
 

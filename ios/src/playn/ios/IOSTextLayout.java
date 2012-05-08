@@ -47,10 +47,13 @@ public abstract class IOSTextLayout implements TextLayout {
     attribs.set_Font(font.ctFont);
     attribs.set_ForegroundColorFromContext(true);
 
-    if (format.effect instanceof TextFormat.Effect.Outline) {
+    if (format.effect instanceof TextFormat.Effect.VectorOutline) {
       attribs.set_StrokeColor(IOSCanvas.toCGColor(format.effect.getAltColor()));
+      float strokeWidth = ((TextFormat.Effect.VectorOutline)format.effect).strokeWidth;
+      // stroke width is expressed as a percentage of the font size in iOS
+      float strokePct = 100 * strokeWidth / font.size();
       // negative stroke width means stroke and fill, rather than just stroke
-      attribs.set_StrokeWidth(new cli.System.Nullable$$00601_$$$_F_$$$$_(-3));
+      attribs.set_StrokeWidth(new cli.System.Nullable$$00601_$$$_F_$$$$_(-strokePct));
     }
 
     CTParagraphStyleSettings pstyle = new CTParagraphStyleSettings();
@@ -252,7 +255,21 @@ public abstract class IOSTextLayout implements TextLayout {
       }
       bctx.SetFillColor(IOSCanvas.toCGColor(format.effect.getAltColor()));
       drawOnce(bctx, x+sx, y+sy);
+
+    } else if (format.effect instanceof TextFormat.Effect.PixelOutline) {
+      bctx.SetFillColor(IOSCanvas.toCGColor(format.effect.getAltColor()));
+      drawOnce(bctx, x+0, y+0);
+      drawOnce(bctx, x+0, y+1);
+      drawOnce(bctx, x+0, y+2);
+      drawOnce(bctx, x+1, y+0);
+      drawOnce(bctx, x+1, y+2);
+      drawOnce(bctx, x+2, y+0);
+      drawOnce(bctx, x+2, y+1);
+      drawOnce(bctx, x+2, y+2);
+      tx = 1;
+      ty = 1;
     }
+
     bctx.SetFillColor(IOSCanvas.toCGColor(format.textColor));
     drawOnce(bctx, x+tx, y+ty);
   }

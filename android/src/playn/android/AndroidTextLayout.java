@@ -170,8 +170,12 @@ class AndroidTextLayout implements TextLayout {
       paint.setColor(format.textColor);
       drawOnce(canvas, x + tx, y + ty);
 
-    } else if (format.effect instanceof TextFormat.Effect.Outline) {
-      // TODO: check whether Android's outline text drawing sucks less than Java's
+    } else if (format.effect instanceof TextFormat.Effect.VectorOutline) {
+      // TODO
+      paint.setColor(format.textColor);
+      drawOnce(canvas, x, y);
+
+    } else if (format.effect instanceof TextFormat.Effect.PixelOutline) {
       paint.setColor(format.effect.getAltColor());
       drawOnce(canvas, x+0, y+0);
       drawOnce(canvas, x+0, y+1);
