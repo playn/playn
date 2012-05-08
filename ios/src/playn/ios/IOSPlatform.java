@@ -15,6 +15,9 @@
  */
 package playn.ios;
 
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -90,6 +93,19 @@ public class IOSPlatform implements Platform {
     IOSPlatform platform = new IOSPlatform(app, orients);
     PlayN.setPlatform(platform);
     return platform;
+  }
+
+  static {
+    // disable output to System.out/err as that will result in a crash due to iOS disallowing
+    // writes to stdout/stderr
+    OutputStream noop = new OutputStream() {
+      @Override
+      public void write(int b) throws IOException {} // noop!
+      @Override
+      public void write(byte b[], int off, int len) throws IOException {} // noop!
+    };
+    System.setOut(new PrintStream(noop));
+    System.setErr(new PrintStream(noop));
   }
 
   private final IOSAudio audio;
