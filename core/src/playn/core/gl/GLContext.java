@@ -105,7 +105,7 @@ public abstract class GLContext {
   }
 
   public void bindFramebuffer(Object fbuf, int width, int height) {
-    if (fbuf != lastFrameBuffer && (fbuf == null || !fbuf.equals(lastFramebuffer))) {
+    if (fbuf != lastFramebuffer && (fbuf == null || !fbuf.equals(lastFramebuffer))) {
       checkGLError("bindFramebuffer");
       flush();
       bindFramebufferImpl(lastFramebuffer = fbuf, curFbufWidth = width, curFbufHeight = height);
