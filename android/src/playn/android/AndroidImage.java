@@ -24,13 +24,15 @@ import playn.core.Pattern;
 import playn.core.ResourceCallback;
 import playn.core.gl.GLContext;
 import playn.core.gl.ImageGL;
+import playn.core.gl.Scale;
 
 class AndroidImage extends ImageGL implements AndroidGLContext.Refreshable, AndroidCanvas.Drawable {
 
   private final AndroidGLContext ctx;
   private final Bitmap bitmap;
 
-  AndroidImage(AndroidGLContext ctx, Bitmap bitmap) {
+  AndroidImage(AndroidGLContext ctx, Bitmap bitmap, Scale scale) {
+    super(scale);
     this.ctx = ctx;
     this.bitmap = bitmap;
     ctx.addRefreshable(this);
@@ -89,7 +91,7 @@ class AndroidImage extends ImageGL implements AndroidGLContext.Refreshable, Andr
 
   @Override
   public Image transform(BitmapTransformer xform) {
-    return new AndroidImage(ctx, ((AndroidBitmapTransformer) xform).transform(bitmap));
+    return new AndroidImage(ctx, ((AndroidBitmapTransformer) xform).transform(bitmap), scale);
   }
 
   @Override

@@ -33,6 +33,7 @@ import playn.core.Image;
 import playn.core.PlayN;
 import playn.core.ResourceCallback;
 import playn.core.Sound;
+import playn.core.gl.Scale;
 
 public class IOSAssets implements Assets {
 
@@ -62,19 +63,22 @@ public class IOSAssets implements Assets {
   @Override
   public Image getImage(String path) {
     String fullPath = Path.Combine(pathPrefix, path);
-    String scaledPath = graphics.adjustImagePath(fullPath);
-    if (File.Exists(scaledPath))
+    String scaledPath = graphics.ctx().scale.adjustImagePath(fullPath);
+    Scale scale = Scale.ONE;
+    if (File.Exists(scaledPath)) {
+      scale = graphics.ctx.scale;
       fullPath = scaledPath;
+    }
     PlayN.log().debug("Loading image: " + fullPath);
     try {
       Stream stream = new FileStream(fullPath, FileMode.wrap(FileMode.Open),
                                      FileAccess.wrap(FileAccess.Read),
                                      FileShare.wrap(FileShare.Read));
       NSData data = NSData.FromStream(stream);
-      return createImage(graphics.ctx, UIImage.LoadFromData(data));
+      return new IOSImage(graphics.ctx, UIImage.LoadFromData(data), scale);
     } catch (Throwable t) {
       PlayN.log().warn("Failed to load image: " + fullPath, t);
-      return createImage(graphics.ctx, new UIImage());
+      return new IOSImage(graphics.ctx, new UIImage(), scale);
     }
   }
 
@@ -111,9 +115,5 @@ public class IOSAssets implements Assets {
   @Override
   public int getPendingRequestCount() {
     return 0; // nothing is async
-  }
-
-  protected IOSAbstractImage createImage(IOSGLContext ctx, UIImage image) {
-    return new IOSImage(ctx, image);
   }
 }

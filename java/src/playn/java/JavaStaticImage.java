@@ -21,13 +21,14 @@ import java.util.List;
 
 import playn.core.Image;
 import playn.core.ResourceCallback;
+import playn.core.gl.Scale;
 
 public class JavaStaticImage extends JavaImage {
 
   private List<ResourceCallback<? super Image>> callbacks;
 
-  public JavaStaticImage(JavaGLContext ctx, final BufferedImage img) {
-    super(ctx, null);
+  public JavaStaticImage(JavaGLContext ctx, final BufferedImage img, Scale scale) {
+    super(ctx, null, scale);
 
     JavaAssets.doResourceAction(new Runnable() {
       public void run () {
@@ -50,10 +51,5 @@ public class JavaStaticImage extends JavaImage {
         callbacks = new ArrayList<ResourceCallback<? super Image>>();
       callbacks.add(callback);
     }
-  }
-
-  @Override
-  public Image transform(BitmapTransformer xform) {
-    return new JavaStaticImage(ctx, ((JavaBitmapTransformer) xform).transform(img));
   }
 }

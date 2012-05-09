@@ -21,6 +21,7 @@ import java.awt.image.BufferedImage;
 
 import playn.core.Image;
 import playn.core.ResourceCallback;
+import playn.core.gl.Scale;
 
 class JavaErrorImage extends JavaImage {
 
@@ -30,7 +31,7 @@ class JavaErrorImage extends JavaImage {
     // the caller will be notified that this image failed to load, but we also create an error
     // image so that subsequent attempts to use this image won't result in numerous follow-on
     // errors when the caller attempts to call width/height/etc.
-    super(ctx, createErrorImage(100, 100));
+    super(ctx, createErrorImage(100, 100), Scale.ONE);
     this.exception = assetLoadException != null ? assetLoadException :
       new RuntimeException("Error loading image");
   }

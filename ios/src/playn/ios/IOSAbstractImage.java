@@ -25,6 +25,7 @@ import playn.core.Image;
 import playn.core.Pattern;
 import playn.core.ResourceCallback;
 import playn.core.gl.ImageGL;
+import playn.core.gl.Scale;
 
 /**
  * Provides some shared bits for {@link IOSImage} and {@link IOSCanvasImage}.
@@ -82,10 +83,10 @@ public abstract class IOSAbstractImage extends ImageGL implements Image, IOSCanv
   public void draw(CGBitmapContext bctx, float dx, float dy, float dw, float dh,
                    float sx, float sy, float sw, float sh) {
     // adjust our source rect to account for the scale factor
-    sx *= ctx.scaleFactor;
-    sy *= ctx.scaleFactor;
-    sw *= ctx.scaleFactor;
-    sh *= ctx.scaleFactor;
+    sx *= scale.factor;
+    sy *= scale.factor;
+    sw *= scale.factor;
+    sh *= scale.factor;
 
     CGImage cgImage = cgImage();
     float iw = cgImage.get_Width(), ih = cgImage.get_Height();
@@ -103,7 +104,8 @@ public abstract class IOSAbstractImage extends ImageGL implements Image, IOSCanv
 
   @Override
   public Image transform(BitmapTransformer xform) {
-    return new IOSImage(ctx, new UIImage(((IOSBitmapTransformer) xform).transform(cgImage())));
+    UIImage ximage = new UIImage(((IOSBitmapTransformer) xform).transform(cgImage()));
+    return new IOSImage(ctx, ximage, scale);
   }
 
   @Override
@@ -114,7 +116,8 @@ public abstract class IOSAbstractImage extends ImageGL implements Image, IOSCanv
       ctx.queueDeleteFramebuffer(reptex);
   }
 
-  protected IOSAbstractImage(IOSGLContext ctx) {
+  protected IOSAbstractImage(IOSGLContext ctx, Scale scale) {
+    super(scale);
     this.ctx = ctx;
   }
 }

@@ -58,8 +58,8 @@ public class IOSCanvas implements Canvas {
     states.addFirst(new IOSCanvasState());
 
     // create our raw image data
-    texWidth = ctx.scaledCeil(width);
-    texHeight = ctx.scaledCeil(height);
+    texWidth = ctx.scale.scaledCeil(width);
+    texHeight = ctx.scale.scaledCeil(height);
     data = Marshal.AllocHGlobal(texWidth * texHeight * 4);
 
     // create the bitmap context via which we'll render into it
@@ -68,8 +68,8 @@ public class IOSCanvas implements Canvas {
       CGImageAlphaInfo.wrap(CGImageAlphaInfo.PremultipliedLast));
 
     // CG coordinate system is OpenGL-style (0,0 in lower left); so we flip it
-    bctx.TranslateCTM(0, ctx.scaled(height));
-    bctx.ScaleCTM(ctx.scaleFactor, -ctx.scaleFactor);
+    bctx.TranslateCTM(0, ctx.scale.scaled(height));
+    bctx.ScaleCTM(ctx.scale.factor, -ctx.scale.factor);
 
     // clear the canvas to start
     clear();

@@ -28,6 +28,9 @@ public abstract class ImageGL implements Image {
   /** Our texture and repeatable texture handles. */
   protected Object tex, reptex;
 
+  /** This image's scale factor. */
+  protected final Scale scale;
+
   /**
    * Creates a texture for this image (if one does not already exist) and returns it. May return
    * null if the underlying image data is not yet ready.
@@ -105,6 +108,10 @@ public abstract class ImageGL implements Image {
     }
   }
 
+  protected ImageGL(Scale scale) {
+    this.scale = scale;
+  }
+
   /**
    * The x offset into our source image at which this image's region starts.
    */
@@ -149,8 +156,8 @@ public abstract class ImageGL implements Image {
     if (reptex != null)
       return;
 
-    int scaledWidth = ctx.scaledCeil(width());
-    int scaledHeight = ctx.scaledCeil(height());
+    int scaledWidth = scale.scaledCeil(width());
+    int scaledHeight = scale.scaledCeil(height());
 
     // GL requires pow2 on axes that repeat
     int width = GLUtil.nextPowerOfTwo(scaledWidth), height = GLUtil.nextPowerOfTwo(scaledHeight);

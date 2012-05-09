@@ -73,7 +73,7 @@ public class IOSGraphics extends GraphicsGL {
     ctx = new IOSGLContext(platform, scale, screenWidth, screenHeight);
     rootLayer = new GroupLayerGL(ctx);
     rootTransform = new StockInternalTransform();
-    rootTransform.uniformScale(ctx.scaleFactor);
+    rootTransform.uniformScale(ctx.scale.factor);
   }
 
   @Override
@@ -143,11 +143,6 @@ public class IOSGraphics extends GraphicsGL {
   }
 
   @Override
-  public float scaleFactor() {
-    return ctx.scaleFactor;
-  }
-
-  @Override
   public GL20 gl20() {
     throw new UnsupportedOperationException();
   }
@@ -160,7 +155,7 @@ public class IOSGraphics extends GraphicsGL {
   void setOrientation(UIDeviceOrientation orientation) {
     ctx.orient = orientation.Value;
     rootTransform = new StockInternalTransform();
-    rootTransform.uniformScale(ctx.scaleFactor);
+    rootTransform.uniformScale(ctx.scale.factor);
     switch (orientation.Value) {
     case UIDeviceOrientation.Portrait:
       invertSizes = false;
@@ -185,7 +180,7 @@ public class IOSGraphics extends GraphicsGL {
 
   IPoint transformTouch(float x, float y) {
     return rootTransform.inverseTransform(
-      touchTemp.set(x*ctx.scaleFactor, y*ctx.scaleFactor), touchTemp);
+      touchTemp.set(x*ctx.scale.factor, y*ctx.scale.factor), touchTemp);
   }
 
   void paint(Game game, float alpha) {

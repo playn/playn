@@ -28,6 +28,7 @@ import playn.core.Image;
 import playn.core.PlayN;
 import playn.core.ResourceCallback;
 import playn.core.Sound;
+import playn.core.gl.Scale;
 
 /**
  * Loads Java assets via the classpath.
@@ -88,7 +89,20 @@ public class JavaAssets extends AbstractAssets {
   @Override
   protected Image doGetImage(String path) {
     try {
-      return graphics.createStaticImage(ImageIO.read(requireScaledResource(pathPrefix + path)));
+      String scaledPath = graphics.ctx().scale.adjustImagePath(path);
+      try {
+        return graphics.createStaticImage(ImageIO.read(requireResource(pathPrefix + scaledPath)),
+                                          graphics.ctx().scale);
+      } catch (FileNotFoundException fnfe) {
+        // if the scaled resource is the same as the unscaled resource, then we fail here
+        if (scaledPath.equals(path))
+          throw fnfe;
+      }
+
+      // otherwise try falling back to the unscaled resource
+      PlayN.log().info("Could not find " + scaledPath + " falling back to " + path);
+      return graphics.createStaticImage(ImageIO.read(requireResource(pathPrefix + path)), Scale.ONE);
+
     } catch (Exception e) {
       PlayN.log().warn("Could not load image at " + pathPrefix + path, e);
       return graphics.createErrorImage(e);
@@ -118,21 +132,6 @@ public class JavaAssets extends AbstractAssets {
         }
       }
     });
-  }
-
-  protected URL requireScaledResource(String path) throws FileNotFoundException {
-    String scaledPath = graphics.adjustImagePath(path);
-    try {
-      return requireResource(scaledPath);
-    } catch (FileNotFoundException fnfe) {
-      // fall through try the unscaled version (if it differs from the default path)
-      if (!scaledPath.equals(path)) {
-        PlayN.log().info("Could not find " + scaledPath + " falling back to unscaled image.");
-        return requireResource(path);
-      } else {
-        throw fnfe;
-      }
-    }
   }
 
   protected URL requireResource(String path) throws FileNotFoundException {

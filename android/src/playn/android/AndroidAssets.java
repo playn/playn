@@ -15,6 +15,7 @@
  */
 package playn.android;
 
+import playn.core.gl.Scale;
 import static playn.core.PlayN.log;
 
 import java.io.BufferedReader;
@@ -71,7 +72,7 @@ public class AndroidAssets extends AbstractAssets {
   }
 
   protected AndroidImage createImage(AndroidGLContext ctx, Bitmap bitmap) {
-    return new AndroidImage(ctx, bitmap);
+    return new AndroidImage(ctx, bitmap, Scale.ONE); // TODO: HiDPI support
   }
 
   /**

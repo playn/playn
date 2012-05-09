@@ -13,9 +13,6 @@
  */
 package playn.core.gl;
 
-import pythagoras.f.MathUtil;
-
-import playn.core.Asserts;
 import playn.core.InternalTransform;
 import playn.core.Platform;
 import playn.core.PlayN;
@@ -37,7 +34,7 @@ public abstract class GLContext {
   public int viewWidth, viewHeight;
 
   /** The scale factor for HiDPI mode, or 1 if HDPI mode is not enabled. */
-  public final float scaleFactor;
+  public final Scale scale;
 
   /**
    * Sets the view width to the specified width and height (in pixels). The framebuffer will
@@ -46,39 +43,9 @@ public abstract class GLContext {
   public void setSize (int width, int height) {
     viewWidth = width;
     viewHeight = height;
-    curFbufWidth = defaultFbufWidth = scaledCeil(width);
-    curFbufHeight = defaultFbufHeight = scaledCeil(height);
+    curFbufWidth = defaultFbufWidth = scale.scaledCeil(width);
+    curFbufHeight = defaultFbufHeight = scale.scaledCeil(height);
     viewWasResized();
-  }
-
-  /** Returns the supplied length scaled by our scale factor. */
-  public float scaled(float length) {
-    return scaleFactor*length;
-  }
-
-  /** Returns the supplied length scaled by our scale factor and rounded up. */
-  public int scaledCeil(float length) {
-    return MathUtil.iceil(scaled(length));
-  }
-
-  /** Returns the supplied length scaled by our scale factor and rounded down. */
-  public int scaledFloor(float length) {
-    return MathUtil.ifloor(scaled(length));
-  }
-
-  /** Returns the supplied length inverse scaled by our scale factor. */
-  public float invScaled(float length) {
-    return length/scaleFactor;
-  }
-
-  /** Returns the supplied length inverse scaled by our scale factor and rounded up. */
-  public int invScaledCeil(float length) {
-    return MathUtil.iceil(invScaled(length));
-  }
-
-  /** Returns the supplied length inverse scaled by our scale factor and rounded down. */
-  public int invScaledFloor(float length) {
-    return MathUtil.ifloor(invScaled(length));
   }
 
   /** Creates a framebuffer that will render into the supplied texture. */
@@ -276,8 +243,7 @@ public abstract class GLContext {
   }
 
   protected GLContext(Platform platform, float scaleFactor) {
-    Asserts.checkArgument(scaleFactor >= 1, "Scale factor cannot be less than one.");
-    this.scaleFactor = scaleFactor;
+    this.scale = new Scale(scaleFactor);
     this.platform = platform;
   }
 

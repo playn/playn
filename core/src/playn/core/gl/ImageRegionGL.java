@@ -25,6 +25,7 @@ public abstract class ImageRegionGL extends ImageGL implements Image.Region {
   protected float width, height;
 
   public ImageRegionGL(ImageGL parent, float x, float y, float width, float height) {
+    super(parent.scale);
     this.parent = parent;
     this.x = x;
     this.y = y;
@@ -140,8 +141,8 @@ public abstract class ImageRegionGL extends ImageGL implements Image.Region {
     if (reptex != null)
       return;
 
-    int scaledWidth = ctx.scaledCeil(this.width);
-    int scaledHeight = ctx.scaledCeil(this.height);
+    int scaledWidth = scale.scaledCeil(this.width);
+    int scaledHeight = scale.scaledCeil(this.height);
 
     // GL requires pow2 on axes that repeat
     int width = GLUtil.nextPowerOfTwo(scaledWidth), height = GLUtil.nextPowerOfTwo(scaledHeight);

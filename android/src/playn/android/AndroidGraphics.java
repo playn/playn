@@ -168,11 +168,6 @@ class AndroidGraphics extends GraphicsGL {
   }
 
   @Override
-  public float scaleFactor() {
-    return ctx.scaleFactor;
-  }
-
-  @Override
   public GL20 gl20() {
     return ctx.gl20;
   }

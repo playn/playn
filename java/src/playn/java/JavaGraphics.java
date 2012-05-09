@@ -35,6 +35,7 @@ import playn.core.gl.GL20;
 import playn.core.gl.GLContext;
 import playn.core.gl.GraphicsGL;
 import playn.core.gl.GroupLayerGL;
+import playn.core.gl.Scale;
 import static playn.core.PlayN.*;
 
 public class JavaGraphics extends GraphicsGL {
@@ -130,11 +131,6 @@ public class JavaGraphics extends GraphicsGL {
   }
 
   @Override
-  public float scaleFactor() {
-    return ctx.scaleFactor;
-  }
-
-  @Override
   public GL20 gl20() {
     if (gl == null) {
       gl = new JavaGL20();
@@ -147,8 +143,8 @@ public class JavaGraphics extends GraphicsGL {
     return ctx;
   }
 
-  protected JavaImage createStaticImage(BufferedImage source) {
-    return new JavaStaticImage(ctx, source);
+  protected JavaImage createStaticImage(BufferedImage source, Scale scale) {
+    return new JavaStaticImage(ctx, source, scale);
   }
 
   protected JavaImage createErrorImage(Exception cause) {
@@ -160,8 +156,8 @@ public class JavaGraphics extends GraphicsGL {
   }
 
   void transformMouse(Point point) {
-    point.x /= ctx.scaleFactor;
-    point.y /= ctx.scaleFactor;
+    point.x /= ctx.scale.factor;
+    point.y /= ctx.scale.factor;
   }
 
   void paintLayers() {

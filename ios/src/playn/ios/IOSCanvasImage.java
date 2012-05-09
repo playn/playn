@@ -29,7 +29,7 @@ public class IOSCanvasImage extends IOSAbstractImage implements CanvasImage {
   private final IOSCanvas canvas;
 
   public IOSCanvasImage(IOSGLContext ctx, int width, int height) {
-    super(ctx);
+    super(ctx, ctx.scale);
     canvas = new IOSCanvas(ctx, width, height);
   }
 

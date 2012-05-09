@@ -27,10 +27,10 @@ public class SurfaceGL extends AbstractSurfaceGL {
     super(ctx);
     this.width = width;
     this.height = height;
-    this.texWidth = ctx.scaledCeil(width);
-    this.texHeight = ctx.scaledCeil(height);
+    this.texWidth = ctx.scale.scaledCeil(width);
+    this.texHeight = ctx.scale.scaledCeil(height);
     createTexture();
-    scale(ctx.scaleFactor, ctx.scaleFactor);
+    scale(ctx.scale.factor, ctx.scale.factor);
   }
 
   @Override

@@ -30,8 +30,8 @@ public class JavaImageRegion extends ImageRegionGL implements JavaCanvas.Drawabl
     JavaImage jparent = (JavaImage)parent;
     // we have to account for the scale factor when extracting our subimage
     BufferedImage subImage = jparent.img.getSubimage(
-      jparent.ctx.scaledFloor(x), jparent.ctx.scaledFloor(y),
-      jparent.ctx.scaledCeil(width()), jparent.ctx.scaledCeil(height()));
+      scale.scaledFloor(x), scale.scaledFloor(y),
+      scale.scaledCeil(width()), scale.scaledCeil(height()));
     Rectangle2D rect = new Rectangle2D.Float(0, 0, width, height);
     return new JavaPattern(this, new TexturePaint(subImage, rect));
   }

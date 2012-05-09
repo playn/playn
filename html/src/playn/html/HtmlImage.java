@@ -32,6 +32,7 @@ import playn.core.Pattern;
 import playn.core.ResourceCallback;
 import playn.core.gl.GLContext;
 import playn.core.gl.ImageGL;
+import playn.core.gl.Scale;
 
 class HtmlImage extends ImageGL implements HtmlCanvas.Drawable {
 
@@ -47,12 +48,14 @@ class HtmlImage extends ImageGL implements HtmlCanvas.Drawable {
   CanvasElement canvas; // Used internally for getRGB
 
   HtmlImage(CanvasElement img) {
+    super(Scale.ONE);
     this.canvas = img;
     fakeComplete(img);
     this.img = img.cast();
   }
 
   HtmlImage(ImageElement img) {
+    super(Scale.ONE);
     this.img = img;
   }
 
