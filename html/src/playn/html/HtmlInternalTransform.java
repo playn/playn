@@ -292,6 +292,12 @@ public class HtmlInternalTransform extends AbstractTransform implements Internal
   }
 
   @Override
+  public Vector transformPoint (IVector v, Vector into) {
+    float x = v.x(), y = v.y();
+    return into.set(m00()*x + m10()*y + tx(), m01()*x + m11()*y + ty());
+  }
+
+  @Override
   public Vector transform(IVector v, Vector into) {
     float x = v.x(), y = v.y();
     return into.set(m00() * x + m10() * y, m01() * x + m11() * y);
