@@ -23,12 +23,12 @@ public interface Surface {
   /**
    * Returns the width of this surface.
    */
-  int width();
+  float width();
 
   /**
    * Returns the height of this surface.
    */
-  int height();
+  float height();
 
   /**
    * Saves the current transform.

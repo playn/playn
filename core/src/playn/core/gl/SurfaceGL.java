@@ -15,15 +15,17 @@
  */
 package playn.core.gl;
 
+import pythagoras.f.MathUtil;
+
 import playn.core.InternalTransform;
 
 public class SurfaceGL extends AbstractSurfaceGL {
 
-  protected final int width, height;
+  protected final float width, height;
   protected final int texWidth, texHeight;
   protected Object tex, fbuf;
 
-  protected SurfaceGL(GLContext ctx, int width, int height) {
+  protected SurfaceGL(GLContext ctx, float width, float height) {
     super(ctx);
     this.width = width;
     this.height = height;
@@ -34,12 +36,12 @@ public class SurfaceGL extends AbstractSurfaceGL {
   }
 
   @Override
-  public int width() {
+  public float width() {
     return width;
   }
 
   @Override
-  public int height() {
+  public float height() {
     return height;
   }
 

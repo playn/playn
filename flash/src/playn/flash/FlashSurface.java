@@ -16,6 +16,8 @@
 
 package playn.flash;
 
+import pythagoras.f.MathUtil;
+
 import playn.core.Asserts;
 import playn.core.Surface;
 import playn.core.Image;
@@ -24,11 +26,11 @@ import playn.flash.FlashCanvasLayer.Context2d;
 
 public class FlashSurface implements Surface {
 
-  private final int width, height;
-  private boolean dirty = true;
+  private final float width, height;
   private final Context2d context2d;
+  private boolean dirty = true;
 
-  FlashSurface(int width, int height, Context2d context2d) {
+  FlashSurface(float width, float height, Context2d context2d) {
     this.width = width;
     this.height = height;
     this.context2d = context2d;
@@ -36,7 +38,7 @@ public class FlashSurface implements Surface {
 
   @Override
   public Surface clear() {
-    context2d.clearRect(0, 0, width, height);
+    context2d.clearRect(0, 0, MathUtil.iceil(width), MathUtil.iceil(height));
     dirty = true;
     return this;
   }
@@ -106,7 +108,7 @@ public class FlashSurface implements Surface {
   }
 
   @Override
-  public final int height() {
+  public final float height() {
     return height;
   }
 
@@ -184,7 +186,7 @@ public class FlashSurface implements Surface {
   }
 
   @Override
-  public final int width() {
+  public final float width() {
     return width;
   }
 

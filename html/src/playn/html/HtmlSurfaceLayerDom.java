@@ -18,6 +18,8 @@ package playn.html;
 import com.google.gwt.dom.client.CanvasElement;
 import com.google.gwt.dom.client.Document;
 
+import pythagoras.f.MathUtil;
+
 import playn.core.Asserts;
 import playn.core.CanvasSurface;
 import playn.core.Surface;
@@ -27,10 +29,10 @@ class HtmlSurfaceLayerDom extends HtmlLayerDom implements SurfaceLayer {
 
   private Surface surface;
 
-  HtmlSurfaceLayerDom(int width, int height) {
+  HtmlSurfaceLayerDom(float width, float height) {
     super(Document.get().createCanvasElement());
-    canvas().setWidth(width);
-    canvas().setHeight(height);
+    canvas().setWidth(MathUtil.iceil(width));
+    canvas().setHeight(MathUtil.iceil(height));
     surface = new CanvasSurface(new HtmlCanvas(canvas(), width, height));
   }
 

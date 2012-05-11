@@ -43,11 +43,11 @@ public class ImmediateLayerGL extends LayerGL implements ImmediateLayer {
     public Clipped(GLContext ctx, final int width, final int height, Renderer renderer) {
       super(ctx, renderer, new ImmediateSurfaceGL(ctx) {
         @Override
-        public int width() {
+        public float width() {
           return width;
         }
         @Override
-        public int height() {
+        public float height() {
           return height;
         }
       });
@@ -90,11 +90,11 @@ public class ImmediateLayerGL extends LayerGL implements ImmediateLayer {
   public ImmediateLayerGL(GLContext ctx, Renderer renderer) {
     this(ctx, renderer, new ImmediateSurfaceGL(ctx) {
         @Override
-        public int width() {
+        public float width() {
           return graphics().width();
         }
         @Override
-        public int height() {
+        public float height() {
           return graphics().height();
         }
     });

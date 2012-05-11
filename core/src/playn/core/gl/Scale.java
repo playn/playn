@@ -55,16 +55,6 @@ public class Scale
     return length/factor;
   }
 
-  /** Returns the supplied length inverse scaled by our scale factor and rounded up. */
-  public int invScaledCeil(float length) {
-    return MathUtil.iceil(invScaled(length));
-  }
-
-  /** Returns the supplied length inverse scaled by our scale factor and rounded down. */
-  public int invScaledFloor(float length) {
-    return MathUtil.ifloor(invScaled(length));
-  }
-
   /**
    * Adjusts the path of the supplied image based on our scale factor. If we have scale 1, the
    * image path is unadjusted. If we have a non-1 scale, the scale is tacked onto the image path

@@ -251,7 +251,7 @@ public interface Canvas {
   /**
    * The height of this canvas.
    */
-  int height();
+  float height();
 
   /**
    * Restores the canvas's previous state.
@@ -390,5 +390,5 @@ public interface Canvas {
   /**
    * The width of this canvas.
    */
-  int width();
+  float width();
 }

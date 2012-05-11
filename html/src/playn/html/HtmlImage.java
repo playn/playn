@@ -60,12 +60,12 @@ class HtmlImage extends ImageGL implements HtmlCanvas.Drawable {
   }
 
   @Override
-  public int height() {
+  public float height() {
     return img == null ? 0 : img.getHeight();
   }
 
   @Override
-  public int width() {
+  public float width() {
     return img == null ? 0 : img.getWidth();
   }
 

@@ -59,12 +59,12 @@ class AndroidImage extends ImageGL implements AndroidGLContext.Refreshable, Andr
   }
 
   @Override
-  public int height() {
+  public float height() {
     return bitmap.getHeight();
   }
 
   @Override
-  public int width() {
+  public float width() {
     return bitmap.getWidth();
   }
 

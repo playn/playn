@@ -163,7 +163,7 @@ class AndroidCanvas implements Canvas {
   }
 
   @Override
-  public int height() {
+  public float height() {
     return canvas.getHeight();
   }
 
@@ -318,7 +318,7 @@ class AndroidCanvas implements Canvas {
   }
 
   @Override
-  public int width() {
+  public float width() {
     return canvas.getWidth();
   }
 

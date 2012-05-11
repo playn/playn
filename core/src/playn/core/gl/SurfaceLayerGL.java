@@ -22,7 +22,7 @@ public class SurfaceLayerGL extends LayerGL implements SurfaceLayer {
 
   private SurfaceGL surface;
 
-  public SurfaceLayerGL(GLContext ctx, int width, int height) {
+  public SurfaceLayerGL(GLContext ctx, float width, float height) {
     this(ctx, new SurfaceGL(ctx, width, height));
   }
 

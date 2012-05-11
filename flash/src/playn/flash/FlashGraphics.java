@@ -13,11 +13,16 @@
  */
 package playn.flash;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import com.google.gwt.canvas.dom.client.CssColor;
 
 import flash.display.StageAlign;
 import flash.display.StageScaleMode;
 import flash.display.Sprite;
+
+import pythagoras.f.MathUtil;
 
 import playn.core.Asserts;
 import playn.core.CanvasImage;
@@ -36,9 +41,6 @@ import playn.core.SurfaceLayer;
 import playn.core.TextFormat;
 import playn.core.TextLayout;
 import playn.core.gl.GL20;
-
-import java.util.HashMap;
-import java.util.Map;
 
 class FlashGraphics implements Graphics {
 
@@ -115,7 +117,7 @@ class FlashGraphics implements Graphics {
   }
 
   @Override
-  public SurfaceLayer createSurfaceLayer(int width, int height) {
+  public SurfaceLayer createSurfaceLayer(float width, float height) {
     return new FlashSurfaceLayer(width, height);
   }
 
@@ -136,8 +138,10 @@ class FlashGraphics implements Graphics {
   }
 
   @Override
-  public CanvasImage createImage(int w, int h) {
-    FlashCanvas surface = new FlashCanvas(w, h, FlashCanvasLayer.CanvasElement.create(w, h).getContext());
+  public CanvasImage createImage(float width, float height) {
+    FlashCanvas surface = new FlashCanvas(
+      width, height, FlashCanvasLayer.CanvasElement.create(
+        MathUtil.iceil(width), MathUtil.iceil(height)).getContext());
     return new FlashCanvasImage(surface);
   }
 

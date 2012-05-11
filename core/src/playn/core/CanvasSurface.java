@@ -95,7 +95,7 @@ public class CanvasSurface implements Surface {
   }
 
   @Override
-  public int height() {
+  public float height() {
     return canvas.height();
   }
 
@@ -161,7 +161,7 @@ public class CanvasSurface implements Surface {
   }
 
   @Override
-  public int width() {
+  public float width() {
     return canvas.width();
   }
 }

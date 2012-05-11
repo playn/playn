@@ -27,6 +27,8 @@ import playn.core.Path;
 import playn.core.Pattern;
 import playn.core.TextLayout;
 
+import pythagoras.f.MathUtil;
+
 class HtmlCanvas implements Canvas {
 
   interface Drawable {
@@ -37,24 +39,24 @@ class HtmlCanvas implements Canvas {
 
   private final CanvasElement canvas;
   private final Context2d ctx;
-  private final int width, height;
+  private final float width, height;
   private boolean dirty = true;
 
-  HtmlCanvas(int width, int height) {
-    this(Document.get().createElement("canvas").<CanvasElement>cast(), width, height);
+  HtmlCanvas(float width, float height) {
+    this(Document.get().createCanvasElement(), width, height);
   }
 
-  HtmlCanvas(CanvasElement canvas, int width, int height) {
+  HtmlCanvas(CanvasElement canvas, float width, float height) {
     this(canvas, canvas.getContext2d(), width, height);
-    canvas.setWidth(width);
-    canvas.setHeight(height);
+    canvas.setWidth(MathUtil.iceil(width));
+    canvas.setHeight(MathUtil.iceil(height));
   }
 
-  HtmlCanvas(Context2d ctx, int width, int height) {
+  HtmlCanvas(Context2d ctx, float width, float height) {
     this(null, ctx, width, height);
   }
 
-  private HtmlCanvas(CanvasElement canvas, Context2d ctx, int width, int height) {
+  private HtmlCanvas(CanvasElement canvas, Context2d ctx, float width, float height) {
     this.canvas = canvas;
     this.width = width;
     this.height = height;
@@ -178,7 +180,7 @@ class HtmlCanvas implements Canvas {
   }
 
   @Override
-  public final int height() {
+  public final float height() {
     return height;
   }
 
@@ -321,7 +323,7 @@ class HtmlCanvas implements Canvas {
   }
 
   @Override
-  public final int width() {
+  public final float width() {
     return width;
   }
 

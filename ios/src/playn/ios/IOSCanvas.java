@@ -43,7 +43,7 @@ public class IOSCanvas implements Canvas {
               float dx, float dy, float dw, float dh);
   }
 
-  private final int width, height;
+  private final float width, height;
   private final int texWidth, texHeight;
 
   private boolean isDirty;
@@ -52,7 +52,7 @@ public class IOSCanvas implements Canvas {
 
   private LinkedList<IOSCanvasState> states = new LinkedList<IOSCanvasState>();
 
-  public IOSCanvas(IOSGLContext ctx, int width, int height) {
+  public IOSCanvas(IOSGLContext ctx, float width, float height) {
     this.width = width;
     this.height = height;
     states.addFirst(new IOSCanvasState());
@@ -109,12 +109,12 @@ public class IOSCanvas implements Canvas {
   }
 
   @Override
-  public int width() {
+  public float width() {
     return width;
   }
 
   @Override
-  public int height() {
+  public float height() {
     return height;
   }
 

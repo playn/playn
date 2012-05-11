@@ -30,11 +30,11 @@ import playn.core.TextLayout;
 class FlashCanvas implements Canvas {
 
 
-  private final int width, height;
+  private final float width, height;
   private boolean dirty = true;
   private final Context2d context2d;
 
-  FlashCanvas(int width, int height, Context2d context2d) {
+  FlashCanvas(float width, float height, Context2d context2d) {
     this.width = width;
     this.height = height;
     this.context2d = context2d;
@@ -155,7 +155,7 @@ class FlashCanvas implements Canvas {
   }
 
   @Override
-  public final int height() {
+  public final float height() {
     return height;
   }
 
@@ -295,7 +295,7 @@ class FlashCanvas implements Canvas {
   }
 
   @Override
-  public final int width() {
+  public final float width() {
     return width;
   }
 

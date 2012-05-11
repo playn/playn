@@ -16,6 +16,7 @@
 package playn.core.gl;
 
 import playn.core.Image;
+import playn.core.InternalTransform;
 import playn.core.ResourceCallback;
 
 public abstract class ImageRegionGL extends ImageGL implements Image.Region {
@@ -71,13 +72,13 @@ public abstract class ImageRegionGL extends ImageGL implements Image.Region {
   }
 
   @Override
-  public int width() {
-    return (int) width;
+  public float width() {
+    return width;
   }
 
   @Override
-  public int height() {
-    return (int) height;
+  public float height() {
+    return height;
   }
 
   @Override
@@ -135,6 +136,17 @@ public abstract class ImageRegionGL extends ImageGL implements Image.Region {
   @Override
   protected void updateTexture(GLContext ctx, Object tex) {
     throw new AssertionError("Region.updateTexture should never be called.");
+  }
+
+  @Override
+  void draw(GLContext ctx, InternalTransform xform, float dx, float dy, float dw, float dh,
+            boolean repeatX, boolean repeatY, float alpha) {
+    Object tex = ensureTexture(ctx, repeatX, repeatY);
+    if (tex != null) {
+      float sw = repeatX ? dw : width, sh = repeatY ? dh : height;
+      ctx.drawTexture(tex, texWidth(repeatX), texHeight(repeatY), xform,
+                      dx, dy, dw, dh, x(), y(), sw, sh, alpha);
+    }
   }
 
   private void scaleTexture(GLContext ctx, boolean repeatX, boolean repeatY) {

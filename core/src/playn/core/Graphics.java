@@ -42,7 +42,7 @@ public interface Graphics {
   /**
    * TODO
    */
-  SurfaceLayer createSurfaceLayer(int width, int height);
+  SurfaceLayer createSurfaceLayer(float width, float height);
 
   /**
    * Creates an immediate layer that is clipped to the specified rectangular region.
@@ -72,7 +72,7 @@ public interface Graphics {
   /**
    * Creates an image that can be painted using the {@link Canvas} interface.
    */
-  CanvasImage createImage(int width, int height);
+  CanvasImage createImage(float width, float height);
 
   /**
    * Creates a linear gradient fill pattern. (x0, y0) and (x1, y1) specify the

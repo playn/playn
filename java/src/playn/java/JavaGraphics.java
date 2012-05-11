@@ -75,8 +75,8 @@ public class JavaGraphics extends GraphicsGL {
   }
 
   @Override
-  public CanvasImage createImage(int w, int h) {
-    return new JavaCanvasImage(ctx, w, h);
+  public CanvasImage createImage(float width, float height) {
+    return new JavaCanvasImage(ctx, width, height);
   }
 
   @Override

@@ -29,7 +29,7 @@ class JavaCanvasImage extends JavaImage implements CanvasImage {
 
   private final JavaCanvas canvas;
 
-  JavaCanvasImage(JavaGLContext ctx, int width, int height) {
+  JavaCanvasImage(JavaGLContext ctx, float width, float height) {
     super(ctx, new BufferedImage(ctx.scale.scaledCeil(width), ctx.scale.scaledCeil(height),
                                  BufferedImage.TYPE_INT_ARGB), ctx.scale);
     Graphics2D gfx = img.createGraphics();

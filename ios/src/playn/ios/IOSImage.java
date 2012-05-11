@@ -34,13 +34,13 @@ public class IOSImage extends IOSAbstractImage {
   }
 
   @Override
-  public int width() {
-    return scale.invScaledCeil(image.get_CGImage().get_Width());
+  public float width() {
+    return scale.invScaled(image.get_CGImage().get_Width());
   }
 
   @Override
-  public int height() {
-    return scale.invScaledCeil(image.get_CGImage().get_Height());
+  public float height() {
+    return scale.invScaled(image.get_CGImage().get_Height());
   }
 
   @Override

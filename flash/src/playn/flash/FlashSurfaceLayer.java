@@ -15,11 +15,12 @@
  */
 package playn.flash;
 
-import playn.core.Asserts;
+import pythagoras.f.MathUtil;
 
 import flash.display.Sprite;
 import playn.flash.FlashCanvasLayer.CanvasElement;
 
+import playn.core.Asserts;
 import playn.core.Surface;
 import playn.core.SurfaceLayer;
 
@@ -34,8 +35,8 @@ public class FlashSurfaceLayer extends FlashLayer implements SurfaceLayer {
    * @param width
    * @param height
    */
-  public FlashSurfaceLayer(int width, int height) {
-    super((Sprite) CanvasElement.create(width, height).cast());
+  public FlashSurfaceLayer(float width, float height) {
+    super((Sprite) CanvasElement.create(MathUtil.iceil(width), MathUtil.iceil(height)).cast());
     surface = new FlashSurface(width, height, ((CanvasElement) display().cast()).getContext());
   }
 

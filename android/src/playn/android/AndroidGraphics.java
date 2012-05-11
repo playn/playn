@@ -71,8 +71,8 @@ class AndroidGraphics extends GraphicsGL {
   }
 
   @Override
-  public CanvasImage createImage(int w, int h) {
-    return new AndroidCanvasImage(this, w, h, true);
+  public CanvasImage createImage(float width, float height) {
+    return new AndroidCanvasImage(this, width, height, true);
   }
 
   @Override
@@ -173,7 +173,7 @@ class AndroidGraphics extends GraphicsGL {
   }
 
   @Override
-  protected SurfaceGL createSurface(int width, int height) {
+  protected SurfaceGL createSurface(float width, float height) {
     return new AndroidSurfaceGL(activity.getCacheDir(), ctx, width, height);
   }
 

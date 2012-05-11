@@ -77,7 +77,7 @@ public class IOSGraphics extends GraphicsGL {
   }
 
   @Override
-  public CanvasImage createImage(int width, int height) {
+  public CanvasImage createImage(float width, float height) {
     return new IOSCanvasImage(ctx, width, height);
   }
 

@@ -17,12 +17,13 @@ package playn.flash;
 
 import com.google.gwt.core.client.JavaScriptObject;
 
-import playn.core.Asserts;
+import pythagoras.f.MathUtil;
 
 import flash.display.BitmapData;
 import flash.gwt.FlashImport;
 import flash.display.Sprite;
 
+import playn.core.Asserts;
 import playn.core.Canvas;
 import playn.core.CanvasLayer;
 
@@ -33,8 +34,8 @@ public class FlashCanvasLayer extends FlashLayer implements CanvasLayer {
 
   private FlashCanvas canvas;
 
-  public FlashCanvasLayer(int width, int height) {
-    super((Sprite) CanvasElement.create(width, height).cast());
+  public FlashCanvasLayer(float width, float height) {
+    super((Sprite) CanvasElement.create(MathUtil.iceil(width), MathUtil.iceil(height)).cast());
     canvas = new FlashCanvas(width, height, ((CanvasElement) display().cast()).getContext());
   }
 

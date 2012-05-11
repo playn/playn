@@ -40,13 +40,13 @@ abstract class JavaImage extends ImageGL implements JavaCanvas.Drawable {
   }
 
   @Override
-  public int width() {
-    return scale.invScaledCeil(img.getWidth());
+  public float width() {
+    return scale.invScaled(img.getWidth());
   }
 
   @Override
-  public int height() {
-    return scale.invScaledCeil(img.getHeight());
+  public float height() {
+    return scale.invScaled(img.getHeight());
   }
 
   @Override

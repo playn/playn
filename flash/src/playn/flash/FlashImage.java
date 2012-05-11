@@ -56,12 +56,12 @@ class FlashImage implements Image {
   }-*/;
 
   @Override
-  public int width() {
+  public float width() {
     return imageData == null ? 0 : imageData.getWidth();
   }
 
   @Override
-  public int height() {
+  public float height() {
     return imageData == null ? 0 : imageData.getHeight();
   }
 

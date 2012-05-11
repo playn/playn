@@ -72,7 +72,7 @@ class HtmlGraphicsGL extends HtmlGraphics {
   }
 
   @Override
-  public SurfaceLayer createSurfaceLayer(int width, int height) {
+  public SurfaceLayer createSurfaceLayer(float width, float height) {
     return new SurfaceLayerGL(ctx, width, height);
   }
 

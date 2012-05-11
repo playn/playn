@@ -27,12 +27,12 @@ public interface Image {
   /**
    * This image's width in pixels.
    */
-  int width();
+  float width();
 
   /**
    * This image's height in pixels.
    */
-  int height();
+  float height();
 
   /**
    * Whether or not this image is ready to be used.

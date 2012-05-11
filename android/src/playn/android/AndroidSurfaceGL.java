@@ -36,7 +36,7 @@ public class AndroidSurfaceGL extends SurfaceGL
   private File cachedPixels;
   private final File cacheDir;
 
-  AndroidSurfaceGL(File cacheDir, AndroidGLContext ctx, int width, int height) {
+  AndroidSurfaceGL(File cacheDir, AndroidGLContext ctx, float width, float height) {
     super(ctx, width, height);
     this.cacheDir = cacheDir;
     ctx.addRefreshable(this);
@@ -54,12 +54,12 @@ public class AndroidSurfaceGL extends SurfaceGL
     if (cachedPixels != null) {
       try {
         AndroidGLContext actx = (AndroidGLContext) ctx;
-        ByteBuffer pixelBuffer = ByteBuffer.allocate(width * height * 4);
+        ByteBuffer pixelBuffer = ByteBuffer.allocate(texWidth * texHeight * 4);
         FileInputStream in = new FileInputStream(cachedPixels);
         in.read(pixelBuffer.array());
         int bufferTex = actx.createTexture(false, false);
-        actx.gl20.glTexImage2D(GL20.GL_TEXTURE_2D, 0, GL20.GL_RGBA, width, height, 0, GL20.GL_RGBA,
-                               GL20.GL_UNSIGNED_BYTE, pixelBuffer);
+        actx.gl20.glTexImage2D(GL20.GL_TEXTURE_2D, 0, GL20.GL_RGBA, texWidth, texHeight, 0,
+                               GL20.GL_RGBA, GL20.GL_UNSIGNED_BYTE, pixelBuffer);
         ctx.drawTexture(bufferTex, width, height, StockInternalTransform.IDENTITY, 0, height,
                         width, -height, false, false, 1);
         ctx.destroyTexture(bufferTex);
@@ -77,8 +77,9 @@ public class AndroidSurfaceGL extends SurfaceGL
     try {
       AndroidGLContext actx = (AndroidGLContext) ctx;
       actx.gl20.glBindFramebuffer(GL20.GL_FRAMEBUFFER, (Integer) fbuf);
-      ByteBuffer pixelBuffer = ByteBuffer.allocate(width * height * 4);
-      actx.gl20.glReadPixels(0, 0, width, height, GL20.GL_RGBA, GL20.GL_UNSIGNED_BYTE, pixelBuffer);
+      ByteBuffer pixelBuffer = ByteBuffer.allocate(texWidth * texHeight * 4);
+      actx.gl20.glReadPixels(0, 0, texWidth, texHeight, GL20.GL_RGBA, GL20.GL_UNSIGNED_BYTE,
+                             pixelBuffer);
       try {
         cachedPixels = new File(cacheDir, "surface-" + Integer.toHexString(hashCode()));
         FileOutputStream out = new FileOutputStream(cachedPixels);

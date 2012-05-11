@@ -69,7 +69,7 @@ public abstract class GraphicsGL implements Graphics {
   }
 
   @Override
-  public SurfaceLayer createSurfaceLayer(int width, int height) {
+  public SurfaceLayer createSurfaceLayer(float width, float height) {
     return new SurfaceLayerGL(ctx(), createSurface(width, height));
   }
 
@@ -84,7 +84,7 @@ public abstract class GraphicsGL implements Graphics {
     return new ImmediateLayerGL(ctx(), renderer);
   }
 
-  protected SurfaceGL createSurface(int width, int height) {
+  protected SurfaceGL createSurface(float width, float height) {
     return new SurfaceGL(ctx(), width, height);
   }
 
