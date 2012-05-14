@@ -41,7 +41,7 @@ public class IOSImageRegion extends ImageRegionGL implements IOSCanvas.Drawable 
   @Override
   public void getRgb(int startX, int startY, int width, int height, int[] rgbArray, int offset,
                      int scanSize) {
-    throw new UnsupportedOperationException("getRgb() not yet supported on iOS");
+    parent.getRgb(startX + (int)x, startY + (int)y, width, height, rgbArray, offset, scanSize);
   }
 
   @Override
