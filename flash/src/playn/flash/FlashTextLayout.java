@@ -23,6 +23,8 @@ import java.util.List;
 
 import static playn.core.PlayN.graphics;
 
+// TODO: remove this annotation once we've nixed deprecated TextFormat bits
+@SuppressWarnings("deprecation")
 class FlashTextLayout implements TextLayout {
 
   private TextFormat format;
@@ -93,8 +95,27 @@ class FlashTextLayout implements TextLayout {
     return format;
   }
 
+  void stroke(FlashCanvasLayer.Context2d ctx, float x, float y) {
+    configContext(ctx);
+    float ypos = 0;
+    for (Line line : lines) {
+      ctx.strokeText(line.text, x + format.align.getX(line.width, width), y + ypos);
+      ypos += metrics.height;
+    }
+  }
+
+  void fill(FlashCanvasLayer.Context2d ctx, float x, float y) {
+    configContext(ctx);
+    float ypos = 0;
+    for (Line line : lines) {
+      ctx.fillText(line.text, x + format.align.getX(line.width, width), y + ypos);
+      ypos += metrics.height;
+    }
+  }
+
   void draw(FlashCanvasLayer.Context2d ctx, float x, float y) {
     configContext(ctx);
+    ctx.setFillStyle(FlashGraphics.cssColorString(format.textColor));
 
     if (format.effect instanceof TextFormat.Effect.Shadow) {
       // TODO
@@ -102,10 +123,6 @@ class FlashTextLayout implements TextLayout {
 //      ctx.setShadowColor(FlashGraphics.cssColorString(seffect.shadowColor));
 //      ctx.setShadowOffsetX(seffect.shadowOffsetX);
 //      ctx.setShadowOffsetY(seffect.shadowOffsetY);
-      drawText(ctx, x, y);
-
-    } else if (format.effect instanceof TextFormat.Effect.VectorOutline) {
-      // TODO
       drawText(ctx, x, y);
 
     } else if (format.effect instanceof TextFormat.Effect.PixelOutline) {
@@ -147,7 +164,6 @@ class FlashTextLayout implements TextLayout {
       case BOLD_ITALIC: bold = "bold"; italic = "italic"; break;
     }
 
-    ctx.setFillStyle(FlashGraphics.cssColorString(format.textColor));
     ctx.setFont(italic + " " + bold + " " + font.size() + " " + font.name());
     ctx.setTextBaseline(FlashCanvasLayer.Context2d.TextBaseline.TOP.getValue());
   }

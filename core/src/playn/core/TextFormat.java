@@ -47,9 +47,11 @@ public class TextFormat {
     public abstract float getX(float textWidth, float lineWidth);
   };
 
-  /** Used to model the different text effects: shadow and outline. */
+  /** @deprecated Use stroke and fill to create your own effects. */
+  @Deprecated
   public static abstract class Effect {
-    /** Indicates that no text effect should be used. */
+    /** @deprecated Use stroke and fill to create your own effects. */
+    @Deprecated
     public static final Effect NONE = new Effect() {
       @Override
       public String toString() {
@@ -57,28 +59,20 @@ public class TextFormat {
       }
     };
 
-    /** Creates a shadow effect as specified. */
+    /** @deprecated Use stroke and fill to create your own effects. */
+    @Deprecated
     public static Effect shadow (int shadowColor, float shadowOffsetX, float shadowOffsetY) {
       return new Shadow(shadowColor, shadowOffsetX, shadowOffsetY);
     }
 
-    /** @deprecated Use {@link #pixelOutline}. */
+    /** @deprecated Use stroke and fill to create your own effects. */
     @Deprecated
     public static Effect outline (int outlineColor) {
       return new PixelOutline(outlineColor);
     }
 
-    /** Creates a pixel outline effect as specified. */
-    public static Effect pixelOutline (int outlineColor) {
-      return new PixelOutline(outlineColor);
-    }
-
-    /** Creates a vector outline effect as specified. */
-    public static Effect vectorOutline (int outlineColor, float strokeWidth) {
-      return new VectorOutline(outlineColor, strokeWidth);
-    }
-
-    /** Contains metadata for the shadow effect. */
+    /** @deprecated Use stroke and fill to create your own effects. */
+    @Deprecated
     public static final class Shadow extends Effect {
       /** The color of the shadow (as {@code 0xAARRGGBB}). */
       public final int shadowColor;
@@ -117,7 +111,8 @@ public class TextFormat {
       }
     }
 
-    /** Contains metadata for the pixel outline effect. */
+    /** @deprecated Use stroke and fill to create your own effects. */
+    @Deprecated
     public static final class PixelOutline extends Effect {
       /** The color of the outline (as {@code 0xAARRGGBB}). */
       public final int outlineColor;
@@ -128,11 +123,11 @@ public class TextFormat {
 
       @Override
       public float adjustWidth (float width) {
-        return width + 4;
+        return width + 2;
       }
       @Override
       public float adjustHeight (float height) {
-        return height + 4;
+        return height + 2;
       }
       @Override
       public Integer getAltColor () {
@@ -142,39 +137,6 @@ public class TextFormat {
       @Override
       public String toString() {
         return "poutline [color=" + Integer.toHexString(outlineColor) + "]";
-      }
-    }
-
-    /** Contains metadata for the vector outline effect. */
-    public static final class VectorOutline extends Effect {
-      /** The color of the outline (as {@code 0xAARRGGBB}). */
-      public final int outlineColor;
-
-      /** The width of the outline stroke. */
-      public final float strokeWidth;
-
-      public VectorOutline (int outlineColor, float strokeWidth) {
-        this.outlineColor = outlineColor;
-        this.strokeWidth = strokeWidth;
-      }
-
-      @Override
-      public float adjustWidth (float width) {
-        return width + strokeWidth;
-      }
-      @Override
-      public float adjustHeight (float height) {
-        return height + strokeWidth;
-      }
-      @Override
-      public Integer getAltColor () {
-        return outlineColor;
-      }
-
-      @Override
-      public String toString() {
-        return "voutline [color=" + Integer.toHexString(outlineColor) +
-          ", width=" + strokeWidth + "]";
       }
     }
 
@@ -207,10 +169,12 @@ public class TextFormat {
   /** The alignment to use for multiline text. */
   public final Alignment align;
 
-  /** The fill color to be used for the text (as {@code 0xAARRGGBB}). */
+  /** @deprecated Use set the stroke or fill color on the canvas instead. */
+  @Deprecated
   public final int textColor;
 
-  /** The effect to apply to the text when rendering, or {@link Effect#NONE}. */
+  /** @deprecated Use stroke and fill to create your own effects. */
+  @Deprecated
   public final Effect effect;
 
   /** Creates a default text format instance. */
@@ -253,12 +217,14 @@ public class TextFormat {
     return new TextFormat(this.font, this.wrapWidth, align, this.textColor, this.effect);
   }
 
-  /** Returns a clone of this text format with the text color configured as specified. */
+  /** @deprecated Use set the stroke or fill color on the canvas instead. */
+  @Deprecated
   public TextFormat withTextColor(int textColor) {
     return new TextFormat(this.font, this.wrapWidth, this.align, textColor, this.effect);
   }
 
-  /** Returns a clone of this text format with the effect configured as specified. */
+  /** @deprecated Use stroke and fill to create your own effects. */
+  @Deprecated
   public TextFormat withEffect(Effect effect) {
     return new TextFormat(this.font, this.wrapWidth, this.align, this.textColor, effect);
   }
@@ -266,7 +232,6 @@ public class TextFormat {
   @Override
   public String toString() {
     String wrapStr = shouldWrap() ? ""+wrapWidth : "n/a";
-    return "[font=" + font + ", wrapWidth=" + wrapStr + ", align=" + align +
-      ", textColor=" + Integer.toHexString(textColor) + ", effect=" + effect + "]";
+    return "[font=" + font + ", wrapWidth=" + wrapStr + ", align=" + align + "]";
   }
 }

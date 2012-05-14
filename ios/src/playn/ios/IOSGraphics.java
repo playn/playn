@@ -109,7 +109,7 @@ public class IOSGraphics extends GraphicsGL {
 
   @Override
   public TextLayout layoutText(String text, TextFormat format) {
-    return IOSTextLayout.create(this, text, format);
+    return new IOSTextLayout(this, text, format);
   }
 
   @Override

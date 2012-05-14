@@ -46,6 +46,8 @@ public class IOSCanvas implements Canvas {
   private final float width, height;
   private final int texWidth, texHeight;
 
+  private float strokeWidth = 1;
+  private int strokeColor = 0xFF000000;
   private boolean isDirty;
   private IntPtr data;
   private CGBitmapContext bctx;
@@ -190,7 +192,7 @@ public class IOSCanvas implements Canvas {
     return this;
   }
 
-  @Override
+  @Override @Deprecated
   public Canvas drawText(TextLayout layout, float x, float y) {
     ((IOSTextLayout) layout).draw(bctx, x, y);
     isDirty = true;
@@ -249,6 +251,13 @@ public class IOSCanvas implements Canvas {
       bctx.Clip();
       gradient.fill(bctx);
     }
+    isDirty = true;
+    return this;
+  }
+
+  @Override
+  public Canvas fillText(TextLayout layout, float x, float y) {
+    ((IOSTextLayout) layout).fill(bctx, x, y);
     isDirty = true;
     return this;
   }
@@ -332,12 +341,14 @@ public class IOSCanvas implements Canvas {
 
   @Override
   public Canvas setStrokeColor(int color) {
+    this.strokeColor = color;
     bctx.SetStrokeColor(toCGColor(color));
     return this;
   }
 
   @Override
   public Canvas setStrokeWidth(float strokeWidth) {
+    this.strokeWidth = strokeWidth;
     bctx.SetLineWidth(strokeWidth);
     return this;
   }
@@ -374,6 +385,13 @@ public class IOSCanvas implements Canvas {
   public Canvas strokeRoundRect(float x, float y, float width, float height, float radius) {
     addRoundRectPath(x, y, width, height, radius);
     bctx.StrokePath();
+    isDirty = true;
+    return this;
+  }
+
+  @Override
+  public Canvas strokeText(TextLayout layout, float x, float y) {
+    ((IOSTextLayout) layout).stroke(bctx, x, y, strokeWidth, strokeColor);
     isDirty = true;
     return this;
   }

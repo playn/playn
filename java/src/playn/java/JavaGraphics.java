@@ -112,7 +112,7 @@ public class JavaGraphics extends GraphicsGL {
 
   @Override
   public TextLayout layoutText(String text, TextFormat format) {
-    return new JavaTextLayout(text, format);
+    return new JavaTextLayout(this, text, format);
   }
 
   @Override

@@ -76,7 +76,7 @@ class GetTextTest extends Test {
     CanvasImage image = graphics().createImage((int)width, (int)height);
     image.canvas().setStrokeColor(0xFF000000);
     image.canvas().setFillColor(0xFF000000);
-    image.canvas().drawText(layout, margin, margin);
+    image.canvas().fillText(layout, margin, margin);
     if (border)
       image.canvas().strokeRect(0, 0, width-1, height-1);
     return image;

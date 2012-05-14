@@ -16,6 +16,7 @@
 package playn.ios;
 
 import cli.MonoTouch.CoreGraphics.CGBitmapContext;
+import cli.MonoTouch.CoreGraphics.CGColor;
 import cli.MonoTouch.CoreGraphics.CGPath;
 import cli.MonoTouch.CoreText.CTFrame;
 import cli.MonoTouch.CoreText.CTFramesetter;
@@ -29,46 +30,12 @@ import cli.MonoTouch.Foundation.NSRange;
 import cli.System.Drawing.PointF;
 import cli.System.Drawing.RectangleF;
 
+import playn.core.AbstractTextLayout;
 import playn.core.TextFormat;
-import playn.core.TextLayout;
 
-public abstract class IOSTextLayout implements TextLayout {
-
-  protected final IOSGraphics gfx;
-  protected final TextFormat format;
-  protected final IOSFont font;
-
-  public static IOSTextLayout create(IOSGraphics gfx, String text, TextFormat format) {
-    // normalize newlines in the text (Windows: CRLF -> LF, Mac OS pre-X: CR -> LF)
-    text = text.replace("\r\n", "\n").replace('\r', '\n');
-
-    IOSFont font = (format.font == null) ? IOSGraphics.defaultFont : (IOSFont) format.font;
-    CTStringAttributes attribs = new CTStringAttributes();
-    attribs.set_Font(font.ctFont);
-    attribs.set_ForegroundColorFromContext(true);
-
-    if (format.effect instanceof TextFormat.Effect.VectorOutline) {
-      attribs.set_StrokeColor(IOSCanvas.toCGColor(format.effect.getAltColor()));
-      float strokeWidth = ((TextFormat.Effect.VectorOutline)format.effect).strokeWidth;
-      // stroke width is expressed as a percentage of the font size in iOS
-      float strokePct = 100 * strokeWidth / font.size();
-      // negative stroke width means stroke and fill, rather than just stroke
-      attribs.set_StrokeWidth(new cli.System.Nullable$$00601_$$$_F_$$$$_(-strokePct));
-    }
-
-    CTParagraphStyleSettings pstyle = new CTParagraphStyleSettings();
-    // the "view C# as Java" abstraction is suffering a bit here; please avert your eyes
-    pstyle.set_Alignment(new cli.System.Nullable$$00601_$$$_Lcli__MonoTouch__CoreText__CTTextAlignment_$$$$_(toCT(format.align)));
-    attribs.set_ParagraphStyle(new CTParagraphStyle(pstyle));
-    // TODO: add underline here; foreground/stroke color also?
-    NSAttributedString atext = new NSAttributedString(text, attribs);
-
-    if (format.shouldWrap() || text.contains("\\n")) {
-      return new Wrapped(gfx, format, font, atext);
-    } else {
-      return new Single(gfx, format, font, atext);
-    }
-  }
+// TODO: remove this annotation once we've nixed deprecated TextFormat bits
+@SuppressWarnings("deprecation")
+class IOSTextLayout extends AbstractTextLayout {
 
   // There are numerous impedance mismatches between how PlayN wants to layout text and how iOS
   // allows text to be laid out. Fortunately, with some hackery, we can make things work (quite
@@ -109,17 +76,33 @@ public abstract class IOSTextLayout implements TextLayout {
   // spacing, because that does not seem to be reported by CTFont.LeadingMetric (which is where I
   // would expect it to be reported), and it is non-zero.
 
-  private static class Wrapped extends IOSTextLayout {
-    protected static final float MAX_HEIGHT = 10000f;
+  private static abstract class IOSTextStamp implements Stamp<CGBitmapContext> {
+    protected final IOSFont font;
+    protected final CTStringAttributes attribs;
+    protected final CGColor color;
 
+    public float width, height;
+    public abstract int lineCount();
+
+    public abstract void paint(CGBitmapContext bctx, float x, float y);
+
+    protected IOSTextStamp(IOSFont font, CTStringAttributes attribs, int color) {
+      this.font = font;
+      this.attribs = attribs;
+      this.color = IOSCanvas.toCGColor(color);
+    }
+  }
+
+  private class Wrapped extends IOSTextStamp {
+    protected static final float MAX_HEIGHT = 10000f;
     private final CTFrame frame;
-    private final float width, height;
     private final float lineHeight;
     private final float adjustX;
 
-    Wrapped(IOSGraphics gfx, TextFormat format, IOSFont font, NSAttributedString atext) {
-      super(gfx, format, font);
+    Wrapped(IOSGraphics gfx, IOSFont font, CTStringAttributes attribs, int color, String text) {
+      super(font, attribs, color);
 
+      NSAttributedString atext = new NSAttributedString(text, attribs);
       float fontLineHeight = font.ctFont.get_AscentMetric() + font.ctFont.get_DescentMetric() +
         font.ctFont.get_LeadingMetric();
 
@@ -144,26 +127,16 @@ public abstract class IOSTextLayout implements TextLayout {
           float lineX = origins[idx++].get_X() + bounds.get_X() + bounds.get_Width();
           maxX = Math.max(maxX, lineX);
         }
-        this.width = format.effect.adjustWidth(maxX - minX);
+        this.width = maxX - minX;
 
         this.lineHeight = (origins.length < 2) ? fontLineHeight :
           (origins[0].get_Y() - origins[1].get_Y());
         float gap = lineHeight - fontLineHeight;
-        this.height = format.effect.adjustHeight(lineHeight * frame.GetLines().length - gap);
+        this.height = lineHeight * frame.GetLines().length - gap;
 
       } finally {
         fs.Dispose();
       }
-    }
-
-    @Override
-    public float width() {
-      return width;
-    }
-
-    @Override
-    public float height() {
-      return height;
     }
 
     @Override
@@ -172,9 +145,14 @@ public abstract class IOSTextLayout implements TextLayout {
     }
 
     @Override
-    void drawOnce(CGBitmapContext bctx, float x, float y) {
-      float dx = x + adjustX;
-      float dy = y + MAX_HEIGHT - font.ctFont.get_DescentMetric();
+    public void draw(CGBitmapContext bctx, float x, float y) {
+      bctx.SetFillColor(color);
+      paint(bctx, x, y);
+    }
+
+    @Override
+    public void paint(CGBitmapContext bctx, float x, float y) {
+      float dx = x + adjustX, dy = y + MAX_HEIGHT;
       bctx.TranslateCTM(dx, dy);
       bctx.ScaleCTM(1, -1);
       frame.Draw(bctx);
@@ -183,16 +161,16 @@ public abstract class IOSTextLayout implements TextLayout {
     }
   }
 
-  // Single line text is much simpler and works without too much fuss.
-
-  private static class Single extends IOSTextLayout {
+  private static class Single extends IOSTextStamp {
     private final CTLine line;
     private final RectangleF bounds;
 
-    Single(IOSGraphics gfx, TextFormat format, IOSFont font, NSAttributedString atext) {
-      super(gfx, format, font);
-      line = new CTLine(atext);
+    Single(IOSGraphics gfx, IOSFont font, CTStringAttributes attribs, int color, String text) {
+      super(font, attribs, color);
+      line = new CTLine(new NSAttributedString(text, attribs));
       bounds = line.GetImageBounds(gfx.scratchCtx);
+      this.width = bounds.get_X() + bounds.get_Width();
+      this.height = font.ctFont.get_AscentMetric() + font.ctFont.get_DescentMetric();
     }
 
     @Override
@@ -201,18 +179,13 @@ public abstract class IOSTextLayout implements TextLayout {
     }
 
     @Override
-    public float width() {
-      return format.effect.adjustWidth(bounds.get_X() + bounds.get_Width());
+    public void draw(CGBitmapContext bctx, float x, float y) {
+      bctx.SetFillColor(color);
+      paint(bctx, x, y);
     }
 
     @Override
-    public float height() {
-      return format.effect.adjustHeight(
-        font.ctFont.get_AscentMetric() + font.ctFont.get_DescentMetric());
-    }
-
-    @Override
-    void drawOnce(CGBitmapContext bctx, float x, float y) {
+    public void paint(CGBitmapContext bctx, float x, float y) {
       float dy = y + font.ctFont.get_AscentMetric();
       bctx.TranslateCTM(x, dy);
       bctx.ScaleCTM(1, -1);
@@ -223,60 +196,81 @@ public abstract class IOSTextLayout implements TextLayout {
     }
   }
 
-  protected IOSTextLayout(IOSGraphics gfx, TextFormat format, IOSFont font) {
+  private final IOSGraphics gfx;
+  private final String text;
+  private final IOSTextStamp fillStamp, altStamp;
+  private IOSTextStamp strokeStamp; // initialized lazily
+  private float strokeWidth;
+  private int strokeColor;
+
+  public IOSTextLayout(IOSGraphics gfx, String text, TextFormat format) {
+    super(gfx, format);
     this.gfx = gfx;
-    this.format = format;
-    this.font = font;
+
+    // normalize newlines in the text (Windows: CRLF -> LF, Mac OS pre-X: CR -> LF)
+    this.text = text.replace("\r\n", "\n").replace('\r', '\n');
+
+    this.fillStamp = createStamp(gfx, format.textColor, this.text, null, null);
+    this.width = fillStamp.width;
+    this.height = fillStamp.height;
+
+    if (format.effect.getAltColor() != null) {
+      this.altStamp = createStamp(gfx, format.effect.getAltColor(), this.text, null, null);
+    } else {
+      this.altStamp = null;
+    }
   }
 
   @Override
-  public TextFormat format() {
-    return format;
+  public int lineCount() {
+    return fillStamp.lineCount();
+  }
+
+  void stroke(CGBitmapContext bctx, float x, float y, float strokeWidth, int strokeColor) {
+    if (strokeStamp == null || strokeWidth != this.strokeWidth) {
+      this.strokeWidth = strokeWidth;
+      strokeStamp = createStamp(gfx, 0, text, strokeWidth, strokeColor);
+    }
+    strokeStamp.paint(bctx, x, y);
+  }
+
+  void fill(CGBitmapContext bctx, float x, float y) {
+    fillStamp.paint(bctx, x, y);
   }
 
   void draw(CGBitmapContext bctx, float x, float y) {
-    float tx = 0, ty = 0;
-    if (format.effect instanceof TextFormat.Effect.Shadow) {
-      TextFormat.Effect.Shadow seffect = (TextFormat.Effect.Shadow)format.effect;
-      // if the shadow is negative, we need to move the real text down/right to keep everything
-      // within our bounds
-      float sx, sy;
-      if (seffect.shadowOffsetX > 0) {
-        sx = seffect.shadowOffsetX;
-      } else {
-        tx = -seffect.shadowOffsetX;
-        sx = 0;
-      }
-      if (seffect.shadowOffsetY > 0) {
-        sy = seffect.shadowOffsetY;
-      } else {
-        ty = -seffect.shadowOffsetY;
-        sy = 0;
-      }
-      bctx.SetFillColor(IOSCanvas.toCGColor(format.effect.getAltColor()));
-      drawOnce(bctx, x+sx, y+sy);
-
-    } else if (format.effect instanceof TextFormat.Effect.PixelOutline) {
-      bctx.SetFillColor(IOSCanvas.toCGColor(format.effect.getAltColor()));
-      drawOnce(bctx, x+0, y+0);
-      drawOnce(bctx, x+0, y+1);
-      drawOnce(bctx, x+0, y+2);
-      drawOnce(bctx, x+1, y+0);
-      drawOnce(bctx, x+1, y+2);
-      drawOnce(bctx, x+2, y+0);
-      drawOnce(bctx, x+2, y+1);
-      drawOnce(bctx, x+2, y+2);
-      tx = 1;
-      ty = 1;
-    }
-
-    bctx.SetFillColor(IOSCanvas.toCGColor(format.textColor));
-    drawOnce(bctx, x+tx, y+ty);
+    draw(bctx, fillStamp, altStamp, x, y);
   }
 
-  abstract void drawOnce(CGBitmapContext bctx, float x, float y);
+  private IOSTextStamp createStamp(IOSGraphics gfx, int color, String text,
+                                   Float strokeWidth, Integer strokeColor) {
+    CTStringAttributes attribs = new CTStringAttributes();
+    IOSFont font = (format.font == null) ? IOSGraphics.defaultFont : (IOSFont) format.font;
+    attribs.set_Font(font.ctFont);
+    attribs.set_ForegroundColorFromContext(true);
 
-  protected static CTTextAlignment toCT(TextFormat.Alignment align) {
+    if (strokeWidth != null) {
+      // stroke width is expressed as a percentage of the font size in iOS
+      float strokePct = 100 * strokeWidth / font.size();
+      attribs.set_StrokeWidth(new cli.System.Nullable$$00601_$$$_F_$$$$_(strokePct));
+      // unfortunately we have to set the stroke color here as well
+      attribs.set_StrokeColor(IOSCanvas.toCGColor(strokeColor));
+    }
+
+    CTParagraphStyleSettings pstyle = new CTParagraphStyleSettings();
+    // the "view C# as Java" abstraction is suffering a bit here; please avert your eyes
+    pstyle.set_Alignment(new cli.System.Nullable$$00601_$$$_Lcli__MonoTouch__CoreText__CTTextAlignment_$$$$_(toCT(format.align)));
+    attribs.set_ParagraphStyle(new CTParagraphStyle(pstyle));
+    // TODO: add underline here?
+
+    if (format.shouldWrap() || text.contains("\\n")) {
+      return new Wrapped(gfx, font, attribs, color, text);
+    } else {
+      return new Single(gfx, font, attribs, color, text);
+    }
+  }
+
+  private static CTTextAlignment toCT(TextFormat.Alignment align) {
     switch (align) {
     default:
     case LEFT: return CTTextAlignment.wrap(CTTextAlignment.Left);

@@ -24,6 +24,8 @@ import android.graphics.Paint;
 import playn.core.TextFormat;
 import playn.core.TextLayout;
 
+// TODO: remove this annotation once we've nixed deprecated TextFormat bits
+@SuppressWarnings("deprecation")
 class AndroidTextLayout implements TextLayout {
 
   private float width, height;
@@ -144,6 +146,22 @@ class AndroidTextLayout implements TextLayout {
     }
   }
 
+  void draw(Canvas canvas, float x, float y, Paint paint) {
+    paint.setTypeface(((AndroidFont)format.font).typeface);
+    paint.setTextSize(format.font.size());
+
+    float yoff = 0;
+    for (Line line : lines) {
+      float rx = format.align.getX(line.width, width);
+      yoff += -metrics.ascent;
+      canvas.drawText(line.text, x + rx, y + yoff, paint);
+      if (line != lines.get(0)) {
+        yoff += metrics.leading; // add interline spacing
+      }
+      yoff += metrics.descent;
+    }
+  }
+
   void draw(Canvas canvas, float x, float y) {
     if (format.effect instanceof TextFormat.Effect.Shadow) {
       // TODO: look into Android built-in support for drawing text with shadows
@@ -169,11 +187,6 @@ class AndroidTextLayout implements TextLayout {
       drawOnce(canvas, x + sx, y + sy);
       paint.setColor(format.textColor);
       drawOnce(canvas, x + tx, y + ty);
-
-    } else if (format.effect instanceof TextFormat.Effect.VectorOutline) {
-      // TODO
-      paint.setColor(format.textColor);
-      drawOnce(canvas, x, y);
 
     } else if (format.effect instanceof TextFormat.Effect.PixelOutline) {
       paint.setColor(format.effect.getAltColor());

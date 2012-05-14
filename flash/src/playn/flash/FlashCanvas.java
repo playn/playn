@@ -29,7 +29,6 @@ import playn.core.TextLayout;
 
 class FlashCanvas implements Canvas {
 
-
   private final float width, height;
   private boolean dirty = true;
   private final Context2d context2d;
@@ -115,6 +114,13 @@ class FlashCanvas implements Canvas {
   }
 
   @Override
+  public Canvas fillText(TextLayout layout, float x, float y) {
+    ((FlashTextLayout) layout).fill(context2d, x, y);
+    dirty = true;
+    return this;
+  }
+
+  @Override
   public Canvas drawText(String text, float x, float y) {
     context2d.strokeText(text, x, y);
     context2d.fillText(text, x, y);
@@ -122,12 +128,12 @@ class FlashCanvas implements Canvas {
     return this;
   }
 
-    @Override
-    public Canvas drawText(TextLayout layout, float x, float y) {
-        ((FlashTextLayout) layout).draw(context2d, x, y);
-        dirty = true;
-        return this;
-    }
+  @Override @Deprecated
+  public Canvas drawText(TextLayout layout, float x, float y) {
+    ((FlashTextLayout) layout).draw(context2d, x, y);
+    dirty = true;
+    return this;
+  }
 
   @Override
   public Canvas fillCircle(float x, float y, float radius) {
@@ -197,11 +203,7 @@ class FlashCanvas implements Canvas {
 
   @Override
   public Canvas setFillColor(int color) {
-    context2d.setFillStyle("rgba("
-        + ((color >> 16) & 0xff) + ","
-        + ((color >> 8) & 0xff) + ","
-        + (color & 0xff) + ","
-        + ((color >> 24) & 0xff)/255.0 + ")");
+    context2d.setFillStyle(FlashGraphics.cssColorString(color));
     return this;
   }
 
@@ -232,11 +234,7 @@ class FlashCanvas implements Canvas {
 
   @Override
   public Canvas setStrokeColor(int color) {
-    context2d.setStrokeStyle("rgba("
-        + ((color >> 16) & 0xff) + ","
-        + ((color >> 8) & 0xff) + ","
-        + (color & 0xff) + ","
-        + ((color >> 24) & 0xff) + ")");
+    context2d.setStrokeStyle(FlashGraphics.cssColorString(color));
     return this;
   }
 
@@ -282,6 +280,13 @@ class FlashCanvas implements Canvas {
   }
 
   @Override
+  public Canvas strokeText(TextLayout layout, float x, float y) {
+    ((FlashTextLayout) layout).stroke(context2d, x, y);
+    dirty = true;
+    return this;
+  }
+
+  @Override
   public Canvas transform(float m11, float m12, float m21, float m22, float dx,
       float dy) {
     context2d.transform(m11, m12, m21, m22, dx, dy);
@@ -300,7 +305,7 @@ class FlashCanvas implements Canvas {
   }
 
   public void quadraticCurveTo(float cpx, float cpy, float x, float y) {
-     context2d.quadraticCurveTo(cpx, cpy, x, y);
+    context2d.quadraticCurveTo(cpx, cpy, x, y);
   }
 
   public void lineTo(float x, float y) {

@@ -16,8 +16,6 @@ package playn.flash;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.google.gwt.canvas.dom.client.CssColor;
-
 import flash.display.StageAlign;
 import flash.display.StageScaleMode;
 import flash.display.Sprite;
@@ -45,18 +43,14 @@ import playn.core.gl.GL20;
 class FlashGraphics implements Graphics {
 
   private static final String HEIGHT_TEXT =
-        "THEQUICKBROWNFOXJUMPEDOVERTHELAZYDOGthequickbrownfoxjumpedoverthelazydog";
+    "THEQUICKBROWNFOXJUMPEDOVERTHELAZYDOGthequickbrownfoxjumpedoverthelazydog";
   private static final String EMWIDTH_TEXT = "m";
 
   private final Map<Font,FlashFontMetrics> fontMetrics = new HashMap<Font,FlashFontMetrics>();
-    private FlashCanvasLayer.CanvasElement dummyCanvas;
-    private FlashCanvasLayer.Context2d dummyCtx;
-    private FlashCanvas canvas;
-    private FlashCanvasLayer.Context2d ctx;
-
-    static CssColor cssColor(int color) {
-    return CssColor.make(cssColorString(color));
-  }
+  private FlashCanvasLayer.CanvasElement dummyCanvas;
+  private FlashCanvasLayer.Context2d dummyCtx;
+  private FlashCanvas canvas;
+  private FlashCanvasLayer.Context2d ctx;
 
   static String cssColorString(int color) {
     double a = ((color >> 24) & 0xff) / 255.0;

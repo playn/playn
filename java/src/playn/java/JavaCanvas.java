@@ -156,10 +156,10 @@ class JavaCanvas implements Canvas {
     return this;
   }
 
-  @Override
+  @Override @Deprecated
   public Canvas drawText(TextLayout layout, float x, float y) {
     currentState().prepareFill(gfx);
-    ((JavaTextLayout)layout).paint(gfx, x, y);
+    ((JavaTextLayout)layout).draw(gfx, x, y);
     isDirty = true;
     return this;
   }
@@ -197,6 +197,14 @@ class JavaCanvas implements Canvas {
     currentState().prepareFill(gfx);
     roundRect.setRoundRect(x, y, width, height, radius*2, radius*2);
     gfx.fill(roundRect);
+    isDirty = true;
+    return this;
+  }
+
+  @Override
+  public Canvas fillText(TextLayout layout, float x, float y) {
+    currentState().prepareFill(gfx);
+    ((JavaTextLayout)layout).fill(gfx, x, y);
     isDirty = true;
     return this;
   }
@@ -342,6 +350,14 @@ class JavaCanvas implements Canvas {
     currentState().prepareStroke(gfx);
     roundRect.setRoundRect(x, y, width, height, radius*2, radius*2);
     gfx.draw(roundRect);
+    isDirty = true;
+    return this;
+  }
+
+  @Override
+  public Canvas strokeText(TextLayout layout, float x, float y) {
+    currentState().prepareStroke(gfx);
+    ((JavaTextLayout)layout).stroke(gfx, x, y);
     isDirty = true;
     return this;
   }

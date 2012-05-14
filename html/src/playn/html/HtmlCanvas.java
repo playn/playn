@@ -139,7 +139,7 @@ class HtmlCanvas implements Canvas {
     return this;
   }
 
-  @Override
+  @Override @Deprecated
   public Canvas drawText(TextLayout layout, float x, float y) {
     ((HtmlTextLayout)layout).draw(ctx, x, y);
     dirty = true;
@@ -175,6 +175,13 @@ class HtmlCanvas implements Canvas {
   public Canvas fillRoundRect(float x, float y, float w, float h, float radius) {
     addRoundRectPath(x, y, width, height, radius);
     ctx.fill();
+    dirty = true;
+    return this;
+  }
+
+  @Override
+  public Canvas fillText(TextLayout layout, float x, float y) {
+    ((HtmlTextLayout)layout).fill(ctx, x, y);
     dirty = true;
     return this;
   }
@@ -222,7 +229,7 @@ class HtmlCanvas implements Canvas {
 
   @Override
   public Canvas setFillColor(int color) {
-    ctx.setFillStyle(HtmlGraphics.cssColor(color));
+    ctx.setFillStyle(HtmlGraphics.cssColorString(color));
     return this;
   }
 
@@ -260,7 +267,7 @@ class HtmlCanvas implements Canvas {
 
   @Override
   public Canvas setStrokeColor(int color) {
-    ctx.setStrokeStyle(HtmlGraphics.cssColor(color));
+    ctx.setStrokeStyle(HtmlGraphics.cssColorString(color));
     return this;
   }
 
@@ -305,6 +312,13 @@ class HtmlCanvas implements Canvas {
   public Canvas strokeRoundRect(float x, float y, float w, float h, float radius) {
     addRoundRectPath(x, y, width, height, radius);
     ctx.stroke();
+    dirty = true;
+    return this;
+  }
+
+  @Override
+  public Canvas strokeText(TextLayout layout, float x, float y) {
+    ((HtmlTextLayout)layout).stroke(ctx, x, y);
     dirty = true;
     return this;
   }
