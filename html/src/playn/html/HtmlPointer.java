@@ -81,7 +81,8 @@ class HtmlPointer extends PointerImpl implements Pointer {
         @Override
         public void handleEvent(NativeEvent nativeEvent) {
           inDragSequence = true;
-          if (onPointerStart(eventFromMouse(rootElement, nativeEvent), false))
+          // cancel mousedown events by default to prevent canvas drag-and-dropping in some browsers
+          if (onPointerStart(eventFromMouse(rootElement, nativeEvent), true))
             nativeEvent.preventDefault();
         }
       });
