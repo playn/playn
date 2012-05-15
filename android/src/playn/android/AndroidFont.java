@@ -27,8 +27,12 @@ class AndroidFont extends AbstractFont {
   public final Typeface typeface;
 
   public AndroidFont(String name, Style style, float size) {
+    this(name, style, size, Typeface.create(name, TO_ANDROID_STYLE.get(style)));
+  }
+
+  public AndroidFont(String name, Style style, float size, Typeface typeface) {
     super(name, style, size);
-    this.typeface = Typeface.create(name, TO_ANDROID_STYLE.get(style));
+    this.typeface = typeface;
   }
 
   protected static final Map<Style,Integer> TO_ANDROID_STYLE =

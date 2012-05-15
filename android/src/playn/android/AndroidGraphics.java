@@ -15,6 +15,9 @@
  */
 package playn.android;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import android.app.ActivityManager;
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -22,7 +25,9 @@ import android.graphics.LinearGradient;
 import android.graphics.PixelFormat;
 import android.graphics.RadialGradient;
 import android.graphics.Shader.TileMode;
+import android.graphics.Typeface;
 import android.view.View;
+import android.util.Pair;
 
 import playn.core.CanvasImage;
 import playn.core.Font;
@@ -39,10 +44,9 @@ import playn.core.gl.GraphicsGL;
 import playn.core.gl.GroupLayerGL;
 import playn.core.gl.SurfaceGL;
 
-class AndroidGraphics extends GraphicsGL {
+public class AndroidGraphics extends GraphicsGL {
 
-  private static int startingScreenWidth;
-  private static int startingScreenHeight;
+  private static int startingScreenWidth, startingScreenHeight;
 
   public final AndroidGLContext ctx;
   public final Bitmap.Config preferredBitmapConfig;
@@ -53,6 +57,8 @@ class AndroidGraphics extends GraphicsGL {
 
   private int screenWidth, screenHeight;
   private boolean sizeSetManually = false;
+  private Map<Pair<String,Font.Style>,Typeface> fonts =
+    new HashMap<Pair<String,Font.Style>,Typeface>();
 
   public AndroidGraphics(AndroidPlatform platform, AndroidGL20 gfx,
                          AndroidTouchEventHandler touchHandler) {
@@ -66,6 +72,28 @@ class AndroidGraphics extends GraphicsGL {
     // TODO: determine scale factor automatically?
     ctx = new AndroidGLContext(platform, 1, gfx, screenWidth, screenHeight);
     rootLayer = new GroupLayerGL(ctx);
+  }
+
+  /**
+   * Registers a font with the graphics system.
+   *
+   * @param path the path to the font resource (relative to the asset manager's path prefix).
+   * @param name the name under which to register the font.
+   * @param style the style variant of the specified name provided by the font file. For example
+   * one might {@code registerFont("myfont.ttf", "My Font", Font.Style.PLAIN)} and
+   * {@code registerFont("myfontb.ttf", "My Font", Font.Style.BOLD)} to provide both the plain and
+   * bold variants of a particular font.
+   */
+  public void registerFont(String path, String name, Font.Style style) {
+    try {
+      // Android has no way to load a font from an input stream so we have to first copy the data
+      // into a file and then load from there; awesome!
+      Typeface face = Typeface.createFromFile(
+        platform.assets().cacheAsset(path, name + path.substring(path.lastIndexOf('.'))));
+      fonts.put(Pair.create(name, style), face);
+    } catch (Exception e) {
+        platform.log().warn("Failed to load font [name=" + name + ", path=" + path + "]", e);
+    }
   }
 
   @Override
@@ -98,7 +126,9 @@ class AndroidGraphics extends GraphicsGL {
 
   @Override
   public Font createFont(String name, Font.Style style, float size) {
-    return new AndroidFont(name, style, size);
+    Typeface face = fonts.get(Pair.create(name, style));
+    return (face == null) ? new AndroidFont(name, style, size) :
+      new AndroidFont(name, style, size, face);
   }
 
   @Override
