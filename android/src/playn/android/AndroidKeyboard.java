@@ -15,7 +15,6 @@
  */
 package playn.android;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.text.InputType;
@@ -25,11 +24,12 @@ import playn.core.Keyboard;
 import playn.core.util.Callback;
 
 public class AndroidKeyboard implements Keyboard {
+
+  private final AndroidPlatform platform;
   private Listener listener;
 
-  public AndroidKeyboard (Activity activity)
-  {
-    _activity = activity;
+  public AndroidKeyboard (AndroidPlatform platform) {
+    this.platform = platform;
   }
 
   @Override
@@ -45,14 +45,14 @@ public class AndroidKeyboard implements Keyboard {
   @Override
   public void getText(final TextType textType, final String label, final String initVal,
       final Callback<String> callback) {
-    _activity.runOnUiThread(new Runnable() {
+    platform.activity.runOnUiThread(new Runnable() {
       public void run () {
-        final AlertDialog.Builder alert = new AlertDialog.Builder(_activity);
+        final AlertDialog.Builder alert = new AlertDialog.Builder(platform.activity);
 
         alert.setMessage(label);
 
         // Set an EditText view to get user input
-        final EditText input = new EditText(_activity);
+        final EditText input = new EditText(platform.activity);
         final int inputType;
         switch (textType) {
         case NUMBER:
@@ -116,7 +116,4 @@ public class AndroidKeyboard implements Keyboard {
     }
     return false;
   }
-
-  /** The android activity in which we are running. */
-  protected Activity _activity;
 }
