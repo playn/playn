@@ -140,9 +140,7 @@ public abstract class GameActivity extends Activity {
 
   @Override
   protected void onDestroy() {
-    File cacheDir = getCacheDir();
-    File[] tempFiles = cacheDir.listFiles();
-    for (File file : tempFiles) {
+    for (File file : getCacheDir().listFiles()) {
       file.delete();
     }
     platform().audio().onDestroy();

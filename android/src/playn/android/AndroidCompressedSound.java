@@ -23,44 +23,27 @@ import android.util.Log;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 
 /**
  * An implementation of AndroidSound using the Android MediaPlayer
  * class.
  */
 public class AndroidCompressedSound extends AndroidSound {
-  private File cachedFile;
+  private final File cachedFile;
   private boolean paused, prepared, looping, playOnPrepare;
   private float volume = 0.99f;
   private int position;
   private MediaPlayer mp;
 
-  public AndroidCompressedSound(File cacheDir, InputStream in, String extension) throws IOException {
-    cachedFile = new File(cacheDir, "sound-" + Integer.toHexString(hashCode())
-        + extension);
-    try {
-      FileOutputStream out = new FileOutputStream(cachedFile);
-      try {
-        byte[] buffer = new byte[16 * 1024];
-        while (true) {
-          int r = in.read(buffer);
-          if (r < 0)
-            break;
-          out.write(buffer, 0, r);
-        }
-      } finally {
-        out.close();
-      }
-    } finally {
-      in.close();
-    }
+  public AndroidCompressedSound(AndroidAssets assets, String path) throws IOException {
+    String extension = path.substring(path.lastIndexOf('.'));
+    this.cachedFile = assets.cacheAsset(
+      path, "sound-" + Integer.toHexString(hashCode()) + extension);
 
     try {
       resetMp();
-    }catch(IOException e) {
+    } catch(IOException e) {
       log().error("IOException thrown building MediaPlayer for sound.");
       onLoadError(e);
     }
@@ -135,7 +118,7 @@ public class AndroidCompressedSound extends AndroidSound {
         paused = false;
         play();  //Queue up to play when prepared.
       }
-    }catch (IOException e) {
+    } catch (IOException e) {
       log().error("IOException thrown resetting MediaPlayer for sound in onResume()");
     }
   }

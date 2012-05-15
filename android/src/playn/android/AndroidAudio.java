@@ -15,9 +15,7 @@
  */
 package playn.android;
 
-import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,29 +23,21 @@ import playn.core.Audio;
 import playn.core.Sound;
 
 class AndroidAudio implements Audio {
-  private List<AndroidSound> sounds = new ArrayList<AndroidSound>();
-  private File cacheDir;
 
-  public AndroidAudio(GameActivity activity) {
-    cacheDir = activity.getFilesDir();
+  private final AndroidPlatform platform;
+  // TODO: holding strong references to all sound files is problematic
+  private final List<AndroidSound> sounds = new ArrayList<AndroidSound>();
+
+  public AndroidAudio(AndroidPlatform platform) {
+    this.platform = platform;
   }
 
-  Sound createSound(String path, InputStream in) throws IOException {
-    String extension = path.substring(path.lastIndexOf('.'));
-    AndroidSound sound;
-
-    /*
-     * MediaPlayer should really be used to play compressed sounds and
-     * other file formats AudioTrack cannot handle. However, the MediaPlayer
-     * implementation is currently the only version of AndroidSound we
-     * have written, so we'll use it here regardless of format.
-     */
-    try {
-      sound = new AndroidCompressedSound(cacheDir, in, extension);
-      sounds.add(sound);
-    }catch (IOException e) {
-      sound = null;
-    }
+  Sound createSound(String path) throws IOException {
+    // MediaPlayer should really be used to play compressed sounds and other file formats
+    // AudioTrack cannot handle. However, the MediaPlayer implementation is currently the only
+    // version of AndroidSound we have written, so we'll use it here regardless of format.
+    AndroidSound sound = new AndroidCompressedSound(platform.assets(), path);
+    sounds.add(sound);
     return sound;
   }
 

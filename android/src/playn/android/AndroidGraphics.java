@@ -48,16 +48,15 @@ class AndroidGraphics extends GraphicsGL {
   public final Bitmap.Config preferredBitmapConfig;
 
   final GroupLayerGL rootLayer;
-  private final GameActivity activity;
-  private final GameViewGL gameView;
+  private final AndroidPlatform platform;
   private final AndroidTouchEventHandler touchHandler;
 
   private int screenWidth, screenHeight;
   private boolean sizeSetManually = false;
 
-  public AndroidGraphics(AndroidPlatform platform, GameActivity activity, AndroidGL20 gfx,
+  public AndroidGraphics(AndroidPlatform platform, AndroidGL20 gfx,
                          AndroidTouchEventHandler touchHandler) {
-    this.activity = activity;
+    this.platform = platform;
     this.touchHandler = touchHandler;
     this.preferredBitmapConfig = mapDisplayPixelFormat();
     if (startingScreenWidth != 0)
@@ -66,7 +65,6 @@ class AndroidGraphics extends GraphicsGL {
       screenHeight = startingScreenHeight;
     // TODO: determine scale factor automatically?
     ctx = new AndroidGLContext(platform, 1, gfx, screenWidth, screenHeight);
-    gameView = activity.gameView();
     rootLayer = new GroupLayerGL(ctx);
   }
 
@@ -146,7 +144,7 @@ class AndroidGraphics extends GraphicsGL {
   }
 
   void refreshScreenSize(boolean resize) {
-    View viewLayout = activity.viewLayout();
+    View viewLayout = platform.activity.viewLayout();
     int oldWidth = screenWidth;
     int oldHeight = screenHeight;
     screenWidth = viewLayout.getWidth();
@@ -174,7 +172,7 @@ class AndroidGraphics extends GraphicsGL {
 
   @Override
   protected SurfaceGL createSurface(float width, float height) {
-    return new AndroidSurfaceGL(activity.getCacheDir(), ctx, width, height);
+    return new AndroidSurfaceGL(platform.activity.getCacheDir(), ctx, width, height);
   }
 
   @Override
@@ -200,13 +198,13 @@ class AndroidGraphics extends GraphicsGL {
   private void setSize(int width, int height, boolean manual) {
     if (manual)
       sizeSetManually = true;
-    gameView.gameSizeSet();
+    platform.activity.gameView().gameSizeSet();
     touchHandler.calculateOffsets(this);
     // Layout the views again to change the surface size
-    activity.runOnUiThread(new Runnable() {
+    platform.activity.runOnUiThread(new Runnable() {
       @Override
       public void run() {
-        View viewLayout = activity.viewLayout();
+        View viewLayout = platform.activity.viewLayout();
         viewLayout.measure(viewLayout.getMeasuredWidth(), viewLayout.getMeasuredHeight());
         viewLayout.requestLayout();
       }
@@ -219,9 +217,9 @@ class AndroidGraphics extends GraphicsGL {
    */
   private Bitmap.Config mapDisplayPixelFormat() {
     // TODO:  This method will require testing over a variety of devices.
-    int format = activity.getWindowManager().getDefaultDisplay().getPixelFormat();
+    int format = platform.activity.getWindowManager().getDefaultDisplay().getPixelFormat();
     ActivityManager activityManager = (ActivityManager)
-      activity.getApplication().getSystemService(Context.ACTIVITY_SERVICE);
+      platform.activity.getApplication().getSystemService(Context.ACTIVITY_SERVICE);
     int memoryClass = activityManager.getMemoryClass();
 
     // For low memory devices (like the HTC Magic), prefer 16-bit bitmaps

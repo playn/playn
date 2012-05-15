@@ -19,6 +19,8 @@ import playn.core.gl.Scale;
 import static playn.core.PlayN.log;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -39,13 +41,11 @@ import android.util.Log;
 
 public class AndroidAssets extends AbstractAssets {
 
-  private final AndroidGraphics graphics;
-  private final AndroidAudio audio;
+  private final AndroidPlatform platform;
   private String pathPrefix = null;
 
-  AndroidAssets(AndroidGraphics graphics, AndroidAudio audio) {
-    this.graphics = graphics;
-    this.audio = audio;
+  AndroidAssets(AndroidPlatform platform) {
+    this.platform = platform;
   }
 
   public void setPathPrefix(String prefix) {
@@ -55,20 +55,9 @@ public class AndroidAssets extends AbstractAssets {
     pathPrefix = (prefix.length() == 0) ? prefix : (prefix + "/");
   }
 
-  /**
-   * Attempts to open the asset with the given name, throwing an
-   * {@link IOException} in case of failure.
-   */
-  private InputStream openAsset(String path) throws IOException {
-    InputStream is = getClass().getClassLoader().getResourceAsStream(pathPrefix + path);
-    if (is == null)
-      throw new IOException("Unable to load resource: " + pathPrefix + path);
-    return is;
-  }
-
   @Override
   protected Image doGetImage(String path) {
-    return createImage(graphics.ctx, doGetBitmap(path));
+    return createImage(platform.graphics().ctx, doGetBitmap(path));
   }
 
   protected AndroidImage createImage(AndroidGLContext ctx, Bitmap bitmap) {
@@ -76,8 +65,36 @@ public class AndroidAssets extends AbstractAssets {
   }
 
   /**
-   * Decodes a resource to a bitmap. Always succeeds, returning an error
-   * placeholder if something goes wrong.
+   * Copies a resource from our APK into a temporary file and returns a handle on that file.
+   *
+   * @param path the path to the to-be-cached asset.
+   * @param cacheName the name to use for the cache file.
+   */
+  File cacheAsset(String path, String cacheName) throws IOException {
+    InputStream in = openAsset(path);
+    File cachedFile = new File(platform.activity.getCacheDir(), cacheName);
+    try {
+      FileOutputStream out = new FileOutputStream(cachedFile);
+      try {
+        byte[] buffer = new byte[16 * 1024];
+        while (true) {
+          int r = in.read(buffer);
+          if (r < 0)
+            break;
+          out.write(buffer, 0, r);
+        }
+      } finally {
+        out.close();
+      }
+    } finally {
+      in.close();
+    }
+    return cachedFile;
+  }
+
+  /**
+   * Decodes a resource to a bitmap. Always succeeds, returning an error placeholder if something
+   * goes wrong.
    */
   Bitmap doGetBitmap(String path) {
     try {
@@ -93,11 +110,22 @@ public class AndroidAssets extends AbstractAssets {
     }
   }
 
+  /**
+   * Attempts to open the asset with the given name, throwing an {@link IOException} in case of
+   * failure.
+   */
+  private InputStream openAsset(String path) throws IOException {
+    InputStream is = getClass().getClassLoader().getResourceAsStream(pathPrefix + path);
+    if (is == null)
+      throw new IOException("Unable to load resource: " + pathPrefix + path);
+    return is;
+  }
+
   private Bitmap decodeBitmap(InputStream is) {
     BitmapFactory.Options options = new BitmapFactory.Options();
     options.inDither = true;
     // Prefer the bitmap config we computed from the window parameter
-    options.inPreferredConfig = graphics.preferredBitmapConfig;
+    options.inPreferredConfig = platform.graphics().preferredBitmapConfig;
     // Never scale bitmaps based on device parameters
     options.inScaled = false;
     return BitmapFactory.decodeStream(is, null, options);
@@ -161,8 +189,7 @@ public class AndroidAssets extends AbstractAssets {
   @Override
   protected Sound doGetSound(String path) {
     try {
-      InputStream in = openAsset(path + ".mp3");
-      return audio.createSound(path + ".mp3", in);
+      return platform.audio().createSound(path + ".mp3");
     } catch (IOException e) {
       log().error("Unable to load sound: " + path, e);
       return new ErrorSound(path, e);
