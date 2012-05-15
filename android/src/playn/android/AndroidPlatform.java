@@ -61,7 +61,7 @@ public class AndroidPlatform implements Platform {
     touchHandler = new AndroidTouchEventHandler(activity.gameView());
     graphics = new AndroidGraphics(this, gl20, touchHandler);
     json = new JsonImpl();
-    keyboard = new AndroidKeyboard();
+    keyboard = new AndroidKeyboard(activity);
     log = new AndroidLog();
     net = new AndroidNet();
     pointer = new AndroidPointer();

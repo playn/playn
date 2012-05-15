@@ -15,11 +15,22 @@
  */
 package playn.android;
 
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.text.InputType;
+import android.widget.EditText;
+
 import playn.core.Keyboard;
 import playn.core.util.Callback;
 
 public class AndroidKeyboard implements Keyboard {
   private Listener listener;
+
+  public AndroidKeyboard (Activity activity)
+  {
+    _activity = activity;
+  }
 
   @Override
   public synchronized void setListener(Listener listener) {
@@ -32,8 +43,51 @@ public class AndroidKeyboard implements Keyboard {
   }
 
   @Override
-  public void getText(TextType textType, String label, String initVal, Callback<String> callback) {
-    callback.onFailure(new UnsupportedOperationException("Not yet implemented."));
+  public void getText(final TextType textType, final String label, final String initVal,
+      final Callback<String> callback) {
+    _activity.runOnUiThread(new Runnable() {
+      public void run () {
+        final AlertDialog.Builder alert = new AlertDialog.Builder(_activity);
+
+        alert.setMessage(label);
+
+        // Set an EditText view to get user input
+        final EditText input = new EditText(_activity);
+        final int inputType;
+        switch (textType) {
+        case NUMBER:
+            inputType = InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_SIGNED;
+            break;
+        case EMAIL:
+            inputType = InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS;
+            break;
+        case URL:
+            inputType = InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_URI;
+            break;
+        case DEFAULT:
+        default:
+            inputType = InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_NORMAL;
+            break;
+        }
+        input.setInputType(inputType);
+        input.setText(initVal);
+        alert.setView(input);
+
+        alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+          public void onClick(DialogInterface dialog, int whichButton) {
+            String value = input.getText().toString();
+            callback.onSuccess(value);
+          }
+        });
+
+        alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+          public void onClick(DialogInterface dialog, int whichButton) {
+            callback.onSuccess(null);
+          }
+        });
+        alert.show();
+      }
+    });
   }
 
   /*
@@ -62,4 +116,7 @@ public class AndroidKeyboard implements Keyboard {
     }
     return false;
   }
+
+  /** The android activity in which we are running. */
+  protected Activity _activity;
 }
