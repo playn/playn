@@ -46,33 +46,25 @@ public class TestsGame implements Game {
     log().info("Right click or touch with two fingers to go to the next test.");
 
     // add a listener for mouse and touch inputs
-    try {
-      mouse().setListener(new Mouse.Adapter() {
-        @Override
-        public void onMouseDown(Mouse.ButtonEvent event) {
-          if (event.button() == Mouse.BUTTON_RIGHT)
-            advanceTest(1);
-          else if (event.button() == Mouse.BUTTON_MIDDLE)
-            advanceTest(-1);
-        }
-      });
-    } catch (UnsupportedOperationException e) {
-      // no support for mouse; no problem
-    }
-    try {
-      touch().setListener(new Touch.Adapter() {
-        public void onTouchStart(Touch.Event[] touches) {
-          // android doesn't bundle multiple touches into a single event, instead we'll get a
-          // separate event array with a single event with a touch with id > 0
-          if (touches.length > 2 || touches[0].id() > 1)
-            advanceTest(-1);
-          else if (touches.length > 1 || touches[0].id() > 0)
-            advanceTest(1);
-        }
-      });
-    } catch (UnsupportedOperationException e) {
-      // no support for touch; no problem
-    }
+    mouse().setListener(new Mouse.Adapter() {
+      @Override
+      public void onMouseDown(Mouse.ButtonEvent event) {
+        if (event.button() == Mouse.BUTTON_RIGHT)
+          advanceTest(1);
+        else if (event.button() == Mouse.BUTTON_MIDDLE)
+          advanceTest(-1);
+      }
+    });
+    touch().setListener(new Touch.Adapter() {
+      public void onTouchStart(Touch.Event[] touches) {
+        // android doesn't bundle multiple touches into a single event, instead we'll get a
+        // separate event array with a single event with a touch with id > 0
+        if (touches.length > 2 || touches[0].id() > 1)
+          advanceTest(-1);
+        else if (touches.length > 1 || touches[0].id() > 0)
+          advanceTest(1);
+      }
+    });
 
     advanceTest(currentTest = 0);
   }
