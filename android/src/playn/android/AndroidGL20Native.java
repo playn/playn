@@ -20,6 +20,16 @@ package playn.android;
  */
 public class AndroidGL20Native extends AndroidGL20 {
 
+  public static boolean available = false;
+  static {
+    try {
+      System.loadLibrary("playn-android-nativelib");
+      available = true;
+    } catch (Throwable t) {
+      android.util.Log.w("playn", "Failed to load playn-android-nativelib: " + t);
+    }
+  }
+
   @Override
   native public void glDrawElements(int mode, int count, int type, int offset);
 
@@ -28,9 +38,5 @@ public class AndroidGL20Native extends AndroidGL20 {
       int stride, int ptr);
 
   AndroidGL20Native() {
-  }
-
-  static {
-    System.loadLibrary("playn-android-nativelib");
   }
 }

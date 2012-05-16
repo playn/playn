@@ -60,7 +60,7 @@ public abstract class GameActivity extends Activity {
 
     // Build the AndroidPlatform and register this activity.
     AndroidGL20 gl20;
-    if (isHoneycombOrLater()) {
+    if (isHoneycombOrLater() || !AndroidGL20Native.available) {
       gl20 = new AndroidGL20();
     } else {
       // Provide our own native bindings for some missing methods.
