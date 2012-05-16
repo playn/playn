@@ -19,6 +19,7 @@ import playn.core.Color;
 import playn.core.Game;
 import playn.core.ImmediateLayer;
 import playn.core.Mouse;
+import playn.core.Keyboard;
 import playn.core.Surface;
 import playn.core.Touch;
 import static playn.core.PlayN.*;
@@ -43,7 +44,7 @@ public class TestsGame implements Game {
   @Override
   public void init() {
     // display basic instructions
-    log().info("Right click or touch with two fingers to go to the next test.");
+    log().info("Right click, touch with two fingers, or type f to go to the next test.");
 
     // add a listener for mouse and touch inputs
     mouse().setListener(new Mouse.Adapter() {
@@ -56,6 +57,7 @@ public class TestsGame implements Game {
       }
     });
     touch().setListener(new Touch.Adapter() {
+      @Override
       public void onTouchStart(Touch.Event[] touches) {
         // android doesn't bundle multiple touches into a single event, instead we'll get a
         // separate event array with a single event with a touch with id > 0
@@ -65,7 +67,15 @@ public class TestsGame implements Game {
           advanceTest(1);
       }
     });
-
+    keyboard().setListener(new Keyboard.Adapter() {
+      @Override
+      public void onKeyTyped(Keyboard.TypedEvent event) {
+        if (event.typedChar() == 'f')
+          advanceTest(1);
+        else if (event.typedChar() == 'b')
+          advanceTest(-1);
+      }
+    });
     advanceTest(currentTest = 0);
   }
 
