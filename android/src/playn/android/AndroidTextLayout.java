@@ -28,11 +28,12 @@ import playn.core.TextLayout;
 @SuppressWarnings("deprecation")
 class AndroidTextLayout implements TextLayout {
 
-  private float width, height;
-  private TextFormat format;
-  private Paint paint;
-  private Paint.FontMetrics metrics;
-  private List<Line> lines = new ArrayList<Line>();
+  private final TextFormat format;
+  private final AndroidFont font;
+  private final Paint paint;
+  private final float width, height;
+  private final Paint.FontMetrics metrics;
+  private final List<Line> lines = new ArrayList<Line>();
 
   private static class Line {
     public final String text;
@@ -65,15 +66,11 @@ class AndroidTextLayout implements TextLayout {
 
   AndroidTextLayout(String text, TextFormat format) {
     this.format = format;
+    this.font = (format.font == null) ? AndroidFont.DEFAULT : (AndroidFont)format.font;
 
     paint = new Paint(Paint.ANTI_ALIAS_FLAG);
-    if (format.font != null) {
-      paint.setTypeface(((AndroidFont)format.font).typeface);
-      // TODO
-      // float density = getContext().getResources().getDisplayMetrics().density;
-      // float scaledPx = format.font.size() * density;
-      paint.setTextSize(format.font.size());
-    }
+    paint.setTypeface(font.typeface);
+    paint.setTextSize(font.size());
     metrics = paint.getFontMetrics();
 
     // normalize newlines in the text (Windows: CRLF -> LF, Mac OS pre-X: CR -> LF)
@@ -147,8 +144,8 @@ class AndroidTextLayout implements TextLayout {
   }
 
   void draw(Canvas canvas, float x, float y, Paint paint) {
-    paint.setTypeface(((AndroidFont)format.font).typeface);
-    paint.setTextSize(format.font.size());
+    paint.setTypeface(font.typeface);
+    paint.setTextSize(font.size());
 
     float yoff = 0;
     for (Line line : lines) {

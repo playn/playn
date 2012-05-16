@@ -24,6 +24,8 @@ import playn.core.AbstractFont;
 
 class AndroidFont extends AbstractFont {
 
+  public static AndroidFont DEFAULT = new AndroidFont("Default", Style.PLAIN, 14, Typeface.DEFAULT);
+
   public final Typeface typeface;
 
   public AndroidFont(String name, Style style, float size) {
