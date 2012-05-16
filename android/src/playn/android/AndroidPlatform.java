@@ -40,9 +40,10 @@ public class AndroidPlatform implements Platform {
   Game game;
   GameActivity activity;
 
+  private final AndroidAnalytics analytics;
+  private final AndroidAssets assets;
   private final AndroidAudio audio;
   private final AndroidGraphics graphics;
-  private final Json json;
   private final AndroidKeyboard keyboard;
   private final AndroidLog log;
   private final AndroidNet net;
@@ -50,25 +51,24 @@ public class AndroidPlatform implements Platform {
   private final AndroidStorage storage;
   private final AndroidTouch touch;
   private final AndroidTouchEventHandler touchHandler;
-  private final AndroidAssets assets;
-  private final AndroidAnalytics analytics;
+  private final Json json;
   private final RunQueue runQueue;
 
   protected AndroidPlatform(GameActivity activity, AndroidGL20 gl20) {
     this.activity = activity;
 
     audio = new AndroidAudio(this);
-    touchHandler = new AndroidTouchEventHandler(activity.gameView());
-    graphics = new AndroidGraphics(this, gl20, touchHandler);
+    graphics = new AndroidGraphics(this, gl20, activity.scaleFactor());
+    analytics = new AndroidAnalytics();
+    assets = new AndroidAssets(this);
     json = new JsonImpl();
     keyboard = new AndroidKeyboard(this);
     log = new AndroidLog();
     net = new AndroidNet();
     pointer = new AndroidPointer();
-    touch = new AndroidTouch();
-    assets = new AndroidAssets(this);
-    analytics = new AndroidAnalytics();
     storage = new AndroidStorage(activity);
+    touch = new AndroidTouch();
+    touchHandler = new AndroidTouchEventHandler(graphics, activity.gameView());
     runQueue = new RunQueue(log);
   }
 

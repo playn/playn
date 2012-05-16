@@ -118,6 +118,10 @@ public abstract class GameActivity extends Activity {
     return false;
   }
 
+  protected float scaleFactor() {
+    return 1; // TODO: determine scale factor automatically?
+  }
+
   public LinearLayout viewLayout() {
     return viewLayout;
   }

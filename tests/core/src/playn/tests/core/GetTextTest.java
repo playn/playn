@@ -73,7 +73,7 @@ class GetTextTest extends Test {
     TextLayout layout = graphics().layoutText(text, new TextFormat());
     float margin = border ? 10 : 0;
     float width = layout.width()+2*margin, height = layout.height()+2*margin;
-    CanvasImage image = graphics().createImage((int)width, (int)height);
+    CanvasImage image = graphics().createImage(width, height);
     image.canvas().setStrokeColor(0xFF000000);
     image.canvas().setFillColor(0xFF000000);
     image.canvas().fillText(layout, margin, margin);

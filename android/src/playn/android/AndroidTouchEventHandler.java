@@ -15,20 +15,24 @@
  */
 package playn.android;
 
+import android.view.MotionEvent;
+
+import pythagoras.f.IPoint;
+
 import playn.core.Pointer;
 import playn.core.Touch;
-import android.view.MotionEvent;
 
 /**
  * Class for taking MotionEvents from GameActivity.onMotionEvent() and parsing
  * them into an array of Touch.Events for the Listener.
  */
 class AndroidTouchEventHandler {
-  private final GameViewGL gameView;
-  private float xScreenOffset = 0;
-  private float yScreenOffset = 0;
 
-  AndroidTouchEventHandler(GameViewGL gameView) {
+  private final AndroidGraphics graphics;
+  private final GameViewGL gameView;
+
+  AndroidTouchEventHandler(AndroidGraphics graphics, GameViewGL gameView) {
+    this.graphics = graphics;
     this.gameView = gameView;
   }
 
@@ -121,22 +125,17 @@ class AndroidTouchEventHandler {
     int eventPointerCount = event.getPointerCount();
     Touch.Event[] touches = new Touch.Event[eventPointerCount];
     double time = event.getEventTime();
-    float x, y, pressure, size;
+    float pressure, size;
     int id;
     for (int t = 0; t < eventPointerCount; t++) {
       int pointerIndex = t;
-      x = event.getX(pointerIndex) + xScreenOffset;
-      y = event.getY(pointerIndex) + yScreenOffset;
+      IPoint xy = graphics.transformTouch(event.getX(pointerIndex), event.getY(pointerIndex));
       pressure = event.getPressure(pointerIndex);
       size = event.getSize(pointerIndex);
       id = event.getPointerId(pointerIndex);
-      touches[t] = new AndroidTouchEventImpl(time, x, y, id, pressure, size, preventDefault);
+      touches[t] = new AndroidTouchEventImpl(
+        time, xy.x(), xy.y(), id, pressure, size, preventDefault);
     }
     return touches;
-  }
-
-  void calculateOffsets(AndroidGraphics graphics) {
-    xScreenOffset = -(graphics.screenWidth() - graphics.width()) / 2;
-    yScreenOffset = -(graphics.screenHeight() - graphics.height()) / 2;
   }
 }

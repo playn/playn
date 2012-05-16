@@ -15,11 +15,9 @@
  */
 package playn.android;
 
-import playn.core.gl.Scale;
-import static playn.core.PlayN.log;
-
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -30,19 +28,23 @@ import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.HttpGet;
 
-import playn.core.AbstractAssets;
-import playn.core.Image;
-import playn.core.ResourceCallback;
-import playn.core.Sound;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import playn.core.AbstractAssets;
+import playn.core.Image;
+import playn.core.ResourceCallback;
+import playn.core.Sound;
+import playn.core.gl.Scale;
+import static playn.core.PlayN.log;
+
 public class AndroidAssets extends AbstractAssets {
 
   private final AndroidPlatform platform;
   private String pathPrefix = null;
+  private Scale assetScale = null;
 
   AndroidAssets(AndroidPlatform platform) {
     this.platform = platform;
@@ -55,13 +57,40 @@ public class AndroidAssets extends AbstractAssets {
     pathPrefix = (prefix.length() == 0) ? prefix : (prefix + "/");
   }
 
-  @Override
-  protected Image doGetImage(String path) {
-    return createImage(platform.graphics().ctx, doGetBitmap(path));
+  /**
+   * Configures the default scale to use for assets. This allows one to use higher resolution
+   * imagery than the device might normally. For example, one can supply scale 2 here, and
+   * configure the graphics scale to 1.25 in order to use iOS Retina graphics (640x960) on a WXGA
+   * (480x800) device.
+   *
+   * TODO: support scaling down the bitmaps to conserve GPU memory.
+   */
+  public void setAssetScale(float scaleFactor) {
+    this.assetScale = new Scale(scaleFactor);
   }
 
-  protected AndroidImage createImage(AndroidGLContext ctx, Bitmap bitmap) {
-    return new AndroidImage(ctx, bitmap, Scale.ONE); // TODO: HiDPI support
+  @Override
+  protected Image doGetImage(String path) {
+    Exception error = null;
+    for (Scale.ScaledResource rsrc : assetScale().getScaledResources(path)) {
+      try {
+        InputStream is = openAsset(rsrc.path);
+        try {
+          return new AndroidImage(platform.graphics().ctx, decodeBitmap(is), rsrc.scale);
+        } finally {
+          is.close();
+        }
+      } catch (FileNotFoundException fnfe) {
+        error = fnfe; // keep going, checking for lower resolution images
+      } catch (Exception e) {
+        error = e;
+        break; // the image was broken not missing, stop here
+      }
+    }
+    platform.log().warn("Could not load image: " + pathPrefix + path, error);
+    // TODO: create error image which reports failure to callbacks
+    // error != null ? error : new FileNotFoundException(path);
+    return new AndroidImage(platform.graphics().ctx, createErrorBitmap(), Scale.ONE);
   }
 
   /**
@@ -92,22 +121,8 @@ public class AndroidAssets extends AbstractAssets {
     return cachedFile;
   }
 
-  /**
-   * Decodes a resource to a bitmap. Always succeeds, returning an error placeholder if something
-   * goes wrong.
-   */
-  Bitmap doGetBitmap(String path) {
-    try {
-      InputStream is = openAsset(path);
-      try {
-        Bitmap bitmap = decodeBitmap(is);
-        return bitmap;
-      } finally {
-        is.close();
-      }
-    } catch (IOException e) {
-      return createErrorBitmap(e);
-    }
+  private Scale assetScale () {
+    return (assetScale != null) ? assetScale : platform.graphics().ctx.scale;
   }
 
   /**
@@ -117,7 +132,7 @@ public class AndroidAssets extends AbstractAssets {
   private InputStream openAsset(String path) throws IOException {
     InputStream is = getClass().getClassLoader().getResourceAsStream(pathPrefix + path);
     if (is == null)
-      throw new IOException("Unable to load resource: " + pathPrefix + path);
+      throw new FileNotFoundException("Missing resource: " + pathPrefix + path);
     return is;
   }
 
@@ -131,11 +146,9 @@ public class AndroidAssets extends AbstractAssets {
     return BitmapFactory.decodeStream(is, null, options);
   }
 
-  private Bitmap createErrorBitmap(Exception e) {
+  private Bitmap createErrorBitmap() {
     int height = 100, width = 100;
-
     Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_4444);
-
     android.graphics.Canvas c = new android.graphics.Canvas(bitmap);
     android.graphics.Paint p = new android.graphics.Paint();
     p.setColor(android.graphics.Color.RED);
@@ -144,46 +157,7 @@ public class AndroidAssets extends AbstractAssets {
         c.drawText("ERROR", xx * 45, yy * 15, p);
       }
     }
-
     return bitmap;
-  }
-
-  private class ErrorSound implements Sound {
-    private final String path;
-    private final IOException exception;
-
-    public ErrorSound(String path, IOException exception) {
-      this.path = path;
-      this.exception = exception;
-    }
-
-    @Override
-    public boolean play() {
-      log().error("Attempted to play sound that was unable to load: " + path);
-      return false;
-    }
-
-    @Override
-    public void stop() {
-    }
-
-    @Override
-    public void setLooping(boolean looping) {
-    }
-
-    @Override
-    public void setVolume(float volume) {
-    }
-
-    @Override
-    public boolean isPlaying() {
-      return false;
-    }
-
-    @Override
-    public void addCallback(ResourceCallback<? super Sound> callback) {
-      callback.error(exception);
-    }
   }
 
   @Override
@@ -192,7 +166,7 @@ public class AndroidAssets extends AbstractAssets {
       return platform.audio().createSound(path + ".mp3");
     } catch (IOException e) {
       log().error("Unable to load sound: " + path, e);
-      return new ErrorSound(path, e);
+      return platform.audio().createErrorSound(path, e);
     }
   }
 

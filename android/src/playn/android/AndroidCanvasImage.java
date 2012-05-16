@@ -15,6 +15,8 @@
  */
 package playn.android;
 
+import android.graphics.Bitmap;
+
 import pythagoras.f.MathUtil;
 
 import playn.core.Canvas;
@@ -25,10 +27,12 @@ class AndroidCanvasImage extends AndroidImage implements CanvasImage {
 
   private final AndroidCanvas canvas;
 
-  AndroidCanvasImage(AndroidGraphics graphics, float width, float height, boolean alpha) {
-    super(graphics.ctx, graphics.createBitmap(MathUtil.iceil(width), MathUtil.iceil(height), alpha),
-          graphics.ctx.scale);
+  AndroidCanvasImage(AndroidGraphics gfx, float width, float height) {
+    super(gfx.ctx, Bitmap.createBitmap(gfx.ctx.scale.scaledCeil(width),
+                                       gfx.ctx.scale.scaledCeil(height),
+                                       gfx.preferredBitmapConfig), gfx.ctx.scale);
     this.canvas = new AndroidCanvas(bitmap());
+    this.canvas.scale(gfx.ctx.scale.factor, gfx.ctx.scale.factor);
   }
 
   @Override

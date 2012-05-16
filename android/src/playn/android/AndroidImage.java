@@ -60,12 +60,12 @@ class AndroidImage extends ImageGL implements AndroidGLContext.Refreshable, Andr
 
   @Override
   public float height() {
-    return bitmap.getHeight();
+    return scale.invScaled(bitmap.getHeight());
   }
 
   @Override
   public float width() {
-    return bitmap.getWidth();
+    return scale.invScaled(bitmap.getWidth());
   }
 
   @Override
@@ -102,6 +102,12 @@ class AndroidImage extends ImageGL implements AndroidGLContext.Refreshable, Andr
   @Override
   public void prepDraw(Rect rect, RectF rectf, float dx, float dy, float dw, float dh,
                        float sx, float sy, float sw, float sh) {
+    // adjust our source rect to account for the scale factor
+    sx *= scale.factor;
+    sy *= scale.factor;
+    sw *= scale.factor;
+    sh *= scale.factor;
+
     rect.set((int) sx, (int) sy, (int) (sx + sw), (int) (sy + sh));
     rectf.set(dx, dy, dx + dw, dy + dh);
   }

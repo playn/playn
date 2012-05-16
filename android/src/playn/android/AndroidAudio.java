@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import playn.core.Audio;
+import playn.core.ResourceCallback;
 import playn.core.Sound;
 
 class AndroidAudio implements Audio {
@@ -39,6 +40,33 @@ class AndroidAudio implements Audio {
     AndroidSound sound = new AndroidCompressedSound(platform.assets(), path);
     sounds.add(sound);
     return sound;
+  }
+
+  Sound createErrorSound(final String path, final IOException exception) {
+    return new Sound() {
+      @Override
+      public boolean play() {
+        platform.log().error("Attempted to play sound that was unable to load: " + path);
+        return false;
+      }
+      @Override
+      public void stop() {
+      }
+      @Override
+      public void setLooping(boolean looping) {
+      }
+      @Override
+      public void setVolume(float volume) {
+      }
+      @Override
+      public boolean isPlaying() {
+        return false;
+      }
+      @Override
+      public void addCallback(ResourceCallback<? super Sound> callback) {
+        callback.error(exception);
+      }
+    };
   }
 
   public void onDestroy() {

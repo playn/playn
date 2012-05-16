@@ -29,13 +29,19 @@ import android.graphics.Typeface;
 import android.view.View;
 import android.util.Pair;
 
+import pythagoras.f.IPoint;
+import pythagoras.f.MathUtil;
+import pythagoras.f.Point;
+
 import playn.core.CanvasImage;
 import playn.core.Font;
 import playn.core.Gradient;
 import playn.core.GroupLayer;
 import playn.core.Image;
+import playn.core.InternalTransform;
 import playn.core.Path;
 import playn.core.Pattern;
+import playn.core.StockInternalTransform;
 import playn.core.TextFormat;
 import playn.core.TextLayout;
 import playn.core.gl.GL20;
@@ -52,26 +58,25 @@ public class AndroidGraphics extends GraphicsGL {
   public final Bitmap.Config preferredBitmapConfig;
 
   final GroupLayerGL rootLayer;
+  private final InternalTransform rootTransform = new StockInternalTransform();
   private final AndroidPlatform platform;
-  private final AndroidTouchEventHandler touchHandler;
+  private final Point touchTemp = new Point();
 
   private int screenWidth, screenHeight;
   private boolean sizeSetManually = false;
   private Map<Pair<String,Font.Style>,Typeface> fonts =
     new HashMap<Pair<String,Font.Style>,Typeface>();
 
-  public AndroidGraphics(AndroidPlatform platform, AndroidGL20 gfx,
-                         AndroidTouchEventHandler touchHandler) {
+  public AndroidGraphics(AndroidPlatform platform, AndroidGL20 gfx, float scaleFactor) {
     this.platform = platform;
-    this.touchHandler = touchHandler;
     this.preferredBitmapConfig = mapDisplayPixelFormat();
     if (startingScreenWidth != 0)
-      screenWidth = startingScreenWidth;
+      screenWidth = MathUtil.iceil(startingScreenWidth / scaleFactor);
     if (startingScreenHeight != 0)
-      screenHeight = startingScreenHeight;
-    // TODO: determine scale factor automatically?
-    ctx = new AndroidGLContext(platform, 1, gfx, screenWidth, screenHeight);
+      screenHeight = MathUtil.iceil(startingScreenHeight / scaleFactor);
+    ctx = new AndroidGLContext(platform, scaleFactor, gfx, screenWidth, screenHeight);
     rootLayer = new GroupLayerGL(ctx);
+    rootTransform.uniformScale(scaleFactor);
   }
 
   /**
@@ -98,7 +103,7 @@ public class AndroidGraphics extends GraphicsGL {
 
   @Override
   public CanvasImage createImage(float width, float height) {
-    return new AndroidCanvasImage(this, width, height, true);
+    return new AndroidCanvasImage(this, width, height);
   }
 
   @Override
@@ -179,7 +184,6 @@ public class AndroidGraphics extends GraphicsGL {
     int oldHeight = screenHeight;
     screenWidth = viewLayout.getWidth();
     screenHeight = viewLayout.getHeight();
-    touchHandler.calculateOffsets(this);
     // Change game size to fill the screen if it has never been set manually.
     if (resize && !sizeSetManually && (screenWidth != oldWidth || screenHeight != oldHeight))
       setSize(screenWidth, screenHeight, false);
@@ -210,26 +214,25 @@ public class AndroidGraphics extends GraphicsGL {
     return ctx;
   }
 
-  /** Used to create bitmaps for canvas images. */
-  Bitmap createBitmap(int width, int height, boolean alpha) {
-    // TODO: Why not always use the preferredBitmapConfig?  (Preserved from pre-GL code)
-    return Bitmap.createBitmap(
-      width, height, alpha ? preferredBitmapConfig : Bitmap.Config.ARGB_8888);
-  }
-
   void preparePaint() {
     ctx.preparePaint();
   }
 
   void paintLayers() {
-    ctx.paintLayers(rootLayer);
+    ctx.paintLayers(rootLayer, rootTransform);
+  }
+
+  IPoint transformTouch(float x, float y) {
+    // TODO: nix these adjustments when we nix support for setting screen size
+    x -= (screenWidth() - width()) / 2;
+    y -= (screenHeight() - height()) / 2;
+    return rootTransform.inverseTransform(touchTemp.set(x, y), touchTemp);
   }
 
   private void setSize(int width, int height, boolean manual) {
     if (manual)
       sizeSetManually = true;
     platform.activity.gameView().gameSizeSet();
-    touchHandler.calculateOffsets(this);
     // Layout the views again to change the surface size
     platform.activity.runOnUiThread(new Runnable() {
       @Override
@@ -253,10 +256,10 @@ public class AndroidGraphics extends GraphicsGL {
     int memoryClass = activityManager.getMemoryClass();
 
     // For low memory devices (like the HTC Magic), prefer 16-bit bitmaps
-    // FIXME: The memoryClass check is from the Canvas-only implementation and may function incorrectly with OpenGL
-    if (format == PixelFormat.RGBA_4444 ||  memoryClass <= 16)
-      return Bitmap.Config.ARGB_4444;
-    else return Bitmap.Config.ARGB_8888;
+    // FIXME: The memoryClass check is from the Canvas-only implementation and may function
+    // incorrectly with OpenGL
+    return (format == PixelFormat.RGBA_4444 || memoryClass <= 16) ?
+      Bitmap.Config.ARGB_4444 : Bitmap.Config.ARGB_8888;
   }
 
   /**

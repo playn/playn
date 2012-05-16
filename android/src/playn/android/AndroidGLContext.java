@@ -15,19 +15,18 @@
  */
 package playn.android;
 
-import static playn.core.PlayN.log;
-import playn.core.gl.GLShader;
-
 import java.util.*;
 
 import android.graphics.Bitmap;
 import android.opengl.GLUtils;
 
 import playn.core.Asserts;
-import playn.core.StockInternalTransform;
+import playn.core.InternalTransform;
 import playn.core.gl.GL20;
 import playn.core.gl.GLContext;
+import playn.core.gl.GLShader;
 import playn.core.gl.GroupLayerGL;
+import static playn.core.PlayN.log;
 
 /**
  * Implements the GL context via Android OpenGL bindings.
@@ -83,11 +82,11 @@ public class AndroidGLContext extends GLContext
     gl20.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
   }
 
-  void paintLayers(GroupLayerGL rootLayer) {
+  void paintLayers(GroupLayerGL rootLayer, InternalTransform rootTransform) {
     checkGLError("updateLayers start");
     // Paint all the layers
     bindFramebuffer();
-    rootLayer.paint(StockInternalTransform.IDENTITY, 1);
+    rootLayer.paint(rootTransform, 1);
     checkGLError("updateLayers end");
     // Guarantee a flush
     useShader(null);
