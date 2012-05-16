@@ -152,6 +152,16 @@ public class CanvasTest extends Test {
         canvas.fillRoundRect(0, 0, 100, 100, 10);
       }
     });
+
+    addTestCanvas(100, 100, new Drawer() {
+      public void draw(Canvas canvas) {
+        // demonstrates a bug (now worked around) in Android round-rect drawing
+        canvas.setFillColor(0xFFFFCC99);
+        canvas.fillRoundRect(0, 0, 98.32f, 29.5f, 12f);
+        canvas.setFillColor(0xFF99CCFF);
+        canvas.fillRoundRect(3, 3, 92.32f, 23.5f, 9.5f);
+      }
+    });
   }
 
   @Override
