@@ -45,7 +45,6 @@ public class IOSGameView extends iPhoneOSGameView {
 
     // TODO: I assume we want to manually manage loss of EGL context
     set_LayerRetainsBacking(false);
-    // TODO: figure out twisty maze of Retina scale bullshit
     set_ContentScaleFactor(scale);
     set_MultipleTouchEnabled(true);
     set_AutoResize(false);

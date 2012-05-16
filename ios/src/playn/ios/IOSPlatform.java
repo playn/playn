@@ -85,12 +85,35 @@ public class IOSPlatform implements Platform {
     }
   };
 
+  /**
+   * Registers your application. Defaults to supporting {@link SupportedOrients#PORTRAITS} and
+   * native iPad resolution.
+   */
   public static IOSPlatform register(UIApplication app) {
     return register(app, SupportedOrients.PORTRAITS);
   }
 
+  /**
+   * Registers your application with the specified supported orientations and native iPad
+   * resolution.
+   */
   public static IOSPlatform register(UIApplication app, SupportedOrients orients) {
-    IOSPlatform platform = new IOSPlatform(app, orients);
+    return register(app, orients, false);
+  }
+
+  /**
+   * Registers your application with the specified supported orientations.
+   *
+   * @param iPadLikePhone if true, an iPad will be treated like a 2x Retina device with resolution
+   * 384x512 and which will use @2x images. A Retina iPad will also have resolution 384x512 and
+   * will use @4x images if they exist, then fall back to @2x (and default (1x) if necessary). If
+   * false, iPad will be treated as a non-Retina device with resolution 768x1024 and will use
+   * default (1x) images, and a Retina iPad will be treated as a Retina device with resolution
+   * 768x1024 and will use @2x images.
+   */
+  public static IOSPlatform register(UIApplication app, SupportedOrients orients,
+                                     boolean iPadLikePhone) {
+    IOSPlatform platform = new IOSPlatform(app, orients, iPadLikePhone);
     PlayN.setPlatform(platform);
     return platform;
   }
@@ -129,18 +152,25 @@ public class IOSPlatform implements Platform {
   private final UIWindow mainWindow;
   private final IOSGameView gameView;
 
-  protected IOSPlatform(UIApplication app, SupportedOrients orients) {
+  protected IOSPlatform(UIApplication app, SupportedOrients orients, boolean iPadLikePhone) {
     this.app = app;
     this.orients = orients;
 
+    float deviceScale = UIScreen.get_MainScreen().get_Scale();
     RectangleF bounds = UIScreen.get_MainScreen().get_Bounds();
-    float scale = UIScreen.get_MainScreen().get_Scale();
+    int screenWidth = (int)bounds.get_Width(), screenHeight = (int)bounds.get_Height();
+    boolean useHalfSize = (screenWidth >= 768) && iPadLikePhone;
+    float viewScale = (useHalfSize ? 2 : 1) * deviceScale;
+    if (useHalfSize) {
+      screenWidth /= 2;
+      screenHeight /= 2;
+    }
 
     // create log first so that other services can use it during initialization
     log = new IOSLog();
 
     audio = new IOSAudio();
-    graphics = new IOSGraphics(this, bounds, scale);
+    graphics = new IOSGraphics(this, screenWidth, screenHeight, viewScale, deviceScale);
     json = new JsonImpl();
     keyboard = new IOSKeyboard();
     net = new IOSNet(this);
@@ -152,7 +182,7 @@ public class IOSPlatform implements Platform {
     runQueue = new RunQueue(log);
 
     mainWindow = new UIWindow(bounds);
-    mainWindow.Add(gameView = new IOSGameView(this, bounds, scale));
+    mainWindow.Add(gameView = new IOSGameView(this, bounds, deviceScale));
 
     // configure our orientation to a supported default, a notification will come in later that
     // will adjust us to the devices current orientation

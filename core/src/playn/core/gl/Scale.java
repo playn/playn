@@ -15,6 +15,9 @@
  */
 package playn.core.gl;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import pythagoras.f.MathUtil;
 
 import playn.core.Asserts;
@@ -22,8 +25,33 @@ import playn.core.Asserts;
 /**
  * Encapsulates a scale factor, provides useful utility methods.
  */
-public class Scale
-{
+public class Scale {
+
+  /** Used by {@link #getScaledResources}. */
+  public static class ScaledResource {
+    /** The scale factor for this resource. */
+    public final Scale scale;
+
+    /**
+     * The path to the resource, including any scale factor annotation. If the scale is one, the
+     * image path is unadjusted. If the scale is greater than one, the scale is tacked onto the
+     * image path (before the extension). The scale factor will be converted to an integer per the
+     * following examples:
+     * <ul>
+     * <li> Scale factor 2: {@code foo.png} becomes {@code foo@2x.png}</li>
+     * <li> Scale factor 4: {@code foo.png} becomes {@code foo@4x.png}</li>
+     * <li> Scale factor 1.5: {@code foo.png} becomes {@code foo@15x.png}</li>
+     * <li> Scale factor 1.25: {@code foo.png} becomes {@code foo@13x.png}</li>
+     * </ul>
+     */
+    public final String path;
+
+    public ScaledResource(Scale scale, String path) {
+      this.scale = scale;
+      this.path = path;
+    }
+  }
+
   /** An unscaled scale factor singleton. */
   public static final Scale ONE = new Scale(1);
 
@@ -56,30 +84,30 @@ public class Scale
   }
 
   /**
-   * Adjusts the path of the supplied image based on our scale factor. If we have scale 1, the
-   * image path is unadjusted. If we have a non-1 scale, the scale is tacked onto the image path
-   * (before the extension). The scale factor will be converted to an integer per the following
-   * examples:
-   * <ul>
-   * <li> Scale factor 2: {@code foo.png} becomes {@code foo@2x.png}</li>
-   * <li> Scale factor 4: {@code foo.png} becomes {@code foo@4x.png}</li>
-   * <li> Scale factor 1.5: {@code foo.png} becomes {@code foo@15x.png}</li>
-   * <li> Scale factor 1.25: {@code foo.png} becomes {@code foo@13x.png}</li>
-   * </ul>
+   * Returns an ordered series of scaled resources to try when loading an asset. The highest
+   * resolution will be tried first, then half that resolution and so forth down to a normal
+   * resolution image. In general this is simply {@code 2, 1}, but on a Retina iPad, it could be
+   * {@code 4, 2, 1}.
    */
-  public String adjustImagePath(String path) {
-    int scaleFactor = (int)(factor * 10);
+  public List<ScaledResource> getScaledResources(String path) {
+    List<ScaledResource> rsrcs = new ArrayList<ScaledResource>();
+    rsrcs.add(new ScaledResource(this, computePath(path, factor)));
+    for (float rscale = factor/2; rscale > 1; rscale /= 2) {
+      rsrcs.add(new ScaledResource(new Scale(rscale), computePath(path, rscale)));
+    }
+    rsrcs.add(new ScaledResource(ONE, path));
+    return rsrcs;
+  }
+
+  private String computePath(String path, float scale) {
+    int scaleFactor = (int)(scale * 10);
     if (scaleFactor % 10 == 0)
       scaleFactor /= 10;
-    if (scaleFactor == 1) {
-      return path;
+    int didx = path.lastIndexOf(".");
+    if (didx == -1) {
+      return path; // no extension!?
     } else {
-      int didx = path.lastIndexOf(".");
-      if (didx == -1) {
-        return path; // no extension!?
-      } else {
-        return path.substring(0, didx) + "@" + scaleFactor + "x" + path.substring(didx);
-      }
+      return path.substring(0, didx) + "@" + scaleFactor + "x" + path.substring(didx);
     }
   }
 }

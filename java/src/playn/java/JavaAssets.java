@@ -88,25 +88,19 @@ public class JavaAssets extends AbstractAssets {
 
   @Override
   protected Image doGetImage(String path) {
-    try {
-      String scaledPath = graphics.ctx().scale.adjustImagePath(path);
+    Exception error = null;
+    for (Scale.ScaledResource rsrc : graphics.ctx().scale.getScaledResources(pathPrefix + path)) {
       try {
-        return graphics.createStaticImage(ImageIO.read(requireResource(pathPrefix + scaledPath)),
-                                          graphics.ctx().scale);
+        return graphics.createStaticImage(ImageIO.read(requireResource(rsrc.path)), rsrc.scale);
       } catch (FileNotFoundException fnfe) {
-        // if the scaled resource is the same as the unscaled resource, then we fail here
-        if (scaledPath.equals(path))
-          throw fnfe;
+        error = fnfe; // keep going, checking for lower resolution images
+      } catch (Exception e) {
+        error = e;
+        break; // the image was broken not missing, stop here
       }
-
-      // otherwise try falling back to the unscaled resource
-      PlayN.log().info("Could not find " + scaledPath + " falling back to " + path);
-      return graphics.createStaticImage(ImageIO.read(requireResource(pathPrefix + path)), Scale.ONE);
-
-    } catch (Exception e) {
-      PlayN.log().warn("Could not load image at " + pathPrefix + path, e);
-      return graphics.createErrorImage(e);
     }
+    PlayN.log().warn("Could not load image: " + pathPrefix + path, error);
+    return graphics.createErrorImage(error != null ? error : new FileNotFoundException(path));
   }
 
   @Override

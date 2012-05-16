@@ -122,7 +122,7 @@ public class IOSCanvas implements Canvas {
 
   @Override
   public Canvas clear() {
-    bctx.ClearRect(new RectangleF(0, 0, width, height));
+    bctx.ClearRect(new RectangleF(0, 0, texWidth, texHeight));
     isDirty = true;
     return this;
   }
