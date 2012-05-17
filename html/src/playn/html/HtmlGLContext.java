@@ -21,6 +21,7 @@ import com.google.gwt.typedarrays.client.Float32Array;
 import com.google.gwt.typedarrays.client.Int32Array;
 import com.google.gwt.typedarrays.client.Uint16Array;
 import com.google.gwt.typedarrays.client.Uint8Array;
+import com.google.gwt.webgl.client.WebGLContextAttributes;
 import com.google.gwt.webgl.client.WebGLFramebuffer;
 import com.google.gwt.webgl.client.WebGLRenderingContext;
 import com.google.gwt.webgl.client.WebGLTexture;
@@ -50,9 +51,12 @@ public class HtmlGLContext extends GLContext {
   HtmlGLContext(HtmlPlatform platform, CanvasElement canvas) throws RuntimeException {
     super(platform, 1); // no HiDPI on the interwebs
 
+    WebGLContextAttributes attrs = WebGLContextAttributes.create();
+    attrs.setAlpha(false);  // No alpha buffer for consistency with other platforms.
+
     // Try to create a context. If this returns null, then the browser doesn't support WebGL on
     // this machine.
-    this.gl = WebGLRenderingContext.getContext(canvas, null);
+    this.gl = WebGLRenderingContext.getContext(canvas, attrs);
     // Some systems seem to have a problem where they return a valid context, but it's in an error
     // state initially. We give up and fall back to Canvas in this case, because nothing seems to
     // work properly.

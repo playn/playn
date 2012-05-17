@@ -34,7 +34,7 @@ class HtmlGraphicsGL extends HtmlGraphics {
 
   private final CanvasElement canvas;
   private final HtmlGLContext ctx;
-  private final HtmlGL20 gl20;
+  private HtmlGL20 gl20;
   private final GroupLayerGL rootLayer;
 
   HtmlGraphicsGL(HtmlPlatform platform) throws RuntimeException {
@@ -42,7 +42,6 @@ class HtmlGraphicsGL extends HtmlGraphics {
     rootElement.appendChild(canvas);
     try {
       ctx = new HtmlGLContext(platform, canvas);
-      gl20 = new HtmlGL20(ctx.gl);
       rootLayer = new GroupLayerGL(ctx);
     } catch (RuntimeException re) {
       // Give up. HtmlPlatform will catch the exception and fall back to dom/canvas.
@@ -117,17 +116,24 @@ class HtmlGraphicsGL extends HtmlGraphics {
 
   @Override
   public GL20 gl20() {
+    if (gl20 == null) {
+      gl20 = new HtmlGL20(ctx.gl);
+    }
     return gl20;
   }
 
   @Override
   void preparePaint() {
-    ctx.preparePaint();
+    if (gl20 == null) {
+      ctx.preparePaint();
+    }
   }
 
   @Override
   void paintLayers() {
-    ctx.paint(rootLayer);
+    if (gl20 == null) {
+      ctx.paint(rootLayer);
+    }
   }
 
   @Override
