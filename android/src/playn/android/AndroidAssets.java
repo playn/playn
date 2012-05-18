@@ -33,6 +33,8 @@ import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import pythagoras.f.MathUtil;
+
 import playn.core.AbstractAssets;
 import playn.core.Image;
 import playn.core.ResourceCallback;
@@ -62,8 +64,6 @@ public class AndroidAssets extends AbstractAssets {
    * imagery than the device might normally. For example, one can supply scale 2 here, and
    * configure the graphics scale to 1.25 in order to use iOS Retina graphics (640x960) on a WXGA
    * (480x800) device.
-   *
-   * TODO: support scaling down the bitmaps to conserve GPU memory.
    */
   public void setAssetScale(float scaleFactor) {
     this.assetScale = new Scale(scaleFactor);
@@ -76,7 +76,19 @@ public class AndroidAssets extends AbstractAssets {
       try {
         InputStream is = openAsset(rsrc.path);
         try {
-          return new AndroidImage(platform.graphics().ctx, decodeBitmap(is), rsrc.scale);
+          Bitmap bitmap = decodeBitmap(is);
+          // if this image is at a higher scale factor than the view, scale the bitmap down to the
+          // view display factor (because otherwise the GPU will end up doing that every time the
+          // bitmap is drawn, and it will do a crappy job of it)
+          Scale viewScale = platform.graphics().ctx.scale, imageScale = rsrc.scale;
+          float viewImageRatio = viewScale.factor / imageScale.factor ;
+          if (viewImageRatio < 1) {
+            int swidth = MathUtil.iceil(viewImageRatio * bitmap.getWidth());
+            int sheight = MathUtil.iceil(viewImageRatio * bitmap.getHeight());
+            bitmap = Bitmap.createScaledBitmap(bitmap, swidth, sheight, true);
+            imageScale = viewScale;
+          }
+          return new AndroidImage(platform.graphics().ctx, bitmap, imageScale);
         } finally {
           is.close();
         }
