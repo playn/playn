@@ -54,28 +54,43 @@ class HtmlMouse extends MouseImpl {
 
     // capture mouse move anywhere on the page that fires only if we are in a drag sequence
     HtmlInput.capturePageEvent("mousemove", new EventHandler() {
+      float lastX = -1, lastY = -1;
       @Override
       public void handleEvent(NativeEvent ev) {
+        float x = HtmlInput.getRelativeX(ev, rootElement);
+        float y = HtmlInput.getRelativeY(ev, rootElement);
+        if (lastX == -1) {
+          lastX = x;
+          lastY = y;
+        }
         if (inDragSequence) {
-          float x = HtmlInput.getRelativeX(ev, rootElement);
-          float y = HtmlInput.getRelativeY(ev, rootElement);
-          if (onMouseMove(new MotionEvent.Impl(PlayN.currentTime(), x, y)))
+          if (onMouseMove(new MotionEvent.Impl(PlayN.currentTime(), x, y, x - lastX, y - lastY)))
             ev.preventDefault();
         }
+        lastX = x;
+        lastY = y;
       }
     });
 
     // capture mouse move on the root element that fires only if we are not in a drag sequence
     // (the page-level event listener will handle the firing when we are in a drag sequence)
     HtmlInput.captureEvent(rootElement, "mousemove", new EventHandler() {
+      float lastX = -1, lastY = -1;
       @Override
       public void handleEvent(NativeEvent ev) {
+        float x = HtmlInput.getRelativeX(ev, rootElement);
+        float y = HtmlInput.getRelativeY(ev, rootElement);
+        if (lastX == -1) {
+          lastX = x;
+          lastY = y;
+        }
+
         if (!inDragSequence) {
-          float x = HtmlInput.getRelativeX(ev, rootElement);
-          float y = HtmlInput.getRelativeY(ev, rootElement);
-          if (onMouseMove(new MotionEvent.Impl(PlayN.currentTime(), x, y)))
+          if (onMouseMove(new MotionEvent.Impl(PlayN.currentTime(), x, y, x - lastX, y - lastY)))
             ev.preventDefault();
         }
+        lastX = x;
+        lastY = y;
       }
     });
 
@@ -149,5 +164,23 @@ class HtmlMouse extends MouseImpl {
     case (NativeEvent.BUTTON_RIGHT):  return BUTTON_RIGHT;
     default:                          return evt.getButton();
     }
+  }
+
+  @Override
+  public void lock() {
+  }
+
+  @Override
+  public void unlock() {
+  }
+
+  @Override
+  public boolean isLocked() {
+    return false;
+  }
+
+  @Override
+  public boolean isLockSupported() {
+    return false;
   }
 }
