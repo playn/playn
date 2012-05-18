@@ -43,11 +43,19 @@ class FlashMouse extends MouseImpl {
       }
     });
     FlashPlatform.captureEvent(Sprite.MOUSEMOVE, new EventHandler<MouseEvent>() {
+      float lastX = -1, lastY = -1;
       @Override
       public void handleEvent(MouseEvent nativeEvent) {
         float x = nativeEvent.getStageX(), y = nativeEvent.getStageY();
-        if (onMouseMove(new MotionEvent.Impl(PlayN.currentTime(), x, y)))
+        if (lastX == -1) {
+          lastX = x;
+          lastY = y;
+        }
+        if (onMouseMove(new MotionEvent.Impl(PlayN.currentTime(), x, y, x - lastX, y - lastY))) {
           nativeEvent.preventDefault();
+        }
+        lastX = x;
+        lastY = y;
       }
     });
   }
@@ -63,5 +71,23 @@ class FlashMouse extends MouseImpl {
 //    } else {
 //      return BUTTON_RIGHT;
 //    }
+  }
+
+  @Override
+  public void lock() {
+  }
+
+  @Override
+  public void unlock() {
+  }
+
+  @Override
+  public boolean isLocked() {
+    return false;
+  }
+
+  @Override
+  public boolean isLockSupported() {
+    return false;
   }
 }
