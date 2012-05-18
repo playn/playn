@@ -78,21 +78,43 @@ public interface Mouse {
 
   /** An event dispatched when the mouse is moved. */
   interface MotionEvent extends Events.Position {
-    // nothing currently here, for future compatibility
+    /**
+     * The x-coordinate associated with this event.
+     */
+    float dx();
+
+    /**
+     * The y-coordinate associated with this event.
+     */
+    float dy();
 
     class Impl extends Events.Position.Impl implements MotionEvent {
-      public Impl(double time, float x, float y) {
+      private final float dx, dy;
+
+      public Impl(double time, float x, float y, float dx, float dy) {
         super(time, x, y);
+        this.dx = dx;
+        this.dy = dy;
+      }
+      
+      public float dx() {
+        return dx;
+      }
+      
+      public float dy() {
+        return dy;
       }
 
       /** Creates a copy of this event with local x and y in the supplied layer's coord system. */
       public MotionEvent.Impl localize(Layer layer) {
         Point local = Layer.Util.screenToLayer(layer, x(), y());
-        return new MotionEvent.Impl(time(), x(), y(), local.x, local.y);
+        return new MotionEvent.Impl(time(), x(), y(), dx(), dy(), local.x, local.y);
       }
 
-      protected Impl(double time, float x, float y, float localX, float localY) {
+      protected Impl(double time, float x, float y, float dx, float dy, float localX, float localY) {
         super(time, x, y, localX, localY);
+        this.dx = dx;
+        this.dy = dy;
       }
 
       @Override
@@ -209,4 +231,24 @@ public interface Mouse {
    * <code>null</code> will cause mouse events to stop being fired.
    */
   void setListener(Listener listener);
+ /**
+   * Lock the mouse, i.e. receive mouse events even when the mouse pointer leaves the window.
+   */
+  void lock();
+
+  /**
+   * Unlock the mouse.
+   */
+  void unlock();
+
+  /**
+   * True if the mouse is locked.
+   */
+  boolean isLocked();
+  
+  /**
+   * True if lock has a chance of success on this platform (the user may still block it, or
+   * detection may be broken for some browsers). 
+   */
+  boolean isLockSupported();
 }

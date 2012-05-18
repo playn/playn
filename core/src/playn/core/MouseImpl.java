@@ -20,7 +20,7 @@ import pythagoras.f.Point;
 /**
  * Handles the common logic for all platform {@link Mouse} implementations.
  */
-public class MouseImpl implements Mouse {
+public abstract class MouseImpl implements Mouse {
 
   private Listener listener;
   private AbstractLayer activeLayer;

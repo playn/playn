@@ -29,4 +29,22 @@ public class MouseStub implements Mouse {
   public void setListener(Listener listener) {
     // noop!
   }
+
+  @Override
+  public void lock() {
+  }
+
+  @Override
+  public void unlock() {
+  }
+
+  @Override
+  public boolean isLocked() {
+    return false;
+  }
+
+  @Override
+  public boolean isLockSupported() {
+    return false;
+  }
 }
