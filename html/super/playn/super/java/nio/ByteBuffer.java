@@ -29,7 +29,7 @@ import java.nio.ByteOrder;
  * </ul>
  */
 public abstract class ByteBuffer extends Buffer implements Comparable<ByteBuffer> {
-
+  
     /** Creates a byte buffer based on a newly allocated byte array.
      *
      * @param capacity the capacity of the new buffer
@@ -56,7 +56,7 @@ public abstract class ByteBuffer extends Buffer implements Comparable<ByteBuffer
     }
 
     /** The byte order of this buffer, default is {@code BIG_ENDIAN}. */
-    Endianness order = Endianness.BIG_ENDIAN;
+    ByteOrder order = ByteOrder.BIG_ENDIAN;
 
     /** Constructs a {@code ByteBuffer} with given capacity.
      *
@@ -449,7 +449,7 @@ public abstract class ByteBuffer extends Buffer implements Comparable<ByteBuffer
      * @return the byte order used by this buffer when converting bytes from/to other primitive types.
      */
     public final ByteOrder order () {
-        return order == Endianness.BIG_ENDIAN ? ByteOrder.BIG_ENDIAN : ByteOrder.LITTLE_ENDIAN;
+        return order;
     }
 
     /** Sets the byte order of this buffer.
@@ -460,11 +460,7 @@ public abstract class ByteBuffer extends Buffer implements Comparable<ByteBuffer
      * @see ByteOrder
      */
     public final ByteBuffer order (ByteOrder byteOrder) {
-        return orderImpl(byteOrder);
-    }
-
-    ByteBuffer orderImpl (ByteOrder byteOrder) {
-        order = byteOrder == ByteOrder.BIG_ENDIAN ? Endianness.BIG_ENDIAN : Endianness.LITTLE_ENDIAN;
+        order = byteOrder;
         return this;
     }
 

@@ -28,7 +28,7 @@ import com.google.gwt.typedarrays.client.Int8Array;
  * classes. </p>
  * <p> All methods are marked final for runtime performance. </p>
  */
-abstract class DirectByteBuffer extends BaseByteBuffer implements playn.html.HasArrayBufferView {
+abstract class DirectByteBuffer extends ByteBuffer implements playn.html.HasArrayBufferView {
 
     Int8Array byteArray;
 
@@ -168,7 +168,7 @@ abstract class DirectByteBuffer extends BaseByteBuffer implements playn.html.Has
 
     protected final int loadInt (int baseOffset) {
         int bytes = 0;
-        if (order == Endianness.BIG_ENDIAN) {
+        if (order == ByteOrder.BIG_ENDIAN) {
             for (int i = 0; i < 4; i++) {
                 bytes = bytes << 8;
                 bytes = bytes | (byteArray.get(baseOffset + i) & 0xFF);
@@ -184,7 +184,7 @@ abstract class DirectByteBuffer extends BaseByteBuffer implements playn.html.Has
 
     protected final long loadLong (int baseOffset) {
         long bytes = 0;
-        if (order == Endianness.BIG_ENDIAN) {
+        if (order == ByteOrder.BIG_ENDIAN) {
             for (int i = 0; i < 8; i++) {
                 bytes = bytes << 8;
                 bytes = bytes | (byteArray.get(baseOffset + i) & 0xFF);
@@ -200,7 +200,7 @@ abstract class DirectByteBuffer extends BaseByteBuffer implements playn.html.Has
 
     protected final short loadShort (int baseOffset) {
         short bytes = 0;
-        if (order == Endianness.BIG_ENDIAN) {
+        if (order == ByteOrder.BIG_ENDIAN) {
             bytes = (short)(byteArray.get(baseOffset) << 8);
             bytes |= (byteArray.get(baseOffset + 1) & 0xFF);
         } else {
@@ -211,7 +211,7 @@ abstract class DirectByteBuffer extends BaseByteBuffer implements playn.html.Has
     }
 
     protected final void store (int baseOffset, int value) {
-        if (order == Endianness.BIG_ENDIAN) {
+        if (order == ByteOrder.BIG_ENDIAN) {
             for (int i = 3; i >= 0; i--) {
                 byteArray.set(baseOffset + i, (byte)(value & 0xFF));
                 value = value >> 8;
@@ -225,7 +225,7 @@ abstract class DirectByteBuffer extends BaseByteBuffer implements playn.html.Has
     }
 
     protected final void store (int baseOffset, long value) {
-        if (order == Endianness.BIG_ENDIAN) {
+        if (order == ByteOrder.BIG_ENDIAN) {
             for (int i = 7; i >= 0; i--) {
                 byteArray.set(baseOffset + i, (byte)(value & 0xFF));
                 value = value >> 8;
@@ -239,12 +239,28 @@ abstract class DirectByteBuffer extends BaseByteBuffer implements playn.html.Has
     }
 
     protected final void store (int baseOffset, short value) {
-        if (order == Endianness.BIG_ENDIAN) {
+        if (order == ByteOrder.BIG_ENDIAN) {
             byteArray.set(baseOffset, (byte)((value >> 8) & 0xFF));
             byteArray.set(baseOffset + 1, (byte)(value & 0xFF));
         } else {
             byteArray.set(baseOffset + 1, (byte)((value >> 8) & 0xFF));
             byteArray.set(baseOffset, (byte)(value & 0xFF));
         }
+    }
+    
+    public final char getChar () {
+      return (char)getShort();
+    }
+
+    public final char getChar (int index) {
+      return (char)getShort(index);
+       }
+
+    public final ByteBuffer putChar (char value) {
+      return putShort((short)value);
+    }
+
+    public final ByteBuffer putChar (int index, char value) {
+      return putShort(index, (short)value);
     }
 }
