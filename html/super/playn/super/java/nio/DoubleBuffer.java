@@ -17,6 +17,9 @@
 
 package java.nio;
 
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+
 /** A buffer of doubles.
  * <p> A double buffer can be created in either one of the following ways: </p>
  * <ul>
@@ -28,53 +31,20 @@ package java.nio;
  */
 public abstract class DoubleBuffer extends Buffer implements Comparable<DoubleBuffer> {
 
-    /** Creates a double buffer based on a newly allocated double array.
-     *
-     * @param capacity the capacity of the new buffer.
-     * @return the created double buffer.
-     * @throws IllegalArgumentException if {@code capacity} is less than zero.
-     */
-    public static DoubleBuffer allocate (int capacity) {
-        if (capacity < 0) {
-            throw new IllegalArgumentException();
-        }
-        return BufferFactory.newDoubleBuffer(capacity);
-    }
-
-    /** Creates a new double buffer by wrapping the given double array.
-     * <p>
-     * Calling this method has the same effect as {@code wrap(array, 0, array.length)}.
-     * </p>
-     *
-     * @param array the double array which the new buffer will be based on.
-     * @return the created double buffer.
-     */
-    public static DoubleBuffer wrap (double[] array) {
-        return wrap(array, 0, array.length);
-    }
-
-    /** Creates a new double buffer by wrapping the given double array.
-     * <p> The new buffer's position will be {@code start}, limit will be {@code start + len},
-     * capacity will be the length of the array. </p>
-     *
-     * @param array the double array which the new buffer will be based on.
-     * @param start the start index, must not be negative and not greater than {@code array.length}.
-     * @param len the length, must not be negative and not greater than {@code array.length - start}.
-     * @return the created double buffer.
-     * @exception IndexOutOfBoundsException if either {@code start} or {@code len} is invalid.
-     */
-    public static DoubleBuffer wrap (double[] array, int start, int len) {
-        int length = array.length;
-        if (start < 0 || len < 0 || (long)start + (long)len > length) {
-            throw new IndexOutOfBoundsException();
-        }
-
-        DoubleBuffer buf = BufferFactory.newDoubleBuffer(array);
-        buf.position = start;
-        buf.limit = start + len;
-
-        return buf;
-    }
+//    /** Creates a double buffer based on a newly allocated double array.
+//     *
+//     * @param capacity the capacity of the new buffer.
+//     * @return the created double buffer.
+//     * @throws IllegalArgumentException if {@code capacity} is less than zero.
+//     */
+//    public static DoubleBuffer allocate (int capacity) {
+//        if (capacity < 0) {
+//            throw new IllegalArgumentException();
+//        }
+//        ByteBuffer bb = ByteBuffer.allocateDirect(capacity * 8);
+//        bb.order(ByteOrder.nativeOrder());
+//        return bb.asDoubleBuffer();
+//    }
 
     /** Constructs a {@code DoubleBuffer} with given capacity.
      *

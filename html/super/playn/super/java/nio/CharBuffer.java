@@ -18,6 +18,8 @@
 package java.nio;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 
 /** A buffer of chars.
  * <p> A char buffer can be created in either one of the following ways: </p>
@@ -32,90 +34,20 @@ import java.io.IOException;
 public abstract class CharBuffer extends Buffer
   implements Comparable<CharBuffer>, CharSequence, Appendable {// , Readable {
 
-    /** Creates a char buffer based on a newly allocated char array.
-     *
-     * @param capacity the capacity of the new buffer.
-     * @return the created char buffer.
-     * @throws IllegalArgumentException if {@code capacity} is less than zero.
-     */
-    public static CharBuffer allocate (int capacity) {
-        if (capacity < 0) {
-            throw new IllegalArgumentException();
-        }
-        return BufferFactory.newCharBuffer(capacity);
-    }
-
-    /** Creates a new char buffer by wrapping the given char array.
-     * <p>
-     * Calling this method has the same effect as {@code wrap(array, 0, array.length)}.
-     * </p>
-     *
-     * @param array the char array which the new buffer will be based on.
-     * @return the created char buffer.
-     */
-    public static CharBuffer wrap (char[] array) {
-        return wrap(array, 0, array.length);
-    }
-
-    /** Creates a new char buffer by wrapping the given char array.
-     * <p> The new buffer's position will be {@code start}, limit will be {@code start + len},
-     * capacity will be the length of the array. </p>
-     *
-     * @param array the char array which the new buffer will be based on.
-     * @param start the start index, must not be negative and not greater than {@code array.length}.
-     * @param len the length, must not be negative and not greater than {@code array.length - start}.
-     * @return the created char buffer.
-     * @exception IndexOutOfBoundsException if either {@code start} or {@code len} is invalid.
-     */
-    public static CharBuffer wrap (char[] array, int start, int len) {
-        int length = array.length;
-        if ((start < 0) || (len < 0) || (long)start + (long)len > length) {
-            throw new IndexOutOfBoundsException();
-        }
-
-        CharBuffer buf = BufferFactory.newCharBuffer(array);
-        buf.position = start;
-        buf.limit = start + len;
-
-        return buf;
-    }
-
-    /** Creates a new char buffer by wrapping the given char sequence.
-     * <p>
-     * Calling this method has the same effect as {@code wrap(chseq, 0, chseq.length())}.
-     * </p>
-     *
-     * @param chseq the char sequence which the new buffer will be based on.
-     * @return the created char buffer.
-     */
-    public static CharBuffer wrap (CharSequence chseq) {
-        return BufferFactory.newCharBuffer(chseq);
-    }
-
-    /** Creates a new char buffer by wrapping the given char sequence.
-     * <p> The new buffer's position will be {@code start}, limit will be {@code end}, capacity
-     * will be the length of the char sequence. The new buffer is read-only. </p>
-     *
-     * @param chseq the char sequence which the new buffer will be based on.
-     * @param start the start index, must not be negative and not greater than {@code chseq.length()}.
-     * @param end the end index, must be no less than {@code start} and no greater than {@code
-     * chseq.length()}.
-     * @return the created char buffer.
-     * @exception IndexOutOfBoundsException if either {@code start} or {@code end} is invalid.
-     */
-    public static CharBuffer wrap (CharSequence chseq, int start, int end) {
-        if (chseq == null) {
-            throw new NullPointerException();
-        }
-        if (start < 0 || end < start || end > chseq.length()) {
-            throw new IndexOutOfBoundsException();
-        }
-
-        CharBuffer result = BufferFactory.newCharBuffer(chseq);
-        result.position = start;
-        result.limit = end;
-        return result;
-    }
+//    /** Creates a char buffer based on a newly allocated char array.
+//     *
+//     * @param capacity the capacity of the new buffer.
+//     * @return the created char buffer.
+//     * @throws IllegalArgumentException if {@code capacity} is less than zero.
+//     */
+//    public static CharBuffer allocate (int capacity) {
+//        if (capacity < 0) {
+//            throw new IllegalArgumentException();
+//        }
+//        ByteBuffer bb = ByteBuffer.allocateDirect(capacity * 2);
+//        bb.order(ByteOrder.nativeOrder());
+//        return bb.asCharBuffer();
+//    }
 
     /** Constructs a {@code CharBuffer} with given capacity.
      *

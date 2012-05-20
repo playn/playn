@@ -17,6 +17,8 @@
 
 package java.nio;
 
+import java.nio.ByteOrder;
+
 /** A buffer for bytes.
  * <p> A byte buffer can be created in either one of the following ways: </p>
  * <ul>
@@ -35,10 +37,9 @@ public abstract class ByteBuffer extends Buffer implements Comparable<ByteBuffer
      * @throws IllegalArgumentException if {@code capacity < 0}.
      */
     public static ByteBuffer allocate (int capacity) {
-        if (capacity < 0) {
-            throw new IllegalArgumentException();
-        }
-        return BufferFactory.newByteBuffer(capacity);
+        ByteBuffer result = allocateDirect(capacity);
+        result.order(ByteOrder.nativeOrder());
+        return result;
     }
 
     /** Creates a direct byte buffer based on a newly allocated memory block.
@@ -51,42 +52,7 @@ public abstract class ByteBuffer extends Buffer implements Comparable<ByteBuffer
         if (capacity < 0) {
             throw new IllegalArgumentException();
         }
-        return BufferFactory.newDirectByteBuffer(capacity);
-    }
-
-    /** Creates a new byte buffer by wrapping the given byte array.
-     * <p>
-     * Calling this method has the same effect as {@code wrap(array, 0, array.length)}.
-     * </p>
-     *
-     * @param array the byte array which the new buffer will be based on
-     * @return the created byte buffer.
-     */
-    public static ByteBuffer wrap (byte[] array) {
-        return BufferFactory.newByteBuffer(array);
-    }
-
-    /** Creates a new byte buffer by wrapping the given byte array.
-     * <p> The new buffer's position will be {@code start}, limit will be {@code start + len},
-     * capacity will be the length of the array. </p>
-     *
-     * @param array the byte array which the new buffer will be based on.
-     * @param start the start index, must not be negative and not greater than {@code array.length}.
-     * @param len the length, must not be negative and not greater than {@code array.length - start}.
-     * @return the created byte buffer.
-     * @exception IndexOutOfBoundsException if either {@code start} or {@code len} is invalid.
-     */
-    public static ByteBuffer wrap (byte[] array, int start, int len) {
-        int length = array.length;
-        if ((start < 0) || (len < 0) || ((long)start + (long)len > length)) {
-            throw new IndexOutOfBoundsException();
-        }
-
-        ByteBuffer buf = BufferFactory.newByteBuffer(array);
-        buf.position = start;
-        buf.limit = start + len;
-
-        return buf;
+        return new DirectReadWriteByteBuffer(capacity);
     }
 
     /** The byte order of this buffer, default is {@code BIG_ENDIAN}. */
@@ -122,31 +88,31 @@ public abstract class ByteBuffer extends Buffer implements Comparable<ByteBuffer
         return protectedArrayOffset();
     }
 
-    /** Returns a char buffer which is based on the remaining content of this byte buffer.
-     * <p> The new buffer's position is zero, its limit and capacity is the number of remaining
-     * bytes divided by two, and its mark is not set. The new buffer's read-only property and byte
-     * order are the same as this buffer's. The new buffer is direct if this byte buffer is direct.
-     * </p>
-     * <p> The new buffer shares its content with this buffer, which means either buffer's change
-     * of content will be visible to the other. The two buffer's position, limit and mark are
-     * independent. </p>
-     *
-     * @return a char buffer which is based on the content of this byte buffer.
-     */
-    public abstract CharBuffer asCharBuffer ();
-
-    /** Returns a double buffer which is based on the remaining content of this byte buffer.
-     * <p> The new buffer's position is zero, its limit and capacity is the number of remaining
-     * bytes divided by eight, and its mark is not set. The new buffer's read-only property and
-     * byte order are the same as this buffer's. The new buffer is direct if this byte buffer is
-     * direct. </p>
-     * <p> The new buffer shares its content with this buffer, which means either buffer's change
-     * of content will be visible to the other. The two buffer's position, limit and mark are
-     * independent. </p>
-     *
-     * @return a double buffer which is based on the content of this byte buffer.
-     */
-    public abstract DoubleBuffer asDoubleBuffer ();
+//    /** Returns a char buffer which is based on the remaining content of this byte buffer.
+//     * <p> The new buffer's position is zero, its limit and capacity is the number of remaining
+//     * bytes divided by two, and its mark is not set. The new buffer's read-only property and byte
+//     * order are the same as this buffer's. The new buffer is direct if this byte buffer is direct.
+//     * </p>
+//     * <p> The new buffer shares its content with this buffer, which means either buffer's change
+//     * of content will be visible to the other. The two buffer's position, limit and mark are
+//     * independent. </p>
+//     *
+//     * @return a char buffer which is based on the content of this byte buffer.
+//     */
+//    public abstract CharBuffer asCharBuffer ();
+//
+//    /** Returns a double buffer which is based on the remaining content of this byte buffer.
+//     * <p> The new buffer's position is zero, its limit and capacity is the number of remaining
+//     * bytes divided by eight, and its mark is not set. The new buffer's read-only property and
+//     * byte order are the same as this buffer's. The new buffer is direct if this byte buffer is
+//     * direct. </p>
+//     * <p> The new buffer shares its content with this buffer, which means either buffer's change
+//     * of content will be visible to the other. The two buffer's position, limit and mark are
+//     * independent. </p>
+//     *
+//     * @return a double buffer which is based on the content of this byte buffer.
+//     */
+//    public abstract DoubleBuffer asDoubleBuffer ();
 
     /** Returns a float buffer which is based on the remaining content of this byte buffer.
      * <p> The new buffer's position is zero, its limit and capacity is the number of remaining
@@ -174,30 +140,18 @@ public abstract class ByteBuffer extends Buffer implements Comparable<ByteBuffer
      */
     public abstract IntBuffer asIntBuffer ();
 
-    /** Returns a long buffer which is based on the remaining content of this byte buffer.
-     * <p> The new buffer's position is zero, its limit and capacity is the number of remaining
-     * bytes divided by eight, and its mark is not set. The new buffer's read-only property and
-     * byte order are the same as this buffer's. The new buffer is direct if this byte buffer is
-     * direct. </p>
-     * <p> The new buffer shares its content with this buffer, which means either buffer's change
-     * of content will be visible to the other. The two buffer's position, limit and mark are
-     * independent. </p>
-     *
-     * @return a long buffer which is based on the content of this byte buffer.
-     */
-    public abstract LongBuffer asLongBuffer ();
-
-    /** Returns a read-only buffer that shares its content with this buffer.
-     * <p> The returned buffer is guaranteed to be a new instance, even if this buffer is read-only
-     * itself. The new buffer's position, limit, capacity and mark are the same as this buffer.
-     * </p>
-     * <p> The new buffer shares its content with this buffer, which means this buffer's change of
-     * content will be visible to the new buffer. The two buffer's position, limit and mark are
-     * independent. </p>
-     *
-     * @return a read-only version of this buffer.
-     */
-    public abstract ByteBuffer asReadOnlyBuffer ();
+//    /** Returns a long buffer which is based on the remaining content of this byte buffer.
+//     * <p> The new buffer's position is zero, its limit and capacity is the number of remaining
+//     * bytes divided by eight, and its mark is not set. The new buffer's read-only property and
+//     * byte order are the same as this buffer's. The new buffer is direct if this byte buffer is
+//     * direct. </p>
+//     * <p> The new buffer shares its content with this buffer, which means either buffer's change
+//     * of content will be visible to the other. The two buffer's position, limit and mark are
+//     * independent. </p>
+//     *
+//     * @return a long buffer which is based on the content of this byte buffer.
+//     */
+//    public abstract LongBuffer asLongBuffer ();
 
     /** Returns a short buffer which is based on the remaining content of this byte buffer.
      * <p> The new buffer's position is zero, its limit and capacity is the number of remaining

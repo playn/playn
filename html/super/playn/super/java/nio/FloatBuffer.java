@@ -17,6 +17,9 @@
 
 package java.nio;
 
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+
 /** A buffer of floats.
  * <p>
  * A float buffer can be created in either of the following ways:
@@ -39,45 +42,9 @@ public abstract class FloatBuffer extends Buffer implements Comparable<FloatBuff
         if (capacity < 0) {
             throw new IllegalArgumentException();
         }
-        return BufferFactory.newFloatBuffer(capacity);
-    }
-
-    /** Creates a new float buffer by wrapping the given float array.
-     * <p>
-     * Calling this method has the same effect as {@code wrap(array, 0, array.length)}.
-     * </p>
-     *
-     * @param array the float array which the new buffer will be based on.
-     * @return the created float buffer.
-     */
-    public static FloatBuffer wrap (float[] array) {
-        return wrap(array, 0, array.length);
-    }
-
-    /** Creates a new float buffer by wrapping the given float array.
-     * <p> The new buffer's position will be {@code start}, limit will be {@code start + len},
-     * capacity will be the length of the array. </p>
-     *
-     * @param array the float array which the new buffer will be based on.
-     * @param start the start index, must not be negative and not greater than {@code array.length}.
-     * @param len the length, must not be negative and not greater than {@code array.length - start}.
-     * @return the created float buffer.
-     * @exception IndexOutOfBoundsException if either {@code start} or {@code len} is invalid.
-     * @exception NullPointerException if {@code array} is null.
-     */
-    public static FloatBuffer wrap (float[] array, int start, int len) {
-        if (array == null) {
-            throw new NullPointerException();
-        }
-        if (start < 0 || len < 0 || (long)start + (long)len > array.length) {
-            throw new IndexOutOfBoundsException();
-        }
-
-        FloatBuffer buf = BufferFactory.newFloatBuffer(array);
-        buf.position = start;
-        buf.limit = start + len;
-
-        return buf;
+        ByteBuffer bb = ByteBuffer.allocateDirect(capacity * 4);
+        bb.order(ByteOrder.nativeOrder());
+        return bb.asFloatBuffer();
     }
 
     /** Constructs a {@code FloatBuffer} with given capacity.
@@ -109,18 +76,6 @@ public abstract class FloatBuffer extends Buffer implements Comparable<FloatBuff
     public final int arrayOffset () {
         return protectedArrayOffset();
     }
-
-    /** Returns a read-only buffer that shares its content with this buffer.
-     * <p> The returned buffer is guaranteed to be a new instance, even if this buffer is read-only
-     * itself. The new buffer's position, limit, capacity and mark are the same as this buffer.
-     * </p>
-     * <p> The new buffer shares its content with this buffer, which means this buffer's change of
-     * content will be visible to the new buffer. The two buffer's position, limit and mark are
-     * independent. </p>
-     *
-     * @return a read-only version of this buffer.
-     */
-    public abstract FloatBuffer asReadOnlyBuffer ();
 
     /** Compacts this float buffer.
      * <p> The remaining floats will be moved to the head of the buffer, starting from position

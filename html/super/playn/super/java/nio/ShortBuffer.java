@@ -17,6 +17,9 @@
 
 package java.nio;
 
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+
 /** A buffer of shorts.
  * <p> A short buffer can be created in either of the following ways: </p>
  * <ul>
@@ -38,45 +41,11 @@ public abstract class ShortBuffer extends Buffer implements Comparable<ShortBuff
         if (capacity < 0) {
             throw new IllegalArgumentException();
         }
-        return BufferFactory.newShortBuffer(capacity);
+        ByteBuffer bb = ByteBuffer.allocateDirect(capacity * 2);
+        bb.order(ByteOrder.nativeOrder());
+        return bb.asShortBuffer();
     }
 
-    /** Creates a new short buffer by wrapping the given short array.
-     * <p>
-     * Calling this method has the same effect as {@code wrap(array, 0, array.length)}.
-     * </p>
-     *
-     * @param array the short array which the new buffer will be based on.
-     * @return the created short buffer.
-     */
-    public static ShortBuffer wrap (short[] array) {
-        return wrap(array, 0, array.length);
-    }
-
-    /** Creates a new short buffer by wrapping the given short array.
-     * <p> The new buffer's position will be {@code start}, limit will be {@code start + len},
-     * capacity will be the length of the array. </p>
-     *
-     * @param array the short array which the new buffer will be based on.
-     * @param start the start index, must not be negative and not greater than {@code array.length}.
-     * @param len the length, must not be negative and not greater than {@code array.length - start}.
-     * @return the created short buffer.
-     * @exception IndexOutOfBoundsException if either {@code start} or {@code len} is invalid.
-     */
-    public static ShortBuffer wrap (short[] array, int start, int len) {
-        if (array == null) {
-            throw new NullPointerException();
-        }
-        if (start < 0 || len < 0 || (long)start + (long)len > array.length) {
-            throw new IndexOutOfBoundsException();
-        }
-
-        ShortBuffer buf = BufferFactory.newShortBuffer(array);
-        buf.position = start;
-        buf.limit = start + len;
-
-        return buf;
-    }
 
     /** Constructs a {@code ShortBuffer} with given capacity.
      *

@@ -16,6 +16,8 @@
 
 package java.nio;
 
+import java.nio.ByteOrder;
+
 import com.google.gwt.typedarrays.client.ArrayBuffer;
 
 /**
@@ -54,17 +56,17 @@ final class DirectReadWriteByteBuffer extends DirectByteBuffer {
     }
 
     public IntBuffer asIntBuffer () {
-        return order() == ByteOrder.nativeOrder() ?
-          DirectReadWriteIntBufferAdapter.wrap(this) : super.asIntBuffer();
+        if (order() != ByteOrder.nativeOrder()) {
+          throw new RuntimeException("Native order supported only.");
+        }
+        return DirectReadWriteIntBufferAdapter.wrap(this);
     }
 
     public ShortBuffer asShortBuffer () {
-        return order() == ByteOrder.nativeOrder() ?
-          DirectReadWriteShortBufferAdapter.wrap(this) : super.asShortBuffer();
-    }
-
-    public ByteBuffer asReadOnlyBuffer () {
-        return DirectReadOnlyByteBuffer.copy(this, mark);
+      if (order() != ByteOrder.nativeOrder()) {
+        throw new RuntimeException("Native order supported only.");
+      }
+      return DirectReadWriteShortBufferAdapter.wrap(this);
     }
 
     public ByteBuffer compact () {

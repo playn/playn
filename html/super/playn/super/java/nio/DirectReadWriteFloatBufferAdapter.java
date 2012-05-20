@@ -48,16 +48,6 @@ final class DirectReadWriteFloatBufferAdapter extends FloatBuffer
           byteBuffer.byteArray.getBuffer(), byteBuffer.byteArray.getByteOffset(), capacity);
     }
 
-    // TODO(haustein) This will be slow
-    @Override
-    public FloatBuffer asReadOnlyBuffer () {
-        DirectReadOnlyFloatBufferAdapter buf = new DirectReadOnlyFloatBufferAdapter(byteBuffer);
-        buf.limit = limit;
-        buf.position = position;
-        buf.mark = mark;
-        return buf;
-    }
-
     @Override
     public FloatBuffer compact () {
         byteBuffer.limit(limit << 2);
