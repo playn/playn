@@ -116,16 +116,9 @@ abstract class DirectByteBuffer extends ByteBuffer implements playn.html.HasArra
 // if (newPosition > limit) {
 // throw new BufferUnderflowException();
 // }
-        int result = loadInt(position);
+        int result = getInt(position);
         position = newPosition;
         return result;
-    }
-
-    public final int getInt (int index) {
-// if (index < 0 || index + 4 > limit) {
-// throw new IndexOutOfBoundsException();
-// }
-        return loadInt(index);
     }
 
     public final long getLong () {
@@ -133,40 +126,27 @@ abstract class DirectByteBuffer extends ByteBuffer implements playn.html.HasArra
 // if (newPosition > limit) {
 // throw new BufferUnderflowException();
 // }
-        long result = loadLong(position);
+        long result = getLong(position);
         position = newPosition;
         return result;
     }
 
-    public final long getLong (int index) {
-// if (index < 0 || index + 8 > limit) {
-// throw new IndexOutOfBoundsException();
-// }
-        return loadLong(index);
-    }
 
     public final short getShort () {
         int newPosition = position + 2;
 // if (newPosition > limit) {
 // throw new BufferUnderflowException();
 // }
-        short result = loadShort(position);
+        short result = getShort(position);
         position = newPosition;
         return result;
-    }
-
-    public final short getShort (int index) {
-// if (index < 0 || index + 2 > limit) {
-// throw new IndexOutOfBoundsException();
-// }
-        return loadShort(index);
     }
 
     public final boolean isDirect () {
         return false;
     }
 
-    protected final int loadInt (int baseOffset) {
+    public final int getInt (int baseOffset) {
         int bytes = 0;
         if (order == ByteOrder.BIG_ENDIAN) {
             for (int i = 0; i < 4; i++) {
@@ -182,7 +162,7 @@ abstract class DirectByteBuffer extends ByteBuffer implements playn.html.HasArra
         return bytes;
     }
 
-    protected final long loadLong (int baseOffset) {
+    public final long getLong (int baseOffset) {
         long bytes = 0;
         if (order == ByteOrder.BIG_ENDIAN) {
             for (int i = 0; i < 8; i++) {
@@ -198,7 +178,7 @@ abstract class DirectByteBuffer extends ByteBuffer implements playn.html.HasArra
         return bytes;
     }
 
-    protected final short loadShort (int baseOffset) {
+    public final short getShort (int baseOffset) {
         short bytes = 0;
         if (order == ByteOrder.BIG_ENDIAN) {
             bytes = (short)(byteArray.get(baseOffset) << 8);
@@ -210,7 +190,7 @@ abstract class DirectByteBuffer extends ByteBuffer implements playn.html.HasArra
         return bytes;
     }
 
-    protected final void store (int baseOffset, int value) {
+    public final ByteBuffer putInt (int baseOffset, int value) {
         if (order == ByteOrder.BIG_ENDIAN) {
             for (int i = 3; i >= 0; i--) {
                 byteArray.set(baseOffset + i, (byte)(value & 0xFF));
@@ -222,9 +202,10 @@ abstract class DirectByteBuffer extends ByteBuffer implements playn.html.HasArra
                 value = value >> 8;
             }
         }
+        return this;
     }
 
-    protected final void store (int baseOffset, long value) {
+    public final ByteBuffer putLong (int baseOffset, long value) {
         if (order == ByteOrder.BIG_ENDIAN) {
             for (int i = 7; i >= 0; i--) {
                 byteArray.set(baseOffset + i, (byte)(value & 0xFF));
@@ -236,9 +217,10 @@ abstract class DirectByteBuffer extends ByteBuffer implements playn.html.HasArra
                 value = value >> 8;
             }
         }
+        return this;
     }
 
-    protected final void store (int baseOffset, short value) {
+    public final ByteBuffer putShort(int baseOffset, short value) {
         if (order == ByteOrder.BIG_ENDIAN) {
             byteArray.set(baseOffset, (byte)((value >> 8) & 0xFF));
             byteArray.set(baseOffset + 1, (byte)(value & 0xFF));
@@ -246,6 +228,7 @@ abstract class DirectByteBuffer extends ByteBuffer implements playn.html.HasArra
             byteArray.set(baseOffset + 1, (byte)((value >> 8) & 0xFF));
             byteArray.set(baseOffset, (byte)(value & 0xFF));
         }
+        return this;
     }
     
     public final char getChar () {
