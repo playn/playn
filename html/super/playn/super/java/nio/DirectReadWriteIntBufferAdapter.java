@@ -32,29 +32,19 @@ import com.google.gwt.typedarrays.client.Int32Array;
 final class DirectReadWriteIntBufferAdapter extends IntBuffer
   implements playn.html.HasArrayBufferView {
 
-    static IntBuffer wrap (DirectReadWriteByteBuffer byteBuffer) {
-        return new DirectReadWriteIntBufferAdapter((DirectReadWriteByteBuffer)byteBuffer.slice());
+    static IntBuffer wrap (ByteBuffer byteBuffer) {
+        return new DirectReadWriteIntBufferAdapter(byteBuffer.slice());
     }
 
-    private final DirectReadWriteByteBuffer byteBuffer;
+    private final ByteBuffer byteBuffer;
     private final Int32Array intArray;
 
-    DirectReadWriteIntBufferAdapter (DirectReadWriteByteBuffer byteBuffer) {
+    DirectReadWriteIntBufferAdapter (ByteBuffer byteBuffer) {
         super((byteBuffer.capacity() >> 2));
         this.byteBuffer = byteBuffer;
         this.byteBuffer.clear();
         this.intArray = Int32Array.create(byteBuffer.byteArray.getBuffer(),
                                           byteBuffer.byteArray.getByteOffset(), capacity);
-    }
-
-    // TODO(haustein) This will be slow
-    @Override
-    public IntBuffer asReadOnlyBuffer () {
-        DirectReadOnlyIntBufferAdapter buf = new DirectReadOnlyIntBufferAdapter(byteBuffer);
-        buf.limit = limit;
-        buf.position = position;
-        buf.mark = mark;
-        return buf;
     }
 
     @Override
@@ -72,7 +62,7 @@ final class DirectReadWriteIntBufferAdapter extends IntBuffer
     @Override
     public IntBuffer duplicate () {
         DirectReadWriteIntBufferAdapter buf = new DirectReadWriteIntBufferAdapter(
-          (DirectReadWriteByteBuffer)byteBuffer.duplicate());
+          (ByteBuffer)byteBuffer.duplicate());
         buf.limit = limit;
         buf.position = position;
         buf.mark = mark;
@@ -148,7 +138,7 @@ final class DirectReadWriteIntBufferAdapter extends IntBuffer
         byteBuffer.limit(limit << 2);
         byteBuffer.position(position << 2);
         IntBuffer result = new DirectReadWriteIntBufferAdapter(
-          (DirectReadWriteByteBuffer)byteBuffer.slice());
+          (ByteBuffer)byteBuffer.slice());
         byteBuffer.clear();
         return result;
     }

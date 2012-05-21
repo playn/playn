@@ -34,29 +34,19 @@ final class DirectReadWriteShortBufferAdapter extends ShortBuffer
   implements playn.html.HasArrayBufferView {
 // implements DirectBuffer {
 
-    static ShortBuffer wrap (DirectReadWriteByteBuffer byteBuffer) {
-        return new DirectReadWriteShortBufferAdapter((DirectReadWriteByteBuffer)byteBuffer.slice());
+    static ShortBuffer wrap (ByteBuffer byteBuffer) {
+        return new DirectReadWriteShortBufferAdapter((ByteBuffer)byteBuffer.slice());
     }
 
-    private final DirectReadWriteByteBuffer byteBuffer;
+    private final ByteBuffer byteBuffer;
     private final Int16Array shortArray;
 
-    DirectReadWriteShortBufferAdapter (DirectReadWriteByteBuffer byteBuffer) {
+    DirectReadWriteShortBufferAdapter (ByteBuffer byteBuffer) {
         super((byteBuffer.capacity() >> 1));
         this.byteBuffer = byteBuffer;
         this.byteBuffer.clear();
         this.shortArray = Int16Array.create(byteBuffer.byteArray.getBuffer(),
                                             byteBuffer.byteArray.getByteOffset(), capacity);
-    }
-
-    // TODO(haustein) This will be slow
-    @Override
-    public ShortBuffer asReadOnlyBuffer () {
-        DirectReadOnlyShortBufferAdapter buf = new DirectReadOnlyShortBufferAdapter(byteBuffer);
-        buf.limit = limit;
-        buf.position = position;
-        buf.mark = mark;
-        return buf;
     }
 
     @Override
@@ -74,7 +64,7 @@ final class DirectReadWriteShortBufferAdapter extends ShortBuffer
     @Override
     public ShortBuffer duplicate () {
         DirectReadWriteShortBufferAdapter buf = new DirectReadWriteShortBufferAdapter(
-            (DirectReadWriteByteBuffer)byteBuffer.duplicate());
+            (ByteBuffer)byteBuffer.duplicate());
         buf.limit = limit;
         buf.position = position;
         buf.mark = mark;
@@ -150,7 +140,7 @@ final class DirectReadWriteShortBufferAdapter extends ShortBuffer
         byteBuffer.limit(limit << 1);
         byteBuffer.position(position << 1);
         ShortBuffer result = new DirectReadWriteShortBufferAdapter(
-          (DirectReadWriteByteBuffer)byteBuffer.slice());
+          (ByteBuffer)byteBuffer.slice());
         byteBuffer.clear();
         return result;
     }

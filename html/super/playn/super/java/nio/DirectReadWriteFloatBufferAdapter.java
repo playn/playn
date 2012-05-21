@@ -33,14 +33,14 @@ final class DirectReadWriteFloatBufferAdapter extends FloatBuffer
   implements playn.html.HasArrayBufferView {
 // implements DirectBuffer {
 
-    static FloatBuffer wrap (DirectReadWriteByteBuffer byteBuffer) {
-        return new DirectReadWriteFloatBufferAdapter((DirectReadWriteByteBuffer)byteBuffer.slice());
+    static FloatBuffer wrap (ByteBuffer byteBuffer) {
+        return new DirectReadWriteFloatBufferAdapter(byteBuffer.slice());
     }
 
-    private final DirectReadWriteByteBuffer byteBuffer;
+    private final ByteBuffer byteBuffer;
     private final Float32Array floatArray;
 
-    DirectReadWriteFloatBufferAdapter (DirectReadWriteByteBuffer byteBuffer) {
+    DirectReadWriteFloatBufferAdapter (ByteBuffer byteBuffer) {
         super((byteBuffer.capacity() >> 2));
         this.byteBuffer = byteBuffer;
         this.byteBuffer.clear();
@@ -63,7 +63,7 @@ final class DirectReadWriteFloatBufferAdapter extends FloatBuffer
     @Override
     public FloatBuffer duplicate () {
         DirectReadWriteFloatBufferAdapter buf = new DirectReadWriteFloatBufferAdapter(
-            (DirectReadWriteByteBuffer)byteBuffer.duplicate());
+            (ByteBuffer)byteBuffer.duplicate());
         buf.limit = limit;
         buf.position = position;
         buf.mark = mark;
@@ -139,7 +139,7 @@ final class DirectReadWriteFloatBufferAdapter extends FloatBuffer
         byteBuffer.limit(limit << 2);
         byteBuffer.position(position << 2);
         FloatBuffer result = new DirectReadWriteFloatBufferAdapter(
-          (DirectReadWriteByteBuffer)byteBuffer.slice());
+          (ByteBuffer)byteBuffer.slice());
         byteBuffer.clear();
         return result;
     }

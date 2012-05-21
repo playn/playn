@@ -77,18 +77,6 @@ public abstract class ShortBuffer extends Buffer implements Comparable<ShortBuff
         return protectedArrayOffset();
     }
 
-    /** Returns a read-only buffer that shares its content with this buffer.
-     * <p> The returned buffer is guaranteed to be a new instance, even if this buffer is read-only
-     * itself. The new buffer's position, limit, capacity and mark are the same as this buffer's.
-     * </p>
-     * <p> The new buffer shares its content with this buffer, which means this buffer's change of
-     * content will be visible to the new buffer. The two buffer's position, limit and mark are
-     * independent. </p>
-     *
-     * @return a read-only version of this buffer.
-     */
-    public abstract ShortBuffer asReadOnlyBuffer ();
-
     /** Compacts this short buffer.
      * <p> The remaining shorts will be moved to the head of the buffer, starting from position
      * zero. Then the position is set to {@code remaining()}; the limit is set to capacity; the
