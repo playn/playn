@@ -73,10 +73,7 @@ class JavaTextLayout extends AbstractTextLayout {
         } else {
           layout.draw(gfx, sx, yoff);
         }
-        if (layout != layouts.get(0)) {
-          yoff += layout.getLeading(); // add interline spacing
-        }
-        yoff += layout.getDescent();
+        yoff += layout.getDescent() + layout.getLeading();
       }
     }
   }
