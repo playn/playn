@@ -20,6 +20,9 @@ package java.nio;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
+import com.google.gwt.typedarrays.client.ArrayBufferView;
+import com.google.gwt.typedarrays.client.Int16Array;
+
 /** A buffer of shorts.
  * <p> A short buffer can be created in either of the following ways: </p>
  * <ul>
@@ -29,8 +32,14 @@ import java.nio.ByteOrder;
  * buffer based on a byte buffer.</li>
  * </ul>
  */
-public abstract class ShortBuffer extends Buffer implements Comparable<ShortBuffer> {
+public final class ShortBuffer extends Buffer implements Comparable<ShortBuffer>, playn.html.HasArrayBufferView {
+    private final ByteBuffer byteBuffer;
+    private final Int16Array shortArray;
 
+    static ShortBuffer wrap (ByteBuffer byteBuffer) {
+      return new ShortBuffer((ByteBuffer)byteBuffer.slice());
+    }
+    
     /** Creates a short buffer based on a newly allocated short array.
      *
      * @param capacity the capacity of the new buffer.
@@ -46,35 +55,12 @@ public abstract class ShortBuffer extends Buffer implements Comparable<ShortBuff
         return bb.asShortBuffer();
     }
 
-
-    /** Constructs a {@code ShortBuffer} with given capacity.
-     *
-     * @param capacity The capacity of the buffer */
-    ShortBuffer (int capacity) {
-        super(capacity);
-    }
-
-    /** Returns the short array which this buffer is based on, if there is one.
-     *
-     * @return the short array which this buffer is based on.
-     * @exception ReadOnlyBufferException if this buffer is based on an array, but it is read-only.
-     * @exception UnsupportedOperationException if this buffer is not based on an array.
-     */
-    public final short[] array () {
-        return protectedArray();
-    }
-
-    /** Returns the offset of the short array which this buffer is based on, if there is one.
-     * <p>
-     * The offset is the index of the array corresponding to the zero position of the buffer.
-     * </p>
-     *
-     * @return the offset of the short array which this buffer is based on.
-     * @exception ReadOnlyBufferException if this buffer is based on an array, but it is read-only.
-     * @exception UnsupportedOperationException if this buffer is not based on an array.
-     */
-    public final int arrayOffset () {
-        return protectedArrayOffset();
+    ShortBuffer(ByteBuffer byteBuffer) {
+      super((byteBuffer.capacity() >> 1));
+      this.byteBuffer = byteBuffer;
+      this.byteBuffer.clear();
+      this.shortArray = Int16Array.create(byteBuffer.byteArray.getBuffer(),
+          byteBuffer.byteArray.getByteOffset(), capacity);
     }
 
     /** Compacts this short buffer.
@@ -85,7 +71,16 @@ public abstract class ShortBuffer extends Buffer implements Comparable<ShortBuff
      * @return this buffer.
      * @exception ReadOnlyBufferException if no changes may be made to the contents of this buffer.
      */
-    public abstract ShortBuffer compact ();
+    public ShortBuffer compact () {
+      byteBuffer.limit(limit << 1);
+      byteBuffer.position(position << 1);
+      byteBuffer.compact();
+      byteBuffer.clear();
+      position = limit - position;
+      limit = capacity;
+      mark = UNSET_MARK;
+      return this;
+    }
 
     /** Compare the remaining shorts of this buffer to another short buffer's remaining shorts.
      *
@@ -123,7 +118,14 @@ public abstract class ShortBuffer extends Buffer implements Comparable<ShortBuff
      *
      * @return a duplicated buffer that shares its content with this buffer.
      */
-    public abstract ShortBuffer duplicate ();
+    public ShortBuffer duplicate () {
+      ShortBuffer buf = new ShortBuffer(
+          (ByteBuffer)byteBuffer.duplicate());
+      buf.limit = limit;
+      buf.position = position;
+      buf.mark = mark;
+      return buf;
+    }
 
     /** Checks whether this short buffer is equal to another object.
      * <p> If {@code other} is not a short buffer then {@code false} is returned. Two short buffers
@@ -158,7 +160,12 @@ public abstract class ShortBuffer extends Buffer implements Comparable<ShortBuff
      * @return the short at the current position.
      * @exception BufferUnderflowException if the position is equal or greater than limit.
      */
-    public abstract short get ();
+    public short get () {
+      // if (position == limit) {
+      // throw new BufferUnderflowException();
+       // }
+      return (short)shortArray.get(position++);
+    }
 
     /** Reads shorts from the current position into the specified short array and increases the
      * position by the number of shorts read.
@@ -204,7 +211,12 @@ public abstract class ShortBuffer extends Buffer implements Comparable<ShortBuff
      * @return a short at the specified index.
      * @exception IndexOutOfBoundsException if index is invalid.
      */
-    public abstract short get (int index);
+    public short get (int index) {
+      // if (index < 0 || index >= limit) {
+      // throw new IndexOutOfBoundsException();
+      // }
+      return (short)shortArray.get(index);
+    }
 
     /** Indicates whether this buffer is based on a short array and is read/write.
      *
@@ -212,7 +224,7 @@ public abstract class ShortBuffer extends Buffer implements Comparable<ShortBuff
      * access, {@code false} otherwise.
      */
     public final boolean hasArray () {
-        return protectedHasArray();
+        return false;
     }
 
     /** Calculates this buffer's hash code from the remaining chars. The position, limit, capacity
@@ -237,7 +249,9 @@ public abstract class ShortBuffer extends Buffer implements Comparable<ShortBuff
      *
      * @return {@code true} if this buffer is direct, {@code false} otherwise.
      */
-    public abstract boolean isDirect ();
+    public boolean isDirect () {
+      return true;
+    }
 
     /** Returns the byte order used by this buffer when converting shorts from/to bytes.
      * <p> If this buffer is not based on a byte buffer, then always return the platform's native
@@ -245,22 +259,9 @@ public abstract class ShortBuffer extends Buffer implements Comparable<ShortBuff
      *
      * @return the byte order used by this buffer when converting shorts from/to bytes.
      */
-    public abstract ByteOrder order ();
-
-    /** Child class implements this method to realize {@code array()}.
-     *
-     * @return see {@code array()} */
-    abstract short[] protectedArray ();
-
-    /** Child class implements this method to realize {@code arrayOffset()}.
-     *
-     * @return see {@code arrayOffset()} */
-    abstract int protectedArrayOffset ();
-
-    /** Child class implements this method to realize {@code hasArray()}.
-     *
-     * @return see {@code hasArray()} */
-    abstract boolean protectedHasArray ();
+    public ByteOrder order () {
+      return ByteOrder.nativeOrder();
+    }
 
     /** Writes the given short to the current position and increases the position by 1.
      *
@@ -269,7 +270,13 @@ public abstract class ShortBuffer extends Buffer implements Comparable<ShortBuff
      * @exception BufferOverflowException if position is equal or greater than limit.
      * @exception ReadOnlyBufferException if no changes may be made to the contents of this buffer.
      */
-    public abstract ShortBuffer put (short s);
+    public ShortBuffer put (short c) {
+      // if (position == limit) {
+      // throw new BufferOverflowException();
+      // }
+      shortArray.set(position++, c);
+      return this;
+    }
 
     /** Writes shorts from the given short array to the current position and increases the position
      * by the number of shorts written. <p> Calling this method has the same effect as {@code
@@ -342,7 +349,13 @@ public abstract class ShortBuffer extends Buffer implements Comparable<ShortBuff
      * @exception IndexOutOfBoundsException if index is invalid.
      * @exception ReadOnlyBufferException if no changes may be made to the contents of this buffer.
      */
-    public abstract ShortBuffer put (int index, short s);
+    public ShortBuffer put (int index, short c) {
+      // if (index < 0 || index >= limit) {
+      // throw new IndexOutOfBoundsException();
+      // }
+      shortArray.set(index, c);
+      return this;
+    }
 
     /** Returns a sliced buffer that shares its content with this buffer.
      * <p> The sliced buffer's capacity will be this buffer's {@code remaining()}, and its zero
@@ -355,7 +368,13 @@ public abstract class ShortBuffer extends Buffer implements Comparable<ShortBuff
      *
      * @return a sliced buffer that shares its content with this buffer.
      */
-    public abstract ShortBuffer slice ();
+    public ShortBuffer slice () {
+      byteBuffer.limit(limit << 1);
+      byteBuffer.position(position << 1);
+      ShortBuffer result = new ShortBuffer(byteBuffer.slice());
+      byteBuffer.clear();
+      return result;
+    }
 
     /** Returns a string representing the state of this short buffer.
      *
@@ -371,5 +390,21 @@ public abstract class ShortBuffer extends Buffer implements Comparable<ShortBuff
         buf.append(" limit="); //$NON-NLS-1$
         buf.append(limit());
         return buf.toString();
+    }
+    
+    public ArrayBufferView getTypedArray () {
+      return shortArray;
+    }
+
+    public int getElementSize () {
+      return 2;
+    }
+
+    public int getElementType() {
+      return 0x1402; // GL_SHORT
+    }
+    
+    public boolean isReadOnly() {
+      return false;
     }
 }

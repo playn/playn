@@ -20,6 +20,9 @@ package java.nio;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
+import com.google.gwt.typedarrays.client.ArrayBufferView;
+import com.google.gwt.typedarrays.client.Float32Array;
+
 /** A buffer of floats.
  * <p>
  * A float buffer can be created in either of the following ways:
@@ -30,8 +33,15 @@ import java.nio.ByteOrder;
  * <li>Use {@link java.nio.ByteBuffer#asFloatBuffer() ByteBuffer.asFloatBuffer} to create a float buffer based on a byte buffer.</li>
  * </ul>
  */
-public abstract class FloatBuffer extends Buffer implements Comparable<FloatBuffer> {
+public final class FloatBuffer extends Buffer implements Comparable<FloatBuffer>, playn.html.HasArrayBufferView {
 
+    private final ByteBuffer byteBuffer;
+    private final Float32Array floatArray;
+    
+    static FloatBuffer wrap (ByteBuffer byteBuffer) {
+      return new FloatBuffer(byteBuffer.slice());
+  }
+    
     /** Creates a float buffer based on a newly allocated float array.
      *
      * @param capacity the capacity of the new buffer.
@@ -47,34 +57,12 @@ public abstract class FloatBuffer extends Buffer implements Comparable<FloatBuff
         return bb.asFloatBuffer();
     }
 
-    /** Constructs a {@code FloatBuffer} with given capacity.
-     *
-     * @param capacity The capacity of the buffer */
-    FloatBuffer (int capacity) {
-        super(capacity);
-    }
-
-    /** Returns the float array which this buffer is based on, if there is one.
-     *
-     * @return the float array which this buffer is based on.
-     * @exception ReadOnlyBufferException if this buffer is based on an array, but it is read-only.
-     * @exception UnsupportedOperationException if this buffer is not based on an array.
-     */
-    public final float[] array () {
-        return protectedArray();
-    }
-
-    /** Returns the offset of the float array which this buffer is based on, if there is one.
-     * <p>
-     * The offset is the index of the array and corresponds to the zero position of the buffer.
-     * </p>
-     *
-     * @return the offset of the float array which this buffer is based on.
-     * @exception ReadOnlyBufferException if this buffer is based on an array, but it is read-only.
-     * @exception UnsupportedOperationException if this buffer is not based on an array.
-     */
-    public final int arrayOffset () {
-        return protectedArrayOffset();
+    FloatBuffer (ByteBuffer byteBuffer) {
+      super((byteBuffer.capacity() >> 2));
+      this.byteBuffer = byteBuffer;
+      this.byteBuffer.clear();
+      this.floatArray = Float32Array.create(
+        byteBuffer.byteArray.getBuffer(), byteBuffer.byteArray.getByteOffset(), capacity);
     }
 
     /** Compacts this float buffer.
@@ -85,7 +73,16 @@ public abstract class FloatBuffer extends Buffer implements Comparable<FloatBuff
      * @return this buffer.
      * @exception ReadOnlyBufferException if no changes may be made to the contents of this buffer.
      */
-    public abstract FloatBuffer compact ();
+    public FloatBuffer compact () {
+      byteBuffer.limit(limit << 2);
+      byteBuffer.position(position << 2);
+      byteBuffer.compact();
+      byteBuffer.clear();
+      position = limit - position;
+      limit = capacity;
+      mark = UNSET_MARK;
+      return this;
+  }
 
     /** Compare the remaining floats of this buffer to another float buffer's remaining floats.
      *
@@ -126,7 +123,14 @@ public abstract class FloatBuffer extends Buffer implements Comparable<FloatBuff
      *
      * @return a duplicated buffer that shares its content with this buffer.
      */
-    public abstract FloatBuffer duplicate ();
+    public FloatBuffer duplicate () {
+      FloatBuffer buf = new FloatBuffer(
+          (ByteBuffer)byteBuffer.duplicate());
+      buf.limit = limit;
+      buf.position = position;
+      buf.mark = mark;
+      return buf;
+    }
 
     /** Checks whether this float buffer is equal to another object.
      * <p> If {@code other} is not a float buffer then {@code false} is returned. Two float buffers
@@ -161,7 +165,12 @@ public abstract class FloatBuffer extends Buffer implements Comparable<FloatBuff
      * @return the float at the current position.
      * @exception BufferUnderflowException if the position is equal or greater than limit.
      */
-    public abstract float get ();
+    public float get () {
+      // if (position == limit) {
+      // throw new BufferUnderflowException();
+      // }
+      return floatArray.get(position++);
+    }
 
     /** Reads floats from the current position into the specified float array and increases the
      * position by the number of floats read.
@@ -208,7 +217,12 @@ public abstract class FloatBuffer extends Buffer implements Comparable<FloatBuff
      * @return a float at the specified index.
      * @exception IndexOutOfBoundsException if index is invalid.
      */
-    public abstract float get (int index);
+    public float get (int index) {
+      // if (index < 0 || index >= limit) {
+      // throw new IndexOutOfBoundsException();
+      // }
+      return floatArray.get(index);
+    }
 
     /** Indicates whether this buffer is based on a float array and is read/write.
      *
@@ -216,7 +230,7 @@ public abstract class FloatBuffer extends Buffer implements Comparable<FloatBuff
      * access, {@code false} otherwise.
      */
     public final boolean hasArray () {
-        return protectedHasArray();
+        return false;
     }
 
 // /**
@@ -243,7 +257,9 @@ public abstract class FloatBuffer extends Buffer implements Comparable<FloatBuff
      *
      * @return {@code true} if this buffer is direct, {@code false} otherwise.
      */
-    public abstract boolean isDirect ();
+    public boolean isDirect () {
+      return true;
+    }
 
     /** Returns the byte order used by this buffer when converting floats from/to bytes.
      * <p> If this buffer is not based on a byte buffer, then always return the platform's native
@@ -251,22 +267,10 @@ public abstract class FloatBuffer extends Buffer implements Comparable<FloatBuff
      *
      * @return the byte order used by this buffer when converting floats from/to bytes.
      */
-    public abstract ByteOrder order ();
+    public ByteOrder order () {
+      return ByteOrder.nativeOrder();
+  }
 
-    /** Child class implements this method to realize {@code array()}.
-     *
-     * @return see {@code array()} */
-    abstract float[] protectedArray ();
-
-    /** Child class implements this method to realize {@code arrayOffset()}.
-     *
-     * @return see {@code arrayOffset()} */
-    abstract int protectedArrayOffset ();
-
-    /** Child class implements this method to realize {@code hasArray()}.
-     *
-     * @return see {@code hasArray()} */
-    abstract boolean protectedHasArray ();
 
     /** Writes the given float to the current position and increases the position by 1.
      *
@@ -275,7 +279,13 @@ public abstract class FloatBuffer extends Buffer implements Comparable<FloatBuff
      * @exception BufferOverflowException if position is equal or greater than limit.
      * @exception ReadOnlyBufferException if no changes may be made to the contents of this buffer.
      */
-    public abstract FloatBuffer put (float f);
+    public FloatBuffer put (float c) {
+   // if (position == limit) {
+   // throw new BufferOverflowException();
+   // }
+           floatArray.set(position++, c);
+           return this;
+       }
 
     /** Writes floats from the given float array to the current position and increases the position
      * by the number of floats written.
@@ -348,7 +358,13 @@ public abstract class FloatBuffer extends Buffer implements Comparable<FloatBuff
      * @exception IndexOutOfBoundsException if index is invalid.
      * @exception ReadOnlyBufferException if no changes may be made to the contents of this buffer.
      */
-    public abstract FloatBuffer put (int index, float f);
+    public FloatBuffer put (int index, float c) {
+      // if (index < 0 || index >= limit) {
+      // throw new IndexOutOfBoundsException();
+      // }
+      floatArray.set(index, c);
+      return this;
+    }
 
     /** Returns a sliced buffer that shares its content with this buffer.
      * <p> The sliced buffer's capacity will be this buffer's {@code remaining()}, and its zero
@@ -361,7 +377,13 @@ public abstract class FloatBuffer extends Buffer implements Comparable<FloatBuff
      *
      * @return a sliced buffer that shares its content with this buffer.
      */
-    public abstract FloatBuffer slice ();
+    public FloatBuffer slice () {
+      byteBuffer.limit(limit << 2);
+      byteBuffer.position(position << 2);
+      FloatBuffer result = new FloatBuffer(byteBuffer.slice());
+      byteBuffer.clear();
+      return result;
+    }
 
     /** Returns a string representing the state of this float buffer.
      *
@@ -377,5 +399,21 @@ public abstract class FloatBuffer extends Buffer implements Comparable<FloatBuff
         buf.append(" limit="); //$NON-NLS-1$
         buf.append(limit());
         return buf.toString();
+    }
+    
+    public ArrayBufferView getTypedArray () {
+      return floatArray;
+    }
+
+    public int getElementSize () {
+      return 4;
+    }
+
+    public int getElementType() {
+      return 0x1406; // GL_FLOAT
+    }
+    
+    public boolean isReadOnly() {
+      return false;
     }
 }

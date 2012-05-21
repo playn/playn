@@ -20,6 +20,9 @@ package java.nio;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
+import com.google.gwt.typedarrays.client.ArrayBufferView;
+import com.google.gwt.typedarrays.client.Int32Array;
+
 /** A buffer of ints.
  * <p>
  * A int buffer can be created in either of the following ways:
@@ -31,7 +34,15 @@ import java.nio.ByteOrder;
  * based on a byte buffer.</li>
  * </ul>
  */
-public abstract class IntBuffer extends Buffer implements Comparable<IntBuffer> {
+public final class IntBuffer extends Buffer implements Comparable<IntBuffer>, playn.html.HasArrayBufferView {
+
+    /** Sliced version of the underlying byte buffer, not the underlying byte buffer directly */
+    private final ByteBuffer byteBuffer;
+    private final Int32Array intArray;
+
+    static IntBuffer wrap (ByteBuffer byteBuffer) {
+      return new IntBuffer(byteBuffer.slice());
+    }
 
     /** Creates an int buffer based on a newly allocated int array.
      *
@@ -46,37 +57,15 @@ public abstract class IntBuffer extends Buffer implements Comparable<IntBuffer> 
         ByteBuffer bb = ByteBuffer.allocateDirect(capacity * 4);
         bb.order(ByteOrder.nativeOrder());
         return bb.asIntBuffer();
-
     }
 
-    /** Constructs a {@code IntBuffer} with given capacity.
-     *
-     * @param capacity the capacity of the buffer. */
-    IntBuffer (int capacity) {
-        super(capacity);
-    }
 
-    /** Returns the int array which this buffer is based on, if there is one.
-     *
-     * @return the int array which this buffer is based on.
-     * @exception ReadOnlyBufferException if this buffer is based on an array, but it is read-only.
-     * @exception UnsupportedOperationException if this buffer is not based on an array.
-     */
-    public final int[] array () {
-        return protectedArray();
-    }
-
-    /** Returns the offset of the int array which this buffer is based on, if there is one.
-     * <p>
-     * The offset is the index of the array corresponds to the zero position of the buffer.
-     * </p>
-     *
-     * @return the offset of the int array which this buffer is based on.
-     * @exception ReadOnlyBufferException if this buffer is based on an array, but it is read-only.
-     * @exception UnsupportedOperationException if this buffer is not based on an array.
-     */
-    public final int arrayOffset () {
-        return protectedArrayOffset();
+    IntBuffer(ByteBuffer byteBuffer) {
+      super((byteBuffer.capacity() >> 2));
+      this.byteBuffer = byteBuffer;
+      this.byteBuffer.clear();
+      this.intArray = Int32Array.create(byteBuffer.byteArray.getBuffer(),
+                                        byteBuffer.byteArray.getByteOffset(), capacity);
     }
 
     /** Compacts this int buffer.
@@ -87,7 +76,16 @@ public abstract class IntBuffer extends Buffer implements Comparable<IntBuffer> 
      * @return this buffer.
      * @exception ReadOnlyBufferException if no changes may be made to the contents of this buffer.
      */
-    public abstract IntBuffer compact ();
+    public IntBuffer compact () {
+      byteBuffer.limit(limit << 2);
+      byteBuffer.position(position << 2);
+      byteBuffer.compact();
+      byteBuffer.clear();
+      position = limit - position;
+      limit = capacity;
+      mark = UNSET_MARK;
+      return this;
+    }
 
     /** Compares the remaining ints of this buffer to another int buffer's remaining ints.
      *
@@ -127,7 +125,14 @@ public abstract class IntBuffer extends Buffer implements Comparable<IntBuffer> 
      *
      * @return a duplicated buffer that shares its content with this buffer.
      */
-    public abstract IntBuffer duplicate ();
+    public IntBuffer duplicate () {
+      IntBuffer buf = new IntBuffer(
+        (ByteBuffer)byteBuffer.duplicate());
+      buf.limit = limit;
+      buf.position = position;
+      buf.mark = mark;
+      return buf;
+    }
 
     /** Checks whether this int buffer is equal to another object.
      * <p> If {@code other} is not a int buffer then {@code false} is returned. Two int buffers are
@@ -162,7 +167,12 @@ public abstract class IntBuffer extends Buffer implements Comparable<IntBuffer> 
      * @return the int at the current position.
      * @exception BufferUnderflowException if the position is equal or greater than limit.
      */
-    public abstract int get ();
+    public int get () {
+      // if (position == limit) {
+      // throw new BufferUnderflowException();
+      // }
+      return intArray.get(position++);
+    }
 
     /** Reads ints from the current position into the specified int array and increases the
      * position by the number of ints read.
@@ -174,8 +184,8 @@ public abstract class IntBuffer extends Buffer implements Comparable<IntBuffer> 
      * @return this buffer.
      * @exception BufferUnderflowException if {@code dest.length} is greater than {@code remaining()}.
      */
-    public IntBuffer get (int[] dest) {
-        return get(dest, 0, dest.length);
+    public IntBuffer get(int[] dest) {
+      return get(dest, 0, dest.length);
     }
 
     /** Reads ints from the current position into the specified int array, starting from the
@@ -210,7 +220,12 @@ public abstract class IntBuffer extends Buffer implements Comparable<IntBuffer> 
      * @return an int at the specified index.
      * @exception IndexOutOfBoundsException if index is invalid.
      */
-    public abstract int get (int index);
+    public int get (int index) {
+      // if (index < 0 || index >= limit) {
+      // throw new IndexOutOfBoundsException();
+      // }
+      return intArray.get(index);
+    }
 
     /** Indicates whether this buffer is based on a int array and is read/write.
      *
@@ -218,7 +233,7 @@ public abstract class IntBuffer extends Buffer implements Comparable<IntBuffer> 
      * {@code false} otherwise.
      */
     public final boolean hasArray () {
-        return protectedHasArray();
+        return false;
     }
 
     /** Calculates this buffer's hash code from the remaining chars. The position, limit, capacity
@@ -244,7 +259,9 @@ public abstract class IntBuffer extends Buffer implements Comparable<IntBuffer> 
      *
      * @return {@code true} if this buffer is direct, {@code false} otherwise.
      */
-    public abstract boolean isDirect ();
+    public boolean isDirect () {
+      return true;
+    }
 
     /** Returns the byte order used by this buffer when converting ints from/to bytes.
      * <p> If this buffer is not based on a byte buffer, then always return the platform's native
@@ -252,22 +269,9 @@ public abstract class IntBuffer extends Buffer implements Comparable<IntBuffer> 
      *
      * @return the byte order used by this buffer when converting ints from/to bytes.
      */
-    public abstract ByteOrder order ();
-
-    /** Child class implements this method to realize {@code array()}.
-     *
-     * @return see {@code array()} */
-    protected abstract int[] protectedArray ();
-
-    /** Child class implements this method to realize {@code arrayOffset()}.
-     *
-     * @return see {@code arrayOffset()} */
-    protected abstract int protectedArrayOffset ();
-
-    /** Child class implements this method to realize {@code hasArray()}.
-     *
-     * @return see {@code hasArray()} */
-    protected abstract boolean protectedHasArray ();
+    public ByteOrder order () {
+      return ByteOrder.nativeOrder();
+    }
 
     /** Writes the given int to the current position and increases the position by 1.
      *
@@ -276,7 +280,13 @@ public abstract class IntBuffer extends Buffer implements Comparable<IntBuffer> 
      * @exception BufferOverflowException if position is equal or greater than limit.
      * @exception ReadOnlyBufferException if no changes may be made to the contents of this buffer.
      */
-    public abstract IntBuffer put (int i);
+    public IntBuffer put (int c) {
+   // if (position == limit) {
+   // throw new BufferOverflowException();
+   // }
+      intArray.set(position++, c);
+      return this;
+    }
 
     /** Writes ints from the given int array to the current position and increases the position by
      * the number of ints written.
@@ -349,8 +359,14 @@ public abstract class IntBuffer extends Buffer implements Comparable<IntBuffer> 
      * @exception IndexOutOfBoundsException if index is invalid.
      * @exception ReadOnlyBufferException if no changes may be made to the contents of this buffer.
      */
-    public abstract IntBuffer put (int index, int i);
-
+    public IntBuffer put (int index, int c) {
+   // if (index < 0 || index >= limit) {
+   // throw new IndexOutOfBoundsException();
+   // }
+      intArray.set(index, c);
+      return this;
+    }
+    
     /** Returns a sliced buffer that shares its content with this buffer.
      * <p> The sliced buffer's capacity will be this buffer's {@code remaining()}, and its zero
      * position will correspond to this buffer's current position. The new buffer's position will
@@ -362,7 +378,13 @@ public abstract class IntBuffer extends Buffer implements Comparable<IntBuffer> 
      *
      * @return a sliced buffer that shares its content with this buffer.
      */
-    public abstract IntBuffer slice ();
+    public IntBuffer slice () {
+      byteBuffer.limit(limit << 2);
+      byteBuffer.position(position << 2);
+      IntBuffer result = new IntBuffer(byteBuffer.slice());
+      byteBuffer.clear();
+      return result;
+  }
 
     /** Returns a string represents of the state of this int buffer.
      *
@@ -378,5 +400,21 @@ public abstract class IntBuffer extends Buffer implements Comparable<IntBuffer> 
         buf.append(" limit="); //$NON-NLS-1$
         buf.append(limit());
         return buf.toString();
+    }
+    
+    public ArrayBufferView getTypedArray () {
+      return intArray;
+    }
+
+    public int getElementSize () {
+      return 4;
+    }
+
+    public int getElementType() {
+      return 0x1404; // GL_INT
+    } 
+    
+    public boolean isReadOnly() {
+      return false;
     }
 }

@@ -31,7 +31,7 @@ import com.google.gwt.typedarrays.client.Int8Array;
  * it;</li>
  * </ul>
  */
-public class ByteBuffer extends Buffer implements Comparable<ByteBuffer>, playn.html.HasArrayBufferView {
+public final class ByteBuffer extends Buffer implements Comparable<ByteBuffer>, playn.html.HasArrayBufferView {
   
     Int8Array byteArray;
 
@@ -130,7 +130,7 @@ public class ByteBuffer extends Buffer implements Comparable<ByteBuffer>, playn.
      * @return a float buffer which is based on the content of this byte buffer.
      */
     public FloatBuffer asFloatBuffer () {
-      return DirectReadWriteFloatBufferAdapter.wrap(this);
+      return FloatBuffer.wrap(this);
   }
 
     /** Returns a int buffer which is based on the remaining content of this byte buffer.
@@ -148,7 +148,7 @@ public class ByteBuffer extends Buffer implements Comparable<ByteBuffer>, playn.
       if (order() != ByteOrder.nativeOrder()) {
         throw new RuntimeException("Native order supported only.");
       }
-      return DirectReadWriteIntBufferAdapter.wrap(this);
+      return IntBuffer.wrap(this);
     }
 
 //    /** Returns a long buffer which is based on the remaining content of this byte buffer.
@@ -179,7 +179,7 @@ public class ByteBuffer extends Buffer implements Comparable<ByteBuffer>, playn.
       if (order() != ByteOrder.nativeOrder()) {
         throw new RuntimeException("Native order supported only.");
       }
-      return DirectReadWriteShortBufferAdapter.wrap(this);
+      return ShortBuffer.wrap(this);
     }
 
     /** Compacts this byte buffer.
