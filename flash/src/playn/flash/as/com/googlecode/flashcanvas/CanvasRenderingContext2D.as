@@ -52,6 +52,7 @@ package com.googlecode.flashcanvas
     import flash.text.TextField;
     import flash.text.TextFieldAutoSize;
     import flash.text.TextFormat;
+    import flash.text.AntiAliasType;
     import flash.utils.ByteArray;
 
     public class CanvasRenderingContext2D
@@ -894,6 +895,7 @@ package com.googlecode.flashcanvas
             var textField:TextField     = new TextField();
             textField.autoSize          = TextFieldAutoSize.LEFT;
             textField.defaultTextFormat = textFormat;
+            textField.antiAliasType     = AntiAliasType.ADVANCED;
             textField.text              = text.replace(/[\t\n\f\r]/g, " ");
             textField.setTextFormat(textFormat);
             return {width: textField.textWidth + 4, height: textField.textHeight + 4 };
@@ -1174,7 +1176,7 @@ package com.googlecode.flashcanvas
 
             // Remove 2px margins around the text
             var matrix:Matrix = new Matrix();
-//            matrix.translate(-2, -2);
+            matrix.translate(0, -2);
 
             if (isStroke)
             {
@@ -1187,7 +1189,7 @@ package com.googlecode.flashcanvas
 
             // Convert the text into BitmapData
             var bitmapData:BitmapData = new BitmapData(width + 4, height + 4, true, 0);
-            bitmapData.draw(textField, matrix);
+            bitmapData.draw(textField, matrix, null, null, null, true);
 
             // Adjust x coordinates
             switch (state.textAlign)
