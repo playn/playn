@@ -152,10 +152,7 @@ class AndroidTextLayout implements TextLayout {
       float rx = format.align.getX(line.width, width);
       yoff += -metrics.ascent;
       canvas.drawText(line.text, x + rx, y + yoff, paint);
-      if (line != lines.get(0)) {
-        yoff += metrics.leading; // add interline spacing
-      }
-      yoff += metrics.descent;
+      yoff += metrics.descent + metrics.leading;
     }
   }
 
