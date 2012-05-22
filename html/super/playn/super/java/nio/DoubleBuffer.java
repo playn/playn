@@ -17,9 +17,6 @@
 
 package java.nio;
 
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-
 /** A buffer of doubles.
  * <p> A double buffer can be created in either one of the following ways: </p>
  * <ul>

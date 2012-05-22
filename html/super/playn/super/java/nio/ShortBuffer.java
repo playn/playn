@@ -17,9 +17,6 @@
 
 package java.nio;
 
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-
 import com.google.gwt.typedarrays.client.ArrayBufferView;
 import com.google.gwt.typedarrays.client.Int16Array;
 
@@ -32,14 +29,16 @@ import com.google.gwt.typedarrays.client.Int16Array;
  * buffer based on a byte buffer.</li>
  * </ul>
  */
-public final class ShortBuffer extends Buffer implements Comparable<ShortBuffer>, playn.html.HasArrayBufferView {
+public final class ShortBuffer extends Buffer
+  implements Comparable<ShortBuffer>, playn.html.HasArrayBufferView {
+
     private final ByteBuffer byteBuffer;
     private final Int16Array shortArray;
 
     static ShortBuffer wrap (ByteBuffer byteBuffer) {
       return new ShortBuffer((ByteBuffer)byteBuffer.slice());
     }
-    
+
     /** Creates a short buffer based on a newly allocated short array.
      *
      * @param capacity the capacity of the new buffer.
@@ -391,7 +390,7 @@ public final class ShortBuffer extends Buffer implements Comparable<ShortBuffer>
         buf.append(limit());
         return buf.toString();
     }
-    
+
     public ArrayBufferView getTypedArray () {
       return shortArray;
     }
@@ -403,7 +402,7 @@ public final class ShortBuffer extends Buffer implements Comparable<ShortBuffer>
     public int getElementType() {
       return 0x1402; // GL_SHORT
     }
-    
+
     public boolean isReadOnly() {
       return false;
     }

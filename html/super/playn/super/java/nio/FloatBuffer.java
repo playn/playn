@@ -17,9 +17,6 @@
 
 package java.nio;
 
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-
 import com.google.gwt.typedarrays.client.ArrayBufferView;
 import com.google.gwt.typedarrays.client.Float32Array;
 
@@ -33,15 +30,16 @@ import com.google.gwt.typedarrays.client.Float32Array;
  * <li>Use {@link java.nio.ByteBuffer#asFloatBuffer() ByteBuffer.asFloatBuffer} to create a float buffer based on a byte buffer.</li>
  * </ul>
  */
-public final class FloatBuffer extends Buffer implements Comparable<FloatBuffer>, playn.html.HasArrayBufferView {
+public final class FloatBuffer extends Buffer
+  implements Comparable<FloatBuffer>, playn.html.HasArrayBufferView {
 
     private final ByteBuffer byteBuffer;
     private final Float32Array floatArray;
-    
+
     static FloatBuffer wrap (ByteBuffer byteBuffer) {
       return new FloatBuffer(byteBuffer.slice());
-  }
-    
+    }
+
     /** Creates a float buffer based on a newly allocated float array.
      *
      * @param capacity the capacity of the new buffer.
@@ -82,7 +80,7 @@ public final class FloatBuffer extends Buffer implements Comparable<FloatBuffer>
       limit = capacity;
       mark = UNSET_MARK;
       return this;
-  }
+    }
 
     /** Compare the remaining floats of this buffer to another float buffer's remaining floats.
      *
@@ -269,8 +267,7 @@ public final class FloatBuffer extends Buffer implements Comparable<FloatBuffer>
      */
     public ByteOrder order () {
       return ByteOrder.nativeOrder();
-  }
-
+    }
 
     /** Writes the given float to the current position and increases the position by 1.
      *
@@ -400,7 +397,7 @@ public final class FloatBuffer extends Buffer implements Comparable<FloatBuffer>
         buf.append(limit());
         return buf.toString();
     }
-    
+
     public ArrayBufferView getTypedArray () {
       return floatArray;
     }
@@ -412,7 +409,7 @@ public final class FloatBuffer extends Buffer implements Comparable<FloatBuffer>
     public int getElementType() {
       return 0x1406; // GL_FLOAT
     }
-    
+
     public boolean isReadOnly() {
       return false;
     }

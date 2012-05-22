@@ -17,9 +17,6 @@
 
 package java.nio;
 
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-
 /** A buffer of longs.
  * <p>
  * A long buffer can be created in either of the following ways:

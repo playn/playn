@@ -18,8 +18,6 @@
 package java.nio;
 
 import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 
 /** A buffer of chars.
  * <p> A char buffer can be created in either one of the following ways: </p>

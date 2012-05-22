@@ -17,9 +17,6 @@
 
 package java.nio;
 
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-
 import com.google.gwt.typedarrays.client.ArrayBufferView;
 import com.google.gwt.typedarrays.client.Int32Array;
 
@@ -34,7 +31,8 @@ import com.google.gwt.typedarrays.client.Int32Array;
  * based on a byte buffer.</li>
  * </ul>
  */
-public final class IntBuffer extends Buffer implements Comparable<IntBuffer>, playn.html.HasArrayBufferView {
+public final class IntBuffer extends Buffer
+  implements Comparable<IntBuffer>, playn.html.HasArrayBufferView {
 
     /** Sliced version of the underlying byte buffer, not the underlying byte buffer directly */
     private final ByteBuffer byteBuffer;
@@ -366,7 +364,7 @@ public final class IntBuffer extends Buffer implements Comparable<IntBuffer>, pl
       intArray.set(index, c);
       return this;
     }
-    
+
     /** Returns a sliced buffer that shares its content with this buffer.
      * <p> The sliced buffer's capacity will be this buffer's {@code remaining()}, and its zero
      * position will correspond to this buffer's current position. The new buffer's position will
@@ -401,7 +399,7 @@ public final class IntBuffer extends Buffer implements Comparable<IntBuffer>, pl
         buf.append(limit());
         return buf.toString();
     }
-    
+
     public ArrayBufferView getTypedArray () {
       return intArray;
     }
@@ -412,8 +410,8 @@ public final class IntBuffer extends Buffer implements Comparable<IntBuffer>, pl
 
     public int getElementType() {
       return 0x1404; // GL_INT
-    } 
-    
+    }
+
     public boolean isReadOnly() {
       return false;
     }

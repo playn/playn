@@ -17,8 +17,6 @@
 
 package java.nio;
 
-import java.nio.ByteOrder;
-
 import com.google.gwt.typedarrays.client.ArrayBuffer;
 import com.google.gwt.typedarrays.client.ArrayBufferView;
 import com.google.gwt.typedarrays.client.Int8Array;
@@ -31,8 +29,9 @@ import com.google.gwt.typedarrays.client.Int8Array;
  * it;</li>
  * </ul>
  */
-public final class ByteBuffer extends Buffer implements Comparable<ByteBuffer>, playn.html.HasArrayBufferView {
-  
+public final class ByteBuffer extends Buffer
+  implements Comparable<ByteBuffer>, playn.html.HasArrayBufferView {
+
     Int8Array byteArray;
 
     /** The byte order of this buffer, default is {@code BIG_ENDIAN}. */
@@ -63,7 +62,7 @@ public final class ByteBuffer extends Buffer implements Comparable<ByteBuffer>, 
         return new ByteBuffer(capacity);
     }
 
-    
+
     static ByteBuffer copy (ByteBuffer other, int markOfOther) {
       ByteBuffer buf = new ByteBuffer(
         other.byteArray.getBuffer(), other.capacity(),
@@ -73,8 +72,7 @@ public final class ByteBuffer extends Buffer implements Comparable<ByteBuffer>, 
       buf.mark = markOfOther;
       buf.order(other.order());
       return buf;
-  }
-
+    }
 
     /** Constructs a {@code ByteBuffer} with given capacity.
      *
@@ -131,7 +129,7 @@ public final class ByteBuffer extends Buffer implements Comparable<ByteBuffer>, 
      */
     public FloatBuffer asFloatBuffer () {
       return FloatBuffer.wrap(this);
-  }
+    }
 
     /** Returns a int buffer which is based on the remaining content of this byte buffer.
      * <p> The new buffer's position is zero, its limit and capacity is the number of remaining
@@ -243,7 +241,7 @@ public final class ByteBuffer extends Buffer implements Comparable<ByteBuffer>, 
      */
     public ByteBuffer duplicate () {
       return copy(this, mark);
-  }
+    }
 
     /** Checks whether this byte buffer is equal to another object.
      * <p> If {@code other} is not a byte buffer then {@code false} is returned. Two byte buffers
@@ -284,6 +282,7 @@ public final class ByteBuffer extends Buffer implements Comparable<ByteBuffer>, 
 // }
         return (byte)byteArray.get(position++);
     }
+
     /** Reads bytes from the current position into the specified byte array and increases the
      * position by the number of bytes read.
      * <p>
@@ -325,7 +324,7 @@ public final class ByteBuffer extends Buffer implements Comparable<ByteBuffer>, 
 
       position += len;
       return this;
-  }
+    }
 
     /** Returns the byte at the specified index and does not change the position.
      *
@@ -372,7 +371,7 @@ public final class ByteBuffer extends Buffer implements Comparable<ByteBuffer>, 
      */
     public final double getDouble () {
       return Numbers.longBitsToDouble(getLong());
-  }
+    }
 
     /** Returns the double at the specified index.
      * <p> The 8 bytes starting at the specified index are composed into a double according to the
@@ -384,7 +383,7 @@ public final class ByteBuffer extends Buffer implements Comparable<ByteBuffer>, 
      */
     public final double getDouble (int index) {
       return Numbers.longBitsToDouble(getLong(index));
-  }
+    }
 
     /** Returns the float at the current position and increases the position by 4.
      * <p> The 4 bytes starting at the current position are composed into a float according to the
@@ -395,7 +394,7 @@ public final class ByteBuffer extends Buffer implements Comparable<ByteBuffer>, 
      */
     public final float getFloat () {
       return Numbers.intBitsToFloat(getInt());
-  }
+    }
 
     /** Returns the float at the specified index.
      * <p> The 4 bytes starting at the specified index are composed into a float according to the
@@ -407,7 +406,7 @@ public final class ByteBuffer extends Buffer implements Comparable<ByteBuffer>, 
      */
     public final float getFloat (int index) {
       return Numbers.intBitsToFloat(getInt(index));
-  }
+    }
 
     /** Returns the int at the current position and increases the position by 4.
      * <p> The 4 bytes starting at the current position are composed into a int according to the
@@ -424,7 +423,8 @@ public final class ByteBuffer extends Buffer implements Comparable<ByteBuffer>, 
       int result = getInt(position);
       position = newPosition;
       return result;
-  }
+    }
+
     /** Returns the int at the specified index.
      * <p> The 4 bytes starting at the specified index are composed into a int according to the
      * current byte order and returned. The position is not changed. </p>
@@ -447,7 +447,7 @@ public final class ByteBuffer extends Buffer implements Comparable<ByteBuffer>, 
           }
       }
       return bytes;
-  }
+    }
 
     /** Returns the long at the current position and increases the position by 8.
      * <p> The 8 bytes starting at the current position are composed into a long according to the
@@ -464,7 +464,8 @@ public final class ByteBuffer extends Buffer implements Comparable<ByteBuffer>, 
       long result = getLong(position);
       position = newPosition;
       return result;
-  }
+    }
+
     /** Returns the long at the specified index.
      * <p> The 8 bytes starting at the specified index are composed into a long according to the
      * current byte order and returned. The position is not changed. </p>
@@ -487,7 +488,7 @@ public final class ByteBuffer extends Buffer implements Comparable<ByteBuffer>, 
           }
       }
       return bytes;
-  }
+    }
 
     /** Returns the short at the current position and increases the position by 2.
      * <p> The 2 bytes starting at the current position are composed into a short according to the
@@ -504,8 +505,7 @@ public final class ByteBuffer extends Buffer implements Comparable<ByteBuffer>, 
       short result = getShort(position);
       position = newPosition;
       return result;
-  }
-
+    }
 
     /** Returns the short at the specified index.
      * <p> The 2 bytes starting at the specified index are composed into a short according to the
@@ -525,7 +525,7 @@ public final class ByteBuffer extends Buffer implements Comparable<ByteBuffer>, 
           bytes |= (byteArray.get(baseOffset) & 0xFF);
       }
       return bytes;
-  }
+    }
 
     /** Indicates whether this buffer is based on a byte array and provides read/write access.
      *
@@ -592,9 +592,9 @@ public final class ByteBuffer extends Buffer implements Comparable<ByteBuffer>, 
    // if (position == limit) {
    // throw new BufferOverflowException();
    // }
-           byteArray.set(position++, b);
-           return this;
-       }
+        byteArray.set(position++, b);
+        return this;
+    }
 
     /** Writes bytes in the given byte array to the current position and increases the position by
      * the number of bytes written. <p> Calling this method has the same effect as {@code put(src,
@@ -782,7 +782,7 @@ public final class ByteBuffer extends Buffer implements Comparable<ByteBuffer>, 
       putInt(position, value);
       position = newPosition;
       return this;
-  }
+    }
 
     /** Writes the given int to the specified index of this buffer.
      * <p>
@@ -808,7 +808,7 @@ public final class ByteBuffer extends Buffer implements Comparable<ByteBuffer>, 
           }
       }
       return this;
-  }
+    }
 
     /** Writes the given long to the current position and increases the position by 8.
      * <p>
@@ -828,7 +828,7 @@ public final class ByteBuffer extends Buffer implements Comparable<ByteBuffer>, 
       putLong(position, value);
       position = newPosition;
       return this;
-  }
+    }
 
     /** Writes the given long to the specified index of this buffer.
      * <p>
@@ -854,7 +854,7 @@ public final class ByteBuffer extends Buffer implements Comparable<ByteBuffer>, 
           }
       }
       return this;
-  }
+    }
 
     /** Writes the given short to the current position and increases the position by 2.
      * <p> The short is converted to bytes using the current byte order. </p>
@@ -872,7 +872,7 @@ public final class ByteBuffer extends Buffer implements Comparable<ByteBuffer>, 
       putShort(position, value);
       position = newPosition;
       return this;
-  }
+    }
 
     /** Writes the given short to the specified index of this buffer.
      * <p> The short is converted to bytes using the current byte order. The position is not
@@ -893,7 +893,7 @@ public final class ByteBuffer extends Buffer implements Comparable<ByteBuffer>, 
           byteArray.set(baseOffset, (byte)(value & 0xFF));
       }
       return this;
-  }
+    }
 
     /** Returns a sliced buffer that shares its content with this buffer.
      * <p> The sliced buffer's capacity will be this buffer's {@code remaining()}, and it's zero
@@ -932,21 +932,20 @@ public final class ByteBuffer extends Buffer implements Comparable<ByteBuffer>, 
 //    public ByteBuffer stringToByteBuffer (String s) {
 //        return new StringByteBuffer(s);
 //    }
-    
-    
+
     public ArrayBufferView getTypedArray () {
-      return byteArray;
-  }
+        return byteArray;
+    }
 
-  public int getElementSize () {
-      return 1;
-  }
+    public int getElementSize () {
+        return 1;
+    }
 
-  public int getElementType() {
-      return 0x1400; // GL_BYTE
-  }
-  
-  public boolean isReadOnly() {
-    return false;
-  }
+    public int getElementType() {
+        return 0x1400; // GL_BYTE
+    }
+
+    public boolean isReadOnly() {
+        return false;
+    }
 }
