@@ -26,10 +26,10 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 
-import playn.core.Net;
+import playn.core.NetImpl;
 import playn.core.util.Callback;
 
-class AndroidNet implements Net {
+class AndroidNet extends NetImpl {
 
   @Override
   public void get(String url, Callback<String> callback) {
@@ -41,28 +41,36 @@ class AndroidNet implements Net {
     doHttp(true, url, data, callback);
   }
 
-  private void doHttp(boolean isPost, String url, String data, Callback<String> callback) {
-    // TODO: use AsyncTask
-    HttpClient httpclient = new DefaultHttpClient();
-    HttpRequestBase req = null;
-    if (isPost) {
-      HttpPost httppost = new HttpPost(url);
-      if (data != null) {
+  AndroidNet(AndroidPlatform platform) {
+    super(platform);
+  }
+
+  private void doHttp(final boolean isPost, final String url, final String data,
+                      final Callback<String> callback) {
+    new Thread("AndroidNet.doHttp") {
+      public void run() {
+        HttpClient httpclient = new DefaultHttpClient();
+        HttpRequestBase req = null;
+        if (isPost) {
+          HttpPost httppost = new HttpPost(url);
+          if (data != null) {
+            try {
+              httppost.setEntity(new StringEntity(data));
+            } catch (UnsupportedEncodingException e) {
+              notifyFailure(callback, e);
+            }
+          }
+          req = httppost;
+        } else {
+          req = new HttpGet(url);
+        }
         try {
-          httppost.setEntity(new StringEntity(data));
-        } catch (UnsupportedEncodingException e) {
-          callback.onFailure(e);
+          HttpResponse response = httpclient.execute(req);
+          notifySuccess(callback, EntityUtils.toString(response.getEntity()));
+        } catch (Exception e) {
+          notifyFailure(callback, e);
         }
       }
-      req = httppost;
-    } else {
-      req = new HttpGet(url);
-    }
-    try {
-      HttpResponse response = httpclient.execute(req);
-      callback.onSuccess(EntityUtils.toString(response.getEntity()));
-    } catch (Exception e) {
-      callback.onFailure(e);
-    }
+    }.start();
   }
 }

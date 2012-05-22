@@ -64,7 +64,7 @@ public class AndroidPlatform implements Platform {
     assets = new AndroidAssets(this);
     json = new JsonImpl();
     keyboard = new AndroidKeyboard(this);
-    net = new AndroidNet();
+    net = new AndroidNet(this);
     pointer = new AndroidPointer();
     storage = new AndroidStorage(activity);
     touch = new AndroidTouch();
