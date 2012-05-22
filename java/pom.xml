@@ -3,7 +3,7 @@
   <parent>
     <groupId>com.googlecode.playn</groupId>
     <artifactId>playn-project</artifactId>
-    <version>1.3-SNAPSHOT</version>
+    <version>1.3</version>
   </parent>
 
   <artifactId>playn-java</artifactId>
@@ -98,9 +98,9 @@
                     </goals>
                   </pluginExecutionFilter>
                   <action>
-                    <execute >
+                    <execute>
                       <runOnIncremental>false</runOnIncremental>
-                    </execute >
+                    </execute>
                   </action>
                 </pluginExecution>
               </pluginExecutions>
