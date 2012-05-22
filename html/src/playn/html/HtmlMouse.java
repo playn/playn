@@ -26,26 +26,50 @@ class HtmlMouse extends MouseImpl {
   boolean inDragSequence = false;
 
   HtmlMouse(final Element rootElement) {
-    // capture mouse down on the root element, only.
-    HtmlInput.captureEvent(rootElement, "mousedown", new EventHandler() {
-      @Override
+    abstract class XYEventHandler implements EventHandler {
       public void handleEvent(NativeEvent ev) {
+        handleEvent(ev, HtmlInput.getRelativeX(ev, rootElement),
+                    HtmlInput.getRelativeY(ev, rootElement));
+      }
+      public abstract void handleEvent(NativeEvent ev, float x, float y);
+    }
+
+    abstract class MoveEventHandler extends XYEventHandler {
+      private float lastX = -1, lastY = -1;
+
+      @Override
+      public void handleEvent(NativeEvent ev, float x, float y) {
+        if (lastX == -1) {
+          lastX = x;
+          lastY = y;
+        }
+        if (inDragSequence == wantDragSequence()) {
+          if (onMouseMove(new MotionEvent.Impl(PlayN.currentTime(), x, y, x - lastX, y - lastY)))
+            ev.preventDefault();
+        }
+        lastX = x;
+        lastY = y;
+      }
+
+      protected abstract boolean wantDragSequence();
+    }
+
+    // capture mouse down on the root element, only.
+    HtmlInput.captureEvent(rootElement, "mousedown", new XYEventHandler() {
+      @Override
+      public void handleEvent(NativeEvent ev, float x, float y) {
         inDragSequence = true;
-        float x = HtmlInput.getRelativeX(ev, rootElement);
-        float y = HtmlInput.getRelativeY(ev, rootElement);
         if (onMouseDown(new ButtonEvent.Impl(PlayN.currentTime(), x, y, getMouseButton(ev))))
           ev.preventDefault();
       }
     });
 
     // capture mouse up anywhere on the page as long as we are in a drag sequence
-    HtmlInput.capturePageEvent("mouseup", new EventHandler() {
+    HtmlInput.capturePageEvent("mouseup", new XYEventHandler() {
       @Override
-      public void handleEvent(NativeEvent ev) {
+      public void handleEvent(NativeEvent ev, float x, float y) {
         if (inDragSequence) {
           inDragSequence = false;
-          float x = HtmlInput.getRelativeX(ev, rootElement);
-          float y = HtmlInput.getRelativeY(ev, rootElement);
           if (onMouseUp(new ButtonEvent.Impl(PlayN.currentTime(), x, y, getMouseButton(ev))))
             ev.preventDefault();
         }
@@ -53,44 +77,19 @@ class HtmlMouse extends MouseImpl {
     });
 
     // capture mouse move anywhere on the page that fires only if we are in a drag sequence
-    HtmlInput.capturePageEvent("mousemove", new EventHandler() {
-      float lastX = -1, lastY = -1;
+    HtmlInput.capturePageEvent("mousemove", new MoveEventHandler() {
       @Override
-      public void handleEvent(NativeEvent ev) {
-        float x = HtmlInput.getRelativeX(ev, rootElement);
-        float y = HtmlInput.getRelativeY(ev, rootElement);
-        if (lastX == -1) {
-          lastX = x;
-          lastY = y;
-        }
-        if (inDragSequence) {
-          if (onMouseMove(new MotionEvent.Impl(PlayN.currentTime(), x, y, x - lastX, y - lastY)))
-            ev.preventDefault();
-        }
-        lastX = x;
-        lastY = y;
+      protected boolean wantDragSequence() {
+        return true;
       }
     });
 
     // capture mouse move on the root element that fires only if we are not in a drag sequence
     // (the page-level event listener will handle the firing when we are in a drag sequence)
-    HtmlInput.captureEvent(rootElement, "mousemove", new EventHandler() {
-      float lastX = -1, lastY = -1;
+    HtmlInput.captureEvent(rootElement, "mousemove", new MoveEventHandler() {
       @Override
-      public void handleEvent(NativeEvent ev) {
-        float x = HtmlInput.getRelativeX(ev, rootElement);
-        float y = HtmlInput.getRelativeY(ev, rootElement);
-        if (lastX == -1) {
-          lastX = x;
-          lastY = y;
-        }
-
-        if (!inDragSequence) {
-          if (onMouseMove(new MotionEvent.Impl(PlayN.currentTime(), x, y, x - lastX, y - lastY)))
-            ev.preventDefault();
-        }
-        lastX = x;
-        lastY = y;
+      protected boolean wantDragSequence() {
+        return false;
       }
     });
 
@@ -164,23 +163,5 @@ class HtmlMouse extends MouseImpl {
     case (NativeEvent.BUTTON_RIGHT):  return BUTTON_RIGHT;
     default:                          return evt.getButton();
     }
-  }
-
-  @Override
-  public void lock() {
-  }
-
-  @Override
-  public void unlock() {
-  }
-
-  @Override
-  public boolean isLocked() {
-    return false;
-  }
-
-  @Override
-  public boolean isLockSupported() {
-    return false;
   }
 }

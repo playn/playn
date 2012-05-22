@@ -32,6 +32,26 @@ class JavaMouse extends MouseImpl {
     this.graphics = graphics;
   }
 
+  @Override
+  public void lock() {
+    Mouse.setGrabbed(true);
+  }
+
+  @Override
+  public void unlock() {
+    Mouse.setGrabbed(false);
+  }
+
+  @Override
+  public boolean isLocked() {
+    return Mouse.isGrabbed();
+  }
+
+  @Override
+  public boolean isLockSupported() {
+    return true;
+  }
+
   void init() throws LWJGLException {
     Mouse.create();
   }
@@ -45,8 +65,7 @@ class JavaMouse extends MouseImpl {
       Point m = new Point(Mouse.getEventX(), Display.getHeight() - Mouse.getEventY() - 1);
       graphics.transformMouse(m);
 
-      int dx = Mouse.getEventDX();
-      int dy = -Mouse.getEventDY();
+      int dx = Mouse.getEventDX(), dy = -Mouse.getEventDY();
       if (btn != -1) {
         if (Mouse.getEventButtonState()) {
           onMouseDown(new ButtonEvent.Impl(time, m.x, m.y, btn));
@@ -71,26 +90,6 @@ class JavaMouse extends MouseImpl {
     case 1:  return BUTTON_RIGHT;
     default: return lwjglButton;
     }
-  }
-
-  @Override
-  public void lock() {
-    Mouse.setGrabbed(true);
-  }
-
-  @Override
-  public void unlock() {
-    Mouse.setGrabbed(false);
-  }
-
-  @Override
-  public boolean isLocked() {
-    return Mouse.isGrabbed();
-  }
-
-  @Override
-  public boolean isLockSupported() {
-    return true;
   }
 }
 

@@ -18,33 +18,10 @@ package playn.core;
 /**
  * A NOOP mouse service for use on platforms that don't support mouse interaction.
  */
-public class MouseStub implements Mouse {
+public class MouseStub extends MouseImpl {
 
   @Override
   public boolean hasMouse() {
-    return false;
-  }
-
-  @Override
-  public void setListener(Listener listener) {
-    // noop!
-  }
-
-  @Override
-  public void lock() {
-  }
-
-  @Override
-  public void unlock() {
-  }
-
-  @Override
-  public boolean isLocked() {
-    return false;
-  }
-
-  @Override
-  public boolean isLockSupported() {
     return false;
   }
 }

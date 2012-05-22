@@ -35,6 +35,26 @@ public abstract class MouseImpl implements Mouse {
     this.listener = listener;
   }
 
+  @Override
+  public void lock() {
+    // noop
+  }
+
+  @Override
+  public void unlock() {
+    // noop
+  }
+
+  @Override
+  public boolean isLocked() {
+    return false;
+  }
+
+  @Override
+  public boolean isLockSupported() {
+    return false;
+  }
+
   protected boolean onMouseDown(ButtonEvent.Impl event) {
     boolean preventDefault = false;
     if (listener != null) {

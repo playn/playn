@@ -72,22 +72,4 @@ class FlashMouse extends MouseImpl {
 //      return BUTTON_RIGHT;
 //    }
   }
-
-  @Override
-  public void lock() {
-  }
-
-  @Override
-  public void unlock() {
-  }
-
-  @Override
-  public boolean isLocked() {
-    return false;
-  }
-
-  @Override
-  public boolean isLockSupported() {
-    return false;
-  }
 }
