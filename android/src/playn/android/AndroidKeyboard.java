@@ -75,14 +75,22 @@ public class AndroidKeyboard implements Keyboard {
 
         alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
           public void onClick(DialogInterface dialog, int whichButton) {
-            String value = input.getText().toString();
-            callback.onSuccess(value);
+            final String value = input.getText().toString();
+            platform.invokeLater(new Runnable() {
+              public void run() {
+                callback.onSuccess(value);
+              }
+            });
           }
         });
 
         alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
           public void onClick(DialogInterface dialog, int whichButton) {
-            callback.onSuccess(null);
+            platform.invokeLater(new Runnable() {
+              public void run() {
+                callback.onSuccess(null);
+              }
+            });
           }
         });
         alert.show();
