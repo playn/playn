@@ -22,15 +22,13 @@ import cli.System.IO.StreamWriter;
 import cli.System.Net.WebRequest;
 import cli.System.Net.WebResponse;
 
-import playn.core.Net;
+import playn.core.NetImpl;
 import playn.core.util.Callback;
 
-public class IOSNet implements Net {
-
-  private final IOSPlatform platform;
+public class IOSNet extends NetImpl {
 
   public IOSNet(IOSPlatform platform) {
-    this.platform = platform;
+    super(platform);
   }
 
   @Override
@@ -52,7 +50,7 @@ public class IOSNet implements Net {
           out.Close();
           req.BeginGetResponse(gotResponse(req, callback), null);
         } catch (Throwable t) {
-          queueFailure(callback, t);
+          notifyFailure(callback, t);
         }
       }
     }), null);
@@ -66,26 +64,13 @@ public class IOSNet implements Net {
         try {
           WebResponse rsp = req.EndGetResponse(result);
           reader = new StreamReader(rsp.GetResponseStream());
-          final String data = reader.ReadToEnd();
-          platform.invokeLater(new Runnable() {
-            public void run () {
-              callback.onSuccess(data);
-            }
-          });
+          notifySuccess(callback, reader.ReadToEnd());
         } catch (final Throwable t) {
-          queueFailure(callback, t);
+          notifyFailure(callback, t);
         } finally {
           if (reader != null)
             reader.Close();
         }
-      }
-    });
-  }
-
-  private void queueFailure (final Callback<?> callback, final Throwable t) {
-    platform.invokeLater(new Runnable() {
-      public void run () {
-        callback.onFailure(t);
       }
     });
   }

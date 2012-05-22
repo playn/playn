@@ -15,9 +15,6 @@
  */
 package playn.java;
 
-import playn.core.Net;
-import playn.core.util.Callback;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -26,13 +23,15 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-public class JavaNet implements Net {
+import playn.core.NetImpl;
+import playn.core.util.Callback;
+
+public class JavaNet extends NetImpl {
 
   private static final int BUF_SIZE = 4096;
-  private final JavaPlatform platform;
 
   public JavaNet(JavaPlatform platform) {
-    this.platform = platform;
+    super(platform);
   }
 
   @Override
@@ -111,21 +110,5 @@ public class JavaNet implements Net {
       result.append(buf, 0, len);
     }
     return result.toString();
-  }
-
-  private void notifySuccess(final Callback<String> callback, final String result) {
-    platform.invokeLater(new Runnable() {
-      public void run() {
-        callback.onSuccess(result);
-      }
-    });
-  }
-
-  private void notifyFailure(final Callback<String> callback, final Throwable cause) {
-    platform.invokeLater(new Runnable() {
-      public void run() {
-        callback.onFailure(cause);
-      }
-    });
   }
 }
