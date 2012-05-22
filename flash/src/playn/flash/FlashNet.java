@@ -43,6 +43,7 @@ public class FlashNet implements Net {
 
       request.method = flash.net.URLRequestMethod.POST;
       request.data = data;
+      request.contentType = "text/xml; charset=UTF-8";
       loader.addEventListener(Event.COMPLETE, function() {
         callback.@playn.core.util.Callback::onSuccess(Ljava/lang/Object;)(loader.data);
       });
