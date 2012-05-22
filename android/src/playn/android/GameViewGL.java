@@ -18,25 +18,25 @@ package playn.android;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
-import playn.core.Keyboard;
-import playn.core.Pointer;
-import playn.core.Touch;
 import android.content.Context;
 import android.opengl.GLSurfaceView;
 import android.util.Log;
 import android.view.SurfaceHolder;
 
-public class GameViewGL extends GLSurfaceView implements SurfaceHolder.Callback {
-  private static volatile int contextId = 1;
+import playn.core.Keyboard;
+import playn.core.Pointer;
+import playn.core.Touch;
 
-  AndroidPlatform platform;
+public class GameViewGL extends GLSurfaceView implements SurfaceHolder.Callback {
+
+  private static volatile int contextId = 1;
 
   private final AndroidGL20 gl20;
   private final AndroidRendererGL renderer;
-  private final SurfaceHolder holder;
-  private GameLoop loop;
   private final GameActivity activity;
+  private GameLoop loop;
   private boolean gameSizeSet = false; // Set by AndroidGraphics
+  AndroidPlatform platform;
 
   private class AndroidRendererGL implements Renderer {
     @Override
@@ -58,16 +58,14 @@ public class GameViewGL extends GLSurfaceView implements SurfaceHolder.Callback 
     @Override
     public void onDrawFrame(GL10 gl) {
       // Wait until onDrawFrame to make sure all the metrics are in place at this point.
-      boolean gameInitialized = (platform != null);
-      if (!gameInitialized) {
+      if (platform == null) {
         platform = AndroidPlatform.register(gl20, activity);
         activity.main();
         loop = new GameLoop(platform);
         loop.start();
-        gameInitialized = true;
       }
       // Handle updating, clearing the screen, and drawing
-      if (loop.running() && gameInitialized)
+      if (loop.running())
         loop.run();
     }
 
@@ -82,8 +80,7 @@ public class GameViewGL extends GLSurfaceView implements SurfaceHolder.Callback 
     super(context);
     this.gl20 = _gl20;
     this.activity = activity;
-    holder = getHolder();
-    holder.addCallback(this);
+    getHolder().addCallback(this);
     setFocusable(true);
     setEGLContextClientVersion(2);
     if (activity.isHoneycombOrLater()) {
