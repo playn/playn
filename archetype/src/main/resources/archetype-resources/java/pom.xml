@@ -27,6 +27,24 @@
     </dependency>
   </dependencies>
 
+  <build>
+    <plugins>
+      <!-- unpack LWJGL when testing -->
+      <plugin>
+        <groupId>com.googlecode.mavennatives</groupId>
+        <artifactId>maven-nativedependencies-plugin</artifactId>
+        <version>0.0.6</version>
+        <executions>
+          <execution>
+            <id>unpacknatives</id>
+            <phase>test-compile</phase>
+            <goals><goal>copy</goal></goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
   <profiles>
     <!-- allows testing of Java backend via: mvn test -Ptest-java -->
     <profile>
@@ -34,18 +52,22 @@
       <build>
         <plugins>
           <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>exec-maven-plugin</artifactId>
-            <version>1.1.1</version>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <version>1.7</version>
             <executions>
               <execution>
                 <phase>test</phase>
-                <goals>
-                  <goal>java</goal>
-                </goals>
                 <configuration>
-                  <mainClass>${package}.java.${JavaGameClassName}Java</mainClass>
+                  <target>
+                    <java fork="true" classname="${package}.java.${JavaGameClassName}Java"
+                          classpathref="maven.test.classpath">
+                      <sysproperty key="java.library.path" value="target/natives"/>
+                    </java>
+                  </target>
                 </configuration>
+                <goals>
+                  <goal>run</goal>
+                </goals>
               </execution>
             </executions>
           </plugin>
