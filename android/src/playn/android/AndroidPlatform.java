@@ -57,13 +57,13 @@ public class AndroidPlatform implements Platform {
   protected AndroidPlatform(GameActivity activity, AndroidGL20 gl20) {
     this.activity = activity;
 
+    log = new AndroidLog();
     audio = new AndroidAudio(this);
     graphics = new AndroidGraphics(this, gl20, activity.scaleFactor());
     analytics = new AndroidAnalytics();
     assets = new AndroidAssets(this);
     json = new JsonImpl();
     keyboard = new AndroidKeyboard(this);
-    log = new AndroidLog();
     net = new AndroidNet();
     pointer = new AndroidPointer();
     storage = new AndroidStorage(activity);
