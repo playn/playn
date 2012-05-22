@@ -15,12 +15,12 @@
 package playn.core;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public abstract class AbstractSound implements Sound {
-  private ArrayList<ResourceCallback<? super Sound>> resourceCallbacks;
 
+  private List<ResourceCallback<? super Sound>> resourceCallbacks;
   private Boolean soundLoaded; // null indicates result not yet known
-
 
   @Override
   public final void addCallback(ResourceCallback<? super Sound> callback) {
@@ -39,6 +39,7 @@ public abstract class AbstractSound implements Sound {
   }
 
   protected void onLoadError(Throwable err) {
+    this.soundLoaded = false;
     if (resourceCallbacks == null) {
       return;
     }
@@ -49,6 +50,7 @@ public abstract class AbstractSound implements Sound {
   }
 
   protected void onLoadComplete() {
+    this.soundLoaded = true;
     if (resourceCallbacks == null) {
       return;
     }
