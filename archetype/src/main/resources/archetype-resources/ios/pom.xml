@@ -36,7 +36,7 @@
       <plugin>
         <groupId>com.samskivert</groupId>
         <artifactId>ikvm-maven-plugin</artifactId>
-        <version>1.1.1</version>
+        <version>1.1.2</version>
         <!-- this lets Maven know that we define 'packaging: dll' -->
         <extensions>true</extensions>
         <configuration>
@@ -50,6 +50,12 @@
             <dll>System.Data.dll</dll>
             <dll>Mono.Data.Sqlite.dll</dll>
           </dlls>
+          <copyDlls>
+            <copyDll>bin/IKVM.Runtime.dll</copyDll>
+            <copyDll>bin/IKVM.OpenJDK.Core.dll</copyDll>
+            <copyDll>bin/IKVM.OpenJDK.Util.dll</copyDll>
+            <copyDll>bin/IKVM.OpenJDK.Text.dll</copyDll>
+          </copyDlls>
         </configuration>
       </plugin>
     </plugins>

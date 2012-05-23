@@ -66,7 +66,7 @@
       <HintPath>bin\\${artifactId}.dll</HintPath>
     </Reference>
     <Reference Include="IKVM.OpenJDK.Core">
-      <HintPath>..\..\..\ikvm-monotouch\bin\IKVM.OpenJDK.Core.dll</HintPath>
+      <HintPath>bin\IKVM.OpenJDK.Core.dll</HintPath>
     </Reference>
     <Reference Include="Mono.Data.Sqlite" />
     <Reference Include="System.Data" />
