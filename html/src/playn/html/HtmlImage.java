@@ -152,6 +152,13 @@ class HtmlImage extends ImageGL implements HtmlCanvas.Drawable {
   }
 
   @Override
+  public void clearTexture() {
+    // we may be in use on a non-WebGL platform, in which case we should NOOP
+    if (ctx != null)
+      super.clearTexture();
+  }
+
+  @Override
   protected void updateTexture(Object tex) {
     ((HtmlGLContext) ctx).updateTexture((WebGLTexture)tex, img);
   }

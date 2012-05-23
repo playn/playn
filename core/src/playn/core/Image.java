@@ -114,4 +114,15 @@ public interface Image {
    * not work on sub-images.
    */
   Image transform(BitmapTransformer xform);
+
+  /**
+   * Clears the GPU texture associated with this image, on platforms implemented via OpenGL. Does
+   * nothing on non-OpenGL platforms. In general it is not necessary to call this method. Images
+   * added to {@link ImageLayer} instances automatically clear their texture when the image layer
+   * is removed from the scene graph. Textures are also cleared when the image is garbage
+   * collected. However, if you manually draw a large number of images to a {@link Surface}, you
+   * may need to clear textures manually to avoid running out of GPU memory on low-memory-having
+   * mobile devices.
+   */
+  void clearTexture();
 }

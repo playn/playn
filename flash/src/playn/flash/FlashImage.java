@@ -107,6 +107,11 @@ class FlashImage implements Image {
     return new FlashImage(((FlashBitmapTransformer) xform).transform(imageData));
   }
 
+  @Override
+  public void clearTexture() {
+    // noop
+  }
+
   BitmapData bitmapData() {
     return imageData;
   }
