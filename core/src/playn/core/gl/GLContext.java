@@ -15,7 +15,6 @@ package playn.core.gl;
 
 import playn.core.InternalTransform;
 import playn.core.Platform;
-import playn.core.PlayN;
 import playn.core.StockInternalTransform;
 
 public abstract class GLContext {

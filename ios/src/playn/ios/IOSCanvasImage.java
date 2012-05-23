@@ -19,7 +19,6 @@ import cli.MonoTouch.CoreGraphics.CGImage;
 
 import playn.core.Canvas;
 import playn.core.CanvasImage;
-import playn.core.gl.GLContext;
 
 /**
  * Provides {@link Canvas} rendering into an image.

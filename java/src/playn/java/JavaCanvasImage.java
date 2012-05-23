@@ -23,7 +23,6 @@ import playn.core.Canvas;
 import playn.core.CanvasImage;
 import playn.core.Image;
 import playn.core.ResourceCallback;
-import playn.core.gl.GLContext;
 
 class JavaCanvasImage extends JavaImage implements CanvasImage {
 

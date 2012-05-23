@@ -78,7 +78,6 @@ class IOSTextLayout extends AbstractTextLayout {
 
   private static abstract class IOSTextStamp implements Stamp<CGBitmapContext> {
     protected final IOSFont font;
-    protected final CTStringAttributes attribs;
     protected final CGColor color;
 
     public float width, height;
@@ -86,9 +85,8 @@ class IOSTextLayout extends AbstractTextLayout {
 
     public abstract void paint(CGBitmapContext bctx, float x, float y);
 
-    protected IOSTextStamp(IOSFont font, CTStringAttributes attribs, int color) {
+    protected IOSTextStamp(IOSFont font, int color) {
       this.font = font;
-      this.attribs = attribs;
       this.color = IOSCanvas.toCGColor(color);
     }
   }
@@ -100,7 +98,7 @@ class IOSTextLayout extends AbstractTextLayout {
     private final float adjustX;
 
     Wrapped(IOSGraphics gfx, IOSFont font, CTStringAttributes attribs, int color, String text) {
-      super(font, attribs, color);
+      super(font, color);
 
       NSAttributedString atext = new NSAttributedString(text, attribs);
       float fontLineHeight = font.ctFont.get_AscentMetric() + font.ctFont.get_DescentMetric() +
@@ -166,7 +164,7 @@ class IOSTextLayout extends AbstractTextLayout {
     private final RectangleF bounds;
 
     Single(IOSGraphics gfx, IOSFont font, CTStringAttributes attribs, int color, String text) {
-      super(font, attribs, color);
+      super(font, color);
       line = new CTLine(new NSAttributedString(text, attribs));
       bounds = line.GetImageBounds(gfx.scratchCtx);
       this.width = bounds.get_X() + bounds.get_Width();
@@ -201,7 +199,6 @@ class IOSTextLayout extends AbstractTextLayout {
   private final IOSTextStamp fillStamp, altStamp;
   private IOSTextStamp strokeStamp; // initialized lazily
   private float strokeWidth;
-  private int strokeColor;
 
   public IOSTextLayout(IOSGraphics gfx, String text, TextFormat format) {
     super(gfx, format);

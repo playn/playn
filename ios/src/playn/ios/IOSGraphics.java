@@ -15,7 +15,6 @@
  */
 package playn.ios;
 
-import cli.System.Drawing.RectangleF;
 import cli.System.Runtime.InteropServices.Marshal;
 
 import cli.MonoTouch.CoreGraphics.CGBitmapContext;

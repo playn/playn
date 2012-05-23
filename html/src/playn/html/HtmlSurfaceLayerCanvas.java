@@ -16,7 +16,6 @@
 package playn.html;
 
 import com.google.gwt.canvas.dom.client.Context2d;
-import com.google.gwt.dom.client.Document;
 
 import playn.core.Asserts;
 import playn.core.CanvasSurface;

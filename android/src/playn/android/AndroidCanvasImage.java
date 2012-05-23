@@ -17,11 +17,8 @@ package playn.android;
 
 import android.graphics.Bitmap;
 
-import pythagoras.f.MathUtil;
-
 import playn.core.Canvas;
 import playn.core.CanvasImage;
-import playn.core.gl.GLContext;
 
 class AndroidCanvasImage extends AndroidImage implements CanvasImage {
 

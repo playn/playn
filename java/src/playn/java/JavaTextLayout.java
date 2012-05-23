@@ -15,7 +15,6 @@
  */
 package playn.java;
 
-import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
@@ -39,7 +38,6 @@ class JavaTextLayout extends AbstractTextLayout {
   private static FontRenderContext dummyFontContext = createDummyFRC();
 
   private List<TextLayout> layouts = new ArrayList<TextLayout>();
-  private Color textColor, altColor;
   private final JavaTextStamp stamp, altStamp;
 
   private class JavaTextStamp implements Stamp<Graphics2D> {

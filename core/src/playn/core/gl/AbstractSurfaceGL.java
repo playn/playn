@@ -20,7 +20,6 @@ import java.util.List;
 
 import pythagoras.f.FloatMath;
 import pythagoras.f.MathUtil;
-import pythagoras.f.Transforms;
 
 import playn.core.Asserts;
 import playn.core.Image;

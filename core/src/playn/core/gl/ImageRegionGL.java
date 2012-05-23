@@ -16,7 +16,6 @@
 package playn.core.gl;
 
 import playn.core.Image;
-import playn.core.InternalTransform;
 import playn.core.ResourceCallback;
 
 public abstract class ImageRegionGL extends ImageGL implements Image.Region {

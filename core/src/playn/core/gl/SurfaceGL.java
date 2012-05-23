@@ -15,8 +15,6 @@
  */
 package playn.core.gl;
 
-import pythagoras.f.MathUtil;
-
 import playn.core.InternalTransform;
 
 public class SurfaceGL extends AbstractSurfaceGL {
