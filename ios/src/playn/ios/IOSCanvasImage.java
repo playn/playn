@@ -49,14 +49,14 @@ public class IOSCanvasImage extends IOSAbstractImage implements CanvasImage {
   }
 
   @Override
-  public Object ensureTexture(GLContext ctx, boolean repeatX, boolean repeatY) {
+  public Object ensureTexture(boolean repeatX, boolean repeatY) {
     // if we have a canvas, and it's dirty, force the recreation of our texture which will obtain
     // the latest canvas data
     if (canvas.dirty()) {
       canvas.clearDirty();
-      clearTexture(ctx);
+      clearTexture();
     }
-    return super.ensureTexture(ctx, repeatX, repeatY);
+    return super.ensureTexture(repeatX, repeatY);
   }
 
   @Override
@@ -65,7 +65,8 @@ public class IOSCanvasImage extends IOSAbstractImage implements CanvasImage {
   }
 
   @Override
-  protected void updateTexture(GLContext ctx, Object tex) {
-    this.ctx.updateTexture((Integer)tex, canvas.texWidth(), canvas.texHeight(), canvas.data());
+  protected void updateTexture(Object tex) {
+    ((IOSGLContext) ctx).updateTexture((Integer)tex, canvas.texWidth(), canvas.texHeight(),
+                                       canvas.data());
   }
 }

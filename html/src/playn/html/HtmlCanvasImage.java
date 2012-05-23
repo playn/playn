@@ -23,8 +23,8 @@ class HtmlCanvasImage extends HtmlImage implements CanvasImage {
 
   private HtmlCanvas canvas;
 
-  public HtmlCanvasImage(HtmlCanvas canvas) {
-    super(canvas.canvas());
+  public HtmlCanvasImage(GLContext ctx, HtmlCanvas canvas) {
+    super(ctx, canvas.canvas());
     this.canvas = canvas;
   }
 
@@ -34,11 +34,11 @@ class HtmlCanvasImage extends HtmlImage implements CanvasImage {
   }
 
   @Override
-  public Object ensureTexture(GLContext ctx, boolean repeatX, boolean repeatY) {
+  public Object ensureTexture(boolean repeatX, boolean repeatY) {
     if (canvas.dirty()) {
       canvas.clearDirty();
-      clearTexture(ctx);
+      clearTexture();
     }
-    return super.ensureTexture(ctx, repeatX, repeatY);
+    return super.ensureTexture(repeatX, repeatY);
   }
 }

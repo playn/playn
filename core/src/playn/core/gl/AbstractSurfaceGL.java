@@ -63,7 +63,7 @@ abstract class AbstractSurfaceGL implements Surface {
   @Override
   public Surface drawImage(Image image, float x, float y, float dw, float dh) {
     bindFramebuffer();
-    ((ImageGL) image).draw(ctx, topTransform(), x, y, dw, dh, false, false, alpha);
+    ((ImageGL) image).draw(topTransform(), x, y, dw, dh, false, false, alpha);
     return this;
   }
 
@@ -71,7 +71,7 @@ abstract class AbstractSurfaceGL implements Surface {
   public Surface drawImage(Image image, float dx, float dy, float dw, float dh,
                            float sx, float sy, float sw, float sh) {
     bindFramebuffer();
-    ((ImageGL) image).draw(ctx, topTransform(), dx, dy, dw, dh, sx, sy, sw, sh, alpha);
+    ((ImageGL) image).draw(topTransform(), dx, dy, dw, dh, sx, sy, sw, sh, alpha);
     return this;
   }
 
@@ -105,7 +105,7 @@ abstract class AbstractSurfaceGL implements Surface {
     l.preConcatenate(topTransform());
 
     if (fillPattern != null) {
-      Object tex = fillPattern.ensureTexture(ctx, true, true);
+      Object tex = fillPattern.ensureTexture(true, true);
       if (tex != null) {
         ctx.fillQuad(l, 0, 0, length, 0, 0, width, length, width,
                      fillPattern.width(), fillPattern.height(), tex, alpha);
@@ -121,7 +121,7 @@ abstract class AbstractSurfaceGL implements Surface {
     bindFramebuffer();
 
     if (fillPattern != null) {
-      Object tex = fillPattern.ensureTexture(ctx, true, true);
+      Object tex = fillPattern.ensureTexture(true, true);
       if (tex != null) {
         ctx.fillRect(topTransform(), x, y, width, height,
                      fillPattern.width(), fillPattern.height(), tex, alpha);
@@ -137,7 +137,7 @@ abstract class AbstractSurfaceGL implements Surface {
     bindFramebuffer();
 
     if (fillPattern != null) {
-      Object tex = fillPattern.ensureTexture(ctx, true, true);
+      Object tex = fillPattern.ensureTexture(true, true);
       if (tex != null) {
         ctx.fillTriangles(topTransform(), xys, indices,
                           fillPattern.width(), fillPattern.height(), tex, alpha);
@@ -154,7 +154,7 @@ abstract class AbstractSurfaceGL implements Surface {
 
     if (fillPattern == null)
       throw new IllegalStateException("No fill pattern currently set");
-    Object tex = fillPattern.ensureTexture(ctx, true, true);
+    Object tex = fillPattern.ensureTexture(true, true);
     if (tex != null) {
       ctx.fillTriangles(topTransform(), xys, sxys, indices, tex, alpha);
     }

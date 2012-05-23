@@ -123,6 +123,11 @@ class HtmlGraphicsGL extends HtmlGraphics {
   }
 
   @Override
+  HtmlGLContext ctx() {
+    return ctx;
+  }
+
+  @Override
   void preparePaint() {
     if (gl20 == null) {
       ctx.preparePaint();

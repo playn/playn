@@ -144,7 +144,7 @@ public class HtmlPlatform implements Platform {
   // initialization, before we have called PlayN.setPlatform
   static final HtmlLog log = GWT.create(HtmlLog.class);
 
-  private final HtmlAssets assets = new HtmlAssets();
+  private final HtmlAssets assets = new HtmlAssets(this);
   private final HtmlAudio audio = new HtmlAudio();
   private final HtmlRegularExpression regularExpression = new HtmlRegularExpression();
   private final HtmlGraphics graphics;
@@ -207,7 +207,7 @@ public class HtmlPlatform implements Platform {
   }
 
   @Override
-  public Graphics graphics() {
+  public HtmlGraphics graphics() {
     return graphics;
   }
 

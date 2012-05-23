@@ -28,7 +28,7 @@ public class IOSImage extends IOSAbstractImage {
 
   private final UIImage image;
 
-  public IOSImage (IOSGLContext ctx, UIImage image, Scale scale) {
+  public IOSImage (GLContext ctx, UIImage image, Scale scale) {
     super(ctx, scale);
     this.image = image;
   }
@@ -54,7 +54,7 @@ public class IOSImage extends IOSAbstractImage {
   }
 
   @Override
-  protected void updateTexture(GLContext ctx, Object tex) {
-    this.ctx.updateTexture((Integer)tex, image);
+  protected void updateTexture(Object tex) {
+    ((IOSGLContext) ctx).updateTexture((Integer)tex, image);
   }
 }

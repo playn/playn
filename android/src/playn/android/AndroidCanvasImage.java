@@ -41,13 +41,13 @@ class AndroidCanvasImage extends AndroidImage implements CanvasImage {
   }
 
   @Override
-  public Object ensureTexture(GLContext ctx, boolean repeatX, boolean repeatY) {
+  public Object ensureTexture(boolean repeatX, boolean repeatY) {
     // if we have a canvas, and it's dirty, force the recreation of our texture which will obtain
     // the latest canvas data
     if (canvas.dirty()) {
       canvas.clearDirty();
-      clearTexture(ctx);
+      clearTexture();
     }
-    return super.ensureTexture(ctx, repeatX, repeatY);
+    return super.ensureTexture(repeatX, repeatY);
   }
 }

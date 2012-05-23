@@ -27,6 +27,7 @@ import cli.System.Drawing.RectangleF;
 import playn.core.Image;
 import playn.core.Pattern;
 import playn.core.ResourceCallback;
+import playn.core.gl.GLContext;
 import playn.core.gl.ImageGL;
 import playn.core.gl.Scale;
 
@@ -34,8 +35,6 @@ import playn.core.gl.Scale;
  * Provides some shared bits for {@link IOSImage} and {@link IOSCanvasImage}.
  */
 public abstract class IOSAbstractImage extends ImageGL implements Image, IOSCanvas.Drawable {
-
-  protected final IOSGLContext ctx;
 
   /**
    * Returns a core graphics image that can be used to paint this image into a canvas.
@@ -146,8 +145,7 @@ public abstract class IOSAbstractImage extends ImageGL implements Image, IOSCanv
       ctx.queueDeleteFramebuffer(reptex);
   }
 
-  protected IOSAbstractImage(IOSGLContext ctx, Scale scale) {
-    super(scale);
-    this.ctx = ctx;
+  protected IOSAbstractImage(GLContext ctx, Scale scale) {
+    super(ctx, scale);
   }
 }

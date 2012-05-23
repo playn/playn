@@ -47,15 +47,15 @@ class HtmlImage extends ImageGL implements HtmlCanvas.Drawable {
   ImageElement img;
   CanvasElement canvas; // Used internally for getRGB
 
-  HtmlImage(CanvasElement img) {
-    super(Scale.ONE);
+  HtmlImage(GLContext ctx, CanvasElement img) {
+    super(ctx, Scale.ONE);
     this.canvas = img;
     fakeComplete(img);
     this.img = img.cast();
   }
 
-  HtmlImage(ImageElement img) {
-    super(Scale.ONE);
+  HtmlImage(GLContext ctx, ImageElement img) {
+    super(ctx, Scale.ONE);
     this.img = img;
   }
 
@@ -148,12 +148,12 @@ class HtmlImage extends ImageGL implements HtmlCanvas.Drawable {
 
   @Override
   public Image transform(BitmapTransformer xform) {
-    return new HtmlImage(((HtmlBitmapTransformer) xform).transform(img));
+    return new HtmlImage(ctx, ((HtmlBitmapTransformer) xform).transform(img));
   }
 
   @Override
-  protected void updateTexture(GLContext ctx, Object tex) {
-    ((HtmlGLContext)ctx).updateTexture((WebGLTexture)tex, img);
+  protected void updateTexture(Object tex) {
+    ((HtmlGLContext) ctx).updateTexture((WebGLTexture)tex, img);
   }
 
   ImageElement subImageElement(float x, float y, float width, float height) {

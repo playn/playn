@@ -77,10 +77,10 @@ public class ImageLayerGL extends LayerGL implements ImageLayer {
     if (this.img == img)
       return;
     if (this.img != null)
-      this.img.release(ctx);
+      this.img.release();
     this.img = (ImageGL) img;
     if (this.img != null)
-      this.img.reference(ctx);
+      this.img.reference();
   }
 
   @Override
@@ -122,7 +122,7 @@ public class ImageLayerGL extends LayerGL implements ImageLayer {
   public void paint(InternalTransform parentTransform, float parentAlpha) {
     if (!visible()) return;
 
-    img.draw(ctx, localTransform(parentTransform), 0, 0, width(), height(), repeatX, repeatY,
+    img.draw(localTransform(parentTransform), 0, 0, width(), height(), repeatX, repeatY,
              parentAlpha * alpha);
   }
 

@@ -47,14 +47,19 @@ public class HtmlAssets extends AbstractCachingAssets {
    */
   private static final boolean LOG_XHR_SUCCESS = false;
 
+  private final HtmlPlatform platform;
   private String pathPrefix = "";
+
+  private Map<String, AutoClientBundleWithLookup> clientBundles =
+    new HashMap<String, AutoClientBundleWithLookup>();
 
   public void setPathPrefix(String prefix) {
     pathPrefix = prefix;
   }
 
-  private Map<String, AutoClientBundleWithLookup> clientBundles =
-    new HashMap<String, AutoClientBundleWithLookup>();
+  public HtmlAssets(HtmlPlatform platform) {
+    this.platform = platform;
+  }
 
   public void addClientBundle(String regExp, AutoClientBundleWithLookup clientBundle) {
     clientBundles.put(regExp, clientBundle);
@@ -255,7 +260,7 @@ public class HtmlAssets extends AbstractCachingAssets {
      */
     setCrossOrigin(img, "anonymous");
     img.setSrc(url);
-    return new HtmlImage(img);
+    return new HtmlImage(platform.graphics().ctx(), img);
   }
 
   /**

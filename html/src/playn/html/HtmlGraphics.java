@@ -93,7 +93,7 @@ public abstract class HtmlGraphics implements Graphics {
 
   @Override
   public CanvasImage createImage(float width, float height) {
-    return new HtmlCanvasImage(new HtmlCanvas(width, height));
+    return new HtmlCanvasImage(ctx(), new HtmlCanvas(width, height));
   }
 
   @Override
@@ -164,6 +164,10 @@ public abstract class HtmlGraphics implements Graphics {
   @Override
   public GL20 gl20() {
     throw new UnsupportedOperationException();
+  }
+
+  HtmlGLContext ctx() {
+    return null;
   }
 
   HtmlFontMetrics getFontMetrics(Font font) {

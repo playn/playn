@@ -28,14 +28,12 @@ import playn.core.gl.Scale;
 
 class AndroidImage extends ImageGL implements AndroidGLContext.Refreshable, AndroidCanvas.Drawable {
 
-  private final AndroidGLContext ctx;
   private final Bitmap bitmap;
 
-  AndroidImage(AndroidGLContext ctx, Bitmap bitmap, Scale scale) {
-    super(scale);
-    this.ctx = ctx;
+  AndroidImage(GLContext ctx, Bitmap bitmap, Scale scale) {
+    super(ctx, scale);
     this.bitmap = bitmap;
-    ctx.addRefreshable(this);
+    ((AndroidGLContext) ctx).addRefreshable(this);
   }
 
   @Override
@@ -50,12 +48,12 @@ class AndroidImage extends ImageGL implements AndroidGLContext.Refreshable, Andr
 
   @Override
   public void onSurfaceLost() {
-    clearTexture(ctx);
+    clearTexture();
   }
 
   public void destroy() {
-    ctx.removeRefreshable(this);
-    clearTexture(ctx);
+    ((AndroidGLContext) ctx).removeRefreshable(this);
+    clearTexture();
   }
 
   @Override
@@ -113,8 +111,8 @@ class AndroidImage extends ImageGL implements AndroidGLContext.Refreshable, Andr
   }
 
   @Override
-  protected void updateTexture(GLContext ctx, Object tex) {
-    this.ctx.updateTexture((Integer)tex, bitmap);
+  protected void updateTexture(Object tex) {
+    ((AndroidGLContext) ctx).updateTexture((Integer)tex, bitmap);
   }
 
   @Override

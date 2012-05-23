@@ -21,13 +21,14 @@ import java.util.List;
 
 import playn.core.Image;
 import playn.core.ResourceCallback;
+import playn.core.gl.GLContext;
 import playn.core.gl.Scale;
 
 public class JavaStaticImage extends JavaImage {
 
   private List<ResourceCallback<? super Image>> callbacks;
 
-  public JavaStaticImage(JavaGLContext ctx, final BufferedImage img, Scale scale) {
+  public JavaStaticImage(GLContext ctx, final BufferedImage img, Scale scale) {
     super(ctx, null, scale);
 
     JavaAssets.doResourceAction(new Runnable() {

@@ -30,12 +30,10 @@ import playn.core.gl.Scale;
 
 abstract class JavaImage extends ImageGL implements JavaCanvas.Drawable {
 
-  protected final JavaGLContext ctx;
   protected BufferedImage img;
 
-  JavaImage(JavaGLContext ctx, BufferedImage img, Scale scale) {
-    super(scale);
-    this.ctx = ctx;
+  JavaImage(GLContext ctx, BufferedImage img, Scale scale) {
+    super(ctx, scale);
     this.img = img;
   }
 
@@ -107,7 +105,7 @@ abstract class JavaImage extends ImageGL implements JavaCanvas.Drawable {
   }
 
   @Override
-  protected void updateTexture(GLContext ctx, Object tex) {
+  protected void updateTexture(Object tex) {
     Asserts.checkState(img != null);
     ((JavaGLContext) ctx).updateTexture((Integer) tex, img);
   }
