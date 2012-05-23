@@ -173,7 +173,7 @@ class HtmlCanvas implements Canvas {
 
   @Override
   public Canvas fillRoundRect(float x, float y, float w, float h, float radius) {
-    addRoundRectPath(x, y, width, height, radius);
+    addRoundRectPath(x, y, w, h, radius);
     ctx.fill();
     dirty = true;
     return this;
@@ -310,7 +310,7 @@ class HtmlCanvas implements Canvas {
 
   @Override
   public Canvas strokeRoundRect(float x, float y, float w, float h, float radius) {
-    addRoundRectPath(x, y, width, height, radius);
+    addRoundRectPath(x, y, w, h, radius);
     ctx.stroke();
     dirty = true;
     return this;

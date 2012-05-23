@@ -107,7 +107,7 @@ class FlashCanvas implements Canvas {
 
   @Override
   public Canvas fillRoundRect(float x, float y, float w, float h, float radius) {
-    addRoundRectPath(x, y, width, height, radius);
+    addRoundRectPath(x, y, w, h, radius);
     context2d.fill();
     dirty = true;
     return this;
@@ -273,7 +273,7 @@ class FlashCanvas implements Canvas {
 
   @Override
   public Canvas strokeRoundRect(float x, float y, float w, float h, float radius) {
-    addRoundRectPath(x, y, width, height, radius);
+    addRoundRectPath(x, y, w, h, radius);
     context2d.stroke();
     dirty = true;
     return this;
