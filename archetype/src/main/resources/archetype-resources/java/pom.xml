@@ -9,9 +9,13 @@
     <version>${version}</version>
   </parent>
 
-  <artifactId>${artifactId}</artifactId>
+  <artifactId>${artifactId}-java</artifactId>
   <packaging>jar</packaging>
   <name>${JavaGameClassName} Java</name>
+
+  <properties>
+    <mainClass>${package}.java.${JavaGameClassName}Java</mainClass>
+  </properties>
 
   <dependencies>
     <dependency>
@@ -42,37 +46,64 @@
           </execution>
         </executions>
       </plugin>
-    </plugins>
-  </build>
 
-  <profiles>
-    <!-- allows testing of Java backend via: mvn test -Ptest-java -->
-    <profile>
-      <id>test-java</id>
-      <build>
-        <plugins>
-          <plugin>
-            <artifactId>maven-antrun-plugin</artifactId>
-            <version>1.7</version>
-            <executions>
-              <execution>
-                <phase>test</phase>
-                <configuration>
-                  <target>
-                    <java fork="true" classname="${package}.java.${JavaGameClassName}Java"
-                          classpathref="maven.test.classpath">
-                      <sysproperty key="java.library.path" value="target/natives"/>
-                    </java>
-                  </target>
-                </configuration>
-                <goals>
-                  <goal>run</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-  </profiles>
+      <!-- allows testing of Java backend via: mvn test -->
+      <plugin>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <version>1.6</version>
+        <executions>
+          <execution>
+            <phase>test</phase>
+            <configuration>
+              <target>
+                <java fork="true" classname="${mainClass}" classpathref="maven.test.classpath">
+                  <sysproperty key="java.library.path" value="target/natives"/>
+                  <arg value="${scaleFactor}"/>
+                </java>
+              </target>
+            </configuration>
+            <goals>
+              <goal>run</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+
+    <!-- This configuration is used to store Eclipse m2e settings only. -->
+    <!-- It has no influence on the Maven build itself.-->
+    <pluginManagement>
+      <plugins>
+        <!-- cause eclipse to unpack the LWJGL natives at the appropriate time -->
+        <plugin>
+          <groupId>org.eclipse.m2e</groupId>
+          <artifactId>lifecycle-mapping</artifactId>
+          <version>1.0.0</version>
+          <configuration>
+            <lifecycleMappingMetadata>
+              <pluginExecutions>
+                <pluginExecution>
+                  <pluginExecutionFilter>
+                    <groupId>com.googlecode.mavennatives</groupId>
+                    <artifactId>
+                      maven-nativedependencies-plugin
+                    </artifactId>
+                    <versionRange>[0.0.6,)</versionRange>
+                    <goals>
+                      <goal>copy</goal>
+                    </goals>
+                  </pluginExecutionFilter>
+                  <action>
+                    <execute>
+                      <runOnIncremental>false</runOnIncremental>
+                    </execute>
+                  </action>
+                </pluginExecution>
+              </pluginExecutions>
+            </lifecycleMappingMetadata>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
 </project>

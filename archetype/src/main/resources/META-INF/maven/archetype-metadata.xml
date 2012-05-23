@@ -12,7 +12,144 @@
         <include>build.xml</include>
       </includes>
     </fileSet>
+    <!-- java module -->
+    <fileSet filtered="true" encoding="UTF-8">
+      <directory>java</directory>
+      <includes>
+        <include>pom.xml</include>
+      </includes>
+    </fileSet>
+    <fileSet filtered="true" packaged="true" encoding="UTF-8">
+      <directory>java/src/main/java</directory>
+      <includes>
+        <include>**/*.java</include>
+      </includes>
+    </fileSet>
+    <!-- html module -->
+    <fileSet filtered="true" encoding="UTF-8">
+      <directory>html</directory>
+      <includes>
+        <include>pom.xml</include>
+      </includes>
+    </fileSet>
+    <fileSet filtered="true" packaged="true" encoding="UTF-8">
+      <directory>html/src/main/java</directory>
+      <includes>
+        <include>**/*.java</include>
+        <include>**/*.xml</include>
+      </includes>
+    </fileSet>
+    <fileSet filtered="true" encoding="UTF-8">
+      <directory>html/src/main/webapp</directory>
+      <includes>
+        <include>**/*.xml</include>
+        <include>**/*.html</include>
+        <include>**/logging.properties</include>
+      </includes>
+    </fileSet>
+    <fileSet filtered="false">
+      <directory>html/src/main/webapp</directory>
+      <includes>
+        <include>favicon.ico</include>
+      </includes>
+    </fileSet>
+    <!-- flash module -->
+    <fileSet filtered="true" encoding="UTF-8">
+      <directory>flash</directory>
+      <includes>
+        <include>pom.xml</include>
+      </includes>
+    </fileSet>
+    <fileSets>
+      <fileSet filtered="true" packaged="true" encoding="UTF-8">
+        <directory>flash/src/main/java</directory>
+        <includes>
+          <include>**/*.xml</include>
+          <include>**/*.java</include>
+        </includes>
+      </fileSet>
+      <fileSet filtered="true" encoding="UTF-8">
+        <directory>flash/src/main/webapp</directory>
+        <includes>
+          <include>**/*.xml</include>
+          <include>**/*.html</include>
+        </includes>
+      </fileSet>
+    </fileSets>
+    <!-- android module -->
+    <fileSet filtered="true" encoding="UTF-8">
+      <directory>android</directory>
+      <includes>
+        <include>pom.xml</include>
+      </includes>
+    </fileSet>
+    <fileSet filtered="true" packaged="true" encoding="UTF-8">
+      <directory>android/src/main/java</directory>
+      <includes>
+        <include>**/*.java</include>
+      </includes>
+    </fileSet>
+    <fileSet filtered="true" encoding="UTF-8">
+      <directory>android/res/values</directory>
+      <includes>
+        <include>**/*.xml</include>
+      </includes>
+    </fileSet>
+    <fileSet encoding="UTF-8">
+      <directory>android/res/drawable-ldpi</directory>
+      <includes>
+        <include>**/*.png</include>
+      </includes>
+    </fileSet>
+    <fileSet encoding="UTF-8">
+      <directory>android/res/drawable-hdpi</directory>
+      <includes>
+        <include>**/*.png</include>
+      </includes>
+    </fileSet>
+    <fileSet encoding="UTF-8">
+      <directory>android/res/drawable-mdpi</directory>
+      <includes>
+        <include>**/*.png</include>
+      </includes>
+    </fileSet>
+    <fileSet filtered="true" encoding="UTF-8">
+      <directory>android</directory>
+      <includes>
+        <include>AndroidManifest.xml</include>
+        <include>default.properties</include>
+      </includes>
+    </fileSet>
+    <fileSet encoding="UTF-8">
+      <directory>android</directory>
+      <includes>
+        <include>proguard.cfg</include>
+      </includes>
+    </fileSet>
+    <!-- ios module -->
+    <fileSet filtered="true" encoding="UTF-8">
+      <directory>ios</directory>
+      <includes>
+        <include>pom.xml</include>
+      </includes>
+    </fileSet>
+    <fileSet filtered="true" encoding="UTF-8">
+      <directory>ios</directory>
+      <includes>
+        <include>Info.plist</include>
+        <include>*.cs</include>
+        <include>*.csproj</include>
+        <include>*.sln</include>
+      </includes>
+    </fileSet>
+    <fileSet encoding="UTF-8">
+      <directory>ios</directory>
+      <includes>
+        <include>**/*.png</include>
+      </includes>
+    </fileSet>
   </fileSets>
+
   <modules>
     <module id="${rootArtifactId}-core" dir="core" name="${rootArtifactId}-core">
       <fileSets>
@@ -30,127 +167,25 @@
         </fileSet>
       </fileSets>
     </module>
+<!--
     <module id="${rootArtifactId}-java" dir="java" name="${rootArtifactId}-java">
       <fileSets>
-        <fileSet filtered="true" packaged="true" encoding="UTF-8">
-          <directory>src/main/java</directory>
-          <includes>
-            <include>**/*.java</include>
-          </includes>
-        </fileSet>
       </fileSets>
     </module>
     <module id="${rootArtifactId}-html" dir="html" name="${rootArtifactId}-html">
       <fileSets>
-        <fileSet filtered="true" packaged="true" encoding="UTF-8">
-          <directory>src/main/java</directory>
-          <includes>
-            <include>**/*.java</include>
-            <include>**/*.xml</include>
-          </includes>
-        </fileSet>
-        <fileSet filtered="true" encoding="UTF-8">
-          <directory>src/main/webapp</directory>
-          <includes>
-            <include>**/*.xml</include>
-            <include>**/*.html</include>
-            <include>**/logging.properties</include>
-          </includes>
-        </fileSet>
-        <fileSet filtered="false">
-          <directory>src/main/webapp</directory>
-          <includes>
-            <include>favicon.ico</include>
-          </includes>
-        </fileSet>
       </fileSets>
     </module>
-<!-- flash subproject temporarily disabled -->
-<!--
     <module id="${rootArtifactId}-flash" dir="flash" name="${rootArtifactId}-flash">
-      <fileSets>
-        <fileSet filtered="true" packaged="true" encoding="UTF-8">
-          <directory>src/main/java</directory>
-          <includes>
-            <include>**/*.xml</include>
-            <include>**/*.java</include>
-          </includes>
-        </fileSet>
-        <fileSet filtered="true" encoding="UTF-8">
-          <directory>src/main/webapp</directory>
-          <includes>
-            <include>**/*.xml</include>
-            <include>**/*.html</include>
-          </includes>
-        </fileSet>
-      </fileSets>
     </module>
--->
     <module id="${rootArtifactId}-android" dir="android" name="${rootArtifactId}-android">
       <fileSets>
-        <fileSet filtered="true" packaged="true" encoding="UTF-8">
-          <directory>src/main/java</directory>
-          <includes>
-            <include>**/*.java</include>
-          </includes>
-        </fileSet>
-        <fileSet filtered="true" encoding="UTF-8">
-          <directory>res/values</directory>
-          <includes>
-            <include>**/*.xml</include>
-          </includes>
-        </fileSet>
-        <fileSet encoding="UTF-8">
-          <directory>res/drawable-ldpi</directory>
-          <includes>
-            <include>**/*.png</include>
-          </includes>
-        </fileSet>
-        <fileSet encoding="UTF-8">
-          <directory>res/drawable-hdpi</directory>
-          <includes>
-            <include>**/*.png</include>
-          </includes>
-        </fileSet>
-        <fileSet encoding="UTF-8">
-          <directory>res/drawable-mdpi</directory>
-          <includes>
-            <include>**/*.png</include>
-          </includes>
-        </fileSet>
-        <fileSet filtered="true" encoding="UTF-8">
-          <directory></directory>
-          <includes>
-            <include>AndroidManifest.xml</include>
-            <include>default.properties</include>
-          </includes>
-        </fileSet>
-        <fileSet encoding="UTF-8">
-          <directory></directory>
-          <includes>
-            <include>proguard.cfg</include>
-          </includes>
-        </fileSet>
       </fileSets>
     </module>
     <module id="${rootArtifactId}-ios" dir="ios" name="${rootArtifactId}-ios">
       <fileSets>
-        <fileSet filtered="true" encoding="UTF-8">
-          <directory></directory>
-          <includes>
-            <include>Info.plist</include>
-            <include>*.cs</include>
-            <include>*.csproj</include>
-            <include>*.sln</include>
-          </includes>
-        </fileSet>
-        <fileSet encoding="UTF-8">
-          <directory></directory>
-          <includes>
-            <include>**/*.png</include>
-          </includes>
-        </fileSet>
       </fileSets>
     </module>
+-->
   </modules>
 </archetype-descriptor>

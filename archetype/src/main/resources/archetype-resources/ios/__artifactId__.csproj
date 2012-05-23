@@ -62,8 +62,8 @@
     <Reference Include="System.Core" />
     <Reference Include="monotouch" />
     <Reference Include="OpenTK" />
-    <Reference Include="${artifactId}">
-      <HintPath>bin\\${artifactId}.dll</HintPath>
+    <Reference Include="${artifactId}-ios">
+      <HintPath>bin\\${artifactId}-ios.dll</HintPath>
     </Reference>
     <Reference Include="IKVM.OpenJDK.Core">
       <HintPath>bin\IKVM.OpenJDK.Core.dll</HintPath>

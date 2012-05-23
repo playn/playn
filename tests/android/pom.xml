@@ -65,6 +65,15 @@
           </dex>
         </configuration>
         <extensions>true</extensions>
+        <executions>
+          <execution>
+            <id>deploy-on-install</id>
+            <phase>install</phase>
+            <goals>
+              <goal>deploy</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>

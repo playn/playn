@@ -9,7 +9,7 @@
     <version>${version}</version>
   </parent>
 
-  <artifactId>${artifactId}</artifactId>
+  <artifactId>${artifactId}-ios</artifactId>
   <packaging>dll</packaging>
   <name>${JavaGameClassName} iOS</name>
 

@@ -9,7 +9,7 @@
     <version>${version}</version>
   </parent>
 
-  <artifactId>${artifactId}</artifactId>
+  <artifactId>${artifactId}-html</artifactId>
   <packaging>war</packaging>
   <name>${JavaGameClassName} HTML</name>
 
@@ -73,6 +73,27 @@
             <phase>prepare-package</phase>
             <goals>
               <goal>compile</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+      <!-- allows testing of HTML backend via: mvn integration-test -Phtml -->
+      <plugin>
+        <groupId>org.mortbay.jetty</groupId>
+        <artifactId>jetty-maven-plugin</artifactId>
+        <version>8.0.0.v20110901</version>
+        <configuration>
+          <webApp>
+            ${project.basedir}/target/${project.artifactId}-${project.version}
+          </webApp>
+        </configuration>
+        <executions>
+          <execution>
+            <id>test-html</id>
+            <phase>integration-test</phase>
+            <goals>
+              <goal>run-exploded</goal>
             </goals>
           </execution>
         </executions>

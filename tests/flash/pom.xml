@@ -6,7 +6,7 @@
   <parent>
     <groupId>com.googlecode.playn</groupId>
     <artifactId>playn-tests</artifactId>
-    <version>1.2-SNAPSHOT</version>
+    <version>1.4-SNAPSHOT</version>
   </parent>
 
   <artifactId>playn-tests-flash</artifactId>
@@ -38,11 +38,6 @@
     <outputDirectory>war/WEB-INF/classes</outputDirectory>
 
     <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-source-plugin</artifactId>
-      </plugin>
-
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-war-plugin</artifactId>
@@ -105,12 +100,27 @@
 	  <extraJvmArgs>-Dflexsdk.home=${flexsdk.dir}</extraJvmArgs>
 	</configuration>
       </plugin>
-    </plugins>
 
-    <resources>
-      <resource>
-        <directory>${basedir}/src</directory>
-      </resource>
-    </resources>
+      <!-- allows testing of Flash backend via: mvn integration-test -Pflash -->
+      <plugin>
+        <groupId>org.mortbay.jetty</groupId>
+        <artifactId>jetty-maven-plugin</artifactId>
+        <version>8.0.0.v20110901</version>
+        <configuration>
+          <webApp>
+            ${project.basedir}/target/${project.artifactId}-${project.version}
+          </webApp>
+        </configuration>
+        <executions>
+          <execution>
+            <id>test-flash</id>
+            <phase>integration-test</phase>
+            <goals>
+              <goal>run-exploded</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
   </build>
 </project>

@@ -10,6 +10,11 @@
   <artifactId>playn-tests-java</artifactId>
   <name>PlayN Tests Java</name>
 
+  <properties>
+    <mainClass>playn.tests.java.TestsGameJava</mainClass>
+    <scaleFactor>1</scaleFactor>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>com.googlecode.playn</groupId>
@@ -26,32 +31,79 @@
 
   <build>
     <sourceDirectory>src</sourceDirectory>
-  </build>
 
-  <profiles>
-    <!-- allows testing of Java backend via: mvn test -Ptest-java -->
-    <profile>
-      <id>test-java</id>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>exec-maven-plugin</artifactId>
-            <version>1.1.1</version>
-            <executions>
-              <execution>
-                <phase>test</phase>
-                <goals>
-                  <goal>java</goal>
-                </goals>
-                <configuration>
-                  <mainClass>playn.tests.java.TestsGameJava</mainClass>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-  </profiles>
+    <plugins>
+      <!-- unpack LWJGL when testing -->
+      <plugin>
+        <groupId>com.googlecode.mavennatives</groupId>
+        <artifactId>maven-nativedependencies-plugin</artifactId>
+        <version>0.0.6</version>
+        <executions>
+          <execution>
+            <id>unpacknatives</id>
+            <phase>test-compile</phase>
+            <goals><goal>copy</goal></goals>
+          </execution>
+        </executions>
+      </plugin>
+
+      <!-- allows testing of Java backend via: mvn test -->
+      <plugin>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <version>1.6</version>
+        <executions>
+          <execution>
+            <phase>test</phase>
+            <configuration>
+              <target>
+                <java fork="true" classname="${mainClass}" classpathref="maven.test.classpath">
+                  <sysproperty key="java.library.path" value="target/natives"/>
+                  <arg value="${scaleFactor}"/>
+                </java>
+              </target>
+            </configuration>
+            <goals>
+              <goal>run</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+
+    <!-- This configuration is used to store Eclipse m2e settings only. -->
+    <!-- It has no influence on the Maven build itself.-->
+    <pluginManagement>
+      <plugins>
+        <!-- cause eclipse to unpack the LWJGL natives at the appropriate time -->
+        <plugin>
+          <groupId>org.eclipse.m2e</groupId>
+          <artifactId>lifecycle-mapping</artifactId>
+          <version>1.0.0</version>
+          <configuration>
+            <lifecycleMappingMetadata>
+              <pluginExecutions>
+                <pluginExecution>
+                  <pluginExecutionFilter>
+                    <groupId>com.googlecode.mavennatives</groupId>
+                    <artifactId>
+                      maven-nativedependencies-plugin
+                    </artifactId>
+                    <versionRange>[0.0.6,)</versionRange>
+                    <goals>
+                      <goal>copy</goal>
+                    </goals>
+                  </pluginExecutionFilter>
+                  <action>
+                    <execute>
+                      <runOnIncremental>false</runOnIncremental>
+                    </execute>
+                  </action>
+                </pluginExecution>
+              </pluginExecutions>
+            </lifecycleMappingMetadata>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
 </project>
