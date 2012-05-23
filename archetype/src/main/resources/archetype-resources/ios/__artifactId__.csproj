@@ -79,9 +79,7 @@
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
-    <Content Include="resources\images\bg.png">
-      <Link>images\bg.png</Link>
-    </Content>
+    <Content Include="assets\images\bg.png" />
     <Content Include="touch-icon-57x57.png" />
   </ItemGroup>
 </Project>
