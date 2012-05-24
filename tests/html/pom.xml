@@ -37,8 +37,6 @@
   </dependencies>
 
   <build>
-    <sourceDirectory>src</sourceDirectory>
-
     <plugins>
       <!-- allows testing of HTML backend via: mvn integration-test -Phtml -->
       <plugin>
@@ -59,15 +57,6 @@
             </goals>
           </execution>
         </executions>
-      </plugin>
-
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-war-plugin</artifactId>
-        <version>2.2</version>
-        <configuration>
-          <warSourceDirectory>war</warSourceDirectory>
-        </configuration>
       </plugin>
 
       <plugin>

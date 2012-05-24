@@ -19,8 +19,6 @@
   </dependencies>
 
   <build>
-    <sourceDirectory>src</sourceDirectory>
-
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -30,7 +28,7 @@
 
     <resources>
       <resource>
-        <directory>${basedir}/src</directory>
+        <directory>${project.build.sourceDirectory}</directory>
       </resource>
     </resources>
   </build>
