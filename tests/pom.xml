@@ -17,13 +17,10 @@
 
   <modules>
     <module>core</module>
+    <module>java</module>
   </modules>
 
   <profiles>
-    <profile>
-      <id>java</id>
-      <modules><module>java</module></modules>
-    </profile>
     <profile>
       <id>android</id>
       <modules><module>android</module></modules>

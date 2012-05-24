@@ -44,28 +44,6 @@
           </execution>
         </executions>
       </plugin>
-
-      <!-- allows testing of Java backend via: mvn test -->
-      <plugin>
-        <artifactId>maven-antrun-plugin</artifactId>
-        <version>1.6</version>
-        <executions>
-          <execution>
-            <phase>test</phase>
-            <configuration>
-              <target>
-                <java fork="true" classname="${mainClass}" classpathref="maven.test.classpath">
-                  <sysproperty key="java.library.path" value="target/natives"/>
-                  <arg value="${scaleFactor}"/>
-                </java>
-              </target>
-            </configuration>
-            <goals>
-              <goal>run</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
     </plugins>
 
     <!-- This configuration is used to store Eclipse m2e settings only. -->
@@ -104,4 +82,35 @@
       </plugins>
     </pluginManagement>
   </build>
+
+  <profiles>
+    <profile>
+      <id>java</id>
+      <build>
+        <plugins>
+          <!-- allows testing of Java backend via: mvn test -->
+          <plugin>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <version>1.6</version>
+            <executions>
+              <execution>
+                <phase>test</phase>
+                <configuration>
+                  <target>
+                    <java fork="true" classname="${mainClass}" classpathref="maven.test.classpath">
+                      <sysproperty key="java.library.path" value="target/natives"/>
+                      <arg value="${scaleFactor}"/>
+                    </java>
+                  </target>
+                </configuration>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 </project>
