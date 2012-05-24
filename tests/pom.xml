@@ -22,7 +22,6 @@
   <profiles>
     <profile>
       <id>java</id>
-      <activation><activeByDefault>true</activeByDefault></activation>
       <modules><module>java</module></modules>
     </profile>
     <profile>
