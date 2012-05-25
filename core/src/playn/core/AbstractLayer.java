@@ -213,8 +213,8 @@ public abstract class AbstractLayer implements Layer {
   }
 
   @Override
-  public Connection addListener(Mouse.Listener listener) {
-    return addInteractor(Mouse.Listener.class, listener);
+  public Connection addListener(Mouse.LayerListener listener) {
+    return addInteractor(Mouse.LayerListener.class, listener);
   }
 
   @Override

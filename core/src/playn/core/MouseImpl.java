@@ -24,6 +24,7 @@ public abstract class MouseImpl implements Mouse {
 
   private Listener listener;
   private AbstractLayer activeLayer;
+  private AbstractLayer hoverLayer;
 
   @Override
   public boolean hasMouse() {
@@ -73,8 +74,8 @@ public abstract class MouseImpl implements Mouse {
       if (activeLayer != null) {
         final ButtonEvent.Impl localEvent = event.localize(activeLayer);
         localEvent.setPreventDefault(preventDefault);
-        activeLayer.interact(Listener.class, new AbstractLayer.Interaction<Listener>() {
-          public void interact(Listener l) {
+        activeLayer.interact(LayerListener.class, new AbstractLayer.Interaction<LayerListener>() {
+          public void interact(LayerListener l) {
             l.onMouseDown(localEvent);
           }
         });
@@ -92,16 +93,52 @@ public abstract class MouseImpl implements Mouse {
       preventDefault = event.getPreventDefault();
     }
 
-    if (activeLayer != null) {
-      final MotionEvent.Impl localEvent = event.localize(activeLayer);
-      localEvent.setPreventDefault(preventDefault);
-      activeLayer.interact(Listener.class, new AbstractLayer.Interaction<Listener>() {
-        public void interact(Listener l) {
-          l.onMouseMove(localEvent);
-        }
-      });
-      preventDefault = localEvent.getPreventDefault();
+    GroupLayer root = PlayN.graphics().rootLayer();
+    if (root.interactive()) {
+      Point p = new Point(event.x(), event.y());
+      root.transform().inverseTransform(p, p);
+      p.x += root.originX();
+      p.y += root.originY();
+      AbstractLayer lastHoverLayer = hoverLayer;
+      hoverLayer = (AbstractLayer)root.hitTest(p);
+
+      // handle onMouseDrag if we have an active layer
+      if (activeLayer != null) {
+        final MotionEvent.Impl localEvent = event.localize(activeLayer);
+        localEvent.setPreventDefault(preventDefault);
+        activeLayer.interact(LayerListener.class, new AbstractLayer.Interaction<LayerListener>() {
+          public void interact(LayerListener l) {
+            l.onMouseDrag(localEvent);
+          }
+        });
+        preventDefault = localEvent.getPreventDefault();
+      }
+
+      // handle onMouseOut
+      if (lastHoverLayer != hoverLayer && lastHoverLayer != null) {
+        final MotionEvent.Impl localEvent = event.localize(lastHoverLayer);
+        localEvent.setPreventDefault(preventDefault);
+        lastHoverLayer.interact(LayerListener.class, new AbstractLayer.Interaction<LayerListener>() {
+          public void interact(LayerListener l) {
+            l.onMouseOut(localEvent);
+          }
+        });
+        preventDefault = localEvent.getPreventDefault();
+      }
+
+      // handle onMouseOver
+      if (hoverLayer != lastHoverLayer && hoverLayer != null) {
+        final MotionEvent.Impl localEvent = event.localize(hoverLayer);
+        localEvent.setPreventDefault(preventDefault);
+        hoverLayer.interact(LayerListener.class, new AbstractLayer.Interaction<LayerListener>() {
+          public void interact(LayerListener l) {
+            l.onMouseOver(localEvent);
+          }
+        });
+        preventDefault = localEvent.getPreventDefault();
+      }
     }
+
     return preventDefault;
   }
 
@@ -116,14 +153,15 @@ public abstract class MouseImpl implements Mouse {
     if (activeLayer != null) {
       final ButtonEvent.Impl localEvent = event.localize(activeLayer);
       localEvent.setPreventDefault(preventDefault);
-      activeLayer.interact(Listener.class, new AbstractLayer.Interaction<Listener>() {
-        public void interact(Listener l) {
+      activeLayer.interact(LayerListener.class, new AbstractLayer.Interaction<LayerListener>() {
+        public void interact(LayerListener l) {
           l.onMouseUp(localEvent);
         }
       });
       preventDefault = localEvent.getPreventDefault();
       activeLayer = null;
     }
+
     return preventDefault;
   }
 
@@ -135,18 +173,6 @@ public abstract class MouseImpl implements Mouse {
       preventDefault = event.getPreventDefault();
     }
 
-    // TODO: if we ever want to dispatch wheel events directly to layers, we'll need this
-    // if (activeLayer != null) {
-    //   final WheelEvent.Impl localEvent = event.localize(activeLayer);
-    //   localEvent.setPreventDefault(preventDefault);
-    //   activeLayer.interact(Listener.class, new AbstractLayer.Interaction<Listener>() {
-    //     public void interact(Listener l) {
-    //       l.onMouseWheelScroll(localEvent);
-    //     }
-    //   });
-    //   preventDefault = localEvent.getPreventDefault();
-    //   activeLayer = null;
-    // }
     return preventDefault;
   }
 }

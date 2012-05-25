@@ -21,8 +21,6 @@ import pythagoras.f.Point;
  * Input-device interface for touch and multi-touch events if they are
  * supported.
  */
-// TODO(pdr): make the (x,y) coordinates relative to a {@link Layer}, if
-// specified, or the {@link Graphics#rootLayer()} otherwise.
 public interface Touch {
 
   /** An event dispatched to report touch information. */

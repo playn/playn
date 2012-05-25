@@ -21,8 +21,6 @@ import pythagoras.f.Point;
  * Input-device interface for mouse events. This interface is for mice and
  * supports buttons and the scroll wheel.
  */
-// TODO(pdr): make the (x,y) coordinates relative to a {@link Layer}, if
-// specified, or the {@link Graphics#rootLayer()} otherwise.
 public interface Mouse {
   /** Used by {@link ButtonEvent} to indicate that the left button is pressed. */
   int BUTTON_LEFT = 0;
@@ -160,6 +158,7 @@ public interface Mouse {
     }
   }
 
+  /** An interface for listening to all mouse events. */
   interface Listener {
     /**
      * Called when the mouse is pressed.
@@ -176,27 +175,11 @@ public interface Mouse {
     void onMouseUp(ButtonEvent event);
 
     /**
-     * Called when the mouse is dragged with a button pressed.
-     *
-     * @param event provides mouse position and other metadata.
-     */
-    // Commented out to avoid bloating this API with unused features
-    //void onMouseDrag(MotionEvent event);
-
-    /**
      * Called when the mouse is moved.
      *
      * @param event provides mouse position and other metadata.
      */
     void onMouseMove(MotionEvent event);
-
-    /**
-     * Called when the mouse is double clicked.
-     *
-     * @param event provides mouse position, button and other metadata.
-     */
-    // Commented out to avoid bloating this API with unused features
-    //void onMouseDoubleClick(ButtonEvent event);
 
     /**
      * Called when mouse wheel scroll occurs.
@@ -210,6 +193,55 @@ public interface Mouse {
     void onMouseWheelScroll(WheelEvent event);
   }
 
+  /** An interface for listening to mouse events that interact with a single layer.
+   * See {@link Layer#addListener(Mouse.LayerListener)}. */
+  interface LayerListener {
+    /**
+     * Called when the mouse is pressed.
+     *
+     * @param event provides mouse position, button and other metadata.
+     */
+    void onMouseDown(ButtonEvent event);
+
+    /**
+     * Called when the mouse is released.
+     *
+     * @param event provides mouse position, button and other metadata.
+     */
+    void onMouseUp(ButtonEvent event);
+
+    /**
+     * Called when the mouse is dragged.
+     *
+     * @param event provides mouse position and other metadata.
+     */
+    void onMouseDrag(MotionEvent event);
+
+    /**
+     * Called when the mouse enters a {@link Layer}.
+     *
+     * Note: MotionEvent is first dispatched to {@link #onMouseMove(MotionEvent)},
+     *       then to {@link #onMouseOut(MotionEvent)} and finally to
+     *       {@link #onMouseOver(MotionEvent)}. These three events share a single
+     *       preventDefault state.
+     *
+     * @param event provides mouse position and other metadata.
+     */
+    void onMouseOver(MotionEvent event);
+
+    /**
+     * Called when the mouse leaves a {@link Layer}.
+     *
+     * Note: MotionEvent is first dispatched to {@link #onMouseMove(MotionEvent)},
+     *       then to {@link #onMouseOut(MotionEvent)} and finally to
+     *       {@link #onMouseOver(MotionEvent)}. These three events share a single
+     *       preventDefault state.
+     *
+     * @param event provides mouse position and other metadata.
+     */
+    void onMouseOut(MotionEvent event);
+  }
+
   /** A {@link Listener} implementation with NOOP stubs provided for each method. */
   class Adapter implements Listener {
     @Override
@@ -220,6 +252,20 @@ public interface Mouse {
     public void onMouseMove(MotionEvent event) { /* NOOP! */ }
     @Override
     public void onMouseWheelScroll(WheelEvent event) { /* NOOP! */ }
+  }
+
+  /** A {@link LayerListener} implementation with NOOP stubs provided for each method. */
+  class LayerAdapter implements LayerListener {
+    @Override
+    public void onMouseDown(ButtonEvent event) { /* NOOP! */ }
+    @Override
+    public void onMouseUp(ButtonEvent event) { /* NOOP! */ }
+    @Override
+    public void onMouseDrag(MotionEvent event) { /* NOOP! */ }
+    @Override
+    public void onMouseOver(MotionEvent event) { /* NOOP! */ }
+    @Override
+    public void onMouseOut(MotionEvent event) { /* NOOP! */ }
   }
 
   /**

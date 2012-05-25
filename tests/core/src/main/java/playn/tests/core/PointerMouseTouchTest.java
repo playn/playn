@@ -74,7 +74,7 @@ class PointerMouseTouchTest extends Test {
     final ImageLayer mouse = graphics().createImageLayer(cat);
     mouse.setTranslation(100, 0);
     graphics().rootLayer().add(mouse);
-    mouse.addListener(new Mouse.Adapter() {
+    mouse.addListener(new Mouse.LayerAdapter() {
       @Override
       public void onMouseDown(ButtonEvent event) {
         _lstart = mouse.transform().translation();
@@ -83,7 +83,7 @@ class PointerMouseTouchTest extends Test {
         logger.log("mouse down (" + event.x() + "," + event.y() + ") button(" + event.button() + ")");
       }
       @Override
-      public void onMouseMove(MotionEvent event) {
+      public void onMouseDrag(MotionEvent event) {
         Vector delta = new Vector(event.x(), event.y()).subtractLocal(_pstart);
         mouse.setTranslation(_lstart.x + delta.x, _lstart.y + delta.y);
         logger.log("mouse move (" + event.x() + "," + event.y() + ")");
@@ -101,7 +101,7 @@ class PointerMouseTouchTest extends Test {
     final ImageLayer mousePD = graphics().createImageLayer(cat);
     mousePD.setTranslation(275, 0);
     graphics().rootLayer().add(mousePD);
-    mousePD.addListener(new Mouse.Adapter() {
+    mousePD.addListener(new Mouse.LayerAdapter() {
       @Override
       public void onMouseDown(ButtonEvent event) {
         _lstart = mousePD.transform().translation();
@@ -111,11 +111,11 @@ class PointerMouseTouchTest extends Test {
         logger.log("pd mouse down (" + event.x() + "," + event.y() + ") button(" + event.button() + ")");
       }
       @Override
-      public void onMouseMove(MotionEvent event) {
+      public void onMouseDrag(MotionEvent event) {
         Vector delta = new Vector(event.x(), event.y()).subtractLocal(_pstart);
         mousePD.setTranslation(_lstart.x + delta.x, _lstart.y + delta.y);
         event.setPreventDefault(true);
-        logger.log("pd mouse move (" + event.x() + "," + event.y() + ")");
+        logger.log("pd mouse drag (" + event.x() + "," + event.y() + ")");
       }
       @Override
       public void onMouseUp(ButtonEvent event) {
