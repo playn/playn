@@ -182,13 +182,23 @@ public class TextFormat {
     this(null, Float.MAX_VALUE, Alignment.LEFT, 0xFF000000, Effect.NONE);
   }
 
-  /** Creates a configured text format instance. */
+  /** @deprecated Use stroke and fill to create your own effects. */
+  @Deprecated
   public TextFormat(Font font, float wrapWidth, Alignment align, int textColor, Effect effect) {
     this.font = font;
     this.wrapWidth = wrapWidth;
     this.align = align;
     this.textColor = textColor;
     this.effect = effect;
+  }
+
+  /** Creates a configured text format instance. */
+  public TextFormat(Font font, float wrapWidth, Alignment align) {
+    this.font = font;
+    this.wrapWidth = wrapWidth;
+    this.align = align;
+    this.textColor = 0xFF000000;
+    this.effect = Effect.NONE;
   }
 
   /** Returns true if line wrapping is desired. */
