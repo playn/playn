@@ -62,7 +62,8 @@ public interface Layer {
   GroupLayer parent();
 
   /**
-   * Returns the layer's transformation matrix.
+   * Returns the layer's transformation matrix. This provides access to the layer's current
+   * translation, scale and rotation.
    */
   Transform transform();
 
@@ -152,10 +153,10 @@ public interface Layer {
   void setDepth(float depth);
 
   /**
-   * Sets the translation of the layer.
-   * <p>
-   * This sets the translation of the layer's transformation matrix so coordinates in the layer will
-   * be translated by this amount.
+   * Sets the translation of the layer. The current translation can be read via {@link #transform}.
+   *
+   * <p> This sets the translation of the layer's transformation matrix so coordinates in the layer
+   * will be translated by this amount. </p>
    *
    * @param x translation on x axis
    * @param y translation on y axis
@@ -163,24 +164,24 @@ public interface Layer {
   void setTranslation(float x, float y);
 
   /**
-   * Sets the scale of the layer.
-   * <p>
-   * This sets the scale of the layer's transformation matrix so coordinates in the layer will be
-   * multiplied by this scale.
-   * <p>
-   * Note that a scale of {@code 1} is equivalent to no scale.
+   * Sets the scale of the layer. The current scale can be read via {@link #transform}.
+   *
+   * <p> This sets the scale of the layer's transformation matrix so coordinates in the layer will
+   * be multiplied by this scale. </p>
+   *
+   * <p> Note that a scale of {@code 1} is equivalent to no scale. </p>
    *
    * @param x non-zero scale value
    */
   void setScale(float x);
 
   /**
-   * Sets the scale of the layer.
-   * <p>
-   * This sets the scale of the layer's transformation matrix so coordinates in the layer will be
-   * multiplied by this scale.
-   * <p>
-   * Note that a scale of {@code 1} is equivalent to no scale.
+   * Sets the scale of the layer. The current scale can be read via {@link #transform}.
+   *
+   * <p> This sets the scale of the layer's transformation matrix so coordinates in the layer will
+   * be multiplied by this scale. </p>
+   *
+   * <p> Note that a scale of {@code 1} is equivalent to no scale. </p>
    *
    * @param x non-zero scale value on the x axis
    * @param y non-zero scale value on the y axis
@@ -188,11 +189,10 @@ public interface Layer {
   void setScale(float x, float y);
 
   /**
-   * Sets the rotation of the layer.
-   * <p>
-   * This sets the rotation of the layer's transformation matrix so coordinates in the layer will be
-   * rotated by this angle.
-   * <p>
+   * Sets the rotation of the layer. The current rotation can be read via {@link #transform}.
+   *
+   * <p> This sets the rotation of the layer's transformation matrix so coordinates in the layer
+   * will be rotated by this angle. </p>
    *
    * @param angle angle to rotate, in radians
    */
