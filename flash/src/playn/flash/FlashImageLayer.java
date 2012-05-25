@@ -94,6 +94,7 @@ public class FlashImageLayer extends FlashLayer implements ImageLayer {
       @Override
       public void done(Image resource) {
         bitmapData = ((FlashImage) resource).bitmapData();
+        dirty = true;
       }
     });
   }
