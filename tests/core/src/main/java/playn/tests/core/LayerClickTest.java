@@ -20,6 +20,8 @@ import pythagoras.f.Vector;
 
 import playn.core.Image;
 import playn.core.ImageLayer;
+import playn.core.Touch;
+import playn.core.Layer;
 import playn.core.Pointer;
 import static playn.core.PlayN.*;
 
@@ -44,58 +46,70 @@ class LayerClickTest extends Test {
     layer1.setRotation(FloatMath.PI/8);
     layer1.setTranslation(50, 50);
     graphics().rootLayer().add(layer1);
-    layer1.addListener(new Pointer.Listener() {
-      public void onPointerStart(Pointer.Event event) {
-        _lstart = layer1.transform().translation();
-        _pstart = new Vector(event.x(), event.y());
-      }
-      public void onPointerDrag(Pointer.Event event) {
-        Vector delta = new Vector(event.x(), event.y()).subtractLocal(_pstart);
-        layer1.setTranslation(_lstart.x + delta.x, _lstart.y + delta.y);
-      }
-      public void onPointerEnd(Pointer.Event event) {
-        // nada
-      }
-      protected Vector _lstart, _pstart;
-    });
+    if (touch().hasTouch()) {
+      layer1.addListener((Touch.LayerListener)new Mover(layer1));
+    } else {
+      layer1.addListener((Pointer.Listener)new Mover(layer1));
+    }
 
     final ImageLayer layer2 = graphics().createImageLayer(orange);
     layer2.setScale(1.5f);
     layer2.setRotation(FloatMath.PI/4);
     layer2.setTranslation(150, 50);
     graphics().rootLayer().add(layer2);
-    layer2.addListener(new Pointer.Listener() {
-      public void onPointerStart(Pointer.Event event) {
-        _lstart = layer2.transform().translation();
-        _pstart = new Vector(event.x(), event.y());
-      }
-      public void onPointerDrag(Pointer.Event event) {
-        Vector delta = new Vector(event.x(), event.y()).subtractLocal(_pstart);
-        layer2.setTranslation(_lstart.x + delta.x, _lstart.y + delta.y);
-      }
-      public void onPointerEnd(Pointer.Event event) {
-        // nada
-      }
-      protected Vector _lstart, _pstart;
-    });
+    if (touch().hasTouch()) {
+      layer2.addListener((Touch.LayerListener)new Mover(layer2));
+    } else {
+      layer2.addListener((Pointer.Listener)new Mover(layer2));
+    }
 
     final ImageLayer layer3 = graphics().createImageLayer(orange);
     layer3.setRotation(-FloatMath.PI/4);
     layer3.setTranslation(50, 150);
     graphics().rootLayer().add(layer3);
-    layer3.addListener(new Pointer.Listener() {
-      public void onPointerStart(Pointer.Event event) {
-        _lstart = layer3.transform().translation();
-        _pstart = new Vector(event.x(), event.y());
-      }
-      public void onPointerDrag(Pointer.Event event) {
-        Vector delta = new Vector(event.x(), event.y()).subtractLocal(_pstart);
-        layer3.setTranslation(_lstart.x + delta.x, _lstart.y + delta.y);
-      }
-      public void onPointerEnd(Pointer.Event event) {
-        // nada
-      }
-      protected Vector _lstart, _pstart;
-    });
+    if (touch().hasTouch()) {
+      layer3.addListener((Touch.LayerListener)new Mover(layer3));
+    } else {
+      layer3.addListener((Pointer.Listener)new Mover(layer3));
+    }
+  }
+
+  protected static class Mover implements Pointer.Listener, Touch.LayerListener {
+    private final Layer layer;
+
+    public Mover (Layer layer) {
+      this.layer = layer;
+    }
+
+    public void onTouchStart(Touch.Event event) {
+      onStart(event.x(), event.y());
+    }
+    public void onTouchMove(Touch.Event event) {
+      onMove(event.x(), event.y());
+    }
+    public void onTouchEnd(Touch.Event event) {
+      // nada
+    }
+
+    public void onPointerStart(Pointer.Event event) {
+      onStart(event.x(), event.y());
+    }
+    public void onPointerDrag(Pointer.Event event) {
+      onMove(event.x(), event.y());
+    }
+    public void onPointerEnd(Pointer.Event event) {
+      // nada
+    }
+
+    protected void onStart(float x, float y) {
+      _lstart = layer.transform().translation();
+      _pstart = new Vector(x, y);
+    }
+    protected void onMove(float x, float y) {
+      Vector delta = new Vector(x, y).subtractLocal(_pstart);
+      layer.setTranslation(_lstart.x + delta.x, _lstart.y + delta.y);
+    }
+
+    protected Vector _lstart, _pstart;
   }
 }
