@@ -24,6 +24,7 @@ import playn.core.Mouse;
 import playn.core.MouseStub;
 import playn.core.Platform;
 import playn.core.PlayN;
+import playn.core.TouchImpl;
 import playn.core.json.JsonImpl;
 import playn.core.util.RunQueue;
 
@@ -49,7 +50,7 @@ public class AndroidPlatform implements Platform {
   private final AndroidNet net;
   private final AndroidPointer pointer;
   private final AndroidStorage storage;
-  private final AndroidTouch touch;
+  private final TouchImpl touch;
   private final AndroidTouchEventHandler touchHandler;
   private final Json json;
   private final RunQueue runQueue;
@@ -67,7 +68,7 @@ public class AndroidPlatform implements Platform {
     net = new AndroidNet(this);
     pointer = new AndroidPointer();
     storage = new AndroidStorage(activity);
-    touch = new AndroidTouch();
+    touch = new TouchImpl();
     touchHandler = new AndroidTouchEventHandler(graphics, activity.gameView());
     runQueue = new RunQueue(log);
   }
@@ -129,7 +130,7 @@ public class AndroidPlatform implements Platform {
   }
 
   @Override
-  public AndroidTouch touch() {
+  public TouchImpl touch() {
     return touch;
   }
 

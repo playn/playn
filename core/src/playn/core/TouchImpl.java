@@ -1,5 +1,5 @@
 /**
- * Copyright 2011 The PlayN Authors
+ * Copyright 2012 The PlayN Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
@@ -13,11 +13,13 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package playn.android;
+package playn.core;
 
-import playn.core.Touch;
+/**
+ * Handles the common logic for all platform {@link Touch} implementations.
+ */
+public class TouchImpl implements Touch {
 
-public class AndroidTouch implements Touch {
   private Listener listener;
 
   @Override
@@ -26,27 +28,22 @@ public class AndroidTouch implements Touch {
   }
 
   @Override
-  public synchronized void setListener(Listener listener) {
+  public void setListener(Listener listener) {
     this.listener = listener;
   }
 
-  /*
-   * The methods below are called from the GL render thread
-   */
-
-  void onTouchStart(Event[] touches) {
+  public void onTouchStart(Event[] touches) {
     if (listener != null)
       listener.onTouchStart(touches);
   }
 
-  void onTouchMove(Event[] touches) {
+  public void onTouchMove(Event[] touches) {
     if (listener != null)
       listener.onTouchMove(touches);
   }
 
-  void onTouchEnd(Event[] touches) {
+  public void onTouchEnd(Event[] touches) {
     if (listener != null)
       listener.onTouchEnd(touches);
   }
-
 }

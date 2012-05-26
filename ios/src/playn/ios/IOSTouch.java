@@ -26,53 +26,34 @@ import cli.MonoTouch.UIKit.UITouch;
 
 import pythagoras.f.IPoint;
 
-import playn.core.Touch;
+import playn.core.TouchImpl;
 
-public class IOSTouch implements Touch {
+public class IOSTouch extends TouchImpl {
 
-  private Listener listener;
   private final IOSGraphics graphics;
 
   public IOSTouch(IOSGraphics graphics) {
     this.graphics = graphics;
   }
 
-  @Override
-  public boolean hasTouch() {
-    return true;
-  }
-
-  @Override
-  public void setListener(Listener listener) {
-    this.listener = listener;
-  }
-
   void onTouchesBegan(NSSet touches, UIEvent event) {
-    if (listener != null) {
-      listener.onTouchStart(toTouchEvents(touches, event));
-    }
+    onTouchStart(toTouchEvents(touches, event));
   }
 
   void onTouchesMoved(NSSet touches, UIEvent event) {
-    if (listener != null) {
-      listener.onTouchMove(toTouchEvents(touches, event));
-    }
+    onTouchMove(toTouchEvents(touches, event));
   }
 
   void onTouchesEnded(NSSet touches, UIEvent event) {
-    if (listener != null) {
-      listener.onTouchEnd(toTouchEvents(touches, event));
-    }
+    onTouchEnd(toTouchEvents(touches, event));
   }
 
   void onTouchesCancelled(NSSet touches, UIEvent event) {
-    if (listener != null) {
-      // TODO: ???
-    }
+    // TODO: ???
   }
 
-  private Touch.Event[] toTouchEvents(NSSet touches, UIEvent event) {
-    final Touch.Event[] events = new Touch.Event[Convert.ToInt32(touches.get_Count())];
+  private Event[] toTouchEvents(NSSet touches, UIEvent event) {
+    final Event[] events = new Event[Convert.ToInt32(touches.get_Count())];
     touches.Enumerate(new NSSetEnumerator(new NSSetEnumerator.Method() {
       public void Invoke (NSObject obj, boolean[] stop) {
         UITouch touch = (UITouch) obj;
@@ -80,7 +61,7 @@ public class IOSTouch implements Touch {
         // transform the point based on our current orientation and scale
         IPoint xloc = graphics.transformTouch(loc.get_X(), loc.get_Y());
         // TODO: sort out what to do about lack of ID
-        events[_idx] = new Touch.Event.Impl(touch.get_Timestamp(), xloc.x(), xloc.y(), 0);
+        events[_idx] = new Event.Impl(touch.get_Timestamp(), xloc.x(), xloc.y(), 0);
       }
       private int _idx = 0;
     }));
