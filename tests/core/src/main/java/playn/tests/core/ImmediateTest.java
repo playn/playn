@@ -22,7 +22,12 @@ import playn.core.ImmediateLayer;
 import playn.core.Surface;
 import static playn.core.PlayN.*;
 
+import pythagoras.f.FloatMath;
+
 public class ImmediateTest extends Test {
+
+  private float elapsed, rotation;
+
   @Override
   public String getName() {
     return "ImmediateTest";
@@ -38,32 +43,67 @@ public class ImmediateTest extends Test {
   public void init() {
     GroupLayer rootLayer = graphics().rootLayer();
 
-    final CanvasImage image = graphics().createImage(100, 100);
-    Canvas canvas = image.canvas();
-    canvas.setFillColor(0xFFCC99FF);
-    canvas.fillCircle(50, 50, 50);
+    final CanvasImage circle = graphics().createImage(100, 100);
+    circle.canvas().setFillColor(0xFFCC99FF);
+    circle.canvas().fillCircle(50, 50, 50);
 
-    ImmediateLayer unclipped = graphics().createImmediateLayer(new ImmediateLayer.Renderer() {
+    final CanvasImage sausage = graphics().createImage(100, 50);
+    sausage.canvas().setFillGradient(graphics().createLinearGradient(
+                                       0, 0, 100, 100, new int[] { 0xFF0000FF, 0xFF00FF00 },
+                                       new float[] { 0, 1 }));
+    sausage.canvas().fillRoundRect(0, 0, 100, 50, 10);
+
+    // add an unclipped layer which will draw our background and outlines
+    rootLayer.add(graphics().createImmediateLayer(new ImmediateLayer.Renderer() {
       public void render (Surface surf) {
         surf.setFillColor(0xFFFFCC99);
         surf.fillRect(0, 0, graphics().width(), graphics().height());
 
-        // fill a rect that will be covered except for one pixel by the clipped immediate layer
+        // fill a rect that will be covered except for one pixel by the clipped immediate layers
         surf.setFillColor(0xFF000000);
-        surf.fillRect(99, 99, 202, 202);
+        surf.fillRect(29, 29, 202, 202);
+        surf.fillRect(259, 29, 102, 102);
+        surf.fillRect(259, 159, 102, 102);
       }
-    });
-    rootLayer.add(unclipped);
+    }));
 
-    ImmediateLayer clipped = graphics().createImmediateLayer(200, 200, new ImmediateLayer.Renderer() {
+    // add a clipped layer that will clip a fill and image draw
+    rootLayer.addAt(graphics().createImmediateLayer(200, 200, new ImmediateLayer.Renderer() {
+      public void render (Surface surf) {
+        // this fill should be clipped to our bounds
+        surf.setFillColor(0xFF99CCFF);
+        surf.fillRect(-50, -50, 300, 300);
+        // and this image should be clipped to our bounds
+        surf.drawImage(circle, 125, -25);
+      }
+    }), 30, 30);
+
+    // add a clipped layer that draws an image through a rotation transform
+    rootLayer.addAt(graphics().createImmediateLayer(100, 100, new ImmediateLayer.Renderer() {
       public void render (Surface surf) {
         surf.setFillColor(0xFF99CCFF);
-        // this fill should be clipped to our bounds
-        surf.fillRect(-50, -50, 300, 300);
-        surf.drawImage(image, 125, -25);
+        surf.fillRect(0, 0, 100, 100);
+        surf.translate(50, 50);
+        surf.rotate(rotation);
+        surf.translate(-50, -50);
+        surf.drawImage(sausage, 0, 25);
       }
-    });
-    clipped.setTranslation(100, 100);
-    rootLayer.add(clipped);
+    }), 260, 30);
+
+    // add a clipped layer that draws an image through a translation transform
+    rootLayer.addAt(graphics().createImmediateLayer(100, 100, new ImmediateLayer.Renderer() {
+      public void render (Surface surf) {
+        surf.setFillColor(0xFF99CCFF);
+        surf.fillRect(0, 0, 100, 100);
+        surf.translate(FloatMath.sin(elapsed) * 50, FloatMath.cos(elapsed) * 50 + 25);
+        surf.drawImage(sausage, 0, 0);
+      }
+    }), 260, 160);
+  }
+
+  @Override
+  public void update(float delta) {
+    elapsed += delta/1000;
+    rotation = elapsed * FloatMath.PI/2;
   }
 }
