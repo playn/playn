@@ -100,11 +100,11 @@ class HtmlTouch extends TouchImpl {
       ($wnd.navigator.userAgent.match(/ipad|iphone|android/i) != null);
   }-*/;
 
-  private Event[] toEvents(NativeEvent nativeEvent, boolean[] preventDefault) {
+  private Event.Impl[] toEvents(NativeEvent nativeEvent, boolean[] preventDefault) {
     // Convert the JsArray<Native Touch> to an array of Touch.Events
     JsArray<com.google.gwt.dom.client.Touch> nativeTouches = nativeEvent.getChangedTouches();
     int nativeTouchesLen = nativeTouches.length();
-    Event[] touches = new Event[nativeTouchesLen];
+    Event.Impl[] touches = new Event.Impl[nativeTouchesLen];
     for (int t = 0; t < nativeTouchesLen; t++) {
       com.google.gwt.dom.client.Touch touch = nativeTouches.get(t);
       float x = touch.getRelativeX(rootElement);

@@ -217,6 +217,11 @@ public abstract class AbstractLayer implements Layer {
     return addInteractor(Mouse.Listener.class, listener);
   }
 
+  @Override
+  public Connection addListener(Touch.LayerListener listener) {
+    return addInteractor(Touch.LayerListener.class, listener);
+  }
+
   // width() and height() exist so that we can share hitTest among all layer implementations;
   // GroupLayer, which does not have a size, overrides hitTest to properly test its children;
   // (non-Clipped) ImmediateLayer inherits this "no size" and always returns null for hitTest

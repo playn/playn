@@ -15,6 +15,8 @@
  */
 package playn.core;
 
+import pythagoras.f.Point;
+
 /**
  * Input-device interface for touch and multi-touch events if they are
  * supported.
@@ -47,6 +49,21 @@ public interface Touch {
       private final float pressure;
       private final float size;
 
+      // TODO: Implement pressure and size across all platforms that support touch.
+      public Impl(double time, float x, float y, int id) {
+        this(time, x, y, id, -1, -1);
+      }
+
+      public Impl(double time, float x, float y, int id, float pressure, float size) {
+        this(time, x, y, x, y, id, pressure, size);
+      }
+
+      /** Creates a copy of this event with local x and y in the supplied layer's coord system. */
+      public Event.Impl localize(Layer layer) {
+        Point local = Layer.Util.screenToLayer(layer, x(), y());
+        return new Event.Impl(time(), x(), y(), local.x, local.y, id(), pressure(), size());
+      }
+
       @Override
       public int id() {
         return id;
@@ -62,16 +79,12 @@ public interface Touch {
         return size;
       }
 
-      public Impl(double time, float x, float y, int id, float pressure, float size) {
-        super(time, x, y);
+      protected Impl(double time, float x, float y, float localX, float localY,
+                     int id, float pressure, float size) {
+        super(time, x, y, localX, localY);
         this.id = id;
         this.pressure = pressure;
         this.size = size;
-      }
-
-      // TODO: Implement pressure and size across all platforms that support touch.
-      public Impl(double time, float x, float y, int id) {
-        this(time, x, y, id, -1, -1);
       }
 
       @Override
@@ -88,6 +101,7 @@ public interface Touch {
     }
   }
 
+  /** An interface for listening to all touch events. */
   interface Listener {
     /**
      * Called when a touch starts.
@@ -111,6 +125,25 @@ public interface Touch {
     void onTouchEnd(Event[] touches);
   }
 
+  /** An interface for listening to touch events that interact with a single layer.
+   * See {@link Layer#addListener(Touch.LayerListener)}. */
+  interface LayerListener {
+    /**
+     * Called when a touch starts that hits this layer.
+     */
+    void onTouchStart(Event touch);
+
+    /**
+     * Called when a touch, that started out hitting the listening layer, moves.
+     */
+    void onTouchMove(Event touch);
+
+    /**
+     * Called when a touch, that started out hitting the listening layer, ends.
+     */
+    void onTouchEnd(Event touch);
+  }
+
   /**
    * A {@link Listener} implementation with NOOP stubs provided for each method.
    */
@@ -121,6 +154,18 @@ public interface Touch {
     public void onTouchMove(Event[] touches) { /* NOOP! */ }
     @Override
     public void onTouchEnd(Event[] touches) { /* NOOP! */ }
+  }
+
+  /**
+   * A {@link LayerListener} implementation with NOOP stubs provided for each method.
+   */
+  class LayerAdapter implements LayerListener {
+    @Override
+    public void onTouchStart(Event touch) { /* NOOP! */ }
+    @Override
+    public void onTouchMove(Event touch) { /* NOOP! */ }
+    @Override
+    public void onTouchEnd(Event touch) { /* NOOP! */ }
   }
 
   /**

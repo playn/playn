@@ -52,8 +52,8 @@ public class IOSTouch extends TouchImpl {
     // TODO: ???
   }
 
-  private Event[] toTouchEvents(NSSet touches, UIEvent event) {
-    final Event[] events = new Event[Convert.ToInt32(touches.get_Count())];
+  private Event.Impl[] toTouchEvents(NSSet touches, UIEvent event) {
+    final Event.Impl[] events = new Event.Impl[Convert.ToInt32(touches.get_Count())];
     touches.Enumerate(new NSSetEnumerator(new NSSetEnumerator.Method() {
       public void Invoke (NSObject obj, boolean[] stop) {
         UITouch touch = (UITouch) obj;

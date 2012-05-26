@@ -205,7 +205,7 @@ public class GameViewGL extends GLSurfaceView implements SurfaceHolder.Callback 
     });
   }
 
-  void onTouchStart(final Touch.Event[] touches) {
+  void onTouchStart(final Touch.Event.Impl[] touches) {
     queueEvent(new Runnable() {
       @Override
       public void run() {
@@ -214,7 +214,7 @@ public class GameViewGL extends GLSurfaceView implements SurfaceHolder.Callback 
     });
   }
 
-  void onTouchMove(final Touch.Event[] touches) {
+  void onTouchMove(final Touch.Event.Impl[] touches) {
     queueEvent(new Runnable() {
       @Override
       public void run() {
@@ -223,7 +223,7 @@ public class GameViewGL extends GLSurfaceView implements SurfaceHolder.Callback 
     });
   }
 
-  void onTouchEnd(final Touch.Event[] touches) {
+  void onTouchEnd(final Touch.Event.Impl[] touches) {
     queueEvent(new Runnable() {
       @Override
       public void run() {
