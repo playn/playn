@@ -43,7 +43,7 @@ object PlayNBuild extends Build {
       )
       case "tests-core" => Seq(
         // copy resources from playn/tests/resources
-        unmanagedResourceDirectories in Compile <+= baseDirectory / "src",
+        unmanagedResourceDirectories in Compile <+= baseDirectory / "src/main/java",
         excludeFilter in unmanagedResources ~= { _ || "*.java" }
       )
       case "tests-java" => LWJGLPlugin.lwjglSettings
