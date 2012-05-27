@@ -33,27 +33,35 @@ public class IOSNet extends NetImpl {
 
   @Override
   public void get(String url, Callback<String> callback) {
-    final WebRequest req = WebRequest.Create(url);
-    req.BeginGetResponse(gotResponse(req, callback), null);
+    try {
+      final WebRequest req = WebRequest.Create(url);
+      req.BeginGetResponse(gotResponse(req, callback), null);
+    } catch (Throwable t) {
+      callback.onFailure(t);
+    }
   }
 
   @Override
   public void post(String url, final String data, final Callback<String> callback) {
-    final WebRequest req = WebRequest.Create(url);
-    req.set_Method("POST");
-    req.BeginGetRequestStream(new AsyncCallback(new AsyncCallback.Method() {
-      @Override
-      public void Invoke(IAsyncResult result) {
-        try {
-          StreamWriter out = new StreamWriter(req.GetRequestStream());
-          out.Write(data);
-          out.Close();
-          req.BeginGetResponse(gotResponse(req, callback), null);
-        } catch (Throwable t) {
-          notifyFailure(callback, t);
+    try {
+      final WebRequest req = WebRequest.Create(url);
+      req.set_Method("POST");
+      req.BeginGetRequestStream(new AsyncCallback(new AsyncCallback.Method() {
+        @Override
+        public void Invoke(IAsyncResult result) {
+          try {
+            StreamWriter out = new StreamWriter(req.GetRequestStream());
+            out.Write(data);
+            out.Close();
+            req.BeginGetResponse(gotResponse(req, callback), null);
+          } catch (Throwable t) {
+            notifyFailure(callback, t);
+          }
         }
-      }
-    }), null);
+      }), null);
+    } catch (Throwable t) {
+      callback.onFailure(t);
+    }
   }
 
   protected AsyncCallback gotResponse (final WebRequest req, final Callback<String> callback) {
