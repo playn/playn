@@ -52,6 +52,7 @@
           </dlls>
           <copyDlls>
             <copyDll>bin/IKVM.Runtime.dll</copyDll>
+            <copyDll>bin/IKVM.Runtime.JNI.dll</copyDll>
             <copyDll>bin/IKVM.OpenJDK.Core.dll</copyDll>
             <copyDll>bin/IKVM.OpenJDK.Util.dll</copyDll>
             <copyDll>bin/IKVM.OpenJDK.Text.dll</copyDll>
