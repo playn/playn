@@ -142,7 +142,7 @@ public interface GLShader
 
     "void main(void) {\n" +
     "  vec4 textureColor = texture2D(u_Texture, v_TexCoord);\n" +
-    "  gl_FragColor = vec4(textureColor.rgb * u_Alpha, textureColor.a * u_Alpha);\n" +
+    "  gl_FragColor = textureColor * u_Alpha;\n" +
     "}";
 
   /** The GLSL code for the color fragment shader. */
@@ -155,6 +155,6 @@ public interface GLShader
     "uniform float u_Alpha;\n" +
 
     "void main(void) {\n" +
-    "  gl_FragColor = vec4(u_Color.rgb * u_Alpha, u_Color.a * u_Alpha);\n" +
+    "  gl_FragColor = u_Color * u_Alpha;\n" +
     "}";
 }
