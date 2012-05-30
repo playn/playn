@@ -84,14 +84,14 @@ public class AndroidGLShader extends IndexedTrisShader
       boolean wasntAlreadyActive = super.prepare(fbufWidth, fbufHeight);
       if (wasntAlreadyActive || color != lastColor || alpha != lastAlpha) {
         flush();
-        gl20.glUniform1f(uAlpha, alpha);
-        lastAlpha = alpha;
-        float a = (float) ((color >> 24) & 0xff) / 255;
-        float r = (float) ((color >> 16) & 0xff) / 255;
-        float g = (float) ((color >> 8) & 0xff) / 255;
-        float b = (float) ((color >> 0) & 0xff) / 255;
-        gl20.glUniform4f(uColor, r, g, b, a);
+        float a = ((color >> 24) & 0xff) / 255f;
+        float r = ((color >> 16) & 0xff) / 255f;
+        float g = ((color >> 8) & 0xff) / 255f;
+        float b = ((color >> 0) & 0xff) / 255f;
+        gl20.glUniform4f(uColor, r, g, b, 1);
         lastColor = color;
+        gl20.glUniform1f(uAlpha, alpha * a);
+        lastAlpha = alpha;
         ctx.checkGLError("colorShader.prepare end");
       }
     }

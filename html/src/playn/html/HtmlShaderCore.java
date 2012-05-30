@@ -81,21 +81,16 @@ class HtmlShaderCore {
       boolean wasntAlreadyActive = prepare(shader, fbufWidth, fbufHeight);
       if (wasntAlreadyActive || color != lastColor || alpha != lastAlpha) {
         shader.flush();
-        gl.uniform1f(uAlpha, alpha);
+        colors.set(0, ((color >> 16) & 0xff) / 255f);
+        colors.set(1, ((color >> 8) & 0xff) / 255f);
+        colors.set(2, ((color >> 0) & 0xff) / 255f);
+        colors.set(3, 1);
+        gl.uniform4fv(uColor, colors);
+        lastColor = color;
+        float a =  ((color >> 24) & 0xff) / 255f;
+        gl.uniform1f(uAlpha, alpha * a);
         lastAlpha = alpha;
-        setColor(color);
       }
-    }
-
-    private void setColor(int color) {
-      // ABGR.
-      colors.set(3, (float)((color >> 24) & 0xff) / 255);
-      colors.set(0, (float)((color >> 16) & 0xff) / 255);
-      colors.set(1, (float)((color >> 8) & 0xff) / 255);
-      colors.set(2, (float)((color >> 0) & 0xff) / 255);
-      gl.uniform4fv(uColor, colors);
-
-      lastColor = color;
     }
   }
 
