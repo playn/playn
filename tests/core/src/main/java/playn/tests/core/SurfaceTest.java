@@ -45,19 +45,19 @@ public class SurfaceTest extends Test {
         drawLine(surf, 10, 120, 130, 180, 10);
 
         // do some rendering with alpha
-        surf.setFillColor(0xFF0000FF);
-        surf.fillRect(10, 200, 100, 50);
-        surf.setAlpha(0.5f);
-        surf.setFillColor(0xFFFF0000);
-        surf.fillRect(10, 200, 50, 50);
+        surf.setAlpha(1f).setFillColor(0xFF0000FF).fillRect(10, 200, 100, 50);
+
+        // these two alpha fills should look the same
+        surf.setFillColor(0x80FF0000).fillRect(10, 200, 25, 50);
+        surf.setAlpha(0.5f).setFillColor(0xFFFF0000).fillRect(35, 200, 25, 50);
+
         surf.drawImage(orange, 65, 205);
         surf.fillRect(10, 260, 50, 50);
         surf.drawImage(orange, 65, 265);
         surf.setAlpha(1f);
 
         // fill some shapes with patterns
-        surf.setFillPattern(pattern);
-        surf.fillRect(200, 50, 100, 100);
+        surf.setFillPattern(pattern).fillRect(200, 50, 100, 100);
         // use same fill pattern for the triangles
         surf.translate(200, 220);
         surf.fillTriangles(verts, indices);
