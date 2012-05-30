@@ -24,7 +24,7 @@ class HtmlPointer extends PointerImpl implements Pointer {
   // true when we are in a drag sequence (after pointer start but before pointer end)
   private boolean inDragSequence = false;
 
-HtmlPointer(final Element rootElement) {
+  HtmlPointer(final Element rootElement) {
     // capture touch start on the root element, only.
     HtmlInput.captureEvent(rootElement, "touchstart", new EventHandler() {
       @Override
