@@ -262,7 +262,7 @@ public interface Layer {
    * to layers "below" it, you must register a NOOP listener on the layer, or manually call {@link
    * #setInteractive} after removing the last listener.</p>
    */
-  Connection addListener(Mouse.LayerListener mouseLayerListener);
+  Connection addListener(Mouse.LayerListener mouseListener);
 
   /**
    * Registers a listener with this layer that will be notified if a touch event happens within its
@@ -279,7 +279,7 @@ public interface Layer {
    * dispatched to layers "below" it, you must register a NOOP listener on the layer, or manually
    * call {@link #setInteractive} after removing the last listener.</p>
    */
-  Connection addListener(Touch.LayerListener touchLayerListener);
+  Connection addListener(Touch.LayerListener touchListener);
 
   /**
    * Interface for {@link Layer}s containing explicit sizes.
