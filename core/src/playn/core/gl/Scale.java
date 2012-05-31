@@ -99,6 +99,11 @@ public class Scale {
     return rsrcs;
   }
 
+  @Override
+  public String toString() {
+    return "x" + factor;
+  }
+
   private String computePath(String path, float scale) {
     int scaleFactor = (int)(scale * 10);
     if (scaleFactor % 10 == 0)
