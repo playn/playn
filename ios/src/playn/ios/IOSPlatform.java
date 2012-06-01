@@ -289,7 +289,7 @@ public class IOSPlatform implements Platform {
   }
 
   void viewDidInit(int defaultFrameBuffer) {
-    graphics.viewDidInit(defaultFrameBuffer);
+    graphics.ctx.viewDidInit(defaultFrameBuffer);
     // configure our orientation to a supported default, a notification will come in later that
     // will adjust us to the device's current orientation
     onOrientationChange(orients.defaultOrient);

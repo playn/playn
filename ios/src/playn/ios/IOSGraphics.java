@@ -72,14 +72,10 @@ public class IOSGraphics extends GraphicsGL {
     this.screenWidth = screenWidth;
     this.screenHeight = screenHeight;
     this.touchScale = touchScale;
-    ctx = new IOSGLContext(platform, viewScale);
+    ctx = new IOSGLContext(platform, viewScale, screenWidth, screenHeight);
     rootLayer = new GroupLayerGL(ctx);
     rootTransform = new StockInternalTransform();
     rootTransform.uniformScale(ctx.scale.factor);
-  }
-
-  void viewDidInit(int defaultFrameBuffer) {
-    ctx.viewDidInit(defaultFrameBuffer, screenWidth, screenHeight);
   }
 
   @Override

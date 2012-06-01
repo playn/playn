@@ -43,13 +43,13 @@ public class IOSGLContext extends GLContext {
   private GLShader.Texture texShader;
   private GLShader.Color colorShader;
 
-  public IOSGLContext(IOSPlatform platform, float scaleFactor) {
+  public IOSGLContext(IOSPlatform platform, float scaleFactor, int screenWidth, int screenHeight) {
     super(platform, scaleFactor);
+    setSize(screenWidth, screenHeight);
   }
 
-  void viewDidInit(int defaultFrameBuffer, int screenWidth, int screenHeight) {
+  void viewDidInit(int defaultFrameBuffer) {
     this.defaultFrameBuffer = defaultFrameBuffer;
-    setSize(screenWidth, screenHeight);
     GL.Disable(All.wrap(All.CullFace));
     GL.Enable(All.wrap(All.Blend));
     GL.BlendFunc(All.wrap(All.One), All.wrap(All.OneMinusSrcAlpha));
@@ -154,7 +154,10 @@ public class IOSGLContext extends GLContext {
 
   @Override
   protected void bindFramebufferImpl(Object frameBuffer, int width, int height) {
-    GL.BindFramebuffer(All.wrap(All.Framebuffer), (Integer) frameBuffer);
+    // this is called during early initialization before we know our default frame buffer id, but
+    // we can just skip binding in that case because our default frame buffer is already bound
+    if (frameBuffer != null)
+      GL.BindFramebuffer(All.wrap(All.Framebuffer), (Integer) frameBuffer);
     GL.Viewport(0, 0, width, height);
   }
 
