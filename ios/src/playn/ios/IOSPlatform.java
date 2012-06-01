@@ -57,7 +57,7 @@ public class IOSPlatform implements Platform {
     },
 
     /** Supports landscape left and right orients. */
-    LANDSCAPES(UIDeviceOrientation.LandscapeLeft) {
+    LANDSCAPES(UIDeviceOrientation.LandscapeRight) {
       @Override
       public boolean isSupported(UIDeviceOrientation orient) {
         return ((orient.Value == UIDeviceOrientation.LandscapeLeft) ||
