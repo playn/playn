@@ -284,12 +284,12 @@ public class IOSPlatform implements Platform {
   @Override
   public void run(Game game) {
     this.game = game;
+    // initialize the game and start things off
+    game.init();
     // start the main game loop (TODO: support 0 update rate)
     gameView.Run(1000d / game.updateRate());
     // make our main window visible
     mainWindow.MakeKeyAndVisible();
-    // initialize the game and start things off
-    game.init();
   }
 
   void onOrientationChange(UIDeviceOrientation orientation) {
