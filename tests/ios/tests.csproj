@@ -91,5 +91,6 @@
     <Content Include="images\imagetypetest%402x.png" />
     <Content Include="images\imagetypetest_expected%402x.png" />
     <Content Include="images\orange%402x.png" />
+    <Content Include="Default%402x.png" />
   </ItemGroup>
 </Project>
