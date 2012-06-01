@@ -72,7 +72,7 @@ public class IOSGameView extends iPhoneOSGameView {
   protected void CreateFrameBuffer() {
     super.CreateFrameBuffer();
     // now that we're loaded, initialize the GL subsystem
-    platform.graphics().ctx.init();
+    platform.graphics().ctx.init(get_Framebuffer());
   }
 
   @Override

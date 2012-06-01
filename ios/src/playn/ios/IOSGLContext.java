@@ -39,16 +39,22 @@ public class IOSGLContext extends GLContext {
 
   int orient;
 
+  private final int screenWidth, screenHeight;
+  private Integer defaultFrameBuffer; // configured in init()
+
   private GLShader.Texture texShader;
   private GLShader.Color colorShader;
 
   public IOSGLContext(IOSPlatform platform, float scaleFactor, int screenWidth, int screenHeight) {
     super(platform, scaleFactor);
-    setSize(screenWidth, screenHeight);
+    this.screenWidth = screenWidth;
+    this.screenHeight = screenHeight;
   }
 
-  public void init() {
+  public void init(int defaultFrameBuffer) {
+    this.defaultFrameBuffer = defaultFrameBuffer;
     reinitGL();
+    setSize(screenWidth, screenHeight);
   }
 
   @Override
@@ -130,7 +136,7 @@ public class IOSGLContext extends GLContext {
 
   @Override
   protected Object defaultFrameBuffer() {
-    return 0;
+    return defaultFrameBuffer;
   }
 
   @Override
