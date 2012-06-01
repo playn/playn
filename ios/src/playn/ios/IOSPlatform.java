@@ -183,10 +183,6 @@ public class IOSPlatform implements Platform {
 
     mainWindow = new UIWindow(bounds);
     mainWindow.Add(gameView = new IOSGameView(this, bounds, deviceScale));
-
-    // configure our orientation to a supported default, a notification will come in later that
-    // will adjust us to the devices current orientation
-    onOrientationChange(orients.defaultOrient);
   }
 
   @Override
@@ -292,11 +288,21 @@ public class IOSPlatform implements Platform {
     mainWindow.MakeKeyAndVisible();
   }
 
+  void viewDidInit(int defaultFrameBuffer) {
+    graphics.viewDidInit(defaultFrameBuffer);
+    // configure our orientation to a supported default, a notification will come in later that
+    // will adjust us to the device's current orientation
+    onOrientationChange(orients.defaultOrient);
+  }
+
   void onOrientationChange(UIDeviceOrientation orientation) {
     if (!orients.isSupported(orientation))
       return; // ignore unsupported (or Unknown) orientations
     graphics.setOrientation(orientation);
-    app.SetStatusBarOrientation(ORIENT_MAP.get(orientation), true);
+    UIInterfaceOrientation sorient = ORIENT_MAP.get(orientation);
+    if (!sorient.equals(app.get_StatusBarOrientation())) {
+      app.SetStatusBarOrientation(sorient, !app.get_StatusBarHidden());
+    }
     // TODO: notify the game of the orientation change
   }
 

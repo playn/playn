@@ -38,23 +38,24 @@ public class IOSGLContext extends GLContext {
   public static final boolean CHECK_ERRORS = false;
 
   int orient;
-
-  private final int screenWidth, screenHeight;
   private Integer defaultFrameBuffer; // configured in init()
 
   private GLShader.Texture texShader;
   private GLShader.Color colorShader;
 
-  public IOSGLContext(IOSPlatform platform, float scaleFactor, int screenWidth, int screenHeight) {
+  public IOSGLContext(IOSPlatform platform, float scaleFactor) {
     super(platform, scaleFactor);
-    this.screenWidth = screenWidth;
-    this.screenHeight = screenHeight;
   }
 
-  public void init(int defaultFrameBuffer) {
+  void viewDidInit(int defaultFrameBuffer, int screenWidth, int screenHeight) {
     this.defaultFrameBuffer = defaultFrameBuffer;
-    reinitGL();
     setSize(screenWidth, screenHeight);
+    GL.Disable(All.wrap(All.CullFace));
+    GL.Enable(All.wrap(All.Blend));
+    GL.BlendFunc(All.wrap(All.One), All.wrap(All.OneMinusSrcAlpha));
+    GL.ClearColor(0, 0, 0, 1);
+    texShader = new IOSGLShader.Texture(this);
+    colorShader = new IOSGLShader.Color(this);
   }
 
   @Override
@@ -215,14 +216,5 @@ public class IOSGLContext extends GLContext {
     rootLayer.paint(rootTransform, 1); // paint all the layers
     checkGLError("updateLayers end");
     useShader(null); // guarantee a flush
-  }
-
-  private void reinitGL() {
-    GL.Disable(All.wrap(All.CullFace));
-    GL.Enable(All.wrap(All.Blend));
-    GL.BlendFunc(All.wrap(All.One), All.wrap(All.OneMinusSrcAlpha));
-    GL.ClearColor(0, 0, 0, 1);
-    texShader = new IOSGLShader.Texture(this);
-    colorShader = new IOSGLShader.Color(this);
   }
 }
