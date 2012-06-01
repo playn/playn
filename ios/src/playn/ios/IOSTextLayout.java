@@ -52,8 +52,9 @@ class IOSTextLayout extends AbstractTextLayout {
   // and y increases for each line, until you get to the last. But in iOS/OpenGL coordinates, that
   // means lines starts at 0,MAX_FLOAT and y decreases line by line until the last line, which is
   // still at some exceedingly large y value. To accommodate that, we use a rectangle of height
-  // MAX_HEIGHT (a large value used instead of Float.MAX_VALUE to avoid overflow problems) and we
-  // translate the graphics context by -MAX_HEIGHT when we render. Hacky, but it works.
+  // MAX_HEIGHT (a large value used instead of Float.MAX_VALUE to avoid overflow problems). We now
+  // render lines ourselves instead of having the CTFrame do the rendering, so we only need
+  // MAX_HEIGHT during layout. We ignore the assigned y positions during rendering.
   //
   // The next problem is that when wrapping text in said region, the x position of each line is
   // recorded and used when rendering the text. This x coordinate accounts for justification, so if
@@ -93,8 +94,8 @@ class IOSTextLayout extends AbstractTextLayout {
 
   private class Wrapped extends IOSTextStamp {
     protected static final float MAX_HEIGHT = 10000f;
-    private final CTFrame frame;
-    private final float lineHeight;
+    private final CTLine[] lines;
+    private final PointF[] origins;
     private final float adjustX;
 
     Wrapped(IOSGraphics gfx, IOSFont font, CTStringAttributes attribs, int color, String text) {
@@ -108,29 +109,20 @@ class IOSTextLayout extends AbstractTextLayout {
       try {
         CGPath path = new CGPath();
         path.AddRect(new RectangleF(0, 0, format.wrapWidth, MAX_HEIGHT));
-        this.frame = fs.GetFrame(new NSRange(0, 0), path, null);
-
-        PointF[] origins = new PointF[frame.GetLines().length];
+        CTFrame frame = fs.GetFrame(new NSRange(0, 0), path, null);
+        this.lines = frame.GetLines();
+        this.origins = new PointF[lines.length];
         frame.GetLineOrigins(new NSRange(0, 0), origins);
-        float minX = Float.MAX_VALUE;
-        for (PointF origin : origins) {
-          minX = Math.min(origin.get_X(), minX);
-        }
-        adjustX = -minX;
-
-        float maxX = 0;
-        int idx = 0;
-        for (CTLine line : frame.GetLines()) {
-          RectangleF bounds = line.GetImageBounds(gfx.scratchCtx);
-          float lineX = origins[idx++].get_X() + bounds.get_X() + bounds.get_Width();
+        float minX = Float.MAX_VALUE, maxX = 0;
+        for (int ii = 0; ii < lines.length; ii++) {
+          RectangleF bounds = lines[ii].GetImageBounds(gfx.scratchCtx);
+          float ox = origins[ii].get_X(), lineX = ox + bounds.get_X() + bounds.get_Width();
+          minX = Math.min(ox, minX);
           maxX = Math.max(maxX, lineX);
         }
+        this.adjustX = -minX;
         this.width = maxX - minX;
-
-        this.lineHeight = (origins.length < 2) ? fontLineHeight :
-          (origins[0].get_Y() - origins[1].get_Y());
-        float gap = lineHeight - fontLineHeight;
-        this.height = lineHeight * frame.GetLines().length - gap;
+        this.height = fontLineHeight * lines.length - font.ctFont.get_LeadingMetric();
 
       } finally {
         fs.Dispose();
@@ -139,7 +131,7 @@ class IOSTextLayout extends AbstractTextLayout {
 
     @Override
     public int lineCount() {
-      return frame.GetLines().length;
+      return lines.length;
     }
 
     @Override
@@ -150,12 +142,20 @@ class IOSTextLayout extends AbstractTextLayout {
 
     @Override
     public void paint(CGBitmapContext bctx, float x, float y) {
-      float dx = x + adjustX, dy = y + MAX_HEIGHT;
+      float dx = x + adjustX, dy = y + font.ctFont.get_AscentMetric();
+      float lineHeight = font.ctFont.get_AscentMetric() + font.ctFont.get_DescentMetric() +
+        font.ctFont.get_LeadingMetric();
+      bctx.SaveState();
       bctx.TranslateCTM(dx, dy);
       bctx.ScaleCTM(1, -1);
-      frame.Draw(bctx);
-      bctx.ScaleCTM(1, -1);
-      bctx.TranslateCTM(-dx, -dy);
+      PointF origin = new PointF(0, 0);
+      for (int ii = 0; ii < lines.length; ii++) {
+        origin.set_X(origins[ii].get_X());
+        bctx.set_TextPosition(origin);
+        lines[ii].Draw(bctx);
+        bctx.TranslateCTM(0, -lineHeight);
+      }
+      bctx.RestoreState();
     }
   }
 
