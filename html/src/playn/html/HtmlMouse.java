@@ -13,6 +13,7 @@
  */
 package playn.html;
 
+import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.NativeEvent;
 
@@ -24,8 +25,20 @@ class HtmlMouse extends MouseImpl {
   private Listener listener;
   // true when we are in a drag sequence (after mouse down but before mouse up)
   boolean inDragSequence = false;
+  boolean isRequestingMouseLock;
+  private final Element rootElement;
 
   HtmlMouse(final Element rootElement) {
+    this.rootElement = rootElement;
+
+    // Needed so the right mouse button becomes available
+    HtmlPlatform.addEventListener(Document.get(), "contextmenu", new EventHandler() {
+      @Override
+      public void handleEvent(NativeEvent evt) {
+        evt.preventDefault();
+        evt.stopPropagation();
+      }
+    }, false);
     abstract class XYEventHandler implements EventHandler {
       public void handleEvent(NativeEvent ev) {
         handleEvent(ev, HtmlInput.getRelativeX(ev, rootElement),
@@ -44,8 +57,18 @@ class HtmlMouse extends MouseImpl {
           lastY = y;
         }
         if (inDragSequence == wantDragSequence()) {
-          if (onMouseMove(new MotionEvent.Impl(PlayN.currentTime(), x, y, x - lastX, y - lastY)))
+          float dx;
+          float dy;
+          if (isLocked()) {
+            dx = getMovementX(ev);
+            dy = getMovementY(ev);
+          } else {
+            dx = x - lastX;
+            dy = y - lastY;
+          }
+          if (onMouseMove(new MotionEvent.Impl(PlayN.currentTime(), x, y, dx, dy))) {
             ev.preventDefault();
+          }
         }
         lastX = x;
         lastY = y;
@@ -73,6 +96,7 @@ class HtmlMouse extends MouseImpl {
           if (onMouseUp(new ButtonEvent.Impl(PlayN.currentTime(), x, y, getMouseButton(ev))))
             ev.preventDefault();
         }
+        handleRequestsInUserEventContext();
       }
     });
 
@@ -107,6 +131,31 @@ class HtmlMouse extends MouseImpl {
   public native boolean hasMouse() /*-{
     return ('onmousedown' in $doc.documentElement) &&
       ($wnd.navigator.userAgent.match(/ipad|iphone|android/i) == null);
+  }-*/;
+
+  private native int getMovementX(NativeEvent nativeEvent) /*-{
+    return nativeEvent.webkitMovementX;
+  }-*/;
+  
+  private native int getMovementY(NativeEvent nativeEvent) /*-{
+      return nativeEvent.webkitMovementY;
+  }-*/;
+
+  void handleRequestsInUserEventContext() {
+    // hack to allow requesting mouse lock from non-mouse/key handler event
+    if (isRequestingMouseLock && !isLocked()) {
+      requestMouseLock(rootElement);
+    }
+  }
+
+  native void requestMouseLock(Element element) /*-{
+    var pointer = navigator.pointer || navigator.mozPointer || navigator.webkitPointer;
+    var self = this;
+    if(pointer) {
+      pointer.lock(element, function() { 
+      }, function(e) {
+      });
+    }
   }-*/;
 
   /**
@@ -164,4 +213,38 @@ class HtmlMouse extends MouseImpl {
     default:                          return evt.getButton();
     }
   }
+  @Override
+  public void lock() {
+    if (isLockSupported()) {
+      isRequestingMouseLock = true;
+      PlayN.log().debug("Requesting mouse lock (supported)");
+    } else {
+      PlayN.log().debug("Requesting mouse lock -- but unsupported");
+    }
+  }
+
+  @Override
+  public void unlock() {
+    PlayN.log().debug("Requesting mouse unlock");
+    isRequestingMouseLock = false;
+    if (isLockSupported()) {
+      unlockImpl();
+    }
+  }
+
+  private native void unlockImpl() /*-{
+    var pointer = navigator.webkitPointer || navigator.mozPointer || navigator.pointer;
+    pointer && pointer.unlock();
+  }-*/;
+
+  @Override
+  public native boolean isLocked() /*-{
+    var pointer = navigator.webkitPointer || navigator.mozPointer || navigator.pointer;
+    return pointer && pointer.isLocked || false; 
+  }-*/;
+  
+  @Override
+  public native boolean isLockSupported() /*-{
+    return !!(navigator.webkitPointer || navigator.mozPointer || navigator.pointer);
+  }-*/;
 }
