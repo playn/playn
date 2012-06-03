@@ -17,6 +17,8 @@
 
 package java.nio;
 
+import java.nio.ByteOrder;
+
 import com.google.gwt.typedarrays.client.ArrayBuffer;
 import com.google.gwt.typedarrays.client.ArrayBufferView;
 import com.google.gwt.typedarrays.client.Int8Array;
@@ -29,9 +31,8 @@ import com.google.gwt.typedarrays.client.Int8Array;
  * it;</li>
  * </ul>
  */
-public final class ByteBuffer extends Buffer
-  implements Comparable<ByteBuffer>, playn.html.HasArrayBufferView {
-
+public final class ByteBuffer extends Buffer implements Comparable<ByteBuffer>, playn.html.HasArrayBufferView, playn.html.TypedArrayHelper.Wrapper {
+  
     Int8Array byteArray;
 
     /** The byte order of this buffer, default is {@code BIG_ENDIAN}. */
@@ -45,7 +46,6 @@ public final class ByteBuffer extends Buffer
      */
     public static ByteBuffer allocate (int capacity) {
         ByteBuffer result = allocateDirect(capacity);
-        result.order(ByteOrder.nativeOrder());
         return result;
     }
 
@@ -62,7 +62,10 @@ public final class ByteBuffer extends Buffer
         return new ByteBuffer(capacity);
     }
 
-
+    public ByteBuffer wrap(ArrayBuffer arrayBuffer) {
+       return new ByteBuffer(arrayBuffer);
+    }
+    
     static ByteBuffer copy (ByteBuffer other, int markOfOther) {
       ByteBuffer buf = new ByteBuffer(
         other.byteArray.getBuffer(), other.capacity(),
@@ -74,15 +77,17 @@ public final class ByteBuffer extends Buffer
       return buf;
     }
 
+
     /** Constructs a {@code ByteBuffer} with given capacity.
      *
      * @param capacity the capacity of the buffer. */
     ByteBuffer (int capacity) {
-        this(ArrayBuffer.create(capacity), capacity, 0);
+        this(ArrayBuffer.create(capacity));
     }
 
     ByteBuffer (ArrayBuffer buf) {
-        this(buf, buf.getByteLength(), 0);
+        super(buf.getByteLength());
+        byteArray = Int8Array.create(buf);
     }
 
     ByteBuffer (ArrayBuffer buffer, int capacity, int offset) {
@@ -282,7 +287,6 @@ public final class ByteBuffer extends Buffer
 // }
         return (byte)byteArray.get(position++);
     }
-
     /** Reads bytes from the current position into the specified byte array and increases the
      * position by the number of bytes read.
      * <p>
@@ -507,6 +511,7 @@ public final class ByteBuffer extends Buffer
       return result;
     }
 
+
     /** Returns the short at the specified index.
      * <p> The 2 bytes starting at the specified index are composed into a short according to the
      * current byte order and returned. The position is not changed. </p>
@@ -592,8 +597,8 @@ public final class ByteBuffer extends Buffer
    // if (position == limit) {
    // throw new BufferOverflowException();
    // }
-        byteArray.set(position++, b);
-        return this;
+           byteArray.set(position++, b);
+           return this;
     }
 
     /** Writes bytes in the given byte array to the current position and increases the position by
@@ -624,7 +629,7 @@ public final class ByteBuffer extends Buffer
      */
     public ByteBuffer put (byte[] src, int off, int len) {
         int length = src.length;
-        if ((off < 0) || (len < 0) || ((long)off + (long)len > length)) {
+        if (off < 0 || len < 0 || off + len > length) {
             throw new IndexOutOfBoundsException();
         }
 
@@ -893,7 +898,7 @@ public final class ByteBuffer extends Buffer
           byteArray.set(baseOffset, (byte)(value & 0xFF));
       }
       return this;
-    }
+      }
 
     /** Returns a sliced buffer that shares its content with this buffer.
      * <p> The sliced buffer's capacity will be this buffer's {@code remaining()}, and it's zero
@@ -932,20 +937,21 @@ public final class ByteBuffer extends Buffer
 //    public ByteBuffer stringToByteBuffer (String s) {
 //        return new StringByteBuffer(s);
 //    }
-
+    
+    
     public ArrayBufferView getTypedArray () {
-        return byteArray;
+      return byteArray;
     }
 
     public int getElementSize () {
-        return 1;
+      return 1;
     }
 
     public int getElementType() {
-        return 0x1400; // GL_BYTE
+      return 0x1400; // GL_BYTE
     }
-
+  
     public boolean isReadOnly() {
-        return false;
+      return false;
     }
 }
