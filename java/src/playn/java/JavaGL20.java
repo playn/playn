@@ -907,7 +907,9 @@ final class JavaGL20 implements playn.core.gl.GL20 {
                                     Buffer ptr) {
     // GL20.glVertexAttribPointer(indx, size, type, normalized, stride,
     // BufferUtils.getOffset(ptr));
-    if (ptr instanceof ByteBuffer) {
+    if (ptr instanceof FloatBuffer) {
+      GL20.glVertexAttribPointer(indx, size, normalized, stride, (FloatBuffer) ptr);
+    } else if (ptr instanceof ByteBuffer) {
       switch (type) {
       case GL_BYTE:
         GL20.glVertexAttribPointer(indx, size, false, normalized, stride, ((ByteBuffer) ptr));
@@ -928,8 +930,6 @@ final class JavaGL20 implements playn.core.gl.GL20 {
       default:
         throw new RuntimeException("NYI for type " + Integer.toHexString(type));
       }
-    } else if (ptr instanceof FloatBuffer) {
-      GL20.glVertexAttribPointer(indx, size, normalized, stride, (FloatBuffer) ptr);
     } else if (ptr instanceof ShortBuffer) {
       throw new RuntimeException("LWJGL does not support short buffers in glVertexAttribPointer.");
     } else {
