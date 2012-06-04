@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright 2011 See AUTHORS file.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -41,9 +41,9 @@ import org.lwjgl.opengl.GL41;
  * An implementation of the {@link GL20} interface based on Jogl. Note that Jogl
  * shaders and OpenGL ES shaders will not be 100% compatible. Some glGetXXX
  * methods are not implemented.
- * 
+ *
  * Based on LIBGDX code by mzechner. Some code from LWJGL's GLES20.java
- * 
+ *
  * @author mzechner
  */
 final class JavaGL20 implements playn.core.gl.GL20 {
@@ -989,7 +989,7 @@ final class JavaGL20 implements playn.core.gl.GL20 {
 			int internalformat, int width, int height, int border,
 			int data_imageSize, int data) {
       throw new UnsupportedOperationException("NYI");
-      
+
     }
 
 	@Override
@@ -1263,7 +1263,7 @@ final class JavaGL20 implements playn.core.gl.GL20 {
 
 		GL41.glGetProgramBinary(program, intBuffer, intBuffer2,
 				(ByteBuffer) binary);
-		
+
 		// Return length, binaryformat
 		intBuffer.get(length, lengthOffset, lengthLength);
 		intBuffer2.get(binaryformat, binaryformatOffset, binaryformatLength);
@@ -1360,7 +1360,7 @@ final class JavaGL20 implements playn.core.gl.GL20 {
 	@Override
 	public void glGetShaderSource(int shader, int bufsize, int[] length,
 			int lengthOffset, byte[] source, int sourceOffset) {
-	    throw new UnsupportedOperationException("NYI");	      
+	    throw new UnsupportedOperationException("NYI");
 	}
 
 	@Override
@@ -1449,14 +1449,14 @@ final class JavaGL20 implements playn.core.gl.GL20 {
 	public void glReadPixels(int x, int y, int width, int height, int format,
 			int type, int pixelsBufferOffset) {
       throw new UnsupportedOperationException("NYI");
-      
+
 	}
 
 	@Override
 	public void glShaderBinary(int n, int[] shaders, int offset,
 			int binaryformat, Buffer binary, int length) {
       throw new UnsupportedOperationException("NYI");
-      
+
 	}
 
 	@Override
@@ -1477,7 +1477,7 @@ final class JavaGL20 implements playn.core.gl.GL20 {
 	public void glTexImage2D(int arg0, int arg1, int arg2, int arg3, int arg4,
 			int arg5, int arg6, int arg7, int arg8) {
       throw new UnsupportedOperationException("NYI");
-      
+
 	}
 
 	@Override
@@ -1515,7 +1515,7 @@ final class JavaGL20 implements playn.core.gl.GL20 {
 	public void glTexSubImage2D(int arg0, int arg1, int arg2, int arg3,
 			int arg4, int arg5, int arg6, int arg7, int arg8) {
       throw new UnsupportedOperationException("NYI");
-      
+
 	}
 
 	@Override
