@@ -20,6 +20,18 @@ package playn.core;
  */
 public interface GroupLayer extends Layer {
 
+  /** A clipped group layer. */
+  interface Clipped extends GroupLayer, HasSize {
+    /** Updates the size of this group layer, and hence its clipping rectangle. */
+    void setSize(float width, float height);
+
+    /** Updates the width of this group layer, and hence its clipping rectangle. */
+    void setWidth(float width);
+
+    /** Updates the height of this group layer, and hence its clipping rectangle. */
+    void setHeight(float height);
+  }
+
   /**
    * Returns the layer at the specified index.
    * <p>

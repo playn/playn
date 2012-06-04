@@ -27,6 +27,59 @@ import playn.core.ParentLayer;
 
 class HtmlGroupLayerCanvas extends HtmlLayerCanvas implements GroupLayer, ParentLayer {
 
+  public static class Clipped extends HtmlGroupLayerCanvas implements GroupLayer.Clipped, HasSize {
+    private float width, height;
+
+    public Clipped (float width, float height) {
+      this.width = width;
+      this.height = height;
+    }
+
+    @Override
+    public void setSize(float width, float height) {
+      this.width = width;
+      this.height = height;
+    }
+
+    @Override
+    public void setWidth(float width) {
+      this.width = width;
+    }
+
+    @Override
+    public void setHeight(float height) {
+      this.height = height;
+    }
+
+    @Override
+    public float width() {
+      return this.width;
+    }
+
+    @Override
+    public float height() {
+      return this.height;
+    }
+
+    @Override
+    public float scaledWidth() {
+      return transform.scaleX() * width();
+    }
+
+    @Override
+    public float scaledHeight() {
+      return transform.scaleY() * height();
+    }
+
+    @Override
+    protected void render(Context2d ctx, float alpha) {
+      ctx.beginPath();
+      ctx.rect(0, 0, width, height);
+      ctx.clip();
+      super.render(ctx, alpha);
+    }
+  }
+
   private GroupLayerImpl<HtmlLayerCanvas> impl = new GroupLayerImpl<HtmlLayerCanvas>();
 
   @Override
@@ -107,9 +160,13 @@ class HtmlGroupLayerCanvas extends HtmlLayerCanvas implements GroupLayer, Parent
 
     ctx.save();
     transform(ctx);
-    for (HtmlLayerCanvas child : impl.children) {
-      child.paint(ctx, parentAlpha * alpha);
-    }
+    render(ctx, parentAlpha * alpha);
     ctx.restore();
+  }
+
+  protected void render(Context2d ctx, float alpha) {
+    for (HtmlLayerCanvas child : impl.children) {
+      child.paint(ctx, alpha);
+    }
   }
 }

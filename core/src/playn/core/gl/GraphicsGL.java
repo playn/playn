@@ -59,6 +59,11 @@ public abstract class GraphicsGL implements Graphics {
   }
 
   @Override
+  public GroupLayer.Clipped createGroupLayer(float width, float height) {
+    return new GroupLayerGL.Clipped(ctx(), width, height);
+  }
+
+  @Override
   public ImageLayer createImageLayer() {
     return new ImageLayerGL(ctx());
   }

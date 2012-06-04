@@ -24,7 +24,8 @@ import playn.core.gl.GL20;
 public interface Graphics {
 
   /**
-   * TODO
+   * Returns the root of the scene graph. When layers are added to this layer, they become visible
+   * on the screen.
    */
   GroupLayer rootLayer();
 
@@ -35,14 +36,14 @@ public interface Graphics {
   CanvasLayer createCanvasLayer(int width, int height);
 
   /**
-   * TODO
+   * Creates a group layer.
    */
   GroupLayer createGroupLayer();
 
   /**
-   * TODO
+   * Creates a clipped group layer, with the initial specified size.
    */
-  SurfaceLayer createSurfaceLayer(float width, float height);
+  GroupLayer.Clipped createGroupLayer(float width, float height);
 
   /**
    * Creates an immediate layer that is clipped to the specified rectangular region.
@@ -58,6 +59,11 @@ public interface Graphics {
    * transform.
    */
   ImmediateLayer createImmediateLayer(ImmediateLayer.Renderer renderer);
+
+  /**
+   * TODO
+   */
+  SurfaceLayer createSurfaceLayer(float width, float height);
 
   /**
    * TODO

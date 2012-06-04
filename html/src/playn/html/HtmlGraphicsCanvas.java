@@ -49,6 +49,11 @@ class HtmlGraphicsCanvas extends HtmlGraphics {
   }
 
   @Override
+  public GroupLayer.Clipped createGroupLayer(float width, float height) {
+    return new HtmlGroupLayerCanvas.Clipped(width, height);
+  }
+
+  @Override
   public ImageLayer createImageLayer() {
     return new HtmlImageLayerCanvas();
   }

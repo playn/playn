@@ -13,6 +13,9 @@
  */
 package playn.core.gl;
 
+import pythagoras.f.Point;
+import pythagoras.f.Vector;
+
 import playn.core.Asserts;
 import playn.core.GroupLayer;
 import playn.core.GroupLayerImpl;
@@ -20,9 +23,68 @@ import playn.core.InternalTransform;
 import playn.core.Layer;
 import playn.core.ParentLayer;
 
-import pythagoras.f.Point;
-
 public class GroupLayerGL extends LayerGL implements GroupLayer, ParentLayer {
+
+  public static class Clipped extends GroupLayerGL implements GroupLayer.Clipped, HasSize {
+    private final Point pos = new Point();
+    private final Vector size = new Vector();
+    private float width, height;
+
+    public Clipped (GLContext ctx, float width, float height) {
+      super(ctx);
+      this.width = width;
+      this.height = height;
+    }
+
+    @Override
+    public void setSize(float width, float height) {
+      this.width = width;
+      this.height = height;
+    }
+
+    @Override
+    public void setWidth(float width) {
+      this.width = width;
+    }
+
+    @Override
+    public void setHeight(float height) {
+      this.height = height;
+    }
+
+    @Override
+    public float width() {
+      return this.width;
+    }
+
+    @Override
+    public float height() {
+      return this.height;
+    }
+
+    @Override
+    public float scaledWidth() {
+      return transform.scaleX() * width();
+    }
+
+    @Override
+    public float scaledHeight() {
+      return transform.scaleY() * height();
+    }
+
+    @Override
+    protected void render (InternalTransform xform, float alpha) {
+      xform.transform(pos.set(0, 0), pos);
+      xform.transform(size.set(width, height), size);
+      ctx.startClipped((int) pos.x, (int) pos.y,
+                       Math.round(Math.abs(size.x)), Math.round(Math.abs(size.y)));
+      try {
+        super.render(xform, alpha);
+      } finally {
+        ctx.endClipped();
+      }
+    }
+  }
 
   private GroupLayerImpl<LayerGL> impl = new GroupLayerImpl<LayerGL>();
 
@@ -104,9 +166,10 @@ public class GroupLayerGL extends LayerGL implements GroupLayer, ParentLayer {
   @Override
   public void paint(InternalTransform parentTransform, float parentAlpha) {
     if (!visible()) return;
+    render(localTransform(parentTransform), parentAlpha * alpha);
+  }
 
-    InternalTransform xform = localTransform(parentTransform);
-    float alpha = parentAlpha * this.alpha;
+  protected void render (InternalTransform xform, float alpha) {
     for (LayerGL child : impl.children) {
       child.paint(xform, alpha);
     }

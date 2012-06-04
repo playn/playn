@@ -111,6 +111,11 @@ class FlashGraphics implements Graphics {
   }
 
   @Override
+  public GroupLayer.Clipped createGroupLayer(float width, float height) {
+    throw new UnsupportedOperationException("Clipped group layer not supported by Flash");
+  }
+
+  @Override
   public SurfaceLayer createSurfaceLayer(float width, float height) {
     return new FlashSurfaceLayer(width, height);
   }

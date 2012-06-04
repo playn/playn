@@ -48,6 +48,11 @@ class HtmlGraphicsDom extends HtmlGraphics {
   }
 
   @Override
+  public GroupLayer.Clipped createGroupLayer(float width, float height) {
+    throw new UnsupportedOperationException("Clipped group layer not supported by HTML/DOM");
+  }
+
+  @Override
   public ImageLayer createImageLayer() {
     return new HtmlImageLayerDom();
   }
