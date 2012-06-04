@@ -34,7 +34,7 @@ class HtmlCanvasImage extends HtmlImage implements CanvasImage {
   }
 
   @Override
-  public Object ensureTexture(boolean repeatX, boolean repeatY) {
+  public int ensureTexture(boolean repeatX, boolean repeatY) {
     if (canvas.dirty()) {
       canvas.clearDirty();
       clearTexture();

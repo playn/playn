@@ -30,93 +30,17 @@ import java.nio.ByteOrder;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
-import static org.lwjgl.opengl.EXTFramebufferObject.*;
-import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.opengl.GL12.*;
+import org.lwjgl.opengl.GL11;
 
 import playn.core.Asserts;
-import playn.core.StockInternalTransform;
-import playn.core.gl.GLContext;
-import playn.core.gl.GLShader;
-import playn.core.gl.GroupLayerGL;
-import static playn.core.PlayN.*;
+import playn.core.gl.GL20Context;
 
-/**
- * Implements the GL context via LWJGL bindings.
- */
-class JavaGLContext extends GLContext {
+class JavaGLContext extends GL20Context {
 
   public static final boolean CHECK_ERRORS = Boolean.getBoolean("playn.glerrors");
 
-  private StockInternalTransform rootXform;
-  private GLShader.Texture texShader;
-  private GLShader.Color colorShader;
-
   JavaGLContext(JavaPlatform platform, float scaleFactor, int screenWidth, int screenHeight) {
-    super(platform, scaleFactor);
-    setSize(screenWidth, screenHeight);
-    // create our root transform with our scale factor
-    rootXform = new StockInternalTransform();
-    rootXform.uniformScale(scaleFactor);
-  }
-
-  @Override
-  public void deleteFramebuffer(Object fbuf) {
-    glDeleteFramebuffersEXT((Integer) fbuf);
-  }
-
-  @Override
-  public Object createTexture(boolean repeatX, boolean repeatY) {
-    int texture = glGenTextures();
-    glBindTexture(GL_TEXTURE_2D, texture);
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, repeatX ? GL_REPEAT : GL_CLAMP_TO_EDGE);
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, repeatY ? GL_REPEAT : GL_CLAMP_TO_EDGE);
-    return texture;
-  }
-
-  @Override
-  public Object createTexture(int width, int height, boolean repeatX, boolean repeatY) {
-    int tex = (Integer) createTexture(repeatX, repeatY);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE,
-                 (ByteBuffer) null);
-    return tex;
-  }
-
-  @Override
-  public void destroyTexture(Object tex) {
-    flush(); // flush in case this texture is queued up to be drawn
-    glDeleteTextures((Integer) tex);
-  }
-
-  @Override
-  public void startClipped(int x, int y, int width, int height) {
-    flush(); // flush any pending unclipped calls
-    glScissor(x, curFbufHeight - y - height, width, height);
-    glEnable(GL_SCISSOR_TEST);
-  }
-
-  @Override
-  public void endClipped() {
-    flush(); // flush our clipped calls with SCISSOR_TEST still enabled
-    glDisable(GL_SCISSOR_TEST);
-  }
-
-  @Override
-  public void clear(float r, float g, float b, float a) {
-    glClearColor(r, g, b, a);
-    glClear(GL_COLOR_BUFFER_BIT);
-  }
-
-  @Override
-  public void checkGLError(String op) {
-    if (CHECK_ERRORS) {
-      int error;
-      while ((error = glGetError()) != GL_NO_ERROR) {
-        log().error(this.getClass().getName() + " -- " + op + ": glError " + error);
-      }
-    }
+    super(platform, new JavaGL20(), scaleFactor, screenWidth, screenHeight, CHECK_ERRORS);
   }
 
   @Override
@@ -130,84 +54,21 @@ class JavaGLContext extends GLContext {
       super.viewWasResized();
   }
 
-  @Override
-  protected Object defaultFrameBuffer() {
-    return 0;
-  }
-
-  @Override
-  protected Object createFramebufferImpl(Object tex) {
-    // Generate the framebuffer and attach the texture
-    int fbuf = glGenFramebuffersEXT();
-    glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbuf);
-    glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D,
-                              (Integer) tex, 0);
-    return fbuf;
-  }
-
-  @Override
-  protected void bindFramebufferImpl(Object fbuf, int width, int height) {
-    glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, (Integer) fbuf);
-    glViewport(0, 0, width, height);
-  }
-
-  @Override
-  protected GLShader.Texture quadTexShader() {
-    return texShader;
-  }
-  @Override
-  protected GLShader.Texture trisTexShader() {
-    return texShader;
-  }
-  @Override
-  protected GLShader.Color quadColorShader() {
-    return colorShader;
-  }
-  @Override
-  protected GLShader.Color trisColorShader() {
-    return colorShader;
-  }
-
   void initGL() {
     try {
       Display.create();
       super.viewWasResized();
-      glDisable(GL_CULL_FACE);
-      glEnable(GL_BLEND);
-      glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-      glClearColor(0, 0, 0, 1);
-      texShader = new JavaGLShader.Texture(this);
-      colorShader = new JavaGLShader.Color(this);
-      checkGLError("initGL");
+      init();
     } catch (LWJGLException e) {
       throw new RuntimeException(e);
     }
   }
 
-  void paintLayers(GroupLayerGL rootLayer) {
-    // Bind the default frameBuffer (the SurfaceView's Surface)
-    checkGLError("updateLayers Start");
-
-    bindFramebuffer();
-
-    // Clear to transparent
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    // Paint all the layers
-    rootLayer.paint(rootXform, 1);
-    checkGLError("updateLayers");
-
-    // Guarantee a flush
-    useShader(null);
-  }
-
-  void updateTexture(int texture, BufferedImage image) {
+  void updateTexture(int tex, BufferedImage image) {
     ByteBuffer buf = convertImageData(image);
-
-    glBindTexture(GL_TEXTURE_2D, texture);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image.getWidth(), image.getHeight(), 0, GL_RGBA,
-                 GL_UNSIGNED_BYTE, buf);
-
+    bindTexture(tex);
+    GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA, image.getWidth(), image.getHeight(), 0,
+                      GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, buf);
     checkGLError("updateTexture");
   }
 

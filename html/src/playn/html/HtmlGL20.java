@@ -1225,17 +1225,17 @@ public final class HtmlGL20 implements playn.core.gl.GL20 {
 
   @Override
   public void glGenBuffers(int n, int[] buffers, int offset) {
-    throw new RuntimeException("NYI");
+    genObjects(n, buffers, offset, WebGLObjectType.BUFFER);
   }
 
   @Override
   public void glGenFramebuffers(int n, int[] framebuffers, int offset) {
-    throw new RuntimeException("NYI");
+    genObjects(n, framebuffers, offset, WebGLObjectType.FRAME_BUFFER);
   }
 
   @Override
   public void glGenRenderbuffers(int n, int[] renderbuffers, int offset) {
-    throw new RuntimeException("NYI");
+    genObjects(n, renderbuffers, offset, WebGLObjectType.RENDER_BUFFER);
   }
 
   @Override

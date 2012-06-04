@@ -104,8 +104,8 @@ abstract class AbstractSurfaceGL implements Surface {
     l.preConcatenate(topTransform());
 
     if (fillPattern != null) {
-      Object tex = fillPattern.ensureTexture(true, true);
-      if (tex != null) {
+      int tex = fillPattern.ensureTexture(true, true);
+      if (tex > 0) {
         ctx.fillQuad(l, 0, 0, length, 0, 0, width, length, width,
                      fillPattern.width(), fillPattern.height(), tex, alpha);
       }
@@ -120,8 +120,8 @@ abstract class AbstractSurfaceGL implements Surface {
     bindFramebuffer();
 
     if (fillPattern != null) {
-      Object tex = fillPattern.ensureTexture(true, true);
-      if (tex != null) {
+      int tex = fillPattern.ensureTexture(true, true);
+      if (tex > 0) {
         ctx.fillRect(topTransform(), x, y, width, height,
                      fillPattern.width(), fillPattern.height(), tex, alpha);
       }
@@ -136,8 +136,8 @@ abstract class AbstractSurfaceGL implements Surface {
     bindFramebuffer();
 
     if (fillPattern != null) {
-      Object tex = fillPattern.ensureTexture(true, true);
-      if (tex != null) {
+      int tex = fillPattern.ensureTexture(true, true);
+      if (tex > 0) {
         ctx.fillTriangles(topTransform(), xys, indices,
                           fillPattern.width(), fillPattern.height(), tex, alpha);
       }
@@ -153,8 +153,8 @@ abstract class AbstractSurfaceGL implements Surface {
 
     if (fillPattern == null)
       throw new IllegalStateException("No fill pattern currently set");
-    Object tex = fillPattern.ensureTexture(true, true);
-    if (tex != null) {
+    int tex = fillPattern.ensureTexture(true, true);
+    if (tex > 0) {
       ctx.fillTriangles(topTransform(), xys, sxys, indices, tex, alpha);
     }
     return this;

@@ -58,8 +58,8 @@ public class AndroidSurfaceGL extends SurfaceGL
         FileInputStream in = new FileInputStream(cachedPixels);
         in.read(pixelBuffer.array());
         int bufferTex = actx.createTexture(false, false);
-        actx.gl20.glTexImage2D(GL20.GL_TEXTURE_2D, 0, GL20.GL_RGBA, texWidth, texHeight, 0,
-                               GL20.GL_RGBA, GL20.GL_UNSIGNED_BYTE, pixelBuffer);
+        actx.gl.glTexImage2D(GL20.GL_TEXTURE_2D, 0, GL20.GL_RGBA, texWidth, texHeight, 0,
+                             GL20.GL_RGBA, GL20.GL_UNSIGNED_BYTE, pixelBuffer);
         ctx.drawTexture(bufferTex, width, height, StockInternalTransform.IDENTITY, 0, height,
                         width, -height, false, false, 1);
         ctx.destroyTexture(bufferTex);
@@ -76,10 +76,10 @@ public class AndroidSurfaceGL extends SurfaceGL
   public void onSurfaceLost() {
     try {
       AndroidGLContext actx = (AndroidGLContext) ctx;
-      actx.gl20.glBindFramebuffer(GL20.GL_FRAMEBUFFER, (Integer) fbuf);
+      actx.gl.glBindFramebuffer(GL20.GL_FRAMEBUFFER, (Integer) fbuf);
       ByteBuffer pixelBuffer = ByteBuffer.allocate(texWidth * texHeight * 4);
-      actx.gl20.glReadPixels(0, 0, texWidth, texHeight, GL20.GL_RGBA, GL20.GL_UNSIGNED_BYTE,
-                             pixelBuffer);
+      actx.gl.glReadPixels(0, 0, texWidth, texHeight, GL20.GL_RGBA, GL20.GL_UNSIGNED_BYTE,
+                           pixelBuffer);
       try {
         cachedPixels = new File(cacheDir, "surface-" + Integer.toHexString(hashCode()));
         FileOutputStream out = new FileOutputStream(cachedPixels);

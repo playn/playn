@@ -256,14 +256,7 @@ public class JavaPlatform implements Platform {
 
       float paintDelta = (float) (now - lastPaintTime);
       if (paintDelta > FRAME_TIME) {
-        if (updateRate == 0) {
-          game.paint(0);
-        } else {
-          game.paint(accum / updateRate);
-        }
-
-        graphics.paintLayers();
-
+        graphics.paint(game, updateRate == 0 ? 0 : accum / updateRate);
         lastPaintTime = now;
       }
 

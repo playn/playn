@@ -111,15 +111,15 @@ class AndroidImage extends ImageGL implements AndroidGLContext.Refreshable, Andr
   }
 
   @Override
-  protected void updateTexture(Object tex) {
-    ((AndroidGLContext) ctx).updateTexture((Integer)tex, bitmap);
+  protected void updateTexture(int tex) {
+    ((AndroidGLContext) ctx).updateTexture(tex, bitmap);
   }
 
   @Override
   protected void finalize() {
-    if (tex != null)
+    if (tex > 0)
       ctx.queueDestroyTexture(tex);
-    if (reptex != null)
+    if (reptex > 0)
       ctx.queueDeleteFramebuffer(reptex);
   }
 }

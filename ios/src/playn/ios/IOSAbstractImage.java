@@ -139,9 +139,9 @@ public abstract class IOSAbstractImage extends ImageGL implements Image, IOSCanv
 
   @Override
   protected void finalize() {
-    if (tex != null)
+    if (tex > 0)
       ctx.queueDestroyTexture(tex);
-    if (reptex != null)
+    if (reptex > 0)
       ctx.queueDeleteFramebuffer(reptex);
   }
 

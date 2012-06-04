@@ -26,8 +26,8 @@ import android.graphics.PixelFormat;
 import android.graphics.RadialGradient;
 import android.graphics.Shader.TileMode;
 import android.graphics.Typeface;
-import android.view.View;
 import android.util.Pair;
+import android.view.View;
 
 import pythagoras.f.IPoint;
 import pythagoras.f.MathUtil;
@@ -35,13 +35,12 @@ import pythagoras.f.Point;
 
 import playn.core.CanvasImage;
 import playn.core.Font;
+import playn.core.Game;
 import playn.core.Gradient;
 import playn.core.GroupLayer;
 import playn.core.Image;
-import playn.core.InternalTransform;
 import playn.core.Path;
 import playn.core.Pattern;
-import playn.core.StockInternalTransform;
 import playn.core.TextFormat;
 import playn.core.TextLayout;
 import playn.core.gl.GL20;
@@ -58,7 +57,6 @@ public class AndroidGraphics extends GraphicsGL {
   public final Bitmap.Config preferredBitmapConfig;
 
   final GroupLayerGL rootLayer;
-  private final InternalTransform rootTransform = new StockInternalTransform();
   private final AndroidPlatform platform;
   private final Point touchTemp = new Point();
 
@@ -74,9 +72,8 @@ public class AndroidGraphics extends GraphicsGL {
       screenWidth = MathUtil.iceil(startingScreenWidth / scaleFactor);
     if (startingScreenHeight != 0)
       screenHeight = MathUtil.iceil(startingScreenHeight / scaleFactor);
-    ctx = new AndroidGLContext(platform, scaleFactor, gfx, screenWidth, screenHeight);
+    ctx = new AndroidGLContext(platform, gfx, scaleFactor, screenWidth, screenHeight);
     rootLayer = new GroupLayerGL(ctx);
-    rootTransform.uniformScale(scaleFactor);
   }
 
   /**
@@ -201,7 +198,7 @@ public class AndroidGraphics extends GraphicsGL {
 
   @Override
   public GL20 gl20() {
-    return ctx.gl20;
+    return ctx.gl;
   }
 
   @Override
@@ -214,19 +211,17 @@ public class AndroidGraphics extends GraphicsGL {
     return ctx;
   }
 
-  void preparePaint() {
-    ctx.preparePaint();
-  }
-
-  void paintLayers() {
-    ctx.paintLayers(rootLayer, rootTransform);
+  void paint(Game game, float paintAlpha) {
+    ctx.preparePaint(rootLayer);
+    game.paint(paintAlpha);     // run the game's custom painting code
+    ctx.paintLayers(rootLayer); // paint the scene graph
   }
 
   IPoint transformTouch(float x, float y) {
     // TODO: nix these adjustments when we nix support for setting screen size
     x -= (screenWidth() - width()) / 2;
     y -= (screenHeight() - height()) / 2;
-    return rootTransform.inverseTransform(touchTemp.set(x, y), touchTemp);
+    return ctx.rootTransform().inverseTransform(touchTemp.set(x, y), touchTemp);
   }
 
   private void setSize(int width, int height, boolean manual) {

@@ -22,7 +22,6 @@ import com.google.gwt.dom.client.CanvasElement;
 import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.ImageElement;
 import com.google.gwt.dom.client.NativeEvent;
-import com.google.gwt.webgl.client.WebGLTexture;
 
 import pythagoras.f.MathUtil;
 
@@ -159,8 +158,8 @@ class HtmlImage extends ImageGL implements HtmlCanvas.Drawable {
   }
 
   @Override
-  protected void updateTexture(Object tex) {
-    ((HtmlGLContext) ctx).updateTexture((WebGLTexture)tex, img);
+  protected void updateTexture(int tex) {
+    ((HtmlGLContext) ctx).updateTexture(tex, img);
   }
 
   ImageElement subImageElement(float x, float y, float width, float height) {

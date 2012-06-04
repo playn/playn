@@ -20,15 +20,57 @@ import playn.core.InternalTransform;
 /**
  * Defines the interface to shaders used by the GL core.
  */
-public interface GLShader
-{
+public interface GLShader {
+
+  /** Provides the ability to bind a uniform float value. */
+  interface Uniform1f {
+    /** Binds a uniform float value. */
+    void bind(float a);
+  }
+  /** Provides the ability to bind a uniform float pair. */
+  interface Uniform2f {
+    /** Binds a uniform float pair. */
+    void bind(float a, float b);
+  }
+  /** Provides the ability to bind a uniform float triple. */
+  interface Uniform3f {
+    /** Binds a uniform float triple. */
+    void bind(float a, float b, float c);
+  }
+  /** Provides the ability to bind a uniform float four-tuple. */
+  interface Uniform4f {
+    /** Binds a uniform float four-tuple. */
+    void bind(float a, float b, float c, float d);
+  }
+  /** Provides the ability to bind a single uniform int. */
+  interface Uniform1i {
+    /** Binds a uniform int value. */
+    void bind(int a);
+  }
+  /** Provides the ability to bind a uniform int pair. */
+  interface Uniform2i {
+    /** Binds a uniform int pair. */
+    void bind(int a, int b);
+  }
+
+  /** Provides the ability to bind a vertex attrib array. */
+  interface Attrib {
+    /** Binds the this attribute to the vertex array at the specified offset.
+     * @param stride the size of a single "bundle" of values in the vertex array.
+     * @param offset the offset of this attribute into the "bundle" of values.
+     * @param buffer the buffer that supplies this attribute's data. */
+    void bind(int stride, int offset, GLBuffer.Float buffer);
+  }
+
   /** Defines the interface to the texture shader. */
   interface Texture extends GLShader {
-    void prepare(Object tex, float alpha, int fbufWidth, int fbufHeight);
+    /** Prepares this shader to render the specified texture, etc. */
+    void prepare(int tex, float alpha, int fbufWidth, int fbufHeight);
   }
 
   /** Defines the interface to the color shader. */
   interface Color extends GLShader {
+    /** Prepares this shader to render the specified color, etc. */
     void prepare(int color, float alpha, int fbufWidth, int fbufHeight);
   }
 
@@ -82,7 +124,7 @@ public interface GLShader
     "attribute vec4 a_Matrix;\n" +
     "attribute vec2 a_Translation;\n" +
     "attribute vec2 a_Position;\n" +
-    "attribute vec2 a_Texture;\n" +
+    "attribute vec2 a_TexCoord;\n" +
     "varying vec2 v_TexCoord;\n" +
 
     "void main(void) {\n" +
@@ -99,7 +141,7 @@ public interface GLShader
     "  gl_Position.x -= 1.0;\n" +
     "  gl_Position.y = 1.0 - gl_Position.y;\n" +
 
-    "  v_TexCoord = a_Texture;\n" +
+    "  v_TexCoord = a_TexCoord;\n" +
     "}";
 
   /** The GLSL code for quad-specific vertex shader. */

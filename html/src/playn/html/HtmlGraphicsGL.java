@@ -16,8 +16,11 @@ package playn.html;
 import com.google.gwt.dom.client.CanvasElement;
 import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.Element;
+import com.google.gwt.webgl.client.WebGLContextAttributes;
+import com.google.gwt.webgl.client.WebGLRenderingContext;
 
 import playn.core.CanvasLayer;
+import playn.core.Game;
 import playn.core.GroupLayer;
 import playn.core.Image;
 import playn.core.ImageLayer;
@@ -41,7 +44,20 @@ class HtmlGraphicsGL extends HtmlGraphics {
     canvas = Document.get().createCanvasElement();
     rootElement.appendChild(canvas);
     try {
-      ctx = new HtmlGLContext(platform, canvas);
+      WebGLContextAttributes attrs = WebGLContextAttributes.create();
+      attrs.setAlpha(false); // no alpha buffer for consistency with other platforms
+
+      // if this returns null, the browser doesn't support WebGL on this machine
+      WebGLRenderingContext gl = WebGLRenderingContext.getContext(canvas, attrs);
+      // Some systems seem to have a problem where they return a valid context, but it's in an
+      // error state initially. We give up and fall back to Canvas in this case, because nothing
+      // seems to work properly.
+      if (gl == null || gl.getError() != WebGLRenderingContext.NO_ERROR) {
+        throw new RuntimeException("GL context not created [err=" +
+                                   (gl == null ? "null" : gl.getError()) + "]");
+      }
+
+      ctx = new HtmlGLContext(platform, gl, canvas);
       rootLayer = new GroupLayerGL(ctx);
     } catch (RuntimeException re) {
       // Give up. HtmlPlatform will catch the exception and fall back to dom/canvas.
@@ -121,10 +137,7 @@ class HtmlGraphicsGL extends HtmlGraphics {
 
   @Override
   public GL20 gl20() {
-    if (gl20 == null) {
-      gl20 = new HtmlGL20(ctx.gl);
-    }
-    return gl20;
+    return ctx.gl;
   }
 
   @Override
@@ -133,17 +146,10 @@ class HtmlGraphicsGL extends HtmlGraphics {
   }
 
   @Override
-  void preparePaint() {
-    if (gl20 == null) {
-      ctx.preparePaint();
-    }
-  }
-
-  @Override
-  void paintLayers() {
-    if (gl20 == null) {
-      ctx.paint(rootLayer);
-    }
+  void paint(Game game, float paintAlpha) {
+    ctx.preparePaint(rootLayer);
+    game.paint(paintAlpha);
+    ctx.paintLayers(rootLayer);
   }
 
   @Override

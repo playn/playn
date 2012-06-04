@@ -54,7 +54,7 @@ public class IOSImage extends IOSAbstractImage {
   }
 
   @Override
-  protected void updateTexture(Object tex) {
-    ((IOSGLContext) ctx).updateTexture((Integer)tex, image);
+  protected void updateTexture(int tex) {
+    ((IOSGLContext) ctx).updateTexture(tex, image);
   }
 }

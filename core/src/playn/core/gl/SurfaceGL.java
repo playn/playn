@@ -21,7 +21,7 @@ public class SurfaceGL extends AbstractSurfaceGL {
 
   protected final float width, height;
   protected final int texWidth, texHeight;
-  protected Object tex, fbuf;
+  protected int tex, fbuf;
 
   protected SurfaceGL(GLContext ctx, float width, float height) {
     super(ctx);
@@ -62,9 +62,9 @@ public class SurfaceGL extends AbstractSurfaceGL {
 
   protected void clearTexture() {
     ctx.destroyTexture(tex);
-    tex = null;
+    tex = 0;
     ctx.deleteFramebuffer(fbuf);
-    fbuf = null;
+    fbuf = 0;
   }
 
   @Override
@@ -76,9 +76,9 @@ public class SurfaceGL extends AbstractSurfaceGL {
   protected void finalize() throws Throwable {
     // if we weren't destroyed earlier, queue up destruction of our texture and framebuffer to be
     // undertaken on the main OpenGL thread on the next frame
-    if (tex != null)
+    if (tex > 0)
       ctx.queueDestroyTexture(tex);
-    if (fbuf != null)
+    if (fbuf > 0)
       ctx.queueDeleteFramebuffer(fbuf);
   }
 }

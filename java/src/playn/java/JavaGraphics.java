@@ -25,6 +25,7 @@ import pythagoras.f.Point;
 
 import playn.core.CanvasImage;
 import playn.core.Font;
+import playn.core.Game;
 import playn.core.Gradient;
 import playn.core.Image;
 import playn.core.Path;
@@ -132,10 +133,7 @@ public class JavaGraphics extends GraphicsGL {
 
   @Override
   public GL20 gl20() {
-    if (gl == null) {
-      gl = new JavaGL20();
-    }
-    return gl;
+    return ctx.gl;
   }
 
   @Override
@@ -160,10 +158,10 @@ public class JavaGraphics extends GraphicsGL {
     point.y /= ctx.scale.factor;
   }
 
-  void paintLayers() {
-    if (gl == null) {
-      ctx.paintLayers(rootLayer);
-    }
+  void paint(Game game, float paintAlpha) {
+    ctx.preparePaint(rootLayer);
+    game.paint(paintAlpha);
+    ctx.paintLayers(rootLayer);
   }
 
   protected Map<String,java.awt.Font> _fonts = new HashMap<String,java.awt.Font>();

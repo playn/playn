@@ -29,16 +29,19 @@ import cli.OpenTK.Graphics.ES20.GL;
 
 import playn.core.InternalTransform;
 import playn.core.PlayN;
+import playn.core.gl.GLBuffer;
 import playn.core.gl.GLContext;
+import playn.core.gl.GLProgram;
 import playn.core.gl.GLShader;
 import playn.core.gl.GroupLayerGL;
+import playn.core.gl.IndexedTrisShader;
 
 public class IOSGLContext extends GLContext {
 
   public static final boolean CHECK_ERRORS = false;
 
   int orient;
-  private Integer defaultFrameBuffer; // configured in init()
+  private int defaultFrameBuffer = -1; // configured in init()
 
   private GLShader.Texture texShader;
   private GLShader.Color colorShader;
@@ -54,17 +57,32 @@ public class IOSGLContext extends GLContext {
     GL.Enable(All.wrap(All.Blend));
     GL.BlendFunc(All.wrap(All.One), All.wrap(All.OneMinusSrcAlpha));
     GL.ClearColor(0, 0, 0, 1);
-    texShader = new IOSGLShader.Texture(this);
-    colorShader = new IOSGLShader.Color(this);
+    texShader = new IndexedTrisShader.Texture(this);
+    colorShader = new IndexedTrisShader.Color(this);
   }
 
   @Override
-  public void deleteFramebuffer(Object fbuf) {
-    GL.DeleteFramebuffers(1, new int[] { (Integer) fbuf });
+  public GLProgram createProgram(String vertShader, String fragShader) {
+    return new IOSGLProgram(this, vertShader, fragShader);
   }
 
   @Override
-  public Integer createTexture(boolean repeatX, boolean repeatY) {
+  public GLBuffer.Float createFloatBuffer(int capacity) {
+    return new IOSGLBuffer.FloatImpl(capacity);
+  }
+
+  @Override
+  public GLBuffer.Short createShortBuffer(int capacity) {
+    return new IOSGLBuffer.ShortImpl(capacity);
+  }
+
+  @Override
+  public void deleteFramebuffer(int fbuf) {
+    GL.DeleteFramebuffers(1, new int[] { fbuf });
+  }
+
+  @Override
+  public int createTexture(boolean repeatX, boolean repeatY) {
     int[] texw = new int[1];
     GL.GenTextures(1, texw);
     int tex = texw[0];
@@ -79,7 +97,7 @@ public class IOSGLContext extends GLContext {
   }
 
   @Override
-  public Integer createTexture(int width, int height, boolean repeatX, boolean repeatY) {
+  public int createTexture(int width, int height, boolean repeatX, boolean repeatY) {
     int tex = createTexture(repeatX, repeatY);
     GL.TexImage2D(All.wrap(All.Texture2D), 0, All.Rgba, width, height, 0, All.wrap(All.Rgba),
                   All.wrap(All.UnsignedByte), null);
@@ -87,8 +105,18 @@ public class IOSGLContext extends GLContext {
   }
 
   @Override
-  public void destroyTexture(Object texObj) {
-    GL.DeleteTextures(1, new int[] { (Integer)texObj });
+  public void activeTexture(int glTextureN) {
+    GL.ActiveTexture(All.wrap(glTextureN));
+  }
+
+  @Override
+  public void bindTexture(int tex) {
+    GL.BindTexture(All.wrap(All.Texture2D), tex);
+  }
+
+  @Override
+  public void destroyTexture(int texObj) {
+    GL.DeleteTextures(1, new int[] { texObj });
   }
 
   @Override
@@ -136,28 +164,28 @@ public class IOSGLContext extends GLContext {
   }
 
   @Override
-  protected Object defaultFrameBuffer() {
+  protected int defaultFrameBuffer() {
     return defaultFrameBuffer;
   }
 
   @Override
-  protected Integer createFramebufferImpl(Object tex) {
+  protected int createFramebufferImpl(int tex) {
     int[] fbufw = new int[1];
     GL.GenFramebuffers(1, fbufw);
 
     int fbuf = fbufw[0];
     GL.BindFramebuffer(All.wrap(All.Framebuffer), fbuf);
     GL.FramebufferTexture2D(All.wrap(All.Framebuffer), All.wrap(All.ColorAttachment0),
-                            All.wrap(All.Texture2D), (Integer) tex, 0);
+                            All.wrap(All.Texture2D), tex, 0);
     return fbuf;
   }
 
   @Override
-  protected void bindFramebufferImpl(Object frameBuffer, int width, int height) {
+  protected void bindFramebufferImpl(int frameBuffer, int width, int height) {
     // this is called during early initialization before we know our default frame buffer id, but
     // we can just skip binding in that case because our default frame buffer is already bound
-    if (frameBuffer != null)
-      GL.BindFramebuffer(All.wrap(All.Framebuffer), (Integer) frameBuffer);
+    if (frameBuffer != -1)
+      GL.BindFramebuffer(All.wrap(All.Framebuffer), frameBuffer);
     GL.Viewport(0, 0, width, height);
   }
 

@@ -31,15 +31,15 @@ public abstract class ImageGL implements Image {
   protected int refs;
 
   /** Our texture and repeatable texture handles. */
-  protected Object tex, reptex;
+  protected int tex, reptex;
 
   /**
    * Creates a texture for this image (if one does not already exist) and returns it. May return
-   * null if the underlying image data is not yet ready.
+   * 0 if the underlying image data is not yet ready.
    */
-  public Object ensureTexture(boolean repeatX, boolean repeatY) {
+  public int ensureTexture(boolean repeatX, boolean repeatY) {
     if (!isReady()) {
-      return null;
+      return 0;
     } else if (repeatX || repeatY) {
       scaleTexture(repeatX, repeatY);
       return reptex;
@@ -53,13 +53,13 @@ public abstract class ImageGL implements Image {
    * Releases this image's texture memory.
    */
   public void clearTexture() {
-    if (tex != null) {
+    if (tex > 0) {
       ctx.destroyTexture(tex);
-      tex = null;
+      tex = 0;
     }
-    if (reptex != null) {
+    if (reptex > 0) {
       ctx.destroyTexture(reptex);
-      reptex = null;
+      reptex = 0;
     }
   }
 
@@ -90,8 +90,8 @@ public abstract class ImageGL implements Image {
    */
   void draw(InternalTransform xform, float dx, float dy, float dw, float dh,
             boolean repeatX, boolean repeatY, float alpha) {
-    Object tex = ensureTexture(repeatX, repeatY);
-    if (tex != null) {
+    int tex = ensureTexture(repeatX, repeatY);
+    if (tex > 0) {
       float sw = repeatX ? dw : width(), sh = repeatY ? dh : height();
       ctx.drawTexture(tex, texWidth(repeatX), texHeight(repeatY), xform,
                       dx, dy, dw, dh, x(), y(), sw, sh, alpha);
@@ -103,8 +103,8 @@ public abstract class ImageGL implements Image {
    */
   void draw(InternalTransform xform, float dx, float dy, float dw, float dh,
             float sx, float sy, float sw, float sh, float alpha) {
-    Object tex = ensureTexture(false, false);
-    if (tex != null) {
+    int tex = ensureTexture(false, false);
+    if (tex > 0) {
       ctx.drawTexture(tex, texWidth(false), texHeight(false), xform,
                       dx, dy, dw, dh, x()+sx, y()+sy, sw, sh, alpha);
     }
@@ -146,17 +146,17 @@ public abstract class ImageGL implements Image {
   /**
    * Copies our current image data into the supplied texture.
    */
-  protected abstract void updateTexture(Object tex);
+  protected abstract void updateTexture(int tex);
 
   private void loadTexture() {
-    if (tex != null)
+    if (tex > 0)
       return;
     tex = ctx.createTexture(false, false);
     updateTexture(tex);
   }
 
   private void scaleTexture(boolean repeatX, boolean repeatY) {
-    if (reptex != null)
+    if (reptex > 0)
       return;
 
     int scaledWidth = scale.scaledCeil(width());
@@ -186,7 +186,7 @@ public abstract class ImageGL implements Image {
 
     // create our texture and point a new framebuffer at it
     reptex = ctx.createTexture(width, height, repeatX, repeatY);
-    Object fbuf = ctx.createFramebuffer(reptex);
+    int fbuf = ctx.createFramebuffer(reptex);
 
     // render the non-repeated texture into the framebuffer properly scaled
     ctx.bindFramebuffer(fbuf, width, height);

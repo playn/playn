@@ -21,7 +21,7 @@ public abstract class GLContext {
 
   private final Platform platform;
   private GLShader curShader;
-  private Object lastFramebuffer;
+  private int lastFramebuffer;
 
   /** The (actual screen pixel) width and height of our default frame buffer. */
   protected int defaultFbufWidth, defaultFbufHeight;
@@ -47,24 +47,48 @@ public abstract class GLContext {
     viewWasResized();
   }
 
+  /**
+   * Creates a shader program, for use by a single {@link GLShader}.
+   * @param vertShader the source code for the vertex shader.
+   * @param fragShader the source code for the fragment shader.
+   */
+  public abstract GLProgram createProgram(String vertShader, String fragShader);
+
+  /**
+   * Creates a float buffer with the specified initial capacity.
+   */
+  public abstract GLBuffer.Float createFloatBuffer(int capacity);
+
+  /**
+   * Creates a short buffer with the specified initial capacity.
+   */
+  public abstract GLBuffer.Short createShortBuffer(int capacity);
+
   /** Creates a framebuffer that will render into the supplied texture. */
-  public Object createFramebuffer(Object tex) {
+  public int createFramebuffer(int tex) {
     flush();
     return createFramebufferImpl(tex);
   }
 
   /** Deletes the supplied frame buffer (which will have come from {@link #createFramebuffer}). */
-  public abstract void deleteFramebuffer(Object fbuf);
+  public abstract void deleteFramebuffer(int fbuf);
 
   /** Creates a texture with the specified repeat behavior. */
-  public abstract Object createTexture(boolean repeatX, boolean repeatY);
+  public abstract int createTexture(boolean repeatX, boolean repeatY);
 
   /** Creates a texture of the specified size, with the specified repeat behavior, into which we
    * can subsequently render. */
-  public abstract Object createTexture(int width, int height, boolean repeatX, boolean repeatY);
+  public abstract int createTexture(int width, int height, boolean repeatX, boolean repeatY);
+
+  /** Activates the specified texture unit.
+   * @param glTextureN the texture unit to active (e.g. {@link GL20#GL_TEXTURE0}). */
+  public abstract void activeTexture(int glTextureN);
+
+  /** Binds the specified texture. */
+  public abstract void bindTexture(int tex);
 
   /** Destroys the supplied texture. */
-  public abstract void destroyTexture(Object tex);
+  public abstract void destroyTexture(int tex);
 
   /** Starts a series of drawing commands that are clipped to the specified rectangle (in view
    * coordinates, not OpenGL coordinates). Thus must be followed by a call to {@link #endClipped}
@@ -81,7 +105,7 @@ public abstract class GLContext {
   public abstract void checkGLError(String op);
 
   /** Queues a texture to be destroyed on the GL thread. */
-  public void queueDestroyTexture(final Object tex) {
+  public void queueDestroyTexture(final int tex) {
     platform.invokeLater(new Runnable() {
       public void run() {
         destroyTexture(tex);
@@ -90,7 +114,7 @@ public abstract class GLContext {
   }
 
   /** Queues a framebuffer to be destroyed on the GL thread. */
-  public void queueDeleteFramebuffer(final Object fbuf) {
+  public void queueDeleteFramebuffer(final int fbuf) {
     platform.invokeLater(new Runnable() {
       public void run() {
         deleteFramebuffer(fbuf);
@@ -103,8 +127,8 @@ public abstract class GLContext {
     return new StockInternalTransform();
   }
 
-  public void bindFramebuffer(Object fbuf, int width, int height) {
-    if (fbuf != lastFramebuffer && (fbuf == null || !fbuf.equals(lastFramebuffer))) {
+  public void bindFramebuffer(int fbuf, int width, int height) {
+    if (fbuf != lastFramebuffer) {
       checkGLError("bindFramebuffer");
       flush();
       bindFramebufferImpl(lastFramebuffer = fbuf, curFbufWidth = width, curFbufHeight = height);
@@ -115,19 +139,19 @@ public abstract class GLContext {
     bindFramebuffer(defaultFrameBuffer(), defaultFbufWidth, defaultFbufHeight);
   }
 
-  public void drawTexture(Object tex, float texWidth, float texHeight, InternalTransform local,
+  public void drawTexture(int tex, float texWidth, float texHeight, InternalTransform local,
                           float dw, float dh, boolean repeatX, boolean repeatY, float alpha) {
     drawTexture(tex, texWidth, texHeight, local, 0, 0, dw, dh, repeatX, repeatY, alpha);
   }
 
-  public void drawTexture(Object tex, float texWidth, float texHeight, InternalTransform local,
+  public void drawTexture(int tex, float texWidth, float texHeight, InternalTransform local,
                           float dx, float dy, float dw, float dh,
                           boolean repeatX, boolean repeatY, float alpha) {
     float sw = repeatX ? dw : texWidth, sh = repeatY ? dh : texHeight;
     drawTexture(tex, texWidth, texHeight, local, dx, dy, dw, dh, 0, 0, sw, sh, alpha);
   }
 
-  public void drawTexture(Object tex, float texWidth, float texHeight, InternalTransform local,
+  public void drawTexture(int tex, float texWidth, float texHeight, InternalTransform local,
                           float dx, float dy, float dw, float dh,
                           float sx, float sy, float sw, float sh, float alpha) {
     GLShader.Texture shader = quadTexShader();
@@ -144,7 +168,7 @@ public abstract class GLContext {
   }
 
   public void fillRect(InternalTransform local, float dx, float dy, float dw, float dh,
-                       float texWidth, float texHeight, Object tex, float alpha) {
+                       float texWidth, float texHeight, int tex, float alpha) {
     GLShader.Texture shader = quadTexShader();
     shader.prepare(tex, alpha, curFbufWidth, curFbufHeight);
     checkGLError("fillRect tex prepared");
@@ -173,7 +197,7 @@ public abstract class GLContext {
 
   public void fillQuad(InternalTransform local, float x1, float y1, float x2, float y2,
                        float x3, float y3, float x4, float y4,
-                       float texWidth, float texHeight, Object tex, float alpha) {
+                       float texWidth, float texHeight, int tex, float alpha) {
     GLShader.Texture shader = quadTexShader();
     shader.prepare(tex, alpha, curFbufWidth, curFbufHeight);
     checkGLError("fillQuad tex prepared");
@@ -195,7 +219,7 @@ public abstract class GLContext {
   }
 
   public void fillTriangles(InternalTransform local, float[] xys, int[] indices,
-                            float texWidth, float texHeight, Object tex, float alpha) {
+                            float texWidth, float texHeight, int tex, float alpha) {
     GLShader.Texture shader = trisTexShader();
     shader.prepare(tex, alpha, curFbufWidth, curFbufHeight);
     checkGLError("fillTris tex prepared");
@@ -213,7 +237,7 @@ public abstract class GLContext {
   }
 
   public void fillTriangles(InternalTransform local, float[] xys, float[] sxys, int[] indices,
-                            Object tex, float alpha) {
+                            int tex, float alpha) {
     GLShader.Texture shader = trisTexShader();
     shader.prepare(tex, alpha, curFbufWidth, curFbufHeight);
     checkGLError("fillTris tex prepared");
@@ -253,17 +277,17 @@ public abstract class GLContext {
   /**
    * Returns the default framebuffer.
    */
-  protected abstract Object defaultFrameBuffer();
+  protected abstract int defaultFrameBuffer();
 
   /**
    * Creates a framebuffer that will render into the supplied texture.
    */
-  protected abstract Object createFramebufferImpl(Object tex);
+  protected abstract int createFramebufferImpl(int tex);
 
   /**
    * Binds the specified framebuffer and sets the viewport to the specified dimensions.
    */
-  protected abstract void bindFramebufferImpl(Object fbuf, int width, int height);
+  protected abstract void bindFramebufferImpl(int fbuf, int width, int height);
 
   protected abstract GLShader.Texture quadTexShader();
 

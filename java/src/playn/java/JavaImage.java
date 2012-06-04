@@ -105,8 +105,8 @@ abstract class JavaImage extends ImageGL implements JavaCanvas.Drawable {
   }
 
   @Override
-  protected void updateTexture(Object tex) {
+  protected void updateTexture(int tex) {
     Asserts.checkState(img != null);
-    ((JavaGLContext) ctx).updateTexture((Integer) tex, img);
+    ((JavaGLContext) ctx).updateTexture(tex, img);
   }
 }

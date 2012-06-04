@@ -19,6 +19,7 @@ import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.Element;
 
 import playn.core.CanvasLayer;
+import playn.core.Game;
 import playn.core.GroupLayer;
 import playn.core.Image;
 import playn.core.ImageLayer;
@@ -107,12 +108,9 @@ class HtmlGraphicsCanvas extends HtmlGraphics {
   }
 
   @Override
-  void preparePaint() {
+  void paint(Game game, float paintAlpha) {
     ctx.clearRect(0, 0, width(), height());
-  }
-
-  @Override
-  void paintLayers() {
+    game.paint(paintAlpha);
     rootLayer.paint(ctx, 1);
     ctx.setGlobalAlpha(1);
   }

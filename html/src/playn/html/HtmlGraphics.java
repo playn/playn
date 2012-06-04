@@ -22,12 +22,13 @@ import com.google.gwt.dom.client.CanvasElement;
 import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.ImageElement;
-import com.google.gwt.dom.client.Style;
 import com.google.gwt.dom.client.Style.Unit;
+import com.google.gwt.dom.client.Style;
 
 import playn.core.Asserts;
 import playn.core.CanvasImage;
 import playn.core.Font;
+import playn.core.Game;
 import playn.core.Gradient;
 import playn.core.Graphics;
 import playn.core.Image;
@@ -197,7 +198,5 @@ public abstract class HtmlGraphics implements Graphics {
 
   abstract Element rootElement();
 
-  abstract void preparePaint();
-
-  abstract void paintLayers();
+  abstract void paint(Game game, float paintAlpha);
 }

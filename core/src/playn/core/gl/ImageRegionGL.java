@@ -34,9 +34,9 @@ public abstract class ImageRegionGL extends ImageGL implements Image.Region {
   }
 
   @Override
-  public Object ensureTexture(boolean repeatX, boolean repeatY) {
+  public int ensureTexture(boolean repeatX, boolean repeatY) {
     if (!isReady()) {
-      return null;
+      return 0;
     } else if (repeatX || repeatY) {
       scaleTexture(repeatX, repeatY);
       return reptex;
@@ -133,12 +133,12 @@ public abstract class ImageRegionGL extends ImageGL implements Image.Region {
   }
 
   @Override
-  protected void updateTexture(Object tex) {
+  protected void updateTexture(int tex) {
     throw new AssertionError("Region.updateTexture should never be called.");
   }
 
   private void scaleTexture(boolean repeatX, boolean repeatY) {
-    if (reptex != null)
+    if (reptex > 0)
       return;
 
     int scaledWidth = scale.scaledCeil(this.width);
@@ -154,11 +154,11 @@ public abstract class ImageRegionGL extends ImageGL implements Image.Region {
       height = scaledHeight;
 
     // our source image is our parent's texture
-    Object tex = parent.ensureTexture(false, false);
+    int tex = parent.ensureTexture(false, false);
 
     // create our texture and point a new framebuffer at it
     reptex = ctx.createTexture(width, height, repeatX, repeatY);
-    Object fbuf = ctx.createFramebuffer(reptex);
+    int fbuf = ctx.createFramebuffer(reptex);
 
     // render the parent texture into the framebuffer properly scaled
     ctx.bindFramebuffer(fbuf, width, height);

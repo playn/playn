@@ -77,7 +77,7 @@ public class GameLoop implements Runnable {
       }
     }
 
-    paint((updateRate == 0) ? 0 : accum / updateRate);
+    platform.graphics().paint(platform.game, (updateRate == 0) ? 0 : accum / updateRate);
 
     if (LOG_FPS) {
       totalTime += delta / 1000;
@@ -98,11 +98,5 @@ public class GameLoop implements Runnable {
 
   public boolean running() {
     return running.get();
-  }
-
-  protected void paint(float paintAlpha) {
-    platform.graphics().preparePaint();
-    platform.game.paint(paintAlpha); // Run the game's custom painting code
-    platform.graphics().paintLayers(); // Paint the scene graph
   }
 }
