@@ -105,8 +105,10 @@ public class GroupLayerGL extends LayerGL implements GroupLayer, ParentLayer {
   public void paint(InternalTransform parentTransform, float parentAlpha) {
     if (!visible()) return;
 
+    InternalTransform xform = localTransform(parentTransform);
+    float alpha = parentAlpha * this.alpha;
     for (LayerGL child : impl.children) {
-      child.paint(localTransform(parentTransform), parentAlpha * alpha);
+      child.paint(xform, alpha);
     }
   }
 }
