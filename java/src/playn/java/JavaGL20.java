@@ -1063,26 +1063,30 @@ final class JavaGL20 implements playn.core.gl.GL20 {
 
   @Override
   public void glGenBuffers(int n, int[] buffers, int offset) {
-    setIntBuffer(buffers, offset, n);
+    resizeIntBuffer(n);
     GL15.glGenBuffers(intBuffer);
+    intBuffer.get(buffers, offset, n);
   }
 
   @Override
   public void glGenFramebuffers(int n, int[] framebuffers, int offset) {
-    setIntBuffer(framebuffers, offset, n);
+    resizeIntBuffer(n);
     EXTFramebufferObject.glGenFramebuffersEXT(intBuffer);
+    intBuffer.get(framebuffers, offset, n);
   }
 
   @Override
   public void glGenRenderbuffers(int n, int[] renderbuffers, int offset) {
-    setIntBuffer(renderbuffers, offset, n);
+    resizeIntBuffer(n);
     EXTFramebufferObject.glGenRenderbuffersEXT(intBuffer);
+    intBuffer.get(renderbuffers, offset, n);
   }
 
   @Override
   public void glGenTextures(int n, int[] textures, int offset) {
-    setIntBuffer(textures, offset, n);
+    resizeIntBuffer(n);
     GL11.glGenTextures(intBuffer);
+    intBuffer.get(textures, offset, n);
   }
 
   @Override
