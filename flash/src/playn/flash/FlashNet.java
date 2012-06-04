@@ -18,6 +18,8 @@ package playn.flash;
 import playn.core.Net;
 import playn.core.PlayN;
 import playn.core.ResourceCallback;
+import playn.core.WebSocket;
+import playn.core.WebSocket.Listener;
 import playn.core.util.Callback;
 public class FlashNet implements Net {
 
@@ -49,4 +51,9 @@ public class FlashNet implements Net {
       });
       loader.load(request);
   }-*/;
+
+  @Override
+  public WebSocket createWebSocket(String url, Listener listener) {
+    throw new UnsupportedOperationException();
+  }
 }
