@@ -43,4 +43,9 @@ public abstract class NetImpl implements Net {
       }
     });
   }
+  
+  @Override
+  public WebSocket createWebSocket(String url, WebSocket.Listener listener) {
+    throw new UnsupportedOperationException();
+  }
 }

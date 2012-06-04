@@ -25,6 +25,11 @@ import playn.core.util.Callback;
 public interface Net {
 
   /**
+   * Create a websocket with given URL and listener.
+   */
+  WebSocket createWebSocket(String url, WebSocket.Listener listener);
+
+  /**
    * Performs an HTTP GET request to the specified URL.
    */
   void get(String url, Callback<String> callback);
