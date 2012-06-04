@@ -36,7 +36,7 @@ import pythagoras.f.Transform;
 public interface Layer {
 
   /** Used to customize a layer's hit testing mechanism. */
-  public interface HitTester {
+  interface HitTester {
     /** Returns {@code layer}, or a child of {@code layer} if the supplied coordinate (which is in
      * {@code layer}'s coordinate system) hits {@code layer}, or one of its children. This allows a
      * layer to customize the default hit testing approach, which is to simply check whether the
@@ -284,32 +284,24 @@ public interface Layer {
   /**
    * Interface for {@link Layer}s containing explicit sizes.
    */
-  public interface HasSize extends Layer {
-    /**
-     * Return the width of the layer.
-     */
-    public float width();
+  interface HasSize extends Layer {
+    /** Returns the width of the layer. */
+    float width();
 
-    /**
-     * Return the height of the layer.
-     */
-    public float height();
+    /** Returns the height of the layer. */
+    float height();
 
-    /**
-     * Return the width of the layer after applying scale.
-     */
-    public float scaledWidth();
+    /** Returns the width of the layer after applying scale. */
+    float scaledWidth();
 
-    /**
-     * Return the height of the layer after applying scale.
-     */
-    public float scaledHeight();
+    /** Returns the height of the layer after applying scale. */
+    float scaledHeight();
   }
 
   /**
    * Utility class for transforming coordinates between {@link Layer}s.
    */
-  public static class Util {
+  static class Util {
     /**
      * Converts the supplied point from coordinates relative to the specified
      * layer to screen coordinates. The results are stored into {@code into},
