@@ -249,11 +249,6 @@ public interface Layer {
    * coordinate system. {@link Event#x} and {@link Event#y} will always contain the screen (global)
    * coordinates of the mouse.
    *
-   * <p>Note that mouse wheel events are not dispatched, as they lack coordinates. If a game wishes
-   * to determine the layer over which the mouse is hovering when wheel events are dispatched, it
-   * can register a global mouse-movement handler to track the position of the mouse, and use the
-   * latest position to determine which layer is under the mouse at the time of wheeling.</p>
-   *
    * <p>When a listener is added, the layer and all of its parents are marked as interactive.
    * Interactive layers intercept mice events. When all listeners are disconnected (including
    * Pointer and Touch listeners), the layer will be marked non-interactive. Its parents are lazily
