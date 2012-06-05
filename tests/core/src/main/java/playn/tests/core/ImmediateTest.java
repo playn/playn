@@ -68,7 +68,7 @@ public class ImmediateTest extends Test {
     }));
 
     // add a clipped layer that will clip a fill and image draw
-    rootLayer.addAt(graphics().createImmediateLayer(200, 200, new ImmediateLayer.Renderer() {
+    ImmediateLayer ilayer = graphics().createImmediateLayer(200, 200, new ImmediateLayer.Renderer() {
       public void render (Surface surf) {
         // this fill should be clipped to our bounds
         surf.setFillColor(0xFF99CCFF);
@@ -76,7 +76,10 @@ public class ImmediateTest extends Test {
         // and this image should be clipped to our bounds
         surf.drawImage(circle, 125, -25);
       }
-    }), 30, 30);
+    });
+    // adjust the origin to ensure that is accounted for in the clipping
+    ilayer.setOrigin(100, 100);
+    rootLayer.addAt(ilayer, 130, 130);
 
     // add a clipped layer that draws an image through a rotation transform
     rootLayer.addAt(graphics().createImmediateLayer(100, 100, new ImmediateLayer.Renderer() {
