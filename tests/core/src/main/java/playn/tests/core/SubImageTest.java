@@ -12,6 +12,7 @@ import playn.core.Image;
 import playn.core.ImageLayer;
 import playn.core.ImmediateLayer;
 import playn.core.Surface;
+import playn.core.ResourceCallback;
 import static playn.core.PlayN.*;
 
 public class SubImageTest extends Test {
@@ -31,10 +32,6 @@ public class SubImageTest extends Test {
 
   @Override
   public void init() {
-    // draw subimages of a simple static image
-    Image orange = assets().getImage("images/orange.png");
-    fragment(orange, 10, 10);
-
     // create a canvas image and draw subimages of that
     int r = 50;
     CanvasImage cimg = graphics().createImage(2*r, 2*r);
@@ -43,44 +40,55 @@ public class SubImageTest extends Test {
     canvas.fillCircle(r, r, r);
     fragment(cimg, 200, 10);
 
-    float pw = orange.width(), ph = orange.height(), phw = pw/2, phh = ph/2;
-    final Image.Region orangemid = orange.subImage(0, phh/2, pw, phh);
+    // draw subimages of a simple static image
+    Image orange = assets().getImage("images/orange.png");
+    orange.addCallback(new ResourceCallback<Image>() {
+      public void done(Image orange) {
+        fragment(orange, 10, 10);
 
-    // tile a sub-image, oh my!
-    ImageLayer tiled = graphics().createImageLayer(orangemid);
-    tiled.setRepeatX(true);
-    tiled.setRepeatY(true);
-    tiled.setSize(100, 100);
-    graphics().rootLayer().addAt(tiled, 10, 150);
+        float pw = orange.width(), ph = orange.height(), phw = pw/2, phh = ph/2;
+        final Image.Region orangemid = orange.subImage(0, phh/2, pw, phh);
 
-    // draw a subimage to a canvas
-    CanvasImage split = graphics().createImage(orange.width(), orange.height());
-    split.canvas().drawImage(orange.subImage(0, 0, phw, phh), phw, phh);
-    split.canvas().drawImage(orange.subImage(phw, 0, phw, phh), 0, phh);
-    split.canvas().drawImage(orange.subImage(0, phh, phw, phh), phw, 0);
-    split.canvas().drawImage(orange.subImage(phw, phh, phw, phh), 0, 0);
-    graphics().rootLayer().addAt(graphics().createImageLayer(split), 130, 150);
+        // tile a sub-image, oh my!
+        ImageLayer tiled = graphics().createImageLayer(orangemid);
+        tiled.setRepeatX(true);
+        tiled.setRepeatY(true);
+        tiled.setSize(100, 100);
+        graphics().rootLayer().addAt(tiled, 10, 150);
 
-    // use a subimage as a fill pattern
-    CanvasImage pat = graphics().createImage(100, 100);
-    pat.canvas().setFillPattern(orangemid.toPattern());
-    pat.canvas().fillRect(0, 0, 100, 100);
-    graphics().rootLayer().addAt(graphics().createImageLayer(pat), 10, 270);
+        // draw a subimage to a canvas
+        CanvasImage split = graphics().createImage(orange.width(), orange.height());
+        split.canvas().drawImage(orange.subImage(0, 0, phw, phh), phw, phh);
+        split.canvas().drawImage(orange.subImage(phw, 0, phw, phh), 0, phh);
+        split.canvas().drawImage(orange.subImage(0, phh, phw, phh), phw, 0);
+        split.canvas().drawImage(orange.subImage(phw, phh, phw, phh), 0, 0);
+        graphics().rootLayer().addAt(graphics().createImageLayer(split), 130, 150);
 
-    // draw a subimage in an immediate layer
-    ImmediateLayer imm = graphics().createImmediateLayer(new ImmediateLayer.Renderer() {
-      public void render(Surface surf) {
-        surf.drawImage(orangemid, 0, 0);
-        surf.drawImage(orangemid, orangemid.width(), 0);
-        surf.drawImage(orangemid, 0, orangemid.height());
-        surf.drawImage(orangemid, orangemid.width(), orangemid.height());
+        // use a subimage as a fill pattern
+        CanvasImage pat = graphics().createImage(100, 100);
+        pat.canvas().setFillPattern(orangemid.toPattern());
+        pat.canvas().fillRect(0, 0, 100, 100);
+        graphics().rootLayer().addAt(graphics().createImageLayer(pat), 10, 270);
+
+        // draw a subimage in an immediate layer
+        ImmediateLayer imm = graphics().createImmediateLayer(new ImmediateLayer.Renderer() {
+          public void render(Surface surf) {
+            surf.drawImage(orangemid, 0, 0);
+            surf.drawImage(orangemid, orangemid.width(), 0);
+            surf.drawImage(orangemid, 0, orangemid.height());
+            surf.drawImage(orangemid, orangemid.width(), orangemid.height());
+          }
+        });
+        graphics().rootLayer().addAt(imm, 130, 200);
+
+        // draw a subimage whose bounds oscillate
+        osci = orange.subImage(0, 0, orange.width(), orange.height());
+        graphics().rootLayer().addAt(graphics().createImageLayer(osci), 150, 300);
+      }
+      public void error(Throwable err) {
+        log().warn("Failed to load orange image", err);
       }
     });
-    graphics().rootLayer().addAt(imm, 130, 200);
-
-    // draw a subimage whose bounds oscillate
-    osci = orange.subImage(0, 0, orange.width(), orange.height());
-    graphics().rootLayer().addAt(graphics().createImageLayer(osci), 150, 300);
   }
 
   @Override
