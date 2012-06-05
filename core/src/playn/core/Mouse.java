@@ -240,6 +240,18 @@ public interface Mouse {
      * @param event provides mouse position and other metadata.
      */
     void onMouseOut(MotionEvent event);
+
+    /**
+     * Called when mouse wheel scroll occurs while the mouse is hovered over the listening layer,
+     * or while the layer is active due to having been previously hit by a mouse click which has
+     * not yet been released.
+     *
+     * <p> Negative velocity corresponds to scrolling north/up. Positive velocity corresponds to
+     * scrolling south/down. Each scroll 'click' is 1 velocity. </p>
+     *
+     * @param event provides wheel velocity and other metadata.
+     */
+    void onMouseWheelScroll(WheelEvent event);
   }
 
   /** A {@link Listener} implementation with NOOP stubs provided for each method. */
@@ -266,6 +278,8 @@ public interface Mouse {
     public void onMouseOver(MotionEvent event) { /* NOOP! */ }
     @Override
     public void onMouseOut(MotionEvent event) { /* NOOP! */ }
+    @Override
+    public void onMouseWheelScroll(WheelEvent event) { /* NOOP! */ }
   }
 
   /**

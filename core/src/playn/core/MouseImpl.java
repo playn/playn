@@ -166,13 +166,13 @@ public abstract class MouseImpl implements Mouse {
   }
 
   protected boolean onMouseWheelScroll(WheelEvent.Impl event) {
-    boolean preventDefault = false;
-    if (listener != null) {
-      event.setPreventDefault(preventDefault);
+    event.setPreventDefault(false);
+    if (listener != null)
       listener.onMouseWheelScroll(event);
-      preventDefault = event.getPreventDefault();
-    }
 
-    return preventDefault;
+    Layer target = (activeLayer != null) ? activeLayer : hoverLayer;
+    if (target != null)
+      listener.onMouseWheelScroll(event);
+    return event.getPreventDefault();
   }
 }
