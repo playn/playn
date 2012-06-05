@@ -39,8 +39,8 @@ public class IOSCanvas implements Canvas {
 
   interface Drawable {
     void draw(CGBitmapContext bctx, float dx, float dy, float dw, float dh);
-    void draw(CGBitmapContext bctx, float sx, float sy, float sw, float sh,
-              float dx, float dy, float dw, float dh);
+    void draw(CGBitmapContext bctx, float dx, float dy, float dw, float dh,
+              float sx, float sy, float sw, float sh);
   }
 
   private final float width, height;
