@@ -15,17 +15,6 @@
  */
 package playn.html;
 
-import static com.google.gwt.webgl.client.WebGLRenderingContext.ARRAY_BUFFER;
-import static com.google.gwt.webgl.client.WebGLRenderingContext.BYTE;
-import static com.google.gwt.webgl.client.WebGLRenderingContext.ELEMENT_ARRAY_BUFFER;
-import static com.google.gwt.webgl.client.WebGLRenderingContext.FLOAT;
-import static com.google.gwt.webgl.client.WebGLRenderingContext.INT;
-import static com.google.gwt.webgl.client.WebGLRenderingContext.SHORT;
-import static com.google.gwt.webgl.client.WebGLRenderingContext.STREAM_DRAW;
-import static com.google.gwt.webgl.client.WebGLRenderingContext.UNSIGNED_BYTE;
-import static com.google.gwt.webgl.client.WebGLRenderingContext.UNSIGNED_SHORT;
-
-
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
@@ -51,6 +40,18 @@ import com.google.gwt.webgl.client.WebGLRenderingContext;
 import com.google.gwt.webgl.client.WebGLShader;
 import com.google.gwt.webgl.client.WebGLTexture;
 import com.google.gwt.webgl.client.WebGLUniformLocation;
+
+import static com.google.gwt.webgl.client.WebGLRenderingContext.ARRAY_BUFFER;
+import static com.google.gwt.webgl.client.WebGLRenderingContext.BYTE;
+import static com.google.gwt.webgl.client.WebGLRenderingContext.COMPILE_STATUS;
+import static com.google.gwt.webgl.client.WebGLRenderingContext.ELEMENT_ARRAY_BUFFER;
+import static com.google.gwt.webgl.client.WebGLRenderingContext.FLOAT;
+import static com.google.gwt.webgl.client.WebGLRenderingContext.INT;
+import static com.google.gwt.webgl.client.WebGLRenderingContext.LINK_STATUS;
+import static com.google.gwt.webgl.client.WebGLRenderingContext.SHORT;
+import static com.google.gwt.webgl.client.WebGLRenderingContext.STREAM_DRAW;
+import static com.google.gwt.webgl.client.WebGLRenderingContext.UNSIGNED_BYTE;
+import static com.google.gwt.webgl.client.WebGLRenderingContext.UNSIGNED_SHORT;
 
 /**
  * WebGL implementation of GL20. Maintains a set of VBOs to translate the NIO buffer based version
@@ -125,6 +126,10 @@ public final class HtmlGL20 implements playn.core.gl.GL20 {
 
   protected WebGLUniformLocation getUniformLocation(int index) {
     return (WebGLUniformLocation) webGLObjects.get(index);
+  }
+
+  protected WebGLTexture getTexture(int index) {
+    return (WebGLTexture) webGLObjects.get(index);
   }
 
   protected void deleteObject(int index, WebGLObjectType type) {
@@ -281,7 +286,7 @@ public final class HtmlGL20 implements playn.core.gl.GL20 {
    */
   protected ArrayBufferView getTypedArray(Buffer buffer, int type, int byteSize) {
     if (!(buffer instanceof HasArrayBufferView)) {
-      throw new RuntimeException("Native buffer required.");
+      throw new RuntimeException("Native buffer required " + buffer);
     }
     HasArrayBufferView arrayHolder = (HasArrayBufferView) buffer;
     int bufferElementSize = arrayHolder.getElementSize();
@@ -312,7 +317,6 @@ public final class HtmlGL20 implements playn.core.gl.GL20 {
     default:
       throw new IllegalArgumentException("Type: " + type);
     }
-
   }
 
   @Override
@@ -387,7 +391,7 @@ public final class HtmlGL20 implements playn.core.gl.GL20 {
 
   @Override
   public void glBindTexture(int target, int textureId) {
-    gl.bindTexture(target, (WebGLTexture) webGLObjects.get(textureId));
+    gl.bindTexture(target, getTexture(textureId));
   }
 
   @Override
@@ -585,8 +589,8 @@ public final class HtmlGL20 implements playn.core.gl.GL20 {
   @Override
   public void glTexImage2D(int target, int level, int internalformat, int width,
                            int height, int border, int format, int type, Buffer pixels) {
-    gl.texImage2D(target, level, internalformat,
-                  width, height, border, format, type, getTypedArray(pixels, type, -1));
+    ArrayBufferView buffer = (pixels == null) ? null : getTypedArray(pixels, type, -1);
+    gl.texImage2D(target, level, internalformat, width, height, border, format, type, buffer);
   }
 
 //  @Override
@@ -761,7 +765,7 @@ public final class HtmlGL20 implements playn.core.gl.GL20 {
   @Override
   public void glFramebufferTexture2D(int target, int attachment, int textarget,
                                      int texture, int level) {
-    glFramebufferTexture2D(target, attachment, textarget, texture, level);
+    gl.framebufferTexture2D(target, attachment, textarget, getTexture(texture), level);
   }
 
   @Override
@@ -802,7 +806,11 @@ public final class HtmlGL20 implements playn.core.gl.GL20 {
 
   @Override
   public void glGetProgramiv(int program, int pname, IntBuffer params) {
-    throw new RuntimeException("NYI glGetProgramiv");
+    if (pname == GL_LINK_STATUS) {
+      params.put(gl.getProgramParameterb(getProgram(program), LINK_STATUS) ? GL_TRUE : GL_FALSE);
+    } else {
+      throw new RuntimeException("NYI glGetProgramiv");
+    }
   }
 
   @Override
@@ -817,7 +825,11 @@ public final class HtmlGL20 implements playn.core.gl.GL20 {
 
   @Override
   public void glGetShaderiv(int shader, int pname, IntBuffer params) {
-    throw new RuntimeException("NYI glGetShaderiv");
+    if (pname == GL_COMPILE_STATUS) {
+      params.put(gl.getShaderParameterb(getShader(shader), COMPILE_STATUS) ? GL_TRUE : GL_FALSE);
+    } else {
+      throw new RuntimeException("NYI glGetShaderiv: " + pname);
+    }
   }
 
   @Override
@@ -1329,7 +1341,12 @@ public final class HtmlGL20 implements playn.core.gl.GL20 {
 
   @Override
   public void glGetProgramiv(int program, int pname, int[] params, int offset) {
-    throw new RuntimeException("NYI glGetProgramiv");
+    if (pname == GL_LINK_STATUS) {
+      params[offset] = gl.getProgramParameterb(getProgram(program), LINK_STATUS) ?
+        GL_TRUE : GL_FALSE;
+    } else {
+      throw new RuntimeException("NYI glGetProgramiv");
+    }
   }
 
   @Override
@@ -1350,7 +1367,12 @@ public final class HtmlGL20 implements playn.core.gl.GL20 {
 
   @Override
   public void glGetShaderiv(int shader, int pname, int[] params, int offset) {
-    throw new RuntimeException("NYI glGetShaderiv");
+    if (pname == GL_COMPILE_STATUS) {
+      params[offset] = gl.getShaderParameterb(getShader(shader), COMPILE_STATUS) ?
+        GL_TRUE : GL_FALSE;
+    } else {
+      throw new RuntimeException("NYI glGetShaderiv: " + pname);
+    }
   }
 
   @Override
