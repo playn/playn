@@ -76,7 +76,7 @@ public class ImmediateLayerGL extends LayerGL implements ImmediateLayer {
     }
 
     protected void render(InternalTransform xform) {
-      xform.transform(pos.set(0, 0), pos);
+      xform.transform(pos.set(originX, originY), pos);
       xform.transform(size.set(width, height), size);
       ctx.startClipped((int) pos.x, (int) pos.y, (int) Math.abs(size.x), (int) Math.abs(size.y));
       try {
