@@ -690,7 +690,7 @@ final class JavaGL20 implements playn.core.gl.GL20 {
   public void glTexImage2D(int target, int level, int internalformat,
                            int width, int height, int border, int format, int type,
                            Buffer pixels) {
-    if (pixels instanceof ByteBuffer)
+    if (pixels instanceof ByteBuffer || pixels == null)
       GL11.glTexImage2D(target, level, internalformat, width, height,
                         border, format, type, (ByteBuffer) pixels);
     else if (pixels instanceof ShortBuffer)
