@@ -160,6 +160,12 @@ public final class HtmlGL20 implements playn.core.gl.GL20 {
     }
   }
 
+  protected void deleteObjects(int count, int[] indices, int offset, WebGLObjectType type) {
+    for (int i = 0; i < count; i++) {
+      deleteObject(indices[offset+i], type);
+    }
+  }
+
   protected int createObject(WebGLObject object, WebGLObjectType type) {
     // TODO (haustein) keep track of empty positions.
 //    for (int i = 0; i < webGLObjects.size(); i++) {
@@ -1143,68 +1149,66 @@ public final class HtmlGL20 implements playn.core.gl.GL20 {
 
   @Override
   public String getPlatformGLExtensions() {
-    throw new RuntimeException("NYI");
+    throw new RuntimeException("NYI getPlatformGLExtensions");
   }
 
   @Override
   public int getSwapInterval() {
-    throw new RuntimeException("NYI");
+    throw new RuntimeException("NYI getSwapInterval");
   }
-
 
   @Override
   public void glClearDepth(double depth) {
-    throw new RuntimeException("NYI");
+    throw new RuntimeException("NYI glClearDepth");
   }
 
   @Override
   public void glCompressedTexImage3D(int arg0, int arg1, int arg2, int arg3,
                                      int arg4, int arg5, int arg6, int arg7, Buffer arg8) {
-    throw new RuntimeException("NYI");
-
+    throw new RuntimeException("NYI glCompressedTexImage3D");
   }
 
   @Override
   public void glCompressedTexSubImage3D(int arg0, int arg1, int arg2, int arg3, int arg4, int arg5,
                                         int arg6, int arg7, int arg8, int arg9, Buffer arg10) {
-    throw new RuntimeException("NYI");
+    throw new RuntimeException("NYI glCompressedTexSubImage3D");
   }
 
   @Override
   public void glCopyTexSubImage3D(int arg0, int arg1, int arg2, int arg3, int arg4, int arg5,
                                   int arg6, int arg7, int arg8) {
-    throw new RuntimeException("NYI");
+    throw new RuntimeException("NYI glCopyTexSubImage3D");
   }
 
   @Override
   public void glDeleteBuffers(int n, int[] buffers, int offset) {
-    throw new RuntimeException("NYI");
+    deleteObjects(n, buffers, offset, WebGLObjectType.BUFFER);
   }
 
   @Override
   public void glDeleteFramebuffers(int n, int[] framebuffers, int offset) {
-    throw new RuntimeException("NYI");
+    deleteObjects(n, framebuffers, offset, WebGLObjectType.FRAME_BUFFER);
   }
 
   @Override
   public void glDeleteRenderbuffers(int n, int[] renderbuffers, int offset) {
-    throw new RuntimeException("NYI");
+    deleteObjects(n, renderbuffers, offset, WebGLObjectType.RENDER_BUFFER);
   }
 
   @Override
   public void glDeleteTextures(int n, int[] textures, int offset) {
-    throw new RuntimeException("NYI");
+    deleteObjects(n, textures, offset, WebGLObjectType.TEXTURE);
   }
 
   @Override
   public void glDepthRange(double zNear, double zFar) {
-    throw new RuntimeException("NYI");
+    throw new RuntimeException("NYI glDepthRange");
   }
 
   @Override
   public void glFramebufferTexture3D(int target, int attachment, int textarget, int texture,
                                      int level, int zoffset) {
-    throw new RuntimeException("NYI");
+    throw new RuntimeException("NYI glFramebufferTexture3D");
   }
 
   @Override
@@ -1224,388 +1228,387 @@ public final class HtmlGL20 implements playn.core.gl.GL20 {
 
   @Override
   public void glGenTextures(int n, int[] textures, int offset) {
-    throw new RuntimeException("NYI");
+    genObjects(n, textures, offset, WebGLObjectType.TEXTURE);
   }
 
   @Override
   public void glGetActiveAttrib(int program, int index, int bufsize, int[] length, int lengthOffset,
                                 int[] size, int sizeOffset, int[] type, int typeOffset,
                                 byte[] name, int nameOffset) {
-    throw new RuntimeException("NYI");
+    throw new RuntimeException("NYI glGetActiveAttrib");
   }
 
   @Override
   public void glGetActiveAttrib(int program, int index, int bufsize, IntBuffer length, IntBuffer size,
                                 IntBuffer type, ByteBuffer name) {
-    throw new RuntimeException("NYI");
+    throw new RuntimeException("NYI glGetActiveAttrib");
   }
 
   @Override
   public void glGetActiveUniform(int program, int index, int bufsize, int[] length, int lengthOffset,
                                  int[] size, int sizeOffset, int[] type, int typeOffset,
                                  byte[] name, int nameOffset) {
-    throw new RuntimeException("NYI");
+    throw new RuntimeException("NYI glGetActiveUniform");
   }
 
   @Override
   public void glGetActiveUniform(int program, int index, int bufsize, IntBuffer length,
                                  IntBuffer size, IntBuffer type, ByteBuffer name) {
-    throw new RuntimeException("NYI");
+    throw new RuntimeException("NYI glGetActiveUniform");
   }
 
   @Override
   public void glGetAttachedShaders(int program, int maxcount, int[] count, int countOffset,
                                    int[] shaders, int shadersOffset) {
-    throw new RuntimeException("NYI");
+    throw new RuntimeException("NYI glGetAttachedShaders");
   }
 
   @Override
   public void glGetAttachedShaders(int program, int maxcount, IntBuffer count, IntBuffer shaders) {
-    throw new RuntimeException("NYI");
+    throw new RuntimeException("NYI glGetAttachedShaders");
   }
 
   @Override
   public void glGetBooleanv(int pname, byte[] params, int offset) {
-    throw new RuntimeException("NYI");
+    throw new RuntimeException("NYI glGetBooleanv");
   }
 
   @Override
   public void glGetBooleanv(int pname, ByteBuffer params) {
-    throw new RuntimeException("NYI");
+    throw new RuntimeException("NYI glGetBooleanv");
   }
 
   @Override
   public int glGetBoundBuffer(int arg0) {
-    throw new RuntimeException("NYI");
+    throw new RuntimeException("NYI glGetBoundBuffer");
   }
 
   @Override
   public void glGetBufferParameteriv(int target, int pname, int[] params, int offset) {
-    throw new RuntimeException("NYI");
+    throw new RuntimeException("NYI glGetBufferParameteriv");
   }
 
   @Override
   public void glGetFloatv(int pname, float[] params, int offset) {
-    throw new RuntimeException("NYI");
+    throw new RuntimeException("NYI glGetFloatv");
   }
 
   @Override
   public void glGetFramebufferAttachmentParameteriv(int target, int attachment, int pname,
                                                     int[] params, int offset) {
-    throw new RuntimeException("NYI");
+    throw new RuntimeException("NYI glGetFramebufferAttachmentParameteriv");
   }
 
   @Override
   public void glGetIntegerv(int pname, int[] params, int offset) {
-    throw new RuntimeException("NYI");
+    throw new RuntimeException("NYI glGetIntegerv");
   }
 
   @Override
   public void glGetProgramBinary(int arg0, int arg1, int[] arg2, int arg3, int[] arg4, int arg5,
                                  Buffer arg6) {
-    throw new RuntimeException("NYI");
+    throw new RuntimeException("NYI glGetProgramBinary");
 
   }
 
   @Override
   public void glGetProgramBinary(int arg0, int arg1, IntBuffer arg2, IntBuffer arg3, Buffer arg4) {
-    throw new RuntimeException("NYI");
+    throw new RuntimeException("NYI glGetProgramBinary");
   }
 
   @Override
   public void glGetProgramInfoLog(int program, int bufsize, int[] length, int lengthOffset,
                                   byte[] infolog, int infologOffset) {
-    throw new RuntimeException("NYI");
+    throw new RuntimeException("NYI glGetProgramInfoLog");
   }
 
   @Override
   public void glGetProgramInfoLog(int program, int bufsize, IntBuffer length, ByteBuffer infolog) {
-    throw new RuntimeException("NYI");
+    throw new RuntimeException("NYI glGetProgramInfoLog");
   }
 
   @Override
   public void glGetProgramiv(int program, int pname, int[] params, int offset) {
-    throw new RuntimeException("NYI");
+    throw new RuntimeException("NYI glGetProgramiv");
   }
 
   @Override
   public void glGetRenderbufferParameteriv(int target, int pname, int[] params, int offset) {
-    throw new RuntimeException("NYI");
+    throw new RuntimeException("NYI glGetRenderbufferParameteriv");
   }
 
   @Override
   public void glGetShaderInfoLog(int shader, int bufsize, int[] length, int lengthOffset,
                                  byte[] infolog, int infologOffset) {
-    throw new RuntimeException("NYI");
+    throw new RuntimeException("NYI glGetShaderInfoLog");
   }
 
   @Override
   public void glGetShaderInfoLog(int shader, int bufsize, IntBuffer length, ByteBuffer infolog) {
-    throw new RuntimeException("NYI");
+    throw new RuntimeException("NYI glGetShaderInfoLog");
   }
 
   @Override
   public void glGetShaderiv(int shader, int pname, int[] params, int offset) {
-    throw new RuntimeException("NYI");
+    throw new RuntimeException("NYI glGetShaderiv");
   }
 
   @Override
   public void glGetShaderPrecisionFormat(int shadertype, int precisiontype, int[] range,
                                          int rangeOffset, int[] precision, int precisionOffset) {
-    throw new RuntimeException("NYI");
+    throw new RuntimeException("NYI glGetShaderPrecisionFormat");
   }
 
   @Override
   public void glGetShaderSource(int shader, int bufsize, int[] length, int lengthOffset,
                                 byte[] source, int sourceOffset) {
-    throw new RuntimeException("NYI");
+    throw new RuntimeException("NYI glGetShaderSource");
   }
 
   @Override
   public void glGetShaderSource(int shader, int bufsize, IntBuffer length, ByteBuffer source) {
-    throw new RuntimeException("NYI");
+    throw new RuntimeException("NYI glGetShaderSource");
   }
 
   @Override
   public void glGetTexParameterfv(int target, int pname, float[] params, int offset) {
-    throw new RuntimeException("NYI");
+    throw new RuntimeException("NYI glGetTexParameterfv");
   }
 
   @Override
   public void glGetTexParameteriv(int target, int pname, int[] params, int offset) {
-    throw new RuntimeException("NYI");
+    throw new RuntimeException("NYI glGetTexParameteriv");
   }
 
   @Override
   public void glGetUniformfv(int program, int location, float[] params, int offset) {
-    throw new RuntimeException("NYI");
+    throw new RuntimeException("NYI glGetUniformfv");
   }
 
   @Override
   public void glGetUniformiv(int program, int location, int[] params, int offset) {
-    throw new RuntimeException("NYI");
+    throw new RuntimeException("NYI glGetUniformiv");
   }
 
   @Override
   public void glGetVertexAttribfv(int index, int pname, float[] params, int offset) {
-    throw new RuntimeException("NYI");
+    throw new RuntimeException("NYI glGetVertexAttribfv");
   }
 
   @Override
   public void glGetVertexAttribiv(int index, int pname, int[] params, int offset) {
-    throw new RuntimeException("NYI");
+    throw new RuntimeException("NYI glGetVertexAttribiv");
   }
 
   @Override
   public boolean glIsVBOArrayEnabled() {
-    throw new RuntimeException("NYI");
+    throw new RuntimeException("NYI glIsVBOArrayEnabled");
   }
 
   @Override
   public boolean glIsVBOElementEnabled() {
-    throw new RuntimeException("NYI");
+    throw new RuntimeException("NYI glIsVBOElementEnabled");
   }
 
   @Override
   public ByteBuffer glMapBuffer(int arg0, int arg1) {
-    throw new RuntimeException("NYI");
+    throw new RuntimeException("NYI glMapBuffer");
   }
 
   @Override
   public void glProgramBinary(int arg0, int arg1, Buffer arg2, int arg3) {
-    throw new RuntimeException("NYI");
+    throw new RuntimeException("NYI glProgramBinary");
   }
 
 
   @Override
   public void glShaderBinary(int n, int[] shaders, int offset, int binaryformat, Buffer binary,
                              int length) {
-    throw new RuntimeException("NYI");
+    throw new RuntimeException("NYI glShaderBinary");
   }
 
   @Override
   public void glShaderSource(int shader, int count, String[] strings, int[] length,
                              int lengthOffset) {
-    throw new RuntimeException("NYI");
+    throw new RuntimeException("NYI glShaderSource");
   }
 
   @Override
   public void glShaderSource(int shader, int count, String[] strings, IntBuffer length) {
-    throw new RuntimeException("NYI");
+    throw new RuntimeException("NYI glShaderSource");
   }
 
   @Override
   public void glTexImage3D(int arg0, int arg1, int arg2, int arg3, int arg4,
                            int arg5, int arg6, int arg7, int arg8, Buffer arg9) {
-    throw new RuntimeException("NYI");
+    throw new RuntimeException("NYI glTexImage3D");
   }
 
   @Override
   public void glTexParameterfv(int target, int pname, float[] params, int offset) {
-    throw new RuntimeException("NYI");
+    throw new RuntimeException("NYI glTexParameterfv");
   }
 
   @Override
   public void glTexParameteriv(int target, int pname, int[] params, int offset) {
-    throw new RuntimeException("NYI");
+    throw new RuntimeException("NYI glTexParameteriv");
   }
-
 
   @Override
   public void glTexSubImage3D(int arg0, int arg1, int arg2, int arg3, int arg4, int arg5,
                               int arg6, int arg7, int arg8, int arg9, Buffer arg10) {
-    throw new RuntimeException("NYI");
+    throw new RuntimeException("NYI glTexSubImage3D");
   }
 
   @Override
   public void glUniform1fv(int location, int count, float[] v, int offset) {
-    throw new RuntimeException("NYI");
+    throw new RuntimeException("NYI glUniform1fv");
   }
 
   @Override
   public void glUniform1iv(int location, int count, int[] v, int offset) {
-    throw new RuntimeException("NYI");
+    throw new RuntimeException("NYI glUniform1iv");
   }
 
   @Override
   public void glUniform2fv(int location, int count, float[] v, int offset) {
-    throw new RuntimeException("NYI");
+    throw new RuntimeException("NYI glUniform2fv");
   }
 
   @Override
   public void glUniform2iv(int location, int count, int[] v, int offset) {
-    throw new RuntimeException("NYI");
+    throw new RuntimeException("NYI glUniform2iv");
   }
 
   @Override
   public void glUniform3fv(int location, int count, float[] v, int offset) {
-    throw new RuntimeException("NYI");
+    throw new RuntimeException("NYI glUniform3fv");
   }
 
   @Override
   public void glUniform3iv(int location, int count, int[] v, int offset) {
-    throw new RuntimeException("NYI");
+    throw new RuntimeException("NYI glUniform3iv");
   }
 
   @Override
   public void glUniform4fv(int location, int count, float[] v, int offset) {
-    throw new RuntimeException("NYI");
+    throw new RuntimeException("NYI glUniform4fv");
   }
 
   @Override
   public void glUniform4iv(int location, int count, int[] v, int offset) {
-    throw new RuntimeException("NYI");
+    throw new RuntimeException("NYI glUniform4iv");
   }
 
   @Override
   public void glUniformMatrix2fv(int location, int count, boolean transpose, float[] value,
                                  int offset) {
-    throw new RuntimeException("NYI");
+    throw new RuntimeException("NYI glUniformMatrix2fv");
   }
 
   @Override
   public void glUniformMatrix3fv(int location, int count, boolean transpose, float[] value,
                                  int offset) {
-    throw new RuntimeException("NYI");
+    throw new RuntimeException("NYI glUniformMatrix3fv");
   }
 
   @Override
   public void glUniformMatrix4fv(int location, int count, boolean transpose, float[] value,
                                  int offset) {
-    throw new RuntimeException("NYI");
+    throw new RuntimeException("NYI glUniformMatrix4fv");
   }
 
   @Override
   public boolean glUnmapBuffer(int arg0) {
-    throw new RuntimeException("NYI");
+    throw new RuntimeException("NYI glUnmapBuffer");
   }
 
   @Override
   public void glVertexAttrib1fv(int indx, float[] values, int offset) {
-    throw new RuntimeException("NYI");
+    throw new RuntimeException("NYI glVertexAttrib1fv");
   }
 
   @Override
   public void glVertexAttrib2fv(int indx, float[] values, int offset) {
-    throw new RuntimeException("NYI");
+    throw new RuntimeException("NYI glVertexAttrib2fv");
   }
 
   @Override
   public void glVertexAttrib3fv(int indx, float[] values, int offset) {
-    throw new RuntimeException("NYI");
+    throw new RuntimeException("NYI glVertexAttrib3fv");
   }
 
   @Override
   public void glVertexAttrib4fv(int indx, float[] values, int offset) {
-    throw new RuntimeException("NYI");
+    throw new RuntimeException("NYI glVertexAttrib4fv");
   }
 
   @Override
   public boolean hasGLSL() {
-    throw new RuntimeException("NYI");
+    throw new RuntimeException("NYI hasGLSL");
   }
 
   @Override
   public boolean isExtensionAvailable(String extension) {
-    throw new RuntimeException("NYI");
+    throw new RuntimeException("NYI isExtensionAvailable");
   }
 
   @Override
   public boolean isFunctionAvailable(String function) {
-    throw new RuntimeException("NYI");
+    throw new RuntimeException("NYI isFunctionAvailable");
   }
 
   @Override
   public void glCompressedTexImage2D(int arg0, int arg1, int arg2, int arg3,
                                      int arg4, int arg5, int arg6, int arg7) {
-    throw new RuntimeException("NYI");
+    throw new RuntimeException("NYI glCompressedTexImage2D");
   }
 
   @Override
   public void glCompressedTexImage3D(int arg0, int arg1, int arg2, int arg3, int arg4, int arg5,
                                      int arg6, int arg7, int arg8) {
-    throw new RuntimeException("NYI");
+    throw new RuntimeException("NYI glCompressedTexImage3D");
   }
 
   @Override
   public void glCompressedTexSubImage2D(int arg0, int arg1, int arg2, int arg3, int arg4, int arg5,
                                         int arg6, int arg7, int arg8) {
-    throw new RuntimeException("NYI");
+    throw new RuntimeException("NYI glCompressedTexSubImage2D");
   }
 
   @Override
   public void glCompressedTexSubImage3D(int arg0, int arg1, int arg2, int arg3, int arg4, int arg5,
                                         int arg6, int arg7, int arg8, int arg9, int arg10) {
-    throw new RuntimeException("NYI");
+    throw new RuntimeException("NYI glCompressedTexSubImage3D");
   }
 
   @Override
   public void glReadPixels(int x, int y, int width, int height, int format, int type,
                            int pixelsBufferOffset) {
-    throw new RuntimeException("NYI");
+    throw new RuntimeException("NYI glReadPixels");
   }
 
   @Override
   public void glTexImage2D(int arg0, int arg1, int arg2, int arg3, int arg4, int arg5, int arg6,
                            int arg7, int arg8) {
-    throw new RuntimeException("NYI");
+    throw new RuntimeException("NYI glTexImage2D");
   }
 
   @Override
   public void glTexImage3D(int arg0, int arg1, int arg2, int arg3, int arg4,
                            int arg5, int arg6, int arg7, int arg8, int arg9) {
-    throw new RuntimeException("NYI");
+    throw new RuntimeException("NYI glTexImage3D");
   }
 
   @Override
   public void glTexSubImage2D(int arg0, int arg1, int arg2, int arg3, int arg4,
                               int arg5, int arg6, int arg7, int arg8) {
-    throw new RuntimeException("NYI");
+    throw new RuntimeException("NYI glTexSubImage2D");
   }
 
   @Override
   public void glTexSubImage3D(int arg0, int arg1, int arg2, int arg3, int arg4, int arg5,
                               int arg6, int arg7, int arg8, int arg9, int arg10) {
-    throw new RuntimeException("NYI");
+    throw new RuntimeException("NYI glTexSubImage3D");
   }
 }
