@@ -54,7 +54,7 @@ final class JavaGL20 implements playn.core.gl.GL20 {
   private ByteBuffer byteBuffer = BufferUtils.createByteBuffer(256);
 
   private void setIntBuffer(final int[] source, final int offset, final int length) {
-    resizeByteBuffer(length);
+    resizeIntBuffer(length);
     intBuffer.put(source, offset, length);
     intBuffer.rewind();
   }
