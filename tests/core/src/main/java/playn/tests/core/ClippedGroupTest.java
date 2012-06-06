@@ -26,9 +26,10 @@ import playn.core.Surface;
 
 public class ClippedGroupTest extends Test {
 
-  private float elapsed, rotation;
-  private GroupLayer.Clipped g1, g2;
+  private float elapsed;
+  private GroupLayer.Clipped g1, g2, g3;
   private ImageLayer i1;
+  private GroupLayer inner;
 
   @Override
   public String getName() {
@@ -59,6 +60,8 @@ public class ClippedGroupTest extends Test {
                  g1.width(), g1.height());
         drawRect(surf, g2.transform().tx() - g2.originX(), g2.transform().ty() - g2.originY(),
                  g2.width(), g2.height());
+        drawRect(surf, g3.transform().tx() - g3.originX(), g3.transform().ty() - g3.originY(),
+                 g3.width(), g3.height());
       }
       protected void drawRect(Surface surf, float x, float y, float w, float h) {
         float left = x-1, top = y-1, right = x+w+2, bot = y+h+2;
@@ -82,6 +85,13 @@ public class ClippedGroupTest extends Test {
     g2.setOrigin(50, 50);
     g2.addAt(graphics().createImageLayer(img), (100 - img.width())/2, (100 - img.height())/2);
     rootLayer.addAt(g2, 200, 75);
+
+    // nest a group layer inside with an animated origin
+    inner = graphics().createGroupLayer();
+    inner.addAt(graphics().createImageLayer(img), (100 - img.width())/2, (100 - img.height())/2);
+    g3 = graphics().createGroupLayer(100, 100);
+    g3.add(inner);
+    rootLayer.addAt(g3, 275, 25);
   }
 
   @Override
@@ -89,5 +99,6 @@ public class ClippedGroupTest extends Test {
     elapsed += delta/1000;
     i1.setRotation(elapsed * FloatMath.PI/2);
     g2.setWidth(Math.max(1f, Math.abs(100 * FloatMath.sin(elapsed))));
+    inner.setOrigin(FloatMath.sin(elapsed * 2f) * 50, FloatMath.cos(elapsed * 2f) * 50);
   }
 }
