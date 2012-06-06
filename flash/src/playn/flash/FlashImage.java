@@ -108,6 +108,11 @@ class FlashImage implements Image {
   }
 
   @Override
+  public int ensureTexture(boolean repeatX, boolean repeatY) {
+    return 0; // not supported
+  }
+
+  @Override
   public void clearTexture() {
     // noop
   }
