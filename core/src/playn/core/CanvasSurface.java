@@ -145,7 +145,7 @@ public class CanvasSurface implements Surface {
   }
 
   @Override
-  public Surface setShaders(GLShader.Texture texShader, GLShader.Color colorShader) {
+  public Surface setShader(GLShader shader) {
     // NOOP
     return this;
   }

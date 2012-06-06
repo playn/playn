@@ -18,7 +18,21 @@ package playn.core.gl;
 import playn.core.InternalTransform;
 
 /**
- * Defines the interface to shaders used by the GL core.
+ * Defines the interface to shaders used by the GL core. The general usage contract for a shader is
+ * the following series of calls:
+ *
+ * <ul>
+ * <li> One or more of the following call pairs:<br/>
+ * {@link #prepareTexture} or {@link #prepareColor} followed by
+ * {@link #addQuad} or {@link #addTriangles}.
+ * <li> A call to {@link #flush} to send everything to the GPU.
+ * </li>
+ *
+ * Because a shader may be prepared multiple times, care should be taken to avoid rebinding the
+ * shader program, uniforms, attributes, etc. if a shader is bound again before being flushed.
+ * {@link AbstractShader} takes care of this, as well as provides a framework for handling the
+ * small variance between texture and color shaders. Custom shader authors should almost certainly
+ * extend {@link AbstractShader} rather than implementing things from scratch.
  */
 public interface GLShader {
 
@@ -62,30 +76,23 @@ public interface GLShader {
     void bind(int stride, int offset, GLBuffer.Float buffer);
   }
 
-  /** Defines the interface to the texture shader. */
-  interface Texture extends GLShader {
-    /** Prepares this shader to render the specified texture, etc. */
-    void prepare(int tex, float alpha, int fbufWidth, int fbufHeight);
-  }
+  /** Prepares this shader to render the specified texture, etc. */
+  void prepareTexture(int tex, float alpha, int fbufWidth, int fbufHeight);
 
-  /** Defines the interface to the color shader. */
-  interface Color extends GLShader {
-    /** Prepares this shader to render the specified color, etc. */
-    void prepare(int color, float alpha, int fbufWidth, int fbufHeight);
-  }
+  /** Prepares this shader to render the specified color, etc. */
+  void prepareColor(int color, float alpha, int fbufWidth, int fbufHeight);
 
-  /**
-   * Adds a quad to the current render operation.
-   */
+  /** Sends all accumulated vertex/element info to GL. */
+  void flush();
+
+  /** Adds a quad to the current render operation. */
   void addQuad(InternalTransform local,
                float x1, float y1, float sx1, float sy1,
                float x2, float y2, float sx2, float sy2,
                float x3, float y3, float sx3, float sy3,
                float x4, float y4, float sx4, float sy4);
 
-  /**
-   * Adds a quad to the current render operation.
-   */
+  /** Adds a quad to the current render operation. */
   void addQuad(InternalTransform local,
                float x1, float y1, float x2, float y2,
                float x3, float y3, float x4, float y4);
@@ -112,11 +119,6 @@ public interface GLShader {
    * be in proper winding order for OpenGL rendering.
    */
   void addTriangles(InternalTransform local, float[] xys, float[] sxys, int[] indices);
-
-  /**
-   * Sends all accumulated vertex/element info to GL.
-   */
-  void flush();
 
   /** The GLSL code for quad-specific vertex shader. */
   String QUAD_VERTEX_SHADER =

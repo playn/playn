@@ -73,8 +73,7 @@ public class GroupLayerGL extends LayerGL implements GroupLayer, ParentLayer {
     }
 
     @Override
-    protected void render (InternalTransform xform, float alpha,
-                           GLShader.Texture texShader, GLShader.Color colorShader) {
+    protected void render (InternalTransform xform, float alpha, GLShader shader) {
       xform.translate(originX, originY);
       xform.transform(pos.set(-originX, -originY), pos);
       xform.transform(size.set(width, height), size);
@@ -82,7 +81,7 @@ public class GroupLayerGL extends LayerGL implements GroupLayer, ParentLayer {
       ctx.startClipped((int) pos.x, (int) pos.y,
                        Math.round(Math.abs(size.x)), Math.round(Math.abs(size.y)));
       try {
-        super.render(xform, alpha, texShader, colorShader);
+        super.render(xform, alpha, shader);
       } finally {
         ctx.endClipped();
       }
@@ -167,18 +166,14 @@ public class GroupLayerGL extends LayerGL implements GroupLayer, ParentLayer {
   }
 
   @Override
-  public void paint(InternalTransform curTransform, float curAlpha,
-                    GLShader.Texture curTexShader, GLShader.Color curColorShader) {
+  public void paint(InternalTransform curTransform, float curAlpha, GLShader curShader) {
     if (!visible()) return;
-    render(localTransform(curTransform), curAlpha * alpha,
-           (texShader == null) ? curTexShader : texShader,
-           (colorShader == null) ? curColorShader : colorShader);
+    render(localTransform(curTransform), curAlpha * alpha, (shader == null) ? curShader : shader);
   }
 
-  protected void render (InternalTransform xform, float alpha,
-                         GLShader.Texture texShader, GLShader.Color colorShader) {
+  protected void render (InternalTransform xform, float alpha, GLShader shader) {
     for (LayerGL child : impl.children) {
-      child.paint(xform, alpha, texShader, colorShader);
+      child.paint(xform, alpha, shader);
     }
   }
 }

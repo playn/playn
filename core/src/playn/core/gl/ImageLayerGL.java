@@ -119,13 +119,11 @@ public class ImageLayerGL extends LayerGL implements ImageLayer {
   }
 
   @Override
-  public void paint(InternalTransform curTransform, float curAlpha,
-                    GLShader.Texture curTexShader, GLShader.Color curColorShader) {
+  public void paint(InternalTransform curTransform, float curAlpha, GLShader curShader) {
     if (!visible()) return;
 
-    GLShader.Texture texShader = (this.texShader == null) ? curTexShader : this.texShader;
-    img.draw(texShader, localTransform(curTransform), 0, 0, width(), height(), repeatX, repeatY,
-             curAlpha * alpha);
+    img.draw((shader == null) ? curShader : shader, localTransform(curTransform),
+             0, 0, width(), height(), repeatX, repeatY, curAlpha * alpha);
   }
 
   @Override

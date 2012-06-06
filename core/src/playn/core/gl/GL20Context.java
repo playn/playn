@@ -31,8 +31,7 @@ public class GL20Context extends GLContext {
 
   private final boolean checkErrors;
   private final InternalTransform rootXform;
-  private GLShader.Texture texShader;
-  private GLShader.Color colorShader;
+  private GLShader shader;
 
   public GL20Context(Platform platform, GL20 gl, float scaleFactor,
                      int screenWidth, int screenHeight, boolean checkErrors) {
@@ -50,8 +49,7 @@ public class GL20Context extends GLContext {
     gl.glEnable(GL_BLEND);
     gl.glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
     gl.glClearColor(0, 0, 0, 1);
-    texShader = new IndexedTrisShader.Texture(this);
-    colorShader = new IndexedTrisShader.Color(this);
+    shader = new IndexedTrisShader(this);
     checkGLError("initGL");
   }
 
@@ -65,8 +63,8 @@ public class GL20Context extends GLContext {
 
   public void paintLayers(GroupLayerGL rootLayer) {
     checkGLError("paintLayers");
-    rootLayer.paint(rootXform, 1, null, null); // paint all the layers
-    useShader(null); // guarantee a flush
+    rootLayer.paint(rootXform, 1, null); // paint all the layers
+    useShader(null, false); // flush any pending shader
   }
 
   public InternalTransform rootTransform() {
@@ -180,19 +178,11 @@ public class GL20Context extends GLContext {
   }
 
   @Override
-  protected GLShader.Texture quadTexShader() {
-    return texShader;
+  protected GLShader quadShader() {
+    return shader;
   }
   @Override
-  protected GLShader.Texture trisTexShader() {
-    return texShader;
-  }
-  @Override
-  protected GLShader.Color quadColorShader() {
-    return colorShader;
-  }
-  @Override
-  protected GLShader.Color trisColorShader() {
-    return colorShader;
+  protected GLShader trisShader() {
+    return shader;
   }
 }

@@ -58,8 +58,11 @@ public class ShaderTest extends Test {
 
     // add a sepia toned orange
     ImageLayer olayer = graphics().createImageLayer(orange);
-    olayer.setShaders(new IndexedTrisShader.Texture(
-                        graphics().ctx(), IndexedTrisShader.VERTEX_SHADER, SEPIA_FRAG_SHADER), null);
+    olayer.setShader(new IndexedTrisShader(graphics().ctx()) {
+      @Override protected String textureFragmentShader() {
+        return SEPIA_FRAG_SHADER;
+      }
+    });
     graphics().rootLayer().addAt(olayer, 75, 25);
   }
 

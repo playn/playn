@@ -224,7 +224,7 @@ public abstract class AbstractLayer implements Layer {
   }
 
   @Override
-  public void setShaders(GLShader.Texture texShader, GLShader.Color colorShader) {
+  public void setShader(GLShader shader) {
     // NOOP
   }
 

@@ -139,24 +139,24 @@ public abstract class GLContext {
     bindFramebuffer(defaultFrameBuffer(), defaultFbufWidth, defaultFbufHeight);
   }
 
-  public void drawTexture(GLShader.Texture shader, int tex, float texWidth, float texHeight,
+  public void drawTexture(GLShader shader, int tex, float texWidth, float texHeight,
                           InternalTransform local, float dw, float dh,
                           boolean repeatX, boolean repeatY, float alpha) {
     drawTexture(shader, tex, texWidth, texHeight, local, 0, 0, dw, dh, repeatX, repeatY, alpha);
   }
 
-  public void drawTexture(GLShader.Texture shader, int tex, float texWidth, float texHeight,
+  public void drawTexture(GLShader shader, int tex, float texWidth, float texHeight,
                           InternalTransform local, float dx, float dy, float dw, float dh,
                           boolean repeatX, boolean repeatY, float alpha) {
     float sw = repeatX ? dw : texWidth, sh = repeatY ? dh : texHeight;
     drawTexture(shader, tex, texWidth, texHeight, local, dx, dy, dw, dh, 0, 0, sw, sh, alpha);
   }
 
-  public void drawTexture(GLShader.Texture shader, int tex, float texWidth, float texHeight,
+  public void drawTexture(GLShader shader, int tex, float texWidth, float texHeight,
                           InternalTransform local, float dx, float dy, float dw, float dh,
                           float sx, float sy, float sw, float sh, float alpha) {
-    if (shader == null) shader = quadTexShader();
-    shader.prepare(tex, alpha, curFbufWidth, curFbufHeight);
+    if (shader == null) shader = quadShader();
+    shader.prepareTexture(tex, alpha, curFbufWidth, curFbufHeight);
     checkGLError("drawTexture texture prepared");
     sx /= texWidth; sy /= texHeight;
     sw /= texWidth; sh /= texHeight;
@@ -168,11 +168,11 @@ public abstract class GLContext {
     checkGLError("drawTexture end");
   }
 
-  public void fillRect(GLShader.Texture shader, InternalTransform local,
+  public void fillRect(GLShader shader, InternalTransform local,
                        float dx, float dy, float dw, float dh, float texWidth, float texHeight,
                        int tex, float alpha) {
-    if (shader == null) shader = quadTexShader();
-    shader.prepare(tex, alpha, curFbufWidth, curFbufHeight);
+    if (shader == null) shader = quadShader();
+    shader.prepareTexture(tex, alpha, curFbufWidth, curFbufHeight);
     checkGLError("fillRect tex prepared");
     float sx = dx / texWidth, sy = dy / texHeight;
     float sw = dw / texWidth, sh = dh / texHeight;
@@ -184,10 +184,10 @@ public abstract class GLContext {
     checkGLError("fillRect tex end");
   }
 
-  public void fillRect(GLShader.Color shader, InternalTransform local,
+  public void fillRect(GLShader shader, InternalTransform local,
                        float dx, float dy, float dw, float dh, int color, float alpha) {
-    if (shader == null) shader = quadColorShader();
-    shader.prepare(color, alpha, curFbufWidth, curFbufHeight);
+    if (shader == null) shader = quadShader();
+    shader.prepareColor(color, alpha, curFbufWidth, curFbufHeight);
     checkGLError("fillRect color prepared");
     shader.addQuad(local,
                    dx,      dy,
@@ -197,11 +197,11 @@ public abstract class GLContext {
     checkGLError("fillRect color end");
   }
 
-  public void fillQuad(GLShader.Texture shader, InternalTransform local, float x1, float y1,
+  public void fillQuad(GLShader shader, InternalTransform local, float x1, float y1,
                        float x2, float y2, float x3, float y3, float x4, float y4,
                        float texWidth, float texHeight, int tex, float alpha) {
-    if (shader == null) shader = quadTexShader();
-    shader.prepare(tex, alpha, curFbufWidth, curFbufHeight);
+    if (shader == null) shader = quadShader();
+    shader.prepareTexture(tex, alpha, curFbufWidth, curFbufHeight);
     checkGLError("fillQuad tex prepared");
     shader.addQuad(local,
                    x1, y1, x1/texWidth, y1/texHeight,
@@ -211,39 +211,39 @@ public abstract class GLContext {
     checkGLError("fillQuad tex end");
   }
 
-  public void fillQuad(GLShader.Color shader, InternalTransform local, float x1, float y1,
+  public void fillQuad(GLShader shader, InternalTransform local, float x1, float y1,
                        float x2, float y2, float x3, float y3, float x4, float y4,
                        int color, float alpha) {
-    if (shader == null) shader = quadColorShader();
-    shader.prepare(color, alpha, curFbufWidth, curFbufHeight);
+    if (shader == null) shader = quadShader();
+    shader.prepareColor(color, alpha, curFbufWidth, curFbufHeight);
     checkGLError("fillQuad color prepared");
     shader.addQuad(local, x1, y1, x2, y2, x3, y3, x4, y4);
     checkGLError("fillQuad color end");
   }
 
-  public void fillTriangles(GLShader.Texture shader, InternalTransform local,
+  public void fillTriangles(GLShader shader, InternalTransform local,
                             float[] xys, int[] indices, float texWidth, float texHeight,
                             int tex, float alpha) {
-    if (shader == null) shader = trisTexShader();
-    shader.prepare(tex, alpha, curFbufWidth, curFbufHeight);
+    if (shader == null) shader = trisShader();
+    shader.prepareTexture(tex, alpha, curFbufWidth, curFbufHeight);
     checkGLError("fillTris tex prepared");
     shader.addTriangles(local, xys, texWidth, texHeight, indices);
     checkGLError("fillTris tex end");
   }
 
-  public void fillTriangles(GLShader.Color shader, InternalTransform local,
+  public void fillTriangles(GLShader shader, InternalTransform local,
                             float[] xys, int[] indices, int color, float alpha) {
-    if (shader == null) shader = trisColorShader();
-    shader.prepare(color, alpha, curFbufWidth, curFbufHeight);
+    if (shader == null) shader = trisShader();
+    shader.prepareColor(color, alpha, curFbufWidth, curFbufHeight);
     checkGLError("fillTris color prepared");
     shader.addTriangles(local, xys, 1, 1, indices);
     checkGLError("fillTris color end");
   }
 
-  public void fillTriangles(GLShader.Texture shader, InternalTransform local,
+  public void fillTriangles(GLShader shader, InternalTransform local,
                             float[] xys, float[] sxys, int[] indices, int tex, float alpha) {
-    if (shader == null) shader = trisTexShader();
-    shader.prepare(tex, alpha, curFbufWidth, curFbufHeight);
+    if (shader == null) shader = trisShader();
+    shader.prepareTexture(tex, alpha, curFbufWidth, curFbufHeight);
     checkGLError("fillTris tex prepared");
     shader.addTriangles(local, xys, sxys, indices);
     checkGLError("fillTris tex end");
@@ -260,8 +260,8 @@ public abstract class GLContext {
   /**
    * Makes the supplied shader the current shader, flushing any previous shader.
    */
-  public boolean useShader(GLShader shader) {
-    if (curShader == shader)
+  public boolean useShader(GLShader shader, boolean forceFlush) {
+    if (curShader == shader && !forceFlush)
       return false;
     checkGLError("useShader");
     flush();
@@ -293,11 +293,7 @@ public abstract class GLContext {
    */
   protected abstract void bindFramebufferImpl(int fbuf, int width, int height);
 
-  protected abstract GLShader.Texture quadTexShader();
+  protected abstract GLShader quadShader();
 
-  protected abstract GLShader.Texture trisTexShader();
-
-  protected abstract GLShader.Color quadColorShader();
-
-  protected abstract GLShader.Color trisColorShader();
+  protected abstract GLShader trisShader();
 }

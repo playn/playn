@@ -88,13 +88,10 @@ public interface Surface {
   Surface setFillPattern(Pattern pattern);
 
   /**
-   * Configures custom shaders used when drawing images and shapes to this surface. If either of
-   * the supplied shaders is null, the default shader will be used.
-   *
-   * @param texShader the shader to use when rendering textured quads and triangles.
-   * @param colorShader the shader to use when rendering solid filled quads and triangles.
+   * Configures a custom shader to use when drawing images and shapes to this surface. If the
+   * supplied shader is null, the default shader will be used.
    */
-  Surface setShaders(GLShader.Texture texShader, GLShader.Color colorShader);
+  Surface setShader(GLShader shader);
 
   /**
    * Clears the entire surface to transparent blackness.

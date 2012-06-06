@@ -22,15 +22,13 @@ import playn.core.gl.GLShader;
 public abstract class LayerGL extends AbstractLayer {
 
   private final InternalTransform savedLocal;
-  protected final GLContext ctx;
 
-  GLShader.Texture texShader;
-  GLShader.Color colorShader;
+  protected final GLContext ctx;
+  protected GLShader shader;
 
   @Override
-  public void setShaders(GLShader.Texture texShader, GLShader.Color colorShader) {
-    this.texShader = texShader;
-    this.colorShader = colorShader;
+  public void setShader(GLShader shader) {
+    this.shader = shader;
   }
 
   protected LayerGL(GLContext ctx) {
@@ -44,6 +42,5 @@ public abstract class LayerGL extends AbstractLayer {
     return savedLocal.concatenate(transform, originX, originY);
   }
 
-  public abstract void paint(InternalTransform curTransform, float curAlpha,
-                             GLShader.Texture curTexShader, GLShader.Color curColorShader);
+  public abstract void paint(InternalTransform curTransform, float curAlpha, GLShader curShader);
 }

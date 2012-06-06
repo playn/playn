@@ -39,9 +39,7 @@ abstract class AbstractSurfaceGL implements Surface {
   protected int fillColor;
   protected float alpha = 1;
   protected ImageGL fillPattern;
-
-  GLShader.Texture texShader;
-  GLShader.Color colorShader;
+  protected GLShader shader;
 
   protected AbstractSurfaceGL(GLContext ctx) {
     this.ctx = ctx;
@@ -65,7 +63,7 @@ abstract class AbstractSurfaceGL implements Surface {
   @Override
   public Surface drawImage(Image image, float x, float y, float dw, float dh) {
     bindFramebuffer();
-    ((ImageGL) image).draw(texShader, topTransform(), x, y, dw, dh, false, false, alpha);
+    ((ImageGL) image).draw(shader, topTransform(), x, y, dw, dh, false, false, alpha);
     return this;
   }
 
@@ -73,7 +71,7 @@ abstract class AbstractSurfaceGL implements Surface {
   public Surface drawImage(Image image, float dx, float dy, float dw, float dh,
                            float sx, float sy, float sw, float sh) {
     bindFramebuffer();
-    ((ImageGL) image).draw(texShader, topTransform(), dx, dy, dw, dh, sx, sy, sw, sh, alpha);
+    ((ImageGL) image).draw(shader, topTransform(), dx, dy, dw, dh, sx, sy, sw, sh, alpha);
     return this;
   }
 
@@ -109,11 +107,11 @@ abstract class AbstractSurfaceGL implements Surface {
     if (fillPattern != null) {
       int tex = fillPattern.ensureTexture(true, true);
       if (tex > 0) {
-        ctx.fillQuad(texShader, l, 0, 0, length, 0, 0, width, length, width,
+        ctx.fillQuad(shader, l, 0, 0, length, 0, 0, width, length, width,
                      fillPattern.width(), fillPattern.height(), tex, alpha);
       }
     } else {
-      ctx.fillQuad(colorShader, l, 0, 0, length, 0, 0, width, length, width, fillColor, alpha);
+      ctx.fillQuad(shader, l, 0, 0, length, 0, 0, width, length, width, fillColor, alpha);
     }
     return this;
   }
@@ -125,11 +123,11 @@ abstract class AbstractSurfaceGL implements Surface {
     if (fillPattern != null) {
       int tex = fillPattern.ensureTexture(true, true);
       if (tex > 0) {
-        ctx.fillRect(texShader, topTransform(), x, y, width, height,
+        ctx.fillRect(shader, topTransform(), x, y, width, height,
                      fillPattern.width(), fillPattern.height(), tex, alpha);
       }
     } else {
-      ctx.fillRect(colorShader, topTransform(), x, y, width, height, fillColor, alpha);
+      ctx.fillRect(shader, topTransform(), x, y, width, height, fillColor, alpha);
     }
     return this;
   }
@@ -141,11 +139,11 @@ abstract class AbstractSurfaceGL implements Surface {
     if (fillPattern != null) {
       int tex = fillPattern.ensureTexture(true, true);
       if (tex > 0) {
-        ctx.fillTriangles(texShader, topTransform(), xys, indices,
+        ctx.fillTriangles(shader, topTransform(), xys, indices,
                           fillPattern.width(), fillPattern.height(), tex, alpha);
       }
     } else {
-      ctx.fillTriangles(colorShader, topTransform(), xys, indices, fillColor, alpha);
+      ctx.fillTriangles(shader, topTransform(), xys, indices, fillColor, alpha);
     }
     return this;
   }
@@ -158,7 +156,7 @@ abstract class AbstractSurfaceGL implements Surface {
       throw new IllegalStateException("No fill pattern currently set");
     int tex = fillPattern.ensureTexture(true, true);
     if (tex > 0) {
-      ctx.fillTriangles(texShader, topTransform(), xys, sxys, indices, tex, alpha);
+      ctx.fillTriangles(shader, topTransform(), xys, sxys, indices, tex, alpha);
     }
     return this;
   }
@@ -219,9 +217,8 @@ abstract class AbstractSurfaceGL implements Surface {
   }
 
   @Override
-  public Surface setShaders(GLShader.Texture texShader, GLShader.Color colorShader) {
-    this.texShader = texShader;
-    this.colorShader = colorShader;
+  public Surface setShader(GLShader shader) {
+    this.shader = shader;
     return this;
   }
 

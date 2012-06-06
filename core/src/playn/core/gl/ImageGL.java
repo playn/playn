@@ -88,7 +88,7 @@ public abstract class ImageGL implements Image {
   /**
    * Draws this image with the supplied transform in the specified target dimensions.
    */
-  void draw(GLShader.Texture shader, InternalTransform xform, float dx, float dy, float dw, float dh,
+  void draw(GLShader shader, InternalTransform xform, float dx, float dy, float dw, float dh,
             boolean repeatX, boolean repeatY, float alpha) {
     int tex = ensureTexture(repeatX, repeatY);
     if (tex > 0) {
@@ -101,7 +101,7 @@ public abstract class ImageGL implements Image {
   /**
    * Draws this image with the supplied transform, and source and target dimensions.
    */
-  void draw(GLShader.Texture shader, InternalTransform xform, float dx, float dy, float dw, float dh,
+  void draw(GLShader shader, InternalTransform xform, float dx, float dy, float dw, float dh,
             float sx, float sy, float sw, float sh, float alpha) {
     int tex = ensureTexture(false, false);
     if (tex > 0) {
