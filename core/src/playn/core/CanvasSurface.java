@@ -15,6 +15,8 @@
  */
 package playn.core;
 
+import playn.core.gl.GLShader;
+
 /**
  * Implementation class, to be used by platforms that implement Surface as just
  * a special case of Canvas.
@@ -139,6 +141,12 @@ public class CanvasSurface implements Surface {
   @Override
   public Surface setFillPattern(Pattern pattern) {
     canvas.setFillPattern(pattern);
+    return this;
+  }
+
+  @Override
+  public Surface setShaders(GLShader.Texture texShader, GLShader.Color colorShader) {
+    // NOOP
     return this;
   }
 

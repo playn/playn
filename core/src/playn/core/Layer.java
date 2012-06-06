@@ -279,11 +279,13 @@ public interface Layer {
   Connection addListener(Touch.LayerListener touchListener);
 
   /**
-   * Configures custom shaders for use when rendering this layer (and its children). If either of
-   * the supplied shaders is null, the default shader will be used.
+   * Configures custom shaders for use when rendering this layer (and its children). Passing null
+   * for either argument will cause the default shader to be used. Configuring a shader on a group
+   * layer will cause that shader to be used when rendering the group layer's children, unless the
+   * child has a custom shader configured itself.
    *
-   * @param texShader the shader to use when rendering textured quads and triangles.
-   * @param colorShader the shader to use when rendering solid filled quads and triangles.
+   * @param texShader the shader to use when rendering images or patterned shapes/triangles.
+   * @param colorShader the shader to use when rendering solid-color shapes/triangles.
    */
   void setShaders(GLShader.Texture texShader, GLShader.Color colorShader);
 

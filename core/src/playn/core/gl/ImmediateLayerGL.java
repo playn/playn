@@ -75,14 +75,15 @@ public class ImmediateLayerGL extends LayerGL implements ImmediateLayer {
       return transform().scaleY() * height();
     }
 
-    protected void render(InternalTransform xform) {
+    protected void render(InternalTransform xform, float alpha,
+                          GLShader.Texture texShader, GLShader.Color colorShader) {
       xform.translate(originX, originY);
       xform.transform(pos.set(-originX, -originY), pos);
       xform.transform(size.set(width, height), size);
       xform.translate(-originX, -originY);
       ctx.startClipped((int) pos.x, (int) pos.y, (int) Math.abs(size.x), (int) Math.abs(size.y));
       try {
-        super.render(xform);
+        super.render(xform, alpha, texShader, colorShader);
       } finally {
         ctx.endClipped();
       }
@@ -114,18 +115,20 @@ public class ImmediateLayerGL extends LayerGL implements ImmediateLayer {
   }
 
   @Override
-  public void paint(InternalTransform parentTransform, float parentAlpha) {
+  public void paint(InternalTransform curTransform, float curAlpha,
+                    GLShader.Texture curTexShader, GLShader.Color curColorShader) {
     if (!visible()) return;
-    InternalTransform xform = localTransform(parentTransform);
+    InternalTransform xform = localTransform(curTransform);
     surface.topTransform().set(xform);
-    render(xform);
+    render(xform, curAlpha * alpha, (this.texShader == null) ? curTexShader : this.texShader,
+           (this.colorShader == null) ? curColorShader : this.colorShader);
   }
 
-  protected void render(InternalTransform xform) {
-    surface.texShader = texShader;
-    surface.colorShader = colorShader;
+  protected void render(InternalTransform xform, float alpha,
+                        GLShader.Texture texShader, GLShader.Color colorShader) {
+    surface.setAlpha(alpha);
+    surface.setShaders(texShader, colorShader);
     renderer.render(surface);
-    surface.texShader = null;
-    surface.colorShader = null;
+    surface.setShaders(null, null);
   }
 }

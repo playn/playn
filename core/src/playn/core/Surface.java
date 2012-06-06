@@ -15,6 +15,8 @@
  */
 package playn.core;
 
+import playn.core.gl.GLShader;
+
 /**
  * TODO
  */
@@ -84,6 +86,15 @@ public interface Surface {
    * pattern.
    */
   Surface setFillPattern(Pattern pattern);
+
+  /**
+   * Configures custom shaders used when drawing images and shapes to this surface. If either of
+   * the supplied shaders is null, the default shader will be used.
+   *
+   * @param texShader the shader to use when rendering textured quads and triangles.
+   * @param colorShader the shader to use when rendering solid filled quads and triangles.
+   */
+  Surface setShaders(GLShader.Texture texShader, GLShader.Color colorShader);
 
   /**
    * Clears the entire surface to transparent blackness.

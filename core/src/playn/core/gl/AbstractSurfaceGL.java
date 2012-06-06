@@ -40,7 +40,6 @@ abstract class AbstractSurfaceGL implements Surface {
   protected float alpha = 1;
   protected ImageGL fillPattern;
 
-  // these are filled in by ImmediateLayerGL or SurfaceLayerGL as appropriate
   GLShader.Texture texShader;
   GLShader.Color colorShader;
 
@@ -216,6 +215,13 @@ abstract class AbstractSurfaceGL implements Surface {
     // TODO: Add it to the state stack.
     Asserts.checkArgument(pattern instanceof GLPattern);
     this.fillPattern = ((GLPattern) pattern).image();
+    return this;
+  }
+
+  @Override
+  public Surface setShaders(GLShader.Texture texShader, GLShader.Color colorShader) {
+    this.texShader = texShader;
+    this.colorShader = colorShader;
     return this;
   }
 

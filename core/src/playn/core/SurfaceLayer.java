@@ -16,12 +16,19 @@
 package playn.core;
 
 /**
- * TODO
+ * Represents a layer that maintains an off-screen texture into which one can render by calling
+ * methods on {@link #surface}. Adding the surface layer to the scene graph results in the
+ * off-screen texture being rendered according to the surface layer's current transform.
+ *
+ * <p><b>Custom shader note:</b> Configuring a custom shader on a surface layer only affects the
+ * drawing of the texture to the main framebuffer. If you wish to use a custom shader when drawing
+ * into the surface's off-screen buffer, use {@link Surface#setShaders}.</p>
  */
 public interface SurfaceLayer extends Layer.HasSize {
 
   /**
-   * TODO
+   * Returns a surface instance that can be used to render into the off-screen texture associated
+   * with this surface layer.
    */
   Surface surface();
 }

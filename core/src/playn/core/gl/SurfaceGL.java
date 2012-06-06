@@ -16,6 +16,7 @@
 package playn.core.gl;
 
 import playn.core.InternalTransform;
+import playn.core.gl.GLShader;
 
 public class SurfaceGL extends AbstractSurfaceGL {
 
@@ -43,7 +44,7 @@ public class SurfaceGL extends AbstractSurfaceGL {
     return height;
   }
 
-  protected void paint(InternalTransform transform, float alpha) {
+  protected void paint(InternalTransform transform, float alpha, GLShader.Texture texShader) {
     // Draw this layer to the screen upside-down, because its contents are flipped (This happens
     // because it uses the same vertex program as everything else, which flips vertically to put
     // the origin at the top-left).

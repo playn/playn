@@ -21,6 +21,10 @@ package playn.core;
  * framebuffer, appropriately interleaved with the rendering of all of the other layers in the
  * scene graph.
  *
+ * <p><b>Custom shader note:</b> An immediate layer defaults to the shader configured by its
+ * parent, but it is possible to change that shader by calling {@link Surface#setShaders} on the
+ * surface passed to {@link Renderer#render}.</p>
+ *
  * <p>See also: http://en.wikipedia.org/wiki/Immediate_mode</p>
  */
 public interface ImmediateLayer extends Layer {
@@ -37,5 +41,6 @@ public interface ImmediateLayer extends Layer {
     void render(Surface surface);
   }
 
+  /** Returns the renderer used by this immediate layer. */
   Renderer renderer ();
 }
