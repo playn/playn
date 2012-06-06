@@ -43,8 +43,7 @@ public class IOSGLContext extends GLContext {
   int orient;
   private int defaultFrameBuffer = -1; // configured in init()
 
-  private GLShader.Texture texShader;
-  private GLShader.Color colorShader;
+  private GLShader shader;
 
   public IOSGLContext(IOSPlatform platform, float scaleFactor, int screenWidth, int screenHeight) {
     super(platform, scaleFactor);
@@ -57,8 +56,7 @@ public class IOSGLContext extends GLContext {
     GL.Enable(All.wrap(All.Blend));
     GL.BlendFunc(All.wrap(All.One), All.wrap(All.OneMinusSrcAlpha));
     GL.ClearColor(0, 0, 0, 1);
-    texShader = new IndexedTrisShader.Texture(this);
-    colorShader = new IndexedTrisShader.Color(this);
+    shader = new IndexedTrisShader(this);
   }
 
   @Override
@@ -190,20 +188,12 @@ public class IOSGLContext extends GLContext {
   }
 
   @Override
-  protected GLShader.Texture quadTexShader() {
-    return texShader;
+  protected GLShader quadShader() {
+    return shader;
   }
   @Override
-  protected GLShader.Texture trisTexShader() {
-    return texShader;
-  }
-  @Override
-  protected GLShader.Color quadColorShader() {
-    return colorShader;
-  }
-  @Override
-  protected GLShader.Color trisColorShader() {
-    return colorShader;
+  protected GLShader trisShader() {
+    return shader;
   }
 
   void updateTexture(int tex, UIImage image) {
@@ -244,8 +234,8 @@ public class IOSGLContext extends GLContext {
   void paintLayers(InternalTransform rootTransform, GroupLayerGL rootLayer) {
     checkGLError("updateLayers start");
     bindFramebuffer();
-    rootLayer.paint(rootTransform, 1, null, null); // paint all the layers
+    rootLayer.paint(rootTransform, 1, null); // paint all the layers
     checkGLError("updateLayers end");
-    useShader(null); // guarantee a flush
+    useShader(null, false); // guarantee a flush
   }
 }
