@@ -32,6 +32,14 @@ public class SurfaceLayerGL extends LayerGL implements SurfaceLayer {
   }
 
   @Override
+  public void setShaders(GLShader.Texture texShader, GLShader.Color colorShader) {
+    super.setShaders(texShader, colorShader);
+    // TODO: it's not clear that we want to use the same shaders in both places...
+    surface.texShader = texShader;
+    surface.colorShader = colorShader;
+  }
+
+  @Override
   public void destroy() {
     super.destroy();
     surface.destroy();

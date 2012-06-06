@@ -88,12 +88,12 @@ public abstract class ImageGL implements Image {
   /**
    * Draws this image with the supplied transform in the specified target dimensions.
    */
-  void draw(InternalTransform xform, float dx, float dy, float dw, float dh,
+  void draw(GLShader.Texture shader, InternalTransform xform, float dx, float dy, float dw, float dh,
             boolean repeatX, boolean repeatY, float alpha) {
     int tex = ensureTexture(repeatX, repeatY);
     if (tex > 0) {
       float sw = repeatX ? dw : width(), sh = repeatY ? dh : height();
-      ctx.drawTexture(tex, texWidth(repeatX), texHeight(repeatY), xform,
+      ctx.drawTexture(shader, tex, texWidth(repeatX), texHeight(repeatY), xform,
                       dx, dy, dw, dh, x(), y(), sw, sh, alpha);
     }
   }
@@ -101,11 +101,11 @@ public abstract class ImageGL implements Image {
   /**
    * Draws this image with the supplied transform, and source and target dimensions.
    */
-  void draw(InternalTransform xform, float dx, float dy, float dw, float dh,
+  void draw(GLShader.Texture shader, InternalTransform xform, float dx, float dy, float dw, float dh,
             float sx, float sy, float sw, float sh, float alpha) {
     int tex = ensureTexture(false, false);
     if (tex > 0) {
-      ctx.drawTexture(tex, texWidth(false), texHeight(false), xform,
+      ctx.drawTexture(shader, tex, texWidth(false), texHeight(false), xform,
                       dx, dy, dw, dh, x()+sx, y()+sy, sw, sh, alpha);
     }
   }
@@ -191,7 +191,7 @@ public abstract class ImageGL implements Image {
     // render the non-repeated texture into the framebuffer properly scaled
     ctx.bindFramebuffer(fbuf, width, height);
     ctx.clear(0, 0, 0, 0);
-    ctx.drawTexture(tex, width(), height(), ctx.createTransform(),
+    ctx.drawTexture(null, tex, width(), height(), ctx.createTransform(),
                     0, height, width, -height, false, false, 1);
 
     // we no longer need this framebuffer; rebind the default framebuffer and delete ours

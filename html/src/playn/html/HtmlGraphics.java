@@ -167,7 +167,8 @@ public abstract class HtmlGraphics implements Graphics {
     throw new UnsupportedOperationException();
   }
 
-  HtmlGLContext ctx() {
+  @Override
+  public HtmlGLContext ctx() {
     return null;
   }
 

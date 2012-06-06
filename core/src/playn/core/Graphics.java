@@ -16,6 +16,7 @@
 package playn.core;
 
 import playn.core.gl.GL20;
+import playn.core.gl.GLContext;
 
 /**
  * Main 2D graphics interface. This interface can be used to create and load
@@ -158,4 +159,10 @@ public interface Graphics {
    * <p> Returns a reference to the GL context. </p>
    */
   GL20 gl20();
+
+  /**
+   * Returns the GL context on platforms that use GL, null otherwise. This is used for creating
+   * custom shaders.
+   */
+  GLContext ctx();
 }

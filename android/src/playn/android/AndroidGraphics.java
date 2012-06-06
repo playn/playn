@@ -202,13 +202,13 @@ public class AndroidGraphics extends GraphicsGL {
   }
 
   @Override
-  protected SurfaceGL createSurface(float width, float height) {
-    return new AndroidSurfaceGL(platform.activity.getCacheDir(), ctx, width, height);
+  public GLContext ctx() {
+    return ctx;
   }
 
   @Override
-  protected GLContext ctx() {
-    return ctx;
+  protected SurfaceGL createSurface(float width, float height) {
+    return new AndroidSurfaceGL(platform.activity.getCacheDir(), ctx, width, height);
   }
 
   void paint(Game game, float paintAlpha) {

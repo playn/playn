@@ -19,6 +19,8 @@ import pythagoras.f.IPoint;
 import pythagoras.f.Point;
 import pythagoras.f.Transform;
 
+import playn.core.gl.GLShader;
+
 /**
  * Layer is the base element for all rendering in PlayN
  * <p>
@@ -275,6 +277,15 @@ public interface Layer {
    * call {@link #setInteractive} after removing the last listener.</p>
    */
   Connection addListener(Touch.LayerListener touchListener);
+
+  /**
+   * Configures custom shaders for use when rendering this layer (and its children). If either of
+   * the supplied shaders is null, the default shader will be used.
+   *
+   * @param texShader the shader to use when rendering textured quads and triangles.
+   * @param colorShader the shader to use when rendering solid filled quads and triangles.
+   */
+  void setShaders(GLShader.Texture texShader, GLShader.Color colorShader);
 
   /**
    * Interface for {@link Layer}s containing explicit sizes.

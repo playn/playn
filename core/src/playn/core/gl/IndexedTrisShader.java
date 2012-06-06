@@ -83,7 +83,14 @@ public abstract class IndexedTrisShader implements GLShader {
     private float lastAlpha;
 
     public Texture(GLContext ctx) {
-      super(ctx, TEX_FRAG_SHADER);
+      this(ctx, VERTEX_SHADER, TEX_FRAG_SHADER);
+    }
+
+    /** Creates a texture shader with customized vertex and fragment shader programs. Note that
+     * these programs <em>must</em> preserve the use of the existing attributes and uniforms. You
+     * can add new uniforms and attributes, but you cannot remove or change the preexisters. */
+    public Texture(GLContext ctx, String vertShader, String fragShader) {
+      super(ctx, vertShader, fragShader);
       uTexture = prog.getUniform1i("u_Texture");
       uAlpha = prog.getUniform1f("u_Alpha");
     }
@@ -120,7 +127,14 @@ public abstract class IndexedTrisShader implements GLShader {
     private float lastAlpha;
 
     public Color(GLContext ctx) {
-      super(ctx, COLOR_FRAG_SHADER);
+      this(ctx, VERTEX_SHADER, COLOR_FRAG_SHADER);
+    }
+
+    /** Creates a color shader with customized vertex and fragment shader programs. Note that these
+     * programs <em>must</em> preserve the use of the existing attributes and uniforms. You can add
+     * new uniforms and attributes, but you cannot remove or change the preexisters. */
+    public Color(GLContext ctx, String vertShader, String fragShader) {
+      super(ctx, vertShader, fragShader);
       uColor = prog.getUniform4f("u_Color");
       uAlpha = prog.getUniform1f("u_Alpha");
     }
@@ -228,9 +242,9 @@ public abstract class IndexedTrisShader implements GLShader {
     ctx.checkGLError("Shader.flush DrawElements");
   }
 
-  protected IndexedTrisShader(GLContext ctx, String fragShader) {
+  protected IndexedTrisShader(GLContext ctx, String vertShader, String fragShader) {
     this.ctx = ctx;
-    this.prog = ctx.createProgram(VERTEX_SHADER, fragShader);
+    this.prog = ctx.createProgram(vertShader, fragShader);
 
     // determine our various shader program locations
     uScreenSize = prog.getUniform2f("u_ScreenSize");

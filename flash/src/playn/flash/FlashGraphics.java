@@ -39,6 +39,7 @@ import playn.core.SurfaceLayer;
 import playn.core.TextFormat;
 import playn.core.TextLayout;
 import playn.core.gl.GL20;
+import playn.core.gl.GLContext;
 
 class FlashGraphics implements Graphics {
 
@@ -212,6 +213,11 @@ class FlashGraphics implements Graphics {
   @Override
   public GL20 gl20() {
     throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public GLContext ctx() {
+    return null;
   }
 
   public void updateLayers() {

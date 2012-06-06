@@ -150,7 +150,7 @@ public class IOSGraphics extends GraphicsGL {
   }
 
   @Override
-  protected GLContext ctx() {
+  public GLContext ctx() {
     return ctx;
   }
 

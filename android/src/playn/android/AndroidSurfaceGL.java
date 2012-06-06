@@ -60,7 +60,7 @@ public class AndroidSurfaceGL extends SurfaceGL
         int bufferTex = actx.createTexture(false, false);
         actx.gl.glTexImage2D(GL20.GL_TEXTURE_2D, 0, GL20.GL_RGBA, texWidth, texHeight, 0,
                              GL20.GL_RGBA, GL20.GL_UNSIGNED_BYTE, pixelBuffer);
-        ctx.drawTexture(bufferTex, width, height, StockInternalTransform.IDENTITY, 0, height,
+        ctx.drawTexture(null, bufferTex, width, height, StockInternalTransform.IDENTITY, 0, height,
                         width, -height, false, false, 1);
         ctx.destroyTexture(bufferTex);
         pixelBuffer = null;

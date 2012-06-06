@@ -122,6 +122,10 @@ public class ImmediateLayerGL extends LayerGL implements ImmediateLayer {
   }
 
   protected void render(InternalTransform xform) {
+    surface.texShader = texShader;
+    surface.colorShader = colorShader;
     renderer.render(surface);
+    surface.texShader = null;
+    surface.colorShader = null;
   }
 }

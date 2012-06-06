@@ -141,7 +141,7 @@ class HtmlGraphicsGL extends HtmlGraphics {
   }
 
   @Override
-  HtmlGLContext ctx() {
+  public HtmlGLContext ctx() {
     return ctx;
   }
 

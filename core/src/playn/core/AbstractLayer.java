@@ -17,6 +17,7 @@ import pythagoras.f.Point;
 import pythagoras.f.Transform;
 
 import playn.core.Layer;
+import playn.core.gl.GLShader;
 
 /**
  * Base {@link Layer} implementation shared among platforms (to avoid reinventing the transform
@@ -220,6 +221,11 @@ public abstract class AbstractLayer implements Layer {
   @Override
   public Connection addListener(Touch.LayerListener listener) {
     return addInteractor(Touch.LayerListener.class, listener);
+  }
+
+  @Override
+  public void setShaders(GLShader.Texture texShader, GLShader.Color colorShader) {
+    // NOOP
   }
 
   // width() and height() exist so that we can share hitTest among all layer implementations;

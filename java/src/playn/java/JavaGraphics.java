@@ -137,7 +137,7 @@ public class JavaGraphics extends GraphicsGL {
   }
 
   @Override
-  protected GLContext ctx() {
+  public GLContext ctx() {
     return ctx;
   }
 

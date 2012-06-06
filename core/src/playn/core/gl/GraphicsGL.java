@@ -92,6 +92,4 @@ public abstract class GraphicsGL implements Graphics {
   protected SurfaceGL createSurface(float width, float height) {
     return new SurfaceGL(ctx(), width, height);
   }
-
-  protected abstract GLContext ctx();
 }

@@ -163,7 +163,7 @@ public abstract class ImageRegionGL extends ImageGL implements Image.Region {
     // render the parent texture into the framebuffer properly scaled
     ctx.bindFramebuffer(fbuf, width, height);
     ctx.clear(0, 0, 0, 0);
-    ctx.drawTexture(tex, texWidth(false), texHeight(false), ctx.createTransform(),
+    ctx.drawTexture(null, tex, texWidth(false), texHeight(false), ctx.createTransform(),
                     0, height, width, -height, this.x, this.y, this.width, this.height, 1);
 
     // we no longer need this framebuffer; rebind the default framebuffer and delete ours

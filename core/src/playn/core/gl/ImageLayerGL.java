@@ -122,7 +122,7 @@ public class ImageLayerGL extends LayerGL implements ImageLayer {
   public void paint(InternalTransform parentTransform, float parentAlpha) {
     if (!visible()) return;
 
-    img.draw(localTransform(parentTransform), 0, 0, width(), height(), repeatX, repeatY,
+    img.draw(texShader, localTransform(parentTransform), 0, 0, width(), height(), repeatX, repeatY,
              parentAlpha * alpha);
   }
 

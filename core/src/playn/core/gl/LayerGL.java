@@ -17,11 +17,21 @@ package playn.core.gl;
 
 import playn.core.AbstractLayer;
 import playn.core.InternalTransform;
+import playn.core.gl.GLShader;
 
 public abstract class LayerGL extends AbstractLayer {
-  private final InternalTransform savedLocal;
 
+  private final InternalTransform savedLocal;
   protected final GLContext ctx;
+
+  GLShader.Texture texShader;
+  GLShader.Color colorShader;
+
+  @Override
+  public void setShaders(GLShader.Texture texShader, GLShader.Color colorShader) {
+    this.texShader = texShader;
+    this.colorShader = colorShader;
+  }
 
   protected LayerGL(GLContext ctx) {
     super(ctx.createTransform());
