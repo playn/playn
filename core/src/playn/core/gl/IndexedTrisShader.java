@@ -22,6 +22,60 @@ import playn.core.InternalTransform;
  */
 public abstract class IndexedTrisShader implements GLShader {
 
+  /** The GLSL code for our vertex shader. */
+  public static final String VERTEX_SHADER =
+    "uniform vec2 u_ScreenSize;\n" +
+    "attribute vec4 a_Matrix;\n" +
+    "attribute vec2 a_Translation;\n" +
+    "attribute vec2 a_Position;\n" +
+    "attribute vec2 a_TexCoord;\n" +
+    "varying vec2 v_TexCoord;\n" +
+
+    "void main(void) {\n" +
+    // Transform the vertex.
+    "  mat3 transform = mat3(\n" +
+    "    a_Matrix[0], a_Matrix[1], 0,\n" +
+    "    a_Matrix[2], a_Matrix[3], 0,\n" +
+    "    a_Translation[0], a_Translation[1], 1);\n" +
+    "  gl_Position = vec4(transform * vec3(a_Position, 1.0), 1);\n" +
+    // Scale from screen coordinates to [0, 2].
+    "  gl_Position.x /= (u_ScreenSize.x / 2.0);\n" +
+    "  gl_Position.y /= (u_ScreenSize.y / 2.0);\n" +
+    // Offset to [-1, 1] and flip y axis to put origin at top-left.
+    "  gl_Position.x -= 1.0;\n" +
+    "  gl_Position.y = 1.0 - gl_Position.y;\n" +
+
+    "  v_TexCoord = a_TexCoord;\n" +
+    "}";
+
+  /** The GLSL code for our texture fragment shader. */
+  public static final String TEX_FRAG_SHADER =
+    "#ifdef GL_ES\n" +
+    "precision highp float;\n" +
+    "#endif\n" +
+
+    "uniform sampler2D u_Texture;\n" +
+    "varying vec2 v_TexCoord;\n" +
+    "uniform float u_Alpha;\n" +
+
+    "void main(void) {\n" +
+    "  vec4 textureColor = texture2D(u_Texture, v_TexCoord);\n" +
+    "  gl_FragColor = textureColor * u_Alpha;\n" +
+    "}";
+
+  /** The GLSL code for our color fragment shader. */
+  public static final String COLOR_FRAG_SHADER =
+    "#ifdef GL_ES\n" +
+    "precision highp float;\n" +
+    "#endif\n" +
+
+    "uniform vec4 u_Color;\n" +
+    "uniform float u_Alpha;\n" +
+
+    "void main(void) {\n" +
+    "  gl_FragColor = u_Color * u_Alpha;\n" +
+    "}";
+
   public static class Texture extends IndexedTrisShader implements GLShader.Texture {
     private final Uniform1i uTexture;
     private final Uniform1f uAlpha;
