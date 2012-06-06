@@ -48,6 +48,12 @@
       <version>4.8.1</version>
       <scope>test</scope>
     </dependency>
+    
+    <dependency>
+      <groupId>org.java_websocket</groupId>
+      <artifactId>websocket</artifactId>
+      <version>20120606</version>
+    </dependency>
   </dependencies>
 
   <build>
