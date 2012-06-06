@@ -244,7 +244,7 @@ public class IOSGLContext extends GLContext {
   void paintLayers(InternalTransform rootTransform, GroupLayerGL rootLayer) {
     checkGLError("updateLayers start");
     bindFramebuffer();
-    rootLayer.paint(rootTransform, 1); // paint all the layers
+    rootLayer.paint(rootTransform, 1, null, null); // paint all the layers
     checkGLError("updateLayers end");
     useShader(null); // guarantee a flush
   }
