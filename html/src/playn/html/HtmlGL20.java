@@ -404,7 +404,6 @@ public final class HtmlGL20 implements playn.core.gl.GL20 {
     gl.clear(mask);
   }
 
-
   @Override
   public final int glGetError() {
     return gl.getError();

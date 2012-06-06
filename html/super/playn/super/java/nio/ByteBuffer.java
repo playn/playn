@@ -77,7 +77,6 @@ public final class ByteBuffer extends Buffer implements Comparable<ByteBuffer>, 
       return buf;
     }
 
-
     /** Constructs a {@code ByteBuffer} with given capacity.
      *
      * @param capacity the capacity of the buffer. */

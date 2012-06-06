@@ -57,7 +57,6 @@ public final class IntBuffer extends Buffer
         return bb.asIntBuffer();
     }
 
-
     IntBuffer(ByteBuffer byteBuffer) {
       super((byteBuffer.capacity() >> 2));
       this.byteBuffer = byteBuffer;

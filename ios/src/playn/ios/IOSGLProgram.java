@@ -101,18 +101,6 @@ public class IOSGLProgram implements GLProgram {
     };
   }
 
-  // IntPtr vaddr = vertexHandle.AddrOfPinnedObject();
-  // long baseVAddr = vaddr.ToInt64();
-  // GL.VertexAttribPointer(aMatrix, 4, All.wrap(All.Float), false, VERTEX_STRIDE, vaddr);
-  // vaddr = new IntPtr(baseVAddr + 16);
-  // GL.VertexAttribPointer(aTranslation, 2, All.wrap(All.Float), false, VERTEX_STRIDE, vaddr);
-  // vaddr = new IntPtr(baseVAddr + 24);
-  // GL.VertexAttribPointer(aPosition, 2, All.wrap(All.Float), false, VERTEX_STRIDE, vaddr);
-  // if (aTexture != -1) {
-  //   vaddr = new IntPtr(baseVAddr + 32);
-  //   GL.VertexAttribPointer(aTexture, 2, All.wrap(All.Float), false, VERTEX_STRIDE, vaddr);
-  // }
-
   @Override
   public void bind() {
     GL.UseProgram(program);

@@ -25,7 +25,7 @@ import playn.core.Asserts;
 import playn.core.InternalTransform;
 
 /**
- * {@link GLBuffer} implementation based on {@core java.nio} and usable with {@link GL20}.
+ * {@link GLBuffer} implementation based on {@code java.nio} and usable with {@link GL20}.
  */
 public abstract class GL20Buffer implements GLBuffer {
 
