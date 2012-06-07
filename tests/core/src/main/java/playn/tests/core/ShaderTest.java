@@ -117,7 +117,7 @@ public class ShaderTest extends Test {
           "    0, 0, 0, 1);\n" +
           "  pos = persp * pos;\n" +
           "  pos /= pos.w;\n" +
-          "  pos += vec4(u_Eye, -pos.z, 0);\n;" +
+          "  pos += vec4(u_Eye, 0, 0);\n;" +
 
           // Transform the vertex per the normal screen transform
           "  mat4 transform = mat4(\n" +
@@ -128,6 +128,7 @@ public class ShaderTest extends Test {
           "  pos = transform * pos;\n" +
           "  pos.x /= (u_ScreenSize.x / 2.0);\n" +
           "  pos.y /= (u_ScreenSize.y / 2.0);\n" +
+          "  pos.z /= (u_ScreenSize.y / 2.0);\n" +
           "  pos.x -= 1.0;\n" +
           "  pos.y = 1.0 - pos.y;\n" +
           "  gl_Position = pos;\n" +
@@ -138,33 +139,29 @@ public class ShaderTest extends Test {
 
       @Override
       protected Core createTextureCore(GLContext ctx) {
-        return new ITCore(ctx, vertexShader(), textureFragmentShader()) {
-          private final Uniform1f uAngle = prog.getUniform1f("u_Angle");
-          private final Uniform2f uEye = prog.getUniform2f("u_Eye");
-
-          @Override
-          public void prepare(int fbufWidth, int fbufHeight) {
-            super.prepare(fbufWidth, fbufHeight);
-            uAngle.bind(elapsed * FloatMath.PI);
-            uEye.bind(0, orange.height()/2);
-          }
-        };
+        return new RotCore(ctx, vertexShader(), textureFragmentShader());
       }
 
       @Override
       protected Core createColorCore(GLContext ctx) {
-        return new ITCore(ctx, vertexShader(), colorFragmentShader()) {
-          private final Uniform1f uAngle = prog.getUniform1f("u_Angle");
-          private final Uniform2f uEye = prog.getUniform2f("u_Eye");
-
-          @Override
-          public void prepare(int fbufWidth, int fbufHeight) {
-            super.prepare(fbufWidth, fbufHeight);
-            uAngle.bind(elapsed * FloatMath.PI);
-            uEye.bind(0, orange.height()/2);
-          }
-        };
+        return new RotCore(ctx, vertexShader(), colorFragmentShader());
       }
+
+      class RotCore extends ITCore {
+        private final Uniform1f uAngle = prog.getUniform1f("u_Angle");
+        private final Uniform2f uEye = prog.getUniform2f("u_Eye");
+
+        public RotCore (GLContext ctx, String vertShader, String fragShader) {
+          super(ctx, vertShader, fragShader);
+        }
+
+        @Override
+        public void prepare(int fbufWidth, int fbufHeight) {
+          super.prepare(fbufWidth, fbufHeight);
+          uAngle.bind(elapsed * FloatMath.PI);
+          uEye.bind(0, orange.height()/2);
+        }
+      };
     };
 
     // add an image that is rotated around the (3D) y axis
