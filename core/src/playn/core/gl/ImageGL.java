@@ -148,6 +148,14 @@ public abstract class ImageGL implements Image {
    */
   protected abstract void updateTexture(int tex);
 
+  @Override
+  protected void finalize() {
+    if (tex > 0)
+      ctx.queueDestroyTexture(tex);
+    if (reptex > 0)
+      ctx.queueDeleteFramebuffer(reptex);
+  }
+
   private void loadTexture() {
     if (tex > 0)
       return;
