@@ -21,7 +21,9 @@ import playn.core.CanvasImage;
 import playn.core.Image;
 import playn.core.ImageLayer;
 import playn.core.ResourceCallback;
+import playn.core.ImmediateLayer;
 import playn.core.gl.GLContext;
+import playn.core.Surface;
 import playn.core.gl.IndexedTrisShader;
 import static playn.core.PlayN.*;
 
@@ -58,7 +60,7 @@ public class ShaderTest extends Test {
     });
   }
 
-  protected void init (Image orange) {
+  protected void init (final Image orange) {
     // add the normal orange
     float dx = orange.width() + 25;
     graphics().rootLayer().addAt(graphics().createImageLayer(orange), 25, 25);
@@ -84,14 +86,8 @@ public class ShaderTest extends Test {
     });
     graphics().rootLayer().addAt(olayer, 25+dx, 25);
 
-    // add an image that is rotated around the (3D) y axis
-    CanvasImage image = graphics().createImage(orange.width(), orange.height());
-    image.canvas().setFillColor(0xFF99CCFF);
-    image.canvas().fillRect(0, 0, image.width(), image.height());
-    image.canvas().drawImage(orange, 0, 0);
-    final ImageLayer rotlayer = graphics().createImageLayer(image);
-    rotlayer.setOrigin(0, image.height()/2);
-    rotlayer.setShader(new IndexedTrisShader(graphics().ctx()) {
+    // create a shader that rotates things around the (3D) y axis
+    IndexedTrisShader rotShader = new IndexedTrisShader(graphics().ctx()) {
       @Override protected String vertexShader() {
         return "uniform vec2 u_ScreenSize;\n" +
           "uniform float u_Angle;\n" +
@@ -150,12 +146,46 @@ public class ShaderTest extends Test {
           public void prepare(int fbufWidth, int fbufHeight) {
             super.prepare(fbufWidth, fbufHeight);
             uAngle.bind(elapsed * FloatMath.PI);
-            uEye.bind(rotlayer.originX(), rotlayer.originY());
+            uEye.bind(0, orange.height()/2);
           }
         };
       }
+
+      @Override
+      protected Core createColorCore(GLContext ctx) {
+        return new ITCore(ctx, vertexShader(), colorFragmentShader()) {
+          private final Uniform1f uAngle = prog.getUniform1f("u_Angle");
+          private final Uniform2f uEye = prog.getUniform2f("u_Eye");
+
+          @Override
+          public void prepare(int fbufWidth, int fbufHeight) {
+            super.prepare(fbufWidth, fbufHeight);
+            uAngle.bind(elapsed * FloatMath.PI);
+            uEye.bind(0, orange.height()/2);
+          }
+        };
+      }
+    };
+
+    // add an image that is rotated around the (3D) y axis
+    CanvasImage image = graphics().createImage(orange.width(), orange.height());
+    image.canvas().setFillColor(0xFF99CCFF);
+    image.canvas().fillRect(0, 0, image.width(), image.height());
+    image.canvas().drawImage(orange, 0, 0);
+    ImageLayer rotlayer = graphics().createImageLayer(image);
+    rotlayer.setShader(rotShader);
+    graphics().rootLayer().addAt(rotlayer, 25 + 2*dx + orange.width(), 25);
+
+    // add an immediate layer that draws a quad and an image (which should rotate)
+    ImmediateLayer irotlayer = graphics().createImmediateLayer(new ImmediateLayer.Renderer() {
+      public void render (Surface surf) {
+        surf.setFillColor(0xFFCC99FF);
+        surf.fillRect(0, 0, orange.width(), orange.height());
+        surf.drawImage(orange, 0, 0);
+      }
     });
-    graphics().rootLayer().addAt(rotlayer, 25 + 2*dx + rotlayer.width(), 25 + rotlayer.originY());
+    irotlayer.setShader(rotShader);
+    graphics().rootLayer().addAt(irotlayer, 25 + 3*dx + orange.width(), 25);
   }
 
   @Override
