@@ -24,22 +24,20 @@ import playn.core.InternalTransform;
 public abstract class AbstractShader implements GLShader {
 
   protected final GLContext ctx;
-  protected final Core texCore, colorCore;
-  protected final Extras texExtras, colorExtras;
-
-  protected Core curCore;
-  protected Extras curExtras;
+  protected Core texCore, colorCore, curCore;
+  protected Extras texExtras, colorExtras, curExtras;
 
   protected AbstractShader(GLContext ctx) {
     this.ctx = ctx;
-    this.texCore = createTextureCore(ctx);
-    this.colorCore = createColorCore(ctx);
-    this.texExtras = createTextureExtras(texCore.program());
-    this.colorExtras = createColorExtras(colorCore.program());
   }
 
   @Override
   public void prepareTexture(int tex, float alpha, int fbufWidth, int fbufHeight) {
+    // create our core lazily so that we ensure we're on the GL thread when it happens
+    if (texCore == null) {
+      this.texCore = createTextureCore(ctx);
+      this.texExtras = createTextureExtras(texCore.program());
+    }
     boolean wasntAlreadyActive = ctx.useShader(this, curCore != texCore);
     if (wasntAlreadyActive) {
       curCore = texCore;
@@ -51,6 +49,11 @@ public abstract class AbstractShader implements GLShader {
 
   @Override
   public void prepareColor(int color, float alpha, int fbufWidth, int fbufHeight) {
+    // create our core lazily so that we ensure we're on the GL thread when it happens
+    if (colorCore == null) {
+      this.colorCore = createColorCore(ctx);
+      this.colorExtras = createColorExtras(colorCore.program());
+    }
     boolean wasntAlreadyActive = ctx.useShader(this, curCore != colorCore);
     if (wasntAlreadyActive) {
       curCore = colorCore;
