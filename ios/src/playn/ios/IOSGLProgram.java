@@ -27,10 +27,47 @@ import static playn.core.PlayN.log;
 
 public class IOSGLProgram implements GLProgram {
 
-  private final int program;
+  private final int program, vertexShader, fragmentShader;
 
-  public IOSGLProgram(IOSGLContext ctx, String vertShader, String fragShader) {
-    this.program = createProgram(ctx, vertShader, fragShader);
+  public IOSGLProgram(IOSGLContext ctx, String vertexSource, String fragmentSource) {
+    int program = 0, vertexShader = 0, fragmentShader = 0;
+    try {
+      program = GL.CreateProgram();
+      if (program == 0)
+        throw new RuntimeException("Failed to create program: " + GL.GetError());
+
+      vertexShader = compileShader(All.wrap(All.VertexShader), vertexSource);
+      GL.AttachShader(program, vertexShader);
+      ctx.checkGLError("Attached vertex shader");
+
+      fragmentShader = compileShader(All.wrap(All.FragmentShader), fragmentSource);
+      GL.AttachShader(program, fragmentShader);
+      ctx.checkGLError("Attached fragment shader");
+
+      GL.LinkProgram(program);
+      int[] linkStatus = new int[1];
+      GL.GetProgram(program, All.wrap(All.LinkStatus), linkStatus);
+      if (linkStatus[0] != All.True) {
+        int[] llength = new int[1];
+        GL.GetProgram(program, All.wrap(All.InfoLogLength), llength);
+        cli.System.Text.StringBuilder log = new cli.System.Text.StringBuilder(llength[0]);
+        GL.GetProgramInfoLog(program, llength[0], llength, log);
+        throw new RuntimeException("Failed to link program: " + log.ToString());
+      }
+
+      this.program = program;
+      this.vertexShader = vertexShader;
+      this.fragmentShader = fragmentShader;
+      program = vertexShader = fragmentShader = 0;
+
+    } finally {
+      if (program != 0)
+        GL.DeleteProgram(program);
+      if (vertexShader != 0)
+        GL.DeleteShader(vertexShader);
+      if (fragmentShader != 0)
+        GL.DeleteShader(program);
+    }
   }
 
   @Override
@@ -106,55 +143,29 @@ public class IOSGLProgram implements GLProgram {
     GL.UseProgram(program);
   }
 
-  protected int createProgram(IOSGLContext ctx, String vertexSource, String fragmentSource) {
-    int vertexShader = loadShader(All.wrap(All.VertexShader), vertexSource);
-    int fragmentShader = loadShader(All.wrap(All.FragmentShader), fragmentSource);
-    int program = GL.CreateProgram();
-    if (program == 0)
-      throw new RuntimeException("Unable to create GL program: " + GL.GetError());
-
-    GL.AttachShader(program, vertexShader);
-    ctx.checkGLError("createProgram Attaching vertex shader");
-    GL.AttachShader(program, fragmentShader);
-    ctx.checkGLError("createProgram Attaching fragment shader");
-    GL.LinkProgram(program);
-
-    int[] linkStatus = new int[1];
-    GL.GetProgram(program, All.wrap(All.LinkStatus), linkStatus);
-    if (linkStatus[0] == All.True)
-      return program;
-
-    int[] llength = new int[1];
-    GL.GetProgram(program, All.wrap(All.InfoLogLength), llength);
-    cli.System.Text.StringBuilder log = new cli.System.Text.StringBuilder(llength[0]);
-    GL.GetProgramInfoLog(program, llength[0], llength, log);
-
-    log().error("Could not link program: ");
-    log().error(log.ToString());
+  @Override
+  public void destroy() {
+    GL.DeleteShader(vertexShader);
+    GL.DeleteShader(fragmentShader);
     GL.DeleteProgram(program);
-    return 0;
   }
 
-  private int loadShader(All type, final String shaderSource) {
+  private int compileShader(All type, final String shaderSource) {
     int shader = GL.CreateShader(type);
     if (shader == 0)
-      throw new RuntimeException("Unable to create GL shader: " + GL.GetError());
+      throw new RuntimeException("Failed to create shader: " + GL.GetError());
     GL.ShaderSource(shader, 1, new String[] { shaderSource }, null);
     GL.CompileShader(shader);
-
     int[] compiled = new int[1];
     GL.GetShader(shader, All.wrap(All.CompileStatus), compiled);
-    if (compiled[0] != All.False)
-      return shader;
-
-    int[] llength = new int[1];
-    GL.GetShader(shader, All.wrap(All.InfoLogLength), llength);
-    cli.System.Text.StringBuilder log = new cli.System.Text.StringBuilder(llength[0]);
-    GL.GetShaderInfoLog(shader, llength[0], llength, log);
-
-    log().error("Could not compile shader " + type + ":");
-    log().error(log.ToString());
-    GL.DeleteShader(shader);
-    return 0;
+    if (compiled[0] == All.False) {
+      int[] llength = new int[1];
+      GL.GetShader(shader, All.wrap(All.InfoLogLength), llength);
+      cli.System.Text.StringBuilder log = new cli.System.Text.StringBuilder(llength[0]);
+      GL.GetShaderInfoLog(shader, llength[0], llength, log);
+      GL.DeleteShader(shader);
+      throw new RuntimeException("Failed to compile shader (" + type + "): " + log.ToString());
+    }
+    return shader;
   }
 }

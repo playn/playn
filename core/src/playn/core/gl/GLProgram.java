@@ -45,4 +45,8 @@ public interface GLProgram {
 
   /** Binds this shader program, in preparation for rendering. */
   void bind();
+
+  /** Frees this program and associated compiled shaders. The program must not be used after
+   * destruction. */
+  void destroy();
 }
