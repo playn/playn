@@ -22,8 +22,19 @@ import pythagoras.f.Point;
  */
 public abstract class PointerImpl implements Pointer {
 
+  private boolean enabled;
   private Listener listener;
   private AbstractLayer activeLayer;
+
+  @Override
+  public boolean isEnabled() {
+    return enabled;
+  }
+
+  @Override
+  public void setEnabled(boolean enabled) {
+    this.enabled = enabled;
+  }
 
   @Override
   public void setListener(Listener listener) {
@@ -31,6 +42,9 @@ public abstract class PointerImpl implements Pointer {
   }
 
   protected boolean onPointerStart(Event.Impl event, boolean preventDefault) {
+    if (!enabled)
+      return preventDefault;
+
     if (listener != null) {
       event.setPreventDefault(preventDefault);
       listener.onPointerStart(event);
@@ -59,6 +73,9 @@ public abstract class PointerImpl implements Pointer {
   }
 
   protected boolean onPointerDrag(Event.Impl event, boolean preventDefault) {
+    if (!enabled)
+      return preventDefault;
+
     if (listener != null) {
       event.setPreventDefault(preventDefault);
       listener.onPointerDrag(event);
@@ -79,6 +96,9 @@ public abstract class PointerImpl implements Pointer {
   }
 
   protected boolean onPointerEnd(Event.Impl event, boolean preventDefault) {
+    if (!enabled)
+      return preventDefault;
+
     if (listener != null) {
       event.setPreventDefault(preventDefault);
       listener.onPointerEnd(event);

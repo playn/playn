@@ -87,6 +87,18 @@ public interface Pointer {
   }
 
   /**
+   * Returns true if pointer interaction is enabled, false if not. Interaction is enabled by default.
+   * See {@link #setEnabled}.
+   */
+  boolean isEnabled();
+
+  /**
+   * Allows pointer interaction to be temporarily disabled. No pointer events will be dispatched
+   * whilst this big switch is in the off position.
+   */
+  void setEnabled(boolean enabled);
+
+  /**
    * Sets the listener that will receive pointer events. Setting the listener to {@code null} will
    * cause pointer events to stop being fired.
    */

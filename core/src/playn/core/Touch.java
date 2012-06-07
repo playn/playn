@@ -173,6 +173,18 @@ public interface Touch {
   boolean hasTouch();
 
   /**
+   * Returns true if touch interaction is enabled, false if not. Interaction is enabled by default.
+   * See {@link #setEnabled}.
+   */
+  boolean isEnabled();
+
+  /**
+   * Allows touch interaction to be temporarily disabled. No touch events will be dispatched whilst
+   * this big switch is in the off position.
+   */
+  void setEnabled(boolean enabled);
+
+  /**
    * Sets the listener that will receive touch events. Setting the listener to
    * <code>null</code> will cause touch events to stop being fired.
    */

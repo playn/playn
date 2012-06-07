@@ -24,6 +24,7 @@ public class TouchImpl implements Touch {
 
   private static final int MAX_ACTIVE_LAYERS = 32;
 
+  private boolean enabled;
   private Listener listener;
   private AbstractLayer[] activeLayers = new AbstractLayer[0];
 
@@ -33,11 +34,24 @@ public class TouchImpl implements Touch {
   }
 
   @Override
+  public boolean isEnabled() {
+    return enabled;
+  }
+
+  @Override
+  public void setEnabled(boolean enabled) {
+    this.enabled = enabled;
+  }
+
+  @Override
   public void setListener(Listener listener) {
     this.listener = listener;
   }
 
   public void onTouchStart(Event.Impl[] touches) {
+    if (!enabled)
+      return;
+
     if (listener != null)
       listener.onTouchStart(touches);
 
@@ -65,6 +79,9 @@ public class TouchImpl implements Touch {
   }
 
   public void onTouchMove(Event.Impl[] touches) {
+    if (!enabled)
+      return;
+
     if (listener != null)
       listener.onTouchMove(touches);
 
@@ -84,6 +101,9 @@ public class TouchImpl implements Touch {
   }
 
   public void onTouchEnd(Event.Impl[] touches) {
+    if (!enabled)
+      return;
+
     if (listener != null)
       listener.onTouchEnd(touches);
 

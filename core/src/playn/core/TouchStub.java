@@ -18,15 +18,10 @@ package playn.core;
 /**
  * A NOOP touch service for use on platforms that don't support touch interaction.
  */
-public class TouchStub implements Touch {
+public class TouchStub extends TouchImpl {
 
   @Override
   public boolean hasTouch() {
     return false;
-  }
-
-  @Override
-  public void setListener(Listener listener) {
-    // noop!
   }
 }

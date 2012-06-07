@@ -22,6 +22,7 @@ import pythagoras.f.Point;
  */
 public abstract class MouseImpl implements Mouse {
 
+  private boolean enabled;
   private Listener listener;
   private AbstractLayer activeLayer;
   private AbstractLayer hoverLayer;
@@ -29,6 +30,16 @@ public abstract class MouseImpl implements Mouse {
   @Override
   public boolean hasMouse() {
     return true;
+  }
+
+  @Override
+  public boolean isEnabled() {
+    return enabled;
+  }
+
+  @Override
+  public void setEnabled(boolean enabled) {
+    this.enabled = enabled;
   }
 
   @Override
@@ -57,6 +68,9 @@ public abstract class MouseImpl implements Mouse {
   }
 
   protected boolean onMouseDown(ButtonEvent.Impl event) {
+    if (!enabled)
+      return false;
+
     boolean preventDefault = false;
     if (listener != null) {
       event.setPreventDefault(preventDefault);
@@ -86,6 +100,9 @@ public abstract class MouseImpl implements Mouse {
   }
 
   protected boolean onMouseMove(MotionEvent.Impl event) {
+    if (!enabled)
+      return false;
+
     boolean preventDefault = false;
     if (listener != null) {
       event.setPreventDefault(preventDefault);
@@ -143,6 +160,9 @@ public abstract class MouseImpl implements Mouse {
   }
 
   protected boolean onMouseUp(ButtonEvent.Impl event) {
+    if (!enabled)
+      return false;
+
     boolean preventDefault = false;
     if (listener != null) {
       event.setPreventDefault(preventDefault);
@@ -166,6 +186,9 @@ public abstract class MouseImpl implements Mouse {
   }
 
   protected boolean onMouseWheelScroll(final WheelEvent.Impl event) {
+    if (!enabled)
+      return false;
+
     event.setPreventDefault(false);
     if (listener != null)
       listener.onMouseWheelScroll(event);

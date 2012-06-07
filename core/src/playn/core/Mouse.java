@@ -289,6 +289,18 @@ public interface Mouse {
   boolean hasMouse();
 
   /**
+   * Returns true if mouse interaction is enabled, false if not. Interaction is enabled by default.
+   * See {@link #setEnabled}.
+   */
+  boolean isEnabled();
+
+  /**
+   * Allows mouse interaction to be temporarily disabled. No mouse events will be dispatched whilst
+   * this big switch is in the off position.
+   */
+  void setEnabled(boolean enabled);
+
+  /**
    * Sets the listener that will receive mouse events. Setting the listener to
    * <code>null</code> will cause mouse events to stop being fired.
    */
