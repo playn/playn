@@ -24,7 +24,7 @@ public class TouchImpl implements Touch {
 
   private static final int MAX_ACTIVE_LAYERS = 32;
 
-  private boolean enabled;
+  private boolean enabled = true;
   private Listener listener;
   private AbstractLayer[] activeLayers = new AbstractLayer[0];
 

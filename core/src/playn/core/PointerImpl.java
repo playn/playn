@@ -22,7 +22,7 @@ import pythagoras.f.Point;
  */
 public abstract class PointerImpl implements Pointer {
 
-  private boolean enabled;
+  private boolean enabled = true;
   private Listener listener;
   private AbstractLayer activeLayer;
 

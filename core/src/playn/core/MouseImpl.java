@@ -22,7 +22,7 @@ import pythagoras.f.Point;
  */
 public abstract class MouseImpl implements Mouse {
 
-  private boolean enabled;
+  private boolean enabled = true;
   private Listener listener;
   private AbstractLayer activeLayer;
   private AbstractLayer hoverLayer;
