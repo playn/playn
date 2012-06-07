@@ -183,6 +183,10 @@ public class IOSPlatform implements Platform {
 
     mainWindow = new UIWindow(bounds);
     mainWindow.Add(gameView = new IOSGameView(this, bounds, deviceScale));
+
+    // configure our orientation to a supported default, a notification will come in later that
+    // will adjust us to the device's current orientation
+    onOrientationChange(orients.defaultOrient);
   }
 
   @Override
@@ -290,9 +294,6 @@ public class IOSPlatform implements Platform {
 
   void viewDidInit(int defaultFrameBuffer) {
     graphics.ctx.viewDidInit(defaultFrameBuffer);
-    // configure our orientation to a supported default, a notification will come in later that
-    // will adjust us to the device's current orientation
-    onOrientationChange(orients.defaultOrient);
   }
 
   void onOrientationChange(UIDeviceOrientation orientation) {
