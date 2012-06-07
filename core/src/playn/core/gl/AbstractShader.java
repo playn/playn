@@ -15,6 +15,7 @@
  */
 package playn.core.gl;
 
+import playn.core.Asserts;
 import playn.core.InternalTransform;
 
 /**
@@ -24,6 +25,7 @@ import playn.core.InternalTransform;
 public abstract class AbstractShader implements GLShader {
 
   protected final GLContext ctx;
+  protected int refs;
   protected Core texCore, colorCore, curCore;
   protected Extras texExtras, colorExtras, curExtras;
 
@@ -96,6 +98,44 @@ public abstract class AbstractShader implements GLShader {
     curCore.addTriangles(local, xys, sxys, indices);
   }
 
+  @Override
+  public void reference() {
+    refs++;
+  }
+
+  @Override
+  public void release() {
+    Asserts.checkState(refs > 0, "Released an shader with no references!");
+    if (--refs == 0) {
+      clearProgram();
+    }
+  }
+
+  @Override
+  public void clearProgram() {
+    if (texCore != null) {
+      texCore.destroy();
+      texExtras.destroy();
+      texCore = null;
+      texExtras = null;
+    }
+    if (colorCore != null) {
+      colorCore.destroy();
+      colorExtras.destroy();
+      colorCore = null;
+      colorExtras = null;
+    }
+    curCore = null;
+    curExtras = null;
+  }
+
+  @Override
+  protected void finalize() {
+    if (texCore != null || colorCore != null) {
+      ctx.queueClearShader(this);
+    }
+  }
+
   /** Implements the core of the indexed tris shader. */
   protected static abstract class Core {
     /** Returns this core's shader program. */
@@ -121,6 +161,11 @@ public abstract class AbstractShader implements GLShader {
     /** See {@link GLShader#addTriangles}. */
     public abstract void addTriangles(InternalTransform local,
                                       float[] xys, float[] sxys, int[] indices);
+
+    /** Destroys this core's shader program and any other GL resources it maintains. */
+    public void destroy() {
+      program().destroy();
+    }
   }
 
   /** Handles the extra bits needed when we're using textures or flat color. */
@@ -128,8 +173,11 @@ public abstract class AbstractShader implements GLShader {
     /** Performs additional binding to prepare for a texture or color render. */
     public abstract void prepare(int texOrColor, float alpha, boolean wasntAlreadyActive);
 
-    /** Called prior to flushing this shader. */
-    public void willFlush() {} // NOOP by default
+    /** Called prior to flushing this shader. Defaults to NOOP. */
+    public void willFlush() {}
+
+    /** Destroys any GL resources maintained by this extras. Defaults to NOOP. */
+    public void destroy() {}
   }
 
   protected abstract Core createTextureCore(GLContext ctx);

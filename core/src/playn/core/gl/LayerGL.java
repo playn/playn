@@ -28,7 +28,19 @@ public abstract class LayerGL extends AbstractLayer {
 
   @Override
   public void setShader(GLShader shader) {
+    if (this.shader != null) {
+      this.shader.release();
+    }
     this.shader = shader;
+    if (this.shader != null) {
+      this.shader.reference();
+    }
+  }
+
+  @Override
+  public void destroy() {
+    super.destroy();
+    setShader(null);
   }
 
   protected LayerGL(GLContext ctx) {

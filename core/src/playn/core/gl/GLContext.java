@@ -122,6 +122,15 @@ public abstract class GLContext {
     });
   }
 
+  /** Queues a custom shader to be cleaned up on the GL thread. */
+  public void queueClearShader(final GLShader shader) {
+    platform.invokeLater(new Runnable() {
+      public void run() {
+        shader.clearProgram();
+      }
+    });
+  }
+
   /** Creates an identity transform, which may subsequently be mutated. */
   public InternalTransform createTransform() {
     return new StockInternalTransform();

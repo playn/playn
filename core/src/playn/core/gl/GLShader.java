@@ -120,6 +120,29 @@ public interface GLShader {
    */
   void addTriangles(InternalTransform local, float[] xys, float[] sxys, int[] indices);
 
+  /**
+   * Notes that this shader is in use by a layer. This is used for reference counted resource
+   * management. When all layers release a shader, it can destroy its shader programs and release
+   * the GL resources it uses.
+   */
+  void reference();
+
+  /**
+   * Notes that this shader is no longer in use by a layer. This is used for reference counted
+   * resource management. When all layers release a shader, it can destroy its shader programs and
+   * release the GL resources it uses.
+   */
+  void release();
+
+  /**
+   * Destroys this shader's programs and releases any GL resources. The programs will be recreated
+   * if the shader is used again. If a shader is used in a {@link Surface}, where it cannot be
+   * reference counted, the caller may wish to manually clear its GL resources when it knows the
+   * shader will no longer be used. Alternatively, the resources will be reclaimed when this shader
+   * is garbage collected.
+   */
+  void clearProgram();
+
   /** The GLSL code for quad-specific vertex shader. */
   String QUAD_VERTEX_SHADER =
   "uniform mat4 dataMatrix[64];\n" +
