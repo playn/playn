@@ -1172,7 +1172,7 @@ final class JavaGL20 implements playn.core.gl.GL20 {
 
   @Override
   public void glGetAttachedShaders(int program, int maxcount, IntBuffer count, IntBuffer shaders) {
-    GL20.glGetAttachedShaders(program, (IntBuffer) count, shaders);
+    GL20.glGetAttachedShaders(program, count, shaders);
   }
 
   @Override
@@ -1185,7 +1185,7 @@ final class JavaGL20 implements playn.core.gl.GL20 {
 
   @Override
   public void glGetBooleanv(int pname, ByteBuffer params) {
-    GL11.glGetBoolean(pname, (ByteBuffer) params);
+    GL11.glGetBoolean(pname, params);
   }
 
   @Override
