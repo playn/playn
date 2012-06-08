@@ -48,7 +48,7 @@
       <version>4.8.1</version>
       <scope>test</scope>
     </dependency>
-    
+
     <dependency>
       <groupId>org.java_websocket</groupId>
       <artifactId>websocket</artifactId>
@@ -120,4 +120,3 @@
     </pluginManagement>
   </build>
 </project>
-

@@ -24,6 +24,11 @@ public abstract class NetImpl implements Net {
 
   private final Platform platform;
 
+  @Override
+  public WebSocket createWebSocket(String url, WebSocket.Listener listener) {
+    throw new UnsupportedOperationException();
+  }
+
   protected NetImpl(Platform platform) {
     this.platform = platform;
   }
@@ -42,10 +47,5 @@ public abstract class NetImpl implements Net {
         callback.onFailure(cause);
       }
     });
-  }
-  
-  @Override
-  public WebSocket createWebSocket(String url, WebSocket.Listener listener) {
-    throw new UnsupportedOperationException();
   }
 }

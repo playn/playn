@@ -15,11 +15,6 @@
  */
 package playn.java;
 
-import playn.core.Net;
-import playn.core.WebSocket;
-import playn.core.WebSocket.Listener;
-import playn.core.util.Callback;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -31,18 +26,21 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class JavaNet implements Net {
+import playn.core.NetImpl;
+import playn.core.WebSocket;
+import playn.core.util.Callback;
+
+public class JavaNet extends NetImpl {
 
   private static final int BUF_SIZE = 4096;
-  private final JavaPlatform platform;
   private List<JavaWebSocket> sockets = new ArrayList<JavaWebSocket>();
 
   public JavaNet(JavaPlatform platform) {
-    this.platform = platform;
+    super(platform);
   }
 
   @Override
-  public WebSocket createWebSocket(String url, Listener listener) {
+  public WebSocket createWebSocket(String url, WebSocket.Listener listener) {
     JavaWebSocket socket = new JavaWebSocket(url, listener);
     sockets.add(socket);
     return socket;
@@ -57,7 +55,6 @@ public class JavaNet implements Net {
           URL url = new URL(canonicalizeUrl(urlStr));
           InputStream stream = url.openStream();
           InputStreamReader reader = new InputStreamReader(stream);
-
           notifySuccess(callback, readFully(reader));
 
         } catch (MalformedURLException e) {
@@ -129,21 +126,5 @@ public class JavaNet implements Net {
       result.append(buf, 0, len);
     }
     return result.toString();
-  }
-
-  private void notifySuccess(final Callback<String> callback, final String result) {
-    platform.invokeLater(new Runnable() {
-      public void run() {
-        callback.onSuccess(result);
-      }
-    });
-  }
-
-  private void notifyFailure(final Callback<String> callback, final Throwable cause) {
-    platform.invokeLater(new Runnable() {
-      public void run() {
-        callback.onFailure(cause);
-      }
-    });
   }
 }

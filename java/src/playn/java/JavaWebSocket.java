@@ -24,37 +24,39 @@ import java.util.Queue;
 import org.java_websocket.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
 
-public class JavaWebSocket implements playn.core.WebSocket {
+import playn.core.WebSocket;
+
+public class JavaWebSocket implements WebSocket {
 
   private abstract class Event {
-      abstract boolean handle();
+    abstract boolean handle();
   }
 
   private class OpenEvent extends Event {
-      boolean handle() {
-        listener.onOpen();
-        return true;
-      }
+    boolean handle() {
+      listener.onOpen();
+      return true;
+    }
   }
 
   private class CloseEvent extends Event {
-      boolean handle() {
-          listener.onClose();
-          return false;
-      }
+    boolean handle() {
+      listener.onClose();
+      return false;
+    }
   }
 
   private class DataMessageEvent extends Event {
-      ByteBuffer dataMessage;
+    ByteBuffer dataMessage;
 
-      DataMessageEvent(ByteBuffer buffer) {
-          dataMessage = buffer;
-      }
-      
-      boolean handle() {
-        listener.onDataMessage(dataMessage);
-        return true;
-      }
+    DataMessageEvent(ByteBuffer buffer) {
+      dataMessage = buffer;
+    }
+
+    boolean handle() {
+      listener.onDataMessage(dataMessage);
+      return true;
+    }
   }
 
   private class TextMessageEvent extends Event {
@@ -68,24 +70,24 @@ public class JavaWebSocket implements playn.core.WebSocket {
       listener.onTextMessage(textMessage);
       return true;
     }
-}
+  }
 
   private class ErrorEvent extends Event {
-      final String reason;
+    final String reason;
 
-      ErrorEvent(String reason) {
-          this.reason = reason;
-      }
+    ErrorEvent(String reason) {
+      this.reason = reason;
+    }
 
-      boolean handle() {
-        listener.onError(reason);
-        return true;
-      }
+    boolean handle() {
+      listener.onError(reason);
+      return true;
+    }
   }
 
   private final WebSocketClient socket;
-  private final playn.core.WebSocket.Listener listener;
-  private Queue<Event> pendingEvents = new LinkedList<Event>();
+  private final WebSocket.Listener listener;
+  private final Queue<Event> pendingEvents = new LinkedList<Event>();
 
   JavaWebSocket(String uri, Listener listener) {
     this.listener = listener;
