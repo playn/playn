@@ -31,6 +31,7 @@ public class GL20Context extends GLContext {
 
   private final boolean checkErrors;
   private final InternalTransform rootXform;
+  private int minFilter = GL_LINEAR, magFilter = GL_LINEAR;
   private GLShader shader;
 
   public GL20Context(Platform platform, GL20 gl, float scaleFactor,
@@ -72,6 +73,12 @@ public class GL20Context extends GLContext {
   }
 
   @Override
+  public void setTextureFilter (Filter minFilter, Filter magFilter) {
+    this.minFilter = toGL(minFilter);
+    this.magFilter = toGL(magFilter);
+  }
+
+  @Override
   public GLProgram createProgram(String vertShader, String fragShader) {
     return new GL20Program(this, gl, vertShader, fragShader);
   }
@@ -96,8 +103,8 @@ public class GL20Context extends GLContext {
     int[] tex = new int[1];
     gl.glGenTextures(1, tex, 0);
     gl.glBindTexture(GL_TEXTURE_2D, tex[0]);
-    gl.glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    gl.glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    gl.glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, magFilter);
+    gl.glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, minFilter);
     gl.glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, repeatX ? GL_REPEAT : GL_CLAMP_TO_EDGE);
     gl.glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, repeatY ? GL_REPEAT : GL_CLAMP_TO_EDGE);
     return tex[0];
@@ -184,5 +191,13 @@ public class GL20Context extends GLContext {
   @Override
   protected GLShader trisShader() {
     return shader;
+  }
+
+  private static int toGL(Filter filter) {
+    switch (filter) {
+    default:
+    case  LINEAR: return GL_LINEAR;
+    case NEAREST: return GL_NEAREST;
+    }
   }
 }

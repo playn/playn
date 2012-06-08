@@ -41,8 +41,8 @@ public class IOSGLContext extends GLContext {
   public static final boolean CHECK_ERRORS = false;
 
   int orient;
+  private int minFilter = All.Linear, magFilter = All.Linear;
   private int defaultFrameBuffer = -1; // configured in init()
-
   private GLShader shader;
 
   public IOSGLContext(IOSPlatform platform, float scaleFactor, int screenWidth, int screenHeight) {
@@ -57,6 +57,12 @@ public class IOSGLContext extends GLContext {
     GL.BlendFunc(All.wrap(All.One), All.wrap(All.OneMinusSrcAlpha));
     GL.ClearColor(0, 0, 0, 1);
     shader = new IndexedTrisShader(this);
+  }
+
+  @Override
+  public void setTextureFilter (Filter minFilter, Filter magFilter) {
+    this.minFilter = toGL(minFilter);
+    this.magFilter = toGL(magFilter);
   }
 
   @Override
@@ -85,8 +91,8 @@ public class IOSGLContext extends GLContext {
     GL.GenTextures(1, texw);
     int tex = texw[0];
     GL.BindTexture(All.wrap(All.Texture2D), tex);
-    GL.TexParameter(All.wrap(All.Texture2D), All.wrap(All.TextureMinFilter), All.Linear);
-    GL.TexParameter(All.wrap(All.Texture2D), All.wrap(All.TextureMagFilter), All.Linear);
+    GL.TexParameter(All.wrap(All.Texture2D), All.wrap(All.TextureMinFilter), minFilter);
+    GL.TexParameter(All.wrap(All.Texture2D), All.wrap(All.TextureMagFilter), magFilter);
     GL.TexParameter(All.wrap(All.Texture2D), All.wrap(All.TextureWrapS),
                     repeatX ? All.Repeat : All.ClampToEdge);
     GL.TexParameter(All.wrap(All.Texture2D), All.wrap(All.TextureWrapT),
@@ -237,5 +243,13 @@ public class IOSGLContext extends GLContext {
     rootLayer.paint(rootTransform, 1, null); // paint all the layers
     checkGLError("updateLayers end");
     useShader(null, false); // guarantee a flush
+  }
+
+  private static int toGL(Filter filter) {
+    switch (filter) {
+    default:
+    case  LINEAR: return All.Linear;
+    case NEAREST: return All.Nearest;
+    }
   }
 }

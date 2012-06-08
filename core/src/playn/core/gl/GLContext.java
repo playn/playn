@@ -19,6 +19,9 @@ import playn.core.StockInternalTransform;
 
 public abstract class GLContext {
 
+  /** Used to configure texture image scaling. */
+  public static enum Filter { LINEAR, NEAREST };
+
   private final Platform platform;
   private GLShader curShader;
   private int lastFramebuffer;
@@ -46,6 +49,14 @@ public abstract class GLContext {
     curFbufHeight = defaultFbufHeight = scale.scaledCeil(height);
     viewWasResized();
   }
+
+  /**
+   * Configures the filter function used when rendering scaled textures.
+   *
+   * @param minFilter the scaling to use when rendering textures that are scaled down.
+   * @param magFilter the scaling to use when rendering textures that are scaled up.
+   */
+  public abstract void setTextureFilter (Filter minFilter, Filter magFilter);
 
   /**
    * Creates a shader program, for use by a single {@link GLShader}.
