@@ -48,34 +48,6 @@ public class IndexedTrisShader extends AbstractShader {
     "  v_TexCoord = a_TexCoord;\n" +
     "}";
 
-  /** The GLSL code for our texture fragment shader. */
-  public static final String TEX_FRAG_SHADER =
-    "#ifdef GL_ES\n" +
-    "precision highp float;\n" +
-    "#endif\n" +
-
-    "uniform sampler2D u_Texture;\n" +
-    "varying vec2 v_TexCoord;\n" +
-    "uniform float u_Alpha;\n" +
-
-    "void main(void) {\n" +
-    "  vec4 textureColor = texture2D(u_Texture, v_TexCoord);\n" +
-    "  gl_FragColor = textureColor * u_Alpha;\n" +
-    "}";
-
-  /** The GLSL code for our color fragment shader. */
-  public static final String COLOR_FRAG_SHADER =
-    "#ifdef GL_ES\n" +
-    "precision highp float;\n" +
-    "#endif\n" +
-
-    "uniform vec4 u_Color;\n" +
-    "uniform float u_Alpha;\n" +
-
-    "void main(void) {\n" +
-    "  gl_FragColor = u_Color * u_Alpha;\n" +
-    "}";
-
   private static final int VERTEX_SIZE = 10; // 10 floats per vertex
   private static final int START_VERTS = 16*4;
   private static final int EXPAND_VERTS = 16*4;
@@ -89,14 +61,6 @@ public class IndexedTrisShader extends AbstractShader {
   }
 
   /**
-   * Creates an indexed triangles shader with customized vertex and fragment shader programs.
-   */
-  public IndexedTrisShader(GLContext ctx, String vertShader,
-                           String texFragShader, String colorFragShader) {
-    super(ctx);
-  }
-
-  /**
    * Returns the vertex shader program. Note that this program <em>must</em> preserve the use of
    * the existing attributes and uniforms. You can add new uniforms and attributes, but you cannot
    * remove or change the defaults.
@@ -105,45 +69,25 @@ public class IndexedTrisShader extends AbstractShader {
     return VERTEX_SHADER;
   }
 
-  /**
-   * Returns the texture fragment shader program. Note that this program <em>must</em> preserve the
-   * use of the existing varying attributes. You can add new varying attributes, but you cannot
-   * remove or change the defaults.
-   */
-  protected String textureFragmentShader() {
-    return TEX_FRAG_SHADER;
-  }
-
-  /**
-   * Returns the color fragment shader program. Note that this program <em>must</em> preserve the
-   * use of the existing varying attributes. You can add new varying attributes, but you cannot
-   * remove or change the defaults.
-   */
-  protected String colorFragmentShader() {
-    return COLOR_FRAG_SHADER;
+  @Override
+  protected Core createTextureCore() {
+    return new ITCore(this, vertexShader(), textureFragmentShader());
   }
 
   @Override
-  protected Core createTextureCore(GLContext ctx) {
-    return new ITCore(ctx, vertexShader(), textureFragmentShader());
-  }
-
-  @Override
-  protected Core createColorCore(GLContext ctx) {
-    return new ITCore(ctx, vertexShader(), colorFragmentShader());
+  protected Core createColorCore() {
+    return new ITCore(this, vertexShader(), colorFragmentShader());
   }
 
   protected class ITCore extends Core {
-    public final GLProgram prog;
-
     private final Uniform2f uScreenSize;
     private final Attrib aMatrix, aTranslation, aPosition, aTexCoord;
 
     private final GLBuffer.Float vertices;
     private final GLBuffer.Short elements;
 
-    public ITCore(GLContext ctx, String vertShader, String fragShader) {
-      prog = ctx.createProgram(vertShader, fragShader);
+    public ITCore(AbstractShader shader, String vertShader, String fragShader) {
+      super(shader, shader.ctx.createProgram(vertShader, fragShader));
 
       // determine our various shader program locations
       uScreenSize = prog.getUniform2f("u_ScreenSize");
@@ -153,13 +97,8 @@ public class IndexedTrisShader extends AbstractShader {
       aTexCoord = prog.getAttrib("a_TexCoord", 2, GL20.GL_FLOAT);
 
       // create our vertex and index buffers
-      vertices = ctx.createFloatBuffer(START_VERTS*VERTEX_SIZE);
-      elements = ctx.createShortBuffer(START_ELEMS);
-    }
-
-    @Override
-    public GLProgram program() {
-      return prog;
+      vertices = shader.ctx.createFloatBuffer(START_VERTS*VERTEX_SIZE);
+      elements = shader.ctx.createShortBuffer(START_ELEMS);
     }
 
     @Override
@@ -168,7 +107,7 @@ public class IndexedTrisShader extends AbstractShader {
       uScreenSize.bind(fbufWidth, fbufHeight);
       vertices.bind(GL20.GL_ARRAY_BUFFER);
       elements.bind(GL20.GL_ELEMENT_ARRAY_BUFFER);
-      ctx.checkGLError("Shader.prepare bind");
+      shader.ctx.checkGLError("Shader.prepare bind");
 
       aMatrix.bind(VERTEX_STRIDE, 0, vertices);
       aTranslation.bind(VERTEX_STRIDE, 16, vertices);
@@ -181,14 +120,14 @@ public class IndexedTrisShader extends AbstractShader {
     public void flush() {
       if (vertices.position() == 0)
         return;
-      ctx.checkGLError("Shader.flush");
+      shader.ctx.checkGLError("Shader.flush");
 
-      vertices.flush(GL20.GL_ARRAY_BUFFER, GL20.GL_STREAM_DRAW);
-      int elems = elements.flush(GL20.GL_ELEMENT_ARRAY_BUFFER, GL20.GL_STREAM_DRAW);
-      ctx.checkGLError("Shader.flush BufferData");
+      vertices.send(GL20.GL_ARRAY_BUFFER, GL20.GL_STREAM_DRAW);
+      int elems = elements.send(GL20.GL_ELEMENT_ARRAY_BUFFER, GL20.GL_STREAM_DRAW);
+      shader.ctx.checkGLError("Shader.flush BufferData");
 
       elements.drawElements(GL20.GL_TRIANGLES, elems);
-      ctx.checkGLError("Shader.flush DrawElements");
+      shader.ctx.checkGLError("Shader.flush DrawElements");
     }
 
     @Override
@@ -243,7 +182,7 @@ public class IndexedTrisShader extends AbstractShader {
       int verts = vertIdx + vertexCount, elems = elements.position() + elemCount;
       int availVerts = vertices.capacity() / VERTEX_SIZE, availElems = elements.capacity();
       if ((verts > availVerts) || (elems > availElems)) {
-        flush();
+        shader.flush();
         if (vertexCount > availVerts)
           expandVerts(vertexCount);
         if (elemCount > availElems)
@@ -266,78 +205,5 @@ public class IndexedTrisShader extends AbstractShader {
         newElems += EXPAND_ELEMS;
       elements.expand(newElems);
     }
-  }
-
-  protected class TextureExtras extends Extras {
-    private final Uniform1i uTexture;
-    private final Uniform1f uAlpha;
-    private int lastTex;
-    private float lastAlpha;
-
-    public TextureExtras(GLProgram prog) {
-      uTexture = prog.getUniform1i("u_Texture");
-      uAlpha = prog.getUniform1f("u_Alpha");
-    }
-
-    @Override
-    public void prepare(int tex, float alpha, boolean wasntAlreadyActive) {
-      ctx.checkGLError("textureShader.prepare start");
-      if (wasntAlreadyActive || tex != lastTex || alpha != lastAlpha) {
-        flush();
-        uAlpha.bind(alpha);
-        lastAlpha = alpha;
-        lastTex = tex;
-        ctx.checkGLError("textureShader.prepare end");
-      }
-
-      if (wasntAlreadyActive) {
-        ctx.activeTexture(GL20.GL_TEXTURE0);
-        uTexture.bind(0);
-      }
-    }
-
-    @Override
-    public void willFlush () {
-      ctx.bindTexture(lastTex);
-    }
-  }
-
-  @Override
-  protected Extras createTextureExtras(GLProgram prog) {
-    return new TextureExtras(prog);
-  }
-
-  protected class ColorExtras extends Extras {
-    private final Uniform4f uColor;
-    private final Uniform1f uAlpha;
-    private int lastColor;
-    private float lastAlpha;
-
-    public ColorExtras(GLProgram prog) {
-      uColor = prog.getUniform4f("u_Color");
-      uAlpha = prog.getUniform1f("u_Alpha");
-    }
-
-    @Override
-    public void prepare(int color, float alpha, boolean wasntAlreadyActive) {
-      ctx.checkGLError("colorShader.prepare start");
-      if (wasntAlreadyActive || color != lastColor || alpha != lastAlpha) {
-        flush();
-        float a = ((color >> 24) & 0xff) / 255f;
-        float r = ((color >> 16) & 0xff) / 255f;
-        float g = ((color >> 8) & 0xff) / 255f;
-        float b = ((color >> 0) & 0xff) / 255f;
-        uColor.bind(r, g, b, 1);
-        lastColor = color;
-        uAlpha.bind(alpha * a);
-        lastAlpha = alpha;
-        ctx.checkGLError("colorShader.prepare end");
-      }
-    }
-  }
-
-  @Override
-  protected Extras createColorExtras(GLProgram prog) {
-    return new ColorExtras(prog);
   }
 }

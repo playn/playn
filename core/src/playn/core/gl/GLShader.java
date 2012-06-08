@@ -56,6 +56,7 @@ public interface GLShader {
     /** Binds a uniform float four-tuple. */
     void bind(float a, float b, float c, float d);
   }
+
   /** Provides the ability to bind a single uniform int. */
   interface Uniform1i {
     /** Binds a uniform int value. */
@@ -142,32 +143,4 @@ public interface GLShader {
    * is garbage collected.
    */
   void clearProgram();
-
-  /** The GLSL code for quad-specific vertex shader. */
-  String QUAD_VERTEX_SHADER =
-  "uniform mat4 dataMatrix[64];\n" +
-  "attribute vec3 vertex;\n" +
-  "varying vec2 v_TexCoord;\n" +
-
-  "void main(void) {\n" +
-    // Pick the correct data matrix for this quad.
-    "mat4 data = dataMatrix[int(vertex.z)];\n" +
-
-    // Transform the vertex.
-    "mat3 transform = mat3(\n" +
-    "  data[0][0], data[0][1], 0,\n" +
-    "  data[0][2], data[0][3], 0,\n" +
-    "  data[1][0], data[1][1], 1);\n" +
-    "gl_Position = vec4(transform * vec3(vertex.xy, 1.0), 1);\n" +
-
-    // Scale from screen coordinates to [0, 2].
-    "gl_Position.x /= (dataMatrix[0][2][2] / 2.0);\n" +
-    "gl_Position.y /= (dataMatrix[0][2][3] / 2.0);\n" +
-
-    // Offset to [-1, 1] and flip y axis to put origin at top-left.
-    "gl_Position.x -= 1.0;\n" +
-    "gl_Position.y = 1.0 - gl_Position.y;\n" +
-
-    "v_TexCoord = vertex.xy * vec2(data[2][0], data[2][1]) + vec2(data[1][2], data[1][3]);\n" +
-  "}";
 }

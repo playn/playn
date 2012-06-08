@@ -20,10 +20,11 @@ import pythagoras.f.FloatMath;
 import playn.core.CanvasImage;
 import playn.core.Image;
 import playn.core.ImageLayer;
-import playn.core.ResourceCallback;
 import playn.core.ImmediateLayer;
-import playn.core.gl.GLContext;
+import playn.core.ResourceCallback;
 import playn.core.Surface;
+import playn.core.gl.AbstractShader;
+import playn.core.gl.GLContext;
 import playn.core.gl.IndexedTrisShader;
 import static playn.core.PlayN.*;
 
@@ -138,21 +139,21 @@ public class ShaderTest extends Test {
       }
 
       @Override
-      protected Core createTextureCore(GLContext ctx) {
-        return new RotCore(ctx, vertexShader(), textureFragmentShader());
+      protected Core createTextureCore() {
+        return new RotCore(this, vertexShader(), textureFragmentShader());
       }
 
       @Override
-      protected Core createColorCore(GLContext ctx) {
-        return new RotCore(ctx, vertexShader(), colorFragmentShader());
+      protected Core createColorCore() {
+        return new RotCore(this, vertexShader(), colorFragmentShader());
       }
 
       class RotCore extends ITCore {
         private final Uniform1f uAngle = prog.getUniform1f("u_Angle");
         private final Uniform2f uEye = prog.getUniform2f("u_Eye");
 
-        public RotCore (GLContext ctx, String vertShader, String fragShader) {
-          super(ctx, vertShader, fragShader);
+        public RotCore (AbstractShader shader, String vertShader, String fragShader) {
+          super(shader, vertShader, fragShader);
         }
 
         @Override

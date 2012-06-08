@@ -24,6 +24,34 @@ import playn.core.InternalTransform;
  */
 public abstract class AbstractShader implements GLShader {
 
+  /** The GLSL code for our texture fragment shader. */
+  public static final String TEX_FRAG_SHADER =
+    "#ifdef GL_ES\n" +
+    "precision highp float;\n" +
+    "#endif\n" +
+
+    "uniform sampler2D u_Texture;\n" +
+    "varying vec2 v_TexCoord;\n" +
+    "uniform float u_Alpha;\n" +
+
+    "void main(void) {\n" +
+    "  vec4 textureColor = texture2D(u_Texture, v_TexCoord);\n" +
+    "  gl_FragColor = textureColor * u_Alpha;\n" +
+    "}";
+
+  /** The GLSL code for our color fragment shader. */
+  public static final String COLOR_FRAG_SHADER =
+    "#ifdef GL_ES\n" +
+    "precision highp float;\n" +
+    "#endif\n" +
+
+    "uniform vec4 u_Color;\n" +
+    "uniform float u_Alpha;\n" +
+
+    "void main(void) {\n" +
+    "  gl_FragColor = u_Color * u_Alpha;\n" +
+    "}";
+
   protected final GLContext ctx;
   protected int refs;
   protected Core texCore, colorCore, curCore;
@@ -37,8 +65,8 @@ public abstract class AbstractShader implements GLShader {
   public void prepareTexture(int tex, float alpha, int fbufWidth, int fbufHeight) {
     // create our core lazily so that we ensure we're on the GL thread when it happens
     if (texCore == null) {
-      this.texCore = createTextureCore(ctx);
-      this.texExtras = createTextureExtras(texCore.program());
+      this.texCore = createTextureCore();
+      this.texExtras = createTextureExtras(texCore.prog);
     }
     boolean wasntAlreadyActive = ctx.useShader(this, curCore != texCore);
     if (wasntAlreadyActive) {
@@ -53,8 +81,8 @@ public abstract class AbstractShader implements GLShader {
   public void prepareColor(int color, float alpha, int fbufWidth, int fbufHeight) {
     // create our core lazily so that we ensure we're on the GL thread when it happens
     if (colorCore == null) {
-      this.colorCore = createColorCore(ctx);
-      this.colorExtras = createColorExtras(colorCore.program());
+      this.colorCore = createColorCore();
+      this.colorExtras = createColorExtras(colorCore.prog);
     }
     boolean wasntAlreadyActive = ctx.useShader(this, curCore != colorCore);
     if (wasntAlreadyActive) {
@@ -138,8 +166,11 @@ public abstract class AbstractShader implements GLShader {
 
   /** Implements the core of the indexed tris shader. */
   protected static abstract class Core {
-    /** Returns this core's shader program. */
-    public abstract GLProgram program();
+    /** The shader of which this core is a part. */
+    public final AbstractShader shader;
+
+    /** This core's shader program. */
+    public final GLProgram prog;
 
     /** Prepares this core's shader to render. */
     public abstract void prepare(int fbufWidth, int fbufHeight);
@@ -164,9 +195,17 @@ public abstract class AbstractShader implements GLShader {
 
     /** Destroys this core's shader program and any other GL resources it maintains. */
     public void destroy() {
-      program().destroy();
+      prog.destroy();
+    }
+
+    protected Core(AbstractShader shader, GLProgram prog) {
+      this.shader = shader;
+      this.prog = prog;
     }
   }
+
+  protected abstract Core createTextureCore();
+  protected abstract Core createColorCore();
 
   /** Handles the extra bits needed when we're using textures or flat color. */
   protected static abstract class Extras {
@@ -180,8 +219,98 @@ public abstract class AbstractShader implements GLShader {
     public void destroy() {}
   }
 
-  protected abstract Core createTextureCore(GLContext ctx);
-  protected abstract Core createColorCore(GLContext ctx);
-  protected abstract Extras createTextureExtras(GLProgram prog);
-  protected abstract Extras createColorExtras(GLProgram prog);
+  protected class TextureExtras extends Extras {
+    private final Uniform1i uTexture;
+    private final Uniform1f uAlpha;
+    private int lastTex;
+    private float lastAlpha;
+
+    public TextureExtras(GLProgram prog) {
+      uTexture = prog.getUniform1i("u_Texture");
+      uAlpha = prog.getUniform1f("u_Alpha");
+    }
+
+    @Override
+    public void prepare(int tex, float alpha, boolean wasntAlreadyActive) {
+      ctx.checkGLError("textureShader.prepare start");
+      if (wasntAlreadyActive || tex != lastTex || alpha != lastAlpha) {
+        flush();
+        uAlpha.bind(alpha);
+        lastAlpha = alpha;
+        lastTex = tex;
+        ctx.checkGLError("textureShader.prepare end");
+      }
+
+      if (wasntAlreadyActive) {
+        ctx.activeTexture(GL20.GL_TEXTURE0);
+        uTexture.bind(0);
+      }
+    }
+
+    @Override
+    public void willFlush () {
+      ctx.bindTexture(lastTex);
+    }
+  }
+
+  /**
+   * Returns the texture fragment shader program. Note that this program <em>must</em> preserve the
+   * use of the existing varying attributes. You can add new varying attributes, but you cannot
+   * remove or change the defaults.
+   */
+  protected String textureFragmentShader() {
+    return TEX_FRAG_SHADER;
+  }
+
+  /**
+   * Creates the extras instance that handles the texture fragment shader.
+   */
+  protected Extras createTextureExtras(GLProgram prog) {
+    return new TextureExtras(prog);
+  }
+
+  protected class ColorExtras extends Extras {
+    private final Uniform4f uColor;
+    private final Uniform1f uAlpha;
+    private int lastColor;
+    private float lastAlpha;
+
+    public ColorExtras(GLProgram prog) {
+      uColor = prog.getUniform4f("u_Color");
+      uAlpha = prog.getUniform1f("u_Alpha");
+    }
+
+    @Override
+    public void prepare(int color, float alpha, boolean wasntAlreadyActive) {
+      ctx.checkGLError("colorShader.prepare start");
+      if (wasntAlreadyActive || color != lastColor || alpha != lastAlpha) {
+        flush();
+        float a = ((color >> 24) & 0xff) / 255f;
+        float r = ((color >> 16) & 0xff) / 255f;
+        float g = ((color >> 8) & 0xff) / 255f;
+        float b = ((color >> 0) & 0xff) / 255f;
+        uColor.bind(r, g, b, 1);
+        lastColor = color;
+        uAlpha.bind(alpha * a);
+        lastAlpha = alpha;
+        ctx.checkGLError("colorShader.prepare end");
+      }
+    }
+  }
+
+  /**
+   * Returns the color fragment shader program. Note that this program <em>must</em> preserve the
+   * use of the existing varying attributes. You can add new varying attributes, but you cannot
+   * remove or change the defaults.
+   */
+  protected String colorFragmentShader() {
+    return COLOR_FRAG_SHADER;
+  }
+
+  /**
+   * Creates the extras instance that handles the color fragment shader.
+   */
+  protected Extras createColorExtras(GLProgram prog) {
+    return new ColorExtras(prog);
+  }
 }
