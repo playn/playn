@@ -479,6 +479,13 @@ public class AndroidGL20 implements GL20 {
   }
 
   @Override
+  public boolean glGetBoolean(int pname) {
+    byte[] out = new byte[1];
+    glGetBooleanv(pname, out, 0);
+    return out[0] != GL_FALSE;
+  }
+
+  @Override
   public void glGetBooleanv(int pname, byte[] params, int offset) {
     // TODO(jonagill): Test!
     ByteBuffer buffer = ByteBuffer.wrap(params, offset, params.length - offset);
@@ -511,6 +518,13 @@ public class AndroidGL20 implements GL20 {
   }
 
   @Override
+  public float glGetFloat(int pname) {
+    float[] out = new float[1];
+    GLES20.glGetFloatv(pname, out, 0);
+    return out[0];
+  }
+
+  @Override
   public void glGetFloatv(int pname, float[] params, int offset) {
     GLES20.glGetFloatv(pname, params, offset);
   }
@@ -530,6 +544,13 @@ public class AndroidGL20 implements GL20 {
   public void glGetFramebufferAttachmentParameteriv(int target, int attachment, int pname,
       IntBuffer params) {
     GLES20.glGetFramebufferAttachmentParameteriv(target, attachment, pname, params);
+  }
+
+  @Override
+  public int glGetInteger(int pname) {
+    int[] out = new int[1];
+    GLES20.glGetIntegerv(pname, out, 0);
+    return out[0];
   }
 
   @Override

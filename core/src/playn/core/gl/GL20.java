@@ -513,6 +513,8 @@ public interface GL20 {
 
   public int glGetAttribLocation(int program, String name);
 
+  public boolean glGetBoolean(int pname);
+
   public void glGetBooleanv(int pname, byte[] params, int offset);
 
   public void glGetBooleanv(int pname, ByteBuffer params);
@@ -525,6 +527,8 @@ public interface GL20 {
 
   public int glGetError();
 
+  public float glGetFloat(int pname);
+
   public void glGetFloatv(int pname, float[] params, int offset);
 
   public void glGetFloatv(int pname, FloatBuffer params);
@@ -534,6 +538,8 @@ public interface GL20 {
 
   public void glGetFramebufferAttachmentParameteriv(int target, int attachment, int pname,
       IntBuffer params);
+
+  public int glGetInteger(int pname);
 
   public void glGetIntegerv(int pname, int[] params, int offset);
 

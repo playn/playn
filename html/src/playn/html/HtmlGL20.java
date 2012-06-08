@@ -525,6 +525,11 @@ public final class HtmlGL20 implements playn.core.gl.GL20 {
   }
 
   @Override
+  public int glGetInteger(int pname) {
+    return gl.getParameteri(pname);
+  }
+
+  @Override
   public void glGetIntegerv(int pname, IntBuffer params) {
     Int32Array result = (Int32Array) gl.getParameterv(pname);
     int pos = params.position();
@@ -790,6 +795,11 @@ public final class HtmlGL20 implements playn.core.gl.GL20 {
   @Override
   public void glGetBufferParameteriv(int target, int pname, IntBuffer params) {
     throw new RuntimeException("NYI glGetBufferParameteriv");
+  }
+
+  @Override
+  public float glGetFloat(int pname) {
+    return gl.getParameterf(pname);
   }
 
   @Override
@@ -1277,6 +1287,11 @@ public final class HtmlGL20 implements playn.core.gl.GL20 {
   @Override
   public void glGetAttachedShaders(int program, int maxcount, IntBuffer count, IntBuffer shaders) {
     throw new RuntimeException("NYI glGetAttachedShaders");
+  }
+
+  @Override
+  public boolean glGetBoolean(int pname) {
+    return gl.getParameterb(pname);
   }
 
   @Override
