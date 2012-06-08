@@ -71,6 +71,21 @@ public abstract class AbstractAssets implements Assets {
     return this.totalRequestsCount - this.errorsCount - this.successCount;
   }
 
+  /**
+   * Normalizes the path, by removing {@code foo/..} pairs until the path contains no {@code ..}s.
+   * For example:
+   * {@code foo/bar/../baz/bif/../bonk.png} becomes {@code foo/baz/bonk.png} and
+   * {@code foo/bar/baz/../../bing.png} becomes {@code foo/bing.png}.
+   */
+  protected static String normalizePath(String path) {
+    int pathLen;
+    do {
+      pathLen = path.length();
+      path = path.replaceAll("[^/]+/\\.\\./", "");
+    } while (path.length() != pathLen);
+    return path;
+  }
+
   private void incrementRequestCount() {
     ++totalRequestsCount;
   }

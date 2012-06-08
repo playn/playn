@@ -142,9 +142,10 @@ public class AndroidAssets extends AbstractAssets {
    * failure.
    */
   private InputStream openAsset(String path) throws IOException {
-    InputStream is = getClass().getClassLoader().getResourceAsStream(pathPrefix + path);
+    String fullPath = normalizePath(pathPrefix + path);
+    InputStream is = getClass().getClassLoader().getResourceAsStream(fullPath);
     if (is == null)
-      throw new FileNotFoundException("Missing resource: " + pathPrefix + path);
+      throw new FileNotFoundException("Missing resource: " + fullPath);
     return is;
   }
 
