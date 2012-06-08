@@ -15,6 +15,8 @@
  */
 package playn.core;
 
+import java.nio.ByteBuffer;
+
 import playn.core.util.Callback;
 
 /**
@@ -23,6 +25,38 @@ import playn.core.util.Callback;
  * TODO(jgw): This is quite anemic at the moment, but it's a starting point.
  */
 public interface Net {
+
+  /** Encapsulates a web socket. */
+  interface WebSocket {
+    /** Notifies game of web socket events. */
+    interface Listener {
+      /** Reports that a requested web socket is now open and ready for use. */
+      void onOpen();
+
+      /** Reports that a text message has arrived on a web socket. */
+      void onTextMessage(String msg);
+
+      /** Reports that a binary message has arrived on a web socket. */
+      void onDataMessage(ByteBuffer msg);
+
+      /** Reports that a web socket has been closed. */
+      void onClose();
+
+      /** Reports that a web socket has encountered an error.
+       * TODO: is it closed as a result of this? */
+      void onError(String reason);
+    }
+
+    /** Requests that this web socket be closed. This will result in a call to {@link
+     * Listener#onClose} when the socket closure is completed. */
+    void close();
+
+    /** Queues the supplied text message to be sent over the socket. */
+    void send(String data);
+
+    /** Queues the supplied binary message to be sent over the socket. */
+    void send(ByteBuffer data);
+  }
 
   /**
    * Create a websocket with given URL and listener.

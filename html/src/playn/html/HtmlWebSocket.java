@@ -1,11 +1,11 @@
 /**
  * Copyright 2010 The PlayN Authors
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  * in compliance with the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software distributed under the License
  * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
  * or implied. See the License for the specific language governing permissions and limitations under
@@ -15,15 +15,17 @@ package playn.html;
 
 import java.nio.ByteBuffer;
 
+import com.google.gwt.typedarrays.client.ArrayBuffer;
+import com.google.gwt.typedarrays.client.Uint8Array;
+
+import playn.core.Net;
+
 import playn.html.websocket.CloseEvent;
 import playn.html.websocket.MessageEvent;
 import playn.html.websocket.OpenEvent;
 import playn.html.websocket.WebSocket;
 
-import com.google.gwt.typedarrays.client.ArrayBuffer;
-import com.google.gwt.typedarrays.client.Uint8Array;
-
-public class HtmlWebSocket implements playn.core.WebSocket {
+public class HtmlWebSocket implements Net.WebSocket {
 
   private WebSocket ws;
 
@@ -69,7 +71,7 @@ public class HtmlWebSocket implements playn.core.WebSocket {
     int len = data.limit();
     // TODO(haustein) Sending the view directly does not work for some reason.
     // May be a chrome issue...?
-    //  Object trick = data;    
+    //  Object trick = data;
     // ArrayBufferView ta = ((HasArrayBufferView) trick).getTypedArray();
     // Int8Array view = Int8Array.create(ta.getBuffer(), ta.getByteOffset(), len)
     // ws.send(view);

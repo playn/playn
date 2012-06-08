@@ -24,9 +24,9 @@ import java.util.Queue;
 import org.java_websocket.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
 
-import playn.core.WebSocket;
+import playn.core.Net;
 
-public class JavaWebSocket implements WebSocket {
+public class JavaWebSocket implements Net.WebSocket {
 
   private abstract class Event {
     abstract boolean handle();
@@ -86,7 +86,7 @@ public class JavaWebSocket implements WebSocket {
   }
 
   private final WebSocketClient socket;
-  private final WebSocket.Listener listener;
+  private final Net.WebSocket.Listener listener;
   private final Queue<Event> pendingEvents = new LinkedList<Event>();
 
   JavaWebSocket(String uri, Listener listener) {
