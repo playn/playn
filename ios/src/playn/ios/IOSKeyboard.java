@@ -50,6 +50,9 @@ public class IOSKeyboard implements Keyboard {
 
     final UITextField field = view.GetTextField(0);
     field.set_ReturnKeyType(UIReturnKeyType.wrap(UIReturnKeyType.Done));
+    if (initVal != null) {
+      field.set_Text(initVal);
+    }
 
     switch (textType) {
     case NUMBER: field.set_KeyboardType(UIKeyboardType.wrap(UIKeyboardType.NumberPad)); break;
