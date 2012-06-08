@@ -53,6 +53,11 @@ public abstract class GL20Buffer implements GLBuffer {
     }
 
     @Override
+    public void skip(int count) {
+      buffer.position(position()+count);
+    }
+
+    @Override
     public void expand(int capacity) {
       // make sure we're not trying to expand this buffer while it has unflushed data
       Asserts.checkState(buffer == null || buffer.position() == 0);
@@ -115,6 +120,11 @@ public abstract class GL20Buffer implements GLBuffer {
     }
 
     @Override
+    public void skip(int count) {
+      buffer.position(position()+count);
+    }
+
+    @Override
     public void expand(int capacity) {
       // make sure we're not trying to expand this buffer while it has unflushed data
       Asserts.checkState(buffer == null || buffer.position() == 0);
@@ -149,7 +159,7 @@ public abstract class GL20Buffer implements GLBuffer {
   }
 
   @Override
-  public int flush(int target, int usage) {
+  public int send(int target, int usage) {
     Buffer buffer = buffer();
     int count = buffer.position(), byteSize = byteSize();
     buffer.position(0);

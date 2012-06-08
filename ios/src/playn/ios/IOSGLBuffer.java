@@ -83,6 +83,12 @@ public abstract class IOSGLBuffer implements GLBuffer {
       return position() * 4;
     }
 
+    @Override
+    public void skip(int count) {
+      position += count;
+    }
+
+    @Override
     IntPtr pointer() {
       return handle.AddrOfPinnedObject();
     }
@@ -105,8 +111,7 @@ public abstract class IOSGLBuffer implements GLBuffer {
 
     @Override
     public void drawElements(int mode, int count) {
-      GL.DrawElements(All.wrap(mode), count, All.wrap(All.UnsignedShort),
-                      handle.AddrOfPinnedObject());
+      GL.DrawElements(All.wrap(mode), count, All.wrap(All.UnsignedShort), new IntPtr(0));
     }
 
     @Override
@@ -126,6 +131,16 @@ public abstract class IOSGLBuffer implements GLBuffer {
     public int byteSize() {
       return position() * 2;
     }
+
+    @Override
+    public void skip(int count) {
+      position += count;
+    }
+
+    @Override
+    IntPtr pointer() {
+      return handle.AddrOfPinnedObject();
+    }
   }
 
   private final int bufferId;
@@ -142,7 +157,9 @@ public abstract class IOSGLBuffer implements GLBuffer {
   }
 
   @Override
-  public int flush(int target, int usage) {
+  public int send(int target, int usage) {
+    // TODO: why is byteSize an IntPtr? File MonoTouch bug?
+    GL.BufferData(All.wrap(target), new IntPtr(byteSize()), pointer(), All.wrap(usage));
     int oposition = position;
     position = 0;
     return oposition;
@@ -153,4 +170,6 @@ public abstract class IOSGLBuffer implements GLBuffer {
     GL.GenBuffers(1, buffers);
     this.bufferId = buffers[0];
   }
+
+  abstract IntPtr pointer();
 }

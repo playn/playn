@@ -61,14 +61,17 @@ public interface GLBuffer {
   /** The size of the data in this buffer, in bytes. */
   int byteSize();
 
+  /** Advances the position of this buffer without writing any data to it. */
+  void skip(int count);
+
   /** Expands the buffer to accommodate the specified new capacity. */
   void expand(int capacity);
 
   /** Issues the GL call to bind this buffer. */
   void bind(int target);
 
-  /** Writes this buffer's data to GL in preparation for rendering. This resets the buffer offset
-   * to zero and prepares the buffer for the accumulation of new elements.
+  /** Sends this buffer's data to GL. A call to {@link #bind} must precede this call. This resets
+   * the buffer offset to zero and prepares the buffer for the accumulation of new elements.
    * @return the number of elements in the buffer at the time it was bound. */
-  int flush(int target, int usage);
+  int send(int target, int usage);
 }

@@ -71,6 +71,25 @@ public class IOSGLProgram implements GLProgram {
   }
 
   @Override
+  public int getInteger(int param) {
+    int[] out = new int[1];
+    GL.GetInteger(All.wrap(param), out);
+    return out[0];
+  }
+  @Override
+  public float getFloat(int param) {
+    float[] out = new float[1];
+    GL.GetFloat(All.wrap(param), out);
+    return out[0];
+  }
+  @Override
+  public boolean getBoolean(int param) {
+    boolean[] out = new boolean[1];
+    GL.GetBoolean(All.wrap(param), out);
+    return out[0];
+  }
+
+  @Override
   public GLShader.Uniform1f getUniform1f(String name) {
     final int loc = GL.GetUniformLocation(program, name);
     return (loc < 0) ? null : new GLShader.Uniform1f() {
@@ -126,14 +145,24 @@ public class IOSGLProgram implements GLProgram {
   }
 
   @Override
+  public GLShader.UniformMatrix4fv getUniformMatrix4fv(String name) {
+    final int loc = GL.GetUniformLocation(program, name);
+    return (loc < 0) ? null : new GLShader.UniformMatrix4fv() {
+      public void bind(GLBuffer.Float data, int count) {
+        IOSGLBuffer.FloatImpl idata = (IOSGLBuffer.FloatImpl) data;
+        idata.position = 0;
+        GL.UniformMatrix4(loc, count, false, idata.data);
+      }
+    };
+  }
+
+  @Override
   public GLShader.Attrib getAttrib(String name, final int size, final int type) {
     final int loc = GL.GetAttribLocation(program, name);
     return (loc < 0) ? null : new GLShader.Attrib() {
-      public void bind(int stride, int offset, GLBuffer.Float data) {
+      public void bind(int stride, int offset) {
         GL.EnableVertexAttribArray(loc);
-        IOSGLBuffer.FloatImpl idata = (IOSGLBuffer.FloatImpl) data;
-        IntPtr daddr = new IntPtr(idata.pointer().ToInt64() + offset);
-        GL.VertexAttribPointer(loc, size, All.wrap(type), false, stride, daddr);
+        GL.VertexAttribPointer(loc, size, All.wrap(type), false, stride, new IntPtr(offset));
       }
     };
   }

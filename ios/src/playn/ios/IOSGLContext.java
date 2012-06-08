@@ -35,6 +35,7 @@ import playn.core.gl.GLProgram;
 import playn.core.gl.GLShader;
 import playn.core.gl.GroupLayerGL;
 import playn.core.gl.IndexedTrisShader;
+import playn.core.gl.QuadShader;
 
 public class IOSGLContext extends GLContext {
 
@@ -43,7 +44,8 @@ public class IOSGLContext extends GLContext {
   int orient;
   private int minFilter = All.Linear, magFilter = All.Linear;
   private int defaultFrameBuffer = -1; // configured in init()
-  private GLShader shader;
+  private GLShader quadShader;
+  private GLShader trisShader;
 
   public IOSGLContext(IOSPlatform platform, float scaleFactor, int screenWidth, int screenHeight) {
     super(platform, scaleFactor);
@@ -56,7 +58,8 @@ public class IOSGLContext extends GLContext {
     GL.Enable(All.wrap(All.Blend));
     GL.BlendFunc(All.wrap(All.One), All.wrap(All.OneMinusSrcAlpha));
     GL.ClearColor(0, 0, 0, 1);
-    shader = new IndexedTrisShader(this);
+    quadShader = new QuadShader(this);
+    trisShader = new IndexedTrisShader(this);
   }
 
   @Override
@@ -195,11 +198,11 @@ public class IOSGLContext extends GLContext {
 
   @Override
   protected GLShader quadShader() {
-    return shader;
+    return quadShader;
   }
   @Override
   protected GLShader trisShader() {
-    return shader;
+    return trisShader;
   }
 
   void updateTexture(int tex, UIImage image) {

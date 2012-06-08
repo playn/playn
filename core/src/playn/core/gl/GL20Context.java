@@ -32,7 +32,7 @@ public class GL20Context extends GLContext {
   private final boolean checkErrors;
   private final InternalTransform rootXform;
   private int minFilter = GL_LINEAR, magFilter = GL_LINEAR;
-  private GLShader shader;
+  private GLShader quadShader, trisShader;
 
   public GL20Context(Platform platform, GL20 gl, float scaleFactor,
                      int screenWidth, int screenHeight, boolean checkErrors) {
@@ -50,7 +50,8 @@ public class GL20Context extends GLContext {
     gl.glEnable(GL_BLEND);
     gl.glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
     gl.glClearColor(0, 0, 0, 1);
-    shader = new IndexedTrisShader(this);
+    quadShader = new QuadShader(this);
+    trisShader = new IndexedTrisShader(this);
     checkGLError("initGL");
   }
 
@@ -186,11 +187,11 @@ public class GL20Context extends GLContext {
 
   @Override
   protected GLShader quadShader() {
-    return shader;
+    return quadShader;
   }
   @Override
   protected GLShader trisShader() {
-    return shader;
+    return trisShader;
   }
 
   private static int toGL(Filter filter) {

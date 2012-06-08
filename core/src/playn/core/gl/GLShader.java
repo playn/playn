@@ -68,13 +68,19 @@ public interface GLShader {
     void bind(int a, int b);
   }
 
+  /** Provides the ability to bind a uniform matrix4 vector. */
+  interface UniformMatrix4fv {
+    /** Binds a uniform matrix4 vector to the supplied data.
+     * @param count the number of <em>matrices</em> to bind (whole matrices, not floats). */
+    void bind(GLBuffer.Float data, int count);
+  }
+
   /** Provides the ability to bind a vertex attrib array. */
   interface Attrib {
     /** Binds the this attribute to the vertex array at the specified offset.
      * @param stride the size of a single "bundle" of values in the vertex array.
-     * @param offset the offset of this attribute into the "bundle" of values.
-     * @param buffer the buffer that supplies this attribute's data. */
-    void bind(int stride, int offset, GLBuffer.Float buffer);
+     * @param offset the offset of this attribute into the "bundle" of values. */
+    void bind(int stride, int offset);
   }
 
   /** Prepares this shader to render the specified texture, etc. */

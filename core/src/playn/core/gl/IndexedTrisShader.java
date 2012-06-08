@@ -105,15 +105,16 @@ public class IndexedTrisShader extends AbstractShader {
     public void prepare(int fbufWidth, int fbufHeight) {
       prog.bind();
       uScreenSize.bind(fbufWidth, fbufHeight);
+
       vertices.bind(GL20.GL_ARRAY_BUFFER);
+      aMatrix.bind(VERTEX_STRIDE, 0);
+      aTranslation.bind(VERTEX_STRIDE, 16);
+      aPosition.bind(VERTEX_STRIDE, 24);
+      if (aTexCoord != null)
+        aTexCoord.bind(VERTEX_STRIDE, 32);
+
       elements.bind(GL20.GL_ELEMENT_ARRAY_BUFFER);
       shader.ctx.checkGLError("Shader.prepare bind");
-
-      aMatrix.bind(VERTEX_STRIDE, 0, vertices);
-      aTranslation.bind(VERTEX_STRIDE, 16, vertices);
-      aPosition.bind(VERTEX_STRIDE, 24, vertices);
-      if (aTexCoord != null)
-        aTexCoord.bind(VERTEX_STRIDE, 32, vertices);
     }
 
     @Override

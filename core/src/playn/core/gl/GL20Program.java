@@ -15,6 +15,8 @@
  */
 package playn.core.gl;
 
+import java.nio.FloatBuffer;
+
 import static playn.core.PlayN.log;
 
 /**
@@ -67,6 +69,19 @@ public class GL20Program implements GLProgram {
   }
 
   @Override
+  public int getInteger(int param) {
+    return gl.glGetInteger(param);
+  }
+  @Override
+  public float getFloat(int param) {
+    return gl.glGetFloat(param);
+  }
+  @Override
+  public boolean getBoolean(int param) {
+    return gl.glGetBoolean(param);
+  }
+
+  @Override
   public GLShader.Uniform1f getUniform1f(String name) {
     final int loc = gl.glGetUniformLocation(program, name);
     return (loc < 0) ? null : new GLShader.Uniform1f() {
@@ -102,6 +117,7 @@ public class GL20Program implements GLProgram {
       }
     };
   }
+
   @Override
   public GLShader.Uniform1i getUniform1i(String name) {
     final int loc = gl.glGetUniformLocation(program, name);
@@ -122,10 +138,22 @@ public class GL20Program implements GLProgram {
   }
 
   @Override
+  public GLShader.UniformMatrix4fv getUniformMatrix4fv(String name) {
+    final int loc = gl.glGetUniformLocation(program, name);
+    return (loc < 0) ? null : new GLShader.UniformMatrix4fv() {
+      public void bind(GLBuffer.Float data, int count) {
+        FloatBuffer buffer = ((GL20Buffer.FloatImpl)data).buffer;
+        buffer.position(0);
+        gl.glUniformMatrix4fv(loc, count, false, buffer);
+      }
+    };
+  }
+
+  @Override
   public GLShader.Attrib getAttrib(String name, final int size, final int type) {
     final int loc = gl.glGetAttribLocation(program, name);
     return (loc < 0) ? null : new GLShader.Attrib() {
-      public void bind(int stride, int offset, GLBuffer.Float data) {
+      public void bind(int stride, int offset) {
         gl.glEnableVertexAttribArray(loc);
         gl.glVertexAttribPointer(loc, size, type, false, stride, offset);
       }
