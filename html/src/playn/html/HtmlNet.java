@@ -19,7 +19,6 @@ import com.google.gwt.xhr.client.ReadyStateChangeHandler;
 import com.google.gwt.xhr.client.XMLHttpRequest;
 
 import playn.core.Net;
-import playn.core.WebSocket;
 import playn.core.util.Callback;
 
 public class HtmlNet implements Net {

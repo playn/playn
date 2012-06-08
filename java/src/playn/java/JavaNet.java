@@ -27,7 +27,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import playn.core.NetImpl;
-import playn.core.WebSocket;
 import playn.core.util.Callback;
 
 public class JavaNet extends NetImpl {
