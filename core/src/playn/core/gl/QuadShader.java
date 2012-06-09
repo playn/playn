@@ -56,7 +56,8 @@ public class QuadShader extends AbstractShader {
   private static final int VERTICES_PER_QUAD = 4;
   private static final int ELEMENTS_PER_QUAD = 6;
   private static final int VERTEX_SIZE = 3; // 3 floats per vertex
-  private static final int MATRIX_SIZE = 16; // 4x4 matrix
+  private static final int VECS_PER_MATRIX = 4; // 4 vec4s per matrix
+  private static final int MATRIX_SIZE = 4 * VECS_PER_MATRIX; // 4x4 matrix
 
   public QuadShader(GLContext ctx) {
     super(ctx);
@@ -93,15 +94,13 @@ public class QuadShader extends AbstractShader {
     public QuadCore(AbstractShader shader, String vertShader, String fragShader) {
       super(shader, shader.ctx.createProgram(vertShader, fragShader));
 
-      // TODO: this seems wacky, MVUV returns number of four element vectors, why are we dividing
-      // it by sixteen? and why are we doing this weird rounding?
-      // int maxVectors = prog.getInteger(GL20.GL_MAX_VERTEX_UNIFORM_VECTORS);
-      // maxQuads = Math.round(maxVectors / (float)MATRIX_SIZE);
-
-      // TEMP: I'm seeing weird issues with glGetInteger...
-      maxQuads = 32;
-
-      data = shader.ctx.createFloatBuffer(maxQuads*MATRIX_SIZE); // 4x4 matrices
+      int maxVecs = prog.getInteger(GL20.GL_MAX_VERTEX_UNIFORM_VECTORS);
+      if (maxVecs < VECS_PER_MATRIX)
+        throw new RuntimeException(
+          "GL_MAX_VERTEX_UNIFORM_VECTORS too low: have " + maxVecs +
+          ", need at least " + VECS_PER_MATRIX);
+      maxQuads = maxVecs / VECS_PER_MATRIX;
+      data = shader.ctx.createFloatBuffer(maxQuads*MATRIX_SIZE);
 
       // compile the shader and get our uniform and attribute
       uScreenSize = prog.getUniform2f("u_ScreenSize");
