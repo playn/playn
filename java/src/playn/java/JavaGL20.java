@@ -1177,9 +1177,7 @@ final class JavaGL20 implements playn.core.gl.GL20 {
 
   @Override
   public boolean glGetBoolean(int pname) {
-    resizeByteBuffer(16); // LWJGL wants room for 16 values
-    GL11.glGetBoolean(pname, byteBuffer);
-    return byteBuffer.get(0) != GL_FALSE;
+    return GL11.glGetBoolean(pname);
   }
 
   @Override
@@ -1210,9 +1208,7 @@ final class JavaGL20 implements playn.core.gl.GL20 {
 
   @Override
   public float glGetFloat(int pname) {
-    resizeFloatBuffer(16); // LWJGL wants room for 16 values
-    GL11.glGetFloat(pname, floatBuffer);
-    return floatBuffer.get(0);
+    return GL11.glGetFloat(pname);
   }
 
   @Override
@@ -1235,9 +1231,7 @@ final class JavaGL20 implements playn.core.gl.GL20 {
 
   @Override
   public int glGetInteger(int pname) {
-    resizeIntBuffer(16); // LWJGL wants room for 16 values
-    GL11.glGetInteger(pname, intBuffer);
-    return intBuffer.get(0);
+    return GL11.glGetInteger(pname);
   }
 
   @Override
