@@ -80,6 +80,21 @@ public class GL20Context extends GLContext {
   }
 
   @Override
+  public int getInteger(int param) {
+    return gl.glGetInteger(param);
+  }
+
+  @Override
+  public float getFloat(int param) {
+    return gl.glGetFloat(param);
+  }
+
+  @Override
+  public boolean getBoolean(int param) {
+    return gl.glGetBoolean(param);
+  }
+
+  @Override
   public GLProgram createProgram(String vertShader, String fragShader) {
     return new GL20Program(this, gl, vertShader, fragShader);
   }
@@ -126,6 +141,7 @@ public class GL20Context extends GLContext {
 
   @Override
   public void bindTexture(int tex) {
+    // TODO: track last bound texture, and avoid calling if it didn't change?
     gl.glBindTexture(GL_TEXTURE_2D, tex);
   }
 

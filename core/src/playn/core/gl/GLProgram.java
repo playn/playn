@@ -20,13 +20,6 @@ package playn.core.gl;
  */
 public interface GLProgram {
 
-  /** Returns the specified GL integer parameter. */
-  int getInteger(int param);
-  /** Returns the specified GL float parameter. */
-  float getFloat(int param);
-  /** Returns the specified GL boolean parameter. */
-  boolean getBoolean(int param);
-
   /** Returns a handle on the uniform with the specified name.
    * Returns null if the program contains no uniform with that name. */
   GLShader.Uniform1f getUniform1f(String name);

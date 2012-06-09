@@ -69,6 +69,27 @@ public class IOSGLContext extends GLContext {
   }
 
   @Override
+  public int getInteger(int param) {
+    int[] out = new int[1];
+    GL.GetInteger(All.wrap(param), out);
+    return out[0];
+  }
+
+  @Override
+  public float getFloat(int param) {
+    float[] out = new float[1];
+    GL.GetFloat(All.wrap(param), out);
+    return out[0];
+  }
+
+  @Override
+  public boolean getBoolean(int param) {
+    boolean[] out = new boolean[1];
+    GL.GetBoolean(All.wrap(param), out);
+    return out[0];
+  }
+
+  @Override
   public GLProgram createProgram(String vertShader, String fragShader) {
     return new IOSGLProgram(this, vertShader, fragShader);
   }

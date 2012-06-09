@@ -58,6 +58,15 @@ public abstract class GLContext {
    */
   public abstract void setTextureFilter (Filter minFilter, Filter magFilter);
 
+  /** Returns the specified GL integer parameter. */
+  public abstract int getInteger(int param);
+
+  /** Returns the specified GL float parameter. */
+  public abstract float getFloat(int param);
+
+  /** Returns the specified GL boolean parameter. */
+  public abstract boolean getBoolean(int param);
+
   /**
    * Creates a shader program, for use by a single {@link GLShader}.
    * @param vertShader the source code for the vertex shader.

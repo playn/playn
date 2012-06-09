@@ -71,25 +71,6 @@ public class IOSGLProgram implements GLProgram {
   }
 
   @Override
-  public int getInteger(int param) {
-    int[] out = new int[1];
-    GL.GetInteger(All.wrap(param), out);
-    return out[0];
-  }
-  @Override
-  public float getFloat(int param) {
-    float[] out = new float[1];
-    GL.GetFloat(All.wrap(param), out);
-    return out[0];
-  }
-  @Override
-  public boolean getBoolean(int param) {
-    boolean[] out = new boolean[1];
-    GL.GetBoolean(All.wrap(param), out);
-    return out[0];
-  }
-
-  @Override
   public GLShader.Uniform1f getUniform1f(String name) {
     final int loc = GL.GetUniformLocation(program, name);
     return (loc < 0) ? null : new GLShader.Uniform1f() {

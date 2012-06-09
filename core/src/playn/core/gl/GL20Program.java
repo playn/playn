@@ -69,19 +69,6 @@ public class GL20Program implements GLProgram {
   }
 
   @Override
-  public int getInteger(int param) {
-    return gl.glGetInteger(param);
-  }
-  @Override
-  public float getFloat(int param) {
-    return gl.glGetFloat(param);
-  }
-  @Override
-  public boolean getBoolean(int param) {
-    return gl.glGetBoolean(param);
-  }
-
-  @Override
   public GLShader.Uniform1f getUniform1f(String name) {
     final int loc = gl.glGetUniformLocation(program, name);
     return (loc < 0) ? null : new GLShader.Uniform1f() {
