@@ -132,6 +132,13 @@ public class IndexedTrisShader extends AbstractShader {
     }
 
     @Override
+    public void destroy() {
+      super.destroy();
+      vertices.destroy();
+      elements.destroy();
+    }
+
+    @Override
     public void addQuad(InternalTransform local,
                         float x1, float y1, float sx1, float sy1,
                         float x2, float y2, float sx2, float sy2,

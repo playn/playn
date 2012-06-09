@@ -165,6 +165,11 @@ public abstract class IOSGLBuffer implements GLBuffer {
     return oposition;
   }
 
+  @Override
+  public void destroy() {
+    GL.DeleteBuffers(1, new int[] { bufferId });
+  }
+
   protected IOSGLBuffer() {
     int[] buffers = new int[1];
     GL.GenBuffers(1, buffers);

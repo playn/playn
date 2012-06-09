@@ -167,6 +167,11 @@ public abstract class GL20Buffer implements GLBuffer {
     return count;
   }
 
+  @Override
+  public void destroy() {
+    gl.glDeleteBuffers(1, new int[] { bufferId }, 0);
+  }
+
   protected abstract Buffer buffer();
 
   protected GL20Buffer(GL20 gl) {

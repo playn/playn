@@ -74,4 +74,7 @@ public interface GLBuffer {
    * the buffer offset to zero and prepares the buffer for the accumulation of new elements.
    * @return the number of elements in the buffer at the time it was bound. */
   int send(int target, int usage);
+
+  /** Releases any GL resources used by this buffer. The buffer may not be used subsequently. */
+  void destroy();
 }

@@ -85,9 +85,8 @@ public class QuadShader extends AbstractShader {
     private final Uniform2f uScreenSize;
     private final UniformMatrix4fv uDataMatrix;
     private final Attrib aVertices;
-    private final GLBuffer.Float verts;
+    private final GLBuffer.Float verts, data;
     private final GLBuffer.Short elems;
-    private final GLBuffer.Float data;
     private final int maxQuads;
     private int quadCounter;
 
@@ -147,6 +146,14 @@ public class QuadShader extends AbstractShader {
       uDataMatrix.bind(data, quadCounter);
       elems.drawElements(GL_TRIANGLES, ELEMENTS_PER_QUAD*quadCounter);
       quadCounter = 0;
+    }
+
+    @Override
+    public void destroy() {
+      super.destroy();
+      verts.destroy();
+      elems.destroy();
+      data.destroy();
     }
 
     @Override
