@@ -68,13 +68,13 @@ public abstract class AbstractShader implements GLShader {
       this.texCore = createTextureCore();
       this.texExtras = createTextureExtras(texCore.prog);
     }
-    boolean wasntAlreadyActive = ctx.useShader(this, curCore != texCore);
-    if (wasntAlreadyActive) {
+    boolean justActivated = ctx.useShader(this, curCore != texCore);
+    if (justActivated) {
       curCore = texCore;
       curExtras = texExtras;
       texCore.prepare(fbufWidth, fbufHeight);
     }
-    texExtras.prepare(tex, alpha, wasntAlreadyActive);
+    texExtras.prepare(tex, alpha, justActivated);
   }
 
   @Override
@@ -84,13 +84,13 @@ public abstract class AbstractShader implements GLShader {
       this.colorCore = createColorCore();
       this.colorExtras = createColorExtras(colorCore.prog);
     }
-    boolean wasntAlreadyActive = ctx.useShader(this, curCore != colorCore);
-    if (wasntAlreadyActive) {
+    boolean justActivated = ctx.useShader(this, curCore != colorCore);
+    if (justActivated) {
       curCore = colorCore;
       curExtras = colorExtras;
       colorCore.prepare(fbufWidth, fbufHeight);
     }
-    colorExtras.prepare(color, alpha, wasntAlreadyActive);
+    colorExtras.prepare(color, alpha, justActivated);
   }
 
   @Override
@@ -210,7 +210,7 @@ public abstract class AbstractShader implements GLShader {
   /** Handles the extra bits needed when we're using textures or flat color. */
   protected static abstract class Extras {
     /** Performs additional binding to prepare for a texture or color render. */
-    public abstract void prepare(int texOrColor, float alpha, boolean wasntAlreadyActive);
+    public abstract void prepare(int texOrColor, float alpha, boolean justActivated);
 
     /** Called prior to flushing this shader. Defaults to NOOP. */
     public void willFlush() {}
@@ -231,17 +231,18 @@ public abstract class AbstractShader implements GLShader {
     }
 
     @Override
-    public void prepare(int tex, float alpha, boolean wasntAlreadyActive) {
+    public void prepare(int tex, float alpha, boolean justActivated) {
       ctx.checkGLError("textureShader.prepare start");
-      if (wasntAlreadyActive || tex != lastTex || alpha != lastAlpha) {
+      boolean stateChanged = (tex != lastTex || alpha != lastAlpha);
+      if (!justActivated && stateChanged)
         flush();
+      if (stateChanged) {
         uAlpha.bind(alpha);
         lastAlpha = alpha;
         lastTex = tex;
         ctx.checkGLError("textureShader.prepare end");
       }
-
-      if (wasntAlreadyActive) {
+      if (justActivated) {
         ctx.activeTexture(GL20.GL_TEXTURE0);
         uTexture.bind(0);
       }
@@ -281,10 +282,12 @@ public abstract class AbstractShader implements GLShader {
     }
 
     @Override
-    public void prepare(int color, float alpha, boolean wasntAlreadyActive) {
+    public void prepare(int color, float alpha, boolean justActivated) {
       ctx.checkGLError("colorShader.prepare start");
-      if (wasntAlreadyActive || color != lastColor || alpha != lastAlpha) {
+      boolean stateChanged = (color != lastColor || alpha != lastAlpha);
+      if (!justActivated && stateChanged)
         flush();
+      if (stateChanged) {
         float a = ((color >> 24) & 0xff) / 255f;
         float r = ((color >> 16) & 0xff) / 255f;
         float g = ((color >> 8) & 0xff) / 255f;
