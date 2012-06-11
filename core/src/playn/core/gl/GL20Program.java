@@ -49,8 +49,9 @@ public class GL20Program implements GLProgram {
       int[] linkStatus = new int[1];
       gl.glGetProgramiv(program, GL20.GL_LINK_STATUS, linkStatus, 0);
       if (linkStatus[0] == GL20.GL_FALSE) {
+        String log = gl.glGetProgramInfoLog(program);
         gl.glDeleteProgram(program);
-        throw new RuntimeException("Failed to link program: " + gl.glGetProgramInfoLog(program));
+        throw new RuntimeException("Failed to link program: " + log);
       }
 
       this.program = program;
@@ -168,9 +169,9 @@ public class GL20Program implements GLProgram {
     int[] compiled = new int[1];
     gl.glGetShaderiv(shader, GL20.GL_COMPILE_STATUS, compiled, 0);
     if (compiled[0] == GL20.GL_FALSE) {
+      String log = gl.glGetShaderInfoLog(shader);
       gl.glDeleteShader(shader);
-      throw new RuntimeException("Failed to compile shader (" + type + "): " +
-                                 gl.glGetShaderInfoLog(shader));
+      throw new RuntimeException("Failed to compile shader (" + type + "): " + log);
     }
     return shader;
   }
