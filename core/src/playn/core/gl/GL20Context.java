@@ -50,7 +50,12 @@ public class GL20Context extends GLContext {
     gl.glEnable(GL_BLEND);
     gl.glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
     gl.glClearColor(0, 0, 0, 1);
-    quadShader = new QuadShader(this);
+    try {
+      quadShader = new QuadShader(this);
+    } catch (Throwable t) {
+      platform.log().warn("Failed to create QuadShader: " + t);
+      quadShader = new IndexedTrisShader(this);
+    }
     trisShader = new IndexedTrisShader(this);
     checkGLError("initGL");
   }

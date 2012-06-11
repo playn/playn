@@ -22,7 +22,7 @@ public abstract class GLContext {
   /** Used to configure texture image scaling. */
   public static enum Filter { LINEAR, NEAREST };
 
-  private final Platform platform;
+  protected final Platform platform;
   private GLShader curShader;
   private int lastFramebuffer;
 
