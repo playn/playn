@@ -65,11 +65,11 @@ public class QuadShader extends AbstractShader {
     super(ctx);
 
     int maxVecs = ctx.getInteger(GL20.GL_MAX_VERTEX_UNIFORM_VECTORS);
-    if (maxVecs < VECS_PER_MATRIX)
+    if (maxVecs <= VECS_PER_MATRIX)
       throw new RuntimeException(
         "GL_MAX_VERTEX_UNIFORM_VECTORS too low: have " + maxVecs +
-        ", need at least " + VECS_PER_MATRIX);
-    this.maxQuads = maxVecs / VECS_PER_MATRIX;
+        ", need at least " + (VECS_PER_MATRIX+1));
+    this.maxQuads = (maxVecs - 1) / VECS_PER_MATRIX; // less one to account for uScreenSize
   }
 
   /**
