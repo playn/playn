@@ -32,7 +32,7 @@ public class GL20Context extends GLContext {
   private final boolean checkErrors;
   private final InternalTransform rootXform;
   private int minFilter = GL_LINEAR, magFilter = GL_LINEAR;
-  private GLShader quadShader, trisShader;
+  private AbstractShader quadShader, trisShader;
 
   public GL20Context(Platform platform, GL20 gl, float scaleFactor,
                      int screenWidth, int screenHeight, boolean checkErrors) {
@@ -52,6 +52,7 @@ public class GL20Context extends GLContext {
     gl.glClearColor(0, 0, 0, 1);
     try {
       quadShader = new QuadShader(this);
+      quadShader.createCores(); // force core creation to test whether it fails
     } catch (Throwable t) {
       platform.log().warn("Failed to create QuadShader: " + t);
       quadShader = new IndexedTrisShader(this);

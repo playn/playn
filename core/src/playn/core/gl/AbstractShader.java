@@ -61,6 +61,15 @@ public abstract class AbstractShader implements GLShader {
     this.ctx = ctx;
   }
 
+  /** Forces the creation of our shader cores. Used during GLContext.init to determine whether we
+   * need to fall back to a less sophisticated quad shader. */
+  public void createCores() {
+    this.texCore = createTextureCore();
+    this.texExtras = createTextureExtras(texCore.prog);
+    this.colorCore = createColorCore();
+    this.colorExtras = createColorExtras(colorCore.prog);
+  }
+
   @Override
   public void prepareTexture(int tex, float alpha, int fbufWidth, int fbufHeight) {
     // create our core lazily so that we ensure we're on the GL thread when it happens

@@ -29,6 +29,7 @@ import cli.OpenTK.Graphics.ES20.GL;
 
 import playn.core.InternalTransform;
 import playn.core.PlayN;
+import playn.core.gl.AbstractShader;
 import playn.core.gl.GLBuffer;
 import playn.core.gl.GLContext;
 import playn.core.gl.GLProgram;
@@ -44,8 +45,7 @@ public class IOSGLContext extends GLContext {
   int orient;
   private int minFilter = All.Linear, magFilter = All.Linear;
   private int defaultFrameBuffer = -1; // configured in init()
-  private GLShader quadShader;
-  private GLShader trisShader;
+  private AbstractShader quadShader, trisShader;
 
   public IOSGLContext(IOSPlatform platform, float scaleFactor, int screenWidth, int screenHeight) {
     super(platform, scaleFactor);
@@ -60,6 +60,7 @@ public class IOSGLContext extends GLContext {
     GL.ClearColor(0, 0, 0, 1);
     try {
       quadShader = new QuadShader(this);
+      quadShader.createCores(); // force core creation to test whether it fails
     } catch (Throwable t) {
       platform.log().warn("Failed to create QuadShader: " + t);
       quadShader = new IndexedTrisShader(this);
