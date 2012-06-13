@@ -215,7 +215,7 @@ class JsonObject implements Json.Object {
 
   @Override
   public <T> TypedArray<T> getArray(String key, Class<T> valueType) {
-    return new JsonTypedArray<T>(getArray(key), valueType);
+    return getArray(key, valueType, null);
   }
 
   @Override
