@@ -98,14 +98,14 @@ public interface GLShader {
   /** Sends all accumulated vertex/element info to GL. */
   void flush();
 
-  /** Adds a quad to the current render operation. */
+  /** Adds a quad with texture coordinates to the current render operation. */
   void addQuad(InternalTransform local,
                float x1, float y1, float sx1, float sy1,
                float x2, float y2, float sx2, float sy2,
                float x3, float y3, float sx3, float sy3,
                float x4, float y4, float sx4, float sy4);
 
-  /** Adds a quad to the current render operation. */
+  /** Adds a quad without texture coordinates to the current render operation. */
   void addQuad(InternalTransform local,
                float x1, float y1, float x2, float y2,
                float x3, float y3, float x4, float y4);
