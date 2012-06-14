@@ -39,12 +39,13 @@ class HtmlGraphicsGL extends HtmlGraphics {
   private HtmlGL20 gl20;
   private final GroupLayerGL rootLayer;
 
-  HtmlGraphicsGL(HtmlPlatform platform) throws RuntimeException {
+  HtmlGraphicsGL(HtmlPlatform platform, HtmlPlatform.Configuration configuration) throws RuntimeException {
     canvas = Document.get().createCanvasElement();
     rootElement.appendChild(canvas);
     try {
       WebGLContextAttributes attrs = WebGLContextAttributes.create();
-      attrs.setAlpha(false); // no alpha buffer for consistency with other platforms
+      attrs.setAlpha(configuration.transparentCanvas);
+      attrs.setAntialias(configuration.antiAliasing);
 
       // if this returns null, the browser doesn't support WebGL on this machine
       WebGLRenderingContext gl = WebGLRenderingContext.getContext(canvas, attrs);

@@ -39,6 +39,12 @@ import playn.html.HtmlUrlParameters.Renderer;
 
 public class HtmlPlatform extends AbstractPlatform {
 
+  public static class Configuration {
+    public Mode mode = Mode.AUTODETECT;
+    public boolean transparentCanvas = false;
+    public boolean antiAliasing = true;
+  }
+  
   /** Used by {@link #register(Mode)}. */
   public static enum Mode {
     WEBGL, CANVAS, DOM, AUTODETECT;
@@ -70,17 +76,32 @@ public class HtmlPlatform extends AbstractPlatform {
    * Prepares the HTML platform for operation.
    */
   public static HtmlPlatform register() {
-    return register(null);
+    return register(new Configuration());
+  }
+
+  /**
+   * Prepares the HTML platform for operation.
+   * @deprecated use register(Configuration) instead.
+   * 
+   * @param mode indicates whether to force the use of WebGL, force the use of Canvas, or to
+   * autodetect whether the browser supports WebGL and use it if possible.
+   */
+  public static HtmlPlatform register(Mode mode) {
+    Configuration configuration = new Configuration();
+    configuration.mode = mode;
+    HtmlPlatform platform = new HtmlPlatform(configuration);
+    PlayN.setPlatform(platform);
+    platform.init();
+    return platform;
   }
 
   /**
    * Prepares the HTML platform for operation.
    *
-   * @param mode indicates whether to force the use of WebGL, force the use of Canvas, or to
-   * autodetect whether the browser supports WebGL and use it if possible.
+   * @param configuration platform-specific settings.
    */
-  public static HtmlPlatform register(Mode mode) {
-    HtmlPlatform platform = new HtmlPlatform(mode);
+  public static HtmlPlatform register(Configuration configuration) {
+    HtmlPlatform platform = new HtmlPlatform(configuration);
     PlayN.setPlatform(platform);
     platform.init();
     return platform;
@@ -161,7 +182,7 @@ public class HtmlPlatform extends AbstractPlatform {
 
   private static AgentInfo agentInfo = computeAgentInfo();
 
-  protected HtmlPlatform(Mode mode) {
+  protected HtmlPlatform(Configuration configuration) {
     super(log);
     if (!GWT.isProdMode()) {
       log.info("You are running in GWT Development Mode. "
@@ -175,7 +196,7 @@ public class HtmlPlatform extends AbstractPlatform {
      * our own exceptions here.
      */
     try {
-      graphics = createGraphics(mode != null ? mode : Renderer.requestedMode());
+      graphics = createGraphics(configuration);
       pointer = new HtmlPointer(graphics.rootElement());
       mouse = new HtmlMouse(graphics.rootElement());
       touch = new HtmlTouch(graphics.rootElement());
@@ -320,18 +341,18 @@ public class HtmlPlatform extends AbstractPlatform {
     return Type.HTML;
   }
 
-  private HtmlGraphics createGraphics(Mode mode) {
+  private HtmlGraphics createGraphics(Configuration configuration) {
     try {
-      switch (mode) {
+      switch (configuration.mode != null ? configuration.mode : Renderer.requestedMode()) {
       case CANVAS:
         return new HtmlGraphicsCanvas();
       case DOM:
         return new HtmlGraphicsDom();
       case WEBGL:
-        return new HtmlGraphicsGL(this);
+        return new HtmlGraphicsGL(this, configuration);
       default:
       case AUTODETECT:
-        return hasGLSupport() ? new HtmlGraphicsGL(this) : new HtmlGraphicsCanvas();
+        return hasGLSupport() ? new HtmlGraphicsGL(this, configuration) : new HtmlGraphicsCanvas();
       }
 
     // HtmlGraphicsGL ctor throws a runtime exception if the context creation fails.
