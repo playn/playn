@@ -42,6 +42,9 @@ public interface GLProgram {
 
   /** Returns a handle on the uniform with the specified name.
    * Returns null if the program contains no uniform with that name. */
+  GLShader.Uniform2fv getUniform2fv(String name);
+  /** Returns a handle on the uniform with the specified name.
+   * Returns null if the program contains no uniform with that name. */
   GLShader.UniformMatrix4fv getUniformMatrix4fv(String name);
 
   /** Returns a handle on the attribute with the specified name.

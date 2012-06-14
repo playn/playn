@@ -68,6 +68,12 @@ public interface GLShader {
     void bind(int a, int b);
   }
 
+  /** Provides the ability to bind a uniform vec2 vector. */
+  interface Uniform2fv {
+    /** Binds a uniform vec2 vector to the supplied data.
+     * @param count the number of <em>vec2</em>s to bind (not individual floats). */
+    void bind(GLBuffer.Float data, int count);
+  }
   /** Provides the ability to bind a uniform matrix4 vector. */
   interface UniformMatrix4fv {
     /** Binds a uniform matrix4 vector to the supplied data.

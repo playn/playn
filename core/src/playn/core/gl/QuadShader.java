@@ -27,49 +27,56 @@ public class QuadShader extends AbstractShader {
   /** The GLSL code for quad-specific vertex shader. */
   public static final String VERTEX_SHADER =
     "uniform vec2 u_ScreenSize;\n" +
-    "uniform mat4 u_DataMatrix[_MAX_QUADS_];\n" +
+    "uniform vec2 u_Data[5*_MAX_QUADS_];\n" +
     "attribute vec3 a_Vertex;\n" +
     "varying vec2 v_TexCoord;\n" +
 
     "void main(void) {\n" +
-    // Pick the correct data matrix for this quad.
-    "mat4 data = u_DataMatrix[int(a_Vertex.z)];\n" +
+    // Extract the transform &c data for this quad.
+    "int index = 5*int(a_Vertex.z);\n" +
+    "vec2 m0 = u_Data[index+0];\n" +
+    "vec2 m1 = u_Data[index+1];\n" +
+    "vec2 tr = u_Data[index+2];\n" +
+    "vec2 tc = u_Data[index+3];\n" +
+    "vec2 tcs = u_Data[index+4];\n" +
 
     // Transform the vertex.
     "mat3 transform = mat3(\n" +
-    "  data[0][0], data[0][1], 0,\n" +
-    "  data[0][2], data[0][3], 0,\n" +
-    "  data[1][0], data[1][1], 1);\n" +
-    "gl_Position = vec4(transform * vec3(a_Vertex.xy, 1.0), 1);\n" +
+    "  m0.x, m0.y, 0,\n" +
+    "  m1.x, m1.y, 0,\n" +
+    "  tr.x, tr.y, 1);\n" +
+    "gl_Position = vec4(transform * vec3(a_Vertex.xy, 1), 1);\n" +
 
     // Scale from screen coordinates to [0, 2].
-    "gl_Position.x /= (u_ScreenSize.x / 2.0);\n" +
-    "gl_Position.y /= (u_ScreenSize.y / 2.0);\n" +
+    "gl_Position.x /= u_ScreenSize.x;\n" +
+    "gl_Position.y /= u_ScreenSize.y;\n" +
 
     // Offset to [-1, 1] and flip y axis to put origin at top-left.
     "gl_Position.x -= 1.0;\n" +
     "gl_Position.y = 1.0 - gl_Position.y;\n" +
 
-    "v_TexCoord = a_Vertex.xy * vec2(data[2][0], data[2][1]) + vec2(data[1][2], data[1][3]);\n" +
+    // Compute our texture coordinate.
+    "v_TexCoord = a_Vertex.xy * vec2(tcs.x, tcs.y) + vec2(tc.x, tc.y);\n" +
     "}";
 
   private static final int VERTICES_PER_QUAD = 4;
   private static final int ELEMENTS_PER_QUAD = 6;
   private static final int VERTEX_SIZE = 3; // 3 floats per vertex
-  private static final int VECS_PER_MATRIX = 4; // 4 vec4s per matrix
-  private static final int MATRIX_SIZE = 4 * VECS_PER_MATRIX; // 4x4 matrix
+  private static final int VEC2S_PER_QUAD = 5; // 5 vec2s per matrix
 
   private final int maxQuads;
 
   public QuadShader(GLContext ctx) {
     super(ctx);
 
-    int maxVecs = ctx.getInteger(GL20.GL_MAX_VERTEX_UNIFORM_VECTORS);
-    if (maxVecs <= VECS_PER_MATRIX)
+    // this returns the maximum number of vec4s, so we x2 to turn it into vec2s; then we subtract
+    // one vec2 to account for the uScreenSize uniform
+    int maxVecs = ctx.getInteger(GL20.GL_MAX_VERTEX_UNIFORM_VECTORS) * 2 - 2;
+    if (maxVecs < VEC2S_PER_QUAD)
       throw new RuntimeException(
         "GL_MAX_VERTEX_UNIFORM_VECTORS too low: have " + maxVecs +
-        ", need at least " + (VECS_PER_MATRIX+1));
-    this.maxQuads = (maxVecs - 1) / VECS_PER_MATRIX; // less one to account for uScreenSize
+        ", need at least " + VEC2S_PER_QUAD);
+    this.maxQuads = maxVecs / VEC2S_PER_QUAD;
   }
 
   /**
@@ -93,7 +100,7 @@ public class QuadShader extends AbstractShader {
 
   protected class QuadCore extends Core {
     private final Uniform2f uScreenSize;
-    private final UniformMatrix4fv uDataMatrix;
+    private final Uniform2fv uData;
     private final Attrib aVertices;
     private final GLBuffer.Float verts, data;
     private final GLBuffer.Short elems;
@@ -102,11 +109,11 @@ public class QuadShader extends AbstractShader {
     public QuadCore(AbstractShader shader, String vertShader, String fragShader) {
       super(shader, shader.ctx.createProgram(vertShader, fragShader));
 
-      data = shader.ctx.createFloatBuffer(maxQuads*MATRIX_SIZE);
+      data = shader.ctx.createFloatBuffer(maxQuads*VEC2S_PER_QUAD*2);
 
       // compile the shader and get our uniform and attribute
       uScreenSize = prog.getUniform2f("u_ScreenSize");
-      uDataMatrix = prog.getUniformMatrix4fv("u_DataMatrix");
+      uData = prog.getUniform2fv("u_Data");
       aVertices = prog.getAttrib("a_Vertex", VERTEX_SIZE, GL_FLOAT);
 
       // create our stock supply of unit quads and stuff them into our buffers
@@ -133,7 +140,7 @@ public class QuadShader extends AbstractShader {
     @Override
     public void prepare(int fbufWidth, int fbufHeight) {
       prog.bind();
-      uScreenSize.bind(fbufWidth, fbufHeight);
+      uScreenSize.bind(fbufWidth/2f, fbufHeight/2f);
       verts.bind(GL_ARRAY_BUFFER);
       aVertices.bind(0, 0);
       elems.bind(GL_ELEMENT_ARRAY_BUFFER);
@@ -143,7 +150,7 @@ public class QuadShader extends AbstractShader {
     public void flush() {
       if (quadCounter == 0)
         return;
-      uDataMatrix.bind(data, quadCounter);
+      uData.bind(data, quadCounter);
       elems.drawElements(GL_TRIANGLES, ELEMENTS_PER_QUAD*quadCounter);
       quadCounter = 0;
     }
@@ -168,7 +175,6 @@ public class QuadShader extends AbstractShader {
       data.add(m00*dw, m01*dw, m10*dh, m11*dh, tx, ty);
       data.add(sx1, sy1);
       data.add(sx2 - sx1, sy3 - sy1);
-      data.skip(6);
       quadCounter++;
 
       if (quadCounter >= maxQuads)
