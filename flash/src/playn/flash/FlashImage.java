@@ -20,6 +20,7 @@ import java.util.List;
 import flash.display.BitmapData;
 import flash.gwt.FlashImport;
 
+import playn.core.AbstractImage;
 import playn.core.Image;
 import playn.core.Pattern;
 import playn.core.gl.Scale;
@@ -29,7 +30,7 @@ import playn.core.util.Callbacks;
 @FlashImport({
   "flash.display.Loader", "flash.events.Event", "flash.net.URLRequest", "flash.system.LoaderContext"
 })
-class FlashImage implements Image {
+class FlashImage extends AbstractImage {
 
   private List<Callback<? super Image>> callbacks;
 
