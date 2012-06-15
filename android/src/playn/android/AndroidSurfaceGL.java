@@ -60,8 +60,12 @@ public class AndroidSurfaceGL extends SurfaceGL
         int bufferTex = actx.createTexture(false, false);
         actx.gl.glTexImage2D(GL20.GL_TEXTURE_2D, 0, GL20.GL_RGBA, texWidth, texHeight, 0,
                              GL20.GL_RGBA, GL20.GL_UNSIGNED_BYTE, pixelBuffer);
-        ctx.drawTexture(null, bufferTex, width, height, StockInternalTransform.IDENTITY, 0, height,
-                        width, -height, false, false, 1);
+        // bind our surface framebuffer and render the saved texture data into it
+        bindFramebuffer();
+        ctx.quadShader(null).prepareTexture(bufferTex, 1).addQuad(
+          StockInternalTransform.IDENTITY, 0, height, width, 0, 0, 0, 1, 1);
+        // rebind the default frame buffer (which will flush the rendering operation)
+        ctx.bindFramebuffer();
         ctx.destroyTexture(bufferTex);
         pixelBuffer = null;
         cachedPixels.delete();
@@ -76,7 +80,7 @@ public class AndroidSurfaceGL extends SurfaceGL
   public void onSurfaceLost() {
     try {
       AndroidGLContext actx = (AndroidGLContext) ctx;
-      actx.gl.glBindFramebuffer(GL20.GL_FRAMEBUFFER, (Integer) fbuf);
+      bindFramebuffer();
       ByteBuffer pixelBuffer = ByteBuffer.allocate(texWidth * texHeight * 4);
       actx.gl.glReadPixels(0, 0, texWidth, texHeight, GL20.GL_RGBA, GL20.GL_UNSIGNED_BYTE,
                            pixelBuffer);

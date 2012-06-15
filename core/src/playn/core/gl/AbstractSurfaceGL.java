@@ -104,14 +104,17 @@ abstract class AbstractSurfaceGL implements Surface {
     l.setTranslation(x0 + wy, y0 - wx);
     l.preConcatenate(topTransform());
 
+    GLShader shader = ctx.quadShader(this.shader);
     if (fillPattern != null) {
       int tex = fillPattern.ensureTexture(true, true);
       if (tex > 0) {
-        ctx.fillQuad(shader, l, 0, 0, length, 0, 0, width, length, width,
-                     fillPattern.width(), fillPattern.height(), tex, alpha);
+        shader.prepareTexture(tex, alpha);
+        shader.addQuad(l, 0, 0, length, width,
+                       0, 0, length/fillPattern.width(), width/fillPattern.height());
       }
     } else {
-      ctx.fillQuad(shader, l, 0, 0, length, 0, 0, width, length, width, fillColor, alpha);
+      shader.prepareColor(fillColor, alpha);
+      shader.addQuad(l, 0, 0, length, width, 0, 0, 1, 1);
     }
     return this;
   }
@@ -120,14 +123,17 @@ abstract class AbstractSurfaceGL implements Surface {
   public Surface fillRect(float x, float y, float width, float height) {
     bindFramebuffer();
 
+    GLShader shader = ctx.quadShader(this.shader);
     if (fillPattern != null) {
       int tex = fillPattern.ensureTexture(true, true);
       if (tex > 0) {
-        ctx.fillRect(shader, topTransform(), x, y, width, height,
-                     fillPattern.width(), fillPattern.height(), tex, alpha);
+        shader.prepareTexture(tex, alpha);
+        float tw = fillPattern.width(), th = fillPattern.height(), r = x+width, b = y+height;
+        shader.addQuad(topTransform(), x, y, x+width, y+height, x / tw, y / th, r / tw, b / th);
       }
     } else {
-      ctx.fillRect(shader, topTransform(), x, y, width, height, fillColor, alpha);
+      shader.prepareColor(fillColor, alpha);
+      shader.addQuad(topTransform(), x, y, x+width, y+height, 0, 0, 1, 1);
     }
     return this;
   }
@@ -136,14 +142,16 @@ abstract class AbstractSurfaceGL implements Surface {
   public Surface fillTriangles(float[] xys, int[] indices) {
     bindFramebuffer();
 
+    GLShader shader = ctx.trisShader(this.shader);
     if (fillPattern != null) {
       int tex = fillPattern.ensureTexture(true, true);
       if (tex > 0) {
-        ctx.fillTriangles(shader, topTransform(), xys, indices,
-                          fillPattern.width(), fillPattern.height(), tex, alpha);
+        shader.prepareTexture(tex, alpha);
+        shader.addTriangles(topTransform(), xys, fillPattern.width(), fillPattern.height(), indices);
       }
     } else {
-      ctx.fillTriangles(shader, topTransform(), xys, indices, fillColor, alpha);
+      shader.prepareColor(fillColor, alpha);
+      shader.addTriangles(topTransform(), xys, 1, 1, indices);
     }
     return this;
   }
@@ -156,7 +164,8 @@ abstract class AbstractSurfaceGL implements Surface {
       throw new IllegalStateException("No fill pattern currently set");
     int tex = fillPattern.ensureTexture(true, true);
     if (tex > 0) {
-      ctx.fillTriangles(shader, topTransform(), xys, sxys, indices, tex, alpha);
+      GLShader shader = ctx.trisShader(this.shader).prepareTexture(tex, alpha);
+      shader.addTriangles(topTransform(), xys, sxys, indices);
     }
     return this;
   }

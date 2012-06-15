@@ -29,7 +29,6 @@ import cli.OpenTK.Graphics.ES20.GL;
 
 import playn.core.InternalTransform;
 import playn.core.PlayN;
-import playn.core.gl.AbstractShader;
 import playn.core.gl.GLBuffer;
 import playn.core.gl.GLContext;
 import playn.core.gl.GLProgram;
@@ -45,7 +44,7 @@ public class IOSGLContext extends GLContext {
   int orient;
   private int minFilter = All.Linear, magFilter = All.Linear;
   private int defaultFrameBuffer = -1; // configured in init()
-  private AbstractShader quadShader, trisShader;
+  private GLShader quadShader, trisShader;
 
   public IOSGLContext(IOSPlatform platform, float scaleFactor, int screenWidth, int screenHeight) {
     super(platform, scaleFactor);

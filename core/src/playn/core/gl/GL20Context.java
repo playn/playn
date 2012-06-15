@@ -32,7 +32,7 @@ public class GL20Context extends GLContext {
   private final boolean checkErrors;
   private final InternalTransform rootXform;
   private int minFilter = GL_LINEAR, magFilter = GL_LINEAR;
-  private AbstractShader quadShader, trisShader;
+  private GLShader quadShader, trisShader;
 
   public GL20Context(Platform platform, GL20 gl, float scaleFactor,
                      int screenWidth, int screenHeight, boolean checkErrors) {

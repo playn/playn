@@ -23,8 +23,8 @@ import playn.core.ImageLayer;
 import playn.core.ImmediateLayer;
 import playn.core.ResourceCallback;
 import playn.core.Surface;
-import playn.core.gl.AbstractShader;
 import playn.core.gl.GLContext;
+import playn.core.gl.GLShader;
 import playn.core.gl.IndexedTrisShader;
 import static playn.core.PlayN.*;
 
@@ -152,7 +152,7 @@ public class ShaderTest extends Test {
         private final Uniform1f uAngle = prog.getUniform1f("u_Angle");
         private final Uniform2f uEye = prog.getUniform2f("u_Eye");
 
-        public RotCore (AbstractShader shader, String vertShader, String fragShader) {
+        public RotCore (GLShader shader, String vertShader, String fragShader) {
           super(shader, vertShader, fragShader);
         }
 

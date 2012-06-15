@@ -15,14 +15,13 @@
  */
 package playn.core.gl;
 
-import playn.core.InternalTransform;
 import playn.core.gl.GLShader;
 import static playn.core.gl.GL20.*;
 
 /**
  * A {@link GLShader} implementation that only handles quads.
  */
-public class QuadShader extends AbstractShader {
+public class QuadShader extends GLShader {
 
   /** The GLSL code for quad-specific vertex shader. */
   public static final String VERTEX_SHADER =
@@ -106,7 +105,7 @@ public class QuadShader extends AbstractShader {
     private final GLBuffer.Short elems;
     private int quadCounter;
 
-    public QuadCore(AbstractShader shader, String vertShader, String fragShader) {
+    public QuadCore(GLShader shader, String vertShader, String fragShader) {
       super(shader, shader.ctx.createProgram(vertShader, fragShader));
 
       data = shader.ctx.createFloatBuffer(maxQuads*VEC2S_PER_QUAD*2);
@@ -164,32 +163,19 @@ public class QuadShader extends AbstractShader {
     }
 
     @Override
-    public void addQuad(InternalTransform local,
+    public void addQuad(float m00, float m01, float m10, float m11, float tx, float ty,
                         float x1, float y1, float sx1, float sy1,
                         float x2, float y2, float sx2, float sy2,
                         float x3, float y3, float sx3, float sy3,
                         float x4, float y4, float sx4, float sy4) {
       float dw = x2 - x1, dh = y3 - y1;
-      float m00 = local.m00(), m01 = local.m01(), m10 = local.m10(), m11 = local.m11();
-      float tx = local.tx() + m00*x1 + m10*y1, ty = local.ty() + m01*x1 + m11*y1;
-      data.add(m00*dw, m01*dw, m10*dh, m11*dh, tx, ty);
+      data.add(m00*dw, m01*dw, m10*dh, m11*dh, tx + m00*x1 + m10*y1, ty + m01*x1 + m11*y1);
       data.add(sx1, sy1);
       data.add(sx2 - sx1, sy3 - sy1);
       quadCounter++;
 
       if (quadCounter >= maxQuads)
         shader.flush();
-    }
-
-    @Override
-    public void addTriangles(InternalTransform local, float[] xys, float texWidth, float texHeight,
-                             int[] indices) {
-      throw new UnsupportedOperationException("Should only be used for quads");
-    }
-
-    @Override
-    public void addTriangles(InternalTransform local, float[] xys, float[] sxys, int[] indices) {
-      throw new UnsupportedOperationException("Should only be used for quads");
     }
   }
 }

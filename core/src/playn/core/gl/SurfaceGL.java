@@ -44,12 +44,12 @@ public class SurfaceGL extends AbstractSurfaceGL {
     return height;
   }
 
-  protected void paint(InternalTransform transform, float alpha, GLShader shader) {
+  protected void paint(InternalTransform xform, float alpha, GLShader shader) {
     // Draw this layer to the screen upside-down, because its contents are flipped (This happens
     // because it uses the same vertex program as everything else, which flips vertically to put
     // the origin at the top-left).
-    ctx.drawTexture(shader, tex, width, height, transform, 0, height, width, -height,
-                    false, false, alpha);
+    ctx.quadShader(shader).prepareTexture(tex, alpha).addQuad(
+      xform, 0, height, width, 0, 0, 0, 1, 1);
   }
 
   protected void destroy() {

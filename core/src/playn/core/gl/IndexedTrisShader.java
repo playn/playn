@@ -15,12 +15,10 @@
  */
 package playn.core.gl;
 
-import playn.core.InternalTransform;
-
 /**
  * A {@link GLShader} implementation that decomposes quads into indexed triangles.
  */
-public class IndexedTrisShader extends AbstractShader {
+public class IndexedTrisShader extends GLShader {
 
   /** The GLSL code for our vertex shader. */
   public static final String VERTEX_SHADER =
@@ -86,7 +84,7 @@ public class IndexedTrisShader extends AbstractShader {
     private final GLBuffer.Float vertices;
     private final GLBuffer.Short elements;
 
-    public ITCore(AbstractShader shader, String vertShader, String fragShader) {
+    public ITCore(GLShader shader, String vertShader, String fragShader) {
       super(shader, shader.ctx.createProgram(vertShader, fragShader));
 
       // determine our various shader program locations
@@ -139,13 +137,11 @@ public class IndexedTrisShader extends AbstractShader {
     }
 
     @Override
-    public void addQuad(InternalTransform local,
+    public void addQuad(float m00, float m01, float m10, float m11, float tx, float ty,
                         float x1, float y1, float sx1, float sy1,
                         float x2, float y2, float sx2, float sy2,
                         float x3, float y3, float sx3, float sy3,
                         float x4, float y4, float sx4, float sy4) {
-      float m00 = local.m00(), m01 = local.m01(), m10 = local.m10(), m11 = local.m11();
-      float tx = local.tx(), ty = local.ty();
       int vertIdx = beginPrimitive(4, 6);
       vertices.add(m00, m01, m10, m11, tx, ty).add(x1, y1).add(sx1, sy1);
       vertices.add(m00, m01, m10, m11, tx, ty).add(x2, y2).add(sx2, sy2);
@@ -161,10 +157,8 @@ public class IndexedTrisShader extends AbstractShader {
     }
 
     @Override
-    public void addTriangles(InternalTransform local,
+    public void addTriangles(float m00, float m01, float m10, float m11, float tx, float ty,
                              float[] xys, float tw, float th, int[] indices) {
-      float m00 = local.m00(), m01 = local.m01(), m10 = local.m10(), m11 = local.m11();
-      float tx = local.tx(), ty = local.ty();
       int vertIdx = beginPrimitive(xys.length/2, indices.length);
       for (int ii = 0, ll = xys.length; ii < ll; ii += 2) {
         float x = xys[ii], y = xys[ii+1];
@@ -175,9 +169,8 @@ public class IndexedTrisShader extends AbstractShader {
     }
 
     @Override
-    public void addTriangles(InternalTransform local, float[] xys, float[] sxys, int[] indices) {
-      float m00 = local.m00(), m01 = local.m01(), m10 = local.m10(), m11 = local.m11();
-      float tx = local.tx(), ty = local.ty();
+    public void addTriangles(float m00, float m01, float m10, float m11, float tx, float ty,
+                             float[] xys, float[] sxys, int[] indices) {
       int vertIdx = beginPrimitive(xys.length/2, indices.length);
       for (int ii = 0, ll = xys.length; ii < ll; ii += 2)
         vertices.add(m00, m01, m10, m11, tx, ty).add(xys[ii], xys[ii+1]).add(sxys[ii], sxys[ii+1]);

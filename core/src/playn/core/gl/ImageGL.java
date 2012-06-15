@@ -92,9 +92,12 @@ public abstract class ImageGL implements Image {
             boolean repeatX, boolean repeatY, float alpha) {
     int tex = ensureTexture(repeatX, repeatY);
     if (tex > 0) {
-      float sw = repeatX ? dw : width(), sh = repeatY ? dh : height();
-      ctx.drawTexture(shader, tex, texWidth(repeatX), texHeight(repeatY), xform,
-                      dx, dy, dw, dh, x(), y(), sw, sh, alpha);
+      float sl = x(), st = y();
+      float sr = sl + (repeatX ? dw : width()), sb = st + (repeatY ? dh : height());
+      float texWidth = texWidth(repeatX), texHeight = texHeight(repeatY);
+      ctx.quadShader(shader).prepareTexture(tex, alpha).addQuad(
+        xform, dx, dy, dx + dw, dy + dh,
+        sl / texWidth, st / texHeight, sr / texWidth, sb / texHeight);
     }
   }
 
@@ -105,8 +108,11 @@ public abstract class ImageGL implements Image {
             float sx, float sy, float sw, float sh, float alpha) {
     int tex = ensureTexture(false, false);
     if (tex > 0) {
-      ctx.drawTexture(shader, tex, texWidth(false), texHeight(false), xform,
-                      dx, dy, dw, dh, x()+sx, y()+sy, sw, sh, alpha);
+      sx += x(); sy += y();
+      float texWidth = texWidth(false), texHeight = texHeight(false);
+      ctx.quadShader(shader).prepareTexture(tex, alpha).addQuad(
+        xform, dx, dy, dx + dw, dy + dh,
+        sx / texWidth, sy / texHeight, (sx + sw) / texWidth, (sy + sh) / texHeight);
     }
   }
 
@@ -199,8 +205,8 @@ public abstract class ImageGL implements Image {
     // render the non-repeated texture into the framebuffer properly scaled
     ctx.bindFramebuffer(fbuf, width, height);
     ctx.clear(0, 0, 0, 0);
-    ctx.drawTexture(null, tex, width(), height(), ctx.createTransform(),
-                    0, height, width, -height, false, false, 1);
+    ctx.quadShader(null).prepareTexture(tex, 1).addQuad(
+      ctx.createTransform(), 0, height, width, 0, 0, 0, 1, 1);
 
     // we no longer need this framebuffer; rebind the default framebuffer and delete ours
     ctx.bindFramebuffer();
