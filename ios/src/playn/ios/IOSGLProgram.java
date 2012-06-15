@@ -66,7 +66,7 @@ public class IOSGLProgram implements GLProgram {
       if (vertexShader != 0)
         GL.DeleteShader(vertexShader);
       if (fragmentShader != 0)
-        GL.DeleteShader(program);
+        GL.DeleteShader(fragmentShader);
     }
   }
 
