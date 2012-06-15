@@ -65,7 +65,7 @@ public class GL20Program implements GLProgram {
       if (vertexShader != 0)
         gl.glDeleteShader(vertexShader);
       if (fragmentShader != 0)
-        gl.glDeleteShader(program);
+        gl.glDeleteShader(fragmentShader);
     }
   }
 
