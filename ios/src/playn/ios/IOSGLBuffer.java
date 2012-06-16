@@ -66,6 +66,13 @@ public abstract class IOSGLBuffer implements GLBuffer {
     }
 
     @Override
+    public Float add(float[] data, int offset, int length) {
+      System.arraycopy(data, offset, data, position, length);
+      position += length;
+      return this;
+    }
+
+    @Override
     public int capacity() {
       return data.length;
     }

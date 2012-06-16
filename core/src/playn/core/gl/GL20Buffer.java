@@ -89,6 +89,12 @@ public abstract class GL20Buffer implements GLBuffer {
       return this;
     }
 
+    @Override
+    public Float add(float[] data, int offset, int length) {
+      buffer.put(data, offset, length);
+      return this;
+    }
+
     protected Buffer buffer() {
       return buffer;
     }

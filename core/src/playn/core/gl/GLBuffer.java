@@ -39,6 +39,13 @@ public interface GLBuffer {
     /** Adds the specified transform to this buffer.
      * @return this buffer for call chaining. */
     Float add(float m00, float m01, float m10, float m11, float tx, float ty);
+
+    /** Adds the supplied values to this buffer.
+     * @param data the value to be added.
+     * @param offset the offset into {@code data} at which to start adding.
+     * @param length the number of values from {@code data} to add.
+     * @return this buffer for call chaining. */
+    Float add(float[] data, int offset, int length);
   }
 
   /** A buffer of 16-bit unsigned integers. */
