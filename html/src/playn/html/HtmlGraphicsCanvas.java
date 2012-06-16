@@ -34,6 +34,7 @@ class HtmlGraphicsCanvas extends HtmlGraphics {
   private final Context2d ctx;
 
   public HtmlGraphicsCanvas(HtmlPlatform.Config config) {
+    super(config);
     scale = new Scale(config.scaleFactor);
     rootLayer = new HtmlGroupLayerCanvas();
     canvas = Document.get().createCanvasElement();

@@ -24,7 +24,10 @@ import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.ImageElement;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.dom.client.Style;
+import com.google.gwt.event.logical.shared.ResizeEvent;
+import com.google.gwt.event.logical.shared.ResizeHandler;
 import com.google.gwt.user.client.DOM;
+import com.google.gwt.user.client.Window;
 
 import pythagoras.f.Point;
 
@@ -70,6 +73,9 @@ public abstract class HtmlGraphics implements Graphics {
   private static final String HEIGHT_TEXT =
     "THEQUICKBROWNFOXJUMPEDOVERTHELAZYDOGthequickbrownfoxjumpedoverthelazydog";
   private static final String EMWIDTH_TEXT = "m";
+
+  // Temporary hack to fix mouse coordinates for scaled fullscreen mode.
+  static float experimentalScale = 1;
 
   /**
    * Sizes or resizes the root element that contains the PlayN view.
@@ -161,7 +167,7 @@ public abstract class HtmlGraphics implements Graphics {
     return null;
   }
 
-  protected HtmlGraphics() {
+  protected HtmlGraphics(HtmlPlatform.Config config) {
     Document doc = Document.get();
 
     dummyCanvas = doc.createCanvasElement();
@@ -184,6 +190,27 @@ public abstract class HtmlGraphics implements Graphics {
     measureElement.getStyle().setTop(-500, Unit.PX);
     measureElement.getStyle().setOverflow(Style.Overflow.VISIBLE);
     rootElement.appendChild(measureElement);
+
+    if (config.experimentalFullscreen) {
+      Window.addResizeHandler(new ResizeHandler() {
+      @Override
+      public void onResize(ResizeEvent event) {
+        if (fullScreenWidth() == event.getWidth() && fullScreenHeight() == event.getHeight()) {
+          experimentalScale = Math.min((float) fullScreenWidth() / (float) width(), (float) fullScreenHeight() / (float) height());
+          int yOfs = (int) ((fullScreenHeight() - height() * experimentalScale) / 3.f); // less distance to the top
+          int xOfs = (int) ((fullScreenWidth() - width() * experimentalScale) / 2.f);
+          rootElement().setAttribute("style",
+              "width:"+experimentalScale * width()+"px;height:"+ experimentalScale*height()+ "px;position:absolute;left:"+xOfs+"px;top:"+yOfs);
+          // This is needed to work around a focus bug in Chrome :(
+          Window.alert("Switching to fullscreen mode.");
+          Document.get().getBody().addClassName("fullscreen");
+        } else {
+          experimentalScale = 1;
+          rootElement().removeAttribute("style");
+          Document.get().getBody().removeClassName("fullscreen");
+        }
+      }});
+    }
   }
 
   abstract Scale scale();
@@ -222,4 +249,11 @@ public abstract class HtmlGraphics implements Graphics {
   abstract Element rootElement();
 
   abstract void paint(Game game, float paintAlpha);
-}
+
+  private native int fullScreenWidth() /*-{
+     return $wnd.screen.width;
+  }-*/;
+
+  private native int fullScreenHeight() /*-{
+    return $wnd.screen.height;
+  }-*/;}

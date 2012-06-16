@@ -57,8 +57,8 @@ abstract class HtmlInput {
    * @return the relative x-position
    */
   static float getRelativeX(NativeEvent e, Element target) {
-    return e.getClientX() - target.getAbsoluteLeft() + target.getScrollLeft()
-        + target.getOwnerDocument().getScrollLeft();
+    return (e.getClientX() - target.getAbsoluteLeft() + target.getScrollLeft()
+        + target.getOwnerDocument().getScrollLeft()) / HtmlGraphics.experimentalScale;
   }
 
   /**
@@ -69,7 +69,7 @@ abstract class HtmlInput {
    * @return the relative y-position
    */
   static float getRelativeY(NativeEvent e, Element target) {
-    return e.getClientY() - target.getAbsoluteTop() + target.getScrollTop()
-        + target.getOwnerDocument().getScrollTop();
+    return (e.getClientY() - target.getAbsoluteTop() + target.getScrollTop()
+        + target.getOwnerDocument().getScrollTop()) / HtmlGraphics.experimentalScale;
   }
 }

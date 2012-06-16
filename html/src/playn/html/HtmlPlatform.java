@@ -43,6 +43,8 @@ public class HtmlPlatform extends AbstractPlatform {
     public boolean transparentCanvas = false;
     public boolean antiAliasing = true;
     public float scaleFactor = 1;
+    // Scale up the canvas on fullscreen. Highly experimental.
+    public boolean experimentalFullscreen = false;
   }
 
   /* @deprecated Use {@link Config}. */
@@ -355,7 +357,7 @@ public class HtmlPlatform extends AbstractPlatform {
       case CANVAS:
         return new HtmlGraphicsCanvas(config);
       case DOM:
-        return new HtmlGraphicsDom();
+        return new HtmlGraphicsDom(config);
       case WEBGL:
         return new HtmlGraphicsGL(this, config);
       default:
