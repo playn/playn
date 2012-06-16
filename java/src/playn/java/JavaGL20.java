@@ -972,7 +972,7 @@ final class JavaGL20 implements playn.core.gl.GL20 {
   public void glCompressedTexImage2D(int target, int level, int internalformat,
                                      int width, int height, int border,
                                      int data_imageSize, int data) {
-    throw new UnsupportedOperationException("NYI");
+    GL13.glCompressedTexImage2D(target, level, internalformat, width, height, border, data_imageSize, data);
   }
 
   @Override
@@ -1422,7 +1422,7 @@ final class JavaGL20 implements playn.core.gl.GL20 {
   @Override
   public void glReadPixels(int x, int y, int width, int height, int format, int type,
                            int pixelsBufferOffset) {
-    throw new UnsupportedOperationException("NYI");
+    GL11.glReadPixels(x, y, width, height, format, type, pixelsBufferOffset);
   }
 
   @Override
@@ -1444,10 +1444,9 @@ final class JavaGL20 implements playn.core.gl.GL20 {
   }
 
   @Override
-  public void glTexImage2D(int arg0, int arg1, int arg2, int arg3, int arg4,
-                           int arg5, int arg6, int arg7, int arg8) {
-    throw new UnsupportedOperationException("NYI");
-
+  public void glTexImage2D(int target, int level, int internalformat, int width, int height,
+                           int border, int format, int type, int pixels) {
+    GL11.glTexImage2D(target, level, internalformat, width, height, border, format, type, pixels);
   }
 
   @Override
@@ -1479,9 +1478,9 @@ final class JavaGL20 implements playn.core.gl.GL20 {
   }
 
   @Override
-  public void glTexSubImage2D(int arg0, int arg1, int arg2, int arg3, int arg4, int arg5, int arg6,
-                              int arg7, int arg8) {
-    throw new UnsupportedOperationException("NYI");
+  public void glTexSubImage2D(int target, int level, int xoffset, int yoffset, int width, int height, int format,
+                              int type, int pixels) {
+    GL11.glTexSubImage2D(target, level, xoffset, yoffset, width, height, format, type, pixels);
   }
 
   @Override

@@ -794,7 +794,7 @@ public final class HtmlGL20 implements playn.core.gl.GL20 {
 
   @Override
   public void glGetBufferParameteriv(int target, int pname, IntBuffer params) {
-    throw new RuntimeException("NYI glGetBufferParameteriv");
+    params.put(params.position(), gl.getBufferParameter(target, pname));
   }
 
   @Override
@@ -854,22 +854,28 @@ public final class HtmlGL20 implements playn.core.gl.GL20 {
 
   @Override
   public void glGetTexParameterfv(int target, int pname, FloatBuffer params) {
-    throw new RuntimeException("NYI glGetTexParameterfv");
+    params.put(params.position(), gl.getTexParameter(target, pname));
   }
 
   @Override
   public void glGetTexParameteriv(int target, int pname, IntBuffer params) {
-    throw new RuntimeException("NYI glGetTexParameteriv");
+    params.put(params.position(), gl.getTexParameter(target, pname));
   }
 
   @Override
   public void glGetUniformfv(int program, int location, FloatBuffer params) {
-    throw new RuntimeException("NYI glGetUniformfv");
+    Float32Array v = gl.getUniformv(getProgram(program), getUniformLocation(location));
+    for (int i = 0; i < v.getLength(); i++) {
+      params.put(params.position() + i, v.get(i));
+    }
   }
 
   @Override
   public void glGetUniformiv(int program, int location, IntBuffer params) {
-    throw new RuntimeException("NYI glGetUniformiv");
+    Int32Array v = gl.getUniformv(getProgram(program), getUniformLocation(location));
+    for (int i = 0; i < v.getLength(); i++) {
+      params.put(params.position() + i, v.get(i));
+    }
   }
 
   @Override
@@ -880,12 +886,15 @@ public final class HtmlGL20 implements playn.core.gl.GL20 {
 
   @Override
   public void glGetVertexAttribfv(int index, int pname, FloatBuffer params) {
-    throw new RuntimeException("NYI glGetVertexAttribfv");
+    Float32Array v = gl.getVertexAttribv(index, pname);
+    for (int i = 0; i < v.getLength(); i++) {
+      params.put(params.position() + i, v.get(i));
+    }
   }
 
   @Override
   public void glGetVertexAttribiv(int index, int pname, IntBuffer params) {
-    throw new RuntimeException("NYI glGetVertexAttribiv");
+    throw new UnsupportedOperationException("NYI glGetVertexAttribiv: WebGL getVertexAttribv always returns a float buffer.");
   }
 
   @Override
@@ -1581,7 +1590,7 @@ public final class HtmlGL20 implements playn.core.gl.GL20 {
 
   @Override
   public boolean hasGLSL() {
-    throw new RuntimeException("NYI hasGLSL");
+    return true;
   }
 
   @Override
