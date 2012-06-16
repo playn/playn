@@ -69,12 +69,12 @@ public class IndexedTrisShader extends GLShader {
 
   @Override
   protected Core createTextureCore() {
-    return new ITCore(this, vertexShader(), textureFragmentShader());
+    return new ITCore(vertexShader(), textureFragmentShader());
   }
 
   @Override
   protected Core createColorCore() {
-    return new ITCore(this, vertexShader(), colorFragmentShader());
+    return new ITCore(vertexShader(), colorFragmentShader());
   }
 
   protected class ITCore extends Core {
@@ -84,8 +84,8 @@ public class IndexedTrisShader extends GLShader {
     private final GLBuffer.Float vertices;
     private final GLBuffer.Short elements;
 
-    public ITCore(GLShader shader, String vertShader, String fragShader) {
-      super(shader, shader.ctx.createProgram(vertShader, fragShader));
+    public ITCore(String vertShader, String fragShader) {
+      super(vertShader, fragShader);
 
       // determine our various shader program locations
       uScreenSize = prog.getUniform2f("u_ScreenSize");
@@ -95,8 +95,8 @@ public class IndexedTrisShader extends GLShader {
       aTexCoord = prog.getAttrib("a_TexCoord", 2, GL20.GL_FLOAT);
 
       // create our vertex and index buffers
-      vertices = shader.ctx.createFloatBuffer(START_VERTS*VERTEX_SIZE);
-      elements = shader.ctx.createShortBuffer(START_ELEMS);
+      vertices = ctx.createFloatBuffer(START_VERTS*VERTEX_SIZE);
+      elements = ctx.createShortBuffer(START_ELEMS);
     }
 
     @Override
@@ -112,21 +112,21 @@ public class IndexedTrisShader extends GLShader {
         aTexCoord.bind(VERTEX_STRIDE, 32);
 
       elements.bind(GL20.GL_ELEMENT_ARRAY_BUFFER);
-      shader.ctx.checkGLError("Shader.prepare bind");
+      ctx.checkGLError("Shader.prepare bind");
     }
 
     @Override
     public void flush() {
       if (vertices.position() == 0)
         return;
-      shader.ctx.checkGLError("Shader.flush");
+      ctx.checkGLError("Shader.flush");
 
       vertices.send(GL20.GL_ARRAY_BUFFER, GL20.GL_STREAM_DRAW);
       int elems = elements.send(GL20.GL_ELEMENT_ARRAY_BUFFER, GL20.GL_STREAM_DRAW);
-      shader.ctx.checkGLError("Shader.flush BufferData");
+      ctx.checkGLError("Shader.flush BufferData");
 
       elements.drawElements(GL20.GL_TRIANGLES, elems);
-      shader.ctx.checkGLError("Shader.flush DrawElements");
+      ctx.checkGLError("Shader.flush DrawElements");
     }
 
     @Override
@@ -183,7 +183,7 @@ public class IndexedTrisShader extends GLShader {
       int verts = vertIdx + vertexCount, elems = elements.position() + elemCount;
       int availVerts = vertices.capacity() / VERTEX_SIZE, availElems = elements.capacity();
       if ((verts > availVerts) || (elems > availElems)) {
-        shader.flush();
+        IndexedTrisShader.this.flush();
         if (vertexCount > availVerts)
           expandVerts(vertexCount);
         if (elemCount > availElems)

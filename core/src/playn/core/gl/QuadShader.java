@@ -89,12 +89,12 @@ public class QuadShader extends GLShader {
 
   @Override
   protected Core createTextureCore() {
-    return new QuadCore(this, vertexShader(), textureFragmentShader());
+    return new QuadCore(vertexShader(), textureFragmentShader());
   }
 
   @Override
   protected Core createColorCore() {
-    return new QuadCore(this, vertexShader(), colorFragmentShader());
+    return new QuadCore(vertexShader(), colorFragmentShader());
   }
 
   protected class QuadCore extends Core {
@@ -105,10 +105,10 @@ public class QuadShader extends GLShader {
     private final GLBuffer.Short elems;
     private int quadCounter;
 
-    public QuadCore(GLShader shader, String vertShader, String fragShader) {
-      super(shader, shader.ctx.createProgram(vertShader, fragShader));
+    public QuadCore(String vertShader, String fragShader) {
+      super(vertShader, fragShader);
 
-      data = shader.ctx.createFloatBuffer(maxQuads*VEC2S_PER_QUAD*2);
+      data = ctx.createFloatBuffer(maxQuads*VEC2S_PER_QUAD*2);
 
       // compile the shader and get our uniform and attribute
       uScreenSize = prog.getUniform2f("u_ScreenSize");
@@ -116,8 +116,8 @@ public class QuadShader extends GLShader {
       aVertices = prog.getAttrib("a_Vertex", VERTEX_SIZE, GL_FLOAT);
 
       // create our stock supply of unit quads and stuff them into our buffers
-      verts = shader.ctx.createFloatBuffer(maxQuads*VERTICES_PER_QUAD*VERTEX_SIZE);
-      elems = shader.ctx.createShortBuffer(maxQuads*ELEMENTS_PER_QUAD);
+      verts = ctx.createFloatBuffer(maxQuads*VERTICES_PER_QUAD*VERTEX_SIZE);
+      elems = ctx.createShortBuffer(maxQuads*ELEMENTS_PER_QUAD);
 
       float[] tv1 = {0.0f, 0.0f}, tv2 = {1.0f, 0.0f}, tv3 = {0.0f, 1.0f}, tv4 = {1.0f, 1.0f};
       for (int ii = 0; ii < maxQuads; ii++) {
@@ -175,7 +175,7 @@ public class QuadShader extends GLShader {
       quadCounter++;
 
       if (quadCounter >= maxQuads)
-        shader.flush();
+        QuadShader.this.flush();
     }
   }
 }

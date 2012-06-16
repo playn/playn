@@ -140,20 +140,20 @@ public class ShaderTest extends Test {
 
       @Override
       protected Core createTextureCore() {
-        return new RotCore(this, vertexShader(), textureFragmentShader());
+        return new RotCore(vertexShader(), textureFragmentShader());
       }
 
       @Override
       protected Core createColorCore() {
-        return new RotCore(this, vertexShader(), colorFragmentShader());
+        return new RotCore(vertexShader(), colorFragmentShader());
       }
 
       class RotCore extends ITCore {
         private final Uniform1f uAngle = prog.getUniform1f("u_Angle");
         private final Uniform2f uEye = prog.getUniform2f("u_Eye");
 
-        public RotCore (GLShader shader, String vertShader, String fragShader) {
-          super(shader, vertShader, fragShader);
+        public RotCore (String vertShader, String fragShader) {
+          super(vertShader, fragShader);
         }
 
         @Override

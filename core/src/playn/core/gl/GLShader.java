@@ -311,10 +311,7 @@ public abstract class GLShader {
   }
 
   /** Implements the core of the indexed tris shader. */
-  protected static abstract class Core {
-    /** The shader of which this core is a part. */
-    public final GLShader shader;
-
+  protected abstract class Core {
     /** This core's shader program. */
     public final GLProgram prog;
 
@@ -348,9 +345,8 @@ public abstract class GLShader {
       prog.destroy();
     }
 
-    protected Core(GLShader shader, GLProgram prog) {
-      this.shader = shader;
-      this.prog = prog;
+    protected Core(String vertShader, String fragShader) {
+      this.prog = ctx.createProgram(vertShader, fragShader);
     }
   }
 
