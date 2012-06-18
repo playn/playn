@@ -43,7 +43,8 @@ public class IOSKeyboard implements Keyboard {
   public void getText(TextType textType, String label, String initVal,
       final Callback<String> callback) {
     UIAlertView view = new UIAlertView();
-    view.set_Title(label);
+    if (label != null)
+      view.set_Title(label);
     view.AddButton("Cancel");
     view.AddButton("OK");
     view.set_AlertViewStyle(UIAlertViewStyle.wrap(UIAlertViewStyle.PlainTextInput));
