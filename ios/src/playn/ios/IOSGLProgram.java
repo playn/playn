@@ -144,7 +144,7 @@ public class IOSGLProgram implements GLProgram {
       public void bind(GLBuffer.Float data, int count) {
         IOSGLBuffer.FloatImpl idata = (IOSGLBuffer.FloatImpl) data;
         idata.position = 0;
-        GL.Uniform2(loc, count, idata.data);
+        GL.Uniform4(loc, count, idata.data);
       }
     };
   }
