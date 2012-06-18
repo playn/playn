@@ -138,6 +138,18 @@ public class IOSGLProgram implements GLProgram {
   }
 
   @Override
+  public GLShader.Uniform4fv getUniform4fv(String name) {
+    final int loc = GL.GetUniformLocation(program, name);
+    return (loc < 0) ? null : new GLShader.Uniform4fv() {
+      public void bind(GLBuffer.Float data, int count) {
+        IOSGLBuffer.FloatImpl idata = (IOSGLBuffer.FloatImpl) data;
+        idata.position = 0;
+        GL.Uniform2(loc, count, idata.data);
+      }
+    };
+  }
+
+  @Override
   public GLShader.UniformMatrix4fv getUniformMatrix4fv(String name) {
     final int loc = GL.GetUniformLocation(program, name);
     return (loc < 0) ? null : new GLShader.UniformMatrix4fv() {

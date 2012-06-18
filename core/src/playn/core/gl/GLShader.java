@@ -74,6 +74,12 @@ public abstract class GLShader {
      * @param count the number of <em>vec2</em>s to bind (not individual floats). */
     void bind(GLBuffer.Float data, int count);
   }
+  /** Provides the ability to bind a uniform vec4 vector. */
+  public static interface Uniform4fv {
+    /** Binds a uniform vec4 vector to the supplied data.
+     * @param count the number of <em>vec4</em>s to bind (not individual floats). */
+    void bind(GLBuffer.Float data, int count);
+  }
   /** Provides the ability to bind a uniform matrix4 vector. */
   public static interface UniformMatrix4fv {
     /** Binds a uniform matrix4 vector to the supplied data.

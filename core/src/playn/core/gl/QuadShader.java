@@ -26,24 +26,22 @@ public class QuadShader extends GLShader {
   /** The GLSL code for quad-specific vertex shader. */
   public static final String VERTEX_SHADER =
     "uniform vec2 u_ScreenSize;\n" +
-    "uniform vec2 u_Data[5*_MAX_QUADS_];\n" +
+    "uniform vec4 u_Data[3*_MAX_QUADS_];\n" +
     "attribute vec3 a_Vertex;\n" +
     "varying vec2 v_TexCoord;\n" +
 
     "void main(void) {\n" +
     // Extract the transform &c data for this quad.
-    "int index = 5*int(a_Vertex.z);\n" +
-    "vec2 m0 = u_Data[index+0];\n" +
-    "vec2 m1 = u_Data[index+1];\n" +
-    "vec2 tr = u_Data[index+2];\n" +
-    "vec2 tc = u_Data[index+3];\n" +
-    "vec2 tcs = u_Data[index+4];\n" +
+    "int index = 3*int(a_Vertex.z);\n" +
+    "vec4 mat = u_Data[index+0];\n" +
+    "vec4 txc = u_Data[index+1];\n" +
+    "vec4 tcs = u_Data[index+2];\n" +
 
     // Transform the vertex.
     "mat3 transform = mat3(\n" +
-    "  m0.x, m0.y, 0,\n" +
-    "  m1.x, m1.y, 0,\n" +
-    "  tr.x, tr.y, 1);\n" +
+    "  mat.x, mat.y, 0,\n" +
+    "  mat.z, mat.w, 0,\n" +
+    "  txc.x, txc.y, 1);\n" +
     "gl_Position = vec4(transform * vec3(a_Vertex.xy, 1), 1);\n" +
 
     // Scale from screen coordinates to [0, 2].
@@ -55,27 +53,27 @@ public class QuadShader extends GLShader {
     "gl_Position.y = 1.0 - gl_Position.y;\n" +
 
     // Compute our texture coordinate.
-    "v_TexCoord = a_Vertex.xy * vec2(tcs.x, tcs.y) + vec2(tc.x, tc.y);\n" +
+    "v_TexCoord = a_Vertex.xy * vec2(tcs.x, tcs.y) + vec2(txc.z, txc.w);\n" +
     "}";
 
   private static final int VERTICES_PER_QUAD = 4;
   private static final int ELEMENTS_PER_QUAD = 6;
   private static final int VERTEX_SIZE = 3; // 3 floats per vertex
-  private static final int VEC2S_PER_QUAD = 5; // 5 vec2s per matrix
+  private static final int VEC4S_PER_QUAD = 3; // 3 vec4s per matrix
 
   private final int maxQuads;
 
   public QuadShader(GLContext ctx) {
     super(ctx);
 
-    // this returns the maximum number of vec4s, so we x2 to turn it into vec2s; then we subtract
-    // one vec2 to account for the uScreenSize uniform
-    int maxVecs = ctx.getInteger(GL20.GL_MAX_VERTEX_UNIFORM_VECTORS) * 2 - 2;
-    if (maxVecs < VEC2S_PER_QUAD)
+    // this returns the maximum number of vec4s; then we subtract one vec2 to account for the
+    // uScreenSize uniform
+    int maxVecs = ctx.getInteger(GL20.GL_MAX_VERTEX_UNIFORM_VECTORS) - 1;
+    if (maxVecs < VEC4S_PER_QUAD)
       throw new RuntimeException(
         "GL_MAX_VERTEX_UNIFORM_VECTORS too low: have " + maxVecs +
-        ", need at least " + VEC2S_PER_QUAD);
-    this.maxQuads = maxVecs / VEC2S_PER_QUAD;
+        ", need at least " + VEC4S_PER_QUAD);
+    this.maxQuads = maxVecs / VEC4S_PER_QUAD;
   }
 
   /**
@@ -99,7 +97,7 @@ public class QuadShader extends GLShader {
 
   protected class QuadCore extends Core {
     private final Uniform2f uScreenSize;
-    private final Uniform2fv uData;
+    private final Uniform4fv uData;
     private final Attrib aVertices;
     private final GLBuffer.Float verts, data;
     private final GLBuffer.Short elems;
@@ -108,11 +106,11 @@ public class QuadShader extends GLShader {
     public QuadCore(String vertShader, String fragShader) {
       super(vertShader, fragShader);
 
-      data = ctx.createFloatBuffer(maxQuads*VEC2S_PER_QUAD*2);
+      data = ctx.createFloatBuffer(maxQuads*VEC4S_PER_QUAD*4);
 
       // compile the shader and get our uniform and attribute
       uScreenSize = prog.getUniform2f("u_ScreenSize");
-      uData = prog.getUniform2fv("u_Data");
+      uData = prog.getUniform4fv("u_Data");
       aVertices = prog.getAttrib("a_Vertex", VERTEX_SIZE, GL_FLOAT);
 
       // create our stock supply of unit quads and stuff them into our buffers
@@ -149,7 +147,7 @@ public class QuadShader extends GLShader {
     public void flush() {
       if (quadCounter == 0)
         return;
-      uData.bind(data, quadCounter);
+      uData.bind(data, quadCounter * VEC4S_PER_QUAD);
       elems.drawElements(GL_TRIANGLES, ELEMENTS_PER_QUAD*quadCounter);
       quadCounter = 0;
     }
@@ -172,6 +170,7 @@ public class QuadShader extends GLShader {
       data.add(m00*dw, m01*dw, m10*dh, m11*dh, tx + m00*x1 + m10*y1, ty + m01*x1 + m11*y1);
       data.add(sx1, sy1);
       data.add(sx2 - sx1, sy3 - sy1);
+      data.skip(2);
       quadCounter++;
 
       if (quadCounter >= maxQuads)
