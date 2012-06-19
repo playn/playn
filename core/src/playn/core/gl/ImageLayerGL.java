@@ -45,13 +45,6 @@ public class ImageLayerGL extends LayerGL implements ImageLayer {
     heightSet = false;
   }
 
-  @Override @Deprecated
-  public void clearSourceRect() {
-    if (img instanceof Image.Region) {
-      setImage(((Image.Region) img).parent());
-    }
-  }
-
   @Override
   public void clearWidth() {
     widthSet = false;
@@ -91,12 +84,6 @@ public class ImageLayerGL extends LayerGL implements ImageLayer {
   @Override
   public void setRepeatY(boolean repeat) {
     repeatY = repeat;
-  }
-
-  @Override @Deprecated
-  public void setSourceRect(float sx, float sy, float sw, float sh) {
-    Image source = (img instanceof Image.Region) ? ((Image.Region)img).parent() : img;
-    setImage(source.subImage(sx, sy, sw, sh));
   }
 
   @Override

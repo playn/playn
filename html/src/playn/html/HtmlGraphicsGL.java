@@ -26,7 +26,6 @@ import playn.core.Image;
 import playn.core.ImageLayer;
 import playn.core.ImmediateLayer;
 import playn.core.SurfaceLayer;
-import playn.core.gl.CanvasLayerGL;
 import playn.core.gl.GL20;
 import playn.core.gl.GroupLayerGL;
 import playn.core.gl.ImageLayerGL;
@@ -64,11 +63,6 @@ class HtmlGraphicsGL extends HtmlGraphics {
       rootElement.removeChild(canvas);
       throw re;
     }
-  }
-
-  @Override @Deprecated
-  public CanvasLayer createCanvasLayer(int width, int height) {
-    return new CanvasLayerGL(ctx, createImage(width, height));
   }
 
   @Override

@@ -59,13 +59,6 @@ public class FlashImageLayer extends FlashLayer implements ImageLayer {
     dirty = true;
   }
 
-  @Override @Deprecated
-  public void clearSourceRect() {
-    if (image instanceof Image.Region) {
-      setImage(((Image.Region) image).parent());
-    }
-  }
-
   @Override
   public void clearWidth() {
     width = NOT_SET;
@@ -109,12 +102,6 @@ public class FlashImageLayer extends FlashLayer implements ImageLayer {
   public void setRepeatY(boolean repeat) {
     repeatY = repeat;
     dirty = true;
-  }
-
-  @Override @Deprecated
-  public void setSourceRect(float sx, float sy, float sw, float sh) {
-    Image source = (image instanceof Image.Region) ? ((Image.Region)image).parent() : image;
-    setImage(source.subImage(sx, sy, sw, sh));
   }
 
   @Override

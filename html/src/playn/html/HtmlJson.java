@@ -1,11 +1,11 @@
 /**
  * Copyright 2010 The PlayN Authors
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  * in compliance with the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software distributed under the License
  * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
  * or implied. See the License for the specific language governing permissions and limitations under
@@ -165,7 +165,7 @@ public class HtmlJson extends JsonImpl implements Json {
       // splice removes from the end if negative numbers are passed in
       index >= 0 && this.splice(index, 1);
     }-*/;
-    
+
     @Override
     public void set(int index, java.lang.Object value) {
       set0(index, wrapNative(value));
@@ -298,12 +298,6 @@ public class HtmlJson extends JsonImpl implements Json {
     }-*/;
 
     @Override
-    @Deprecated
-    public final TypedArray<String> getKeys() {
-      return keys();
-    }
-
-    @Override
     public TypedArray<String> keys() {
       return new JsonTypedArray<String>(getNativeKeys(), String.class);
     }
@@ -342,7 +336,7 @@ public class HtmlJson extends JsonImpl implements Json {
     public void put(String key, java.lang.Object value) {
       put0(key, wrapNative(value));
     }
-    
+
     @Override
     public native void remove(String key) /*-{
       delete this[key];

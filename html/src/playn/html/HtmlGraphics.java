@@ -109,16 +109,6 @@ public abstract class HtmlGraphics implements Graphics {
     return new HtmlGradient(gradient);
   }
 
-  @Override @Deprecated
-  public Path createPath() {
-    return new HtmlPath();
-  }
-
-  @Override @Deprecated
-  public Pattern createPattern(Image image) {
-    return image.toPattern();
-  }
-
   @Override
   public Gradient createRadialGradient(float x, float y, float r, int[] colors,
       float[] positions) {

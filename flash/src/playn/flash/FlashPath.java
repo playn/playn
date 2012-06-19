@@ -77,7 +77,7 @@ public class FlashPath implements Path {
     list.setLength(0);
   }
 
-  void replay(FlashCanvasLayer.Context2d ctx) {
+  void replay(FlashCanvas.Context2d ctx) {
     ctx.beginPath();
 
     int len = list.length(), i = 0;

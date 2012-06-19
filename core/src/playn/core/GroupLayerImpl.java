@@ -71,31 +71,12 @@ public class GroupLayerImpl<L extends AbstractLayer>
     self.add(layer);
   }
 
-  // TODO: remove this when GroupLayer.add(int,Layer) is removed
-  public void add(GroupLayer self, int index, L child) {
-    // remove the child from any existing parent, preventing multiple parents
-    if (child.parent() != null) {
-      child.parent().remove(child);
-    }
-    children.add(index, child);
-    child.setParent(self);
-    child.onAdd();
-    // if this child is active, we need to become active
-    if (child.interactive())
-      self.setInteractive(true);
-  }
-
   public void remove(GroupLayer self, L child) {
     int index = findChild(child, child.depth());
     if (index < 0) {
       throw new UnsupportedOperationException(
         "Could not remove Layer because it is not a child of the GroupLayer");
     }
-    remove(index);
-  }
-
-  // TODO: remove this when GroupLayer.remove(int) is removed
-  public void remove(GroupLayer self, int index) {
     remove(index);
   }
 

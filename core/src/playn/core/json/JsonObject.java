@@ -204,15 +204,6 @@ class JsonObject implements Json.Object {
     return get(key) instanceof Json.Object;
   }
 
-  /**
-   * Gets a set of keys for this JSON object.
-   */
-  @Override
-  @Deprecated
-  public TypedArray<String> getKeys() {
-    return keys();
-  }
-
   @Override
   public <T> TypedArray<T> getArray(String key, Class<T> valueType) {
     return getArray(key, valueType, null);

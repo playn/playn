@@ -110,16 +110,6 @@ public class AndroidGraphics extends GraphicsGL {
     return new AndroidGradient(gradient);
   }
 
-  @Override @Deprecated
-  public Path createPath() {
-    return new AndroidPath();
-  }
-
-  @Override @Deprecated
-  public Pattern createPattern(Image img) {
-    return img.toPattern();
-  }
-
   @Override
   public Gradient createRadialGradient(float x, float y, float r, int[] colors, float[] positions) {
     RadialGradient gradient = new RadialGradient(x, y, r, colors, positions, TileMode.CLAMP);

@@ -47,117 +47,6 @@ public class TextFormat {
     public abstract float getX(float textWidth, float lineWidth);
   };
 
-  /** @deprecated Use stroke and fill to create your own effects. */
-  @Deprecated
-  public static abstract class Effect {
-    /** @deprecated Use stroke and fill to create your own effects. */
-    @Deprecated
-    public static final Effect NONE = new Effect() {
-      @Override
-      public String toString() {
-        return "none";
-      }
-    };
-
-    /** @deprecated Use stroke and fill to create your own effects. */
-    @Deprecated
-    public static Effect shadow (int shadowColor, float shadowOffsetX, float shadowOffsetY) {
-      return new Shadow(shadowColor, shadowOffsetX, shadowOffsetY);
-    }
-
-    /** @deprecated Use stroke and fill to create your own effects. */
-    @Deprecated
-    public static Effect outline (int outlineColor) {
-      return new PixelOutline(outlineColor);
-    }
-
-    /** @deprecated Use stroke and fill to create your own effects. */
-    @Deprecated
-    public static final class Shadow extends Effect {
-      /** The color of the shadow (as {@code 0xAARRGGBB}). */
-      public final int shadowColor;
-
-      /** The pixel offset of the shadow in the x-direction. */
-      public final float shadowOffsetX;
-
-      /** The pixel offset of the shadow in the y-direction. */
-      public final float shadowOffsetY;
-
-      public Shadow (int shadowColor, float shadowOffsetX, float shadowOffsetY) {
-        this.shadowColor = shadowColor;
-        this.shadowOffsetX = shadowOffsetX;
-        this.shadowOffsetY = shadowOffsetY;
-      }
-
-      @Override
-      public float adjustWidth (float width) {
-        return width + Math.abs(shadowOffsetX);
-      }
-
-      @Override
-      public float adjustHeight (float height) {
-        return height + Math.abs(shadowOffsetY);
-      }
-
-      @Override
-      public Integer getAltColor () {
-        return shadowColor;
-      }
-
-      @Override
-      public String toString() {
-        return "shadow [color=" + Integer.toHexString(shadowColor) +
-          ", offX=" + shadowOffsetX + ", offY=" + shadowOffsetY + "]";
-      }
-    }
-
-    /** @deprecated Use stroke and fill to create your own effects. */
-    @Deprecated
-    public static final class PixelOutline extends Effect {
-      /** The color of the outline (as {@code 0xAARRGGBB}). */
-      public final int outlineColor;
-
-      public PixelOutline (int outlineColor) {
-        this.outlineColor = outlineColor;
-      }
-
-      @Override
-      public float adjustWidth (float width) {
-        return width + 2;
-      }
-      @Override
-      public float adjustHeight (float height) {
-        return height + 2;
-      }
-      @Override
-      public Integer getAltColor () {
-        return outlineColor;
-      }
-
-      @Override
-      public String toString() {
-        return "poutline [color=" + Integer.toHexString(outlineColor) + "]";
-      }
-    }
-
-    /** Used internally for text layout calculations. */
-    public float adjustWidth (float width) {
-      return width;
-    }
-
-    /** Used internally for text layout calculations. */
-    public float adjustHeight (float height) {
-      return height;
-    }
-
-    /** Used internally for text rendering. */
-    public Integer getAltColor () {
-      return null;
-    }
-
-    private Effect () {} // disallow other classes to extend this one
-  }
-
   /** The font in which to render the text (or null which indicates that the default font should be
    * used). */
   public final Font font;
@@ -169,27 +58,9 @@ public class TextFormat {
   /** The alignment to use for multiline text. */
   public final Alignment align;
 
-  /** @deprecated Use set the stroke or fill color on the canvas instead. */
-  @Deprecated
-  public final int textColor;
-
-  /** @deprecated Use stroke and fill to create your own effects. */
-  @Deprecated
-  public final Effect effect;
-
   /** Creates a default text format instance. */
   public TextFormat() {
-    this(null, Float.MAX_VALUE, Alignment.LEFT, 0xFF000000, Effect.NONE);
-  }
-
-  /** @deprecated Use stroke and fill to create your own effects. */
-  @Deprecated
-  public TextFormat(Font font, float wrapWidth, Alignment align, int textColor, Effect effect) {
-    this.font = font;
-    this.wrapWidth = wrapWidth;
-    this.align = align;
-    this.textColor = textColor;
-    this.effect = effect;
+    this(null, Float.MAX_VALUE, Alignment.LEFT);
   }
 
   /** Creates a configured text format instance. */
@@ -197,8 +68,6 @@ public class TextFormat {
     this.font = font;
     this.wrapWidth = wrapWidth;
     this.align = align;
-    this.textColor = 0xFF000000;
-    this.effect = Effect.NONE;
   }
 
   /** Returns true if line wrapping is desired. */
@@ -208,35 +77,23 @@ public class TextFormat {
 
   /** Returns a clone of this text format with the font configured as specified. */
   public TextFormat withFont(Font font) {
-    return new TextFormat(font, this.wrapWidth, this.align, this.textColor, this.effect);
+    return new TextFormat(font, this.wrapWidth, this.align);
   }
 
   /** Returns a clone of this text format with the wrap width and alignment configured as
    * specified. */
   public TextFormat withWrapping(float wrapWidth, Alignment align) {
-    return new TextFormat(this.font, wrapWidth, align, this.textColor, this.effect);
+    return new TextFormat(this.font, wrapWidth, align);
   }
 
   /** Returns a clone of this text format with the wrap width configured as specified. */
   public TextFormat withWrapWidth(float wrapWidth) {
-    return new TextFormat(this.font, wrapWidth, this.align, this.textColor, this.effect);
+    return new TextFormat(this.font, wrapWidth, this.align);
   }
 
   /** Returns a clone of this text format with the alignment configured as specified. */
   public TextFormat withAlignment(Alignment align) {
-    return new TextFormat(this.font, this.wrapWidth, align, this.textColor, this.effect);
-  }
-
-  /** @deprecated Use set the stroke or fill color on the canvas instead. */
-  @Deprecated
-  public TextFormat withTextColor(int textColor) {
-    return new TextFormat(this.font, this.wrapWidth, this.align, textColor, this.effect);
-  }
-
-  /** @deprecated Use stroke and fill to create your own effects. */
-  @Deprecated
-  public TextFormat withEffect(Effect effect) {
-    return new TextFormat(this.font, this.wrapWidth, this.align, this.textColor, effect);
+    return new TextFormat(this.font, this.wrapWidth, align);
   }
 
   @Override

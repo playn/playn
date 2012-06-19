@@ -86,16 +86,6 @@ public class JavaGraphics extends GraphicsGL {
     return JavaGradient.createLinear(x0, y0, x1, y1, positions, colors);
   }
 
-  @Override @Deprecated
-  public Path createPath() {
-    return new JavaPath();
-  }
-
-  @Override @Deprecated
-  public Pattern createPattern(Image img) {
-    return img.toPattern();
-  }
-
   @Override
   public Gradient createRadialGradient(float x, float y, float r, int[] colors, float[] positions) {
     return JavaGradient.createRadial(x, y, r, positions, colors);

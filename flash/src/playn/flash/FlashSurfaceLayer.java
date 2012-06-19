@@ -18,7 +18,7 @@ package playn.flash;
 import pythagoras.f.MathUtil;
 
 import flash.display.Sprite;
-import playn.flash.FlashCanvasLayer.CanvasElement;
+import playn.flash.FlashCanvas.CanvasElement;
 
 import playn.core.Asserts;
 import playn.core.Surface;

@@ -24,8 +24,6 @@ import android.graphics.Paint;
 import playn.core.TextFormat;
 import playn.core.TextLayout;
 
-// TODO: remove this annotation once we've nixed deprecated TextFormat bits
-@SuppressWarnings("deprecation")
 class AndroidTextLayout implements TextLayout {
 
   private final TextFormat format;
@@ -91,12 +89,9 @@ class AndroidTextLayout implements TextLayout {
     for (Line line : lines) {
       twidth = Math.max(twidth, line.width);
     }
-    float theight = lines.size() * (-metrics.ascent + metrics.descent) +
+    width = twidth;
+    height = lines.size() * (-metrics.ascent + metrics.descent) +
       (lines.size()-1) * metrics.leading; // leading only applies to lines after 0
-
-    // finalize our our width and height calculations
-    width = format.effect.adjustWidth(twidth);
-    height = format.effect.adjustHeight(theight);
   }
 
   void breakLine(String text) {
@@ -150,68 +145,9 @@ class AndroidTextLayout implements TextLayout {
     float yoff = 0;
     for (Line line : lines) {
       float rx = format.align.getX(line.width, width);
-      yoff += -metrics.ascent;
+      yoff -= metrics.ascent;
       canvas.drawText(line.text, x + rx, y + yoff, paint);
       yoff += metrics.descent + metrics.leading;
-    }
-  }
-
-  void draw(Canvas canvas, float x, float y) {
-    if (format.effect instanceof TextFormat.Effect.Shadow) {
-      // TODO: look into Android built-in support for drawing text with shadows
-      TextFormat.Effect.Shadow seffect = (TextFormat.Effect.Shadow)format.effect;
-      // if the shadow is negative, we need to move the real text down/right to keep everything
-      // within our bounds
-      float tx, sx, ty, sy;
-      if (seffect.shadowOffsetX > 0) {
-        tx = 0;
-        sx = seffect.shadowOffsetX;
-      } else {
-        tx = -seffect.shadowOffsetX;
-        sx = 0;
-      }
-      if (seffect.shadowOffsetY > 0) {
-        ty = 0;
-        sy = seffect.shadowOffsetY;
-      } else {
-        ty = -seffect.shadowOffsetY;
-        sy = 0;
-      }
-      paint.setColor(format.effect.getAltColor());
-      drawOnce(canvas, x + sx, y + sy);
-      paint.setColor(format.textColor);
-      drawOnce(canvas, x + tx, y + ty);
-
-    } else if (format.effect instanceof TextFormat.Effect.PixelOutline) {
-      paint.setColor(format.effect.getAltColor());
-      drawOnce(canvas, x+0, y+0);
-      drawOnce(canvas, x+0, y+1);
-      drawOnce(canvas, x+0, y+2);
-      drawOnce(canvas, x+1, y+0);
-      drawOnce(canvas, x+1, y+2);
-      drawOnce(canvas, x+2, y+0);
-      drawOnce(canvas, x+2, y+1);
-      drawOnce(canvas, x+2, y+2);
-
-      paint.setColor(format.textColor);
-      drawOnce(canvas, x+1, y+1);
-
-    } else {
-      paint.setColor(format.textColor);
-      drawOnce(canvas, x, y);
-    }
-  }
-
-  void drawOnce(Canvas canvas, float x, float y) {
-    float yoff = 0;
-    for (Line line : lines) {
-      float rx = format.align.getX(line.width, width);
-      yoff += -metrics.ascent;
-      canvas.drawText(line.text, x + rx, y + yoff, paint);
-      if (line != lines.get(0)) {
-        yoff += metrics.leading; // add interline spacing
-      }
-      yoff += metrics.descent;
     }
   }
 }

@@ -15,7 +15,6 @@
  */
 package playn.java;
 
-import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.font.FontRenderContext;
@@ -31,50 +30,11 @@ import java.util.List;
 import playn.core.AbstractTextLayout;
 import playn.core.TextFormat;
 
-// TODO: remove this annotation once we've nixed deprecated TextFormat bits
-@SuppressWarnings("deprecation")
 class JavaTextLayout extends AbstractTextLayout {
 
   private static FontRenderContext dummyFontContext = createDummyFRC();
 
   private List<TextLayout> layouts = new ArrayList<TextLayout>();
-  private final JavaTextStamp stamp, altStamp;
-
-  private class JavaTextStamp implements Stamp<Graphics2D> {
-    private final Color color;
-
-    public JavaTextStamp(int color) {
-      this.color = JavaCanvasState.convertColor(color);
-    }
-
-    @Override
-    public void draw(Graphics2D gfx, float x, float y) {
-      gfx.setColor(color);
-      paint(gfx, x, y, false);
-    }
-
-    public void paint(Graphics2D gfx, float x, float y, boolean stroke) {
-      float yoff = y;
-      for (TextLayout layout : layouts) {
-        Rectangle2D bounds = layout.getBounds();
-        // some fonts starting rendering inset to the right, and others start rendering at a negative
-        // inset, blowing outside their bounding box (naughty!); for the former, we trim off that
-        // inset and for the latter we shift everything to the right to ensure that we don't paint
-        // outside our reported bounding box (so that someone can create a single canvas of bounding
-        // box size and render this text layout into it at (0,0) and nothing will get cut off)
-        float sx = x + (float)-bounds.getX() + format.align.getX(getWidth(bounds), width);
-        yoff += layout.getAscent();
-        if (stroke) {
-          gfx.translate(sx, yoff);
-          gfx.draw(layout.getOutline(null));
-          gfx.translate(-sx, -yoff);
-        } else {
-          layout.draw(gfx, sx, yoff);
-        }
-        yoff += layout.getDescent() + layout.getLeading();
-      }
-    }
-  }
 
   public JavaTextLayout(JavaGraphics gfx, String text, TextFormat format) {
     super(gfx, format);
@@ -115,14 +75,6 @@ class JavaTextLayout extends AbstractTextLayout {
     }
     width = twidth;
     height = theight;
-
-    // create our stamps
-    stamp = new JavaTextStamp(format.textColor);
-    if (format.effect.getAltColor() != null) {
-      altStamp = new JavaTextStamp(format.effect.getAltColor());
-    } else {
-      altStamp = null;
-    }
   }
 
   @Override
@@ -131,17 +83,33 @@ class JavaTextLayout extends AbstractTextLayout {
   }
 
   void stroke(Graphics2D gfx, float x, float y) {
-    stamp.paint(gfx, x, y, true);
-  }
-
-  void draw(Graphics2D gfx, float x, float y) {
-    Color ocolor = gfx.getColor();
-    draw(gfx, stamp, altStamp, x, y);
-    gfx.setColor(ocolor);
+    paint(gfx, x+pad, y+pad, true);
   }
 
   void fill(Graphics2D gfx, float x, float y) {
-    stamp.paint(gfx, x, y, false);
+    paint(gfx, x+pad, y+pad, false);
+  }
+
+  void paint(Graphics2D gfx, float x, float y, boolean stroke) {
+    float yoff = y;
+    for (TextLayout layout : layouts) {
+      Rectangle2D bounds = layout.getBounds();
+      // some fonts starting rendering inset to the right, and others start rendering at a negative
+      // inset, blowing outside their bounding box (naughty!); for the former, we trim off that
+      // inset and for the latter we shift everything to the right to ensure that we don't paint
+      // outside our reported bounding box (so that someone can create a single canvas of bounding
+      // box size and render this text layout into it at (0,0) and nothing will get cut off)
+      float sx = x + (float)-bounds.getX() + format.align.getX(getWidth(bounds), width);
+      yoff += layout.getAscent();
+      if (stroke) {
+        gfx.translate(sx, yoff);
+        gfx.draw(layout.getOutline(null));
+        gfx.translate(-sx, -yoff);
+      } else {
+          layout.draw(gfx, sx, yoff);
+      }
+      yoff += layout.getDescent() + layout.getLeading();
+    }
   }
 
   private static float getWidth(Rectangle2D bounds) {

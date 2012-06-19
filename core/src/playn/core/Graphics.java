@@ -31,12 +31,6 @@ public interface Graphics {
   GroupLayer rootLayer();
 
   /**
-   * @deprecated Use {@link #createImage(int,int)} and {@link #createImageLayer(Image)}.
-   */
-  @Deprecated
-  CanvasLayer createCanvasLayer(int width, int height);
-
-  /**
    * Creates a group layer.
    */
   GroupLayer createGroupLayer();
@@ -88,18 +82,6 @@ public interface Graphics {
    */
   Gradient createLinearGradient(float x0, float y0, float x1, float y1,
       int colors[], float positions[]);
-
-  /**
-   * @deprecated Use {@link Canvas#createPath}.
-   */
-  @Deprecated
-  Path createPath();
-
-  /**
-   * @deprecated Use {@link Image#toPattern}.
-   */
-  @Deprecated
-  Pattern createPattern(Image img);
 
   /**
    * Creates a radial gradient fill pattern. (x0, y0, r) specifies the circle

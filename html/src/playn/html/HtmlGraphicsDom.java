@@ -38,11 +38,6 @@ class HtmlGraphicsDom extends HtmlGraphics {
     rootLayer = new HtmlGroupLayerDom(div);
   }
 
-  @Override @Deprecated
-  public CanvasLayer createCanvasLayer(int width, int height) {
-    return new HtmlCanvasLayerDom(width, height);
-  }
-
   @Override
   public GroupLayer createGroupLayer() {
     return new HtmlGroupLayerDom();

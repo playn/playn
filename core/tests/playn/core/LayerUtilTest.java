@@ -116,16 +116,8 @@ public class LayerUtilTest {
       impl.add(this, (AbstractLayer)layer);
     }
     @Override
-    @Deprecated public void add(int index, Layer layer) {
-      impl.add(this, index, (AbstractLayer)layer);
-    }
-    @Override
     public void remove(Layer layer) {
       impl.remove(this, (AbstractLayer)layer);
-    }
-    @Override
-    @Deprecated public void remove(int index) {
-      impl.remove(this, index);
     }
     @Override
     public void clear() {

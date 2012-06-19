@@ -99,16 +99,8 @@ public class GroupLayerImplTest {
       impl.add(this, (TestLayer)layer);
     }
     @Override
-    @Deprecated public void add(int index, Layer layer) {
-      impl.add(this, index, (TestLayer)layer);
-    }
-    @Override
     public void remove(Layer layer) {
       impl.remove(this, (TestLayer)layer);
-    }
-    @Override
-    @Deprecated public void remove(int index) {
-      impl.remove(this, index);
     }
     @Override
     public void clear() {

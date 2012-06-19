@@ -16,7 +16,9 @@
 package playn.flash;
 
 import flash.display.BitmapData;
-import playn.flash.FlashCanvasLayer.Context2d;
+import flash.gwt.FlashImport;
+
+import com.google.gwt.core.client.JavaScriptObject;
 
 import playn.core.Asserts;
 import playn.core.Canvas;
@@ -28,6 +30,240 @@ import playn.core.Pattern;
 import playn.core.TextLayout;
 
 class FlashCanvas implements Canvas {
+
+  @FlashImport({"com.googlecode.flashcanvas.CanvasRenderingContext2D"})
+  final static class Context2d extends JavaScriptObject {
+
+    public native void setGlobalCompositeOperation(String composite) /*-{
+       this.globalCompositeOperation = composite;
+    }-*/;
+
+    public native void arc(float x, float y, float radius, float sa, float ea,
+                           boolean anticlockwise) /*-{
+        this.arc(x, y, radius, sa, ea, anticlockwise);
+    }-*/;
+
+    public native void setStrokeWidth(float w) /*-{
+        this.lineWidth = w;
+    }-*/;
+
+    /**
+     * Enum for text baseline style.
+     */
+    public enum TextBaseline {
+      ALPHABETIC("alphabetic"), BOTTOM("bottom"), HANGING("hanging"), IDEOGRAPHIC("ideographic"),
+      MIDDLE("middle"), TOP("top");
+
+      private final String value;
+
+      private TextBaseline(String value) {
+        this.value = value;
+      }
+
+      public String getValue() {
+        return value;
+      }
+    }
+
+    protected Context2d() {}
+
+    public native void resize(int x, int y) /*-{
+      this.resize(x,y);
+    }-*/;
+
+    public native void beginPath() /*-{
+      this.beginPath();
+    }-*/;
+
+    public native void moveTo(double x, double y) /*-{
+      this.moveTo(x, y);
+    }-*/;
+
+    public native void lineTo(double x, double y) /*-{
+      this.lineTo(x, y);
+    }-*/;
+
+    public native void stroke() /*-{
+      this.stroke();
+    }-*/;
+
+    public native void clip() /*-{
+      this.clip();
+    }-*/;
+
+    public native void setGlobalAlpha(float alpha) /*-{
+        this.globalAlpha = alpha;
+    }-*/;
+
+    public native void setStrokeStyle(String color) /*-{
+      this.strokeStyle = color;
+    }-*/;
+
+     public native void setFillStyle(String color) /*-{
+      this.fillStyle = color;
+    }-*/;
+
+    /**
+     * @param bitmapData
+     * @param x
+     * @param y
+     */
+    public native void drawImage(BitmapData bitmapData, float x, float y) /*-{
+      this._renderImage(bitmapData, [x, y]);
+    }-*/;
+
+    public native void drawImage(BitmapData bitmapData, float x, float y, float w, float h) /*-{
+      this._renderImage(bitmapData, [x, y, w, h]);
+    }-*/;
+
+    public native void drawImage(BitmapData bitmapData, float x, float y, float w, float h,
+        float sx, float sy, float sw, float sh) /*-{
+      this._renderImage(bitmapData, [sx, sy, sw, sh, x, y, w, h]);
+    }-*/;
+    /**
+     *
+     */
+    public native void restore() /*-{
+      this.restore();
+    }-*/;
+
+    public native void save() /*-{
+      this.save();
+    }-*/;
+
+    /**
+     * @param radians
+     */
+    public native void rotate(float radians) /*-{
+      // TODO Auto-generated method stub
+      this.rotate(radians);
+    }-*/;
+
+    public native void scale(float sx, float sy) /*-{
+    // TODO Auto-generated method stub
+      this.scale(sx, sy);
+    }-*/;
+
+    public native void translate(float tx, float ty) /*-{
+    // TODO Auto-generated method stub
+      this.translate(tx, ty);
+    }-*/;
+
+    /**
+     * @param m11
+     * @param m12
+     * @param m21
+     * @param m22
+     * @param dx
+     * @param dy
+     */
+    public native void transform(float m11, float m12, float m21, float m22, float dx, float dy) /*-{
+      // TODO Auto-generated method stub
+      this.transform(m11, m12, m21, m22, dx, dy);
+    }-*/;
+
+    public native void setTransform(float m11, float m12, float m21, float m22,
+                                    float dx, float dy) /*-{
+    // TODO Auto-generated method stub
+      this.setTransform(m11, m12, m21, m22, dx, dy);
+    }-*/;
+
+    public native void fillText(String text, float x, float y) /*-{
+      this.fillText(text, x, y);
+    }-*/;
+
+    public native void rect(float x, float y, float w, float h) /*-{
+        this.rect(x, y, w, h);
+    }-*/;
+
+    public native void fillRect(float x, float y, float w, float h) /*-{
+      this.fillRect(x, y, w, h);
+    }-*/;
+
+    public native void strokeText(String text, float x, float y) /*-{
+      this.strokeText(text, x, y);
+    }-*/;
+
+    public native void arcTo(double curX, double curY, double x, double y, double radius)  /*-{
+      this.arcTo(curX, curY, x, y, radius);
+    }-*/;
+
+    public native void bezierCurveTo(double c1x, double c1y, double c2x, double c2y,
+                                     double x, double y)  /*-{
+      this.bezierCurveTo(c1x, c1y, c2x, c2y, x, y);
+    }-*/;
+
+    public native void quadraticCurveTo(
+        double cpx, double cpy, double x, double y) /*-{
+      this.quadraticCurveTo(cpx, cpy, x, y);
+    }-*/;
+
+    public native void closePath() /*-{
+      this.closePath();
+    }-*/;
+
+    public native void fill() /*-{
+      this.fill();
+    }-*/;
+
+    public native void strokeRect(float x, float y, float w, float h) /*-{
+      this.strokeRect(x, y, w, h);
+    }-*/;
+
+    public native BitmapData bitmapData() /*-{
+      return this.canvas.bitmapData;
+    }-*/;
+
+    public native void clearRect(int x, int y, int width, int height) /*-{
+      this.clearRect(x, y, width, height);
+    }-*/;
+
+    public native void setLineWidth(float width) /*-{
+      this.lineWidth = width;
+    }-*/;
+
+    public native void setTextBaseline(String baseline) /*-{
+      this.textBaseline = baseline;
+    }-*/;
+
+    public native void setFont(String font) /*-{
+      this.font = font;
+    }-*/;
+
+
+    final static class Measure extends JavaScriptObject {
+      protected Measure(){}
+
+      public native int getWidth() /*-{
+        return this.width;
+      }-*/;
+
+      public native int getHeight() /*-{
+        return this.height-4;
+      }-*/;
+    }
+
+    public native Measure measureText(String line) /*-{
+      return this.measureText(line);
+    }-*/;
+  }
+
+  @FlashImport({"com.googlecode.flashcanvas.Canvas"})
+  final static class CanvasElement extends JavaScriptObject {
+    protected CanvasElement() {}
+
+    public static native CanvasElement create() /*-{
+      return new com.googlecode.flashcanvas.Canvas();
+    }-*/;
+
+    public static native CanvasElement create(int width, int height) /*-{
+      return new com.googlecode.flashcanvas.Canvas(width, height);
+    }-*/;
+
+    public final native Context2d getContext() /*-{
+      return this.getContext("2d");
+    }-*/;
+  }
 
   private final float width, height;
   private boolean dirty = true;
@@ -124,13 +360,6 @@ class FlashCanvas implements Canvas {
   public Canvas drawText(String text, float x, float y) {
     context2d.strokeText(text, x, y);
     context2d.fillText(text, x, y);
-    dirty = true;
-    return this;
-  }
-
-  @Override @Deprecated
-  public Canvas drawText(TextLayout layout, float x, float y) {
-    ((FlashTextLayout) layout).draw(context2d, x, y);
     dirty = true;
     return this;
   }

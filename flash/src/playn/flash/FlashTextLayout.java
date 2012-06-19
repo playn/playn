@@ -23,8 +23,6 @@ import java.util.List;
 
 import static playn.core.PlayN.graphics;
 
-// TODO: remove this annotation once we've nixed deprecated TextFormat bits
-@SuppressWarnings("deprecation")
 class FlashTextLayout implements TextLayout {
 
   private TextFormat format;
@@ -41,7 +39,7 @@ class FlashTextLayout implements TextLayout {
     }
   }
 
-  FlashTextLayout(FlashCanvasLayer.Context2d ctx, String text, TextFormat format) {
+  FlashTextLayout(FlashCanvas.Context2d ctx, String text, TextFormat format) {
     Font font = getFont(format);
     this.format = format;
     this.metrics = ((FlashGraphics)graphics()).getFontMetrics(font);
@@ -95,7 +93,7 @@ class FlashTextLayout implements TextLayout {
     return format;
   }
 
-  void stroke(FlashCanvasLayer.Context2d ctx, float x, float y) {
+  void stroke(FlashCanvas.Context2d ctx, float x, float y) {
     configContext(ctx);
     float ypos = 0;
     for (Line line : lines) {
@@ -104,7 +102,7 @@ class FlashTextLayout implements TextLayout {
     }
   }
 
-  void fill(FlashCanvasLayer.Context2d ctx, float x, float y) {
+  void fill(FlashCanvas.Context2d ctx, float x, float y) {
     configContext(ctx);
     float ypos = 0;
     for (Line line : lines) {
@@ -113,48 +111,7 @@ class FlashTextLayout implements TextLayout {
     }
   }
 
-  void draw(FlashCanvasLayer.Context2d ctx, float x, float y) {
-    configContext(ctx);
-    ctx.setFillStyle(FlashGraphics.cssColorString(format.textColor));
-
-    if (format.effect instanceof TextFormat.Effect.Shadow) {
-      // TODO
-//      TextFormat.Effect.Shadow seffect = (TextFormat.Effect.Shadow)format.effect;
-//      ctx.setShadowColor(FlashGraphics.cssColorString(seffect.shadowColor));
-//      ctx.setShadowOffsetX(seffect.shadowOffsetX);
-//      ctx.setShadowOffsetY(seffect.shadowOffsetY);
-      drawText(ctx, x, y);
-
-    } else if (format.effect instanceof TextFormat.Effect.PixelOutline) {
-      ctx.save();
-      ctx.setFillStyle(FlashGraphics.cssColorString(format.effect.getAltColor()));
-
-      drawText(ctx, x + 0, y + 0);
-      drawText(ctx, x + 0, y + 1);
-      drawText(ctx, x + 0, y + 2);
-      drawText(ctx, x + 1, y + 0);
-      drawText(ctx, x + 1, y + 2);
-      drawText(ctx, x + 2, y + 0);
-      drawText(ctx, x + 2, y + 1);
-      drawText(ctx, x + 2, y + 2);
-
-      ctx.restore();
-      drawText(ctx, x + 1, y + 1);
-
-    } else {
-      drawText(ctx, x, y);
-    }
-  }
-
-  void drawText(FlashCanvasLayer.Context2d ctx, float x, float y) {
-    float ypos = 0;
-    for (Line line : lines) {
-      ctx.fillText(line.text, x + format.align.getX(line.width, width), y + ypos);
-      ypos += metrics.height;
-    }
-  }
-
-  void configContext(FlashCanvasLayer.Context2d ctx) {
+  void configContext(FlashCanvas.Context2d ctx) {
     Font font = getFont(format);
     String italic = "normal";
     String bold = "normal";
@@ -165,14 +122,14 @@ class FlashTextLayout implements TextLayout {
     }
 
     ctx.setFont(italic + " " + bold + " " + font.size() + " " + font.name());
-    ctx.setTextBaseline(FlashCanvasLayer.Context2d.TextBaseline.TOP.getValue());
+    ctx.setTextBaseline(FlashCanvas.Context2d.TextBaseline.TOP.getValue());
   }
 
   Font getFont(TextFormat format) {
     return format.font == null ? FlashFont.DEFAULT : format.font;
   }
 
-  int measureLine(FlashCanvasLayer.Context2d ctx, String[] words, int idx) {
+  int measureLine(FlashCanvas.Context2d ctx, String[] words, int idx) {
     // we always put at least one word on a line
     String line = words[idx++];
     int startIdx = idx;

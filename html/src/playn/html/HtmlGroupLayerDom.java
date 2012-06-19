@@ -58,19 +58,6 @@ class HtmlGroupLayerDom extends HtmlLayerDom implements GroupLayer, ParentLayer 
     }
   }
 
-  @Override @Deprecated
-  public void add(int index, Layer layer) {
-    Asserts.checkArgument(layer instanceof HtmlLayerDom);
-    HtmlLayerDom hlayer = (HtmlLayerDom) layer;
-    if (index == size()) {
-      element().appendChild(hlayer.element());
-    } else {
-      Node refChild = element().getChild(index);
-      element().insertBefore(hlayer.element(), refChild);
-    }
-    impl.add(this, index, hlayer);
-  }
-
   @Override
   public void addAt(Layer layer, float tx, float ty) {
     impl.addAt(this, layer, tx, ty);
@@ -82,12 +69,6 @@ class HtmlGroupLayerDom extends HtmlLayerDom implements GroupLayer, ParentLayer 
     HtmlLayerDom hlayer = (HtmlLayerDom) layer;
     impl.remove(this, hlayer);
     element().removeChild(hlayer.element());
-  }
-
-  @Override @Deprecated
-  public void remove(int index) {
-    impl.remove(this, index);
-    element().removeChild(element().getChild(index));
   }
 
   @Override

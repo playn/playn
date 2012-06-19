@@ -60,22 +60,9 @@ public interface GroupLayer extends Layer {
   void addAt(Layer layer, float tx, float ty);
 
   /**
-   * @deprecated Use {@link Layer#setDepth} to manage render order.
-   */
-  @Deprecated
-  void add(int index, Layer layer);
-
-  /**
    * Removes a layer from the group.
    */
   void remove(Layer layer);
-
-  /**
-   * @deprecated Manual index management has been deprecated in favor of {@link Layer#setDepth}.
-   * Use {@link #remove(Layer)} to remove layers.
-   */
-  @Deprecated
-  void remove(int index);
 
   /**
    * Removes all the layers from this group.

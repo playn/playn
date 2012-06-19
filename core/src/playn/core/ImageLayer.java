@@ -68,16 +68,4 @@ public interface ImageLayer extends Layer.HasSize {
    * TODO
    */
   void clearWidth();
-
-  /**
-   * @deprecated Use {@link Image#subImage}.
-   */
-  @Deprecated
-  void setSourceRect(float sx, float sy, float sw, float sh);
-
-  /**
-   * @deprecated Use {@link Image#subImage}.
-   */
-  @Deprecated
-  void clearSourceRect();
 }

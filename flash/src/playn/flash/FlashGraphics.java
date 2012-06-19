@@ -48,10 +48,10 @@ class FlashGraphics implements Graphics {
   private static final String EMWIDTH_TEXT = "m";
 
   private final Map<Font,FlashFontMetrics> fontMetrics = new HashMap<Font,FlashFontMetrics>();
-  private FlashCanvasLayer.CanvasElement dummyCanvas;
-  private FlashCanvasLayer.Context2d dummyCtx;
+  private FlashCanvas.CanvasElement dummyCanvas;
+  private FlashCanvas.Context2d dummyCtx;
   private FlashCanvas canvas;
-  private FlashCanvasLayer.Context2d ctx;
+  private FlashCanvas.Context2d ctx;
 
   static String cssColorString(int color) {
     double a = ((color >> 24) & 0xff) / 255.0;
@@ -82,7 +82,7 @@ class FlashGraphics implements Graphics {
 
   protected FlashGraphics() {
     rootLayer = FlashGroupLayer.getRoot();
-    FlashCanvasLayer.CanvasElement canvasElement = FlashCanvasLayer.CanvasElement.create();
+    FlashCanvas.CanvasElement canvasElement = FlashCanvas.CanvasElement.create();
     canvas = new FlashCanvas(screenWidth(), screenHeight(), canvasElement.getContext());
     ctx = canvas.getContext2d();
     setSize (screenWidth(), screenHeight());
@@ -91,7 +91,7 @@ class FlashGraphics implements Graphics {
     Sprite.getRootSprite().addChild((Sprite) canvasElement.cast());
     PlayN.log().info("Graphics System Initialized: Dimensions ("
         + screenWidth() + " x " + screenHeight() + ")");
-    dummyCanvas = FlashCanvasLayer.CanvasElement.create();
+    dummyCanvas = FlashCanvas.CanvasElement.create();
     dummyCtx = dummyCanvas.getContext();
   }
 
@@ -99,11 +99,6 @@ class FlashGraphics implements Graphics {
   @Override
   public GroupLayer rootLayer() {
     return rootLayer;
-  }
-
-  @Override @Deprecated
-  public CanvasLayer createCanvasLayer(int width, int height) {
-    return new FlashCanvasLayer(width, height);
   }
 
   @Override
@@ -140,7 +135,7 @@ class FlashGraphics implements Graphics {
   @Override
   public CanvasImage createImage(float width, float height) {
     FlashCanvas surface = new FlashCanvas(
-      width, height, FlashCanvasLayer.CanvasElement.create(
+      width, height, FlashCanvas.CanvasElement.create(
         MathUtil.iceil(width), MathUtil.iceil(height)).getContext());
     return new FlashCanvasImage(surface);
   }
@@ -150,16 +145,6 @@ class FlashGraphics implements Graphics {
       int[] colors, float[] positions) {
     Asserts.checkArgument(colors.length == positions.length);
     return new FlashGradient();
-  }
-
-  @Override @Deprecated
-  public Path createPath() {
-    return new FlashPath();
-  }
-
-  @Override @Deprecated
-  public Pattern createPattern(Image img) {
-    return img.toPattern();
   }
 
   @Override

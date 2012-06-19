@@ -105,12 +105,6 @@ public class GroupLayerGL extends LayerGL implements GroupLayer, ParentLayer {
     impl.add(this, (LayerGL) layer);
   }
 
-  @Override @Deprecated
-  public void add(int index, Layer layer) {
-    Asserts.checkArgument(layer instanceof LayerGL);
-    impl.add(this, index, (LayerGL) layer);
-  }
-
   @Override
   public void addAt(Layer layer, float tx, float ty) {
     impl.addAt(this, layer, tx, ty);
@@ -120,11 +114,6 @@ public class GroupLayerGL extends LayerGL implements GroupLayer, ParentLayer {
   public void remove(Layer layer) {
     Asserts.checkArgument(layer instanceof LayerGL);
     impl.remove(this, (LayerGL) layer);
-  }
-
-  @Override @Deprecated
-  public void remove(int index) {
-    impl.remove(this, index);
   }
 
   @Override

@@ -85,16 +85,6 @@ public class IOSGraphics extends GraphicsGL {
     return new IOSGradient.Linear(x0, y0, x1, y1, colors, positions);
   }
 
-  @Override @Deprecated
-  public Path createPath() {
-    return new IOSPath();
-  }
-
-  @Override @Deprecated
-  public Pattern createPattern(Image image) {
-    return image.toPattern();
-  }
-
   @Override
   public Gradient createRadialGradient(float x, float y, float r, int[] colors, float[] positions) {
     return new IOSGradient.Radial(x, y, r, colors, positions);

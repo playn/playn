@@ -23,7 +23,7 @@ import playn.core.Surface;
 import playn.core.Image;
 import playn.core.Pattern;
 import playn.core.gl.GLShader;
-import playn.flash.FlashCanvasLayer.Context2d;
+import playn.flash.FlashCanvas.Context2d;
 
 public class FlashSurface implements Surface {
 

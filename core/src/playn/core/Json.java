@@ -395,12 +395,6 @@ public interface Json {
     boolean containsKey(String key);
 
     /**
-     * Gets a set of keys for this JSON object. Use {@link #keys} instead.
-     */
-    @Deprecated
-    TypedArray<String> getKeys();
-
-    /**
      * Gets a snapshot of the current set of keys for this JSON object. Modifications to the object
      * will not be reflected in this set of keys.
      */

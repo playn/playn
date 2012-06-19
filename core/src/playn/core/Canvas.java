@@ -217,12 +217,6 @@ public interface Canvas {
   Canvas drawText(String text, float x, float y);
 
   /**
-   * @deprecated Use {@link #strokeText} or {@link #fillText}.
-   */
-  @Deprecated
-  Canvas drawText(TextLayout layout, float x, float y);
-
-  /**
    * Fills a circle at the specified center and radius.
    */
   Canvas fillCircle(float x, float y, float radius);

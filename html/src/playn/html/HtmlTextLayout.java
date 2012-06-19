@@ -25,8 +25,6 @@ import java.util.List;
 
 import static playn.core.PlayN.graphics;
 
-// TODO: remove this annotation once we've nixed deprecated TextFormat bits
-@SuppressWarnings("deprecation")
 class HtmlTextLayout implements TextLayout {
 
   private TextFormat format;
@@ -108,46 +106,6 @@ class HtmlTextLayout implements TextLayout {
 
   void fill(Context2d ctx, float x, float y) {
     configContext(ctx);
-    float ypos = 0;
-    for (Line line : lines) {
-      ctx.fillText(line.text, x + format.align.getX(line.width, width), y + ypos);
-      ypos += metrics.height;
-    }
-  }
-
-  void draw(Context2d ctx, float x, float y) {
-    configContext(ctx);
-    ctx.setFillStyle(HtmlGraphics.cssColorString(format.textColor));
-
-    if (format.effect instanceof TextFormat.Effect.Shadow) {
-      TextFormat.Effect.Shadow seffect = (TextFormat.Effect.Shadow)format.effect;
-      ctx.setShadowColor(HtmlGraphics.cssColorString(seffect.shadowColor));
-      ctx.setShadowOffsetX(seffect.shadowOffsetX);
-      ctx.setShadowOffsetY(seffect.shadowOffsetY);
-      drawText(ctx, x, y);
-
-    } else if (format.effect instanceof TextFormat.Effect.PixelOutline) {
-      ctx.save();
-      ctx.setFillStyle(HtmlGraphics.cssColorString(format.effect.getAltColor()));
-
-      drawText(ctx, x + 0, y + 0);
-      drawText(ctx, x + 0, y + 1);
-      drawText(ctx, x + 0, y + 2);
-      drawText(ctx, x + 1, y + 0);
-      drawText(ctx, x + 1, y + 2);
-      drawText(ctx, x + 2, y + 0);
-      drawText(ctx, x + 2, y + 1);
-      drawText(ctx, x + 2, y + 2);
-
-      ctx.restore();
-      drawText(ctx, x + 1, y + 1);
-
-    } else {
-      drawText(ctx, x, y);
-    }
-  }
-
-  void drawText(Context2d ctx, float x, float y) {
     float ypos = 0;
     for (Line line : lines) {
       ctx.fillText(line.text, x + format.align.getX(line.width, width), y + ypos);

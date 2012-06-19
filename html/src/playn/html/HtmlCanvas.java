@@ -139,13 +139,6 @@ class HtmlCanvas implements Canvas {
     return this;
   }
 
-  @Override @Deprecated
-  public Canvas drawText(TextLayout layout, float x, float y) {
-    ((HtmlTextLayout)layout).draw(ctx, x, y);
-    dirty = true;
-    return this;
-  }
-
   @Override
   public Canvas fillCircle(float x, float y, float radius) {
     ctx.beginPath();

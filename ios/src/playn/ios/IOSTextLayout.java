@@ -33,8 +33,6 @@ import cli.System.Drawing.RectangleF;
 import playn.core.AbstractTextLayout;
 import playn.core.TextFormat;
 
-// TODO: remove this annotation once we've nixed deprecated TextFormat bits
-@SuppressWarnings("deprecation")
 class IOSTextLayout extends AbstractTextLayout {
 
   // There are numerous impedance mismatches between how PlayN wants to layout text and how iOS
@@ -77,19 +75,11 @@ class IOSTextLayout extends AbstractTextLayout {
   // spacing, because that does not seem to be reported by CTFont.LeadingMetric (which is where I
   // would expect it to be reported), and it is non-zero.
 
-  private static abstract class IOSTextStamp implements Stamp<CGBitmapContext> {
-    protected final IOSFont font;
-    protected final CGColor color;
-
+  private abstract class IOSTextStamp {
     public float width, height;
+
     public abstract int lineCount();
-
     public abstract void paint(CGBitmapContext bctx, float x, float y);
-
-    protected IOSTextStamp(IOSFont font, int color) {
-      this.font = font;
-      this.color = IOSCanvas.toCGColor(color);
-    }
   }
 
   private class Wrapped extends IOSTextStamp {
@@ -97,14 +87,13 @@ class IOSTextLayout extends AbstractTextLayout {
     private final CTLine[] lines;
     private final PointF[] origins;
     private final float adjustX;
+    private final float ascent, lineHeight;
 
-    Wrapped(IOSGraphics gfx, IOSFont font, CTStringAttributes attribs, int color, String text) {
-      super(font, color);
+    Wrapped(IOSFont font, CTStringAttributes attribs, String text) {
+      this.ascent = font.ctFont.get_AscentMetric();
+      this.lineHeight = ascent + font.ctFont.get_DescentMetric() + font.ctFont.get_LeadingMetric();
 
       NSAttributedString atext = new NSAttributedString(text, attribs);
-      float fontLineHeight = font.ctFont.get_AscentMetric() + font.ctFont.get_DescentMetric() +
-        font.ctFont.get_LeadingMetric();
-
       CTFramesetter fs = new CTFramesetter(atext);
       try {
         CGPath path = new CGPath();
@@ -122,7 +111,7 @@ class IOSTextLayout extends AbstractTextLayout {
         }
         this.adjustX = -minX;
         this.width = maxX - minX;
-        this.height = fontLineHeight * lines.length - font.ctFont.get_LeadingMetric();
+        this.height = lineHeight * lines.length - font.ctFont.get_LeadingMetric();
 
       } finally {
         fs.Dispose();
@@ -135,16 +124,8 @@ class IOSTextLayout extends AbstractTextLayout {
     }
 
     @Override
-    public void draw(CGBitmapContext bctx, float x, float y) {
-      bctx.SetFillColor(color);
-      paint(bctx, x, y);
-    }
-
-    @Override
     public void paint(CGBitmapContext bctx, float x, float y) {
-      float dx = x + adjustX, dy = y + font.ctFont.get_AscentMetric();
-      float lineHeight = font.ctFont.get_AscentMetric() + font.ctFont.get_DescentMetric() +
-        font.ctFont.get_LeadingMetric();
+      float dx = x + adjustX, dy = y + ascent;
       bctx.SaveState();
       bctx.TranslateCTM(dx, dy);
       bctx.ScaleCTM(1, -1);
@@ -159,16 +140,17 @@ class IOSTextLayout extends AbstractTextLayout {
     }
   }
 
-  private static class Single extends IOSTextStamp {
+  private class Single extends IOSTextStamp {
     private final CTLine line;
     private final RectangleF bounds;
+    private final float ascent;
 
-    Single(IOSGraphics gfx, IOSFont font, CTStringAttributes attribs, int color, String text) {
-      super(font, color);
-      line = new CTLine(new NSAttributedString(text, attribs));
-      bounds = line.GetImageBounds(gfx.scratchCtx);
+    Single(IOSFont font, CTStringAttributes attribs, String text) {
+      this.ascent = font.ctFont.get_AscentMetric();
+      this.line = new CTLine(new NSAttributedString(text, attribs));
+      this.bounds = line.GetImageBounds(gfx.scratchCtx);
       this.width = bounds.get_X() + bounds.get_Width();
-      this.height = font.ctFont.get_AscentMetric() + font.ctFont.get_DescentMetric();
+      this.height = ascent + font.ctFont.get_DescentMetric();
     }
 
     @Override
@@ -177,14 +159,8 @@ class IOSTextLayout extends AbstractTextLayout {
     }
 
     @Override
-    public void draw(CGBitmapContext bctx, float x, float y) {
-      bctx.SetFillColor(color);
-      paint(bctx, x, y);
-    }
-
-    @Override
     public void paint(CGBitmapContext bctx, float x, float y) {
-      float dy = y + font.ctFont.get_AscentMetric();
+      float dy = y + ascent;
       bctx.TranslateCTM(x, dy);
       bctx.ScaleCTM(1, -1);
       bctx.set_TextPosition(new PointF(0, 0));
@@ -196,26 +172,18 @@ class IOSTextLayout extends AbstractTextLayout {
 
   private final IOSGraphics gfx;
   private final String text;
-  private final IOSTextStamp fillStamp, altStamp;
+  private final IOSTextStamp fillStamp;
   private IOSTextStamp strokeStamp; // initialized lazily
   private float strokeWidth;
 
   public IOSTextLayout(IOSGraphics gfx, String text, TextFormat format) {
     super(gfx, format);
     this.gfx = gfx;
-
     // normalize newlines in the text (Windows: CRLF -> LF, Mac OS pre-X: CR -> LF)
     this.text = text.replace("\r\n", "\n").replace('\r', '\n');
-
-    this.fillStamp = createStamp(gfx, format.textColor, this.text, null, null);
+    this.fillStamp = createStamp(this.text, null, null);
     this.width = fillStamp.width;
     this.height = fillStamp.height;
-
-    if (format.effect.getAltColor() != null) {
-      this.altStamp = createStamp(gfx, format.effect.getAltColor(), this.text, null, null);
-    } else {
-      this.altStamp = null;
-    }
   }
 
   @Override
@@ -226,21 +194,16 @@ class IOSTextLayout extends AbstractTextLayout {
   void stroke(CGBitmapContext bctx, float x, float y, float strokeWidth, int strokeColor) {
     if (strokeStamp == null || strokeWidth != this.strokeWidth) {
       this.strokeWidth = strokeWidth;
-      strokeStamp = createStamp(gfx, 0, text, strokeWidth, strokeColor);
+      strokeStamp = createStamp(text, strokeWidth, strokeColor);
     }
-    strokeStamp.paint(bctx, x, y);
+    strokeStamp.paint(bctx, x+pad, y+pad);
   }
 
   void fill(CGBitmapContext bctx, float x, float y) {
-    fillStamp.paint(bctx, x, y);
+    fillStamp.paint(bctx, x+pad, y+pad);
   }
 
-  void draw(CGBitmapContext bctx, float x, float y) {
-    draw(bctx, fillStamp, altStamp, x, y);
-  }
-
-  private IOSTextStamp createStamp(IOSGraphics gfx, int color, String text,
-                                   Float strokeWidth, Integer strokeColor) {
+  private IOSTextStamp createStamp(String text, Float strokeWidth, Integer strokeColor) {
     CTStringAttributes attribs = new CTStringAttributes();
     IOSFont font = (format.font == null) ? IOSGraphics.defaultFont : (IOSFont) format.font;
     attribs.set_Font(font.ctFont);
@@ -250,7 +213,7 @@ class IOSTextLayout extends AbstractTextLayout {
       // stroke width is expressed as a percentage of the font size in iOS
       float strokePct = 100 * strokeWidth / font.size();
       attribs.set_StrokeWidth(new cli.System.Nullable$$00601_$$$_F_$$$$_(strokePct));
-      // unfortunately we have to set the stroke color here as well
+      // unfortunately we have to set the stroke color here, we cannot inherit it from the context
       attribs.set_StrokeColor(IOSCanvas.toCGColor(strokeColor));
     }
 
@@ -261,9 +224,9 @@ class IOSTextLayout extends AbstractTextLayout {
     // TODO: add underline here?
 
     if (format.shouldWrap() || text.contains("\\n")) {
-      return new Wrapped(gfx, font, attribs, color, text);
+      return new Wrapped(font, attribs, text);
     } else {
-      return new Single(gfx, font, attribs, color, text);
+      return new Single(font, attribs, text);
     }
   }
 

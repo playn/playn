@@ -48,11 +48,6 @@ public abstract class GraphicsGL implements Graphics {
     return ctx().scale.factor;
   }
 
-  @Override @Deprecated
-  public CanvasLayer createCanvasLayer(int width, int height) {
-    return new CanvasLayerGL(ctx(), createImage(width, height));
-  }
-
   @Override
   public GroupLayer createGroupLayer() {
     return new GroupLayerGL(ctx());

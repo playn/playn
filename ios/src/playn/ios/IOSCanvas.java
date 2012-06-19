@@ -192,13 +192,6 @@ public class IOSCanvas implements Canvas {
     return this;
   }
 
-  @Override @Deprecated
-  public Canvas drawText(TextLayout layout, float x, float y) {
-    ((IOSTextLayout) layout).draw(bctx, x, y);
-    isDirty = true;
-    return this;
-  }
-
   @Override
   public Canvas fillCircle(float x, float y, float radius) {
     IOSGradient gradient = currentState().gradient;

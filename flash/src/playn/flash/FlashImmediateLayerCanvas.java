@@ -15,22 +15,25 @@
  */
 package playn.flash;
 
+import flash.display.Sprite;
+
+import pythagoras.f.MathUtil;
+
 import playn.core.CanvasSurface;
 import playn.core.ImmediateLayer;
 
 import static playn.core.PlayN.graphics;
 
-class FlashImmediateLayerCanvas extends FlashCanvasLayer implements ImmediateLayer {
+class FlashImmediateLayerCanvas extends FlashLayer implements ImmediateLayer {
 
   private final Renderer renderer;
   private final CanvasSurface surf;
 
-  static class Clipped extends FlashImmediateLayerCanvas
-      implements ImmediateLayer.Clipped {
+  static class Clipped extends FlashImmediateLayerCanvas implements ImmediateLayer.Clipped {
     private final int width, height;
 
-    public Clipped(FlashCanvasLayer.Context2d ctx, int width, int height, Renderer renderer) {
-      super(renderer, new CanvasSurface(new FlashCanvas(width, height, ctx)));
+    public Clipped(FlashCanvas.Context2d ctx, int width, int height, Renderer renderer) {
+      super(ctx, width, height, renderer);
       this.width = width;
       this.height = height;
     }
@@ -56,7 +59,7 @@ class FlashImmediateLayerCanvas extends FlashCanvasLayer implements ImmediateLay
     }
 
     @Override
-    protected void render(Context2d ctx) {
+    protected void render(FlashCanvas.Context2d ctx) {
       ctx.beginPath();
       ctx.rect(0, 0, width, height);
       ctx.clip();
@@ -64,8 +67,8 @@ class FlashImmediateLayerCanvas extends FlashCanvasLayer implements ImmediateLay
     }
   }
 
-  public FlashImmediateLayerCanvas(FlashCanvasLayer.Context2d ctx, Renderer renderer) {
-    this(renderer, new CanvasSurface(new FlashCanvas(graphics().width(), graphics().height(), ctx)));
+  public FlashImmediateLayerCanvas(FlashCanvas.Context2d ctx, Renderer renderer) {
+    this(ctx, graphics().width(), graphics().height(), renderer);
   }
 
   @Override
@@ -73,13 +76,15 @@ class FlashImmediateLayerCanvas extends FlashCanvasLayer implements ImmediateLay
       return renderer;
   }
 
-  protected FlashImmediateLayerCanvas(Renderer renderer, CanvasSurface surf) {
-    super(surf.width(), surf.height());
+  protected FlashImmediateLayerCanvas(FlashCanvas.Context2d ctx, float width, float height,
+                                      Renderer renderer) {
+    super((Sprite) FlashCanvas.CanvasElement.create(
+            MathUtil.iceil(width), MathUtil.iceil(height)).cast());
     this.renderer = renderer;
-    this.surf = surf;
+    this.surf = new CanvasSurface(new FlashCanvas(width, height, ctx));
   }
 
-  void paint(FlashCanvasLayer.Context2d ctx, float parentAlpha) {
+  void paint(FlashCanvas.Context2d ctx, float parentAlpha) {
     if (!visible()) return;
 
     ctx.save();
@@ -89,14 +94,14 @@ class FlashImmediateLayerCanvas extends FlashCanvasLayer implements ImmediateLay
     ctx.restore();
   }
 
-  void transform(Context2d ctx) {
+  void transform(FlashCanvas.Context2d ctx) {
     ctx.translate(originX, originY);
     ctx.transform(transform.m00(), transform.m01(), transform.m10(),
         transform.m11(), transform.tx() - originX, transform.ty() - originY);
     ctx.translate(-originX, -originY);
   }
 
-  protected void render(Context2d ctx) {
+  protected void render(FlashCanvas.Context2d ctx) {
     renderer.render(surf);
   }
 }
