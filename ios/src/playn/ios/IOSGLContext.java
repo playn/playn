@@ -27,8 +27,11 @@ import cli.MonoTouch.UIKit.UIImage;
 import cli.OpenTK.Graphics.ES20.All;
 import cli.OpenTK.Graphics.ES20.GL;
 
+import pythagoras.f.FloatMath;
+
 import playn.core.InternalTransform;
 import playn.core.PlayN;
+import playn.core.StockInternalTransform;
 import playn.core.gl.GLBuffer;
 import playn.core.gl.GLContext;
 import playn.core.gl.GLProgram;
@@ -41,13 +44,15 @@ public class IOSGLContext extends GLContext {
 
   public static final boolean CHECK_ERRORS = false;
 
-  int orient;
+  private final InternalTransform rootTransform = new StockInternalTransform();
+  private int orient;
   private int minFilter = All.Linear, magFilter = All.Linear;
   private int defaultFrameBuffer = -1; // configured in init()
   private GLShader quadShader, trisShader;
 
   public IOSGLContext(IOSPlatform platform, float scaleFactor, int screenWidth, int screenHeight) {
     super(platform, scaleFactor);
+    rootTransform.uniformScale(scaleFactor);
     setSize(screenWidth, screenHeight);
   }
 
@@ -65,6 +70,28 @@ public class IOSGLContext extends GLContext {
       quadShader = new IndexedTrisShader(this);
     }
     trisShader = new IndexedTrisShader(this);
+  }
+
+  boolean setOrientation(UIDeviceOrientation orientation) {
+    orient = orientation.Value;
+    rootTransform.setTransform(scale.factor, 0, 0, scale.factor, 0, 0);
+    switch (orientation.Value) {
+    default:
+    case UIDeviceOrientation.Portrait:
+      return false;
+    case UIDeviceOrientation.PortraitUpsideDown:
+      rootTransform.translate(-viewWidth, -viewHeight);
+      rootTransform.scale(-1, -1);
+      return false;
+    case UIDeviceOrientation.LandscapeLeft:
+      rootTransform.rotate(FloatMath.PI/2);
+      rootTransform.translate(0, -viewWidth);
+      return true;
+    case UIDeviceOrientation.LandscapeRight:
+      rootTransform.rotate(-FloatMath.PI/2);
+      rootTransform.translate(-viewHeight, 0);
+      return true;
+    }
   }
 
   @Override
@@ -197,6 +224,11 @@ public class IOSGLContext extends GLContext {
   }
 
   @Override
+  public InternalTransform rootTransform() {
+    return rootTransform;
+  }
+
+  @Override
   protected int defaultFrameBuffer() {
     return defaultFrameBuffer;
   }
@@ -266,7 +298,7 @@ public class IOSGLContext extends GLContext {
     checkGLError("preparePaint end");
   }
 
-  void paintLayers(InternalTransform rootTransform, GroupLayerGL rootLayer) {
+  void paintLayers(GroupLayerGL rootLayer) {
     checkGLError("updateLayers start");
     bindFramebuffer();
     rootLayer.paint(rootTransform, 1, null); // paint all the layers

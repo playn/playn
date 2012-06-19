@@ -75,6 +75,7 @@ public class GL20Context extends GLContext {
     useShader(null, false); // flush any pending shader
   }
 
+  @Override
   public InternalTransform rootTransform() {
     return rootXform;
   }

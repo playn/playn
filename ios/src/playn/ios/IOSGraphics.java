@@ -22,7 +22,6 @@ import cli.MonoTouch.CoreGraphics.CGColorSpace;
 import cli.MonoTouch.CoreGraphics.CGImageAlphaInfo;
 import cli.MonoTouch.UIKit.UIDeviceOrientation;
 
-import pythagoras.f.FloatMath;
 import pythagoras.f.IPoint;
 import pythagoras.f.Point;
 
@@ -56,7 +55,6 @@ public class IOSGraphics extends GraphicsGL {
   private final int screenWidth, screenHeight;
   private final float touchScale;
   private final Point touchTemp = new Point();
-  private InternalTransform rootTransform;
   private boolean invertSizes;
 
   // a scratch bitmap context used for measuring text
@@ -74,8 +72,6 @@ public class IOSGraphics extends GraphicsGL {
     this.touchScale = touchScale;
     ctx = new IOSGLContext(platform, viewScale, screenWidth, screenHeight);
     rootLayer = new GroupLayerGL(ctx);
-    rootTransform = new StockInternalTransform();
-    rootTransform.uniformScale(ctx.scale.factor);
   }
 
   @Override
@@ -155,38 +151,17 @@ public class IOSGraphics extends GraphicsGL {
   }
 
   void setOrientation(UIDeviceOrientation orientation) {
-    ctx.orient = orientation.Value;
-    rootTransform = new StockInternalTransform();
-    rootTransform.uniformScale(ctx.scale.factor);
-    switch (orientation.Value) {
-    case UIDeviceOrientation.Portrait:
-      invertSizes = false;
-      break;
-    case UIDeviceOrientation.PortraitUpsideDown:
-      rootTransform.translate(-ctx.viewWidth, -ctx.viewHeight);
-      rootTransform.scale(-1, -1);
-      invertSizes = false;
-      break;
-    case UIDeviceOrientation.LandscapeLeft:
-      rootTransform.rotate(FloatMath.PI/2);
-      rootTransform.translate(0, -ctx.viewWidth);
-      invertSizes = true;
-      break;
-    case UIDeviceOrientation.LandscapeRight:
-      rootTransform.rotate(-FloatMath.PI/2);
-      rootTransform.translate(-ctx.viewHeight, 0);
-      invertSizes = true;
-      break;
-    }
+    invertSizes = ctx.setOrientation(orientation);
   }
 
   IPoint transformTouch(float x, float y) {
-    return rootTransform.inverseTransform(touchTemp.set(x*touchScale, y*touchScale), touchTemp);
+    return ctx.rootTransform().inverseTransform(
+      touchTemp.set(x*touchScale, y*touchScale), touchTemp);
   }
 
   void paint(Game game, float alpha) {
     ctx.preparePaint();
     game.paint(alpha); // run the game's custom painting code
-    ctx.paintLayers(rootTransform, rootLayer);
+    ctx.paintLayers(rootLayer);
   }
 }

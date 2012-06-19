@@ -156,6 +156,10 @@ public abstract class GLContext {
     return new StockInternalTransform();
   }
 
+  /** Returns the root transform which converts scale-independent coordinates into pixels. On some
+   * platforms this may also handle screen rotation. Do not modify! */
+  public abstract InternalTransform rootTransform();
+
   public void bindFramebuffer(int fbuf, int width, int height) {
     if (fbuf != lastFramebuffer) {
       checkGLError("bindFramebuffer");
