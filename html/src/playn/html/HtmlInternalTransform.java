@@ -105,6 +105,13 @@ public class HtmlInternalTransform extends AbstractTransform implements Internal
     return matrix.get(5);
   }
 
+  // @Override TODO: uncomment annotation when we bump to pythagoras 1.3 depend
+  public void get(float[] matrix) {
+    matrix[0] = m00(); matrix[1] = m01();
+    matrix[2] = m10(); matrix[3] = m11();
+    matrix[4] =  tx(); matrix[5] = ty();
+  }
+
   @Override
   public Transform setUniformScale(float scale) {
     return setScale(scale, scale);
