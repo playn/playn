@@ -9,7 +9,7 @@ using ${package}.core;
 namespace ${package}
 {
   [Register ("AppDelegate")]
-  public partial class AppDelegate : UIApplicationDelegate {
+  public partial class AppDelegate : IOSApplicationDelegate {
     public override bool FinishedLaunching (UIApplication app, NSDictionary options) {
       app.SetStatusBarHidden(true, true);
       var pf = IOSPlatform.register(app, IOSPlatform.SupportedOrients.PORTRAITS);

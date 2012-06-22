@@ -68,12 +68,6 @@ public class GameViewGL extends GLSurfaceView implements SurfaceHolder.Callback 
       if (loop.running())
         loop.run();
     }
-
-    void onPause() {
-      if (platform != null) {
-        platform.graphics().ctx.onSurfaceLost();
-      }
-    }
   }
 
   public GameViewGL(AndroidGL20 _gl20, GameActivity activity, Context context) {
@@ -141,14 +135,29 @@ public class GameViewGL extends GLSurfaceView implements SurfaceHolder.Callback 
 
   @Override
   public void onPause() {
-    queueEvent(new Runnable() {
-      // This method will be called on the rendering thread:
-      @Override
-      public void run() {
-        renderer.onPause();
-      }
-    });
+    if (platform != null) {
+      queueEvent(new Runnable() {
+        @Override
+        public void run() {
+          platform.graphics().ctx.onSurfaceLost();
+          platform.onPause();
+        }
+      });
+    }
     super.onPause();
+  }
+
+  @Override
+  public void onResume() {
+    super.onResume();
+    if (platform != null) {
+      queueEvent(new Runnable() {
+        @Override
+        public void run() {
+          platform.onResume();
+        }
+      });
+    }
   }
 
   void onKeyDown(final Keyboard.Event event) {

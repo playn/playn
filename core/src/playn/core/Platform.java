@@ -19,6 +19,7 @@ package playn.core;
  * Generic platform interface. New platforms are defined as implementations of this interface.
  */
 public interface Platform {
+
   public enum Type { JAVA, HTML, ANDROID, IOS, FLASH }
 
   void run(Game game);
@@ -32,6 +33,8 @@ public interface Platform {
   void openURL(String url);
 
   void invokeLater(Runnable runnable);
+
+  void setLifecycleListener(PlayN.LifecycleListener listener);
 
   Audio audio();
 

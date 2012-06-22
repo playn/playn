@@ -18,17 +18,16 @@ package playn.android;
 import android.content.Intent;
 import android.net.Uri;
 
+import playn.core.AbstractPlatform;
 import playn.core.Game;
 import playn.core.Json;
 import playn.core.Mouse;
 import playn.core.MouseStub;
-import playn.core.Platform;
 import playn.core.PlayN;
 import playn.core.TouchImpl;
 import playn.core.json.JsonImpl;
-import playn.core.util.RunQueue;
 
-public class AndroidPlatform implements Platform {
+public class AndroidPlatform extends AbstractPlatform {
 
   public static final boolean DEBUG_LOGS = true;
 
@@ -46,19 +45,17 @@ public class AndroidPlatform implements Platform {
   private final AndroidAudio audio;
   private final AndroidGraphics graphics;
   private final AndroidKeyboard keyboard;
-  private final AndroidLog log;
   private final AndroidNet net;
   private final AndroidPointer pointer;
   private final AndroidStorage storage;
   private final TouchImpl touch;
   private final AndroidTouchEventHandler touchHandler;
   private final Json json;
-  private final RunQueue runQueue;
 
   protected AndroidPlatform(GameActivity activity, AndroidGL20 gl20) {
+    super(new AndroidLog());
     this.activity = activity;
 
-    log = new AndroidLog();
     audio = new AndroidAudio(this);
     graphics = new AndroidGraphics(this, gl20, activity.scaleFactor());
     analytics = new AndroidAnalytics();
@@ -70,7 +67,6 @@ public class AndroidPlatform implements Platform {
     storage = new AndroidStorage(activity);
     touch = new TouchImpl();
     touchHandler = new AndroidTouchEventHandler(graphics, activity.gameView());
-    runQueue = new RunQueue(log);
   }
 
   @Override
@@ -104,11 +100,6 @@ public class AndroidPlatform implements Platform {
   }
 
   @Override
-  public AndroidLog log() {
-    return log;
-  }
-
-  @Override
   public AndroidNet net() {
     return net;
   }
@@ -117,11 +108,6 @@ public class AndroidPlatform implements Platform {
   public void openURL(String url) {
     Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
     activity.startActivity(browserIntent);
-  }
-
-  @Override
-  public void invokeLater(Runnable runnable) {
-    runQueue.add(runnable);
   }
 
   @Override
@@ -172,6 +158,14 @@ public class AndroidPlatform implements Platform {
   @Override
   public Type type() {
     return Type.ANDROID;
+  }
+
+  // allow these to be called by GameViewGL
+  protected void onPause() {
+    super.onPause();
+  }
+  protected void onResume() {
+    super.onResume();
   }
 
   void update(float delta) {

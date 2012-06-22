@@ -137,16 +137,6 @@ public class IOSGameView extends iPhoneOSGameView {
   }
 
   @Override
-  protected void OnVisibleChanged(EventArgs e) {
-    super.OnVisibleChanged(e);
-  }
-
-  @Override
-  protected void OnWindowStateChanged(EventArgs e) {
-    super.OnWindowStateChanged(e);
-  }
-
-  @Override
   public void TouchesBegan(NSSet touches, UIEvent event) {
     super.TouchesBegan(touches, event);
     platform.touch().onTouchesBegan(touches, event);

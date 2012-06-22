@@ -22,6 +22,7 @@ import flash.events.Event;
 import flash.display.Sprite;
 import flash.events.EventType;
 
+import playn.core.AbstractPlatform;
 import playn.core.Analytics;
 import playn.core.Audio;
 import playn.core.Game;
@@ -31,7 +32,6 @@ import playn.core.Keyboard;
 import playn.core.Log;
 import playn.core.Mouse;
 import playn.core.Net;
-import playn.core.Platform;
 import playn.core.PlayN;
 import playn.core.Pointer;
 import playn.core.RegularExpression;
@@ -39,10 +39,9 @@ import playn.core.Storage;
 import playn.core.Touch;
 import playn.core.TouchStub;
 import playn.core.json.JsonImpl;
-import playn.core.util.RunQueue;
 import playn.html.HtmlRegularExpression;
 
-public class FlashPlatform implements Platform {
+public class FlashPlatform extends AbstractPlatform {
 
   static final int DEFAULT_WIDTH = 640;
   static final int DEFAULT_HEIGHT = 480;
@@ -71,11 +70,9 @@ public class FlashPlatform implements Platform {
   private final FlashGraphics graphics;
   private final Json json;
   private final FlashKeyboard keyboard;
-  private final FlashLog log;
   private final FlashNet net;
   private final FlashPointer pointer;
   private final FlashMouse mouse;
-  private final RunQueue runQueue;
 
   private Game game;
   private TimerCallback paintCallback;
@@ -84,7 +81,7 @@ public class FlashPlatform implements Platform {
   private Analytics analytics;
 
   protected FlashPlatform() {
-    log = new FlashLog();
+    super(new FlashLog());
     regularExpression = new HtmlRegularExpression();
     net = new FlashNet();
     audio = new FlashAudio();
@@ -95,7 +92,6 @@ public class FlashPlatform implements Platform {
     graphics = new FlashGraphics();
     storage = new FlashStorage();
     analytics = new FlashAnalytics();
-    runQueue = new RunQueue(log);
   }
 
   @Override
@@ -126,11 +122,6 @@ public class FlashPlatform implements Platform {
   @Override
   public Keyboard keyboard() {
     return keyboard;
-  }
-
-  @Override
-  public Log log() {
-    return log;
   }
 
   @Override
@@ -172,11 +163,6 @@ public class FlashPlatform implements Platform {
   @Override
   public void openURL(String url) {
       //TODO: implement
-  }
-
-  @Override
-  public void invokeLater(Runnable runnable) {
-    runQueue.add(runnable);
   }
 
   @Override
@@ -225,7 +211,7 @@ public class FlashPlatform implements Platform {
         if (frameCounter == FPS_COUNTER_MAX) {
           double frameRate = frameCounter /
             ((time() - frameCounterStart) / 1000.0);
-          PlayN.log().info("FPS: " + frameRate);
+          log().info("FPS: " + frameRate);
           frameCounter = 0;
         }
       }

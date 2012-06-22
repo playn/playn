@@ -9,7 +9,7 @@ using playn.tests.core;
 namespace playn.tests.ios
 {
   [Register ("AppDelegate")]
-  public partial class AppDelegate : UIApplicationDelegate {
+  public partial class AppDelegate : IOSApplicationDelegate {
     public override bool FinishedLaunching (UIApplication app, NSDictionary options) {
       IOSPlatform.register(app, IOSPlatform.SupportedOrients.LANDSCAPES);
       PlayN.run(new TestsGame());

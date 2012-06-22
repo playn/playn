@@ -28,6 +28,16 @@ public class PlayN {
 
   private static Platform platform;
 
+  /** Used to receive lifecycle notifications. See {@link #setLifecycleListener}. */
+  public static interface LifecycleListener {
+    /** Called just before the game is paused (made non-active on mobile platforms). */
+    void onPause();
+    /** Called just after the game is resumed (made active on mobile platforms). */
+    void onResume();
+    /** Called just before the game will be closed (on mobile and web platforms). */
+    void onExit();
+  }
+
   /**
    * Call this method to start your {@link Game}. It must be called only once,
    * and all work after this call is made will be performed in {@link Game}'s
@@ -75,6 +85,14 @@ public class PlayN {
    */
   public static void invokeLater(Runnable runnable) {
     platform.invokeLater(runnable);
+  }
+
+  /**
+   * Configures a listener to be notified of lifecycle events. Any previous listener will be
+   * overwritten. Supply null to clear the listener.
+   */
+  public static void setLifecycleListener(LifecycleListener listener) {
+    platform.setLifecycleListener(listener);
   }
 
   /**

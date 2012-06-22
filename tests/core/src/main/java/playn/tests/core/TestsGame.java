@@ -25,8 +25,7 @@ import static playn.core.PlayN.*;
 
 public class TestsGame implements Game {
   Test[] tests = new Test[] {
-    new ShaderTest(),
-    new ClippedGroupTest(),
+    new PauseResumeTest(),
     new TextTest(),
     new SubImageTest(),
     new SurfaceTest(),
@@ -40,6 +39,8 @@ public class TestsGame implements Game {
     new GetTextTest(),
     new PointerMouseTouchTest(),
     new MouseWheelTest(),
+    new ShaderTest(),
+    new ClippedGroupTest(),
     /*new YourTest(),*/
   };
   int currentTest;

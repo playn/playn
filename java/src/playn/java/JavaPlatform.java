@@ -20,6 +20,7 @@ import java.io.IOException;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.opengl.Display;
 
+import playn.core.AbstractPlatform;
 import playn.core.Analytics;
 import playn.core.Audio;
 import playn.core.Game;
@@ -28,7 +29,6 @@ import playn.core.Keyboard;
 import playn.core.Log;
 import playn.core.Mouse;
 import playn.core.Net;
-import playn.core.Platform;
 import playn.core.PlayN;
 import playn.core.Pointer;
 import playn.core.RegularExpression;
@@ -36,9 +36,8 @@ import playn.core.Storage;
 import playn.core.Touch;
 import playn.core.TouchStub;
 import playn.core.json.JsonImpl;
-import playn.core.util.RunQueue;
 
-public class JavaPlatform implements Platform {
+public class JavaPlatform extends AbstractPlatform {
 
   // Maximum delta time to consider between update() calls (in milliseconds). If the delta between
   // two update()s is greater than MAX_DELTA, we clamp to MAX_DELTA.
@@ -80,7 +79,6 @@ public class JavaPlatform implements Platform {
 
   private final JavaAnalytics analytics = new JavaAnalytics();
   private final JavaAudio audio = new JavaAudio();
-  private final JavaLog log = new JavaLog();
   private final JavaNet net = new JavaNet(this);
   private final JavaRegularExpression regex = new JavaRegularExpression();
   private final JavaStorage storage = new JavaStorage();
@@ -90,7 +88,6 @@ public class JavaPlatform implements Platform {
   private final JavaGraphics graphics;
   private final JavaMouse mouse;
   private final JavaAssets assets;
-  private final RunQueue runQueue = new RunQueue(log);
 
   private int updateRate = 0;
   private float accum = updateRate;
@@ -98,6 +95,7 @@ public class JavaPlatform implements Platform {
   private double lastPaintTime;
 
   public JavaPlatform(float scaleFactor) {
+    super(new JavaLog());
     graphics = new JavaGraphics(this, scaleFactor);
     mouse = new JavaMouse(graphics);
     assets = new JavaAssets(graphics, audio);
@@ -135,11 +133,6 @@ public class JavaPlatform implements Platform {
   @Override
   public Keyboard keyboard() {
     return keyboard;
-  }
-
-  @Override
-  public Log log() {
-    return log;
   }
 
   @Override
@@ -205,11 +198,6 @@ public class JavaPlatform implements Platform {
   }
 
   @Override
-  public void invokeLater(Runnable runnable) {
-    runQueue.add(runnable);
-  }
-
-  @Override
   public void run(final Game game) {
     this.updateRate = game.updateRate();
 
@@ -225,12 +213,22 @@ public class JavaPlatform implements Platform {
 
     game.init();
 
+    boolean wasActive = Display.isActive();
     while (!Display.isCloseRequested()) {
       // Event handling.
       mouse.update();
       keyboard.update();
       pointer.update();
       net.update();
+
+      // Notify the app if lose or regain focus (treat said as pause/resume).
+      if (wasActive != Display.isActive()) {
+        if (wasActive)
+          onPause();
+        else
+          onResume();
+        wasActive = Display.isActive();
+      }
 
       // Execute any pending runnables.
       runQueue.execute();
@@ -264,6 +262,7 @@ public class JavaPlatform implements Platform {
       Display.update();
     }
 
+    onExit();
     System.exit(0);
   }
 

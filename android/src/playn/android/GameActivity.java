@@ -158,8 +158,6 @@ public abstract class GameActivity extends Activity {
     if (platform() != null)
       platform().audio().onPause();
     super.onPause();
-
-    // TODO: Notify game
   }
 
   @Override
@@ -169,8 +167,6 @@ public abstract class GameActivity extends Activity {
     if (platform() != null)
       platform().audio().onResume();
     super.onResume();
-
-    // TODO: Notify game
   }
 
   /**

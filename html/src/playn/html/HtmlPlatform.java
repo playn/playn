@@ -21,6 +21,7 @@ import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.Style.Cursor;
 import com.google.gwt.user.client.Window;
 
+import playn.core.AbstractPlatform;
 import playn.core.Storage;
 import playn.core.Analytics;
 import playn.core.Audio;
@@ -30,15 +31,13 @@ import playn.core.Json;
 import playn.core.Keyboard;
 import playn.core.Log;
 import playn.core.Net;
-import playn.core.Platform;
 import playn.core.Pointer;
 import playn.core.Mouse;
 import playn.core.Touch;
 import playn.core.RegularExpression;
-import playn.core.util.RunQueue;
 import playn.html.HtmlUrlParameters.Renderer;
 
-public class HtmlPlatform implements Platform {
+public class HtmlPlatform extends AbstractPlatform {
 
   /** Used by {@link #register(Mode)}. */
   public static enum Mode {
@@ -155,7 +154,6 @@ public class HtmlPlatform implements Platform {
   private final HtmlTouch touch;
   private final HtmlStorage storage = new HtmlStorage();
   private final HtmlAnalytics analytics = new HtmlAnalytics();
-  private final RunQueue runQueue = new RunQueue(log);
 
   private Game game;
   private TimerCallback paintCallback;
@@ -164,6 +162,7 @@ public class HtmlPlatform implements Platform {
   private static AgentInfo agentInfo = computeAgentInfo();
 
   protected HtmlPlatform(Mode mode) {
+    super(log);
     if (!GWT.isProdMode()) {
       log.info("You are running in GWT Development Mode. "
           + "For optimal performance you may want to use an alternative method. "
@@ -218,11 +217,6 @@ public class HtmlPlatform implements Platform {
   @Override
   public Keyboard keyboard() {
     return keyboard;
-  }
-
-  @Override
-  public Log log() {
-    return log;
   }
 
   @Override
@@ -319,11 +313,6 @@ public class HtmlPlatform implements Platform {
   @Override
   public void openURL(String url) {
     Window.open(url, "_blank", "");
-  }
-
-  @Override
-  public void invokeLater(Runnable runnable) {
-    runQueue.add(runnable);
   }
 
   @Override

@@ -30,20 +30,19 @@ import cli.MonoTouch.UIKit.UIInterfaceOrientation;
 import cli.MonoTouch.UIKit.UIScreen;
 import cli.MonoTouch.UIKit.UIWindow;
 
+import playn.core.AbstractPlatform;
 import playn.core.Game;
 import playn.core.Json;
 import playn.core.Mouse;
 import playn.core.MouseStub;
-import playn.core.Platform;
 import playn.core.PlayN;
 import playn.core.RegularExpression;
 import playn.core.json.JsonImpl;
-import playn.core.util.RunQueue;
 
 /**
  * Provides access to all the PlayN services on iOS.
  */
-public class IOSPlatform implements Platform {
+public class IOSPlatform extends AbstractPlatform {
 
   /** Defines the orientations supported by your app. */
   public enum SupportedOrients {
@@ -135,14 +134,12 @@ public class IOSPlatform implements Platform {
   private final IOSGraphics graphics;
   private final Json json;
   private final IOSKeyboard keyboard;
-  private final IOSLog log;
   private final IOSNet net;
   private final IOSPointer pointer;
   private final IOSStorage storage;
   private final IOSTouch touch;
   private final IOSAssets assets;
   private final IOSAnalytics analytics;
-  private final RunQueue runQueue;
 
   private Game game;
   private float accum, alpha;
@@ -153,6 +150,7 @@ public class IOSPlatform implements Platform {
   private final IOSGameView gameView;
 
   protected IOSPlatform(UIApplication app, SupportedOrients orients, boolean iPadLikePhone) {
+    super(new IOSLog());
     this.app = app;
     this.orients = orients;
 
@@ -166,9 +164,6 @@ public class IOSPlatform implements Platform {
       screenHeight /= 2;
     }
 
-    // create log first so that other services can use it during initialization
-    log = new IOSLog();
-
     audio = new IOSAudio();
     graphics = new IOSGraphics(this, screenWidth, screenHeight, viewScale, deviceScale);
     json = new JsonImpl();
@@ -179,10 +174,13 @@ public class IOSPlatform implements Platform {
     assets = new IOSAssets(graphics, audio);
     analytics = new IOSAnalytics();
     storage = new IOSStorage();
-    runQueue = new RunQueue(log);
 
     mainWindow = new UIWindow(bounds);
     mainWindow.Add(gameView = new IOSGameView(this, bounds, deviceScale));
+
+    // if the game supplied a proper delegate, configure it (for lifecycle notifications)
+    if (app.get_Delegate() instanceof IOSApplicationDelegate)
+      ((IOSApplicationDelegate) app.get_Delegate()).setPlatform(this);
 
     // configure our orientation to a supported default, a notification will come in later that
     // will adjust us to the device's current orientation
@@ -222,11 +220,6 @@ public class IOSPlatform implements Platform {
   @Override
   public IOSKeyboard keyboard() {
     return keyboard;
-  }
-
-  @Override
-  public IOSLog log() {
-    return log;
   }
 
   @Override
@@ -277,11 +270,6 @@ public class IOSPlatform implements Platform {
   }
 
   @Override
-  public void invokeLater(Runnable runnable) {
-    runQueue.add(runnable);
-  }
-
-  @Override
   public void run(Game game) {
     this.game = game;
     // initialize the game and start things off
@@ -290,6 +278,17 @@ public class IOSPlatform implements Platform {
     gameView.Run(1000d / game.updateRate());
     // make our main window visible
     mainWindow.MakeKeyAndVisible();
+  }
+
+  // make these accessible to IOSApplicationDelegate
+  protected void onPause() {
+    super.onPause();
+  }
+  protected void onResume() {
+    super.onResume();
+  }
+  protected void onExit() {
+    super.onExit();
   }
 
   void viewDidInit(int defaultFrameBuffer) {
