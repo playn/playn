@@ -43,7 +43,7 @@ public class IOSApplicationDelegate extends UIApplicationDelegate {
   }
 
   @Override
-  public void DidEnterBackground(UIApplication app) {
+  public void OnResignActivation(UIApplication app) {
     // UIApplicationDelegate specifically disallows calling super here
     if (platform != null) {
       // we call onPause directly because routing it through the GL thread results in our being
