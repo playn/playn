@@ -46,10 +46,10 @@ public class IOSApplicationDelegate extends UIApplicationDelegate {
   public void OnResignActivation(UIApplication app) {
     // UIApplicationDelegate specifically disallows calling super here
     if (platform != null) {
-      // we call onPause directly because routing it through the GL thread results in our being
-      // suspended before the app can process the onPause call; this means the things that can be
-      // done in onPause are very limited, but at least we give the app the most time we can to
-      // accomplish those things
+      // we call this directly because routing it through the GL thread results in iOS thinking
+      // that we're done and can be suspended immediately; the GL thread will already have been
+      // suspended at this point, so race conditions should not be an issue (modulo invisible
+      // changes sitting in another CPU's cache which we can do nothing about)
       platform.onPause();
     }
   }
@@ -58,6 +58,7 @@ public class IOSApplicationDelegate extends UIApplicationDelegate {
   public void WillTerminate(UIApplication app) {
     // UIApplicationDelegate specifically disallows calling super here
     if (platform != null) {
+      // we call this directly for the same reason as onPause
       platform.onExit();
     }
   }
