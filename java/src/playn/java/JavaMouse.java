@@ -26,10 +26,10 @@ import playn.core.PlayN;
 
 class JavaMouse extends MouseImpl {
 
-  private final JavaGraphics graphics;
+  private final JavaPlatform platform;
 
-  public JavaMouse(JavaGraphics graphics) {
-    this.graphics = graphics;
+  public JavaMouse(JavaPlatform platform) {
+    this.platform = platform;
   }
 
   @Override
@@ -63,7 +63,7 @@ class JavaMouse extends MouseImpl {
       double time = (double) (Mouse.getEventNanoseconds() / 1000000);
       int btn = getButton(Mouse.getEventButton());
       Point m = new Point(Mouse.getEventX(), Display.getHeight() - Mouse.getEventY() - 1);
-      graphics.transformMouse(m);
+      platform.graphics().transformMouse(m);
 
       int dx = Mouse.getEventDX(), dy = -Mouse.getEventDY();
       if (btn != -1) {

@@ -33,6 +33,7 @@ import playn.core.Pattern;
 import playn.core.TextFormat;
 import playn.core.TextLayout;
 import playn.core.gl.GL20;
+import playn.core.gl.GL20Context;
 import playn.core.gl.GLContext;
 import playn.core.gl.GraphicsGL;
 import playn.core.gl.GroupLayerGL;
@@ -45,11 +46,19 @@ public class JavaGraphics extends GraphicsGL {
   private final int DEFAULT_HEIGHT = 480;
 
   private final GroupLayerGL rootLayer;
-  private final JavaGLContext ctx;
-  private JavaGL20 gl;
+  private final GL20Context ctx;
 
-  public JavaGraphics(JavaPlatform platform, float scaleFactor) {
-    this.ctx = new JavaGLContext(platform, scaleFactor, DEFAULT_WIDTH, DEFAULT_HEIGHT);
+  public JavaGraphics(JavaPlatform platform, float scaleFactor, boolean headless) {
+    // if we're being run in headless mode, create a stub GL context which does not trigger the
+    // initialization of LWJGL; this allows tests to run against non-graphics services without
+    // needing to configure LWJGL native libraries
+    if (headless)
+      this.ctx = new GL20Context(platform, null, 1, DEFAULT_WIDTH, DEFAULT_HEIGHT, false) {
+        @Override
+        protected void viewWasResized () {}
+      };
+    else
+      this.ctx = new JavaGLContext(platform, scaleFactor, DEFAULT_WIDTH, DEFAULT_HEIGHT);
     this.rootLayer = new GroupLayerGL(ctx);
   }
 
@@ -140,7 +149,7 @@ public class JavaGraphics extends GraphicsGL {
   }
 
   void init() {
-    ctx.initGL();
+    ctx.init();
   }
 
   void transformMouse(Point point) {

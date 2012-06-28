@@ -23,12 +23,13 @@ import playn.core.Canvas;
 import playn.core.CanvasImage;
 import playn.core.Image;
 import playn.core.ResourceCallback;
+import playn.core.gl.GLContext;
 
 class JavaCanvasImage extends JavaImage implements CanvasImage {
 
   private final JavaCanvas canvas;
 
-  JavaCanvasImage(JavaGLContext ctx, float width, float height) {
+  JavaCanvasImage(GLContext ctx, float width, float height) {
     super(ctx, new BufferedImage(ctx.scale.scaledCeil(width), ctx.scale.scaledCeil(height),
                                  BufferedImage.TYPE_INT_ARGB), ctx.scale);
     Graphics2D gfx = img.createGraphics();

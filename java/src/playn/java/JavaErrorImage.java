@@ -21,13 +21,14 @@ import java.awt.image.BufferedImage;
 
 import playn.core.Image;
 import playn.core.ResourceCallback;
+import playn.core.gl.GLContext;
 import playn.core.gl.Scale;
 
 class JavaErrorImage extends JavaImage {
 
   private final Exception exception;
 
-  public JavaErrorImage(JavaGLContext ctx, Exception assetLoadException) {
+  public JavaErrorImage(GLContext ctx, Exception assetLoadException) {
     // the caller will be notified that this image failed to load, but we also create an error
     // image so that subsequent attempts to use this image won't result in numerous follow-on
     // errors when the caller attempts to call width/height/etc.

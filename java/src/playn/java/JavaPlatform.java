@@ -50,31 +50,33 @@ public class JavaPlatform extends AbstractPlatform {
   // we try to squeeze a paint() near max bound of FRAME_TIME.
   private static final float FRAME_TIME = 10;
 
-  private static JavaPlatform instance;
+  private static JavaPlatform testInstance;
 
   public static JavaPlatform register() {
-    String sfprop = System.getProperty("playn.scaleFactor");
-    if (sfprop != null) {
-      try {
-        return register(Float.parseFloat(sfprop));
-      } catch (Exception e) {
-        System.err.println("Invalid scaleFactor supplied '" + sfprop + "': " + e);
-        // fall through and register with scale factor 1
-      }
+    float scaleFactor = 1;
+    String sfprop = System.getProperty("playn.scaleFactor", String.valueOf(scaleFactor));
+    try {
+      return register(Float.parseFloat(sfprop));
+    } catch (Exception e) {
+      System.err.println("Invalid scaleFactor supplied '" + sfprop + "': " + e);
     }
-    return register(1);
+    return register(scaleFactor);
   }
 
   public static JavaPlatform register(float scaleFactor) {
-    // Guard against multiple-registration. This can happen when running tests in maven.
-    if (instance != null) {
-      return instance;
-    }
-
-    instance = new JavaPlatform(scaleFactor);
+    JavaPlatform instance = new JavaPlatform(scaleFactor, false);
     PlayN.setPlatform(instance);
-    instance.init();
     return instance;
+  }
+
+  public static JavaPlatform registerHeadless() {
+    // Guard against multiple-registration. This can happen when running tests in maven.
+    if (testInstance != null) {
+      return testInstance;
+    }
+    testInstance = new JavaPlatform(1, true);
+    PlayN.setPlatform(testInstance);
+    return testInstance;
   }
 
   private final JavaAnalytics analytics = new JavaAnalytics();
@@ -86,19 +88,17 @@ public class JavaPlatform extends AbstractPlatform {
   private final JavaKeyboard keyboard = new JavaKeyboard();
   private final JavaPointer pointer = new JavaPointer();
   private final JavaGraphics graphics;
-  private final JavaMouse mouse;
-  private final JavaAssets assets;
+  private final JavaMouse mouse = new JavaMouse(this);
+  private final JavaAssets assets = new JavaAssets(this);
 
   private int updateRate = 0;
   private float accum = updateRate;
   private double lastUpdateTime;
   private double lastPaintTime;
 
-  public JavaPlatform(float scaleFactor) {
+  public JavaPlatform(float scaleFactor, boolean headless) {
     super(new JavaLog());
-    graphics = new JavaGraphics(this, scaleFactor);
-    mouse = new JavaMouse(graphics);
-    assets = new JavaAssets(graphics, audio);
+    graphics = new JavaGraphics(this, scaleFactor, headless);
   }
 
   /**
@@ -116,7 +116,7 @@ public class JavaPlatform extends AbstractPlatform {
   }
 
   @Override
-  public Audio audio() {
+  public JavaAudio audio() {
     return audio;
   }
 
@@ -201,6 +201,7 @@ public class JavaPlatform extends AbstractPlatform {
   public void run(final Game game) {
     this.updateRate = game.updateRate();
 
+    storage.init();
     try {
       // initialize LWJGL (and show the display) now that the game has been initialized
       graphics.init();
@@ -264,9 +265,5 @@ public class JavaPlatform extends AbstractPlatform {
 
     onExit();
     System.exit(0);
-  }
-
-  protected void init() {
-    storage.init();
   }
 }

@@ -38,8 +38,7 @@ public class JavaAssets extends AbstractAssets {
   /** Makes asset loading asynchronous to mimic the behavior of the HTML backend. */
   private static final boolean asyncLoad = Boolean.getBoolean("playn.java.asyncLoad");
 
-  private final JavaGraphics graphics;
-  private final JavaAudio audio;
+  private final JavaPlatform platform;
   private String pathPrefix = "";
 
   static void doResourceAction(Runnable action) {
@@ -49,9 +48,8 @@ public class JavaAssets extends AbstractAssets {
       action.run();
   }
 
-  public JavaAssets (JavaGraphics graphics, JavaAudio audio) {
-    this.graphics = graphics;
-    this.audio = audio;
+  public JavaAssets (JavaPlatform platform) {
+    this.platform = platform;
   }
 
   /**
@@ -88,6 +86,7 @@ public class JavaAssets extends AbstractAssets {
 
   @Override
   protected Image doGetImage(String path) {
+    JavaGraphics graphics = platform.graphics();
     Exception error = null;
     for (Scale.ScaledResource rsrc : graphics.ctx().scale.getScaledResources(pathPrefix + path)) {
       try {
@@ -109,9 +108,9 @@ public class JavaAssets extends AbstractAssets {
     InputStream in = getClass().getClassLoader().getResourceAsStream(pathPrefix + path);
     if (in == null) {
       PlayN.log().warn("Could not find sound " + pathPrefix + path);
-      return audio.createNoopSound();
+      return platform.audio().createNoopSound();
     } else {
-      return audio.createSound(path, in);
+      return platform.audio().createSound(path, in);
     }
   }
 

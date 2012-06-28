@@ -44,6 +44,17 @@ class JavaGLContext extends GL20Context {
   }
 
   @Override
+  public void init() {
+    try {
+      Display.create();
+      super.viewWasResized();
+      super.init();
+    } catch (LWJGLException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  @Override
   protected void viewWasResized() {
     try {
       Display.setDisplayMode(new DisplayMode(defaultFbufWidth, defaultFbufHeight));
@@ -52,16 +63,6 @@ class JavaGLContext extends GL20Context {
     }
     if (Display.isCreated())
       super.viewWasResized();
-  }
-
-  void initGL() {
-    try {
-      Display.create();
-      super.viewWasResized();
-      init();
-    } catch (LWJGLException e) {
-      throw new RuntimeException(e);
-    }
   }
 
   void updateTexture(int tex, BufferedImage image) {
