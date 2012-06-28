@@ -30,22 +30,6 @@
   </dependencies>
 
   <build>
-    <plugins>
-      <!-- unpack LWJGL when testing -->
-      <plugin>
-        <groupId>com.googlecode.mavennatives</groupId>
-        <artifactId>maven-nativedependencies-plugin</artifactId>
-        <version>0.0.6</version>
-        <executions>
-          <execution>
-            <id>unpacknatives</id>
-            <phase>test-compile</phase>
-            <goals><goal>copy</goal></goals>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
-
     <!-- This configuration is used to store Eclipse m2e settings only. -->
     <!-- It has no influence on the Maven build itself.-->
     <pluginManagement>
@@ -88,6 +72,19 @@
       <id>java</id>
       <build>
         <plugins>
+          <!-- unpack LWJGL when testing -->
+          <plugin>
+            <groupId>com.googlecode.mavennatives</groupId>
+            <artifactId>maven-nativedependencies-plugin</artifactId>
+            <version>0.0.6</version>
+            <executions>
+              <execution>
+                <id>unpacknatives</id>
+                <phase>test-compile</phase>
+                <goals><goal>copy</goal></goals>
+              </execution>
+            </executions>
+          </plugin>
           <!-- allows testing of Java backend via: mvn test -->
           <plugin>
             <artifactId>maven-antrun-plugin</artifactId>
