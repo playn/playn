@@ -82,4 +82,8 @@ public class IOSSound implements Sound {
       player = null;
     }
   }
+
+  protected void finalize() {
+    dispose(); // meh
+  }
 }

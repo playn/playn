@@ -104,10 +104,14 @@ public class IOSCanvas implements Canvas {
   }
 
   public void dispose() {
-    bctx.Dispose();
-    bctx = null;
-    Marshal.FreeHGlobal(data);
-    data = null;
+    if (bctx != null) {
+      bctx.Dispose();
+      bctx = null;
+    }
+    if (data != null) {
+      Marshal.FreeHGlobal(data);
+      data = null;
+    }
   }
 
   @Override
@@ -399,6 +403,10 @@ public class IOSCanvas implements Canvas {
   public Canvas translate(float x, float y) {
     bctx.TranslateCTM(x, y);
     return this;
+  }
+
+  protected void finalize() {
+    dispose(); // meh
   }
 
   private void addRoundRectPath(float x, float y, float width, float height, float radius) {
