@@ -44,7 +44,7 @@ public class HtmlPlatform extends AbstractPlatform {
     public boolean transparentCanvas = false;
     public boolean antiAliasing = true;
   }
-  
+
   /** Used by {@link #register(Mode)}. */
   public static enum Mode {
     WEBGL, CANVAS, DOM, AUTODETECT;
@@ -82,10 +82,11 @@ public class HtmlPlatform extends AbstractPlatform {
   /**
    * Prepares the HTML platform for operation.
    * @deprecated use register(Configuration) instead.
-   * 
+   *
    * @param mode indicates whether to force the use of WebGL, force the use of Canvas, or to
    * autodetect whether the browser supports WebGL and use it if possible.
    */
+  @Deprecated
   public static HtmlPlatform register(Mode mode) {
     Configuration configuration = new Configuration();
     configuration.mode = mode;
