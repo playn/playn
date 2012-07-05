@@ -17,6 +17,7 @@ package playn.html;
 
 import com.google.gwt.dom.client.NativeEvent;
 import com.google.gwt.event.dom.client.KeyCodes;
+import com.google.gwt.user.client.Window;
 
 import playn.core.Key;
 import playn.core.Keyboard;
@@ -83,7 +84,7 @@ class HtmlKeyboard implements Keyboard {
 
   @Override
   public void getText(TextType textType, String label, String initVal, Callback<String> callback) {
-    callback.onFailure(new UnsupportedOperationException("Not yet implemented."));
+    callback.onSuccess(Window.prompt(label, initVal));
   }
 
   private static Key keyForCode(int keyCode) {
