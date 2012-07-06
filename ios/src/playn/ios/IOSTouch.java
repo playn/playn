@@ -60,8 +60,9 @@ public class IOSTouch extends TouchImpl {
         PointF loc = touch.LocationInView(touch.get_View());
         // transform the point based on our current orientation and scale
         IPoint xloc = graphics.transformTouch(loc.get_X(), loc.get_Y());
-        // TODO: sort out what to do about lack of ID
-        events[_idx++] = new Event.Impl(touch.get_Timestamp(), xloc.x(), xloc.y(), 0);
+        // on iOS the memory address of the UITouch object is the unique id
+        int id = touch.get_Handle().ToInt32();
+        events[_idx++] = new Event.Impl(touch.get_Timestamp(), xloc.x(), xloc.y(), id);
         stop[0] = false;
       }
       private int _idx = 0;
