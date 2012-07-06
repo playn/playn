@@ -15,6 +15,9 @@
  */
 package playn.core;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import pythagoras.f.Point;
 
 /**
@@ -26,7 +29,7 @@ public class TouchImpl implements Touch {
 
   private boolean enabled = true;
   private Listener listener;
-  private AbstractLayer[] activeLayers = new AbstractLayer[0];
+  private Map<Integer,AbstractLayer> activeLayers = new HashMap<Integer,AbstractLayer>();
 
   @Override
   public boolean hasTouch() {
@@ -64,7 +67,7 @@ public class TouchImpl implements Touch {
         p.y += root.originY();
         AbstractLayer hitLayer = (AbstractLayer)root.hitTest(p);
         if (hitLayer != null) {
-          setActiveLayer(event.id(), hitLayer);
+          activeLayers.put(event.id(), hitLayer);
           final Event.Impl localEvent = event.localize(hitLayer);
           localEvent.setPreventDefault(event.getPreventDefault());
           hitLayer.interact(LayerListener.class, new AbstractLayer.Interaction<LayerListener>() {
@@ -86,7 +89,7 @@ public class TouchImpl implements Touch {
       listener.onTouchMove(touches);
 
     for (Event.Impl event : touches) {
-      AbstractLayer activeLayer = getActiveLayer(event.id());
+      AbstractLayer activeLayer = activeLayers.get(event.id());
       if (activeLayer != null) {
         final Event.Impl localEvent = event.localize(activeLayer);
         localEvent.setPreventDefault(event.getPreventDefault());
@@ -108,7 +111,7 @@ public class TouchImpl implements Touch {
       listener.onTouchEnd(touches);
 
     for (Event.Impl event : touches) {
-      AbstractLayer activeLayer = getActiveLayer(event.id());
+      AbstractLayer activeLayer = activeLayers.get(event.id());
       if (activeLayer != null) {
         final Event.Impl localEvent = event.localize(activeLayer);
         localEvent.setPreventDefault(event.getPreventDefault());
@@ -118,25 +121,8 @@ public class TouchImpl implements Touch {
           }
         });
         event.setPreventDefault(localEvent.getPreventDefault());
-        setActiveLayer(event.id(), null);
+        activeLayers.put(event.id(), null);
       }
     }
-  }
-
-  private AbstractLayer getActiveLayer(int index) {
-    return (activeLayers.length > index) ? activeLayers[index] : null;
-  }
-
-  private void setActiveLayer(int index, AbstractLayer layer) {
-    if (index > MAX_ACTIVE_LAYERS) {
-      PlayN.log().warn("Refusing to track active layer with too high index: " + index);
-      return;
-    }
-    if (activeLayers.length <= index) {
-      AbstractLayer[] nlayers = new AbstractLayer[index+1];
-      System.arraycopy(activeLayers, 0, nlayers, 0, activeLayers.length);
-      activeLayers = nlayers;
-    }
-    activeLayers[index] = layer;
   }
 }
