@@ -15,6 +15,9 @@
  */
 package playn.tests.core;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import playn.core.Game;
 import playn.core.ImmediateLayer;
 import playn.core.Mouse;
@@ -63,13 +66,21 @@ public class TestsGame implements Game {
     touch().setListener(new Touch.Adapter() {
       @Override
       public void onTouchStart(Touch.Event[] touches) {
-        // android doesn't bundle multiple touches into a single event, instead we'll get a
-        // separate event array with a single event with a touch with id > 0
-        if (touches.length > 2 || touches[0].id() > 1)
+        // Android and iOS handle touch events rather differently, so we need to do this finagling
+        // to determine whether there is an active two or three finger touch
+        for (Touch.Event event : touches)
+          _active.add(event.id());
+        if (_active.size() > 2)
           advanceTest(-1);
-        else if (touches.length > 1 || touches[0].id() > 0)
+        else if (_active.size() > 1)
           advanceTest(1);
       }
+      @Override
+      public void onTouchEnd(Touch.Event[] touches) {
+        for (Touch.Event event : touches)
+          _active.remove(event.id());
+      }
+      protected Set<Integer> _active = new HashSet<Integer>();
     });
     keyboard().setListener(new Keyboard.Adapter() {
       @Override
