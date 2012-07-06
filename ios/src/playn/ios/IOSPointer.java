@@ -36,15 +36,23 @@ public class IOSPointer extends PointerImpl {
   }
 
   void onTouchesBegan(NSSet touches, UIEvent event) {
-    onPointerStart(toPointerEvent(touches, event), false);
+    Event.Impl ev = toPointerEvent(touches, event);
+    if (ev != null)
+      onPointerStart(ev, false);
   }
 
   void onTouchesMoved(NSSet touches, UIEvent event) {
-    onPointerDrag(toPointerEvent(touches, event), false);
+    Event.Impl ev = toPointerEvent(touches, event);
+    if (ev != null)
+      onPointerDrag(ev, false);
   }
 
   void onTouchesEnded(NSSet touches, UIEvent event) {
-    onPointerEnd(toPointerEvent(touches, event), false);
+    Event.Impl ev = toPointerEvent(touches, event);
+    if (ev != null) {
+      onPointerEnd(ev, false);
+      _active = null;
+    }
   }
 
   void onTouchesCancelled(NSSet touches, UIEvent event) {
@@ -56,13 +64,21 @@ public class IOSPointer extends PointerImpl {
     touches.Enumerate(new NSSetEnumerator(new NSSetEnumerator.Method() {
       public void Invoke (NSObject obj, boolean[] stop) {
         UITouch touch = (UITouch) obj;
-        PointF loc = touch.LocationInView(touch.get_View());
-        // transform the point based on our current orientation and scale
-        IPoint xloc = graphics.transformTouch(loc.get_X(), loc.get_Y());
-        eventw[0] = new Event.Impl(touch.get_Timestamp(), xloc.x(), xloc.y(), true);
-        stop[0] = true;
+        // if we have an active touch, we only care about that touch
+        if (_active != null && touch != _active) {
+          stop[0] = false;
+        } else {
+          _active = touch;
+          PointF loc = touch.LocationInView(touch.get_View());
+          // transform the point based on our current orientation and scale
+          IPoint xloc = graphics.transformTouch(loc.get_X(), loc.get_Y());
+          eventw[0] = new Event.Impl(touch.get_Timestamp(), xloc.x(), xloc.y(), true);
+          stop[0] = true;
+        }
       }
     }));
     return eventw[0];
   }
+
+  private UITouch _active;
 }
