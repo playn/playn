@@ -10,6 +10,7 @@
     <OutputType>Exe</OutputType>
     <RootNamespace>tests</RootNamespace>
     <AssemblyName>tests</AssemblyName>
+    <newfilesearch>OnLoad</newfilesearch>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|iPhoneSimulator' ">
     <DebugSymbols>true</DebugSymbols>
@@ -73,6 +74,15 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Info.plist" />
+    <None Include="pom.xml">
+      <Visible>False</Visible>
+    </None>
+    <None Include="tests.userprefs">
+      <Visible>False</Visible>
+    </None>
+    <None Include=".settings">
+      <Visible>False</Visible>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Main.cs" />
@@ -92,5 +102,9 @@
     <Content Include="images\imagetypetest_expected%402x.png" />
     <Content Include="images\orange%402x.png" />
     <Content Include="Default%402x.png" />
+    <Content Include="images\cat.png" />
+    <Content Include="images\horns.png" />
+    <Content Include="images\orange%4015x.png" />
+    <Content Include="images\princess.png" />
   </ItemGroup>
 </Project>
