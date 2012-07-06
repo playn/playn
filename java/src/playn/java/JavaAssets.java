@@ -14,6 +14,8 @@
 package playn.java;
 
 import java.awt.EventQueue;
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -22,6 +24,8 @@ import javax.imageio.ImageIO;
 
 import com.google.common.base.Charsets;
 import com.google.common.io.Resources;
+
+import pythagoras.f.MathUtil;
 
 import playn.core.AbstractAssets;
 import playn.core.Image;
@@ -40,6 +44,7 @@ public class JavaAssets extends AbstractAssets {
 
   private final JavaPlatform platform;
   private String pathPrefix = "";
+  private Scale assetScale = null;
 
   static void doResourceAction(Runnable action) {
     if (asyncLoad)
@@ -76,6 +81,15 @@ public class JavaAssets extends AbstractAssets {
     return pathPrefix;
   }
 
+  /**
+   * Configures the default scale to use for assets. This allows one to specify an intermediate
+   * graphics scale (like 1.5) and scale the 2x imagery down to 1.5x instead of scaling the 1.5x
+   * imagery up (or displaying nothing at all).
+   */
+  public void setAssetScale(float scaleFactor) {
+    this.assetScale = new Scale(scaleFactor);
+  }
+
   InputStream getAssetStream(String path) throws IOException {
     InputStream in = getClass().getClassLoader().getResourceAsStream(pathPrefix + path);
     if (in == null) {
@@ -88,9 +102,17 @@ public class JavaAssets extends AbstractAssets {
   protected Image doGetImage(String path) {
     JavaGraphics graphics = platform.graphics();
     Exception error = null;
-    for (Scale.ScaledResource rsrc : graphics.ctx().scale.getScaledResources(pathPrefix + path)) {
+    for (Scale.ScaledResource rsrc : assetScale().getScaledResources(pathPrefix + path)) {
       try {
-        return graphics.createStaticImage(ImageIO.read(requireResource(rsrc.path)), rsrc.scale);
+        BufferedImage image = ImageIO.read(requireResource(rsrc.path));
+        // if image is at a higher scale factor than the view, scale it to the view display factor
+        Scale viewScale = platform.graphics().ctx().scale, imageScale = rsrc.scale;
+        float viewImageRatio = viewScale.factor / imageScale.factor ;
+        if (viewImageRatio < 1) {
+          image = scaleImage(image, viewImageRatio);
+          imageScale = viewScale;
+        }
+        return graphics.createStaticImage(image, imageScale);
       } catch (FileNotFoundException fnfe) {
         error = fnfe; // keep going, checking for lower resolution images
       } catch (Exception e) {
@@ -133,5 +155,19 @@ public class JavaAssets extends AbstractAssets {
       throw new FileNotFoundException(path);
     }
     return url;
+  }
+
+  private BufferedImage scaleImage (BufferedImage image, float viewImageRatio) {
+    int swidth = MathUtil.iceil(viewImageRatio * image.getWidth());
+    int sheight = MathUtil.iceil(viewImageRatio * image.getHeight());
+    BufferedImage scaled = new BufferedImage(swidth, sheight, BufferedImage.TYPE_INT_ARGB);
+    Graphics2D gfx = scaled.createGraphics();
+    gfx.drawImage(image.getScaledInstance(swidth, sheight, java.awt.Image.SCALE_SMOOTH), 0, 0, null);
+    gfx.dispose();
+    return scaled;
+  }
+
+  private Scale assetScale () {
+    return (assetScale != null) ? assetScale : platform.graphics().ctx().scale;
   }
 }
