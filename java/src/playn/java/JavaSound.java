@@ -100,10 +100,10 @@ class JavaSound implements Sound {
     if (clip == null) {
       return false;
     }
+    clip.setFramePosition(0);
     if (looping) {
       clip.loop(Clip.LOOP_CONTINUOUSLY);
     } else {
-      clip.setFramePosition(0);
       clip.start();
     }
     return true;
