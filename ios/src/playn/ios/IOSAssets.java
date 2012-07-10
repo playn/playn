@@ -30,7 +30,6 @@ import cli.MonoTouch.UIKit.UIImage;
 import playn.core.Asserts;
 import playn.core.Assets;
 import playn.core.Image;
-import playn.core.PlayN;
 import playn.core.ResourceCallback;
 import playn.core.Sound;
 import playn.core.gl.Scale;
@@ -38,12 +37,10 @@ import playn.core.gl.Scale;
 public class IOSAssets implements Assets {
 
   private String pathPrefix = "";
-  private final IOSGraphics graphics;
-  private final IOSAudio audio;
+  private final IOSPlatform platform;
 
-  public IOSAssets(IOSGraphics graphics, IOSAudio audio) {
-    this.graphics = graphics;
-    this.audio = audio;
+  public IOSAssets(IOSPlatform platform) {
+    this.platform = platform;
   }
 
   /**
@@ -64,37 +61,42 @@ public class IOSAssets implements Assets {
   public Image getImage(String path) {
     String fullPath = Path.Combine(pathPrefix, path);
     Throwable error = null;
-    for (Scale.ScaledResource rsrc : graphics.ctx().scale.getScaledResources(fullPath)) {
+    for (Scale.ScaledResource rsrc : platform.graphics().ctx().scale.getScaledResources(fullPath)) {
       if (!File.Exists(rsrc.path)) continue;
-      PlayN.log().debug("Loading image: " + rsrc.path);
+      platform.log().debug("Loading image: " + rsrc.path);
       try {
         Stream stream = new FileStream(rsrc.path, FileMode.wrap(FileMode.Open),
                                        FileAccess.wrap(FileAccess.Read),
                                        FileShare.wrap(FileShare.Read));
         NSData data = NSData.FromStream(stream);
-        return new IOSImage(graphics.ctx, UIImage.LoadFromData(data), rsrc.scale);
+        return new IOSImage(platform.graphics().ctx, UIImage.LoadFromData(data), rsrc.scale);
       } catch (Throwable t) {
-        PlayN.log().warn("Failed to load image: " + rsrc.path, t);
+        platform.log().warn("Failed to load image: " + rsrc.path, t);
         error = t; // note this error if this is the lowest resolution image, but fall back to
                    // lower resolution images if not; in the Java backend we'd fail here, but this
                    // is a production backend, so we want to try to make things work
       }
     }
     // TODO: return an error image
-    return new IOSImage(graphics.ctx, new UIImage(), Scale.ONE);
+    return new IOSImage(platform.graphics().ctx, new UIImage(), Scale.ONE);
   }
 
   @Override
   public Sound getSound(String path) {
-    path += ".mp3";
-    PlayN.log().debug("Loading sound " + path);
-    String fullPath = Path.Combine(pathPrefix, path);
-    return audio.createSound(fullPath);
+    // first try the .caf sound, then fall back to .mp3
+    for (String encpath : new String[] { path + ".caf", path + ".mp3" }) {
+      String fullPath = Path.Combine(pathPrefix, encpath);
+      if (!File.Exists(fullPath)) continue;
+      platform.log().debug("Loading sound " + path);
+      return platform.audio().createSound(fullPath);
+    }
+    platform.log().warn("Missing sound: " + path);
+    return platform.audio().createMissingSound(path);
   }
 
   @Override
   public void getText(String path, ResourceCallback<String> callback) {
-    PlayN.log().debug("Loading text " + path);
+    platform.log().debug("Loading text " + path);
     String fullPath = Path.Combine(pathPrefix, path);
     StreamReader reader = null;
     try {

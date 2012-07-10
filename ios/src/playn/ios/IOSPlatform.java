@@ -171,7 +171,7 @@ public class IOSPlatform extends AbstractPlatform {
     net = new IOSNet(this);
     pointer = new IOSPointer(graphics);
     touch = new IOSTouch(graphics);
-    assets = new IOSAssets(graphics, audio);
+    assets = new IOSAssets(this);
     analytics = new IOSAnalytics();
     storage = new IOSStorage();
 
