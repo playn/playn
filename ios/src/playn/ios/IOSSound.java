@@ -40,7 +40,7 @@ public class IOSSound implements Sound {
 
   @Override
   public void stop() {
-    player.Pause();
+    player.Stop();
     player.set_CurrentTime(0);
   }
 
