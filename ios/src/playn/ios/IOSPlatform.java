@@ -164,7 +164,7 @@ public class IOSPlatform extends AbstractPlatform {
       screenHeight /= 2;
     }
 
-    audio = new IOSAudio();
+    audio = new IOSAudio(this);
     graphics = new IOSGraphics(this, screenWidth, screenHeight, viewScale, deviceScale);
     json = new JsonImpl();
     keyboard = new IOSKeyboard();

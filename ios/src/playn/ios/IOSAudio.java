@@ -15,11 +15,29 @@
  */
 package playn.ios;
 
+import cli.MonoTouch.AVFoundation.AVAudioPlayer;
+import cli.MonoTouch.Foundation.NSError;
+import cli.MonoTouch.Foundation.NSUrl;
+
 import playn.core.Audio;
+import playn.core.Sound;
 
 public class IOSAudio implements Audio {
 
-  IOSSound createSound(String path) {
-    return new IOSSound(path);
+  private final IOSPlatform platform;
+
+  public IOSAudio(IOSPlatform platform) {
+    this.platform = platform;
+  }
+
+  Sound createSound(String path) {
+    NSError[] error = new NSError[1];
+    AVAudioPlayer player = AVAudioPlayer.FromUrl(NSUrl.FromFilename(path), error);
+    if (error[0] == null) {
+      return new IOSSound(player);
+    } else {
+      platform.log().warn("Error loading sound [" + path + ", " + error[0] + "]");
+      return new Sound.Error(new Exception(error[0].ToString()));
+    }
   }
 }

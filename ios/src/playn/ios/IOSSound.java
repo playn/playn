@@ -16,10 +16,7 @@
 package playn.ios;
 
 import cli.MonoTouch.AVFoundation.AVAudioPlayer;
-import cli.MonoTouch.Foundation.NSError;
-import cli.MonoTouch.Foundation.NSUrl;
 
-import playn.core.PlayN;
 import playn.core.ResourceCallback;
 import playn.core.Sound;
 
@@ -28,62 +25,46 @@ import playn.core.Sound;
  */
 public class IOSSound implements Sound {
 
-  private AVAudioPlayer player;
+  private final AVAudioPlayer player;
 
-  public IOSSound (String path) {
-    NSError[] error = new NSError[1];
-    player = AVAudioPlayer.FromUrl(NSUrl.FromFilename(path), error);
-    if (error[0] != null) {
-      PlayN.log().warn("Error loading sound [" + path + ", " + error[0] + "]");
-      return;
-    }
-    player.PrepareToPlay();
+  public IOSSound (AVAudioPlayer player) {
+    this.player = player;
+    this.player.PrepareToPlay();
   }
 
   @Override
   public boolean play() {
-    if (player == null) return false;
     player.set_CurrentTime(0);
     return player.Play();
   }
 
   @Override
   public void stop() {
-    if (player != null) {
-      player.Pause();
-      player.set_CurrentTime(0);
-    }
+    player.Pause();
+    player.set_CurrentTime(0);
   }
 
   @Override
   public void setLooping(boolean looping) {
-    if (player != null) player.set_NumberOfLoops(looping ? -1 : 0);
+    player.set_NumberOfLoops(looping ? -1 : 0);
   }
 
   @Override
   public void setVolume(float volume) {
-    if (player != null) player.set_Volume(volume);
+    player.set_Volume(volume);
   }
 
   @Override
   public boolean isPlaying() {
-    return player != null && player.get_Playing();
+    return player.get_Playing();
   }
 
   @Override
   public void addCallback(ResourceCallback<? super Sound> callback) {
-    // non-null players are always ready
-    if (player != null) callback.done(this);
-  }
-
-  public void dispose() {
-    if (player != null) {
-      player.Dispose();
-      player = null;
-    }
+    callback.done(this);
   }
 
   protected void finalize() {
-    dispose(); // meh
+    player.Dispose(); // meh
   }
 }
