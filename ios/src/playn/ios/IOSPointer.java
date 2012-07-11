@@ -56,7 +56,10 @@ public class IOSPointer extends PointerImpl {
   }
 
   void onTouchesCancelled(NSSet touches, UIEvent event) {
-    // TODO: ???
+      Event.Impl ev = toPointerEvent(touches, event);
+      if (ev != null) {
+        _active = null;
+      }
   }
 
   private Event.Impl toPointerEvent(NSSet touches, UIEvent event) {
