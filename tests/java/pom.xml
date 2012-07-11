@@ -4,7 +4,7 @@
   <parent>
     <groupId>com.googlecode.playn</groupId>
     <artifactId>playn-tests</artifactId>
-    <version>1.4-SNAPSHOT</version>
+    <version>1.4</version>
   </parent>
 
   <artifactId>playn-tests-java</artifactId>
@@ -95,8 +95,8 @@
                 <configuration>
                   <target>
                     <java fork="true" classname="${mainClass}" classpathref="maven.test.classpath">
-                      <sysproperty key="java.library.path" value="target/natives"/>
-                      <arg value="${scaleFactor}"/>
+                      <sysproperty key="java.library.path" value="target/natives" />
+                      <arg value="${scaleFactor}" />
                     </java>
                   </target>
                 </configuration>
