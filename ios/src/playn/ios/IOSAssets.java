@@ -15,6 +15,8 @@
  */
 package playn.ios;
 
+import java.io.FileNotFoundException;
+
 import cli.System.IO.File;
 import cli.System.IO.FileAccess;
 import cli.System.IO.FileMode;
@@ -82,7 +84,7 @@ public class IOSAssets implements Assets {
   }
 
   @Override
-  public Sound getSound(String path) {
+  public Sound getSound(final String path) {
     // first try the .caf sound, then fall back to .mp3
     for (String encpath : new String[] { path + ".caf", path + ".mp3" }) {
       String fullPath = Path.Combine(pathPrefix, encpath);
@@ -90,8 +92,9 @@ public class IOSAssets implements Assets {
       platform.log().debug("Loading sound " + path);
       return platform.audio().createSound(fullPath);
     }
+
     platform.log().warn("Missing sound: " + path);
-    return platform.audio().createMissingSound(path);
+    return new Sound.Error(new FileNotFoundException(path));
   }
 
   @Override

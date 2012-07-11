@@ -20,8 +20,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import playn.core.Audio;
-import playn.core.ResourceCallback;
-import playn.core.Sound;
 
 class AndroidAudio implements Audio {
 
@@ -33,40 +31,13 @@ class AndroidAudio implements Audio {
     this.platform = platform;
   }
 
-  Sound createSound(String path) throws IOException {
+  AndroidSound createSound(String path) throws IOException {
     // MediaPlayer should really be used to play compressed sounds and other file formats
     // AudioTrack cannot handle. However, the MediaPlayer implementation is currently the only
     // version of AndroidSound we have written, so we'll use it here regardless of format.
     AndroidSound sound = new AndroidCompressedSound(platform.assets(), path);
     sounds.add(sound);
     return sound;
-  }
-
-  Sound createErrorSound(final String path, final IOException exception) {
-    return new Sound() {
-      @Override
-      public boolean play() {
-        platform.log().error("Attempted to play sound that was unable to load: " + path);
-        return false;
-      }
-      @Override
-      public void stop() {
-      }
-      @Override
-      public void setLooping(boolean looping) {
-      }
-      @Override
-      public void setVolume(float volume) {
-      }
-      @Override
-      public boolean isPlaying() {
-        return false;
-      }
-      @Override
-      public void addCallback(ResourceCallback<? super Sound> callback) {
-        callback.error(exception);
-      }
-    };
   }
 
   public void onDestroy() {

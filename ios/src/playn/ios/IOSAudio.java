@@ -15,34 +15,11 @@
  */
 package playn.ios;
 
-import java.io.FileNotFoundException;
-
 import playn.core.Audio;
-import playn.core.ResourceCallback;
-import playn.core.Sound;
 
 public class IOSAudio implements Audio {
 
-  Sound createSound(String path) {
+  IOSSound createSound(String path) {
     return new IOSSound(path);
-  }
-
-  Sound createMissingSound(final String path) {
-    return new Sound() {
-      @Override
-      public boolean play() {
-        return false;
-      }
-      @Override
-      public void stop() {}
-      @Override public void setLooping(boolean looping) {}
-      @Override public void setVolume(float volume) {}
-      @Override public boolean isPlaying() {
-        return false;
-      }
-      @Override public void addCallback(ResourceCallback<? super Sound> callback) {
-        callback.error(new FileNotFoundException(path));
-      }
-    };
   }
 }

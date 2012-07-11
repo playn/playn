@@ -15,39 +15,13 @@
  */
 package playn.java;
 
-import playn.core.ResourceCallback;
-
 import java.io.InputStream;
 
 import playn.core.Audio;
-import playn.core.Sound;
 
 class JavaAudio implements Audio {
 
-  Sound createSound(String name, InputStream in) {
+  JavaSound createSound(String name, InputStream in) {
     return new JavaSound(name, in);
-  }
-
-  Sound createNoopSound() {
-    return new Sound() {
-      @Override
-      public boolean play() {
-        return false;
-      }
-      @Override
-      public void stop() {}
-      @Override
-      public void setLooping(boolean looping) {}
-      @Override
-      public void setVolume(float volume) {}
-      @Override
-      public boolean isPlaying() {
-        return false;
-      }
-      @Override
-      public void addCallback(ResourceCallback<? super Sound> callback) {
-        callback.done(this);
-      }
-    };
   }
 }

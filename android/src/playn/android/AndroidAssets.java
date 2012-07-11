@@ -179,7 +179,7 @@ public class AndroidAssets extends AbstractAssets {
       return platform.audio().createSound(path + ".mp3");
     } catch (IOException e) {
       log().error("Unable to load sound: " + path, e);
-      return platform.audio().createErrorSound(path, e);
+      return new Sound.Error(e);
     }
   }
 

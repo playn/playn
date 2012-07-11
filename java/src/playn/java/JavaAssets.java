@@ -29,7 +29,6 @@ import pythagoras.f.MathUtil;
 
 import playn.core.AbstractAssets;
 import playn.core.Image;
-import playn.core.PlayN;
 import playn.core.ResourceCallback;
 import playn.core.Sound;
 import playn.core.gl.Scale;
@@ -120,19 +119,18 @@ public class JavaAssets extends AbstractAssets {
         break; // the image was broken not missing, stop here
       }
     }
-    PlayN.log().warn("Could not load image: " + pathPrefix + path, error);
+    platform.log().warn("Could not load image: " + pathPrefix + path, error);
     return graphics.createErrorImage(error != null ? error : new FileNotFoundException(path));
   }
 
   @Override
   protected Sound doGetSound(String path) {
-    path += ".mp3";
-    InputStream in = getClass().getClassLoader().getResourceAsStream(pathPrefix + path);
-    if (in == null) {
-      PlayN.log().warn("Could not find sound " + pathPrefix + path);
-      return platform.audio().createNoopSound();
-    } else {
-      return platform.audio().createSound(path, in);
+    final String soundPath = path + ".mp3";
+    try {
+      return platform.audio().createSound(soundPath, getAssetStream(soundPath));
+    } catch (Exception e) {
+      platform.log().warn("Sound load error " + soundPath + ": " + e);
+      return new Sound.Error(e);
     }
   }
 

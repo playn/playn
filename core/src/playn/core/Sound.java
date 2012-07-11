@@ -18,6 +18,44 @@ package playn.core;
  */
 public interface Sound {
 
+  /** A sound that does nothing. Useful for optionally playing sound or no sound. */
+  public static class Silence implements Sound {
+    @Override
+    public boolean play() {
+      return false;
+    }
+    @Override
+    public void stop() {
+    }
+    @Override
+    public void setLooping(boolean looping) {
+    }
+    @Override
+    public void setVolume(float volume) {
+    }
+    @Override
+    public boolean isPlaying() {
+      return false;
+    }
+    @Override
+    public void addCallback(ResourceCallback<? super Sound> callback) {
+      callback.done(this);
+    }
+  }
+
+  /** Represents a sound that failed to load. Reports the supplied error to all listeners. */
+  public static class Error extends Silence {
+    private final Exception error;
+    public Error (Exception error) {
+      this.error = error;
+    }
+
+    @Override
+    public void addCallback(ResourceCallback<? super Sound> callback) {
+      callback.error(error);
+    }
+  }
+
   /**
    * If possible, begin playback of this audio stream. The audio system will make best efforts to
    * playback this sound. However, lack of audio or codec support, or a (temporary) unavailability
