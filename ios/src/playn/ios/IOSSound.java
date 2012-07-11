@@ -50,6 +50,11 @@ public class IOSSound implements Sound {
   }
 
   @Override
+  public float volume() {
+    return player.get_Volume();
+  }
+
+  @Override
   public void setVolume(float volume) {
     player.set_Volume(volume);
   }

@@ -26,11 +26,8 @@ import playn.core.AbstractSound;
 class FlashSound extends AbstractSound {
 
   private NativeSound sound;
-
   private boolean looping;
-
   private boolean isPlaying;
-
   private SoundChannel soundChannel;
 
   @FlashImport({"flash.media.SoundChannel"})
@@ -40,9 +37,9 @@ class FlashSound extends AbstractSound {
     public native void stop() /*-{
       this.stop();
     }-*/;
-    /**
-     * @param volume
-     */
+    public native float volume() /*-{
+      return this.soundTransform.volume;
+    }-*/;
     public native void setVolume(float volume) /*-{
       this.soundTransform.volume = volume;
     }-*/;
@@ -100,17 +97,16 @@ class FlashSound extends AbstractSound {
     this.looping = looping;
   }
 
-  /* (non-Javadoc)
-   * @see playn.core.Sound#isPlaying()
-   */
   @Override
   public boolean isPlaying() {
     return isPlaying;
   }
 
-  /* (non-Javadoc)
-   * @see playn.core.Sound#setVolume(float)
-   */
+  @Override
+  public float volume() {
+    return (soundChannel == null) ? 0 : soundChannel.volume();
+  }
+
   @Override
   public void setVolume(float volume) {
     if (soundChannel != null) {
@@ -118,9 +114,6 @@ class FlashSound extends AbstractSound {
     }
   }
 
-  /* (non-Javadoc)
-   * @see playn.core.Sound#play()
-   */
   @Override
   public boolean play() {
     soundChannel = sound.play(looping);

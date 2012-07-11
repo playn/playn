@@ -21,7 +21,10 @@ import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
+import javax.sound.sampled.FloatControl;
 import javax.sound.sampled.LineUnavailableException;
+
+import pythagoras.f.MathUtil;
 
 import playn.core.Asserts;
 import playn.core.PlayN;
@@ -100,9 +103,17 @@ class JavaSound implements Sound {
   }
 
   @Override
+  public float volume() {
+    FloatControl volctrl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
+    float min = volctrl.getMinimum(), range = (0 - min), gain = volctrl.getValue();
+    return (gain - min) / range;
+  }
+
+  @Override
   public void setVolume(float volume) {
-    Asserts.checkArgument(0f <= volume && volume <= 1f, "Must ensure 0f <= volume <= 1f");
-    // TODO implement
+    FloatControl volctrl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
+    float min = volctrl.getMinimum(), range = (0 - min);
+    volctrl.setValue(min + range * MathUtil.clamp(volume, 0, 1));
   }
 
   @Override

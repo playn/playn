@@ -31,6 +31,10 @@ public interface Sound {
     public void setLooping(boolean looping) {
     }
     @Override
+    public float volume() {
+      return 0;
+    }
+    @Override
     public void setVolume(float volume) {
     }
     @Override
@@ -80,6 +84,11 @@ public interface Sound {
    * @param looping {@literal true} if the audio stream should be looped indefinitely
    */
   void setLooping(boolean looping);
+
+  /**
+   * @return the current volume of this sound, a value between {@literal 0.0} and {@literal 1.0}.
+   */
+  float volume();
 
   /**
    * @param volume new volume between {@literal 0.0} and {@literal 1.0}

@@ -15,21 +15,24 @@
  */
 package playn.android;
 
-import static playn.core.PlayN.log;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnErrorListener;
 import android.util.Log;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
+import pythagoras.f.MathUtil;
+
+import static playn.core.PlayN.log;
 
 /**
  * An implementation of AndroidSound using the Android MediaPlayer
  * class.
  */
 public class AndroidCompressedSound extends AndroidSound {
+
   private final File cachedFile;
   private boolean paused, prepared, looping, playOnPrepare;
   private float volume = 0.99f;
@@ -83,8 +86,13 @@ public class AndroidCompressedSound extends AndroidSound {
   }
 
   @Override
+  public float volume() {
+    return volume;
+  }
+
+  @Override
   public void setVolume(float volume) {
-    this.volume = volume < 0 ? 0 : volume >= 1 ? 0.99f : volume;
+    this.volume = MathUtil.clamp(volume, 0, 1);
     if (mp != null) mp.setVolume(this.volume, this.volume);
   }
 

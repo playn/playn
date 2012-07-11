@@ -20,6 +20,8 @@ import com.allen_sauer.gwt.voices.client.handler.SoundHandler;
 import com.allen_sauer.gwt.voices.client.handler.SoundLoadStateChangeEvent;
 import com.allen_sauer.gwt.voices.client.Sound.LoadState;
 
+import pythagoras.f.MathUtil;
+
 import playn.core.AbstractSound;
 import playn.core.Asserts;
 
@@ -79,8 +81,13 @@ class HtmlSound extends AbstractSound {
   }
 
   @Override
+  public float volume() {
+    return sound.getVolume() / 100f;
+  }
+
+  @Override
   public void setVolume(float volume) {
-    Asserts.checkArgument(0f <= volume && volume <= 1f, "Must ensure 0f <= volume <= 1f");
+    volume = MathUtil.clamp(volume, 0, 1);
     sound.setVolume((int) (volume * 100));
   }
 
