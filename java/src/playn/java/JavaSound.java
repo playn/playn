@@ -30,69 +30,45 @@ import playn.core.Sound;
 
 class JavaSound implements Sound {
 
-  private final String name;
   private Clip clip;
   private boolean looping;
 
-  private List<ResourceCallback<? super Sound>> callbacks;
+  private List<ResourceCallback<? super Sound>> callbacks = NONE;
 
-  JavaSound(String name, final InputStream inputStream) {
-    this.name = name;
-
+  JavaSound(final String name, final InputStream inputStream) {
     JavaAssets.doResourceAction(new Runnable() {
       public void run () {
-        init(inputStream);
-        if (callbacks != null) {
-          for (ResourceCallback<? super Sound> callback : callbacks) {
+        try {
+          init(name, inputStream);
+          for (ResourceCallback<? super Sound> callback : callbacks)
             callback.done(JavaSound.this);
-          }
-          callbacks = null;
+        } catch (Exception e) {
+          PlayN.log().warn("Sound initialization failed '" + name + "': " + e);
+          for (ResourceCallback<? super Sound> callback : callbacks)
+            callback.error(e);
         }
+        callbacks = NONE;
       }
     });
   }
 
-  private void init(InputStream inputStream) {
-    try {
-      clip = AudioSystem.getClip();
-    } catch (LineUnavailableException e) {
-      PlayN.log().warn("Unable to create clip for " + name);
-      return; // give up
-    } catch (IllegalArgumentException e) {
-      // OpenJDK on Linux may throw java.lang.IllegalArgumentException: No line matching interface
-      // Clip supporting format PCM_SIGNED unknown sample rate, 16 bit, stereo, 4 bytes/frame,
-      // big-endian is supported.
-      PlayN.log().info("Failed to load sound " + name + " due to " + e.toString());
-      return; // give up
+  private void init(String name, InputStream inputStream) throws Exception {
+    clip = AudioSystem.getClip();
+    AudioInputStream ais = AudioSystem.getAudioInputStream(inputStream);
+    if (name.endsWith(".mp3")) {
+      AudioFormat baseFormat = ais.getFormat();
+      AudioFormat decodedFormat = new AudioFormat(
+        AudioFormat.Encoding.PCM_SIGNED,
+        baseFormat.getSampleRate(),
+        16, // we have to force sample size to 16
+        baseFormat.getChannels(),
+        baseFormat.getChannels()*2,
+        baseFormat.getSampleRate(),
+        false // big endian
+        );
+      ais = AudioSystem.getAudioInputStream(decodedFormat, ais);
     }
-
-    AudioInputStream ais;
-    try {
-      ais = AudioSystem.getAudioInputStream(inputStream);
-      if (name.endsWith(".mp3")) {
-        AudioFormat baseFormat = ais.getFormat();
-        AudioFormat decodedFormat = new AudioFormat(
-          AudioFormat.Encoding.PCM_SIGNED,
-          baseFormat.getSampleRate(),
-          16, // we have to force sample size to 16
-          baseFormat.getChannels(),
-          baseFormat.getChannels()*2,
-          baseFormat.getSampleRate(),
-          false // big endian
-          );
-        ais = AudioSystem.getAudioInputStream(decodedFormat, ais);
-      }
-    } catch (Exception e) {
-      PlayN.log().warn("Failed to create audio stream for " + name, e);
-      return; // give up
-    }
-
-    try {
-      clip.open(ais);
-    } catch (Exception e) {
-      PlayN.log().warn("Failed to open sound " + name, e);
-      return; // give up
-    }
+    clip.open(ais);
   }
 
   @Override
@@ -139,10 +115,12 @@ class JavaSound implements Sound {
     if (clip != null) {
       callback.done(this);
     } else {
-      if (callbacks == null) {
+      if (callbacks == NONE)
         callbacks = new ArrayList<ResourceCallback<? super Sound>>();
-      }
       callbacks.add(callback);
     }
   }
+
+  protected static final List<ResourceCallback<? super Sound>> NONE =
+    new ArrayList<ResourceCallback<? super Sound>>();
 }
