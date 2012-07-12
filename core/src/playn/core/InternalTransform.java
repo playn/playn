@@ -58,5 +58,5 @@ public interface InternalTransform extends Transform {
   /**
    * Returns a copy of this transform.
    */
-  InternalTransform clone();
+  InternalTransform copy();
 }
