@@ -12,6 +12,8 @@
 	<string>com.googlecode.playn.tests</string>
 	<key>CFBundleVersion</key>
 	<string>1.0</string>
+	<key>MinimumOSVersion</key>
+	<string>5.0</string>
 	<key>UIDeviceFamily</key>
 	<array>
 		<integer>1</integer>
