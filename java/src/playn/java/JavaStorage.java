@@ -20,7 +20,6 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.util.Properties;
 
-import playn.core.PlayN;
 import playn.core.Storage;
 
 /**
@@ -29,13 +28,17 @@ import playn.core.Storage;
  * TODO(pdr): probably want better handling on where the file is stored
  */
 class JavaStorage implements Storage {
+
   private static final File tempFile =
     new File(new File(System.getProperty("java.io.tmpdir")), "playn.tmp");
-  private boolean isPersisted = false; // false by default
-  private Properties properties;
 
-  public void init() {
-    properties = maybeRetrieveProperties();
+  private final JavaPlatform platform;
+  private final Properties properties;
+  private boolean isPersisted = false; // false by default
+
+  JavaStorage(JavaPlatform platform) {
+    this.platform = platform;
+    this.properties = maybeRetrieveProperties();
   }
 
   @Override
@@ -70,7 +73,7 @@ class JavaStorage implements Storage {
       properties.store(new FileOutputStream(tempFile), null);
       isPersisted = true;
     } catch (Exception e) {
-      PlayN.log().info("Error persisting properties: " + e.getMessage());
+      platform.log().info("Error persisting properties: " + e.getMessage());
       isPersisted = false;
     }
   }
@@ -82,7 +85,7 @@ class JavaStorage implements Storage {
         properties.load(new FileInputStream(tempFile));
         isPersisted = true;
       } catch(Exception e) {
-        PlayN.log().info("Error retrieving file: " + e.getMessage());
+        platform.log().info("Error retrieving file: " + e.getMessage());
         isPersisted = false;
       }
     } else {

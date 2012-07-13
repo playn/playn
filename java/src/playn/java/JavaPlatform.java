@@ -83,7 +83,7 @@ public class JavaPlatform extends AbstractPlatform {
   private final JavaAudio audio = new JavaAudio();
   private final JavaNet net = new JavaNet(this);
   private final JavaRegularExpression regex = new JavaRegularExpression();
-  private final JavaStorage storage = new JavaStorage();
+  private final JavaStorage storage = new JavaStorage(this);
   private final JsonImpl json = new JsonImpl();
   private final JavaKeyboard keyboard = new JavaKeyboard();
   private final JavaPointer pointer = new JavaPointer();
@@ -201,7 +201,6 @@ public class JavaPlatform extends AbstractPlatform {
   public void run(final Game game) {
     this.updateRate = game.updateRate();
 
-    storage.init();
     try {
       // initialize LWJGL (and show the display) now that the game has been initialized
       graphics.init();
