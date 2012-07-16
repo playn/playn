@@ -24,6 +24,7 @@ import javax.sound.sampled.Clip;
 import javax.sound.sampled.FloatControl;
 import javax.sound.sampled.LineUnavailableException;
 
+import pythagoras.f.FloatMath;
 import pythagoras.f.MathUtil;
 
 import playn.core.Asserts;
@@ -105,15 +106,13 @@ class JavaSound implements Sound {
   @Override
   public float volume() {
     FloatControl volctrl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
-    float min = volctrl.getMinimum(), range = (0 - min), gain = volctrl.getValue();
-    return (gain - min) / range;
+    return toVolume(volctrl.getValue());
   }
 
   @Override
   public void setVolume(float volume) {
     FloatControl volctrl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
-    float min = volctrl.getMinimum(), range = (0 - min);
-    volctrl.setValue(min + range * MathUtil.clamp(volume, 0, 1));
+    volctrl.setValue(toGain(MathUtil.clamp(volume, 0, 1)));
   }
 
   @Override
@@ -130,6 +129,14 @@ class JavaSound implements Sound {
         callbacks = new ArrayList<ResourceCallback<? super Sound>>();
       callbacks.add(callback);
     }
+  }
+
+  protected static float toVolume (float gain) {
+    return FloatMath.pow(10, gain/20);
+  }
+
+  protected static float toGain (float volume) {
+    return 20 * FloatMath.log10(volume);
   }
 
   protected static final List<ResourceCallback<? super Sound>> NONE =
