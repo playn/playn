@@ -16,7 +16,13 @@
 
 package playn.tests.core;
 
+import playn.core.CanvasImage;
+import playn.core.Font;
 import playn.core.Game;
+import playn.core.ImageLayer;
+import playn.core.TextFormat;
+import playn.core.TextLayout;
+import static playn.core.PlayN.graphics;
 
 public abstract class Test implements Game {
 
@@ -39,4 +45,21 @@ public abstract class Test implements Game {
   public int updateRate() {
     return 25;
   }
+
+  protected ImageLayer createDescripLayer(String descrip, float width) {
+    TextLayout layout = graphics().layoutText(
+      descrip, new TextFormat().withFont(DESCRIP_FONT).withWrapping(
+        width, TextFormat.Alignment.CENTER));
+    CanvasImage image = graphics().createImage(layout.width(), layout.height());
+    image.canvas().setFillColor(0xFF000000);
+    image.canvas().fillText(layout, 0, 0);
+    return graphics().createImageLayer(image);
+  }
+
+  protected void addDescrip(String descrip, float x, float y, float width) {
+    ImageLayer layer = createDescripLayer(descrip, width);
+    graphics().rootLayer().addAt(layer, Math.round(x + (width - layer.width())/2), y);
+  }
+
+  protected static Font DESCRIP_FONT = graphics().createFont("Helvetica", Font.Style.PLAIN, 12);
 }

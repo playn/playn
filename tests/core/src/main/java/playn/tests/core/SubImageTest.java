@@ -12,6 +12,7 @@ import playn.core.Image;
 import playn.core.ImageLayer;
 import playn.core.ImmediateLayer;
 import playn.core.Surface;
+import playn.core.Layer;
 import playn.core.ResourceCallback;
 import static playn.core.PlayN.*;
 
@@ -33,18 +34,18 @@ public class SubImageTest extends Test {
   @Override
   public void init() {
     // create a canvas image and draw subimages of that
-    int r = 50;
+    int r = 30;
     CanvasImage cimg = graphics().createImage(2*r, 2*r);
     Canvas canvas = cimg.canvas();
     canvas.setFillColor(0xFF99CCFF);
     canvas.fillCircle(r, r, r);
-    fragment(cimg, 200, 10);
+    fragment("CanvasImage", cimg, 250, 160);
 
     // draw subimages of a simple static image
     Image orange = assets().getImage("images/orange.png");
     orange.addCallback(new ResourceCallback<Image>() {
       public void done(Image orange) {
-        fragment(orange, 10, 10);
+        fragment("Image", orange, 250, 10);
 
         float pw = orange.width(), ph = orange.height(), phw = pw/2, phh = ph/2;
         final Image.Region orangemid = orange.subImage(0, phh/2, pw, phh);
@@ -54,7 +55,13 @@ public class SubImageTest extends Test {
         tiled.setRepeatX(true);
         tiled.setRepeatY(true);
         tiled.setSize(100, 100);
-        graphics().rootLayer().addAt(tiled, 10, 150);
+        addTest(10, 10, tiled, "ImageLayer tiled with subimage");
+
+        // use a subimage as a fill pattern
+        CanvasImage pat = graphics().createImage(100, 100);
+        pat.canvas().setFillPattern(orangemid.toPattern());
+        pat.canvas().fillRect(0, 0, 100, 100);
+        addTest(10, 150, graphics().createImageLayer(pat), "Canvas filled with subimage");
 
         // draw a subimage to a canvas
         CanvasImage split = graphics().createImage(orange.width(), orange.height());
@@ -62,13 +69,7 @@ public class SubImageTest extends Test {
         split.canvas().drawImage(orange.subImage(phw, 0, phw, phh), 0, phh);
         split.canvas().drawImage(orange.subImage(0, phh, phw, phh), phw, 0);
         split.canvas().drawImage(orange.subImage(phw, phh, phw, phh), 0, 0);
-        graphics().rootLayer().addAt(graphics().createImageLayer(split), 130, 150);
-
-        // use a subimage as a fill pattern
-        CanvasImage pat = graphics().createImage(100, 100);
-        pat.canvas().setFillPattern(orangemid.toPattern());
-        pat.canvas().fillRect(0, 0, 100, 100);
-        graphics().rootLayer().addAt(graphics().createImageLayer(pat), 10, 270);
+        addTest(140, 10, graphics().createImageLayer(split), "draw subimg into Canvas", 80);
 
         // draw a subimage in an immediate layer
         ImmediateLayer imm = graphics().createImmediateLayer(new ImmediateLayer.Renderer() {
@@ -79,16 +80,32 @@ public class SubImageTest extends Test {
             surf.drawImage(orangemid, orangemid.width(), orangemid.height());
           }
         });
-        graphics().rootLayer().addAt(imm, 130, 200);
+        addTest(130, 100, 2*orangemid.width(), 2*orangemid.height(), imm,
+                "draw subimg into Surface", 100);
 
         // draw a subimage whose bounds oscillate
         osci = orange.subImage(0, 0, orange.width(), orange.height());
-        graphics().rootLayer().addAt(graphics().createImageLayer(osci), 150, 300);
+        addTest(130, 190, graphics().createImageLayer(osci),
+                "ImageLayer with subimage with changing width", 100);
       }
       public void error(Throwable err) {
         log().warn("Failed to load orange image", err);
       }
     });
+  }
+
+  protected void addTest(float lx, float ly, float lwidth, float lheight, Layer layer,
+                         String descrip, float twidth) {
+    graphics().rootLayer().addAt(layer, lx + (twidth-lwidth)/2, ly);
+    addDescrip(descrip, lx, ly + lheight + 5, twidth);
+  }
+
+  protected void addTest(float lx, float ly, Layer.HasSize layer, String descrip, float twidth) {
+    addTest(lx, ly, layer.width(), layer.height(), layer, descrip, twidth);
+  }
+
+  protected void addTest(float lx, float ly, Layer.HasSize layer, String descrip) {
+    addTest(lx, ly, layer, descrip, layer.width());
   }
 
   @Override
@@ -98,7 +115,7 @@ public class SubImageTest extends Test {
     osci.setBounds(0, 0, osciCurWidth, osci.parent().height());
   }
 
-  protected void fragment(Image image, float ox, float oy) {
+  protected void fragment(String source, Image image, float ox, float oy) {
     float hw = image.width()/2f, hh = image.height()/2f;
     Image ul = image.subImage(0, 0, hw, hh);
     Image ur = image.subImage(hw, 0, hw, hh);
@@ -121,6 +138,8 @@ public class SubImageTest extends Test {
     group.addAt(scaleLayer(graphics().createImageLayer(lr), 2), xoff+2*dx, 2*dy);
 
     graphics().rootLayer().addAt(group, ox, oy);
+    addDescrip(source + " split into subimages, and scaled", ox, oy + image.height()*2 + 25,
+               3*image.width()+40);
   }
 
   protected ImageLayer scaleLayer(ImageLayer layer, float scale) {

@@ -38,32 +38,44 @@ public class SurfaceTest extends Test {
     final Pattern pattern = assets().getImage("images/tile.png").toPattern();
     final Image orange = assets().getImage("images/orange.png");
 
-    ImmediateLayer unclipped = graphics().createImmediateLayer(new ImmediateLayer.Renderer() {
+    // draw some wide lines
+    addTest("drawLine with width", 10, 10, 120, 120, new ImmediateLayer.Renderer() {
       public void render (Surface surf) {
-        drawLine(surf, 10, 50, 60, 100, 15);
-        drawLine(surf, 80, 100, 130, 50, 10);
-        drawLine(surf, 10, 120, 130, 180, 10);
+        drawLine(surf, 0, 0, 50, 50, 15);
+        drawLine(surf, 70, 50, 120, 0, 10);
+        drawLine(surf, 0, 70, 120, 120, 10);
+      }
+    });
 
-        // do some rendering with alpha
-        surf.setAlpha(1f).setFillColor(0xFF0000FF).fillRect(10, 200, 100, 50);
-
+    addTest("left & right half are same color", 10, 160, 100, 25, new ImmediateLayer.Renderer() {
+      public void render (Surface surf) {
+        surf.setFillColor(0xFF0000FF).fillRect(0, 0, 100, 25);
         // these two alpha fills should look the same
-        surf.setFillColor(0x80FF0000).fillRect(10, 200, 25, 50);
-        surf.setAlpha(0.5f).setFillColor(0xFFFF0000).fillRect(35, 200, 25, 50);
+        surf.setFillColor(0x80FF0000).fillRect(0, 0, 50, 25);
+        surf.setAlpha(0.5f).setFillColor(0xFFFF0000).fillRect(50, 0, 50, 25).setAlpha(1f);
+      }
+    });
 
-        surf.drawImage(orange, 65, 205);
-        surf.fillRect(10, 260, 50, 50);
-        surf.drawImage(orange, 65, 265);
+    addTest("fillRect and drawImage at 50% alpha", 10, 240, 100, 100, new ImmediateLayer.Renderer() {
+      public void render (Surface surf) {
+        surf.setFillColor(0xFF0000FF).fillRect(0, 0, 100, 50);
+        surf.setAlpha(0.5f);
+        surf.drawImage(orange, 55, 5);
+        surf.fillRect(0, 50, 50, 50);
+        surf.drawImage(orange, 55, 55);
         surf.setAlpha(1f);
+      }
+    });
 
+    addTest("fillRect/Triangles with pattern", 180, 10, 120, 220, new ImmediateLayer.Renderer() {
+      public void render (Surface surf) {
         // fill some shapes with patterns
-        surf.setFillPattern(pattern).fillRect(200, 50, 100, 100);
+        surf.setFillPattern(pattern).fillRect(10, 0, 100, 100);
         // use same fill pattern for the triangles
-        surf.translate(200, 220);
+        surf.translate(0, 160);
         surf.fillTriangles(verts, indices);
       }
     });
-    graphics().rootLayer().add(unclipped);
 
     // draw some randomly jiggling dots in the right half of the screen
     float hwidth = graphics().width()/2, height = graphics().height();
@@ -77,9 +89,15 @@ public class SurfaceTest extends Test {
       dot.surface().fillRect(0, 5, 5, 5);
       dot.setTranslation(hwidth + random()*hwidth, random()*height);
       dots.add(dot);
-      System.err.println("Created dot at " + dot.transform());
+      // System.err.println("Created dot at " + dot.transform());
       graphics().rootLayer().add(dot);
     }
+  }
+
+  protected void addTest(String descrip, float lx, float ly, float lwidth, float lheight,
+                         ImmediateLayer.Renderer renderer) {
+    graphics().rootLayer().addAt(graphics().createImmediateLayer(renderer), lx, ly);
+    addDescrip(descrip, lx, ly+lheight+5, lwidth);
   }
 
   @Override

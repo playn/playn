@@ -22,7 +22,8 @@ import playn.core.*;
 import static playn.core.PlayN.*;
 
 public class TestsGame implements Game {
-  Test[] tests = new Test[] {
+
+  private Test[] tests = new Test[] {
     new CanvasTest(),
     new SurfaceTest(),
     new TextTest(),
@@ -41,7 +42,7 @@ public class TestsGame implements Game {
     new ShaderTest(),
     /*new YourTest(),*/
   };
-  Test currentTest;
+  private Test currentTest;
 
   @Override
   public void init() {
@@ -82,6 +83,7 @@ public class TestsGame implements Game {
     });
 
     displayMenu();
+    startTest(tests[3]);
   }
 
   // defers display of menu by one frame to avoid the right click or touch being processed by the

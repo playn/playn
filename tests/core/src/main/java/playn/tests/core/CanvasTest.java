@@ -20,8 +20,8 @@ import playn.core.CanvasImage;
 import playn.core.Image;
 import playn.core.ImageLayer;
 import playn.core.Layer;
-import playn.core.ResourceCallback;
 import playn.core.Path;
+import playn.core.ResourceCallback;
 import static playn.core.PlayN.*;
 
 public class CanvasTest extends Test {
@@ -49,7 +49,7 @@ public class CanvasTest extends Test {
     startMillis = currentTime();
     lastSecs = -1;
 
-    addTestCanvas(100, 100, new Drawer() {
+    addTestCanvas("radial fill gradient", 100, 100, new Drawer() {
       public void draw(Canvas canvas) {
         canvas.setFillGradient(graphics().createRadialGradient(
                                  0, 0, 50, new int[] { 0xFFFF0000, 0xFF00FF00 },
@@ -58,7 +58,7 @@ public class CanvasTest extends Test {
       }
     });
 
-    addTestCanvas(100, 100, new Drawer() {
+    addTestCanvas("linear fill gradient", 100, 100, new Drawer() {
       public void draw(Canvas canvas) {
         canvas.setFillGradient(graphics().createLinearGradient(
                                  0, 0, 100, 100, new int[] { 0xFF0000FF, 0xFF00FF00 },
@@ -67,14 +67,14 @@ public class CanvasTest extends Test {
       }
     });
 
-    addTestCanvas(100, 100, "images/tile.png", new ImageDrawer() {
+    addTestCanvas("image fill pattern", 100, 100, "images/tile.png", new ImageDrawer() {
       public void draw(Canvas canvas, Image tile) {
         canvas.setFillPattern(tile.toPattern());
         canvas.fillRect(0, 0, 100, 100);
       }
     });
 
-    addTestCanvas(100, 100, new Drawer() {
+    addTestCanvas("lines and circles", 100, 100, new Drawer() {
       public void draw(Canvas canvas) {
         canvas.setFillColor(0xFF99CCFF);
         canvas.fillRect(0, 0, 100, 100);
@@ -92,7 +92,7 @@ public class CanvasTest extends Test {
       }
     });
 
-    addTestCanvas(100, 100, "images/orange.png", new ImageDrawer() {
+    addTestCanvas("image, subimage", 100, 100, "images/orange.png", new ImageDrawer() {
       public void draw(Canvas canvas, Image orange) {
         canvas.setFillColor(0xFF99CCFF);
         canvas.fillRect(0, 0, 100, 100);
@@ -117,12 +117,12 @@ public class CanvasTest extends Test {
     layer.setRepeatX(true);
     layer.setRepeatY(true);
     layer.setSize(100, 100);
-    addTestLayer(100, 100, layer);
+    addTestLayer("ImageLayer repeat x/y", 100, 100, layer);
 
     timeImg = graphics().createImage(100, 100);
-    addTestLayer(100, 100, graphics().createImageLayer(timeImg));
+    addTestLayer("updated canvas", 100, 100, graphics().createImageLayer(timeImg));
 
-    addTestCanvas(100, 100, new Drawer() {
+    addTestCanvas("filled bezier path", 100, 100, new Drawer() {
       public void draw(Canvas canvas) {
         // draw a rounded rect with bezier curves
         Path path = canvas.createPath();
@@ -143,7 +143,7 @@ public class CanvasTest extends Test {
       }
     });
 
-    addTestCanvas(100, 100, new Drawer() {
+    addTestCanvas("gradient round rect", 100, 100, new Drawer() {
       public void draw(Canvas canvas) {
         // draw a rounded rect directly
         canvas.setFillGradient(graphics().createLinearGradient(
@@ -153,7 +153,7 @@ public class CanvasTest extends Test {
       }
     });
 
-    addTestCanvas(100, 100, new Drawer() {
+    addTestCanvas("nested round rect", 100, 100, new Drawer() {
       public void draw(Canvas canvas) {
         // demonstrates a bug (now worked around) in Android round-rect drawing
         canvas.setFillColor(0xFFFFCC99);
@@ -183,9 +183,9 @@ public class CanvasTest extends Test {
     void draw(Canvas canvas);
   }
 
-  private void addTestCanvas(int width, int height, Drawer drawer) {
+  private void addTestCanvas(String descrip, int width, int height, Drawer drawer) {
     CanvasImage image = createCanvasImage(width, height, drawer);
-    addTestLayer(width, height, graphics().createImageLayer(image));
+    addTestLayer(descrip, width, height, graphics().createImageLayer(image));
   }
 
   private CanvasImage createCanvasImage(int width, int height, final Drawer drawer) {
@@ -194,25 +194,31 @@ public class CanvasTest extends Test {
     return image;
   }
 
-  private void addTestLayer(int width, int height, Layer layer) {
+  private void addTestLayer(String descrip, int width, int height, Layer layer) {
     // if this layer won't fit in this row, wrap down to the next
     if (nextX + width > graphics().width()) {
       nextY += (maxY + GAP);
       nextX = GAP;
       maxY = 0;
     }
-    layer.setTranslation(nextX, nextY);
-    graphics().rootLayer().add(layer);
+
+    // add the layer and its description below
+    graphics().rootLayer().addAt(layer, nextX, nextY);
+    ImageLayer dlayer = createDescripLayer(descrip, width);
+    graphics().rootLayer().addAt(dlayer, nextX + Math.round((width-dlayer.width())/2),
+                                 nextY + height + 2);
+
     // update our positioning info
     nextX += (width + GAP);
-    maxY = Math.max(maxY, height);
+    maxY = Math.max(maxY, height+dlayer.height()+2);
   }
 
   private interface ImageDrawer {
     void draw(Canvas canvas, Image image);
   }
 
-  private void addTestCanvas(int width, int height, String imagePath, final ImageDrawer drawer) {
+  private void addTestCanvas(String descrip, int width, int height, String imagePath,
+                             final ImageDrawer drawer) {
     final CanvasImage target = graphics().createImage(width, height);
     assets().getImage(imagePath).addCallback(new ResourceCallback<Image>() {
       public void done(Image image) {
@@ -222,6 +228,6 @@ public class CanvasTest extends Test {
         System.err.println("Oops! " + err);
       }
     });
-    addTestLayer(width, height, graphics().createImageLayer(target));
+    addTestLayer(descrip, width, height, graphics().createImageLayer(target));
   }
 }
