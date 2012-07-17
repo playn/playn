@@ -19,18 +19,20 @@ package playn.tests.core;
 import playn.core.Game;
 
 public abstract class Test implements Game {
+
   public abstract String getName();
 
   public abstract String getDescription();
 
   @Override
   public void update(float delta) {
-
   }
 
   @Override
   public void paint(float alpha) {
+  }
 
+  public void dispose() {
   }
 
   @Override

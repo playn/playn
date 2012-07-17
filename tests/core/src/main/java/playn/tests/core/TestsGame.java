@@ -18,21 +18,17 @@ package playn.tests.core;
 import java.util.HashSet;
 import java.util.Set;
 
-import playn.core.Game;
-import playn.core.ImmediateLayer;
-import playn.core.Mouse;
-import playn.core.Keyboard;
-import playn.core.Surface;
-import playn.core.Touch;
+import playn.core.*;
 import static playn.core.PlayN.*;
 
 public class TestsGame implements Game {
   Test[] tests = new Test[] {
-    new PauseResumeTest(),
+    new CanvasTest(),
+    new SurfaceTest(),
     new TextTest(),
     new SubImageTest(),
-    new SurfaceTest(),
-    new CanvasTest(),
+    new ClippedGroupTest(),
+    new PauseResumeTest(),
     new ImmediateTest(),
     new ImageTypeTest(),
     new AlphaLayerTest(),
@@ -43,24 +39,21 @@ public class TestsGame implements Game {
     new PointerMouseTouchTest(),
     new MouseWheelTest(),
     new ShaderTest(),
-    new ClippedGroupTest(),
     /*new YourTest(),*/
   };
-  int currentTest;
+  Test currentTest;
 
   @Override
   public void init() {
     // display basic instructions
-    log().info("Right click, touch with two fingers, or type f to go to the next test.");
+    log().info("Right click, touch with two fingers, or type ESC to return to test menu.");
 
     // add a listener for mouse and touch inputs
     mouse().setListener(new Mouse.Adapter() {
       @Override
       public void onMouseDown(Mouse.ButtonEvent event) {
         if (event.button() == Mouse.BUTTON_RIGHT)
-          advanceTest(1);
-        else if (event.button() == Mouse.BUTTON_MIDDLE)
-          advanceTest(-1);
+          displayMenuLater();
       }
     });
     touch().setListener(new Touch.Adapter() {
@@ -70,10 +63,8 @@ public class TestsGame implements Game {
         // to determine whether there is an active two or three finger touch
         for (Touch.Event event : touches)
           _active.add(event.id());
-        if (_active.size() > 2)
-          advanceTest(-1);
-        else if (_active.size() > 1)
-          advanceTest(1);
+        if (_active.size() > 1)
+          displayMenuLater();
       }
       @Override
       public void onTouchEnd(Touch.Event[] touches) {
@@ -84,50 +75,103 @@ public class TestsGame implements Game {
     });
     keyboard().setListener(new Keyboard.Adapter() {
       @Override
-      public void onKeyTyped(Keyboard.TypedEvent event) {
-        if (event.typedChar() == 'f')
-          advanceTest(1);
-        else if (event.typedChar() == 'b')
-          advanceTest(-1);
+      public void onKeyDown(Keyboard.Event event) {
+        if (event.key() == Key.ESCAPE)
+          displayMenu();
       }
     });
-    advanceTest(currentTest = 0);
+
+    displayMenu();
   }
 
-  Test currentTest() {
-    return tests[currentTest];
+  // defers display of menu by one frame to avoid the right click or touch being processed by the
+  // menu when it is displayed
+  void displayMenuLater() {
+    invokeLater(new Runnable() {
+      public void run() {
+        displayMenu();
+      }
+    });
   }
 
-  void advanceTest(int delta) {
-    currentTest = (currentTest + tests.length + delta) % tests.length;
+  void displayMenu() {
+    GroupLayer root = graphics().rootLayer();
+    root.clear();
+    root.add(createWhiteBackground());
+
+    float gap = 20, x = gap, y = gap, maxHeight = 0;
+    for (Test test : tests) {
+      ImageLayer button = createButton(test);
+      if (x + button.width() > graphics().width() - gap) {
+        x = gap;
+        y += maxHeight + gap;
+        maxHeight = 0;
+      }
+      maxHeight = Math.max(maxHeight, button.height());
+      root.addAt(button, x, y);
+      x += button.width() + gap;
+    }
+  }
+
+  ImageLayer createButton (final Test test) {
+    TextLayout layout = graphics().layoutText(test.getName(), BUTTON_FMT);
+    CanvasImage image = graphics().createImage(layout.width()+10, layout.height()+10);
+    image.canvas().setFillColor(0xFFCCCCCC);
+    image.canvas().fillRect(0, 0, image.width(), image.height());
+    image.canvas().setFillColor(0xFF000000);
+    image.canvas().fillText(layout, 5, 5);
+    image.canvas().setStrokeColor(0xFF000000);
+    image.canvas().strokeRect(0, 0, image.width()-1, image.height()-1);
+    ImageLayer layer = graphics().createImageLayer(image);
+    layer.addListener(new Pointer.Adapter() {
+      public void onPointerStart(Pointer.Event event) {
+        startTest(test);
+      }
+    });
+    return layer;
+  }
+
+  void startTest (Test test) {
+    if (currentTest != null)
+      currentTest.dispose();
+    currentTest = test;
 
     // setup root layer for next test
     graphics().rootLayer().clear();
+    graphics().rootLayer().add(createWhiteBackground());
+
+    log().info("Starting " + currentTest.getName());
+    log().info(" Description: " + currentTest.getDescription());
+    currentTest.init();
+  }
+
+  @Override
+  public void paint(float alpha) {
+    if (currentTest != null)
+      currentTest.paint(alpha);
+  }
+
+  @Override
+  public void update(float delta) {
+    if (currentTest != null)
+      currentTest.update(delta);
+  }
+
+  @Override
+  public int updateRate() {
+    return (currentTest == null) ? 25 : currentTest.updateRate();
+  }
+
+  protected ImmediateLayer createWhiteBackground() {
     ImmediateLayer bg = graphics().createImmediateLayer(new ImmediateLayer.Renderer() {
       public void render(Surface surf) {
         surf.setFillColor(0xFFFFFFFF).fillRect(0, 0, graphics().width(), graphics().height());
       }
     });
     bg.setDepth(Float.NEGATIVE_INFINITY); // render behind everything
-    graphics().rootLayer().add(bg);
-
-    log().info("Starting " + currentTest().getName());
-    log().info(" Description: " + currentTest().getDescription());
-    currentTest().init();
+    return bg;
   }
 
-  @Override
-  public void paint(float alpha) {
-    currentTest().paint(alpha);
-  }
-
-  @Override
-  public void update(float delta) {
-    currentTest().update(delta);
-  }
-
-  @Override
-  public int updateRate() {
-    return currentTest().updateRate();
-  }
+  protected static TextFormat BUTTON_FMT = new TextFormat().withFont(
+    graphics().createFont("Helvetica", Font.Style.PLAIN, 18f));
 }

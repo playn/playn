@@ -70,6 +70,11 @@ public class PauseResumeTest extends Test {
     graphics().rootLayer().addAt(layer, 15, 15);
   }
 
+  @Override
+  public void dispose() {
+    setLifecycleListener(null);
+  }
+
   protected void updateDisplay() {
     StringBuffer buf = new StringBuffer();
     if (notifications.isEmpty()) {
