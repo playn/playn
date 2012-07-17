@@ -83,7 +83,7 @@ public class TestsGame implements Game {
     });
 
     displayMenu();
-    startTest(tests[3]);
+    // startTest(tests[3]);
   }
 
   // defers display of menu by one frame to avoid the right click or touch being processed by the
