@@ -13,6 +13,7 @@
  */
 package playn.core.gl;
 
+import playn.core.Asserts;
 import playn.core.InternalTransform;
 import playn.core.Platform;
 import playn.core.StockInternalTransform;
@@ -25,6 +26,7 @@ public abstract class GLContext {
   protected final Platform platform;
   private GLShader curShader;
   private int lastFramebuffer;
+  private int pushedFramebuffer = -1, pushedWidth, pushedHeight;
 
   /** The (actual screen pixel) width and height of our default frame buffer. */
   protected int defaultFbufWidth, defaultFbufHeight;
@@ -170,6 +172,25 @@ public abstract class GLContext {
 
   public void bindFramebuffer() {
     bindFramebuffer(defaultFrameBuffer(), defaultFbufWidth, defaultFbufHeight);
+  }
+
+  /** Stores the metadata for the currently bound frame buffer, and binds the supplied framebuffer.
+   * This must be followed by a call to {@link #popFramebuffer}. Also, it is not allowed to push a
+   * framebuffer if a framebuffer is already pushed. Only one level of nesting is supported. */
+  public void pushFramebuffer(int fbuf, int width, int height) {
+    Asserts.checkState(pushedFramebuffer == -1, "Already have a pushed framebuffer");
+    pushedFramebuffer = lastFramebuffer;
+    pushedWidth = curFbufWidth;
+    pushedHeight = curFbufHeight;
+    bindFramebuffer(fbuf, width, height);
+  }
+
+  /** Pops the framebuffer pushed by a previous call to {@link #pushFramebuffer} and restores the
+   * framebuffer that was active prior to that call. */
+  public void popFramebuffer() {
+    Asserts.checkState(pushedFramebuffer != -1, "Have no pushed framebuffer");
+    bindFramebuffer(pushedFramebuffer, pushedWidth, pushedHeight);
+    pushedFramebuffer = 0;
   }
 
   /** Returns the supplied shader if non-null, or the default quad shader if null. */

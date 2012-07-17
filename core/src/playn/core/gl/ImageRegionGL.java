@@ -159,18 +159,19 @@ public abstract class ImageRegionGL extends ImageGL implements Image.Region {
     // create our texture and point a new framebuffer at it
     reptex = ctx.createTexture(width, height, repeatX, repeatY);
     int fbuf = ctx.createFramebuffer(reptex);
-
-    // render the parent texture into the framebuffer properly scaled
-    ctx.bindFramebuffer(fbuf, width, height);
-    ctx.clear(0, 0, 0, 0);
-    float tw = texWidth(false), th = texHeight(false);
-    float sl = this.x, st = this.y, sr = sl + this.width, sb = st + this.height;
-    GLShader shader = ctx.quadShader(null).prepareTexture(tex, 1);
-    shader.addQuad(ctx.createTransform(), 0, height, width, 0,
-                   sl / tw, st / th, sr / tw, sb / th);
-
-    // we no longer need this framebuffer; rebind the default framebuffer and delete ours
-    ctx.bindFramebuffer();
-    ctx.deleteFramebuffer(fbuf);
+    ctx.pushFramebuffer(fbuf, width, height);
+    try {
+      // render the parent texture into the framebuffer properly scaled
+      ctx.clear(0, 0, 0, 0);
+      float tw = texWidth(false), th = texHeight(false);
+      float sl = this.x, st = this.y, sr = sl + this.width, sb = st + this.height;
+      GLShader shader = ctx.quadShader(null).prepareTexture(tex, 1);
+      shader.addQuad(ctx.createTransform(), 0, height, width, 0,
+                     sl / tw, st / th, sr / tw, sb / th);
+    } finally {
+      // we no longer need this framebuffer; rebind the previous framebuffer and delete ours
+      ctx.popFramebuffer();
+      ctx.deleteFramebuffer(fbuf);
+    }
   }
 }
