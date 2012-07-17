@@ -175,5 +175,5 @@ public class TestsGame implements Game {
   }
 
   protected static TextFormat BUTTON_FMT = new TextFormat().withFont(
-    graphics().createFont("Helvetica", Font.Style.PLAIN, 18f));
+    graphics().createFont("Helvetica", Font.Style.PLAIN, 24));
 }
