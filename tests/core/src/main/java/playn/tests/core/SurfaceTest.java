@@ -7,9 +7,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import playn.core.ImmediateLayer;
+import playn.core.AssetWatcher;
 import playn.core.Image;
 import playn.core.Pattern;
 import playn.core.Surface;
+import playn.core.ResourceCallback;
 import playn.core.SurfaceLayer;
 import static playn.core.PlayN.*;
 
@@ -29,34 +31,52 @@ public class SurfaceTest extends Test {
 
   @Override
   public void init() {
+    final Image tile = assets().getImage("images/tile.png");
+    final Image orange = assets().getImage("images/orange.png");
+    AssetWatcher watcher = new AssetWatcher(new AssetWatcher.Listener() {
+      public void done() {
+        addTests(orange, tile);
+      }
+      public void error(Throwable err) {
+        addDescrip("Error: " + err.getMessage(), 10, errY, graphics().width()-20);
+        errY += 30;
+      }
+      private float errY = 10;
+    });
+    watcher.add(tile);
+    watcher.add(orange);
+    watcher.start();
+  }
+
+  protected void addTests (final Image orange, Image tile) {
+    final Pattern pattern = tile.toPattern();
+
     int samples = 128; // big enough to force a buffer size increase
     final float[] verts = new float[(samples+1)*4];
     final int[] indices = new int[samples*6];
     tessellateCurve(0, 40*(float)Math.PI, verts, indices, new F() {
       public float apply (float x) { return (float)Math.sin(x/20)*50; }
     });
-    final Pattern pattern = assets().getImage("images/tile.png").toPattern();
-    final Image orange = assets().getImage("images/orange.png");
 
     // draw some wide lines
-    addTest("drawLine with width", 10, 10, 120, 120, new ImmediateLayer.Renderer() {
+    addTest(10, 10, 120, 120, new ImmediateLayer.Renderer() {
       public void render (Surface surf) {
         drawLine(surf, 0, 0, 50, 50, 15);
         drawLine(surf, 70, 50, 120, 0, 10);
         drawLine(surf, 0, 70, 120, 120, 10);
       }
-    });
+    }, "drawLine with width");
 
-    addTest("left & right half are same color", 10, 160, 100, 25, new ImmediateLayer.Renderer() {
+    addTest(20, 160, 100, 25, new ImmediateLayer.Renderer() {
       public void render (Surface surf) {
         surf.setFillColor(0xFF0000FF).fillRect(0, 0, 100, 25);
         // these two alpha fills should look the same
         surf.setFillColor(0x80FF0000).fillRect(0, 0, 50, 25);
         surf.setAlpha(0.5f).setFillColor(0xFFFF0000).fillRect(50, 0, 50, 25).setAlpha(1f);
       }
-    });
+    }, "left and right half are both same color");
 
-    addTest("fillRect and drawImage at 50% alpha", 10, 240, 100, 100, new ImmediateLayer.Renderer() {
+    addTest(20, 240, 100, 100, new ImmediateLayer.Renderer() {
       public void render (Surface surf) {
         surf.setFillColor(0xFF0000FF).fillRect(0, 0, 100, 50);
         surf.setAlpha(0.5f);
@@ -65,9 +85,9 @@ public class SurfaceTest extends Test {
         surf.drawImage(orange, 55, 55);
         surf.setAlpha(1f);
       }
-    });
+    }, "fillRect and drawImage at 50% alpha");
 
-    addTest("fillRect/Triangles with pattern", 180, 10, 120, 220, new ImmediateLayer.Renderer() {
+    addTest(180, 10, 120, 210, new ImmediateLayer.Renderer() {
       public void render (Surface surf) {
         // fill some shapes with patterns
         surf.setFillPattern(pattern).fillRect(10, 0, 100, 100);
@@ -75,7 +95,11 @@ public class SurfaceTest extends Test {
         surf.translate(0, 160);
         surf.fillTriangles(verts, indices);
       }
-    });
+    }, "ImmediateLayer patterned fillRect, fillTriangles");
+
+    SurfaceLayer slayer = graphics().createSurfaceLayer(100, 100);
+    slayer.surface().setFillPattern(pattern).fillRect(0, 0, 100, 100);
+    addTest(190, 280, slayer, "SurfaceLayer patterned fillRect");
 
     // draw some randomly jiggling dots in the right half of the screen
     float hwidth = graphics().width()/2, height = graphics().height();
@@ -94,10 +118,9 @@ public class SurfaceTest extends Test {
     }
   }
 
-  protected void addTest(String descrip, float lx, float ly, float lwidth, float lheight,
-                         ImmediateLayer.Renderer renderer) {
-    graphics().rootLayer().addAt(graphics().createImmediateLayer(renderer), lx, ly);
-    addDescrip(descrip, lx, ly+lheight+5, lwidth);
+  protected void addTest(float lx, float ly, float lwidth, float lheight,
+                         ImmediateLayer.Renderer renderer, String descrip) {
+    addTest(lx, ly, graphics().createImmediateLayer(renderer), lwidth, lheight, descrip);
   }
 
   @Override

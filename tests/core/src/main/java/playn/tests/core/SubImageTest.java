@@ -80,7 +80,7 @@ public class SubImageTest extends Test {
             surf.drawImage(orangemid, orangemid.width(), orangemid.height());
           }
         });
-        addTest(130, 100, 2*orangemid.width(), 2*orangemid.height(), imm,
+        addTest(130, 100, imm, 2*orangemid.width(), 2*orangemid.height(),
                 "draw subimg into Surface", 100);
 
         // draw a subimage whose bounds oscillate
@@ -92,20 +92,6 @@ public class SubImageTest extends Test {
         log().warn("Failed to load orange image", err);
       }
     });
-  }
-
-  protected void addTest(float lx, float ly, float lwidth, float lheight, Layer layer,
-                         String descrip, float twidth) {
-    graphics().rootLayer().addAt(layer, lx + (twidth-lwidth)/2, ly);
-    addDescrip(descrip, lx, ly + lheight + 5, twidth);
-  }
-
-  protected void addTest(float lx, float ly, Layer.HasSize layer, String descrip, float twidth) {
-    addTest(lx, ly, layer.width(), layer.height(), layer, descrip, twidth);
-  }
-
-  protected void addTest(float lx, float ly, Layer.HasSize layer, String descrip) {
-    addTest(lx, ly, layer, descrip, layer.width());
   }
 
   @Override
