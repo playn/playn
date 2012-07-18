@@ -6,6 +6,8 @@ package playn.tests.core;
 import java.util.ArrayList;
 import java.util.List;
 
+import pythagoras.f.Rectangle;
+
 import playn.core.ImmediateLayer;
 import playn.core.AssetWatcher;
 import playn.core.Image;
@@ -18,6 +20,7 @@ import static playn.core.PlayN.*;
 public class SurfaceTest extends Test {
 
   private List<SurfaceLayer> dots = new ArrayList<SurfaceLayer>();
+  private Rectangle dotBox;
 
   @Override
   public String getName() {
@@ -74,7 +77,7 @@ public class SurfaceTest extends Test {
         surf.setFillColor(0x80FF0000).fillRect(0, 0, 50, 25);
         surf.setAlpha(0.5f).setFillColor(0xFFFF0000).fillRect(50, 0, 50, 25).setAlpha(1f);
       }
-    }, "left and right half are both same color");
+    }, "left and right half both same color");
 
     addTest(20, 240, 100, 100, new ImmediateLayer.Renderer() {
       public void render (Surface surf) {
@@ -87,7 +90,7 @@ public class SurfaceTest extends Test {
       }
     }, "fillRect and drawImage at 50% alpha");
 
-    addTest(180, 10, 120, 210, new ImmediateLayer.Renderer() {
+    addTest(160, 10, 120, 210, new ImmediateLayer.Renderer() {
       public void render (Surface surf) {
         // fill some shapes with patterns
         surf.setFillPattern(pattern).fillRect(10, 0, 100, 100);
@@ -99,10 +102,28 @@ public class SurfaceTest extends Test {
 
     SurfaceLayer slayer = graphics().createSurfaceLayer(100, 100);
     slayer.surface().setFillPattern(pattern).fillRect(0, 0, 100, 100);
-    addTest(190, 280, slayer, "SurfaceLayer patterned fillRect");
+    addTest(170, 280, slayer, "SurfaceLayer patterned fillRect");
 
-    // draw some randomly jiggling dots in the right half of the screen
-    float hwidth = graphics().width()/2, height = graphics().height();
+    final int twidth = 150, theight = 75;
+    graphics().rootLayer().addAt(graphics().createImmediateLayer(new ImmediateLayer.Renderer() {
+      public void render (Surface surf) {
+        surf.setFillColor(0xFFCCCCCC).fillRect(0, 0, twidth+2, theight+2);
+      }
+    }), 314, 9);
+    addTest(315, 10, graphics().createImmediateLayer(twidth, theight, new ImmediateLayer.Renderer() {
+      public void render (Surface surf) {
+        // fill some shapes with patterns
+        surf.setFillPattern(pattern).fillRect(-10, -10, twidth+20, theight+20);
+      }
+    }), "Clipped pattern should not exceed grey rectangle");
+
+    // draw some randomly jiggling dots inside a bounded region
+    dotBox = new Rectangle(315, 140, 200, 100);
+    addTest(dotBox.x, dotBox.y, dotBox.width, dotBox.height, new ImmediateLayer.Renderer() {
+      public void render (Surface surf) {
+        surf.setFillColor(0xFFCCCCCC).fillRect(0, 0, dotBox.width, dotBox.height);
+      }
+    }, "Randomly positioned SurfaceLayers");
     for (int ii = 0; ii < 10; ii++) {
       SurfaceLayer dot = graphics().createSurfaceLayer(10, 10);
       dot.surface().setFillColor(0xFFFF0000);
@@ -111,7 +132,8 @@ public class SurfaceTest extends Test {
       dot.surface().setFillColor(0xFF0000FF);
       dot.surface().fillRect(5, 0, 5, 5);
       dot.surface().fillRect(0, 5, 5, 5);
-      dot.setTranslation(hwidth + random()*hwidth, random()*height);
+      dot.setTranslation(dotBox.x + random()*(dotBox.width-10),
+                         dotBox.y + random()*(dotBox.height-10));
       dots.add(dot);
       // System.err.println("Created dot at " + dot.transform());
       graphics().rootLayer().add(dot);
@@ -127,10 +149,10 @@ public class SurfaceTest extends Test {
   public void paint(float alpha) {
     super.paint(alpha);
 
-    float hwidth = graphics().width()/2, height = graphics().height();
     for (SurfaceLayer dot : dots) {
       if (random() > 0.95) {
-        dot.setTranslation(hwidth + random()*hwidth, random()*height);
+        dot.setTranslation(dotBox.x + random()*(dotBox.width-10),
+                           dotBox.y + random()*(dotBox.height-10));
       }
     }
   }
