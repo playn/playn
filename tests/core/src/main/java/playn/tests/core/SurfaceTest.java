@@ -10,6 +10,7 @@ import pythagoras.f.Rectangle;
 
 import playn.core.ImmediateLayer;
 import playn.core.AssetWatcher;
+import playn.core.GroupLayer;
 import playn.core.Image;
 import playn.core.Pattern;
 import playn.core.Surface;
@@ -61,25 +62,27 @@ public class SurfaceTest extends Test {
       public float apply (float x) { return (float)Math.sin(x/20)*50; }
     });
 
+    float ygap = 20, ypos = 10;
+
     // draw some wide lines
-    addTest(10, 10, 120, 120, new ImmediateLayer.Renderer() {
+    ypos = ygap + addTest(10, ypos, new ImmediateLayer.Renderer() {
       public void render (Surface surf) {
         drawLine(surf, 0, 0, 50, 50, 15);
         drawLine(surf, 70, 50, 120, 0, 10);
         drawLine(surf, 0, 70, 120, 120, 10);
       }
-    }, "drawLine with width");
+    }, 120, 120, "drawLine with width");
 
-    addTest(20, 160, 100, 25, new ImmediateLayer.Renderer() {
+    ypos = ygap + addTest(20, ypos, new ImmediateLayer.Renderer() {
       public void render (Surface surf) {
         surf.setFillColor(0xFF0000FF).fillRect(0, 0, 100, 25);
         // these two alpha fills should look the same
         surf.setFillColor(0x80FF0000).fillRect(0, 0, 50, 25);
         surf.setAlpha(0.5f).setFillColor(0xFFFF0000).fillRect(50, 0, 50, 25).setAlpha(1f);
       }
-    }, "left and right half both same color");
+    }, 100, 25, "left and right half both same color");
 
-    addTest(20, 240, 100, 100, new ImmediateLayer.Renderer() {
+    ypos = ygap + addTest(20, ypos, new ImmediateLayer.Renderer() {
       public void render (Surface surf) {
         surf.setFillColor(0xFF0000FF).fillRect(0, 0, 100, 50);
         surf.setAlpha(0.5f);
@@ -88,9 +91,11 @@ public class SurfaceTest extends Test {
         surf.drawImage(orange, 55, 55);
         surf.setAlpha(1f);
       }
-    }, "fillRect and drawImage at 50% alpha");
+    }, 100, 100, "fillRect and drawImage at 50% alpha");
 
-    addTest(160, 10, 120, 210, new ImmediateLayer.Renderer() {
+    ypos = 10;
+
+    ypos = ygap + addTest(160, ypos, new ImmediateLayer.Renderer() {
       public void render (Surface surf) {
         // fill some shapes with patterns
         surf.setFillPattern(pattern).fillRect(10, 0, 100, 100);
@@ -98,32 +103,37 @@ public class SurfaceTest extends Test {
         surf.translate(0, 160);
         surf.fillTriangles(verts, indices);
       }
-    }, "ImmediateLayer patterned fillRect, fillTriangles");
+    }, 120, 210, "ImmediateLayer patterned fillRect, fillTriangles");
 
     SurfaceLayer slayer = graphics().createSurfaceLayer(100, 100);
     slayer.surface().setFillPattern(pattern).fillRect(0, 0, 100, 100);
-    addTest(170, 280, slayer, "SurfaceLayer patterned fillRect");
+    ypos = ygap + addTest(170, ypos, slayer, "SurfaceLayer patterned fillRect");
 
+    ypos = 10;
+
+    // fill a patterned quad in a clipped group layer
     final int twidth = 150, theight = 75;
-    graphics().rootLayer().addAt(graphics().createImmediateLayer(new ImmediateLayer.Renderer() {
+    GroupLayer group = graphics().createGroupLayer();
+    ypos = ygap + addTest(315, 10, group, twidth, theight,
+                          "Clipped pattern should not exceed grey rectangle");
+    group.add(graphics().createImmediateLayer(new ImmediateLayer.Renderer() {
       public void render (Surface surf) {
-        surf.setFillColor(0xFFCCCCCC).fillRect(0, 0, twidth+2, theight+2);
+        surf.setFillColor(0xFFCCCCCC).fillRect(0, 0, twidth, theight);
       }
-    }), 314, 9);
-    addTest(315, 10, graphics().createImmediateLayer(twidth, theight, new ImmediateLayer.Renderer() {
+    }));
+    group.add(graphics().createImmediateLayer(twidth, theight, new ImmediateLayer.Renderer() {
       public void render (Surface surf) {
-        // fill some shapes with patterns
         surf.setFillPattern(pattern).fillRect(-10, -10, twidth+20, theight+20);
       }
-    }), "Clipped pattern should not exceed grey rectangle");
+    }));
 
     // draw some randomly jiggling dots inside a bounded region
-    dotBox = new Rectangle(315, 140, 200, 100);
-    addTest(dotBox.x, dotBox.y, dotBox.width, dotBox.height, new ImmediateLayer.Renderer() {
+    dotBox = new Rectangle(315, ypos, 200, 100);
+    ypos = ygap + addTest(dotBox.x, dotBox.y, new ImmediateLayer.Renderer() {
       public void render (Surface surf) {
         surf.setFillColor(0xFFCCCCCC).fillRect(0, 0, dotBox.width, dotBox.height);
       }
-    }, "Randomly positioned SurfaceLayers");
+    }, dotBox.width, dotBox.height, "Randomly positioned SurfaceLayers");
     for (int ii = 0; ii < 10; ii++) {
       SurfaceLayer dot = graphics().createSurfaceLayer(10, 10);
       dot.surface().setFillColor(0xFFFF0000);
@@ -140,9 +150,9 @@ public class SurfaceTest extends Test {
     }
   }
 
-  protected void addTest(float lx, float ly, float lwidth, float lheight,
-                         ImmediateLayer.Renderer renderer, String descrip) {
-    addTest(lx, ly, graphics().createImmediateLayer(renderer), lwidth, lheight, descrip);
+  protected float addTest(float lx, float ly, ImmediateLayer.Renderer renderer,
+                          float lwidth, float lheight, String descrip) {
+    return addTest(lx, ly, graphics().createImmediateLayer(renderer), lwidth, lheight, descrip);
   }
 
   @Override

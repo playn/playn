@@ -47,28 +47,29 @@ public abstract class Test implements Game {
     return 25;
   }
 
-  protected void addTest(float lx, float ly, Layer.HasSize layer, String descrip) {
-    addTest(lx, ly, layer, descrip, layer.width());
+  protected float addTest(float lx, float ly, Layer.HasSize layer, String descrip) {
+    return addTest(lx, ly, layer, descrip, layer.width());
   }
 
-  protected void addTest(float lx, float ly, Layer.HasSize layer, String descrip, float twidth) {
-    addTest(lx, ly, layer, layer.width(), layer.height(), descrip, twidth);
+  protected float addTest(float lx, float ly, Layer.HasSize layer, String descrip, float twidth) {
+    return addTest(lx, ly, layer, layer.width(), layer.height(), descrip, twidth);
   }
 
-  protected void addTest(float lx, float ly, Layer layer, float lwidth, float lheight,
+  protected float addTest(float lx, float ly, Layer layer, float lwidth, float lheight,
                          String descrip) {
-    addTest(lx, ly, layer, lwidth, lheight, descrip, lwidth);
+    return addTest(lx, ly, layer, lwidth, lheight, descrip, lwidth);
   }
 
-  protected void addTest(float lx, float ly, Layer layer, float lwidth, float lheight,
-                         String descrip, float twidth) {
+  protected float addTest(float lx, float ly, Layer layer, float lwidth, float lheight,
+                          String descrip, float twidth) {
     graphics().rootLayer().addAt(layer, lx + (twidth-lwidth)/2, ly);
-    addDescrip(descrip, lx, ly + lheight + 5, twidth);
+    return addDescrip(descrip, lx, ly + lheight + 5, twidth);
   }
 
-  protected void addDescrip(String descrip, float x, float y, float width) {
+  protected float addDescrip(String descrip, float x, float y, float width) {
     ImageLayer layer = createDescripLayer(descrip, width);
     graphics().rootLayer().addAt(layer, Math.round(x + (width - layer.width())/2), y);
+    return y + layer.height();
   }
 
   protected ImageLayer createDescripLayer(String descrip, float width) {
