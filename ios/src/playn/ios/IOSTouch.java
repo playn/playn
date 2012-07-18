@@ -62,7 +62,7 @@ public class IOSTouch extends TouchImpl {
         IPoint xloc = graphics.transformTouch(loc.get_X(), loc.get_Y());
         // on iOS the memory address of the UITouch object is the unique id
         int id = touch.get_Handle().ToInt32();
-        events[_idx++] = new Event.Impl(touch.get_Timestamp(), xloc.x(), xloc.y(), id);
+        events[_idx++] = new Event.Impl(touch.get_Timestamp() * 1000, xloc.x(), xloc.y(), id);
         stop[0] = false;
       }
       private int _idx = 0;
