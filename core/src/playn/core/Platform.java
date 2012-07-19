@@ -20,7 +20,7 @@ package playn.core;
  */
 public interface Platform {
 
-  public enum Type { JAVA, HTML, ANDROID, IOS, FLASH }
+  public enum Type { JAVA, HTML, ANDROID, IOS, FLASH, STUB }
 
   void run(Game game);
 

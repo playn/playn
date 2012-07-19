@@ -48,6 +48,15 @@ public class PlayN {
   }
 
   /**
+   * Returns the currently registered platform instance. This can be useful for games that wish to
+   * avoid littering their code with calls to the static {@link PlayN} methods, and for services
+   * that can accept a mocked {@link Platform} for testing.
+   */
+  public static Platform platform() {
+    return platform;
+  }
+
+  /**
    * Returns the platform {@link Platform.Type}.
    */
   public static Platform.Type platformType() {
