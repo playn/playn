@@ -16,8 +16,9 @@
 package playn.core;
 
 /**
- * Represents a listener registration and allows unregistration. See {@link Pointer#addListener},
- * {@link Mouse#addListener}, and {@link Touch#addListener}. */
+ * Represents a listener registration and allows unregistration. See {@link Layer#addListener},
+ * etc.
+ */
 public interface Connection {
 
   /** Disconnects this listener registration. */

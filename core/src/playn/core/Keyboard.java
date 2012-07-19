@@ -156,8 +156,9 @@ public interface Keyboard {
    * a keyboard customized to the particular type of text.
    * @param label a label to display over the text entry interface, may be null.
    * @param initialValue the initial value to display in the text input field, may be null.
-   * @param a callback which will be notified when the text entry is complete. If the user cancels
-   * the text entry process, null will be supplied. Otherwise the entered text will be supplied.
+   * @param callback a callback which will be notified when the text entry is complete. If the user
+   * cancels the text entry process, null will be supplied. Otherwise the entered text will be
+   * supplied.
    */
   void getText(TextType textType, String label, String initialValue, Callback<String> callback);
 }

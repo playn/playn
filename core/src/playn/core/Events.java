@@ -103,13 +103,13 @@ public class Events {
 
     /**
      * The x-coordinate associated with this event transformed into the receiving layer's
-     * coordinate system. See {@link Pointer#addListener}, etc.
+     * coordinate system. See {@link Layer#addListener}, etc.
      */
     float localX();
 
     /**
      * The y-coordinate associated with this event transformed into the receiving layer's
-     * coordinate system. See {@link Pointer#addListener}, etc.
+     * coordinate system. See {@link Layer#addListener}, etc.
      */
     float localY();
 

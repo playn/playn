@@ -98,7 +98,7 @@ public interface Graphics {
 
   /**
    * Lays out the supplied text using the specified format. The text may subsequently be rendered
-   * on a canvas via {@link Canvas#drawText(TextLayout,float,float)}.
+   * on a canvas via {@link Canvas#fillText(TextLayout,float,float)}.
    */
   TextLayout layoutText(String text, TextFormat format);
 

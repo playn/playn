@@ -110,7 +110,7 @@ public interface Image {
 
   /**
    * Generates a new image from this image's bitmap, using a bitmap transformer created for the
-   * platform in use. See {@link JavaBitmapTransformer} and {@code IOSBitmapTransformer}. This does
+   * platform in use. See {@code JavaBitmapTransformer} and {@code IOSBitmapTransformer}. This does
    * not work on sub-images.
    */
   Image transform(BitmapTransformer xform);

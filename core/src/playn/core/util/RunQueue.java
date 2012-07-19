@@ -16,6 +16,7 @@
 package playn.core.util;
 
 import playn.core.Log;
+import playn.core.Platform;
 
 /**
  * Manages a queue of runnables. Used to implement {@link Platform#invokeLater} by the various

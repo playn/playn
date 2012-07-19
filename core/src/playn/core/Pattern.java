@@ -16,7 +16,7 @@
 package playn.core;
 
 /**
- * A bitmap fill pattern created by {@link Graphics#createPattern(Image)}.
+ * A bitmap fill pattern created by {@link Image#toPattern}.
  */
 public interface Pattern {
 }

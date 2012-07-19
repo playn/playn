@@ -22,7 +22,7 @@ package playn.core;
  *
  * <p><b>Custom shader note:</b> Configuring a custom shader on a surface layer only affects the
  * drawing of the texture to the main framebuffer. If you wish to use a custom shader when drawing
- * into the surface's off-screen buffer, use {@link Surface#setShaders}.</p>
+ * into the surface's off-screen buffer, use {@link Surface#setShader}.</p>
  */
 public interface SurfaceLayer extends Layer.HasSize {
 

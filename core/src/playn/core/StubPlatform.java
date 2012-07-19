@@ -28,7 +28,7 @@ import playn.core.util.Callback;
  * aspects of the platform that are needed to support the code under test.
  *
  * <p> The services that are implemented are:
- * <ul><li> {@link #type} - reports {@link Type#STUB}
+ * <ul><li> {@link #type} - reports {@link Platform.Type#STUB}
  * <li> {@link #time} - returns current time
  * <li> {@link #random} - returns {@link Math#random}
  * <li> {@link #invokeLater} - invokes the supplied runnable immediately on the calling thread

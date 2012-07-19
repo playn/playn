@@ -220,10 +220,9 @@ public interface Mouse {
     /**
      * Called when the mouse enters a {@link Layer}.
      *
-     * Note: MotionEvent is first dispatched to {@link #onMouseMove(MotionEvent)},
-     *       then to {@link #onMouseOut(MotionEvent)} and finally to
-     *       {@link #onMouseOver(MotionEvent)}. These three events share a single
-     *       preventDefault state.
+     * Note: MotionEvent is first dispatched to {@link #onMouseDrag}, then to {@link #onMouseOut}
+     *       and finally to {@link #onMouseOver}. These three events share a single preventDefault
+     *       state.
      *
      * @param event provides mouse position and other metadata.
      */
@@ -232,10 +231,8 @@ public interface Mouse {
     /**
      * Called when the mouse leaves a {@link Layer}.
      *
-     * Note: MotionEvent is first dispatched to {@link #onMouseMove(MotionEvent)},
-     *       then to {@link #onMouseOut(MotionEvent)} and finally to
-     *       {@link #onMouseOver(MotionEvent)}. These three events share a single
-     *       preventDefault state.
+     * Note: MotionEvent is first dispatched to {@link #onMouseDrag}, then to {@link #onMouseOut}
+     * and finally to {@link #onMouseOver}. These three events share a single preventDefault state.
      *
      * @param event provides mouse position and other metadata.
      */

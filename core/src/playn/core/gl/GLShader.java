@@ -17,6 +17,7 @@ package playn.core.gl;
 
 import playn.core.Asserts;
 import playn.core.InternalTransform;
+import playn.core.Surface;
 
 /**
  * Defines the interface to shaders used by the GL core. The general usage contract for a shader is
@@ -167,8 +168,8 @@ public abstract class GLShader {
    * Adds a collection of triangles to the current render operation.
    *
    * @param xys a list of x/y coordinates as: {@code [x1, y1, x2, y2, ...]}.
-   * @param texWidth the width of the texture for which we will auto-generate texture coordinates.
-   * @param texHeight the height of the texture for which we will auto-generate texture coordinates.
+   * @param tw the width of the texture for which we will auto-generate texture coordinates.
+   * @param th the height of the texture for which we will auto-generate texture coordinates.
    * @param indices the index of the triangle vertices in the supplied {@code xys} array. This must
    * be in proper winding order for OpenGL rendering.
    */

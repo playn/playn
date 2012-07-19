@@ -83,17 +83,17 @@ public interface Layer {
   /**
    * Returns true if this layer reacts to clicks and touches. If a layer is interactive, it will
    * respond to {@link #hitTest}, which forms the basis for the click and touch processing provided
-   * by {@link Pointer#addListener}, {@link Touch#addListener} and {@link Mouse#addListener}.
+   * by the various {@code addListener} methods.
    */
   boolean interactive();
 
   /**
    * Configures this layer as reactive to clicks and touches, or not. Note that a layer's
    * interactivity is automatically activated when a listener is added to the layer (or to a child
-   * of a {@link GroupLayer}) via {@link Pointer#addListener}, etc. Also a {@link GroupLayer} will
-   * be made non-interactive automatically if an event is dispatched to it and it discovers that it
-   * has no interactive children. Manual management of interactivity is thus generally only useful
-   * for "leaf" nodes in the scene graph.
+   * of a {@link GroupLayer}) via {@link #addListener}, etc. Also a {@link GroupLayer} will be made
+   * non-interactive automatically if an event is dispatched to it and it discovers that it has no
+   * interactive children. Manual management of interactivity is thus generally only useful for
+   * "leaf" nodes in the scene graph.
    */
   void setInteractive(boolean interactive);
 
@@ -229,10 +229,10 @@ public interface Layer {
 
   /**
    * Registers a listener with this layer that will be notified if a click/touch event happens
-   * within its bounds. Events dispatched to this listener will have their {@link Event#localX} and
-   * {@link Event#localY} values set to the coordinates of the click/touch as transformed into this
-   * layer's coordinate system. {@link Event#x} and {@link Event#y} will always contain the screen
-   * (global) coordinates of the click/touch.
+   * within its bounds. Events dispatched to this listener will have their {@code localX} and
+   * {@code localY} values set to the coordinates of the click/touch as transformed into this
+   * layer's coordinate system. {@code x} and {@code y} will always contain the screen (global)
+   * coordinates of the click/touch.
    *
    * <p>When a listener is added, the layer and all of its parents are marked as interactive.
    * Interactive layers intercept touches/clicks. When all listeners are disconnected (including
@@ -246,10 +246,9 @@ public interface Layer {
 
   /**
    * Registers a listener with this layer that will be notified if a mouse event happens within its
-   * bounds. Events dispatched to this listener will have their {@link Event#localX} and {@link
-   * Event#localY} values set to the coordinates of the mouse as transformed into this layer's
-   * coordinate system. {@link Event#x} and {@link Event#y} will always contain the screen (global)
-   * coordinates of the mouse.
+   * bounds. Events dispatched to this listener will have their {@code localX} and {@code localY}
+   * values set to the coordinates of the mouse as transformed into this layer's coordinate system.
+   * {@code x} and {@code y} will always contain the screen (global) coordinates of the mouse.
    *
    * <p>When a listener is added, the layer and all of its parents are marked as interactive.
    * Interactive layers intercept mice events. When all listeners are disconnected (including
@@ -263,10 +262,9 @@ public interface Layer {
 
   /**
    * Registers a listener with this layer that will be notified if a touch event happens within its
-   * bounds. Events dispatched to this listener will have their {@link Event#localX} and {@link
-   * Event#localY} values set to the coordinates of the touch as transformed into this layer's
-   * coordinate system. {@link Event#x} and {@link Event#y} will always contain the screen (global)
-   * coordinates of the touch.
+   * bounds. Events dispatched to this listener will have their {@code localX} and {@code localY}
+   * values set to the coordinates of the touch as transformed into this layer's coordinate system.
+   * {@code x} and {@code y} will always contain the screen (global) coordinates of the touch.
    *
    * <p>When a listener is added, the layer and all of its parents are marked as interactive.
    * Interactive layers intercept touches/clicks. When all listeners are disconnected (including
