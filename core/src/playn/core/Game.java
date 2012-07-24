@@ -20,7 +20,7 @@ package playn.core;
  *
  * TODO(jgw): Callbacks for resize, background, foreground, shutdown.
  *
- * TODO(jgw): Link to game loop wiki page.
+ * @see <a href="http://code.google.com/p/playn/wiki/GameLoop">Understanding the Game Loop</a>
  */
 public interface Game {
 
