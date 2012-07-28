@@ -67,6 +67,8 @@ class HtmlSurfaceLayerCanvas extends HtmlLayerCanvas implements SurfaceLayer {
 
   @Override
   void paint(Context2d ctx, float parentAlpha) {
+    if (!visible()) return;
+
     ctx.save();
     transform(ctx);
 
