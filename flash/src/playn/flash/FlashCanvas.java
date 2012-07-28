@@ -295,7 +295,6 @@ class FlashCanvas implements Canvas {
   public Canvas drawImage(Image img, float x, float y) {
     Asserts.checkArgument(img instanceof FlashImage);
     dirty = true;
-    PlayN.log().info("Drawing image " + ((FlashImage) img).bitmapData());
     context2d.drawImage(((FlashImage) img).bitmapData(), x, y);
     return this;
   }
