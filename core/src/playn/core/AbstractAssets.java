@@ -62,8 +62,7 @@ public abstract class AbstractAssets implements Assets {
 
   @Override
   public final boolean isDone() {
-    boolean done = (this.totalRequestsCount == this.errorsCount + this.successCount);
-    return done;
+    return (this.totalRequestsCount == this.errorsCount + this.successCount);
   }
 
   @Override
