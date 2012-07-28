@@ -20,16 +20,19 @@ import pythagoras.f.FloatMath;
 import playn.core.CanvasImage;
 import playn.core.GroupLayer;
 import playn.core.ImageLayer;
-import static playn.core.PlayN.graphics;
 import playn.core.ImmediateLayer;
+import playn.core.Layer;
 import playn.core.Surface;
+import playn.core.SurfaceLayer;
+import static playn.core.PlayN.graphics;
 
 public class ClippedGroupTest extends Test {
 
   private float elapsed;
-  private GroupLayer.Clipped g1, g2, g3;
+  private GroupLayer.Clipped g1, g2, g3, g4;
   private ImageLayer i1;
   private GroupLayer inner;
+  private SurfaceLayer s1;
 
   @Override
   public String getName() {
@@ -56,12 +59,14 @@ public class ClippedGroupTest extends Test {
       public void render(Surface surf) {
         // draw the border of our various clipped groups
         surf.setFillColor(0xFF000000);
-        drawRect(surf, g1.transform().tx() - g1.originX(), g1.transform().ty() - g1.originY(),
-                 g1.width(), g1.height());
-        drawRect(surf, g2.transform().tx() - g2.originX(), g2.transform().ty() - g2.originY(),
-                 g2.width(), g2.height());
-        drawRect(surf, g3.transform().tx() - g3.originX(), g3.transform().ty() - g3.originY(),
-                 g3.width(), g3.height());
+        outline(surf, g1);
+        outline(surf, g2);
+        outline(surf, g3);
+        outline(surf, g4);
+      }
+      protected void outline (Surface surf, Layer.HasSize ly) {
+        drawRect(surf, ly.transform().tx() - ly.originX(), ly.transform().ty() - ly.originY(),
+                 ly.width(), ly.height());
       }
       protected void drawRect(Surface surf, float x, float y, float w, float h) {
         float left = x-1, top = y-1, right = x+w+2, bot = y+h+2;
@@ -92,12 +97,21 @@ public class ClippedGroupTest extends Test {
     g3 = graphics().createGroupLayer(100, 100);
     g3.add(inner);
     rootLayer.addAt(g3, 275, 25);
+
+    // create a group layer with a static clip, and a rotating surface layer inside
+    g4 = graphics().createGroupLayer(100, 100);
+    s1 = graphics().createSurfaceLayer(100, 50);
+    s1.surface().setFillColor(0xFF99CCFF).fillRect(0, 0, 100, 50);
+    s1.setOrigin(s1.width()/2, s1.height()/2);
+    g4.addAt(s1, 50, 50);
+    rootLayer.addAt(g4, 400, 25);
   }
 
   @Override
   public void update(float delta) {
     elapsed += delta/1000;
     i1.setRotation(elapsed * FloatMath.PI/2);
+    s1.setRotation(elapsed * FloatMath.PI/2);
     g2.setWidth(Math.max(1f, Math.abs(100 * FloatMath.sin(elapsed))));
     inner.setOrigin(FloatMath.sin(elapsed * 2f) * 50, FloatMath.cos(elapsed * 2f) * 50);
   }
