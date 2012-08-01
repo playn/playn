@@ -18,6 +18,8 @@ package playn.android;
 import java.io.UnsupportedEncodingException;
 
 import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
+import org.apache.http.StatusLine;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
@@ -66,7 +68,13 @@ class AndroidNet extends NetImpl {
         }
         try {
           HttpResponse response = httpclient.execute(req);
-          notifySuccess(callback, EntityUtils.toString(response.getEntity()));
+          StatusLine status = response.getStatusLine();
+          int code = status.getStatusCode();
+          if (code == HttpStatus.SC_OK) {
+            notifySuccess(callback, EntityUtils.toString(response.getEntity()));
+          } else {
+            notifyFailure(callback, new HttpException(code, status.getReasonPhrase()));
+          }
         } catch (Exception e) {
           notifyFailure(callback, e);
         }

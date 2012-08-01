@@ -22,6 +22,7 @@ import java.io.Reader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -52,9 +53,14 @@ public class JavaNet extends NetImpl {
       public void run() {
         try {
           URL url = new URL(canonicalizeUrl(urlStr));
-          InputStream stream = url.openStream();
-          InputStreamReader reader = new InputStreamReader(stream);
-          notifySuccess(callback, readFully(reader));
+          URLConnection conn = url.openConnection();
+          if (conn instanceof HttpURLConnection) {
+            processResponse((HttpURLConnection) conn, callback);
+          } else {
+            InputStream stream = conn.getInputStream();
+            InputStreamReader reader = new InputStreamReader(stream);
+            notifySuccess(callback, readFully(reader));
+          }
 
         } catch (MalformedURLException e) {
           notifyFailure(callback, e);
@@ -81,9 +87,7 @@ public class JavaNet extends NetImpl {
           conn.connect();
           conn.getOutputStream().write(data.getBytes("UTF-8"));
           conn.getOutputStream().close();
-          String result = readFully(new InputStreamReader(conn.getInputStream()));
-          conn.disconnect();
-          notifySuccess(callback, result);
+          processResponse(conn, callback);
 
         } catch (MalformedURLException e) {
           notifyFailure(callback, e);
@@ -100,6 +104,21 @@ public class JavaNet extends NetImpl {
       if (!s.update()) {
         it.remove();
       }
+    }
+  }
+
+  private void processResponse(HttpURLConnection conn, Callback<String> callback)
+      throws IOException {
+    try {
+      int code = conn.getResponseCode();
+      if (code != HttpURLConnection.HTTP_OK) {
+        throw new HttpException(code, conn.getResponseMessage());
+      } else {
+        String result = readFully(new InputStreamReader(conn.getInputStream()));
+        notifySuccess(callback, result);
+      }
+    } finally {
+      conn.disconnect();
     }
   }
 

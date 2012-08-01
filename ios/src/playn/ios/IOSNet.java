@@ -19,8 +19,9 @@ import cli.System.AsyncCallback;
 import cli.System.IAsyncResult;
 import cli.System.IO.StreamReader;
 import cli.System.IO.StreamWriter;
+import cli.System.Net.HttpStatusCode;
+import cli.System.Net.HttpWebResponse;
 import cli.System.Net.WebRequest;
-import cli.System.Net.WebResponse;
 
 import playn.core.NetImpl;
 import playn.core.util.Callback;
@@ -70,9 +71,14 @@ public class IOSNet extends NetImpl {
       public void Invoke(IAsyncResult result) {
         StreamReader reader = null;
         try {
-          WebResponse rsp = req.EndGetResponse(result);
-          reader = new StreamReader(rsp.GetResponseStream());
-          notifySuccess(callback, reader.ReadToEnd());
+          HttpWebResponse rsp = (HttpWebResponse) req.EndGetResponse(result);
+          HttpStatusCode code = rsp.get_StatusCode();
+          if (code == HttpStatusCode.wrap(HttpStatusCode.OK)) {
+            reader = new StreamReader(rsp.GetResponseStream());
+            notifySuccess(callback, reader.ReadToEnd());
+          } else {
+            notifyFailure(callback, new HttpException(code.Value, rsp.get_StatusDescription()));
+          }
         } catch (final Throwable t) {
           notifyFailure(callback, t);
         } finally {

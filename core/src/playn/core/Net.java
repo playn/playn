@@ -15,14 +15,13 @@
  */
 package playn.core;
 
+import java.io.IOException;
 import java.nio.ByteBuffer;
 
 import playn.core.util.Callback;
 
 /**
  * PlayN network interface.
- *
- * TODO(jgw): This is quite anemic at the moment, but it's a starting point.
  */
 public interface Net {
 
@@ -56,6 +55,17 @@ public interface Net {
 
     /** Queues the supplied binary message to be sent over the socket. */
     void send(ByteBuffer data);
+  }
+
+  /** Used to report HTTP error responses by {@link #get} and {@link #post}. */
+  public static class HttpException extends IOException {
+    /** The HTTP error code reported by the server. */
+    public final int errorCode;
+
+    public HttpException(int errorCode, String message) {
+      super(message);
+      this.errorCode = errorCode;
+    }
   }
 
   /**

@@ -36,10 +36,10 @@ public class HtmlNet implements Net {
         @Override
         public void onReadyStateChange(XMLHttpRequest xhr) {
           if (xhr.getReadyState() == XMLHttpRequest.DONE) {
-            if (xhr.getStatus() >= 400) {
-              callback.onFailure(new RuntimeException("Bad HTTP status code: " + xhr.getStatus()));
-            } else {
+            if (xhr.getStatus() == 200) {
               callback.onSuccess(xhr.getResponseText());
+            } else {
+              callback.onFailure(new HttpException(xhr.getStatus(), xhr.getStatusText()));
             }
           }
         }
@@ -59,10 +59,10 @@ public class HtmlNet implements Net {
         @Override
         public void onReadyStateChange(XMLHttpRequest xhr) {
           if (xhr.getReadyState() == XMLHttpRequest.DONE) {
-            if (xhr.getStatus() >= 400) {
-              callback.onFailure(new RuntimeException("Bad HTTP status code: " + xhr.getStatus()));
-            } else {
+            if (xhr.getStatus() == 200) {
               callback.onSuccess(xhr.getResponseText());
+            } else {
+              callback.onFailure(new HttpException(xhr.getStatus(), xhr.getStatusText()));
             }
           }
         }
