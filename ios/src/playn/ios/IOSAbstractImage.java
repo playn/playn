@@ -65,21 +65,15 @@ public abstract class IOSAbstractImage extends ImageGL implements Image, IOSCanv
   @Override
   public void getRgb(int startX, int startY, int width, int height, int[] rgbArray, int offset,
                      int scanSize) {
-    CGImage image = cgImage();
     int bytesPerRow = 4 * width;
     byte[] regionBytes = new byte[bytesPerRow * height];
     CGBitmapContext context = new CGBitmapContext(regionBytes, width, height, 8, bytesPerRow,
       // PremultipliedFirst for ARGB, same as BufferedImage in Java.
       CGColorSpace.CreateDeviceRGB(), CGImageAlphaInfo.wrap(CGImageAlphaInfo.PremultipliedFirst));
-    context.SetBlendMode(CGBlendMode.wrap(CGBlendMode.Copy));
-    // UIImage and CGImage use coordinate spaces with relatively inverted Y. Less 1 pixel to adjust
-    // the proper row to the top of the region
-    int invertedY = image.get_Height() - startY - height + 1;
-    context.TranslateCTM(-startX, -invertedY);
-    context.DrawImage(new RectangleF(0, 0, image.get_Width(), image.get_Height()), image);
+    draw(context, 0, 0, width, height, startX, startY, width, height);
 
     int x = 0;
-    int y = 0;
+    int y = height - 1; // inverted Y
     for (int px = 0; px < regionBytes.length; px += 4) {
       int a = (int)regionBytes[px    ] & 0xFF;
       int r = (int)regionBytes[px + 1] & 0xFF;
@@ -90,7 +84,7 @@ public abstract class IOSAbstractImage extends ImageGL implements Image, IOSCanv
       x++;
       if (x == width) {
         x = 0;
-        y++;
+        y--;
       }
     }
   }
