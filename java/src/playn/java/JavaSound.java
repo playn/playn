@@ -131,6 +131,13 @@ class JavaSound implements Sound {
     }
   }
 
+  protected void finalize() {
+    if (clip != null) {
+      clip.close();
+      clip = null;
+    }
+  }
+
   protected static float toVolume (float gain) {
     return FloatMath.pow(10, gain/20);
   }
