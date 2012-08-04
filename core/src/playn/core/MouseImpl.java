@@ -119,40 +119,21 @@ public abstract class MouseImpl implements Mouse {
       AbstractLayer lastHoverLayer = hoverLayer;
       hoverLayer = (AbstractLayer)root.hitTest(p);
 
-      // handle onMouseDrag if we have an active layer
+      // handle onMouseDrag if we have an active layer, onMouseMove otherwise
       if (activeLayer != null) {
-        final MotionEvent.Impl localEvent = event.localize(activeLayer);
-        localEvent.setPreventDefault(preventDefault);
-        activeLayer.interact(LayerListener.class, new AbstractLayer.Interaction<LayerListener>() {
-          public void interact(LayerListener l) {
-            l.onMouseDrag(localEvent);
-          }
-        });
-        preventDefault = localEvent.getPreventDefault();
+        preventDefault = dispatchMotion(event, preventDefault, activeLayer, ON_MOUSE_DRAG);
+      } else if (hoverLayer != null) {
+        preventDefault = dispatchMotion(event, preventDefault, hoverLayer, ON_MOUSE_MOVE);
       }
 
       // handle onMouseOut
       if (lastHoverLayer != hoverLayer && lastHoverLayer != null) {
-        final MotionEvent.Impl localEvent = event.localize(lastHoverLayer);
-        localEvent.setPreventDefault(preventDefault);
-        lastHoverLayer.interact(LayerListener.class, new AbstractLayer.Interaction<LayerListener>() {
-          public void interact(LayerListener l) {
-            l.onMouseOut(localEvent);
-          }
-        });
-        preventDefault = localEvent.getPreventDefault();
+        preventDefault = dispatchMotion(event, preventDefault, lastHoverLayer, ON_MOUSE_OUT);
       }
 
       // handle onMouseOver
       if (hoverLayer != lastHoverLayer && hoverLayer != null) {
-        final MotionEvent.Impl localEvent = event.localize(hoverLayer);
-        localEvent.setPreventDefault(preventDefault);
-        hoverLayer.interact(LayerListener.class, new AbstractLayer.Interaction<LayerListener>() {
-          public void interact(LayerListener l) {
-            l.onMouseOver(localEvent);
-          }
-        });
-        preventDefault = localEvent.getPreventDefault();
+        preventDefault = dispatchMotion(event, preventDefault, hoverLayer, ON_MOUSE_OVER);
       }
     }
 
@@ -202,4 +183,40 @@ public abstract class MouseImpl implements Mouse {
       });
     return event.getPreventDefault();
   }
+
+  protected boolean dispatchMotion(MotionEvent.Impl event, boolean preventDefault,
+                                   AbstractLayer layer, final Dispatcher dispatcher) {
+    final MotionEvent.Impl localEvent = event.localize(layer);
+    localEvent.setPreventDefault(preventDefault);
+    layer.interact(LayerListener.class, new AbstractLayer.Interaction<LayerListener>() {
+      public void interact(LayerListener l) {
+        dispatcher.dispatch(l, localEvent);
+      }
+    });
+    return localEvent.getPreventDefault();
+  }
+
+  protected interface Dispatcher {
+    void dispatch(LayerListener l, MotionEvent.Impl event);
+  }
+  protected static final Dispatcher ON_MOUSE_DRAG = new Dispatcher() {
+    public void dispatch(LayerListener l, MotionEvent.Impl event) {
+      l.onMouseDrag(event);
+    }
+  };
+  protected static final Dispatcher ON_MOUSE_MOVE = new Dispatcher() {
+    public void dispatch(LayerListener l, MotionEvent.Impl event) {
+      l.onMouseMove(event);
+    }
+  };
+  protected static final Dispatcher ON_MOUSE_OVER = new Dispatcher() {
+    public void dispatch(LayerListener l, MotionEvent.Impl event) {
+      l.onMouseOver(event);
+    }
+  };
+  protected static final Dispatcher ON_MOUSE_OUT = new Dispatcher() {
+    public void dispatch(LayerListener l, MotionEvent.Impl event) {
+      l.onMouseOut(event);
+    }
+  };
 }

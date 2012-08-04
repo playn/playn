@@ -211,18 +211,28 @@ public interface Mouse {
     void onMouseUp(ButtonEvent event);
 
     /**
-     * Called when the mouse is dragged.
+     * Called when the mouse button is pressed on a layer and is subsequently moved (dragged). This
+     * event is dispatched to the layer that was "hit" when the mouse button was first pressed.
      *
      * @param event provides mouse position and other metadata.
      */
     void onMouseDrag(MotionEvent event);
 
     /**
+     * Called when the mouse is moved and is not currently engaged in a drag (see {@link
+     * #onMouseDrag}. The event is dispatched to the layer which is intersected by the mouse
+     * coordinates.
+     *
+     * @param event provides mouse position and other metadata.
+     */
+    void onMouseMove(MotionEvent event);
+
+    /**
      * Called when the mouse enters a {@link Layer}.
      *
-     * Note: MotionEvent is first dispatched to {@link #onMouseDrag}, then to {@link #onMouseOut}
-     *       and finally to {@link #onMouseOver}. These three events share a single preventDefault
-     *       state.
+     * Note: MotionEvent is first dispatched to {@link #onMouseDrag} or {@link #onMouseMove}, then
+     *       to {@link #onMouseOut} and finally to {@link #onMouseOver}. These three events share a
+     *       single preventDefault state.
      *
      * @param event provides mouse position and other metadata.
      */
@@ -231,8 +241,9 @@ public interface Mouse {
     /**
      * Called when the mouse leaves a {@link Layer}.
      *
-     * Note: MotionEvent is first dispatched to {@link #onMouseDrag}, then to {@link #onMouseOut}
-     * and finally to {@link #onMouseOver}. These three events share a single preventDefault state.
+     * Note: MotionEvent is first dispatched to {@link #onMouseDrag} or {@link #onMouseMove}, then
+     * to {@link #onMouseOut} and finally to {@link #onMouseOver}. These three events share a
+     * single preventDefault state.
      *
      * @param event provides mouse position and other metadata.
      */
@@ -271,6 +282,8 @@ public interface Mouse {
     public void onMouseUp(ButtonEvent event) { /* NOOP! */ }
     @Override
     public void onMouseDrag(MotionEvent event) { /* NOOP! */ }
+    @Override
+    public void onMouseMove(MotionEvent event) { /* NOOP! */ }
     @Override
     public void onMouseOver(MotionEvent event) { /* NOOP! */ }
     @Override
