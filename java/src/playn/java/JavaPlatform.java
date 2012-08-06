@@ -46,6 +46,10 @@ public class JavaPlatform extends AbstractPlatform {
 
     /** Configures platform in headless mode; useful for unit testing. */
     public boolean headless = false;
+
+    /** Dictates the name of the temporary file used by {@link JavaStorage}. Configure this if you
+     * want to run multiple sessions without overwriting one another's storage. */
+    public String storageFileName = "playn";
   }
 
   /**
@@ -116,7 +120,7 @@ public class JavaPlatform extends AbstractPlatform {
   private final JavaAudio audio = new JavaAudio();
   private final JavaNet net = new JavaNet(this);
   private final JavaRegularExpression regex = new JavaRegularExpression();
-  private final JavaStorage storage = new JavaStorage(this);
+  private final JavaStorage storage;
   private final JsonImpl json = new JsonImpl();
   private final JavaKeyboard keyboard = new JavaKeyboard();
   private final JavaPointer pointer = new JavaPointer();
@@ -132,6 +136,7 @@ public class JavaPlatform extends AbstractPlatform {
   public JavaPlatform(Config config) {
     super(new JavaLog());
     graphics = new JavaGraphics(this, config);
+    storage = new JavaStorage(this, config);
   }
 
   /**

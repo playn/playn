@@ -29,15 +29,15 @@ import playn.core.Storage;
  */
 class JavaStorage implements Storage {
 
-  private static final File tempFile =
-    new File(new File(System.getProperty("java.io.tmpdir")), "playn.tmp");
-
   private final JavaPlatform platform;
+  private final File tempFile;
   private final Properties properties;
   private boolean isPersisted = false; // false by default
 
-  JavaStorage(JavaPlatform platform) {
+  JavaStorage(JavaPlatform platform, JavaPlatform.Config config) {
     this.platform = platform;
+    this.tempFile = new File(new File(System.getProperty("java.io.tmpdir")),
+                             config.storageFileName + ".tmp");
     this.properties = maybeRetrieveProperties();
   }
 
