@@ -39,6 +39,56 @@ import playn.core.json.JsonImpl;
 
 public class JavaPlatform extends AbstractPlatform {
 
+  /** Defines JavaPlatform configurable parameters. */
+  public static class Config {
+    /** The graphics scale factor. Allows simulating HiDPI mode during testing. */
+    public float scaleFactor = getDefaultScaleFactor(); // default scale factor is 1
+
+    /** Configures platform in headless mode; useful for unit testing. */
+    public boolean headless = false;
+  }
+
+  /**
+   * Registers the Java platform with a default configuration.
+   */
+  public static JavaPlatform register() {
+    return register(new Config());
+  }
+
+  /**
+   * Registers the Java platform with the specified configuration.
+   */
+  public static JavaPlatform register(Config config) {
+    // guard against multiple-registration (only in headless mode because this can happen when
+    // running tests in Maven; in non-headless mode, we want to fail rather than silently ignore
+    // erroneous repeated registration)
+    if (config.headless && testInstance != null) {
+      return testInstance;
+    }
+    JavaPlatform instance = new JavaPlatform(config);
+    if (config.headless) {
+      testInstance = instance;
+    }
+    PlayN.setPlatform(instance);
+    return instance;
+  }
+
+  /** @deprecated Use {@link JavaPlatform#register(Config)}. */
+  @Deprecated
+  public static JavaPlatform register(float scaleFactor) {
+    Config config = new Config();
+    config.scaleFactor = scaleFactor;
+    return register(config);
+  }
+
+  /** @deprecated Use {@link JavaPlatform#register(Config)}. */
+  @Deprecated
+  public static JavaPlatform registerHeadless() {
+    Config config = new Config();
+    config.headless = true;
+    return register(config);
+  }
+
   // Maximum delta time to consider between update() calls (in milliseconds). If the delta between
   // two update()s is greater than MAX_DELTA, we clamp to MAX_DELTA.
   private static final float MAX_DELTA = 100;
@@ -52,31 +102,14 @@ public class JavaPlatform extends AbstractPlatform {
 
   private static JavaPlatform testInstance;
 
-  public static JavaPlatform register() {
-    float scaleFactor = 1;
-    String sfprop = System.getProperty("playn.scaleFactor", String.valueOf(scaleFactor));
+  private static float getDefaultScaleFactor() {
+    String sfprop = System.getProperty("playn.scaleFactor", "1");
     try {
-      return register(Float.parseFloat(sfprop));
+      return Float.parseFloat(sfprop);
     } catch (Exception e) {
       System.err.println("Invalid scaleFactor supplied '" + sfprop + "': " + e);
+      return 1;
     }
-    return register(scaleFactor);
-  }
-
-  public static JavaPlatform register(float scaleFactor) {
-    JavaPlatform instance = new JavaPlatform(scaleFactor, false);
-    PlayN.setPlatform(instance);
-    return instance;
-  }
-
-  public static JavaPlatform registerHeadless() {
-    // Guard against multiple-registration. This can happen when running tests in maven.
-    if (testInstance != null) {
-      return testInstance;
-    }
-    testInstance = new JavaPlatform(1, true);
-    PlayN.setPlatform(testInstance);
-    return testInstance;
   }
 
   private final JavaAnalytics analytics = new JavaAnalytics();
@@ -96,9 +129,9 @@ public class JavaPlatform extends AbstractPlatform {
   private double lastUpdateTime;
   private double lastPaintTime;
 
-  public JavaPlatform(float scaleFactor, boolean headless) {
+  public JavaPlatform(Config config) {
     super(new JavaLog());
-    graphics = new JavaGraphics(this, scaleFactor, headless);
+    graphics = new JavaGraphics(this, config);
   }
 
   /**

@@ -23,7 +23,11 @@ import playn.tests.core.TestsGame;
 public class TestsGameJava {
 
   public static void main(String[] args) {
-    JavaPlatform platform = JavaPlatform.register(args.length == 0 ? 1 : Float.parseFloat(args[0]));
+    JavaPlatform.Config config = new JavaPlatform.Config();
+    if (args.length > 0) {
+      config.scaleFactor = Float.parseFloat(args[0]);
+    }
+    JavaPlatform platform = JavaPlatform.register(config);
     platform.setTitle("Tests");
     platform.assets().setPathPrefix("playn/tests/resources");
     PlayN.run(new TestsGame());

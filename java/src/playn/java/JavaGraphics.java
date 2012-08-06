@@ -42,23 +42,22 @@ import static playn.core.PlayN.*;
 
 public class JavaGraphics extends GraphicsGL {
 
-  private final int DEFAULT_WIDTH = 640;
-  private final int DEFAULT_HEIGHT = 480;
+  private final static int DEF_WIDTH = 640, DEF_HEIGHT = 480;
 
   private final GroupLayerGL rootLayer;
   private final GL20Context ctx;
 
-  public JavaGraphics(JavaPlatform platform, float scaleFactor, boolean headless) {
+  public JavaGraphics(JavaPlatform platform, JavaPlatform.Config config) {
     // if we're being run in headless mode, create a stub GL context which does not trigger the
     // initialization of LWJGL; this allows tests to run against non-graphics services without
     // needing to configure LWJGL native libraries
-    if (headless)
-      this.ctx = new GL20Context(platform, null, 1, DEFAULT_WIDTH, DEFAULT_HEIGHT, false) {
+    if (config.headless)
+      this.ctx = new GL20Context(platform, null, config.scaleFactor, DEF_WIDTH, DEF_HEIGHT, false) {
         @Override
         protected void viewWasResized () {}
       };
     else
-      this.ctx = new JavaGLContext(platform, scaleFactor, DEFAULT_WIDTH, DEFAULT_HEIGHT);
+      this.ctx = new JavaGLContext(platform, config.scaleFactor, DEF_WIDTH, DEF_HEIGHT);
     this.rootLayer = new GroupLayerGL(ctx);
   }
 
