@@ -73,7 +73,7 @@ public class IOSNet extends NetImpl {
         try {
           HttpWebResponse rsp = (HttpWebResponse) req.EndGetResponse(result);
           HttpStatusCode code = rsp.get_StatusCode();
-          if (code == HttpStatusCode.wrap(HttpStatusCode.OK)) {
+          if (code.Value == HttpStatusCode.OK) {
             reader = new StreamReader(rsp.GetResponseStream());
             notifySuccess(callback, reader.ReadToEnd());
           } else {
