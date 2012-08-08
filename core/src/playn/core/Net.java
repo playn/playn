@@ -66,6 +66,12 @@ public interface Net {
       super(message);
       this.errorCode = errorCode;
     }
+
+    @Override
+    public String toString() {
+      String msg = getLocalizedMessage();
+      return "HTTP " + errorCode + (msg == null ? "" : (": " + msg));
+    }
   }
 
   /**
