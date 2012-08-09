@@ -180,7 +180,7 @@ public class IOSCanvas implements Canvas {
 
   @Override
   public Canvas drawPoint(float x, float y) {
-    return drawLine(x, y, x, y);
+    return strokeRect(x, y, 1, 1);
   }
 
   @Override
