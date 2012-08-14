@@ -70,7 +70,7 @@ public class IOSGraphics extends GraphicsGL {
     this.screenWidth = screenWidth;
     this.screenHeight = screenHeight;
     this.touchScale = touchScale;
-    ctx = new IOSGLContext(platform, viewScale, screenWidth, screenHeight);
+    ctx = new IOSGLContext(platform, new IOSGL20(), viewScale, screenWidth, screenHeight);
     rootLayer = new GroupLayerGL(ctx);
   }
 
@@ -132,7 +132,7 @@ public class IOSGraphics extends GraphicsGL {
 
   @Override
   public GL20 gl20() {
-    throw new UnsupportedOperationException();
+    return ctx.gl;
   }
 
   @Override

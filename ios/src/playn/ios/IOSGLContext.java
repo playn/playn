@@ -32,6 +32,7 @@ import pythagoras.f.FloatMath;
 import playn.core.InternalTransform;
 import playn.core.PlayN;
 import playn.core.StockInternalTransform;
+import playn.core.gl.GL20;
 import playn.core.gl.GLBuffer;
 import playn.core.gl.GLContext;
 import playn.core.gl.GLProgram;
@@ -44,14 +45,18 @@ public class IOSGLContext extends GLContext {
 
   public static final boolean CHECK_ERRORS = false;
 
+  public final GL20 gl;
+
   private final InternalTransform rootTransform = new StockInternalTransform();
   private int orient;
   private int minFilter = All.Linear, magFilter = All.Linear;
   private int defaultFrameBuffer = -1; // configured in init()
   private GLShader quadShader, trisShader;
 
-  public IOSGLContext(IOSPlatform platform, float scaleFactor, int screenWidth, int screenHeight) {
+  public IOSGLContext(IOSPlatform platform, IOSGL20 gl,
+                      float scaleFactor, int screenWidth, int screenHeight) {
     super(platform, scaleFactor);
+    this.gl = gl;
     rootTransform.uniformScale(scaleFactor);
     setSize(screenWidth, screenHeight);
   }
