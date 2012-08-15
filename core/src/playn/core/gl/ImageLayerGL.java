@@ -107,7 +107,7 @@ public class ImageLayerGL extends LayerGL implements ImageLayer {
 
   @Override
   public void paint(InternalTransform curTransform, float curAlpha, GLShader curShader) {
-    if (!visible()) return;
+    if (!visible() || img == null) return;
 
     img.draw((shader == null) ? curShader : shader, localTransform(curTransform),
              0, 0, width(), height(), repeatX, repeatY, curAlpha * alpha);
