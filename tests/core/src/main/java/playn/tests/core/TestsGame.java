@@ -23,6 +23,18 @@ import static playn.core.PlayN.*;
 
 public class TestsGame implements Game {
 
+  public static Image makeButtonImage(String label) {
+    TextLayout layout = graphics().layoutText(label, BUTTON_FMT);
+    CanvasImage image = graphics().createImage(layout.width()+10, layout.height()+10);
+    image.canvas().setFillColor(0xFFCCCCCC);
+    image.canvas().fillRect(0, 0, image.width(), image.height());
+    image.canvas().setFillColor(0xFF000000);
+    image.canvas().fillText(layout, 5, 5);
+    image.canvas().setStrokeColor(0xFF000000);
+    image.canvas().strokeRect(0, 0, image.width()-1, image.height()-1);
+    return image;
+  }
+
   private Test[] tests = new Test[] {
     new CanvasTest(),
     new SurfaceTest(),
@@ -53,6 +65,8 @@ public class TestsGame implements Game {
     mouse().setListener(new Mouse.Adapter() {
       @Override
       public void onMouseDown(Mouse.ButtonEvent event) {
+        if (currentTest != null && currentTest.usesPositionalInputs())
+          return;
         if (event.button() == Mouse.BUTTON_RIGHT)
           displayMenuLater();
       }
@@ -60,6 +74,8 @@ public class TestsGame implements Game {
     touch().setListener(new Touch.Adapter() {
       @Override
       public void onTouchStart(Touch.Event[] touches) {
+        if (currentTest != null && currentTest.usesPositionalInputs())
+          return;
         // Android and iOS handle touch events rather differently, so we need to do this finagling
         // to determine whether there is an active two or three finger touch
         for (Touch.Event event : touches)
@@ -69,6 +85,8 @@ public class TestsGame implements Game {
       }
       @Override
       public void onTouchEnd(Touch.Event[] touches) {
+        if (currentTest != null && currentTest.usesPositionalInputs())
+          return;
         for (Touch.Event event : touches)
           _active.remove(event.id());
       }
@@ -116,15 +134,7 @@ public class TestsGame implements Game {
   }
 
   ImageLayer createButton (final Test test) {
-    TextLayout layout = graphics().layoutText(test.getName(), BUTTON_FMT);
-    CanvasImage image = graphics().createImage(layout.width()+10, layout.height()+10);
-    image.canvas().setFillColor(0xFFCCCCCC);
-    image.canvas().fillRect(0, 0, image.width(), image.height());
-    image.canvas().setFillColor(0xFF000000);
-    image.canvas().fillText(layout, 5, 5);
-    image.canvas().setStrokeColor(0xFF000000);
-    image.canvas().strokeRect(0, 0, image.width()-1, image.height()-1);
-    ImageLayer layer = graphics().createImageLayer(image);
+    ImageLayer layer = graphics().createImageLayer(makeButtonImage(test.getName()));
     layer.addListener(new Pointer.Adapter() {
       public void onPointerStart(Pointer.Event event) {
         startTest(test);

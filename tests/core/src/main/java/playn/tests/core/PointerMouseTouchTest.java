@@ -20,10 +20,11 @@ import java.util.ArrayList;
 import pythagoras.f.Vector;
 
 import playn.core.CanvasImage;
+import playn.core.Events;
 import playn.core.Font;
-import playn.core.Image;
 import playn.core.ImageLayer;
 import playn.core.Mouse;
+import playn.core.Mouse.WheelEvent;
 import playn.core.Pointer;
 import playn.core.TextFormat;
 import playn.core.TextLayout;
@@ -40,6 +41,8 @@ class PointerMouseTouchTest extends Test {
 
   private TextLogger logger;
 
+  private Toggle preventDefault;
+
   @Override
   public String getName() {
     return "PointerMouseTouchTest";
@@ -52,148 +55,141 @@ class PointerMouseTouchTest extends Test {
 
   @Override
   public void init() {
-    Image cat = assets().getImage("images/cat.png");
-    Image horns = assets().getImage("images/horns.png");
+    float y = 20;
 
-    createLabel("No Prevent Default", 75, 20);
-    createLabel("Yes Prevent Default", 250, 20);
-    createLabel("Event Log", 475, 20);
-    createLabel("Mouse", 20, 100);
-    createLabel("Pointer", 20, 350);
+    preventDefault = new Toggle("Prevent Default");
+    graphics().rootLayer().addAt(preventDefault.layer, 20, y);
+    y += preventDefault.layer.image().height() + 5;
 
+    final ImageLayer mouse = createLabel("Mouse", 0xff000000, 0xffff8080, 20, y += 25);
+    y += mouse.image().height() + 5;
+
+    final ImageLayer pointer = createLabel("Pointer", 0xff000000, 0xff80ff80, 20, y += 50);
+    y += pointer.image().height() + 5;
+
+    createLabel("Event Log", 0, 325, 20);
 
     // setup the logger and its layer
-    CanvasImage logImage = graphics().createImage(300, 400);
+    CanvasImage logImage = graphics().createImage(375, 400);
     ImageLayer logLayer = graphics().createImageLayer(logImage);
-    logLayer.setTranslation(400, 40);
+    logLayer.setTranslation(325, 40);
     graphics().rootLayer().add(logLayer);
     logger = new TextLogger(logImage, logFormat);
 
 
-    // add mouse layer listener without prevent default
-    final ImageLayer mouse = graphics().createImageLayer(cat);
-    mouse.setTranslation(100, 0);
-    graphics().rootLayer().add(mouse);
-    mouse.addListener(new Mouse.LayerAdapter() {
+    // add mouse layer listener
+    mouse.addListener(new Mouse.LayerListener() {
       @Override
       public void onMouseDown(ButtonEvent event) {
         _lstart = mouse.transform().translation();
         _pstart = new Vector(event.x(), event.y());
         mouse.setAlpha(0.5f);
-        logger.log("mouse down (" + event.x() + "," + event.y() + ") button(" + event.button() + ")");
+        modify(event);
+        logger.log(describe(event, "mouse down"));
       }
       @Override
       public void onMouseDrag(MotionEvent event) {
         Vector delta = new Vector(event.x(), event.y()).subtractLocal(_pstart);
         mouse.setTranslation(_lstart.x + delta.x, _lstart.y + delta.y);
-        logger.log("mouse move (" + event.x() + "," + event.y() + ")");
+        modify(event);
+        logger.log(describe(event, "mouse drag"));
       }
       @Override
       public void onMouseUp(ButtonEvent event) {
         mouse.setAlpha(1.0f);
-        logger.log("mouse up (" + event.x() + "," + event.y() + ")");
+        modify(event);
+        logger.log(describe(event, "mouse up"));
       }
+      @Override public void onMouseMove (MotionEvent event) {
+        modify(event);
+        logger.log(describe(event, "mouse move"));
+      }
+      @Override public void onMouseOver (MotionEvent event) {
+        modify(event);
+        logger.log(describe(event, "mouse over"));
+      }
+      @Override public void onMouseOut (MotionEvent event) {
+        modify(event);
+        logger.log(describe(event, "mouse out"));
+      }
+      @Override public void onMouseWheelScroll (WheelEvent event) {
+        // TODO: mouse wheel
+      }
+
       protected Vector _lstart, _pstart;
     });
 
 
-    // add mouse layer listener with prevent default
-    final ImageLayer mousePD = graphics().createImageLayer(cat);
-    mousePD.setTranslation(275, 0);
-    graphics().rootLayer().add(mousePD);
-    mousePD.addListener(new Mouse.LayerAdapter() {
-      @Override
-      public void onMouseDown(ButtonEvent event) {
-        _lstart = mousePD.transform().translation();
-        _pstart = new Vector(event.x(), event.y());
-        mousePD.setAlpha(0.5f);
-        event.flags().setPreventDefault(true);
-        logger.log("pd mouse down (" + event.x() + "," + event.y() + ") button(" + event.button() + ")");
-      }
-      @Override
-      public void onMouseDrag(MotionEvent event) {
-        Vector delta = new Vector(event.x(), event.y()).subtractLocal(_pstart);
-        mousePD.setTranslation(_lstart.x + delta.x, _lstart.y + delta.y);
-        event.flags().setPreventDefault(true);
-        logger.log("pd mouse drag (" + event.x() + "," + event.y() + ")");
-      }
-      @Override
-      public void onMouseUp(ButtonEvent event) {
-        mousePD.setAlpha(1.0f);
-        event.flags().setPreventDefault(true);
-        logger.log("pd mouse up (" + event.x() + "," + event.y() + ")");
-      }
-      protected Vector _lstart, _pstart;
-    });
-
-
-    // add pointer layer listener without prevent default
-    final ImageLayer pointer = graphics().createImageLayer(horns);
-    pointer.setTranslation(100, 250);
-    graphics().rootLayer().add(pointer);
-    pointer.addListener(new Pointer.Adapter() {
+    // add pointer layer listener
+    pointer.addListener(new Pointer.Listener() {
       @Override
       public void onPointerStart(Event event) {
         _lstart = pointer.transform().translation();
         _pstart = new Vector(event.x(), event.y());
         pointer.setAlpha(0.5f);
-        logger.log("pointer start (" + event.x() + "," + event.y() + ") touch(" + (event.isTouch() ? "yes" : "no") + ")");
+        modify(event);
+        logger.log(describe(event, "pointer start"));
       }
       @Override
       public void onPointerDrag(Event event) {
         Vector delta = new Vector(event.x(), event.y()).subtractLocal(_pstart);
         pointer.setTranslation(_lstart.x + delta.x, _lstart.y + delta.y);
-        logger.log("pointer drag (" + event.x() + "," + event.y() + ")");
+        modify(event);
+        logger.log(describe(event, "pointer drag"));
       }
       @Override
       public void onPointerEnd(Event event) {
         pointer.setAlpha(1.0f);
-        logger.log("pointer end (" + event.x() + "," + event.y() + ")");
-      }
-      protected Vector _lstart, _pstart;
-    });
-
-
-    // add pointer layer listener with prevent default
-    final ImageLayer pointerPD = graphics().createImageLayer(horns);
-    pointerPD.setTranslation(275, 250);
-    graphics().rootLayer().add(pointerPD);
-    pointerPD.addListener(new Pointer.Adapter() {
-      @Override
-      public void onPointerStart(Event event) {
-        _lstart = pointerPD.transform().translation();
-        _pstart = new Vector(event.x(), event.y());
-        pointerPD.setAlpha(0.5f);
-        event.flags().setPreventDefault(true);
-        logger.log("pd pointer start (" + event.x() + "," + event.y() + ") touch(" + (event.isTouch() ? "yes" : "no") + ")");
-      }
-      @Override
-      public void onPointerDrag(Event event) {
-        Vector delta = new Vector(event.x(), event.y()).subtractLocal(_pstart);
-        pointerPD.setTranslation(_lstart.x + delta.x, _lstart.y + delta.y);
-        event.flags().setPreventDefault(true);
-        logger.log("pd pointer drag (" + event.x() + "," + event.y() + ")");
-      }
-      @Override
-      public void onPointerEnd(Event event) {
-        pointerPD.setAlpha(1.0f);
-        event.flags().setPreventDefault(true);
-        logger.log("pd pointer end (" + event.x() + "," + event.y() + ")");
+        modify(event);
+        logger.log(describe(event, "pointer end"));
       }
       protected Vector _lstart, _pstart;
     });
   }
 
-  protected void createLabel(String text, float x, float y) {
+  @Override public boolean usesPositionalInputs () {
+    return true;
+  }
+
+  protected ImageLayer createLabel(String text, int bg, float x, float y) {
+    return createLabel(text, 0xFF6699CC, bg, x, y);
+  }
+
+  protected ImageLayer createLabel(String text, int fg, int bg, float x, float y) {
     TextLayout layout = graphics().layoutText(text, baseFormat);
     float twidth = layout.width();
     float theight = layout.height();
     CanvasImage image = graphics().createImage(twidth, theight);
-    image.canvas().setFillColor(0xFF6699CC);
+    if (bg != 0) {
+      image.canvas().setFillColor(bg);
+      image.canvas().fillRect(0, 0, twidth, theight);
+    }
+    image.canvas().setFillColor(fg);
     image.canvas().fillText(layout, 0, 0);
     ImageLayer imageLayer = graphics().createImageLayer(image);
     imageLayer.setTranslation(x, y);
     graphics().rootLayer().add(imageLayer);
+    return imageLayer;
+  }
+
+  protected void modify(Events.Position event) {
+    event.flags().setPreventDefault(preventDefault.value);
+  }
+
+  protected String describe(Events.Position event, String handler) {
+    String pd = event.flags().getPreventDefault() ? "pd " : "";
+    String msg = pd + handler + " (" + event.x() + "," + event.y() + ")";
+    if (event instanceof Pointer.Event) {
+      msg += " isTouch(" + ((Pointer.Event)event).isTouch() + ")";
+    }
+    if (event instanceof Mouse.ButtonEvent) {
+      msg += " button(" + ((Mouse.ButtonEvent)event).button() + ")";
+    }
+    if (event instanceof Mouse.MotionEvent) {
+      Mouse.MotionEvent me = (Mouse.MotionEvent)event;
+      msg += " d(" + me.dx() + "," + me.dy() + ")";
+    }
+    return msg;
   }
 
   protected class TextLogger {
@@ -221,6 +217,27 @@ class PointerMouseTouchTest extends Test {
       image.canvas().clear();
       image.canvas().setFillColor(0xFF6699CC);
       image.canvas().fillText(layout, 0, 0);
+    }
+  }
+
+  protected class Toggle {
+    final ImageLayer layer = graphics().createImageLayer();
+    final String prefix;
+    boolean value;
+
+    Toggle(String name) {
+      this.prefix = name + ": ";
+      set(false);
+      layer.addListener(new Pointer.Adapter() {
+        @Override
+        public void onPointerStart(Event event) {
+          set(!value);
+        }
+      });
+    }
+    void set(boolean value) {
+      this.value = value;
+      layer.setImage(TestsGame.makeButtonImage(prefix + (value ? "On" : "Off")));
     }
   }
 }

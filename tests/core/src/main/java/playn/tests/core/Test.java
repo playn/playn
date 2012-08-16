@@ -47,6 +47,10 @@ public abstract class Test implements Game {
     return 25;
   }
 
+  public boolean usesPositionalInputs () {
+    return false;
+  }
+
   protected float addTest(float lx, float ly, Layer.HasSize layer, String descrip) {
     return addTest(lx, ly, layer, descrip, layer.width());
   }
