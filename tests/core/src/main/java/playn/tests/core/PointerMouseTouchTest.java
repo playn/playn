@@ -113,7 +113,8 @@ class PointerMouseTouchTest extends Test {
         logger.log(describe(event, "mouse out"));
       }
       @Override public void onMouseWheelScroll (WheelEvent event) {
-        // TODO: mouse wheel
+        modify(event);
+        logger.log(describe(event, "mouse wheel"));
       }
 
       protected Vector _lstart, _pstart;
