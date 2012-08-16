@@ -38,8 +38,9 @@ public class IOSGameView extends iPhoneOSGameView {
 
   private static final float MAX_DELTA = 100;
 
-  private DateTime lastUpdate = DateTime.get_Now();
   private final IOSPlatform platform;
+  private DateTime lastUpdate = DateTime.get_Now();
+  private boolean paused;
 
   public IOSGameView(IOSPlatform platform, RectangleF bounds, float scale) {
     super(bounds);
@@ -62,6 +63,17 @@ public class IOSGameView extends iPhoneOSGameView {
           IOSGameView.this.platform.onOrientationChange(
             UIDevice.get_CurrentDevice().get_Orientation());
         }}));
+  }
+
+  // called when we're put into the background; normally we'll stop executing shortly after this,
+  // but if the game requests additional time in the background, we need to stop rendering while
+  // we're in the background
+  void onPause() {
+    paused = true;
+  }
+
+  void onResume() {
+    paused = false;
   }
 
   @Override
@@ -111,9 +123,11 @@ public class IOSGameView extends iPhoneOSGameView {
   protected void OnRenderFrame(FrameEventArgs e) {
     super.OnRenderFrame(e);
 
-    MakeCurrent();
-    platform.paint();
-    SwapBuffers();
+    if (!paused) {
+      MakeCurrent();
+      platform.paint();
+      SwapBuffers();
+    }
   }
 
   @Override
