@@ -129,18 +129,18 @@ public interface Mouse {
   }
 
   /** An event dispatched when the mouse wheel is scrolled. */
-  interface WheelEvent extends Events.Input {
+  interface WheelEvent extends Events.Position {
     /**
      * The velocity of the scroll wheel. Negative velocity corresponds to scrolling north/up. Each
      * scroll 'click' is 1 velocity.
      */
     float velocity();
 
-    class Impl extends Events.Input.Impl implements WheelEvent {
+    class Impl extends Events.Position.Impl implements WheelEvent {
       private float velocity;
 
-      public Impl(Events.Flags flags, double time, float velocity) {
-        super(flags, time);
+      public Impl(Events.Flags flags, double time, float x, float y, float velocity) {
+        super(flags, time, x, y);
         this.velocity = velocity;
       }
 

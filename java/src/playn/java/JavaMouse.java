@@ -76,7 +76,7 @@ class JavaMouse extends MouseImpl {
         }
       } else if (Mouse.getEventDWheel() != 0) {
         onMouseWheelScroll(new WheelEvent.Impl(
-          JavaPlatform.NOOP_EVENT_FLAGS, time, -Mouse.getEventDWheel()));
+          JavaPlatform.NOOP_EVENT_FLAGS, time, m.x, m.y, -Mouse.getEventDWheel()));
       } else {
         onMouseMove(new MotionEvent.Impl(JavaPlatform.NOOP_EVENT_FLAGS, time, m.x, m.y, dx, dy));
         pointer.onMouseMove(time, m.x, m.y);

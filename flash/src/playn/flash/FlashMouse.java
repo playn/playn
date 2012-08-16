@@ -22,6 +22,7 @@ import playn.core.Events;
 import playn.core.PlayN;
 import playn.core.MouseImpl;
 
+// TODO: mouse wheel dispatches
 class FlashMouse extends MouseImpl {
 
   FlashMouse() {

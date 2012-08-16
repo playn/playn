@@ -20,6 +20,7 @@ import com.google.gwt.dom.client.NativeEvent;
 import playn.core.Events;
 import playn.core.PlayN;
 import playn.core.MouseImpl;
+import pythagoras.f.Point;
 
 class HtmlMouse extends MouseImpl {
 
@@ -28,6 +29,7 @@ class HtmlMouse extends MouseImpl {
   boolean inDragSequence = false;
   boolean isRequestingMouseLock;
   private final Element rootElement;
+  private final Point lastMousePt = new Point();
 
   HtmlMouse(final Element rootElement) {
     this.rootElement = rootElement;
@@ -74,6 +76,7 @@ class HtmlMouse extends MouseImpl {
         }
         lastX = x;
         lastY = y;
+        lastMousePt.set(x, y);
       }
 
       protected abstract boolean wantDragSequence();
@@ -125,7 +128,8 @@ class HtmlMouse extends MouseImpl {
       @Override
       public void handleEvent(NativeEvent ev) {
         if (onMouseWheelScroll(new WheelEvent.Impl(
-          new Events.Flags.Impl(), PlayN.currentTime(), getMouseWheelVelocity(ev))))
+          new Events.Flags.Impl(), PlayN.currentTime(), lastMousePt.x, lastMousePt.y,
+          getMouseWheelVelocity(ev))))
           ev.preventDefault();
       }
     });
