@@ -25,8 +25,6 @@ import pythagoras.f.Point;
  */
 public class TouchImpl implements Touch {
 
-  private static final int MAX_ACTIVE_LAYERS = 32;
-
   private boolean enabled = true;
   private Listener listener;
   private Map<Integer,AbstractLayer> activeLayers = new HashMap<Integer,AbstractLayer>();
@@ -121,7 +119,7 @@ public class TouchImpl implements Touch {
           }
         });
         event.setPreventDefault(localEvent.getPreventDefault());
-        activeLayers.put(event.id(), null);
+        activeLayers.remove(event.id());
       }
     }
   }
