@@ -104,7 +104,7 @@ public class AndroidKeyboard implements Keyboard {
   boolean onKeyDown(Event event) {
     if (listener != null) {
       listener.onKeyDown(event);
-      return event.getPreventDefault();
+      return event.flags().getPreventDefault();
     }
     return false;
   }
@@ -112,7 +112,7 @@ public class AndroidKeyboard implements Keyboard {
   boolean onKeyTyped(TypedEvent event) {
     if (listener != null) {
       listener.onKeyTyped(event);
-      return event.getPreventDefault();
+      return event.flags().getPreventDefault();
     }
     return false;
   }
@@ -120,7 +120,7 @@ public class AndroidKeyboard implements Keyboard {
   boolean onKeyUp(Event event) {
     if (listener != null) {
       listener.onKeyUp(event);
-      return event.getPreventDefault();
+      return event.flags().getPreventDefault();
     }
     return false;
   }

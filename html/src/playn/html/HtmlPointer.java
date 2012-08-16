@@ -16,6 +16,7 @@ package playn.html;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.dom.client.*;
 
+import playn.core.Events;
 import playn.core.PlayN;
 import playn.core.Pointer;
 import playn.core.PointerImpl;
@@ -108,11 +109,11 @@ class HtmlPointer extends PointerImpl implements Pointer {
   private static Event.Impl eventFromMouse(final Element rootElement, NativeEvent nativeEvent) {
     float x = HtmlInput.getRelativeX(nativeEvent, rootElement);
     float y = HtmlInput.getRelativeY(nativeEvent, rootElement);
-    return new Event.Impl(PlayN.currentTime(), x, y, false);
+    return new Event.Impl(new Events.Flags.Impl(), PlayN.currentTime(), x, y, false);
   }
 
   private static Event.Impl eventFromTouch(final Element rootElement, Touch touch) {
     float x = touch.getRelativeX(rootElement), y = touch.getRelativeY(rootElement);
-    return new Event.Impl(PlayN.currentTime(), x, y, true);
+    return new Event.Impl(new Events.Flags.Impl(), PlayN.currentTime(), x, y, true);
   }
 }

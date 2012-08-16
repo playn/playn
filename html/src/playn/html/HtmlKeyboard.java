@@ -19,6 +19,7 @@ import com.google.gwt.dom.client.NativeEvent;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.user.client.Window;
 
+import playn.core.Events;
 import playn.core.Key;
 import playn.core.Keyboard;
 import playn.core.PlayN;
@@ -35,9 +36,9 @@ class HtmlKeyboard implements Keyboard {
       public void handleEvent(NativeEvent nativeEvent) {
         if (listener != null) {
           Event.Impl event = new Event.Impl(
-            PlayN.currentTime(), keyForCode(nativeEvent.getKeyCode()));
+            new Events.Flags.Impl(), PlayN.currentTime(), keyForCode(nativeEvent.getKeyCode()));
           listener.onKeyDown(event);
-          if (event.getPreventDefault()) {
+          if (event.flags().getPreventDefault()) {
             nativeEvent.preventDefault();
           }
         }
@@ -48,9 +49,9 @@ class HtmlKeyboard implements Keyboard {
       public void handleEvent(NativeEvent nativeEvent) {
         if (listener != null) {
           TypedEvent.Impl event = new TypedEvent.Impl(
-            PlayN.currentTime(), (char)nativeEvent.getCharCode());
+            new Events.Flags.Impl(), PlayN.currentTime(), (char)nativeEvent.getCharCode());
           listener.onKeyTyped(event);
-          if (event.getPreventDefault()) {
+          if (event.flags().getPreventDefault()) {
             nativeEvent.preventDefault();
           }
         }
@@ -62,9 +63,9 @@ class HtmlKeyboard implements Keyboard {
       public void handleEvent(NativeEvent nativeEvent) {
         if (listener != null) {
           Event.Impl event = new Event.Impl(
-            PlayN.currentTime(), keyForCode(nativeEvent.getKeyCode()));
+            new Events.Flags.Impl(), PlayN.currentTime(), keyForCode(nativeEvent.getKeyCode()));
           listener.onKeyUp(event);
-          if (event.getPreventDefault()) {
+          if (event.flags().getPreventDefault()) {
             nativeEvent.preventDefault();
           }
         }

@@ -20,8 +20,11 @@ package playn.core;
  */
 public class Events {
 
-  /** The base for all input events. */
-  public interface Input {
+  /** Defines some information for how event processing may be controlled. One flags instances may
+   * be shared among multiple events.
+   * TODO: better name than flags? ProcessControls is more accurate but too long.
+   */
+  public interface Flags {
     /**
      * Return whether the default action normally taken by the platform will be prevented.
      */
@@ -39,6 +42,31 @@ public class Events {
      */
     void setPreventDefault(boolean preventDefault);
 
+    public static class Impl implements Flags {
+      private boolean preventDefault; // default false
+
+      @Override
+      public boolean getPreventDefault () {
+        return preventDefault;
+      }
+
+      @Override
+      public void setPreventDefault (boolean preventDefault) {
+        this.preventDefault = preventDefault;
+      }
+
+      @Override
+      public String toString() {
+        return preventDefault ? "preventDefault" : "normal";
+      }
+    }
+  }
+
+  /** The base for all input events. */
+  public interface Input {
+    /** The flags that control the processing of this event. */
+    Flags flags();
+
     /**
      * The time at which this event was generated, in milliseconds. This time's magnitude is not
      * portable (i.e. may not be the same across backends), clients must interpret it as only a
@@ -49,26 +77,22 @@ public class Events {
     // TODO(mdb): a mechanism to determine which modifier keys are pressed, if any
 
     abstract class Impl implements Input {
+      private final Flags flags;
       private final double time;
-      private boolean preventDefault; // default false
 
       @Override
       public double time() {
         return time;
       }
 
-      protected Impl(double time) {
+      @Override
+      public Flags flags () {
+        return flags;
+      }
+
+      protected Impl(Flags flags, double time) {
+        this.flags = flags;
         this.time = time;
-      }
-
-      @Override
-      public void setPreventDefault(boolean preventDefault) {
-        this.preventDefault = preventDefault;
-      }
-
-      @Override
-      public boolean getPreventDefault() {
-        return preventDefault;
       }
 
       protected String name() {
@@ -83,7 +107,7 @@ public class Events {
       }
 
       protected void addFields(StringBuilder builder) {
-        builder.append("time=").append(time).append(", preventDefault=").append(preventDefault);
+        builder.append("time=").append(time).append(", flags=").append(flags);
       }
 
     }
@@ -136,12 +160,13 @@ public class Events {
         return localY;
       }
 
-      protected Impl(double time, float x, float y) {
-        this(time, x, y, x, y);
+      protected Impl(Flags flags, double time, float x, float y) {
+        this(flags, time, x, y, x, y);
       }
 
-      protected Impl(double time, float x, float y, float localX, float localY) {
-        super(time);
+      protected Impl(Flags flags, double time, float x, float y,
+                     float localX, float localY) {
+        super(flags, time);
         this.x = x;
         this.y = y;
         this.localX = localX;

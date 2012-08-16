@@ -45,10 +45,9 @@ public abstract class PointerImpl implements Pointer {
     if (!enabled)
       return preventDefault;
 
+    event.flags().setPreventDefault(preventDefault);
     if (listener != null) {
-      event.setPreventDefault(preventDefault);
       listener.onPointerStart(event);
-      preventDefault = event.getPreventDefault();
     }
 
     GroupLayer root = PlayN.graphics().rootLayer();
@@ -60,62 +59,54 @@ public abstract class PointerImpl implements Pointer {
       activeLayer = (AbstractLayer)root.hitTest(p);
       if (activeLayer != null) {
         final Event.Impl localEvent = event.localize(activeLayer);
-        localEvent.setPreventDefault(preventDefault);
         activeLayer.interact(Listener.class, new AbstractLayer.Interaction<Listener>() {
           public void interact(Listener l) {
             l.onPointerStart(localEvent);
           }
         });
-        preventDefault = localEvent.getPreventDefault();
       }
     }
-    return preventDefault;
+    return event.flags().getPreventDefault();
   }
 
   protected boolean onPointerDrag(Event.Impl event, boolean preventDefault) {
     if (!enabled)
       return preventDefault;
 
+    event.flags().setPreventDefault(preventDefault);
     if (listener != null) {
-      event.setPreventDefault(preventDefault);
       listener.onPointerDrag(event);
-      preventDefault = event.getPreventDefault();
     }
 
     if (activeLayer != null) {
       final Event.Impl localEvent = event.localize(activeLayer);
-      localEvent.setPreventDefault(preventDefault);
       activeLayer.interact(Listener.class, new AbstractLayer.Interaction<Listener>() {
         public void interact(Listener l) {
           l.onPointerDrag(localEvent);
         }
       });
-      preventDefault = localEvent.getPreventDefault();
     }
-    return preventDefault;
+    return event.flags().getPreventDefault();
   }
 
   protected boolean onPointerEnd(Event.Impl event, boolean preventDefault) {
     if (!enabled)
       return preventDefault;
 
+    event.flags().setPreventDefault(preventDefault);
     if (listener != null) {
-      event.setPreventDefault(preventDefault);
       listener.onPointerEnd(event);
-      preventDefault = event.getPreventDefault();
     }
 
     if (activeLayer != null) {
       final Event.Impl localEvent = event.localize(activeLayer);
-      localEvent.setPreventDefault(preventDefault);
       activeLayer.interact(Listener.class, new AbstractLayer.Interaction<Listener>() {
         public void interact(Listener l) {
           l.onPointerEnd(localEvent);
         }
       });
-      preventDefault = localEvent.getPreventDefault();
       activeLayer = null;
     }
-    return preventDefault;
+    return event.flags().getPreventDefault();
   }
 }

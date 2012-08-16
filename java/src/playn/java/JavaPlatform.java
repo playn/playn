@@ -23,6 +23,7 @@ import org.lwjgl.opengl.Display;
 import playn.core.AbstractPlatform;
 import playn.core.Analytics;
 import playn.core.Audio;
+import playn.core.Events;
 import playn.core.Game;
 import playn.core.Json;
 import playn.core.Keyboard;
@@ -38,6 +39,12 @@ import playn.core.TouchStub;
 import playn.core.json.JsonImpl;
 
 public class JavaPlatform extends AbstractPlatform {
+
+  /** Ignores all event flags. We don't currently need them for java. */
+  static Events.Flags NOOP_EVENT_FLAGS = new Events.Flags() {
+    @Override public boolean getPreventDefault () {return false;}
+    @Override public void setPreventDefault (boolean preventDefault) { }
+  };
 
   /** Defines JavaPlatform configurable parameters. */
   public static class Config {

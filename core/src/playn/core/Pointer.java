@@ -15,6 +15,7 @@
  */
 package playn.core;
 
+import playn.core.Events.Flags;
 import pythagoras.f.Point;
 
 /**
@@ -32,14 +33,15 @@ public interface Pointer {
     class Impl extends Events.Position.Impl implements Event {
       private boolean isTouch;
 
-      public Impl(double time, float x, float y, boolean isTouch) {
-        this(time, x, y, x, y, isTouch);
+      public Impl(Flags flags, double time, float x, float y, boolean isTouch) {
+        this(flags, time, x, y, x, y, isTouch);
       }
 
-      /** Creates a copy of this event with local x and y in the supplied layer's coord system. */
+      /** Creates a copy of this event with local x and y in the supplied layer's coord system
+       * and flags inherited from this instance. */
       public Event.Impl localize(Layer layer) {
         Point local = Layer.Util.screenToLayer(layer, x(), y());
-        return new Event.Impl(time(), x(), y(), local.x, local.y, isTouch());
+        return new Event.Impl(flags(), time(), x(), y(), local.x, local.y, isTouch());
       }
 
       @Override
@@ -47,8 +49,9 @@ public interface Pointer {
         return isTouch;
       }
 
-      protected Impl(double time, float x, float y, float localX, float localY, boolean isTouch) {
-        super(time, x, y, localX, localY);
+      protected Impl(Flags flags, double time, float x, float y, float localX, float localY,
+                     boolean isTouch) {
+        super(flags, time, x, y, localX, localY);
         this.isTouch = isTouch;
       }
 

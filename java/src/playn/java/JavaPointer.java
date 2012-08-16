@@ -22,18 +22,18 @@ class JavaPointer extends PointerImpl {
   private boolean mouseDown;
 
   void onMouseDown(double time, float x, float y) {
-    onPointerStart(new Event.Impl(time, x, y, false), false);
+    onPointerStart(new Event.Impl(JavaPlatform.NOOP_EVENT_FLAGS, time, x, y, false), false);
     mouseDown = true;
   }
 
   void onMouseUp(double time, float x, float y) {
-    onPointerEnd(new Event.Impl(time, x, y, false), false);
+    onPointerEnd(new Event.Impl(JavaPlatform.NOOP_EVENT_FLAGS, time, x, y, false), false);
     mouseDown = false;
   }
 
   void onMouseMove(double time, float x, float y) {
     if (mouseDown) {
-      onPointerDrag(new Event.Impl(time, x, y, false), false);
+      onPointerDrag(new Event.Impl(JavaPlatform.NOOP_EVENT_FLAGS, time, x, y, false), false);
     }
   }
 

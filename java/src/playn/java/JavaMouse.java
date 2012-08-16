@@ -68,16 +68,17 @@ class JavaMouse extends MouseImpl {
       int dx = Mouse.getEventDX(), dy = -Mouse.getEventDY();
       if (btn != -1) {
         if (Mouse.getEventButtonState()) {
-          onMouseDown(new ButtonEvent.Impl(time, m.x, m.y, btn));
+          onMouseDown(new ButtonEvent.Impl(JavaPlatform.NOOP_EVENT_FLAGS, time, m.x, m.y, btn));
           pointer.onMouseDown(time, m.x, m.y);
         } else {
-          onMouseUp(new ButtonEvent.Impl(time, m.x, m.y, btn));
+          onMouseUp(new ButtonEvent.Impl(JavaPlatform.NOOP_EVENT_FLAGS, time, m.x, m.y, btn));
           pointer.onMouseUp(time, m.x, m.y);
         }
       } else if (Mouse.getEventDWheel() != 0) {
-        onMouseWheelScroll(new WheelEvent.Impl(time, -Mouse.getEventDWheel()));
+        onMouseWheelScroll(new WheelEvent.Impl(
+          JavaPlatform.NOOP_EVENT_FLAGS, time, -Mouse.getEventDWheel()));
       } else {
-        onMouseMove(new MotionEvent.Impl(time, m.x, m.y, dx, dy));
+        onMouseMove(new MotionEvent.Impl(JavaPlatform.NOOP_EVENT_FLAGS, time, m.x, m.y, dx, dy));
         pointer.onMouseMove(time, m.x, m.y);
       }
     }

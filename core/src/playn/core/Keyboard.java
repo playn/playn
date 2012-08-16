@@ -49,8 +49,8 @@ public interface Keyboard {
         return key;
       }
 
-      public Impl(double time, Key key) {
-        super(time);
+      public Impl(Events.Flags flags, double time, Key key) {
+        super(flags, time);
         this.key = key;
       }
 
@@ -82,8 +82,8 @@ public interface Keyboard {
         return typedChar;
       }
 
-      public Impl(double time, char typedChar) {
-        super(time);
+      public Impl(Events.Flags flags, double time, char typedChar) {
+        super(flags, time);
         this.typedChar = typedChar;
       }
 

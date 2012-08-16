@@ -18,6 +18,7 @@ package playn.flash;
 import flash.events.MouseEvent;
 import flash.display.Sprite;
 
+import playn.core.Events;
 import playn.core.PlayN;
 import playn.core.PointerImpl;
 
@@ -53,6 +54,7 @@ class FlashPointer extends PointerImpl {
   }
 
   protected static Event.Impl toEvent(MouseEvent event) {
-    return new Event.Impl(PlayN.currentTime(), event.getStageX(), event.getStageY(), false);
+    return new Event.Impl(
+      new Events.Flags.Impl(), PlayN.currentTime(), event.getStageX(), event.getStageY(), false);
   }
 }

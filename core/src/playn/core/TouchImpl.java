@@ -67,13 +67,11 @@ public class TouchImpl implements Touch {
         if (hitLayer != null) {
           activeLayers.put(event.id(), hitLayer);
           final Event.Impl localEvent = event.localize(hitLayer);
-          localEvent.setPreventDefault(event.getPreventDefault());
           hitLayer.interact(LayerListener.class, new AbstractLayer.Interaction<LayerListener>() {
             public void interact(LayerListener l) {
               l.onTouchStart(localEvent);
             }
           });
-          event.setPreventDefault(localEvent.getPreventDefault());
         }
       }
     }
@@ -90,13 +88,11 @@ public class TouchImpl implements Touch {
       AbstractLayer activeLayer = activeLayers.get(event.id());
       if (activeLayer != null) {
         final Event.Impl localEvent = event.localize(activeLayer);
-        localEvent.setPreventDefault(event.getPreventDefault());
         activeLayer.interact(LayerListener.class, new AbstractLayer.Interaction<LayerListener>() {
           public void interact(LayerListener l) {
             l.onTouchMove(localEvent);
           }
         });
-        event.setPreventDefault(localEvent.getPreventDefault());
       }
     }
   }
@@ -112,13 +108,11 @@ public class TouchImpl implements Touch {
       AbstractLayer activeLayer = activeLayers.get(event.id());
       if (activeLayer != null) {
         final Event.Impl localEvent = event.localize(activeLayer);
-        localEvent.setPreventDefault(event.getPreventDefault());
         activeLayer.interact(LayerListener.class, new AbstractLayer.Interaction<LayerListener>() {
           public void interact(LayerListener l) {
             l.onTouchEnd(localEvent);
           }
         });
-        event.setPreventDefault(localEvent.getPreventDefault());
         activeLayers.remove(event.id());
       }
     }

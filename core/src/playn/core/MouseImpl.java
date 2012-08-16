@@ -71,11 +71,9 @@ public abstract class MouseImpl implements Mouse {
     if (!enabled)
       return false;
 
-    boolean preventDefault = false;
+    event.flags().setPreventDefault(false);
     if (listener != null) {
-      event.setPreventDefault(preventDefault);
       listener.onMouseDown(event);
-      preventDefault = event.getPreventDefault();
     }
 
     GroupLayer root = PlayN.graphics().rootLayer();
@@ -87,27 +85,23 @@ public abstract class MouseImpl implements Mouse {
       activeLayer = (AbstractLayer)root.hitTest(p);
       if (activeLayer != null) {
         final ButtonEvent.Impl localEvent = event.localize(activeLayer);
-        localEvent.setPreventDefault(preventDefault);
         activeLayer.interact(LayerListener.class, new AbstractLayer.Interaction<LayerListener>() {
           public void interact(LayerListener l) {
             l.onMouseDown(localEvent);
           }
         });
-        preventDefault = localEvent.getPreventDefault();
       }
     }
-    return preventDefault;
+    return event.flags().getPreventDefault();
   }
 
   protected boolean onMouseMove(MotionEvent.Impl event) {
     if (!enabled)
       return false;
 
-    boolean preventDefault = false;
+    event.flags().setPreventDefault(false);
     if (listener != null) {
-      event.setPreventDefault(preventDefault);
       listener.onMouseMove(event);
-      preventDefault = event.getPreventDefault();
     }
 
     GroupLayer root = PlayN.graphics().rootLayer();
@@ -121,56 +115,51 @@ public abstract class MouseImpl implements Mouse {
 
       // handle onMouseDrag if we have an active layer, onMouseMove otherwise
       if (activeLayer != null) {
-        preventDefault = dispatchMotion(event, preventDefault, activeLayer, ON_MOUSE_DRAG);
+        dispatchMotion(event, activeLayer, ON_MOUSE_DRAG);
       } else if (hoverLayer != null) {
-        preventDefault = dispatchMotion(event, preventDefault, hoverLayer, ON_MOUSE_MOVE);
+        dispatchMotion(event, hoverLayer, ON_MOUSE_MOVE);
       }
 
       // handle onMouseOut
       if (lastHoverLayer != hoverLayer && lastHoverLayer != null) {
-        preventDefault = dispatchMotion(event, preventDefault, lastHoverLayer, ON_MOUSE_OUT);
+        dispatchMotion(event, lastHoverLayer, ON_MOUSE_OUT);
       }
 
       // handle onMouseOver
       if (hoverLayer != lastHoverLayer && hoverLayer != null) {
-        preventDefault = dispatchMotion(event, preventDefault, hoverLayer, ON_MOUSE_OVER);
+        dispatchMotion(event, hoverLayer, ON_MOUSE_OVER);
       }
     }
 
-    return preventDefault;
+    return event.flags().getPreventDefault();
   }
 
   protected boolean onMouseUp(ButtonEvent.Impl event) {
     if (!enabled)
       return false;
 
-    boolean preventDefault = false;
+    event.flags().setPreventDefault(false);
     if (listener != null) {
-      event.setPreventDefault(preventDefault);
       listener.onMouseUp(event);
-      preventDefault = event.getPreventDefault();
     }
 
     if (activeLayer != null) {
       final ButtonEvent.Impl localEvent = event.localize(activeLayer);
-      localEvent.setPreventDefault(preventDefault);
       activeLayer.interact(LayerListener.class, new AbstractLayer.Interaction<LayerListener>() {
         public void interact(LayerListener l) {
           l.onMouseUp(localEvent);
         }
       });
-      preventDefault = localEvent.getPreventDefault();
       activeLayer = null;
     }
 
-    return preventDefault;
+    return event.flags().getPreventDefault();
   }
 
   protected boolean onMouseWheelScroll(final WheelEvent.Impl event) {
     if (!enabled)
       return false;
 
-    event.setPreventDefault(false);
     if (listener != null)
       listener.onMouseWheelScroll(event);
 
@@ -181,19 +170,17 @@ public abstract class MouseImpl implements Mouse {
           l.onMouseWheelScroll(event);
         }
       });
-    return event.getPreventDefault();
+    return event.flags().getPreventDefault();
   }
 
-  protected boolean dispatchMotion(MotionEvent.Impl event, boolean preventDefault,
-                                   AbstractLayer layer, final Dispatcher dispatcher) {
+  protected void dispatchMotion(MotionEvent.Impl event, AbstractLayer layer,
+                                   final Dispatcher dispatcher) {
     final MotionEvent.Impl localEvent = event.localize(layer);
-    localEvent.setPreventDefault(preventDefault);
     layer.interact(LayerListener.class, new AbstractLayer.Interaction<LayerListener>() {
       public void interact(LayerListener l) {
         dispatcher.dispatch(l, localEvent);
       }
     });
-    return localEvent.getPreventDefault();
   }
 
   protected interface Dispatcher {

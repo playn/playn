@@ -17,6 +17,7 @@ import com.google.gwt.core.client.JsArray;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.NativeEvent;
 
+import playn.core.Events;
 import playn.core.PlayN;
 import playn.core.TouchImpl;
 
@@ -26,28 +27,6 @@ class HtmlTouch extends TouchImpl {
   // true when we are in a touch sequence (after touch start but before touch end)
   private boolean inTouchSequence = false;
 
-  /**
-   * Special implementation of Event.Impl for keeping track of changes to preventDefault
-   */
-  static class HtmlTouchEventImpl extends Event.Impl {
-    final boolean[] preventDefault;
-
-    public HtmlTouchEventImpl(double time, float x, float y, int id, boolean[] preventDefault) {
-      super(time, x, y, id);
-      this.preventDefault = preventDefault;
-    }
-
-    @Override
-    public void setPreventDefault(boolean preventDefault) {
-      this.preventDefault[0] = preventDefault;
-    }
-
-    @Override
-    public boolean getPreventDefault() {
-      return preventDefault[0];
-    }
-  }
-
   HtmlTouch(Element rootElement) {
     this.rootElement = rootElement;
 
@@ -56,9 +35,9 @@ class HtmlTouch extends TouchImpl {
       @Override
       public void handleEvent(NativeEvent nativeEvent) {
         inTouchSequence = true;
-        boolean[] preventDefault = {false};
-        onTouchStart(toEvents(nativeEvent, preventDefault));
-        if (preventDefault[0])
+        Events.Flags flags = new Events.Flags.Impl();
+        onTouchStart(toEvents(nativeEvent, flags));
+        if (flags.getPreventDefault())
           nativeEvent.preventDefault();
       }
     });
@@ -68,9 +47,9 @@ class HtmlTouch extends TouchImpl {
       @Override
       public void handleEvent(NativeEvent nativeEvent) {
         if (inTouchSequence) {
-          boolean[] preventDefault = {false};
-          onTouchMove(toEvents(nativeEvent, preventDefault));
-          if (preventDefault[0])
+          Events.Flags flags = new Events.Flags.Impl();
+          onTouchMove(toEvents(nativeEvent, flags));
+          if (flags.getPreventDefault())
             nativeEvent.preventDefault();
         }
       }
@@ -81,9 +60,9 @@ class HtmlTouch extends TouchImpl {
       @Override
       public void handleEvent(NativeEvent nativeEvent) {
         if (inTouchSequence) {
-          boolean[] preventDefault = {false};
-          onTouchEnd(toEvents(nativeEvent, preventDefault));
-          if (preventDefault[0])
+          Events.Flags flags = new Events.Flags.Impl();
+          onTouchEnd(toEvents(nativeEvent, flags));
+          if (flags.getPreventDefault())
             nativeEvent.preventDefault();
 
           // if there are no remaining active touches, note that this touch sequence has ended
@@ -100,7 +79,7 @@ class HtmlTouch extends TouchImpl {
       ($wnd.navigator.userAgent.match(/ipad|iphone|android/i) != null);
   }-*/;
 
-  private Event.Impl[] toEvents(NativeEvent nativeEvent, boolean[] preventDefault) {
+  private Event.Impl[] toEvents(NativeEvent nativeEvent, Events.Flags flags) {
     // Convert the JsArray<Native Touch> to an array of Touch.Events
     JsArray<com.google.gwt.dom.client.Touch> nativeTouches = nativeEvent.getChangedTouches();
     int nativeTouchesLen = nativeTouches.length();
@@ -110,7 +89,7 @@ class HtmlTouch extends TouchImpl {
       float x = touch.getRelativeX(rootElement);
       float y = touch.getRelativeY(rootElement);
       int id = getTouchIdentifier(nativeEvent, t);
-      touches[t] = new HtmlTouchEventImpl(PlayN.currentTime(), x, y, id, preventDefault);
+      touches[t] = new Event.Impl(flags, PlayN.currentTime(), x, y, id);
     }
     return touches;
   }

@@ -17,6 +17,7 @@ package playn.android;
 
 import java.io.File;
 
+import playn.core.Events;
 import playn.core.Key;
 import playn.core.Keyboard;
 
@@ -177,26 +178,25 @@ public abstract class GameActivity extends Activity {
   @Override
   public boolean onKeyDown(int keyCode, KeyEvent nativeEvent) {
     long time = nativeEvent.getEventTime();
-    Keyboard.Event event = new Keyboard.Event.Impl(time, keyForCode(keyCode));
+    Keyboard.Event event = new Keyboard.Event.Impl(
+      new Events.Flags.Impl(), time, keyForCode(keyCode));
     gameView.onKeyDown(event);
-    boolean downPrevent = event.getPreventDefault();
 
-    boolean typedPrevent = false;
     int unicodeChar = nativeEvent.getUnicodeChar();
     if (unicodeChar != 0) {
-      Keyboard.TypedEvent typedEvent = new Keyboard.TypedEvent.Impl(time, (char)unicodeChar);
-      gameView.onKeyTyped(typedEvent);
-      typedPrevent = typedEvent.getPreventDefault();
+      gameView.onKeyTyped(new Keyboard.TypedEvent.Impl(
+        event.flags(), time, (char)unicodeChar));
     }
 
-    return downPrevent || typedPrevent;
+    return event.flags().getPreventDefault();
   }
 
   @Override
   public boolean onKeyUp(int keyCode, KeyEvent nativeEvent) {
-    Keyboard.Event event = new Keyboard.Event.Impl(nativeEvent.getEventTime(), keyForCode(keyCode));
+    Keyboard.Event event = new Keyboard.Event.Impl(
+      new Events.Flags.Impl(), nativeEvent.getEventTime(), keyForCode(keyCode));
     gameView.onKeyUp(event);
-    return event.getPreventDefault();
+    return event.flags().getPreventDefault();
   }
 
   /**

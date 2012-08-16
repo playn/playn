@@ -17,6 +17,7 @@ import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.NativeEvent;
 
+import playn.core.Events;
 import playn.core.PlayN;
 import playn.core.MouseImpl;
 
@@ -66,7 +67,8 @@ class HtmlMouse extends MouseImpl {
             dx = x - lastX;
             dy = y - lastY;
           }
-          if (onMouseMove(new MotionEvent.Impl(PlayN.currentTime(), x, y, dx, dy))) {
+          if (onMouseMove(new MotionEvent.Impl(
+            new Events.Flags.Impl(), PlayN.currentTime(), x, y, dx, dy))) {
             ev.preventDefault();
           }
         }
@@ -82,7 +84,8 @@ class HtmlMouse extends MouseImpl {
       @Override
       public void handleEvent(NativeEvent ev, float x, float y) {
         inDragSequence = true;
-        if (onMouseDown(new ButtonEvent.Impl(PlayN.currentTime(), x, y, getMouseButton(ev))))
+        if (onMouseDown(new ButtonEvent.Impl(
+          new Events.Flags.Impl(), PlayN.currentTime(), x, y, getMouseButton(ev))))
           ev.preventDefault();
       }
     });
@@ -93,7 +96,8 @@ class HtmlMouse extends MouseImpl {
       public void handleEvent(NativeEvent ev, float x, float y) {
         if (inDragSequence) {
           inDragSequence = false;
-          if (onMouseUp(new ButtonEvent.Impl(PlayN.currentTime(), x, y, getMouseButton(ev))))
+          if (onMouseUp(new ButtonEvent.Impl(
+            new Events.Flags.Impl(), PlayN.currentTime(), x, y, getMouseButton(ev))))
             ev.preventDefault();
         }
         handleRequestsInUserEventContext();
@@ -120,8 +124,8 @@ class HtmlMouse extends MouseImpl {
     HtmlInput.captureEvent(rootElement, getMouseWheelEvent(), new EventHandler() {
       @Override
       public void handleEvent(NativeEvent ev) {
-        if (onMouseWheelScroll(new WheelEvent.Impl(PlayN.currentTime(),
-                                                   getMouseWheelVelocity(ev))))
+        if (onMouseWheelScroll(new WheelEvent.Impl(
+          new Events.Flags.Impl(), PlayN.currentTime(), getMouseWheelVelocity(ev))))
           ev.preventDefault();
       }
     });

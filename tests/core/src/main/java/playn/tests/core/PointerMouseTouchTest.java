@@ -107,20 +107,20 @@ class PointerMouseTouchTest extends Test {
         _lstart = mousePD.transform().translation();
         _pstart = new Vector(event.x(), event.y());
         mousePD.setAlpha(0.5f);
-        event.setPreventDefault(true);
+        event.flags().setPreventDefault(true);
         logger.log("pd mouse down (" + event.x() + "," + event.y() + ") button(" + event.button() + ")");
       }
       @Override
       public void onMouseDrag(MotionEvent event) {
         Vector delta = new Vector(event.x(), event.y()).subtractLocal(_pstart);
         mousePD.setTranslation(_lstart.x + delta.x, _lstart.y + delta.y);
-        event.setPreventDefault(true);
+        event.flags().setPreventDefault(true);
         logger.log("pd mouse drag (" + event.x() + "," + event.y() + ")");
       }
       @Override
       public void onMouseUp(ButtonEvent event) {
         mousePD.setAlpha(1.0f);
-        event.setPreventDefault(true);
+        event.flags().setPreventDefault(true);
         logger.log("pd mouse up (" + event.x() + "," + event.y() + ")");
       }
       protected Vector _lstart, _pstart;
@@ -164,20 +164,20 @@ class PointerMouseTouchTest extends Test {
         _lstart = pointerPD.transform().translation();
         _pstart = new Vector(event.x(), event.y());
         pointerPD.setAlpha(0.5f);
-        event.setPreventDefault(true);
+        event.flags().setPreventDefault(true);
         logger.log("pd pointer start (" + event.x() + "," + event.y() + ") touch(" + (event.isTouch() ? "yes" : "no") + ")");
       }
       @Override
       public void onPointerDrag(Event event) {
         Vector delta = new Vector(event.x(), event.y()).subtractLocal(_pstart);
         pointerPD.setTranslation(_lstart.x + delta.x, _lstart.y + delta.y);
-        event.setPreventDefault(true);
+        event.flags().setPreventDefault(true);
         logger.log("pd pointer drag (" + event.x() + "," + event.y() + ")");
       }
       @Override
       public void onPointerEnd(Event event) {
         pointerPD.setAlpha(1.0f);
-        event.setPreventDefault(true);
+        event.flags().setPreventDefault(true);
         logger.log("pd pointer end (" + event.x() + "," + event.y() + ")");
       }
       protected Vector _lstart, _pstart;

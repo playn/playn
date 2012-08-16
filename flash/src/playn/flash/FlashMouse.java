@@ -18,6 +18,7 @@ package playn.flash;
 import flash.events.MouseEvent;
 import flash.display.Sprite;
 
+import playn.core.Events;
 import playn.core.PlayN;
 import playn.core.MouseImpl;
 
@@ -29,8 +30,8 @@ class FlashMouse extends MouseImpl {
       @Override
       public void handleEvent(MouseEvent nativeEvent) {
         float x = nativeEvent.getStageX(), y = nativeEvent.getStageY();
-        if (onMouseDown(new ButtonEvent.Impl(PlayN.currentTime(), x, y,
-                                             getMouseButton(nativeEvent))))
+        if (onMouseDown(new ButtonEvent.Impl(
+          new Events.Flags.Impl(), PlayN.currentTime(), x, y, getMouseButton(nativeEvent))))
           nativeEvent.preventDefault();
       }
     });
@@ -38,7 +39,8 @@ class FlashMouse extends MouseImpl {
       @Override
       public void handleEvent(MouseEvent nativeEvent) {
         float x = nativeEvent.getStageX(), y = nativeEvent.getStageY();
-        if (onMouseUp(new ButtonEvent.Impl(PlayN.currentTime(), x, y, getMouseButton(nativeEvent))))
+        if (onMouseUp(new ButtonEvent.Impl(
+          new Events.Flags.Impl(), PlayN.currentTime(), x, y, getMouseButton(nativeEvent))))
           nativeEvent.preventDefault();
       }
     });
@@ -51,7 +53,8 @@ class FlashMouse extends MouseImpl {
           lastX = x;
           lastY = y;
         }
-        if (onMouseMove(new MotionEvent.Impl(PlayN.currentTime(), x, y, x - lastX, y - lastY))) {
+        if (onMouseMove(new MotionEvent.Impl(
+          new Events.Flags.Impl(), PlayN.currentTime(), x, y, x - lastX, y - lastY))) {
           nativeEvent.preventDefault();
         }
         lastX = x;

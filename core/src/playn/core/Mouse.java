@@ -40,8 +40,8 @@ public interface Mouse {
     class Impl extends Events.Position.Impl implements ButtonEvent {
       private int button;
 
-      public Impl(double time, float x, float y, int button) {
-        super(time, x, y);
+      public Impl(Events.Flags flags, double time, float x, float y, int button) {
+        super(flags, time, x, y);
         this.button = button;
       }
 
@@ -50,14 +50,16 @@ public interface Mouse {
         return button;
       }
 
-      /** Creates a copy of this event with local x and y in the supplied layer's coord system. */
+      /** Creates a copy of this event with local x and y in the supplied layer's coord system and
+       * flags inherited from this event. */
       public ButtonEvent.Impl localize(Layer layer) {
         Point local = Layer.Util.screenToLayer(layer, x(), y());
-        return new ButtonEvent.Impl(time(), x(), y(), local.x, local.y, button);
+        return new ButtonEvent.Impl(flags(), time(), x(), y(), local.x, local.y, button);
       }
 
-      protected Impl(double time, float x, float y, float localX, float localY, int button) {
-        super(time, x, y, localX, localY);
+      protected Impl(Events.Flags flags, double time, float x, float y,
+                     float localX, float localY, int button) {
+        super(flags, time, x, y, localX, localY);
         this.button = button;
       }
 
@@ -89,8 +91,8 @@ public interface Mouse {
     class Impl extends Events.Position.Impl implements MotionEvent {
       private final float dx, dy;
 
-      public Impl(double time, float x, float y, float dx, float dy) {
-        super(time, x, y);
+      public Impl(Events.Flags flags, double time, float x, float y, float dx, float dy) {
+        super(flags, time, x, y);
         this.dx = dx;
         this.dy = dy;
       }
@@ -105,14 +107,16 @@ public interface Mouse {
         return dy;
       }
 
-      /** Creates a copy of this event with local x and y in the supplied layer's coord system. */
+      /** Creates a copy of this event with local x and y in the supplied layer's coord system
+       * and flags inherited from this instance. */
       public MotionEvent.Impl localize(Layer layer) {
         Point local = Layer.Util.screenToLayer(layer, x(), y());
-        return new MotionEvent.Impl(time(), x(), y(), dx(), dy(), local.x, local.y);
+        return new MotionEvent.Impl(flags(), time(), x(), y(), dx(), dy(), local.x, local.y);
       }
 
-      protected Impl(double time, float x, float y, float dx, float dy, float localX, float localY) {
-        super(time, x, y, localX, localY);
+      protected Impl(Events.Flags flags, double time, float x, float y, float dx, float dy,
+                     float localX, float localY) {
+        super(flags, time, x, y, localX, localY);
         this.dx = dx;
         this.dy = dy;
       }
@@ -135,8 +139,8 @@ public interface Mouse {
     class Impl extends Events.Input.Impl implements WheelEvent {
       private float velocity;
 
-      public Impl(double time, float velocity) {
-        super(time);
+      public Impl(Events.Flags flags, double time, float velocity) {
+        super(flags, time);
         this.velocity = velocity;
       }
 

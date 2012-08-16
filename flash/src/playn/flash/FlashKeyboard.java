@@ -19,6 +19,7 @@ import flash.events.KeyboardEvent;
 import flash.display.InteractiveObject;
 import flash.ui.Keyboard;
 
+import playn.core.Events;
 import playn.core.Key;
 import playn.core.PlayN;
 import playn.core.util.Callback;
@@ -33,17 +34,19 @@ class FlashKeyboard implements playn.core.Keyboard {
       @Override
       public void handleEvent(KeyboardEvent nativeEvent) {
         if (listener != null) {
-          Event.Impl event = new Event.Impl(PlayN.currentTime(), keyForCode(nativeEvent.keyCode()));
+          Event.Impl event = new Event.Impl(
+            new Events.Flags.Impl(), PlayN.currentTime(), keyForCode(nativeEvent.keyCode()));
           listener.onKeyDown(event);
-          if (event.getPreventDefault()) {
+          if (event.flags().getPreventDefault()) {
             nativeEvent.preventDefault();
           }
 
           int charCode = nativeEvent.charCode();
           if (charCode != 0) {
-            TypedEvent.Impl typedEvent = new TypedEvent.Impl(PlayN.currentTime(), (char)charCode);
+            TypedEvent.Impl typedEvent = new TypedEvent.Impl(
+              new Events.Flags.Impl(), PlayN.currentTime(), (char)charCode);
             listener.onKeyTyped(typedEvent);
-            if (typedEvent.getPreventDefault()) {
+            if (typedEvent.flags().getPreventDefault()) {
               nativeEvent.preventDefault();
             }
           }
@@ -55,9 +58,10 @@ class FlashKeyboard implements playn.core.Keyboard {
       @Override
       public void handleEvent(KeyboardEvent nativeEvent) {
         if (listener != null) {
-          Event.Impl event = new Event.Impl(PlayN.currentTime(), keyForCode(nativeEvent.keyCode()));
+          Event.Impl event = new Event.Impl(
+            new Events.Flags.Impl(), PlayN.currentTime(), keyForCode(nativeEvent.keyCode()));
           listener.onKeyUp(event);
-          if (event.getPreventDefault()) {
+          if (event.flags().getPreventDefault()) {
             nativeEvent.preventDefault();
           }
         }

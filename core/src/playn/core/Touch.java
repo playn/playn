@@ -48,18 +48,20 @@ public interface Touch {
       private final float size;
 
       // TODO: Implement pressure and size across all platforms that support touch.
-      public Impl(double time, float x, float y, int id) {
-        this(time, x, y, id, -1, -1);
+      public Impl(Events.Flags flags, double time, float x, float y, int id) {
+        this(flags, time, x, y, id, -1, -1);
       }
 
-      public Impl(double time, float x, float y, int id, float pressure, float size) {
-        this(time, x, y, x, y, id, pressure, size);
+      public Impl(Events.Flags flags, double time, float x, float y, int id,
+                  float pressure, float size) {
+        this(flags, time, x, y, x, y, id, pressure, size);
       }
 
-      /** Creates a copy of this event with local x and y in the supplied layer's coord system. */
+      /** Creates a copy of this event with local x and y in the supplied layer's coord system
+       * and flags inherited from this instance. */
       public Event.Impl localize(Layer layer) {
         Point local = Layer.Util.screenToLayer(layer, x(), y());
-        return new Event.Impl(time(), x(), y(), local.x, local.y, id(), pressure(), size());
+        return new Event.Impl(flags(), time(), x(), y(), local.x, local.y, id(), pressure(), size());
       }
 
       @Override
@@ -77,9 +79,9 @@ public interface Touch {
         return size;
       }
 
-      protected Impl(double time, float x, float y, float localX, float localY,
+      protected Impl(Events.Flags flags, double time, float x, float y, float localX, float localY,
                      int id, float pressure, float size) {
-        super(time, x, y, localX, localY);
+        super(flags, time, x, y, localX, localY);
         this.id = id;
         this.pressure = pressure;
         this.size = size;
