@@ -40,12 +40,6 @@ import playn.core.json.JsonImpl;
 
 public class JavaPlatform extends AbstractPlatform {
 
-  /** Ignores all event flags. We don't currently need them for java. */
-  static Events.Flags NOOP_EVENT_FLAGS = new Events.Flags() {
-    @Override public boolean getPreventDefault () {return false;}
-    @Override public void setPreventDefault (boolean preventDefault) { }
-  };
-
   /** Defines JavaPlatform configurable parameters. */
   public static class Config {
     /** The graphics scale factor. Allows simulating HiDPI mode during testing. */

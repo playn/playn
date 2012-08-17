@@ -21,6 +21,7 @@ import javax.swing.JOptionPane;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.input.Keyboard;
 
+import playn.core.Events;
 import playn.core.Key;
 import playn.core.util.Callback;
 
@@ -63,16 +64,16 @@ class JavaKeyboard implements playn.core.Keyboard {
         Key key = translateKey(keyCode);
         if (key != null)
           listener.onKeyDown(new playn.core.Keyboard.Event.Impl(
-            JavaPlatform.NOOP_EVENT_FLAGS, time, key));
+            new Events.Flags.Impl(), time, key));
         char keyChar = Keyboard.getEventCharacter();
         if (!Character.isISOControl(keyChar))
           listener.onKeyTyped(new playn.core.Keyboard.TypedEvent.Impl(
-            JavaPlatform.NOOP_EVENT_FLAGS, time, keyChar));
+            new Events.Flags.Impl(), time, keyChar));
       } else {
         Key key = translateKey(keyCode);
         if (key != null)
           listener.onKeyUp(new playn.core.Keyboard.Event.Impl(
-            JavaPlatform.NOOP_EVENT_FLAGS, time, key));
+            new Events.Flags.Impl(), time, key));
       }
     }
   }
