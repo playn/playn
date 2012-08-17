@@ -16,6 +16,8 @@
 package playn.tests.core;
 
 import java.util.ArrayList;
+import java.util.Map;
+import java.util.TreeMap;
 
 import pythagoras.f.Vector;
 
@@ -41,6 +43,7 @@ class PointerMouseTouchTest extends Test {
       withFont(graphics().createFont("Times New Roman", Font.Style.PLAIN, 12));
 
   private TextLogger logger;
+  private TextMapper motionLabel;
 
   private Toggle preventDefault, propagate;
 
@@ -81,14 +84,17 @@ class PointerMouseTouchTest extends Test {
     final ImageLayer pointer = createLabel("Pointer", parent, 0xff000000, 0xff80ff80, 20, y += 50);
     y += pointer.image().height() + 5;
 
-    createLabel("Event Log", 0, 325, 20);
-
     // setup the logger and its layer
-    CanvasImage logImage = graphics().createImage(375, 400);
-    ImageLayer logLayer = graphics().createImageLayer(logImage);
-    logLayer.setTranslation(325, 40);
-    graphics().rootLayer().add(logLayer);
-    logger = new TextLogger(logImage, logFormat);
+    createLabel("Event Log", 0, 325, 20);
+    logger = new TextLogger(375, 300, logFormat);
+    logger.layer.setTranslation(325, 40);
+    graphics().rootLayer().add(logger.layer);
+
+    // setup the motion logger and its layer
+    createLabel("Motion Log", 0, 325, 340);
+    motionLabel = new TextMapper(375, 120, logFormat);
+    motionLabel.layer.setTranslation(325, 360);
+    graphics().rootLayer().add(motionLabel.layer);
 
     // add mouse layer listener
     mouse.addListener(new Mouse.LayerListener() {
@@ -105,7 +111,7 @@ class PointerMouseTouchTest extends Test {
         Vector delta = new Vector(event.x(), event.y()).subtractLocal(_pstart);
         mouse.setTranslation(_lstart.x + delta.x, _lstart.y + delta.y);
         modify(event);
-        logger.log(describe(event, "mouse drag"));
+        motionLabel.set("mouse drag", describe(event, ""));
       }
       @Override
       public void onMouseUp(ButtonEvent event) {
@@ -115,7 +121,7 @@ class PointerMouseTouchTest extends Test {
       }
       @Override public void onMouseMove (MotionEvent event) {
         modify(event);
-        logger.log(describe(event, "mouse move"));
+        motionLabel.set("mouse move", describe(event, ""));
       }
       @Override public void onMouseOver (MotionEvent event) {
         modify(event);
@@ -137,28 +143,27 @@ class PointerMouseTouchTest extends Test {
     parent.addListener(new Mouse.LayerListener() {
       @Override
       public void onMouseDown(ButtonEvent event) {
-        logger.log("parent mouse down");
+        logger.log(describe(event, "parent mouse down"));
       }
       @Override
       public void onMouseDrag(MotionEvent event) {
-        logger.log("parent mouse drag");
+        motionLabel.set("parent mouse drag", describe(event, ""));
       }
       @Override
       public void onMouseUp(ButtonEvent event) {
-        logger.log("parent mouse up");
+        logger.log(describe(event, "parent mouse up"));
       }
       @Override public void onMouseMove (MotionEvent event) {
-        // this is pretty noisy
-        // logger.log("parent mouse move");
+        motionLabel.set("parent mouse move", describe(event, ""));
       }
       @Override public void onMouseOver (MotionEvent event) {
-        logger.log("parent mouse over");
+        logger.log(describe(event, "parent mouse over"));
       }
       @Override public void onMouseOut (MotionEvent event) {
-        logger.log("parent mouse out");
+        logger.log(describe(event, "parent mouse out"));
       }
       @Override public void onMouseWheelScroll (WheelEvent event) {
-        logger.log("parent mouse wheel");
+        logger.log(describe(event, "parent mouse wheel"));
       }
     });
 
@@ -177,7 +182,7 @@ class PointerMouseTouchTest extends Test {
         Vector delta = new Vector(event.x(), event.y()).subtractLocal(_pstart);
         pointer.setTranslation(_lstart.x + delta.x, _lstart.y + delta.y);
         modify(event);
-        logger.log(describe(event, "pointer drag"));
+        motionLabel.set("pointer drag", describe(event, ""));
       }
       @Override
       public void onPointerEnd(Event event) {
@@ -192,21 +197,28 @@ class PointerMouseTouchTest extends Test {
     parent.addListener(new Pointer.Listener() {
       @Override
       public void onPointerStart(Event event) {
-        logger.log("parent pointer start");
+        logger.log(describe(event, "parent pointer start"));
       }
       @Override
       public void onPointerDrag(Event event) {
-        logger.log("parent pointer drag");
+        motionLabel.set("parent pointer drag", describe(event, ""));
       }
       @Override
       public void onPointerEnd(Event event) {
-        logger.log("parent pointer end");
+        logger.log(describe(event, "parent pointer end"));
       }
     });
   }
 
   @Override public boolean usesPositionalInputs () {
     return true;
+  }
+
+  @Override
+  public void paint(float alpha) {
+    super.paint(alpha);
+    logger.paint();
+    motionLabel.paint();
   }
 
   protected ImageLayer createLabel(String text, int bg, float x, float y) {
@@ -251,31 +263,89 @@ class PointerMouseTouchTest extends Test {
     return msg;
   }
 
-  protected class TextLogger {
-    private CanvasImage image;
-    private TextFormat format;
-    private ArrayList<String> entries = new ArrayList<String>(0);
+  protected class Label {
+    public final ImageLayer layer;
 
-    public TextLogger(CanvasImage image, TextFormat format) {
-      this.image = image;
+    private final CanvasImage image;
+    private final TextFormat format;
+    private TextLayout layout;
+    private String text;
+    private boolean dirty;
+
+    public Label(float wid, float hei, TextFormat format) {
+      image = graphics().createImage(wid, hei);
+      layer = graphics().createImageLayer(image);
       this.format = format;
+    }
+
+    public void set(String text) {
+      this.text = text;
+      dirty = true;
+    }
+
+    public void paint() {
+      if (!dirty) {
+        return;
+      }
+
+      layout = graphics().layoutText(text, format);
+      if (layout.height() > image.height()) {
+        System.out.println("Clipped");
+      }
+      image.canvas().clear();
+      image.canvas().setFillColor(0xFF6699CC);
+      image.canvas().fillText(layout, 0, 0);
+      dirty = false;
+    }
+  }
+
+  protected class TextMapper extends Label {
+    public Map<String, String> values = new TreeMap<String, String>();
+    public TextMapper(float wid, float hei, TextFormat format) {
+      super(wid, hei, format);
+    }
+
+    public void set(String name, String value) {
+      values.put(name, value);
+      update();
+    }
+
+    public void update () {
+      StringBuilder sb = new StringBuilder();
+      for (String name : values.keySet()) {
+        sb.append(name).append(": ").append(values.get(name)).append('\n');
+      }
+      set(sb.toString());
+    }
+  }
+
+  protected class TextLogger extends Label {
+    private final ArrayList<String> entries = new ArrayList<String>();
+    private final int lineCount;
+
+    public TextLogger(float wid, float hei, TextFormat format) {
+      super(wid, hei, format);
+      int lineCount = 1;
+      for (String maxText = "a\n";;lineCount++, maxText += "a\n") {
+        if (graphics().layoutText(maxText, format).height() > hei) {
+          break;
+        }
+      }
+      this.lineCount = lineCount - 1;
     }
 
     public void log(String text) {
       entries.add(text);
+      if (entries.size() > lineCount) {
+        entries.remove(0);
+      }
       StringBuilder sb = new StringBuilder();
       for (int i = entries.size() - 1; i >=0; i--) {
         sb.append(entries.get(i));
         sb.append('\n');
       }
 
-      TextLayout layout = graphics().layoutText(sb.toString(), format);
-      if (layout.height() > image.height() && !entries.isEmpty())
-        entries.remove(0);
-
-      image.canvas().clear();
-      image.canvas().setFillColor(0xFF6699CC);
-      image.canvas().fillText(layout, 0, 0);
+      set(sb.toString());
     }
   }
 
