@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.TreeMap;
 
+import pythagoras.f.Point;
 import pythagoras.f.Vector;
 
 import playn.core.CanvasImage;
@@ -26,9 +27,12 @@ import playn.core.Events;
 import playn.core.Font;
 import playn.core.GroupLayer;
 import playn.core.ImageLayer;
+import playn.core.ImmediateLayer;
+import playn.core.Layer;
 import playn.core.Mouse;
 import playn.core.Mouse.WheelEvent;
 import playn.core.Pointer;
+import playn.core.Surface;
 import playn.core.TextFormat;
 import playn.core.TextLayout;
 import playn.core.Mouse.ButtonEvent;
@@ -75,14 +79,13 @@ class PointerMouseTouchTest extends Test {
     graphics().rootLayer().addAt(propagate.layer, 20, y);
     y += propagate.layer.image().height() + 5;
 
-    GroupLayer parent = graphics().createGroupLayer();
-    graphics().rootLayer().add(parent);
+    final Box mouse = new Box("Mouse", 0xffff8080, propagate.layer.image().width(), 120);
+    graphics().rootLayer().addAt(mouse.layer, 20, y);
+    y += mouse.layer.height() + 5;
 
-    final ImageLayer mouse = createLabel("Mouse", parent, 0xff000000, 0xffff8080, 20, y += 25);
-    y += mouse.image().height() + 5;
-
-    final ImageLayer pointer = createLabel("Pointer", parent, 0xff000000, 0xff80ff80, 20, y += 50);
-    y += pointer.image().height() + 5;
+    final Box pointer = new Box("Pointer", 0xff80ff80, propagate.layer.image().width(), 120);
+    graphics().rootLayer().addAt(pointer.layer, 20, y);
+    y += pointer.layer.height() + 5;
 
     // setup the logger and its layer
     createLabel("Event Log", 0, 325, 20);
@@ -97,25 +100,26 @@ class PointerMouseTouchTest extends Test {
     graphics().rootLayer().add(motionLabel.layer);
 
     // add mouse layer listener
-    mouse.addListener(new Mouse.LayerListener() {
+    mouse.label.addListener(new Mouse.LayerListener() {
+      ImageLayer label = mouse.label;
       @Override
       public void onMouseDown(ButtonEvent event) {
-        _lstart = mouse.transform().translation();
+        _lstart = label.transform().translation();
         _pstart = new Vector(event.x(), event.y());
-        mouse.setAlpha(0.5f);
+        label.setAlpha(0.5f);
         modify(event);
         logger.log(describe(event, "mouse down"));
       }
       @Override
       public void onMouseDrag(MotionEvent event) {
         Vector delta = new Vector(event.x(), event.y()).subtractLocal(_pstart);
-        mouse.setTranslation(_lstart.x + delta.x, _lstart.y + delta.y);
+        label.setTranslation(_lstart.x + delta.x, _lstart.y + delta.y);
         modify(event);
         motionLabel.set("mouse drag", describe(event, ""));
       }
       @Override
       public void onMouseUp(ButtonEvent event) {
-        mouse.setAlpha(1.0f);
+        label.setAlpha(1.0f);
         modify(event);
         logger.log(describe(event, "mouse up"));
       }
@@ -140,7 +144,7 @@ class PointerMouseTouchTest extends Test {
     });
 
     // add mouse layer listener to parent
-    parent.addListener(new Mouse.LayerListener() {
+    mouse.layer.addListener(new Mouse.LayerListener() {
       @Override
       public void onMouseDown(ButtonEvent event) {
         logger.log(describe(event, "parent mouse down"));
@@ -168,25 +172,26 @@ class PointerMouseTouchTest extends Test {
     });
 
     // add pointer layer listener
-    pointer.addListener(new Pointer.Listener() {
+    pointer.label.addListener(new Pointer.Listener() {
+      ImageLayer label = pointer.label;
       @Override
       public void onPointerStart(Event event) {
-        _lstart = pointer.transform().translation();
+        _lstart = label.transform().translation();
         _pstart = new Vector(event.x(), event.y());
-        pointer.setAlpha(0.5f);
+        label.setAlpha(0.5f);
         modify(event);
         logger.log(describe(event, "pointer start"));
       }
       @Override
       public void onPointerDrag(Event event) {
         Vector delta = new Vector(event.x(), event.y()).subtractLocal(_pstart);
-        pointer.setTranslation(_lstart.x + delta.x, _lstart.y + delta.y);
+        label.setTranslation(_lstart.x + delta.x, _lstart.y + delta.y);
         modify(event);
         motionLabel.set("pointer drag", describe(event, ""));
       }
       @Override
       public void onPointerEnd(Event event) {
-        pointer.setAlpha(1.0f);
+        label.setAlpha(1.0f);
         modify(event);
         logger.log(describe(event, "pointer end"));
       }
@@ -194,7 +199,7 @@ class PointerMouseTouchTest extends Test {
     });
 
     // add pointer listener for parent layer
-    parent.addListener(new Pointer.Listener() {
+    pointer.layer.addListener(new Pointer.Listener() {
       @Override
       public void onPointerStart(Event event) {
         logger.log(describe(event, "parent pointer start"));
@@ -367,6 +372,36 @@ class PointerMouseTouchTest extends Test {
     void set(boolean value) {
       this.value = value;
       layer.setImage(TestsGame.makeButtonImage(prefix + (value ? "On" : "Off")));
+    }
+  }
+
+  protected class Box implements ImmediateLayer.Renderer, Layer.HitTester {
+    final GroupLayer.Clipped layer;
+    final ImageLayer label;
+
+    Box (String text, int color, float wid, float hei) {
+      layer = graphics().createGroupLayer(wid, hei);
+      layer.add(graphics().createImmediateLayer(this));
+      label = createLabel(text, layer, 0xff000000, color, 0, 0);
+      layer.addAt(label, (wid - label.image().width()) / 2, (hei - label.image().height()) / 2);
+      layer.setHitTester(this);
+    }
+
+    @Override
+    public Layer hitTest(Layer layer, Point p) {
+      if (p.x >= 0 && p.y >= 0 && p.x < this.layer.width() && p.y < this.layer.height()) {
+        return layer.hitTestDefault(p);
+      }
+      return null;
+    }
+
+    @Override
+    public void render(Surface surface) {
+      surface.setFillColor(0xff000000);
+      surface.drawLine(0, 0, layer.width(), 0, 1);
+      surface.drawLine(layer.width(), 0, layer.width(), layer.height(), 1);
+      surface.drawLine(layer.width(), layer.height() - 1, 0, layer.height() - 1, 1);
+      surface.drawLine(1, layer.height() - 1, 1, 0, 1);
     }
   }
 }
