@@ -223,7 +223,7 @@ class IOSTextLayout extends AbstractTextLayout {
     attribs.set_ParagraphStyle(new CTParagraphStyle(pstyle));
     // TODO: add underline here?
 
-    if (format.shouldWrap() || text.contains("\n")) {
+    if (format.shouldWrap() || text.indexOf('\n') != -1) {
       return new Wrapped(font, attribs, text);
     } else {
       return new Single(font, attribs, text);
