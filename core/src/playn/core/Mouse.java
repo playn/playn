@@ -50,8 +50,7 @@ public interface Mouse {
         return button;
       }
 
-      /** Creates a copy of this event with local x and y in the supplied layer's coord system and
-       * flags inherited from this event. */
+      @Override
       public ButtonEvent.Impl localize(Layer layer) {
         Point local = Layer.Util.screenToLayer(layer, x(), y());
         return new ButtonEvent.Impl(flags(), time(), x(), y(), local.x, local.y, button);
@@ -107,8 +106,7 @@ public interface Mouse {
         return dy;
       }
 
-      /** Creates a copy of this event with local x and y in the supplied layer's coord system
-       * and flags inherited from this instance. */
+      @Override
       public MotionEvent.Impl localize(Layer layer) {
         Point local = Layer.Util.screenToLayer(layer, x(), y());
         return new MotionEvent.Impl(flags(), time(), x(), y(), dx(), dy(), local.x, local.y);
@@ -152,6 +150,18 @@ public interface Mouse {
       @Override
       protected String name() {
         return "WheelEvent";
+      }
+
+      protected Impl(Events.Flags flags, double time, float x, float y,
+                     float localX, float localY, float velocity) {
+        super(flags, time, x, y, localX, localY);
+        this.velocity = velocity;
+      }
+
+      @Override
+      public WheelEvent.Impl localize (Layer layer) {
+        Point local = Layer.Util.screenToLayer(layer, x(), y());
+        return new WheelEvent.Impl(flags(), time(), x(), y(), local.x, local.y, velocity);
       }
 
       @Override

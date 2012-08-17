@@ -140,6 +140,10 @@ public class Events {
     abstract class Impl extends Input.Impl implements Position {
       private final float x, y, localX, localY;
 
+      /** Creates a copy of this event with local x and y in the supplied layer's coord system and
+       * flags inherited from this event. */
+      abstract Position.Impl localize(Layer hit);
+
       @Override
       public float x() {
         return x;

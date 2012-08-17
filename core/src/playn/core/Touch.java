@@ -57,8 +57,7 @@ public interface Touch {
         this(flags, time, x, y, x, y, id, pressure, size);
       }
 
-      /** Creates a copy of this event with local x and y in the supplied layer's coord system
-       * and flags inherited from this instance. */
+      @Override
       public Event.Impl localize(Layer layer) {
         Point local = Layer.Util.screenToLayer(layer, x(), y());
         return new Event.Impl(flags(), time(), x(), y(), local.x, local.y, id(), pressure(), size());
