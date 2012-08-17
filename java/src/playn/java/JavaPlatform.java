@@ -243,6 +243,12 @@ public class JavaPlatform extends AbstractPlatform {
   }
 
   @Override
+  public void setPropagateEvents(boolean propagate) {
+    mouse.setPropagateEvents(propagate);
+    pointer.setPropagateEvents(propagate);
+  }
+
+  @Override
   public void run(final Game game) {
     this.updateRate = game.updateRate();
 

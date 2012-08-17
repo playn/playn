@@ -23,6 +23,7 @@ import pythagoras.f.Point;
 public abstract class PointerImpl implements Pointer {
 
   private boolean enabled = true;
+  private Dispatcher dispatcher = Dispatcher.SINGLE;
   private Listener listener;
   private AbstractLayer activeLayer;
 
@@ -39,6 +40,10 @@ public abstract class PointerImpl implements Pointer {
   @Override
   public void setListener(Listener listener) {
     this.listener = listener;
+  }
+
+  public void setPropagateEvents(boolean propagate) {
+    dispatcher = Dispatcher.Util.select(propagate);
   }
 
   protected boolean onPointerStart(Event.Impl event, boolean preventDefault) {
@@ -58,7 +63,7 @@ public abstract class PointerImpl implements Pointer {
       p.y += root.originY();
       activeLayer = (AbstractLayer)root.hitTest(p);
       if (activeLayer != null) {
-        event.dispatch(activeLayer, Listener.class, START);
+        dispatcher.dispatch(activeLayer, Listener.class, event, START);
       }
     }
     return event.flags().getPreventDefault();
@@ -74,7 +79,7 @@ public abstract class PointerImpl implements Pointer {
     }
 
     if (activeLayer != null) {
-      event.dispatch(activeLayer, Listener.class, DRAG);
+      dispatcher.dispatch(activeLayer, Listener.class, event, DRAG);
     }
     return event.flags().getPreventDefault();
   }
@@ -89,7 +94,7 @@ public abstract class PointerImpl implements Pointer {
     }
 
     if (activeLayer != null) {
-      event.dispatch(activeLayer, Listener.class, END);
+      dispatcher.dispatch(activeLayer, Listener.class, event, END);
       activeLayer = null;
     }
     return event.flags().getPreventDefault();

@@ -124,6 +124,10 @@ public class StubPlatform implements Platform {
   }
 
   @Override
+  public void setPropagateEvents(boolean propagate) {
+  }
+
+  @Override
   public void invokeLater(Runnable runnable) {
     runnable.run();
   }

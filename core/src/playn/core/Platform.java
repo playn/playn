@@ -36,6 +36,8 @@ public interface Platform {
 
   void setLifecycleListener(PlayN.LifecycleListener listener);
 
+  void setPropagateEvents(boolean propagate);
+
   Audio audio();
 
   Graphics graphics();

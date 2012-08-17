@@ -270,6 +270,12 @@ public class IOSPlatform extends AbstractPlatform {
   }
 
   @Override
+  public void setPropagateEvents(boolean propagate) {
+    touch.setPropagateEvents(propagate);
+    pointer.setPropagateEvents(propagate);
+  }
+
+  @Override
   public void run(Game game) {
     this.game = game;
     // initialize the game and start things off

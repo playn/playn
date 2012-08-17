@@ -156,6 +156,12 @@ public class AndroidPlatform extends AbstractPlatform {
   }
 
   @Override
+  public void setPropagateEvents(boolean propagate) {
+    touch.setPropagateEvents(propagate);
+    pointer.setPropagateEvents(propagate);
+  }
+
+  @Override
   public Type type() {
     return Type.ANDROID;
   }

@@ -166,6 +166,12 @@ public class FlashPlatform extends AbstractPlatform {
   }
 
   @Override
+  public void setPropagateEvents(boolean propagate) {
+    mouse.setPropagateEvents(propagate);
+    pointer.setPropagateEvents(propagate);
+  }
+
+  @Override
   public void run(final Game game) {
     final int updateRate = game.updateRate();
     this.game = game;

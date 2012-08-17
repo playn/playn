@@ -26,6 +26,7 @@ import pythagoras.f.Point;
 public class TouchImpl implements Touch {
 
   private boolean enabled = true;
+  private Dispatcher dispatcher = Dispatcher.SINGLE;
   private Listener listener;
   private Map<Integer,AbstractLayer> activeLayers = new HashMap<Integer,AbstractLayer>();
 
@@ -49,6 +50,10 @@ public class TouchImpl implements Touch {
     this.listener = listener;
   }
 
+  public void setPropagateEvents(boolean propagate) {
+    dispatcher = Dispatcher.Util.select(propagate);
+  }
+
   public void onTouchStart(Event.Impl[] touches) {
     if (!enabled)
       return;
@@ -66,7 +71,7 @@ public class TouchImpl implements Touch {
         AbstractLayer hitLayer = (AbstractLayer)root.hitTest(p);
         if (hitLayer != null) {
           activeLayers.put(event.id(), hitLayer);
-          event.dispatch(hitLayer, LayerListener.class, START);
+          dispatcher.dispatch(hitLayer, LayerListener.class, event, START);
         }
       }
     }
@@ -82,7 +87,7 @@ public class TouchImpl implements Touch {
     for (Event.Impl event : touches) {
       AbstractLayer activeLayer = activeLayers.get(event.id());
       if (activeLayer != null) {
-        event.dispatch(activeLayer, LayerListener.class, MOVE);
+        dispatcher.dispatch(activeLayer, LayerListener.class, event, MOVE);
       }
     }
   }
@@ -97,7 +102,7 @@ public class TouchImpl implements Touch {
     for (Event.Impl event : touches) {
       AbstractLayer activeLayer = activeLayers.get(event.id());
       if (activeLayer != null) {
-        event.dispatch(activeLayer, LayerListener.class, END);
+        dispatcher.dispatch(activeLayer, LayerListener.class, event, END);
         activeLayers.remove(event.id());
       }
     }

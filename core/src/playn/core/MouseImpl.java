@@ -23,6 +23,7 @@ import pythagoras.f.Point;
 public abstract class MouseImpl implements Mouse {
 
   private boolean enabled = true;
+  private Dispatcher dispatcher = Dispatcher.SINGLE;
   private Listener listener;
   private AbstractLayer activeLayer;
   private AbstractLayer hoverLayer;
@@ -67,6 +68,10 @@ public abstract class MouseImpl implements Mouse {
     return false;
   }
 
+  public void setPropagateEvents(boolean propagate) {
+    dispatcher = Dispatcher.Util.select(propagate);
+  }
+
   protected boolean onMouseDown(ButtonEvent.Impl event) {
     if (!enabled)
       return false;
@@ -84,7 +89,7 @@ public abstract class MouseImpl implements Mouse {
       p.y += root.originY();
       activeLayer = (AbstractLayer)root.hitTest(p);
       if (activeLayer != null) {
-        event.dispatch(activeLayer, LayerListener.class, DOWN);
+        dispatcher.dispatch(activeLayer, LayerListener.class, event, DOWN);
       }
     }
     return event.flags().getPreventDefault();
@@ -110,19 +115,19 @@ public abstract class MouseImpl implements Mouse {
 
       // handle onMouseDrag if we have an active layer, onMouseMove otherwise
       if (activeLayer != null) {
-        event.dispatch(activeLayer, LayerListener.class, DRAG);
+        dispatcher.dispatch(activeLayer, LayerListener.class, event, DRAG);
       } else if (hoverLayer != null) {
-        event.dispatch(hoverLayer, LayerListener.class, MOVE);
+        dispatcher.dispatch(hoverLayer, LayerListener.class, event, MOVE);
       }
 
       // handle onMouseOut
       if (lastHoverLayer != hoverLayer && lastHoverLayer != null) {
-        event.dispatch(lastHoverLayer, LayerListener.class, OUT);
+        dispatcher.dispatch(lastHoverLayer, LayerListener.class, event, OUT);
       }
 
       // handle onMouseOver
       if (hoverLayer != lastHoverLayer && hoverLayer != null) {
-        event.dispatch(hoverLayer, LayerListener.class, OVER);
+        dispatcher.dispatch(hoverLayer, LayerListener.class, event, OVER);
       }
     }
 
@@ -139,7 +144,7 @@ public abstract class MouseImpl implements Mouse {
     }
 
     if (activeLayer != null) {
-      event.dispatch(activeLayer, LayerListener.class, UP);
+      dispatcher.dispatch(activeLayer, LayerListener.class, event, UP);
       activeLayer = null;
     }
 
@@ -155,7 +160,7 @@ public abstract class MouseImpl implements Mouse {
 
     AbstractLayer target = (activeLayer != null) ? activeLayer : hoverLayer;
     if (target != null)
-      event.dispatch(target, LayerListener.class, WHEEL_SCROLL);
+      dispatcher.dispatch(target, LayerListener.class, event, WHEEL_SCROLL);
     return event.flags().getPreventDefault();
   }
 
