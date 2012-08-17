@@ -20,7 +20,7 @@ package playn.core;
  */
 public class Events {
 
-  /** Defines some information for how event processing may be controlled. One flags instances may
+  /** Defines some information for how event processing may be controlled. One instance may
    * be shared among multiple events.
    * TODO: better name than flags? ProcessControls is more accurate but too long.
    */
@@ -42,8 +42,23 @@ public class Events {
      */
     void setPreventDefault(boolean preventDefault);
 
+    /**
+     * Returns true if the event is eligible to also dispatch to parents of the current layer. If
+     * this method returns true and the platform has propagation enabled, then the layer's parent's
+     * listeners will also be notified. Otherwise, the event processing will exit after the current
+     * layer's listeners have all been notified.
+     * @see Platform#setPropagateEvents(boolean)
+     */
+    boolean getPropagationStopped();
+
+    /**
+     * Sets whether the event is eligible to also dispatch to parents of the current layer.
+     * @see #getPropagationStopped()
+     */
+    void setPropagationStopped(boolean stopped);
+
     public static class Impl implements Flags {
-      private boolean preventDefault; // default false
+      private boolean preventDefault, stopped;
 
       @Override
       public boolean getPreventDefault () {
@@ -53,6 +68,16 @@ public class Events {
       @Override
       public void setPreventDefault (boolean preventDefault) {
         this.preventDefault = preventDefault;
+      }
+
+      @Override
+      public boolean getPropagationStopped() {
+        return stopped;
+      }
+
+      @Override
+      public void setPropagationStopped(boolean stopped) {
+        this.stopped = stopped;
       }
 
       @Override

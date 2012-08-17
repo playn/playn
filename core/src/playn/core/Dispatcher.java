@@ -38,7 +38,7 @@ interface Dispatcher {
         AbstractLayer.Interaction<L, E> interaction) {
       @SuppressWarnings("unchecked") E localized = (E)event.localize(layer);
       layer.interact(listenerType, interaction, localized);
-      while (layer.parent() != null) {
+      while (layer.parent() != null && !localized.flags().getPropagationStopped()) {
         layer = (AbstractLayer)layer.parent();
         layer.interact(listenerType, interaction, localized);
       }
