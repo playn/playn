@@ -15,6 +15,8 @@
  */
 package playn.core;
 
+import pythagoras.f.Point;
+
 /**
  * Defines some shared events.
  */
@@ -162,7 +164,14 @@ public class Events {
      */
     float localY();
 
+    /**
+     * The layer that was hit when generating this event, or null if the event is currently
+     * being processed by the global listener.
+     */
+    Layer hit();
+
     abstract class Impl extends Input.Impl implements Position {
+      private final Layer hit;
       private final float x, y, localX, localY;
 
       /** Creates a copy of this event with local x and y in the supplied layer's coord system and
@@ -189,17 +198,28 @@ public class Events {
         return localY;
       }
 
-      protected Impl(Flags flags, double time, float x, float y) {
-        this(flags, time, x, y, x, y);
+      @Override
+      public Layer hit() {
+        return hit;
       }
 
-      protected Impl(Flags flags, double time, float x, float y,
-                     float localX, float localY) {
+      protected Impl(Flags flags, double time, float x, float y) {
+        this(null, flags, time, x, y);
+      }
+
+      protected Impl(Layer hit, Flags flags, double time, float x, float y) {
         super(flags, time);
+        this.hit = hit;
         this.x = x;
         this.y = y;
-        this.localX = localX;
-        this.localY = localY;
+        if (hit == null) {
+          this.localX = x;
+          this.localY = y;
+        } else {
+          Point local = Layer.Util.screenToLayer(hit, x, y);
+          this.localX = local.x;
+          this.localY = local.y;
+        }
       }
 
       @Override
@@ -210,7 +230,7 @@ public class Events {
       @Override
       protected void addFields(StringBuilder builder) {
         super.addFields(builder);
-        builder.append(", x=").append(x).append(", y=").append(y);
+        builder.append(", x=").append(x).append(", y=").append(y).append(", hit=").append(hit);
       }
     }
   }

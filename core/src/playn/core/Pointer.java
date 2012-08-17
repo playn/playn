@@ -16,7 +16,6 @@
 package playn.core;
 
 import playn.core.Events.Flags;
-import pythagoras.f.Point;
 
 /**
  * Input-device interface for pointer events. This is a generic interface that
@@ -34,13 +33,12 @@ public interface Pointer {
       private boolean isTouch;
 
       public Impl(Flags flags, double time, float x, float y, boolean isTouch) {
-        this(flags, time, x, y, x, y, isTouch);
+        this(null, flags, time, x, y, isTouch);
       }
 
       @Override
-      public Event.Impl localize(Layer layer) {
-        Point local = Layer.Util.screenToLayer(layer, x(), y());
-        return new Event.Impl(flags(), time(), x(), y(), local.x, local.y, isTouch());
+      public Event.Impl localize(Layer hit) {
+        return new Event.Impl(hit, flags(), time(), x(), y(), isTouch());
       }
 
       @Override
@@ -48,9 +46,8 @@ public interface Pointer {
         return isTouch;
       }
 
-      protected Impl(Flags flags, double time, float x, float y, float localX, float localY,
-                     boolean isTouch) {
-        super(flags, time, x, y, localX, localY);
+      protected Impl(Layer hit, Flags flags, double time, float x, float y, boolean isTouch) {
+        super(hit, flags, time, x, y);
         this.isTouch = isTouch;
       }
 

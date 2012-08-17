@@ -15,8 +15,6 @@
  */
 package playn.core;
 
-import pythagoras.f.Point;
-
 /**
  * Input-device interface for touch and multi-touch events if they are
  * supported.
@@ -54,13 +52,12 @@ public interface Touch {
 
       public Impl(Events.Flags flags, double time, float x, float y, int id,
                   float pressure, float size) {
-        this(flags, time, x, y, x, y, id, pressure, size);
+        this(null, flags, time, x, y, id, pressure, size);
       }
 
       @Override
-      public Event.Impl localize(Layer layer) {
-        Point local = Layer.Util.screenToLayer(layer, x(), y());
-        return new Event.Impl(flags(), time(), x(), y(), local.x, local.y, id(), pressure(), size());
+      public Event.Impl localize(Layer hit) {
+        return new Event.Impl(hit, flags(), time(), x(), y(), id(), pressure(), size());
       }
 
       @Override
@@ -78,9 +75,9 @@ public interface Touch {
         return size;
       }
 
-      protected Impl(Events.Flags flags, double time, float x, float y, float localX, float localY,
+      protected Impl(Layer hit, Events.Flags flags, double time, float x, float y,
                      int id, float pressure, float size) {
-        super(flags, time, x, y, localX, localY);
+        super(hit, flags, time, x, y);
         this.id = id;
         this.pressure = pressure;
         this.size = size;

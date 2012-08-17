@@ -15,8 +15,6 @@
  */
 package playn.core;
 
-import pythagoras.f.Point;
-
 /**
  * Input-device interface for mouse events. This interface is for mice and
  * supports buttons and the scroll wheel.
@@ -41,7 +39,7 @@ public interface Mouse {
       private int button;
 
       public Impl(Events.Flags flags, double time, float x, float y, int button) {
-        super(flags, time, x, y);
+        super(null, flags, time, x, y);
         this.button = button;
       }
 
@@ -51,14 +49,12 @@ public interface Mouse {
       }
 
       @Override
-      public ButtonEvent.Impl localize(Layer layer) {
-        Point local = Layer.Util.screenToLayer(layer, x(), y());
-        return new ButtonEvent.Impl(flags(), time(), x(), y(), local.x, local.y, button);
+      public ButtonEvent.Impl localize(Layer hit) {
+        return new ButtonEvent.Impl(hit, flags(), time(), x(), y(), button);
       }
 
-      protected Impl(Events.Flags flags, double time, float x, float y,
-                     float localX, float localY, int button) {
-        super(flags, time, x, y, localX, localY);
+      protected Impl(Layer hit, Events.Flags flags, double time, float x, float y, int button) {
+        super(hit, flags, time, x, y);
         this.button = button;
       }
 
@@ -107,14 +103,13 @@ public interface Mouse {
       }
 
       @Override
-      public MotionEvent.Impl localize(Layer layer) {
-        Point local = Layer.Util.screenToLayer(layer, x(), y());
-        return new MotionEvent.Impl(flags(), time(), x(), y(), dx(), dy(), local.x, local.y);
+      public MotionEvent.Impl localize(Layer hit) {
+        return new MotionEvent.Impl(hit, flags(), time(), x(), y(), dx(), dy());
       }
 
-      protected Impl(Events.Flags flags, double time, float x, float y, float dx, float dy,
-                     float localX, float localY) {
-        super(flags, time, x, y, localX, localY);
+      protected Impl(Layer hit, Events.Flags flags, double time, float x, float y,
+                     float dx, float dy) {
+        super(hit, flags, time, x, y);
         this.dx = dx;
         this.dy = dy;
       }
@@ -152,16 +147,14 @@ public interface Mouse {
         return "WheelEvent";
       }
 
-      protected Impl(Events.Flags flags, double time, float x, float y,
-                     float localX, float localY, float velocity) {
-        super(flags, time, x, y, localX, localY);
+      protected Impl(Layer hit, Events.Flags flags, double time, float x, float y, float velocity) {
+        super(hit, flags, time, x, y);
         this.velocity = velocity;
       }
 
       @Override
-      public WheelEvent.Impl localize (Layer layer) {
-        Point local = Layer.Util.screenToLayer(layer, x(), y());
-        return new WheelEvent.Impl(flags(), time(), x(), y(), local.x, local.y, velocity);
+      public WheelEvent.Impl localize (Layer hit) {
+        return new WheelEvent.Impl(hit, flags(), time(), x(), y(), velocity);
       }
 
       @Override
