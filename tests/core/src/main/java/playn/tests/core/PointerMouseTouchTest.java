@@ -22,6 +22,7 @@ import pythagoras.f.Vector;
 import playn.core.CanvasImage;
 import playn.core.Events;
 import playn.core.Font;
+import playn.core.GroupLayer;
 import playn.core.ImageLayer;
 import playn.core.Mouse;
 import playn.core.Mouse.WheelEvent;
@@ -41,7 +42,7 @@ class PointerMouseTouchTest extends Test {
 
   private TextLogger logger;
 
-  private Toggle preventDefault;
+  private Toggle preventDefault, propagate;
 
   @Override
   public String getName() {
@@ -61,10 +62,23 @@ class PointerMouseTouchTest extends Test {
     graphics().rootLayer().addAt(preventDefault.layer, 20, y);
     y += preventDefault.layer.image().height() + 5;
 
-    final ImageLayer mouse = createLabel("Mouse", 0xff000000, 0xffff8080, 20, y += 25);
+    propagate = new Toggle("Enable Propagation") {
+      @Override
+      void set(boolean value) {
+        super.set(value);
+        platform().setPropagateEvents(value);
+      }
+    };
+    graphics().rootLayer().addAt(propagate.layer, 20, y);
+    y += propagate.layer.image().height() + 5;
+
+    GroupLayer parent = graphics().createGroupLayer();
+    graphics().rootLayer().add(parent);
+
+    final ImageLayer mouse = createLabel("Mouse", parent, 0xff000000, 0xffff8080, 20, y += 25);
     y += mouse.image().height() + 5;
 
-    final ImageLayer pointer = createLabel("Pointer", 0xff000000, 0xff80ff80, 20, y += 50);
+    final ImageLayer pointer = createLabel("Pointer", parent, 0xff000000, 0xff80ff80, 20, y += 50);
     y += pointer.image().height() + 5;
 
     createLabel("Event Log", 0, 325, 20);
@@ -75,7 +89,6 @@ class PointerMouseTouchTest extends Test {
     logLayer.setTranslation(325, 40);
     graphics().rootLayer().add(logLayer);
     logger = new TextLogger(logImage, logFormat);
-
 
     // add mouse layer listener
     mouse.addListener(new Mouse.LayerListener() {
@@ -120,6 +133,34 @@ class PointerMouseTouchTest extends Test {
       protected Vector _lstart, _pstart;
     });
 
+    // add mouse layer listener to parent
+    parent.addListener(new Mouse.LayerListener() {
+      @Override
+      public void onMouseDown(ButtonEvent event) {
+        logger.log("parent mouse down");
+      }
+      @Override
+      public void onMouseDrag(MotionEvent event) {
+        logger.log("parent mouse drag");
+      }
+      @Override
+      public void onMouseUp(ButtonEvent event) {
+        logger.log("parent mouse up");
+      }
+      @Override public void onMouseMove (MotionEvent event) {
+        // this is pretty noisy
+        // logger.log("parent mouse move");
+      }
+      @Override public void onMouseOver (MotionEvent event) {
+        logger.log("parent mouse over");
+      }
+      @Override public void onMouseOut (MotionEvent event) {
+        logger.log("parent mouse out");
+      }
+      @Override public void onMouseWheelScroll (WheelEvent event) {
+        logger.log("parent mouse wheel");
+      }
+    });
 
     // add pointer layer listener
     pointer.addListener(new Pointer.Listener() {
@@ -146,6 +187,22 @@ class PointerMouseTouchTest extends Test {
       }
       protected Vector _lstart, _pstart;
     });
+
+    // add pointer listener for parent layer
+    parent.addListener(new Pointer.Listener() {
+      @Override
+      public void onPointerStart(Event event) {
+        logger.log("parent pointer start");
+      }
+      @Override
+      public void onPointerDrag(Event event) {
+        logger.log("parent pointer drag");
+      }
+      @Override
+      public void onPointerEnd(Event event) {
+        logger.log("parent pointer end");
+      }
+    });
   }
 
   @Override public boolean usesPositionalInputs () {
@@ -153,10 +210,11 @@ class PointerMouseTouchTest extends Test {
   }
 
   protected ImageLayer createLabel(String text, int bg, float x, float y) {
-    return createLabel(text, 0xFF6699CC, bg, x, y);
+    return createLabel(text, graphics().rootLayer(), 0xFF6699CC, bg, x, y);
   }
 
-  protected ImageLayer createLabel(String text, int fg, int bg, float x, float y) {
+  protected ImageLayer createLabel(String text, GroupLayer parent,
+                                   int fg, int bg, float x, float y) {
     TextLayout layout = graphics().layoutText(text, baseFormat);
     float twidth = layout.width();
     float theight = layout.height();
@@ -169,7 +227,7 @@ class PointerMouseTouchTest extends Test {
     image.canvas().fillText(layout, 0, 0);
     ImageLayer imageLayer = graphics().createImageLayer(image);
     imageLayer.setTranslation(x, y);
-    graphics().rootLayer().add(imageLayer);
+    parent.add(imageLayer);
     return imageLayer;
   }
 
