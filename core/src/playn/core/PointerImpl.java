@@ -58,12 +58,7 @@ public abstract class PointerImpl implements Pointer {
       p.y += root.originY();
       activeLayer = (AbstractLayer)root.hitTest(p);
       if (activeLayer != null) {
-        final Event.Impl localEvent = event.localize(activeLayer);
-        activeLayer.interact(Listener.class, new AbstractLayer.Interaction<Listener>() {
-          public void interact(Listener l) {
-            l.onPointerStart(localEvent);
-          }
-        });
+        event.dispatch(activeLayer, Listener.class, START);
       }
     }
     return event.flags().getPreventDefault();
@@ -79,12 +74,7 @@ public abstract class PointerImpl implements Pointer {
     }
 
     if (activeLayer != null) {
-      final Event.Impl localEvent = event.localize(activeLayer);
-      activeLayer.interact(Listener.class, new AbstractLayer.Interaction<Listener>() {
-        public void interact(Listener l) {
-          l.onPointerDrag(localEvent);
-        }
-      });
+      event.dispatch(activeLayer, Listener.class, DRAG);
     }
     return event.flags().getPreventDefault();
   }
@@ -99,14 +89,30 @@ public abstract class PointerImpl implements Pointer {
     }
 
     if (activeLayer != null) {
-      final Event.Impl localEvent = event.localize(activeLayer);
-      activeLayer.interact(Listener.class, new AbstractLayer.Interaction<Listener>() {
-        public void interact(Listener l) {
-          l.onPointerEnd(localEvent);
-        }
-      });
+      event.dispatch(activeLayer, Listener.class, END);
       activeLayer = null;
     }
     return event.flags().getPreventDefault();
   }
+
+  protected AbstractLayer.Interaction<Listener, Event.Impl> START =
+      new AbstractLayer.Interaction<Listener, Event.Impl>() {
+    public void interact(Listener l, Event.Impl ev) {
+      l.onPointerStart(ev);
+    }
+  };
+
+  protected AbstractLayer.Interaction<Listener, Event.Impl> DRAG =
+      new AbstractLayer.Interaction<Listener, Event.Impl>() {
+    public void interact(Listener l, Event.Impl ev) {
+      l.onPointerDrag(ev);
+    }
+  };
+
+  protected AbstractLayer.Interaction<Listener, Event.Impl> END =
+      new AbstractLayer.Interaction<Listener, Event.Impl>() {
+    public void interact(Listener l, Event.Impl ev) {
+      l.onPointerEnd(ev);
+    }
+  };
 }

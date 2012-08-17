@@ -144,6 +144,15 @@ public class Events {
        * flags inherited from this event. */
       abstract Position.Impl localize(Layer hit);
 
+      /** Issues an interact call to the given layer and listener with a localized copy of this
+       * event. */
+      <L, E extends Events.Position.Impl> void dispatch(
+          AbstractLayer layer, Class<L> listenerType,
+          AbstractLayer.Interaction<L, E> interaction) {
+        @SuppressWarnings("unchecked") E event = (E)this.localize(layer);
+        layer.interact(listenerType, interaction, event);
+      }
+
       @Override
       public float x() {
         return x;

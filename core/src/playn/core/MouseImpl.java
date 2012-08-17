@@ -84,12 +84,7 @@ public abstract class MouseImpl implements Mouse {
       p.y += root.originY();
       activeLayer = (AbstractLayer)root.hitTest(p);
       if (activeLayer != null) {
-        final ButtonEvent.Impl localEvent = event.localize(activeLayer);
-        activeLayer.interact(LayerListener.class, new AbstractLayer.Interaction<LayerListener>() {
-          public void interact(LayerListener l) {
-            l.onMouseDown(localEvent);
-          }
-        });
+        event.dispatch(activeLayer, LayerListener.class, DOWN);
       }
     }
     return event.flags().getPreventDefault();
@@ -115,19 +110,19 @@ public abstract class MouseImpl implements Mouse {
 
       // handle onMouseDrag if we have an active layer, onMouseMove otherwise
       if (activeLayer != null) {
-        dispatchMotion(event, activeLayer, ON_MOUSE_DRAG);
+        event.dispatch(activeLayer, LayerListener.class, DRAG);
       } else if (hoverLayer != null) {
-        dispatchMotion(event, hoverLayer, ON_MOUSE_MOVE);
+        event.dispatch(hoverLayer, LayerListener.class, MOVE);
       }
 
       // handle onMouseOut
       if (lastHoverLayer != hoverLayer && lastHoverLayer != null) {
-        dispatchMotion(event, lastHoverLayer, ON_MOUSE_OUT);
+        event.dispatch(lastHoverLayer, LayerListener.class, OUT);
       }
 
       // handle onMouseOver
       if (hoverLayer != lastHoverLayer && hoverLayer != null) {
-        dispatchMotion(event, hoverLayer, ON_MOUSE_OVER);
+        event.dispatch(hoverLayer, LayerListener.class, OVER);
       }
     }
 
@@ -144,12 +139,7 @@ public abstract class MouseImpl implements Mouse {
     }
 
     if (activeLayer != null) {
-      final ButtonEvent.Impl localEvent = event.localize(activeLayer);
-      activeLayer.interact(LayerListener.class, new AbstractLayer.Interaction<LayerListener>() {
-        public void interact(LayerListener l) {
-          l.onMouseUp(localEvent);
-        }
-      });
+      event.dispatch(activeLayer, LayerListener.class, UP);
       activeLayer = null;
     }
 
@@ -165,45 +155,56 @@ public abstract class MouseImpl implements Mouse {
 
     AbstractLayer target = (activeLayer != null) ? activeLayer : hoverLayer;
     if (target != null)
-      target.interact(LayerListener.class, new AbstractLayer.Interaction<LayerListener>() {
-        public void interact(LayerListener l) {
-          l.onMouseWheelScroll(event);
-        }
-      });
+      event.dispatch(target, LayerListener.class, WHEEL_SCROLL);
     return event.flags().getPreventDefault();
   }
 
-  protected void dispatchMotion(MotionEvent.Impl event, AbstractLayer layer,
-                                   final Dispatcher dispatcher) {
-    final MotionEvent.Impl localEvent = event.localize(layer);
-    layer.interact(LayerListener.class, new AbstractLayer.Interaction<LayerListener>() {
-      public void interact(LayerListener l) {
-        dispatcher.dispatch(l, localEvent);
-      }
-    });
-  }
+  protected AbstractLayer.Interaction<LayerListener, ButtonEvent.Impl> DOWN =
+      new AbstractLayer.Interaction<LayerListener, ButtonEvent.Impl>() {
+    @Override public void interact (LayerListener l, ButtonEvent.Impl ev) {
+      l.onMouseDown(ev);
+    }
+  };
 
-  protected interface Dispatcher {
-    void dispatch(LayerListener l, MotionEvent.Impl event);
-  }
-  protected static final Dispatcher ON_MOUSE_DRAG = new Dispatcher() {
-    public void dispatch(LayerListener l, MotionEvent.Impl event) {
-      l.onMouseDrag(event);
+  protected AbstractLayer.Interaction<LayerListener, ButtonEvent.Impl> UP =
+      new AbstractLayer.Interaction<LayerListener, ButtonEvent.Impl>() {
+    @Override public void interact (LayerListener l, ButtonEvent.Impl ev) {
+      l.onMouseUp(ev);
     }
   };
-  protected static final Dispatcher ON_MOUSE_MOVE = new Dispatcher() {
-    public void dispatch(LayerListener l, MotionEvent.Impl event) {
-      l.onMouseMove(event);
+
+  protected AbstractLayer.Interaction<LayerListener, MotionEvent.Impl> DRAG =
+      new AbstractLayer.Interaction<LayerListener, MotionEvent.Impl>() {
+    @Override public void interact (LayerListener l, MotionEvent.Impl ev) {
+      l.onMouseDrag(ev);
     }
   };
-  protected static final Dispatcher ON_MOUSE_OVER = new Dispatcher() {
-    public void dispatch(LayerListener l, MotionEvent.Impl event) {
-      l.onMouseOver(event);
+
+  protected AbstractLayer.Interaction<LayerListener, MotionEvent.Impl> MOVE =
+      new AbstractLayer.Interaction<LayerListener, MotionEvent.Impl>() {
+    @Override public void interact (LayerListener l, MotionEvent.Impl ev) {
+      l.onMouseMove(ev);
     }
   };
-  protected static final Dispatcher ON_MOUSE_OUT = new Dispatcher() {
-    public void dispatch(LayerListener l, MotionEvent.Impl event) {
-      l.onMouseOut(event);
+
+  protected AbstractLayer.Interaction<LayerListener, MotionEvent.Impl> OVER =
+      new AbstractLayer.Interaction<LayerListener, MotionEvent.Impl>() {
+    @Override public void interact (LayerListener l, MotionEvent.Impl ev) {
+      l.onMouseOver(ev);
+    }
+  };
+
+  protected AbstractLayer.Interaction<LayerListener, MotionEvent.Impl> OUT =
+      new AbstractLayer.Interaction<LayerListener, MotionEvent.Impl>() {
+    @Override public void interact (LayerListener l, MotionEvent.Impl ev) {
+      l.onMouseOut(ev);
+    }
+  };
+
+  protected AbstractLayer.Interaction<LayerListener, WheelEvent.Impl> WHEEL_SCROLL =
+      new AbstractLayer.Interaction<LayerListener, WheelEvent.Impl>() {
+    @Override public void interact (LayerListener l, WheelEvent.Impl ev) {
+      l.onMouseWheelScroll(ev);
     }
   };
 }

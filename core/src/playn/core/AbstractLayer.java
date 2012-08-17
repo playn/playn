@@ -26,8 +26,8 @@ import playn.core.gl.GLShader;
 public abstract class AbstractLayer implements Layer {
 
   /** Used to dispatch pointer/touch/mouse events to layers. */
-  public interface Interaction<L> {
-    void interact(L listener);
+  public interface Interaction<L, E> {
+    void interact(L listener, E argument);
   }
 
   protected static class Interactor<L> {
@@ -262,8 +262,8 @@ public abstract class AbstractLayer implements Layer {
     }
   }
 
-  <L> void interact(Class<L> listenerType, Interaction<L> interaction) {
-    interact(listenerType, interaction, rootInteractor);
+  <L, E> void interact(Class<L> listenerType, Interaction<L, E> interaction, E argument) {
+    interact(listenerType, interaction, rootInteractor, argument);
   }
 
   boolean hasInteractors() {
@@ -276,13 +276,14 @@ public abstract class AbstractLayer implements Layer {
   // dispatch: we essentially build a list of interactors to which to dispatch on the stack, before
   // dispatching to any interactors; if an interactor is added or removed during dispatch, it
   // neither affects, nor conflicts with, the current dispatch
-  private <L> void interact(Class<L> type, Interaction<L> interaction, Interactor<?> current) {
+  private <L, E> void interact(Class<L> type, Interaction<L, E> interaction,
+                               Interactor<?> current, E argument) {
     if (current == null)
       return;
-    interact(type, interaction, current.next);
+    interact(type, interaction, current.next, argument);
     if (current.listenerType == type) {
       @SuppressWarnings("unchecked") L listener = (L)current.listener;
-      interaction.interact(listener);
+      interaction.interact(listener, argument);
     }
   }
 

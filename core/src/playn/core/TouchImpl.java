@@ -66,12 +66,7 @@ public class TouchImpl implements Touch {
         AbstractLayer hitLayer = (AbstractLayer)root.hitTest(p);
         if (hitLayer != null) {
           activeLayers.put(event.id(), hitLayer);
-          final Event.Impl localEvent = event.localize(hitLayer);
-          hitLayer.interact(LayerListener.class, new AbstractLayer.Interaction<LayerListener>() {
-            public void interact(LayerListener l) {
-              l.onTouchStart(localEvent);
-            }
-          });
+          event.dispatch(hitLayer, LayerListener.class, START);
         }
       }
     }
@@ -87,12 +82,7 @@ public class TouchImpl implements Touch {
     for (Event.Impl event : touches) {
       AbstractLayer activeLayer = activeLayers.get(event.id());
       if (activeLayer != null) {
-        final Event.Impl localEvent = event.localize(activeLayer);
-        activeLayer.interact(LayerListener.class, new AbstractLayer.Interaction<LayerListener>() {
-          public void interact(LayerListener l) {
-            l.onTouchMove(localEvent);
-          }
-        });
+        event.dispatch(activeLayer, LayerListener.class, MOVE);
       }
     }
   }
@@ -107,14 +97,30 @@ public class TouchImpl implements Touch {
     for (Event.Impl event : touches) {
       AbstractLayer activeLayer = activeLayers.get(event.id());
       if (activeLayer != null) {
-        final Event.Impl localEvent = event.localize(activeLayer);
-        activeLayer.interact(LayerListener.class, new AbstractLayer.Interaction<LayerListener>() {
-          public void interact(LayerListener l) {
-            l.onTouchEnd(localEvent);
-          }
-        });
+        event.dispatch(activeLayer, LayerListener.class, END);
         activeLayers.remove(event.id());
       }
     }
   }
+
+  private static AbstractLayer.Interaction<LayerListener, Event.Impl> START =
+      new AbstractLayer.Interaction<LayerListener, Event.Impl>() {
+    @Override public void interact (LayerListener l, Event.Impl ev) {
+      l.onTouchStart(ev);
+    }
+  };
+
+  private static AbstractLayer.Interaction<LayerListener, Event.Impl> MOVE =
+      new AbstractLayer.Interaction<LayerListener, Event.Impl>() {
+    @Override public void interact (LayerListener l, Event.Impl ev) {
+      l.onTouchMove(ev);
+    }
+  };
+
+  private static AbstractLayer.Interaction<LayerListener, Event.Impl> END =
+      new AbstractLayer.Interaction<LayerListener, Event.Impl>() {
+    @Override public void interact (LayerListener l, Event.Impl ev) {
+      l.onTouchEnd(ev);
+    }
+  };
 }
