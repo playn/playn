@@ -39,6 +39,7 @@ import playn.core.TextLayout;
 import playn.core.Mouse.ButtonEvent;
 import playn.core.Mouse.MotionEvent;
 import playn.core.Pointer.Event;
+import playn.core.Touch;
 import static playn.core.PlayN.*;
 
 class PointerMouseTouchTest extends Test {
@@ -81,13 +82,18 @@ class PointerMouseTouchTest extends Test {
     graphics().rootLayer().addAt(propagate.layer, 20, y);
     y += propagate.layer.image().height() + 5;
 
-    final Box mouse = new Box("Mouse", 0xffff8080, propagate.layer.image().width(), 120);
+    float boxWidth = 300, boxHeight = 110;
+    final Box mouse = new Box("Mouse", 0xffff8080, boxWidth, boxHeight);
     graphics().rootLayer().addAt(mouse.layer, 20, y);
     y += mouse.layer.height() + 5;
 
-    final Box pointer = new Box("Pointer", 0xff80ff80, propagate.layer.image().width(), 120);
+    final Box pointer = new Box("Pointer", 0xff80ff80, boxWidth, boxHeight);
     graphics().rootLayer().addAt(pointer.layer, 20, y);
     y += pointer.layer.height() + 5;
+
+    final Box touch = new Box("Touch", 0xff8080ff, boxWidth, boxHeight);
+    graphics().rootLayer().addAt(touch.layer, 20, y);
+    y += touch.layer.height() + 5;
 
     // setup the logger and its layer
     createLabel("Event Log", 0, 325, 20);
@@ -213,6 +219,53 @@ class PointerMouseTouchTest extends Test {
       @Override
       public void onPointerEnd(Event event) {
         logger.log(describe(event, "parent pointer end"));
+      }
+    });
+
+    // add touch layer listener
+    touch.label.addListener(new Touch.LayerListener() {
+      ImageLayer label = touch.label;
+      @Override
+      public void onTouchStart(Touch.Event event) {
+        _lstart = label.transform().translation();
+        _pstart = new Vector(event.x(), event.y());
+        label.setAlpha(0.5f);
+        modify(event);
+        logger.log(describe(event, "touch start"));
+      }
+
+      @Override
+      public void onTouchMove(Touch.Event event) {
+        Vector delta = new Vector(event.x(), event.y()).subtractLocal(_pstart);
+        label.setTranslation(_lstart.x + delta.x, _lstart.y + delta.y);
+        modify(event);
+        motionLabel.set("touch move", describe(event, ""));
+      }
+
+      @Override
+      public void onTouchEnd(Touch.Event event) {
+        label.setAlpha(1.0f);
+        modify(event);
+        logger.log(describe(event, "touch end"));
+      }
+      protected Vector _lstart, _pstart;
+    });
+
+    // add touch parent layer listener
+    touch.layer.addListener(new Touch.LayerListener() {
+      @Override
+      public void onTouchStart(Touch.Event event) {
+        logger.log(describe(event, "parent touch start"));
+      }
+
+      @Override
+      public void onTouchMove(Touch.Event event) {
+        motionLabel.set("parent touch move", describe(event, ""));
+      }
+
+      @Override
+      public void onTouchEnd(Touch.Event event) {
+        logger.log(describe(event, "parent touch end"));
       }
     });
   }
