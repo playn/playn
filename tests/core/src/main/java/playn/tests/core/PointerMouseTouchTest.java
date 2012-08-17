@@ -16,6 +16,7 @@
 package playn.tests.core;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -49,7 +50,8 @@ class PointerMouseTouchTest extends Test {
   private TextLogger logger;
   private TextMapper motionLabel;
 
-  private Toggle preventDefault, propagate;
+  private Toggle<Boolean> preventDefault;
+  private Toggle<String> propagate;
 
   @Override
   public String getName() {
@@ -65,15 +67,15 @@ class PointerMouseTouchTest extends Test {
   public void init() {
     float y = 20;
 
-    preventDefault = new Toggle("Prevent Default");
+    preventDefault = new Toggle<Boolean>("Prevent Default", false, true);
     graphics().rootLayer().addAt(preventDefault.layer, 20, y);
     y += preventDefault.layer.image().height() + 5;
 
-    propagate = new Toggle("Enable Propagation") {
+    propagate = new Toggle<String>("Propagation", "Off", "On", "On (stop)") {
       @Override
-      void set(boolean value) {
+      void set(int value) {
         super.set(value);
-        platform().setPropagateEvents(value);
+        platform().setPropagateEvents(value != 0);
       }
     };
     graphics().rootLayer().addAt(propagate.layer, 20, y);
@@ -249,7 +251,8 @@ class PointerMouseTouchTest extends Test {
   }
 
   protected void modify(Events.Position event) {
-    event.flags().setPreventDefault(preventDefault.value);
+    event.flags().setPreventDefault(preventDefault.value());
+    event.flags().setPropagationStopped(propagate.valueIdx == 2);
   }
 
   protected String describe(Events.Position event, String handler) {
@@ -354,24 +357,38 @@ class PointerMouseTouchTest extends Test {
     }
   }
 
-  protected class Toggle {
+  protected class Toggle<T> {
     final ImageLayer layer = graphics().createImageLayer();
     final String prefix;
-    boolean value;
+    final List<T> values = new ArrayList<T>();
+    int valueIdx;
 
-    Toggle(String name) {
+    Toggle(String name, T...values) {
+      for (T value : values) {
+        this.values.add(value);
+      }
       this.prefix = name + ": ";
-      set(false);
       layer.addListener(new Pointer.Adapter() {
         @Override
         public void onPointerStart(Event event) {
-          set(!value);
+          set((valueIdx + 1) % Toggle.this.values.size());
         }
       });
+
+      set(0);
     }
-    void set(boolean value) {
-      this.value = value;
-      layer.setImage(TestsGame.makeButtonImage(prefix + (value ? "On" : "Off")));
+
+    String toString(T value) {
+      return value.toString();
+    }
+
+    void set(int idx) {
+      this.valueIdx = idx;
+      layer.setImage(TestsGame.makeButtonImage(prefix + toString(values.get(idx))));
+    }
+
+    T value() {
+      return values.get(valueIdx);
     }
   }
 
