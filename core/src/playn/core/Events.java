@@ -103,9 +103,15 @@ public class Events {
 
     // TODO(mdb): a mechanism to determine which modifier keys are pressed, if any
 
-    abstract class Impl implements Input {
+    class Impl implements Input {
       private final Flags flags;
       private final double time;
+
+      /** Creates a copy of this event with local x and y in the supplied layer's coord system and
+       * flags inherited from this event. */
+      Input.Impl localize(Layer hit) {
+        return this;
+      }
 
       @Override
       public double time() {
@@ -174,9 +180,8 @@ public class Events {
       private final Layer hit;
       private final float x, y, localX, localY;
 
-      /** Creates a copy of this event with local x and y in the supplied layer's coord system and
-       * flags inherited from this event. */
-      abstract Position.Impl localize(Layer hit);
+      @Override
+      abstract Input.Impl localize(Layer hit);
 
       @Override
       public float x() {

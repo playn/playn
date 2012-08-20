@@ -22,7 +22,7 @@ interface Dispatcher {
   /** Dispatches events to a single layer. */
   static final Dispatcher SINGLE = new Dispatcher() {
     @Override
-    public <L, E extends Events.Position.Impl> void dispatch(
+    public <L, E extends Events.Input.Impl> void dispatch(
         AbstractLayer layer, Class<L> listenerType, E event,
         AbstractLayer.Interaction<L, E> interaction) {
       @SuppressWarnings("unchecked") E localized = (E)event.localize(layer);
@@ -33,7 +33,7 @@ interface Dispatcher {
   /** Dispatches events to a layer and all its parents. */
   static final Dispatcher PROPAGATING = new Dispatcher() {
     @Override
-    public <L, E extends Events.Position.Impl> void dispatch(
+    public <L, E extends Events.Input.Impl> void dispatch(
         AbstractLayer layer, Class<L> listenerType, E event,
         AbstractLayer.Interaction<L, E> interaction) {
       @SuppressWarnings("unchecked") E localized = (E)event.localize(layer);
@@ -53,7 +53,7 @@ interface Dispatcher {
 
   /** Issues an interact call to a layer and listener with a localized copy of the
    * given event.*/
-  <L, E extends Events.Position.Impl> void dispatch(
+  <L, E extends Events.Input.Impl> void dispatch(
     AbstractLayer layer, Class<L> listenerType,
     E event, AbstractLayer.Interaction<L, E> interaction);
 }
