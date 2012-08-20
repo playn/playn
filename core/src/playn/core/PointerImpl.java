@@ -42,6 +42,15 @@ public abstract class PointerImpl implements Pointer {
     this.listener = listener;
   }
 
+  @Override
+  public void cancelLayerDrags() {
+    if (activeLayer != null) {
+      Event.Impl event = new Event.Impl(new Events.Flags.Impl(), PlayN.currentTime(), 0, 0, false);
+      dispatcher.dispatch(activeLayer, Listener.class, event, CANCEL);
+      activeLayer = null;
+    }
+  }
+
   public void setPropagateEvents(boolean propagate) {
     dispatcher = Dispatcher.Util.select(propagate);
   }
@@ -100,6 +109,22 @@ public abstract class PointerImpl implements Pointer {
     return event.flags().getPreventDefault();
   }
 
+  protected boolean onPointerCancel(Event.Impl event, boolean preventDefault) {
+    if (!enabled)
+      return preventDefault;
+
+    event.flags().setPreventDefault(preventDefault);
+    if (listener != null) {
+      listener.onPointerCancel(event);
+    }
+
+    if (activeLayer != null) {
+      dispatcher.dispatch(activeLayer, Listener.class, event, CANCEL);
+      activeLayer = null;
+    }
+    return event.flags().getPreventDefault();
+  }
+
   protected AbstractLayer.Interaction<Listener, Event.Impl> START =
       new AbstractLayer.Interaction<Listener, Event.Impl>() {
     public void interact(Listener l, Event.Impl ev) {
@@ -118,6 +143,13 @@ public abstract class PointerImpl implements Pointer {
       new AbstractLayer.Interaction<Listener, Event.Impl>() {
     public void interact(Listener l, Event.Impl ev) {
       l.onPointerEnd(ev);
+    }
+  };
+
+  protected AbstractLayer.Interaction<Listener, Event.Impl> CANCEL =
+      new AbstractLayer.Interaction<Listener, Event.Impl>() {
+    public void interact(Listener l, Event.Impl ev) {
+      l.onPointerCancel(ev);
     }
   };
 }

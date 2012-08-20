@@ -73,6 +73,13 @@ public interface Pointer {
      * Called when the pointer drags (always between start/end events).
      */
     void onPointerDrag(Event event);
+
+    /**
+     * Called when a drag is canceled (always after start and takes the place of end). This happens
+     * when {@link #cancelLayerDrags} is called, or it can be initiated by the OS. <em>Note:</em>
+     * the coordinates of this event will be (0, 0) if initiated by {@link #cancelLayerDrags}.
+     */
+    void onPointerCancel(Event event);
   }
 
   /** A {@link Listener} implementation with NOOP stubs provided for each method. */
@@ -83,6 +90,8 @@ public interface Pointer {
     public void onPointerEnd(Event event) { /* NOOP! */ }
     @Override
     public void onPointerDrag(Event event) { /* NOOP! */ }
+    @Override
+    public void onPointerCancel(Event event) { /* NOOP! */ }
   }
 
   /**
@@ -102,4 +111,15 @@ public interface Pointer {
    * cause pointer events to stop being fired.
    */
   void setListener(Listener listener);
+
+  /**
+   * Cancels any currently active drag interaction <em>on a layer</em>. This does not cancel a drag
+   * interaction being managed by the global pointer listener. This is useful if you are
+   * implementing "overlapping" interactions, like the ability to click on buttons and also the
+   * ability to flick scroll an entire interface. You might start an interaction by clicking a
+   * button, but then turn that interaction into a flick scroll by flicking your finger. Your code
+   * should then cancel the button interaction so that the user does not accidentally end up
+   * clicking the button if they happen to move finger in just the right way.
+   */
+  void cancelLayerDrags();
 }

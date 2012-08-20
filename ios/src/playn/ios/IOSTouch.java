@@ -50,7 +50,7 @@ public class IOSTouch extends TouchImpl {
   }
 
   void onTouchesCancelled(NSSet touches, UIEvent event) {
-    // TODO: ???
+    onTouchCancel(toTouchEvents(touches, event));
   }
 
   private Event.Impl[] toTouchEvents(NSSet touches, UIEvent event) {

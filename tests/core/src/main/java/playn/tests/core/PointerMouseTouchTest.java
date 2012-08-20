@@ -203,6 +203,12 @@ class PointerMouseTouchTest extends Test {
         modify(event);
         logger.log(describe(event, "pointer end"));
       }
+      @Override
+      public void onPointerCancel(Event event) {
+        label.setAlpha(1.0f);
+        modify(event);
+        logger.log(describe(event, "pointer cancel"));
+      }
       protected Vector _lstart, _pstart;
     });
 
@@ -219,6 +225,10 @@ class PointerMouseTouchTest extends Test {
       @Override
       public void onPointerEnd(Event event) {
         logger.log(describe(event, "parent pointer end"));
+      }
+      @Override
+      public void onPointerCancel(Event event) {
+        logger.log(describe(event, "parent pointer cancel"));
       }
     });
 
@@ -248,6 +258,14 @@ class PointerMouseTouchTest extends Test {
         modify(event);
         logger.log(describe(event, "touch end"));
       }
+
+      @Override
+      public void onTouchCancel(Touch.Event event) {
+        label.setAlpha(1.0f);
+        modify(event);
+        logger.log(describe(event, "touch cancel"));
+      }
+
       protected Vector _lstart, _pstart;
     });
 
@@ -266,6 +284,11 @@ class PointerMouseTouchTest extends Test {
       @Override
       public void onTouchEnd(Touch.Event event) {
         logger.log(describe(event, "parent touch end"));
+      }
+
+      @Override
+      public void onTouchCancel(Touch.Event event) {
+        logger.log(describe(event, "parent touch cancel"));
       }
     });
   }

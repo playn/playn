@@ -16,8 +16,7 @@
 package playn.core;
 
 /**
- * Input-device interface for touch and multi-touch events if they are
- * supported.
+ * Input-device interface for touch and multi-touch events if they are supported.
  */
 public interface Touch {
 
@@ -119,6 +118,12 @@ public interface Touch {
      * @param touches one or more {@link Event}s.
      */
     void onTouchEnd(Event[] touches);
+
+    /**
+     * Called when a touch, that started out hitting the listening layer, is canceled. This happens
+     * when the OS cancels one or more active touches.
+     */
+    void onTouchCancel(Event[] touches);
   }
 
   /** An interface for listening to touch events that interact with a single layer.
@@ -138,6 +143,13 @@ public interface Touch {
      * Called when a touch, that started out hitting the listening layer, ends.
      */
     void onTouchEnd(Event touch);
+
+    /**
+     * Called when a touch, that started out hitting the listening layer, is canceled. This happens
+     * when {@link #cancelLayerTouches} is called, or it can be initiated by the OS. <em>Note:</em>
+     * the coordinates of this event will be (0, 0) if initiated by {@link #cancelLayerTouches}.
+     */
+    void onTouchCancel(Event touch);
   }
 
   /**
@@ -150,6 +162,8 @@ public interface Touch {
     public void onTouchMove(Event[] touches) { /* NOOP! */ }
     @Override
     public void onTouchEnd(Event[] touches) { /* NOOP! */ }
+    @Override
+    public void onTouchCancel(Event[] touch) { /* NOOP! */ }
   }
 
   /**
@@ -162,6 +176,8 @@ public interface Touch {
     public void onTouchMove(Event touch) { /* NOOP! */ }
     @Override
     public void onTouchEnd(Event touch) { /* NOOP! */ }
+    @Override
+    public void onTouchCancel(Event touch) { /* NOOP! */ }
   }
 
   /**
@@ -187,4 +203,18 @@ public interface Touch {
    * <code>null</code> will cause touch events to stop being fired.
    */
   void setListener(Listener listener);
+
+  /**
+   * Cancels all currently active touch interactions <em>on layers</em>. This does not cancel any
+   * touch interactions being managed by the global touch listener. This is useful if you are
+   * implementing "overlapping" interactions, like the ability to click on buttons and also the
+   * ability to flick scroll an entire interface. You might start an interaction by clicking a
+   * button, but then turn that interaction into a flick scroll by flicking your finger. Your code
+   * should then cancel the button interaction so that the user does not accidentally end up
+   * clicking the button if they happen to move finger in just the right way.
+   *
+   * @param except a layer to be exempted from the cancelation (this would be the layer that "wins"
+   * in the conflict of who gets to process the event sequence), or null.
+   */
+  void cancelLayerTouches(Layer except);
 }

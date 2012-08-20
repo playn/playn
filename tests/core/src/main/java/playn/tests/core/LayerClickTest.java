@@ -90,6 +90,9 @@ class LayerClickTest extends Test {
     public void onTouchEnd(Touch.Event event) {
       // nada
     }
+    public void onTouchCancel(Touch.Event event) {
+      // nada
+    }
 
     public void onPointerStart(Pointer.Event event) {
       onStart(event.x(), event.y());
@@ -98,6 +101,9 @@ class LayerClickTest extends Test {
       onMove(event.x(), event.y());
     }
     public void onPointerEnd(Pointer.Event event) {
+      // nada
+    }
+    public void onPointerCancel(Pointer.Event event) {
       // nada
     }
 
