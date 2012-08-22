@@ -59,7 +59,7 @@ class AndroidNet extends NetImpl {
             try {
               httppost.setEntity(new StringEntity(data));
             } catch (UnsupportedEncodingException e) {
-              notifyFailure(callback, e);
+              platform.notifyFailure(callback, e);
             }
           }
           req = httppost;
@@ -71,12 +71,12 @@ class AndroidNet extends NetImpl {
           StatusLine status = response.getStatusLine();
           int code = status.getStatusCode();
           if (code == HttpStatus.SC_OK) {
-            notifySuccess(callback, EntityUtils.toString(response.getEntity()));
+            platform.notifySuccess(callback, EntityUtils.toString(response.getEntity()));
           } else {
-            notifyFailure(callback, new HttpException(code, status.getReasonPhrase()));
+            platform.notifyFailure(callback, new HttpException(code, status.getReasonPhrase()));
           }
         } catch (Exception e) {
-          notifyFailure(callback, e);
+          platform.notifyFailure(callback, e);
         }
       }
     }.start();

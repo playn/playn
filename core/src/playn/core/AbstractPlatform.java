@@ -15,6 +15,7 @@
  */
 package playn.core;
 
+import playn.core.util.Callback;
 import playn.core.util.RunQueue;
 
 /**
@@ -40,6 +41,28 @@ public abstract class AbstractPlatform implements Platform {
   @Override
   public Log log() {
     return log;
+  }
+
+  /**
+   * Delivers {@code result} to {@code callback} on the next game tick (on the PlayN thread).
+   */
+  public <T> void notifySuccess(final Callback<T> callback, final T result) {
+    invokeLater(new Runnable() {
+      public void run() {
+        callback.onSuccess(result);
+      }
+    });
+  }
+
+  /**
+   * Delivers {@code error} to {@code callback} on the next game tick (on the PlayN thread).
+   */
+  public void notifyFailure(final Callback<?> callback, final Throwable error) {
+    invokeLater(new Runnable() {
+      public void run() {
+        callback.onFailure(error);
+      }
+    });
   }
 
   protected AbstractPlatform(Log log) {

@@ -56,7 +56,7 @@ public class IOSNet extends NetImpl {
             out.Close();
             req.BeginGetResponse(gotResponse(req, callback), null);
           } catch (Throwable t) {
-            notifyFailure(callback, t);
+            platform.notifyFailure(callback, t);
           }
         }
       }), null);
@@ -75,12 +75,13 @@ public class IOSNet extends NetImpl {
           HttpStatusCode code = rsp.get_StatusCode();
           if (code.Value == HttpStatusCode.OK) {
             reader = new StreamReader(rsp.GetResponseStream());
-            notifySuccess(callback, reader.ReadToEnd());
+            platform.notifySuccess(callback, reader.ReadToEnd());
           } else {
-            notifyFailure(callback, new HttpException(code.Value, rsp.get_StatusDescription()));
+            String descrip = rsp.get_StatusDescription();
+            platform.notifyFailure(callback, new HttpException(code.Value, descrip));
           }
         } catch (final Throwable t) {
-          notifyFailure(callback, t);
+          platform.notifyFailure(callback, t);
         } finally {
           if (reader != null)
             reader.Close();

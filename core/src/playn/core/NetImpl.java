@@ -22,30 +22,14 @@ import playn.core.util.Callback;
  */
 public abstract class NetImpl implements Net {
 
-  private final Platform platform;
+  protected final AbstractPlatform platform;
 
   @Override
   public WebSocket createWebSocket(String url, WebSocket.Listener listener) {
     throw new UnsupportedOperationException();
   }
 
-  protected NetImpl(Platform platform) {
+  protected NetImpl(AbstractPlatform platform) {
     this.platform = platform;
-  }
-
-  protected void notifySuccess(final Callback<String> callback, final String result) {
-    platform.invokeLater(new Runnable() {
-      public void run() {
-        callback.onSuccess(result);
-      }
-    });
-  }
-
-  protected void notifyFailure(final Callback<String> callback, final Throwable cause) {
-    platform.invokeLater(new Runnable() {
-      public void run() {
-        callback.onFailure(cause);
-      }
-    });
   }
 }

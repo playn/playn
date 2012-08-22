@@ -59,13 +59,13 @@ public class JavaNet extends NetImpl {
           } else {
             InputStream stream = conn.getInputStream();
             InputStreamReader reader = new InputStreamReader(stream);
-            notifySuccess(callback, readFully(reader));
+            platform.notifySuccess(callback, readFully(reader));
           }
 
         } catch (MalformedURLException e) {
-          notifyFailure(callback, e);
+          platform.notifyFailure(callback, e);
         } catch (IOException e) {
-          notifyFailure(callback, e);
+          platform.notifyFailure(callback, e);
         }
       }
     }.start();
@@ -90,9 +90,9 @@ public class JavaNet extends NetImpl {
           processResponse(conn, callback);
 
         } catch (MalformedURLException e) {
-          notifyFailure(callback, e);
+          platform.notifyFailure(callback, e);
         } catch (IOException e) {
-          notifyFailure(callback, e);
+          platform.notifyFailure(callback, e);
         }
       }
     }.start();
@@ -115,7 +115,7 @@ public class JavaNet extends NetImpl {
         throw new HttpException(code, conn.getResponseMessage());
       } else {
         String result = readFully(new InputStreamReader(conn.getInputStream()));
-        notifySuccess(callback, result);
+        platform.notifySuccess(callback, result);
       }
     } finally {
       conn.disconnect();
