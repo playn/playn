@@ -89,16 +89,8 @@ public class JavaAssets extends AbstractAssets {
     this.assetScale = new Scale(scaleFactor);
   }
 
-  InputStream getAssetStream(String path) throws IOException {
-    InputStream in = getClass().getClassLoader().getResourceAsStream(pathPrefix + path);
-    if (in == null) {
-      throw new FileNotFoundException(path);
-    }
-    return in;
-  }
-
   @Override
-  protected Image doGetImage(String path) {
+  public Image getImage(String path) {
     JavaGraphics graphics = platform.graphics();
     Exception error = null;
     for (Scale.ScaledResource rsrc : assetScale().getScaledResources(pathPrefix + path)) {
@@ -124,7 +116,7 @@ public class JavaAssets extends AbstractAssets {
   }
 
   @Override
-  protected Sound doGetSound(String path) {
+  public Sound getSound(String path) {
     final String soundPath = path + ".mp3";
     try {
       return platform.audio().createSound(soundPath, getAssetStream(soundPath));
@@ -135,7 +127,7 @@ public class JavaAssets extends AbstractAssets {
   }
 
   @Override
-  protected void doGetText(final String path, final ResourceCallback<String> callback) {
+  public void getText(final String path, final ResourceCallback<String> callback) {
     doResourceAction(new Runnable() {
       public void run() {
         try {
@@ -145,6 +137,14 @@ public class JavaAssets extends AbstractAssets {
         }
       }
     });
+  }
+
+  InputStream getAssetStream(String path) throws IOException {
+    InputStream in = getClass().getClassLoader().getResourceAsStream(pathPrefix + path);
+    if (in == null) {
+      throw new FileNotFoundException(path);
+    }
+    return in;
   }
 
   protected URL requireResource(String path) throws FileNotFoundException {

@@ -70,7 +70,7 @@ public class AndroidAssets extends AbstractAssets {
   }
 
   @Override
-  protected Image doGetImage(String path) {
+  public Image getImage(String path) {
     Exception error = null;
     for (Scale.ScaledResource rsrc : assetScale().getScaledResources(path)) {
       try {
@@ -103,6 +103,40 @@ public class AndroidAssets extends AbstractAssets {
     // TODO: create error image which reports failure to callbacks
     // error != null ? error : new FileNotFoundException(path);
     return new AndroidImage(platform.graphics().ctx, createErrorBitmap(), Scale.ONE);
+  }
+
+  @Override
+  public Sound getSound(String path) {
+    try {
+      return platform.audio().createSound(path + ".mp3");
+    } catch (IOException e) {
+      log().error("Unable to load sound: " + path, e);
+      return new Sound.Error(e);
+    }
+  }
+
+  @Override
+  public void getText(final String path, final ResourceCallback<String> callback) {
+    try {
+      InputStream is = openAsset(path);
+      try {
+        StringBuilder fileData = new StringBuilder(1000);
+        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+        char[] buf = new char[1024];
+        int numRead = 0;
+        while ((numRead = reader.read(buf)) != -1) {
+          String readData = String.valueOf(buf, 0, numRead);
+          fileData.append(readData);
+        }
+        reader.close();
+        String text = fileData.toString();
+        callback.done(text);
+      } finally {
+        is.close();
+      }
+    } catch (IOException e) {
+      callback.error(e);
+    }
   }
 
   /**
@@ -171,40 +205,6 @@ public class AndroidAssets extends AbstractAssets {
       }
     }
     return bitmap;
-  }
-
-  @Override
-  protected Sound doGetSound(String path) {
-    try {
-      return platform.audio().createSound(path + ".mp3");
-    } catch (IOException e) {
-      log().error("Unable to load sound: " + path, e);
-      return new Sound.Error(e);
-    }
-  }
-
-  @Override
-  protected void doGetText(final String path, final ResourceCallback<String> callback) {
-    try {
-      InputStream is = openAsset(path);
-      try {
-        StringBuilder fileData = new StringBuilder(1000);
-        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-        char[] buf = new char[1024];
-        int numRead = 0;
-        while ((numRead = reader.read(buf)) != -1) {
-          String readData = String.valueOf(buf, 0, numRead);
-          fileData.append(readData);
-        }
-        reader.close();
-        String text = fileData.toString();
-        callback.done(text);
-      } finally {
-        is.close();
-      }
-    } catch (IOException e) {
-      callback.error(e);
-    }
   }
 
   public abstract static class DownloaderTask<T> extends AsyncTask<String, Void, T> {

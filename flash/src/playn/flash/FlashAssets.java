@@ -27,55 +27,28 @@ import playn.core.ResourceCallback;
 import java.util.HashMap;
 import java.util.Map;
 
-import playn.core.AbstractCachingAssets;
-import playn.core.PlayN;
+import playn.core.AbstractAssets;
 import playn.core.Image;
+import playn.core.PlayN;
 import playn.core.Sound;
 
 @FlashImport({"flash.net.URLLoader", "flash.net.URLRequest"})
-public class FlashAssets extends AbstractCachingAssets {
+public class FlashAssets extends AbstractAssets {
 
-
+  private final Map<String, AutoClientBundleWithLookup> clientBundles =
+    new HashMap<String, AutoClientBundleWithLookup>();
   private String pathPrefix = "";
 
   public void setPathPrefix(String prefix) {
     pathPrefix = prefix;
   }
 
-  private Map<String, AutoClientBundleWithLookup> clientBundles = new HashMap<String, AutoClientBundleWithLookup>();
-
   public void addClientBundle(String regExp, AutoClientBundleWithLookup clientBundle) {
     clientBundles.put(regExp, clientBundle);
   }
 
-
-
   @Override
-  protected Sound loadSound(String path) {
-    String url = pathPrefix + path;
-
-    AutoClientBundleWithLookup clientBundle = getBundle(path);
-    if (clientBundle != null) {
-      String key = getKey(path);
-      DataResource resource = (DataResource) getResource(key, clientBundle);
-      if (resource != null) {
-        url = resource.getUrl();
-      }
-    } else {
-      url += ".mp3";
-    }
-
-    return adaptSound(url);
-  }
-
-  private Sound adaptSound(String url) {
-    FlashAudio audio = (FlashAudio) PlayN.audio();
-    FlashSound sound = audio.createSound(url);
-    return sound;
-  }
-
-  @Override
-  protected Image loadImage(String path) {
+  public Image getImage(String path) {
     String url = pathPrefix + path;
     PlayN.log().info("Looking to load " + url);
     AutoClientBundleWithLookup clientBundle = getBundle(path);
@@ -86,8 +59,34 @@ public class FlashAssets extends AbstractCachingAssets {
         url = resource.getURL();
       }
     }
-
     return adaptImage(url);
+  }
+
+  @Override
+  public Sound getSound(String path) {
+    String url = pathPrefix + path;
+    AutoClientBundleWithLookup clientBundle = getBundle(path);
+    if (clientBundle != null) {
+      String key = getKey(path);
+      DataResource resource = (DataResource) getResource(key, clientBundle);
+      if (resource != null) {
+        url = resource.getUrl();
+      }
+    } else {
+      url += ".mp3";
+    }
+    return adaptSound(url);
+  }
+
+  @Override
+  public void getText(String path, ResourceCallback<String> callback) {
+    loadText(pathPrefix + path, callback);
+  }
+
+  private Sound adaptSound(String url) {
+    FlashAudio audio = (FlashAudio) PlayN.audio();
+    FlashSound sound = audio.createSound(url);
+    return sound;
   }
 
   /**
@@ -121,16 +120,6 @@ public class FlashAssets extends AbstractCachingAssets {
   private Image adaptImage(String url) {
     PlayN.log().info("Loading " + url);
     return new FlashImage(url);
-  }
-
-
-
-  /* (non-Javadoc)
-   * @see playn.core.AbstractAssets#doGetText(java.lang.String, playn.core.ResourceCallback)
-   */
-  @Override
-  protected void doGetText(String path, ResourceCallback<String> callback) {
-    loadText(pathPrefix + path, callback);
   }
 
   static native void loadText(String path, ResourceCallback<String> callback) /*-{

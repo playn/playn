@@ -15,59 +15,19 @@
  */
 package playn.core;
 
+/**
+ * Base {@link Assets} implementation shared among platforms.
+ */
 public abstract class AbstractAssets implements Assets {
 
-  private int totalRequestsCount = 0;
-  private int successCount = 0;
-  private int errorsCount = 0;
-
-  private ResourceCallback<Object> callback = new ResourceCallback<Object>() {
-    @Override
-    public void done(Object resource) {
-      ++successCount;
-    }
-
-    @Override
-    public void error(Throwable e) {
-      ++errorsCount;
-    }
-  };
-
-  @Override
-  public final Image getImage(String path) {
-    incrementRequestCount();
-    Image image = doGetImage(path);
-    image.addCallback(callback);
-    return image;
-  }
-
-  protected abstract Image doGetImage(String path);
-
-  @Override
-  public final Sound getSound(String path) {
-    incrementRequestCount();
-    Sound sound = doGetSound(path);
-    sound.addCallback(callback);
-    return sound;
-  }
-
-  protected abstract Sound doGetSound(String path);
-
-  @Override
-  public void getText(String path, ResourceCallback<String> callback) {
-    doGetText(path, callback);
-  }
-
-  protected abstract void doGetText(String path, ResourceCallback<String> callback);
-
-  @Override
+  @Deprecated
   public final boolean isDone() {
-    return (this.totalRequestsCount == this.errorsCount + this.successCount);
+    return true;
   }
 
-  @Override
+  @Deprecated
   public final int getPendingRequestCount() {
-    return this.totalRequestsCount - this.errorsCount - this.successCount;
+    return 0;
   }
 
   /**
@@ -83,9 +43,5 @@ public abstract class AbstractAssets implements Assets {
       path = path.replaceAll("[^/]+/\\.\\./", "");
     } while (path.length() != pathLen);
     return path;
-  }
-
-  private void incrementRequestCount() {
-    ++totalRequestsCount;
   }
 }

@@ -45,13 +45,14 @@ public interface Assets {
   void getText(String path, ResourceCallback<String> callback);
 
   /**
-   * Return <code>true</code> if all requested assets have been loaded or errored out,
-   * or <code>false</code> if there are assets remaining to be retrieved
+   * @deprecated Use {@link WatchedAssets}.
    */
+  @Deprecated
   boolean isDone();
 
   /**
-   * Return how many assets have not yet been loaded or errored out
+   * @deprecated Use {@link WatchedAssets}.
    */
+  @Deprecated
   int getPendingRequestCount();
 }

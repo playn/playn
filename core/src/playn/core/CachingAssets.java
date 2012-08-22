@@ -18,33 +18,51 @@ package playn.core;
 import java.util.HashMap;
 import java.util.Map;
 
-public abstract class AbstractCachingAssets extends AbstractAssets {
+/**
+ * An {@link Assets} wrapper that caches all loaded images and sounds with no expiration mechanism.
+ */
+public class CachingAssets implements Assets {
 
-  Map<String, Object> cache = new HashMap<String, Object>();
+  private final Assets delegate;
+  private final Map<String, Object> cache = new HashMap<String, Object>();
+
+  public CachingAssets (Assets delegate) {
+    this.delegate = delegate;
+  }
 
   @Override
-  protected final Image doGetImage(String path) {
+  public Image getImage(String path) {
     Object object = null;
     if ((object = cache.get(path)) == null) {
-      object = loadImage(path);
+      object = delegate.getImage(path);
       cache.put(path, object);
     }
-
     return (Image) object;
   }
 
-  protected abstract Image loadImage(String path);
-
   @Override
-  protected final Sound doGetSound(String path) {
+  public Sound getSound(String path) {
     Object object = null;
     if ((object = cache.get(path)) == null) {
-      object = loadSound(path);
+      object = delegate.getSound(path);
       cache.put(path, object);
     }
-
     return (Sound) object;
   }
 
-  protected abstract Sound loadSound(String path);
+  @Override
+  public void getText(String path, ResourceCallback<String> callback) {
+    // no caching for text loading
+    delegate.getText(path, callback);
+  }
+
+  @Deprecated
+  public boolean isDone() {
+    return delegate.isDone();
+  }
+
+  @Deprecated
+  public int getPendingRequestCount() {
+    return delegate.getPendingRequestCount();
+  }
 }

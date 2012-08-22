@@ -31,15 +31,15 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.xhr.client.ReadyStateChangeHandler;
 import com.google.gwt.xhr.client.XMLHttpRequest;
 
-import playn.core.AbstractCachingAssets;
+import playn.core.AbstractAssets;
 import playn.core.AutoClientBundleWithLookup;
-import playn.core.PlayN;
 import playn.core.Image;
+import playn.core.PlayN;
 import playn.core.ResourceCallback;
 import playn.core.Sound;
 import playn.html.XDomainRequest.Handler;
 
-public class HtmlAssets extends AbstractCachingAssets {
+public class HtmlAssets extends AbstractAssets {
 
   /**
    * Whether or not to log successful progress of {@code XMLHTTPRequest} and
@@ -48,17 +48,12 @@ public class HtmlAssets extends AbstractCachingAssets {
   private static final boolean LOG_XHR_SUCCESS = false;
 
   private final HtmlPlatform platform;
-  private String pathPrefix = "";
-
-  private Map<String, AutoClientBundleWithLookup> clientBundles =
+  private final Map<String, AutoClientBundleWithLookup> clientBundles =
     new HashMap<String, AutoClientBundleWithLookup>();
+  private String pathPrefix = "";
 
   public void setPathPrefix(String prefix) {
     pathPrefix = prefix;
-  }
-
-  public HtmlAssets(HtmlPlatform platform) {
-    this.platform = platform;
   }
 
   public void addClientBundle(String regExp, AutoClientBundleWithLookup clientBundle) {
@@ -66,7 +61,37 @@ public class HtmlAssets extends AbstractCachingAssets {
   }
 
   @Override
-  protected void doGetText(final String path, final ResourceCallback<String> callback) {
+  public Image getImage(String path) {
+    String url = pathPrefix + path;
+    AutoClientBundleWithLookup clientBundle = getBundle(path);
+    if (clientBundle != null) {
+      String key = getKey(path);
+      ImageResource resource = (ImageResource) getResource(key, clientBundle);
+      if (resource != null) {
+        url = resource.getURL();
+      }
+    }
+    return adaptImage(url);
+  }
+
+  @Override
+  public Sound getSound(String path) {
+    String url = pathPrefix + path;
+    AutoClientBundleWithLookup clientBundle = getBundle(path);
+    if (clientBundle != null) {
+      String key = getKey(path);
+      DataResource resource = (DataResource) getResource(key, clientBundle);
+      if (resource != null) {
+        url = resource.getUrl();
+      }
+    } else {
+      url += ".mp3";
+    }
+    return adaptSound(url);
+  }
+
+  @Override
+  public void getText(final String path, final ResourceCallback<String> callback) {
     final String fullPath = pathPrefix + path;
     /*
      * Except for IE, all browsers support on-domain and cross-domain XHR via
@@ -87,6 +112,10 @@ public class HtmlAssets extends AbstractCachingAssets {
         throw e;
       }
     }
+  }
+
+  HtmlAssets(HtmlPlatform platform) {
+    this.platform = platform;
   }
 
   private void doXdr(final String fullPath, final ResourceCallback<String> callback) {
@@ -183,44 +212,10 @@ public class HtmlAssets extends AbstractCachingAssets {
     xhr.send();
   }
 
-  @Override
-  protected Sound loadSound(String path) {
-    String url = pathPrefix + path;
-
-    AutoClientBundleWithLookup clientBundle = getBundle(path);
-    if (clientBundle != null) {
-      String key = getKey(path);
-      DataResource resource = (DataResource) getResource(key, clientBundle);
-      if (resource != null) {
-        url = resource.getUrl();
-      }
-    } else {
-      url += ".mp3";
-    }
-
-    return adaptSound(url);
-  }
-
   private Sound adaptSound(String url) {
     HtmlAudio audio = (HtmlAudio) PlayN.audio();
     HtmlSound sound = audio.createSound(url);
     return sound;
-  }
-
-  @Override
-  protected Image loadImage(String path) {
-    String url = pathPrefix + path;
-
-    AutoClientBundleWithLookup clientBundle = getBundle(path);
-    if (clientBundle != null) {
-      String key = getKey(path);
-      ImageResource resource = (ImageResource) getResource(key, clientBundle);
-      if (resource != null) {
-        url = resource.getURL();
-      }
-    }
-
-    return adaptImage(url);
   }
 
   /**

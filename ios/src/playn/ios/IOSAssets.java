@@ -29,14 +29,14 @@ import cli.System.IO.StreamReader;
 import cli.MonoTouch.Foundation.NSData;
 import cli.MonoTouch.UIKit.UIImage;
 
+import playn.core.AbstractAssets;
 import playn.core.Asserts;
-import playn.core.Assets;
 import playn.core.Image;
 import playn.core.ResourceCallback;
 import playn.core.Sound;
 import playn.core.gl.Scale;
 
-public class IOSAssets implements Assets {
+public class IOSAssets extends AbstractAssets {
 
   private String pathPrefix = "";
   private final IOSPlatform platform;
@@ -112,15 +112,5 @@ public class IOSAssets implements Assets {
         reader.Close();
       }
     }
-  }
-
-  @Override
-  public boolean isDone() {
-    return true; // nothing is async
-  }
-
-  @Override
-  public int getPendingRequestCount() {
-    return 0; // nothing is async
   }
 }
