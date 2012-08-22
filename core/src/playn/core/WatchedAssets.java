@@ -15,6 +15,8 @@
  */
 package playn.core;
 
+import playn.core.util.Callback;
+
 /**
  * An {@link Assets} wrapper that tracks the loading status of all asynchronously loaded resources.
  */
@@ -25,14 +27,14 @@ public class WatchedAssets implements Assets {
   private int successCount = 0;
   private int errorsCount = 0;
 
-  private ResourceCallback<Object> callback = new ResourceCallback<Object>() {
+  private Callback<Object> callback = new Callback<Object>() {
     @Override
-    public void done(Object resource) {
+    public void onSuccess(Object resource) {
       ++successCount;
     }
 
     @Override
-    public void error(Throwable e) {
+    public void onFailure(Throwable e) {
       ++errorsCount;
     }
   };
@@ -58,7 +60,7 @@ public class WatchedAssets implements Assets {
   }
 
   @Override
-  public void getText(String path, ResourceCallback<String> callback) {
+  public void getText(String path, Callback<String> callback) {
     // no tracking for text loading
     delegate.getText(path, callback);
   }

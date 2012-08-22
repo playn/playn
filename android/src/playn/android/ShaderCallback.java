@@ -15,18 +15,18 @@
  */
 package playn.android;
 
-import playn.core.ResourceCallback;
+import playn.core.util.Callback;
 
-class ShaderCallback implements ResourceCallback<String> {
+class ShaderCallback implements Callback<String> {
   private String shader;
 
   @Override
-  public void done(String shader) {
+  public void onSuccess(String shader) {
     this.shader = shader;
   }
 
   @Override
-  public void error(Throwable err) {
+  public void onFailure(Throwable err) {
     throw new RuntimeException("Exception loading shader strings.", err);
   }
 

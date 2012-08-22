@@ -16,7 +16,7 @@
 package playn.core.gl;
 
 import playn.core.Image;
-import playn.core.ResourceCallback;
+import playn.core.util.Callback;
 
 public abstract class ImageRegionGL extends ImageGL implements Image.Region {
 
@@ -99,13 +99,13 @@ public abstract class ImageRegionGL extends ImageGL implements Image.Region {
   }
 
   @Override
-  public void addCallback(final ResourceCallback<? super Image> callback) {
-    parent.addCallback(new ResourceCallback<Image>() {
-      public void done(Image image) {
-        callback.done(ImageRegionGL.this);
+  public void addCallback(final Callback<? super Image> callback) {
+    parent.addCallback(new Callback<Image>() {
+      public void onSuccess(Image image) {
+        callback.onSuccess(ImageRegionGL.this);
       }
-      public void error(Throwable err) {
-        callback.error(err);
+      public void onFailure(Throwable err) {
+        callback.onFailure(err);
       }
     });
   }

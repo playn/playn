@@ -26,10 +26,10 @@ import cli.System.Drawing.RectangleF;
 
 import playn.core.Image;
 import playn.core.Pattern;
-import playn.core.ResourceCallback;
 import playn.core.gl.GLContext;
 import playn.core.gl.ImageGL;
 import playn.core.gl.Scale;
+import playn.core.util.Callback;
 
 /**
  * Provides some shared bits for {@link IOSImage} and {@link IOSCanvasImage}.
@@ -47,8 +47,8 @@ public abstract class IOSAbstractImage extends ImageGL implements Image, IOSCanv
   }
 
   @Override
-  public void addCallback(ResourceCallback<? super Image> callback) {
-    callback.done(this); // we're always ready
+  public void addCallback(Callback<? super Image> callback) {
+    callback.onSuccess(this); // we're always ready
   }
 
   @Override

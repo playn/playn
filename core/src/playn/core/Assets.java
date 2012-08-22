@@ -15,6 +15,8 @@
  */
 package playn.core;
 
+import playn.core.util.Callback;
+
 /**
  * Fetches and returns assets.  This interface assumes that some or all assets
  * are asynchronously loaded.
@@ -42,7 +44,7 @@ public interface Assets {
    *
    * @param path a path to the resource
    */
-  void getText(String path, ResourceCallback<String> callback);
+  void getText(String path, Callback<String> callback);
 
   /**
    * @deprecated Use {@link WatchedAssets}.

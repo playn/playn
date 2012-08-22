@@ -15,22 +15,21 @@
  */
 package playn.flash;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import com.google.gwt.resources.client.DataResource;
 import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.resources.client.ResourcePrototype;
 
 import flash.gwt.FlashImport;
 
-import playn.core.AutoClientBundleWithLookup;
-import playn.core.ResourceCallback;
-
-import java.util.HashMap;
-import java.util.Map;
-
 import playn.core.AbstractAssets;
+import playn.core.AutoClientBundleWithLookup;
 import playn.core.Image;
 import playn.core.PlayN;
 import playn.core.Sound;
+import playn.core.util.Callback;
 
 @FlashImport({"flash.net.URLLoader", "flash.net.URLRequest"})
 public class FlashAssets extends AbstractAssets {
@@ -79,7 +78,7 @@ public class FlashAssets extends AbstractAssets {
   }
 
   @Override
-  public void getText(String path, ResourceCallback<String> callback) {
+  public void getText(String path, Callback<String> callback) {
     loadText(pathPrefix + path, callback);
   }
 
@@ -122,12 +121,12 @@ public class FlashAssets extends AbstractAssets {
     return new FlashImage(url);
   }
 
-  static native void loadText(String path, ResourceCallback<String> callback) /*-{
+  static native void loadText(String path, Callback<String> callback) /*-{
      var req = new flash.net.URLRequest(path);
      var loader = new flash.net.URLLoader();
      loader.addEventListener("complete", function(evt) {
        var l2 = flash.net.URLLoader(evt.target);
-       callback.@playn.core.ResourceCallback::done(Ljava/lang/Object;)(l2.data);
+       callback.@playn.core.util.Callback::onSuccess(Ljava/lang/Object;)(l2.data);
      });
      try {
        loader.load(req);

@@ -22,8 +22,8 @@ import java.awt.image.BufferedImage;
 import playn.core.Canvas;
 import playn.core.CanvasImage;
 import playn.core.Image;
-import playn.core.ResourceCallback;
 import playn.core.gl.GLContext;
+import playn.core.util.Callback;
 
 class JavaCanvasImage extends JavaImage implements CanvasImage {
 
@@ -44,8 +44,8 @@ class JavaCanvasImage extends JavaImage implements CanvasImage {
   }
 
   @Override
-  public void addCallback(ResourceCallback<? super Image> callback) {
-    callback.done(this);
+  public void addCallback(Callback<? super Image> callback) {
+    callback.onSuccess(this);
   }
 
   @Override

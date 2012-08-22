@@ -15,18 +15,31 @@
  */
 package playn.core;
 
+import playn.core.util.Callback;
+
 /**
- * Callback interface used to notify completion or failure of a resource request.
+ * @deprecated Use {@link Callback}.
  */
-public interface ResourceCallback<T> {
+@Deprecated
+public abstract class ResourceCallback<T> implements Callback<T> {
 
   /**
    * Called when the resource is successfully loaded.
    */
-  void done(T resource);
+  public abstract void done(T resource);
 
   /**
    * Called when the resource fails to load.
    */
-  void error(Throwable err);
+  public abstract void error(Throwable err);
+
+  @Override
+  public void onSuccess(T resource) {
+    done(resource);
+  }
+
+  @Override
+  public void onFailure (Throwable err) {
+    error(err);
+  }
 }

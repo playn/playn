@@ -29,9 +29,9 @@ import pythagoras.f.MathUtil;
 
 import playn.core.AbstractAssets;
 import playn.core.Image;
-import playn.core.ResourceCallback;
 import playn.core.Sound;
 import playn.core.gl.Scale;
+import playn.core.util.Callback;
 
 /**
  * Loads Java assets via the classpath.
@@ -127,13 +127,13 @@ public class JavaAssets extends AbstractAssets {
   }
 
   @Override
-  public void getText(final String path, final ResourceCallback<String> callback) {
+  public void getText(final String path, final Callback<String> callback) {
     doResourceAction(new Runnable() {
       public void run() {
         try {
-          callback.done(Resources.toString(requireResource(pathPrefix + path), Charsets.UTF_8));
+          callback.onSuccess(Resources.toString(requireResource(pathPrefix + path), Charsets.UTF_8));
         } catch (Exception e) {
-          callback.error(e);
+          callback.onFailure(e);
         }
       }
     });

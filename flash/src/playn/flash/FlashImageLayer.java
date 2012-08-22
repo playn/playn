@@ -26,9 +26,9 @@ import flash.display.Bitmap;
 import flash.display.Sprite;
 
 import playn.core.PlayN;
-import playn.core.ResourceCallback;
 import playn.core.Image;
 import playn.core.ImageLayer;
+import playn.core.util.Callback;
 
 public class FlashImageLayer extends FlashLayer implements ImageLayer {
 
@@ -79,13 +79,13 @@ public class FlashImageLayer extends FlashLayer implements ImageLayer {
   @Override
   public void setImage(Image image) {
     this.image = (FlashImage) image;
-    image.addCallback(new ResourceCallback<Image>() {
+    image.addCallback(new Callback<Image>() {
       @Override
-      public void error(Throwable err) {
+      public void onFailure(Throwable err) {
         PlayN.log().error(err.toString());
       }
       @Override
-      public void done(Image resource) {
+      public void onSuccess(Image resource) {
         bitmapData = ((FlashImage) resource).bitmapData();
         dirty = true;
       }

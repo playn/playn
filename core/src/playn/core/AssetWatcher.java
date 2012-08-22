@@ -13,6 +13,8 @@
  */
 package playn.core;
 
+import playn.core.util.Callback;
+
 /**
  * A utility class that helps keep track of image loading.
  * <p>
@@ -20,6 +22,7 @@ package playn.core;
  * {@link AssetWatcher#add(Image)} and finally call {@link AssetWatcher#start()}.
  */
 public class AssetWatcher {
+
   /**
    * Listener interface for AssetWatcher.
    */
@@ -39,16 +42,15 @@ public class AssetWatcher {
   private boolean start;
   private final Listener listener;
 
-  @SuppressWarnings("rawtypes")
-  private ResourceCallback callback = new ResourceCallback() {
+  private Callback<Object> callback = new Callback<Object>() {
     @Override
-    public void done(Object resource) {
+    public void onSuccess(Object resource) {
       ++loaded;
       maybeDone();
     }
 
     @Override
-    public void error(Throwable e) {
+    public void onFailure(Throwable e) {
       ++errors;
       if (listener != null)
         listener.error(e);

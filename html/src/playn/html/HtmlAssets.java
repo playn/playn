@@ -35,8 +35,8 @@ import playn.core.AbstractAssets;
 import playn.core.AutoClientBundleWithLookup;
 import playn.core.Image;
 import playn.core.PlayN;
-import playn.core.ResourceCallback;
 import playn.core.Sound;
+import playn.core.util.Callback;
 import playn.html.XDomainRequest.Handler;
 
 public class HtmlAssets extends AbstractAssets {
@@ -91,7 +91,7 @@ public class HtmlAssets extends AbstractAssets {
   }
 
   @Override
-  public void getText(final String path, final ResourceCallback<String> callback) {
+  public void getText(final String path, final Callback<String> callback) {
     final String fullPath = pathPrefix + path;
     /*
      * Except for IE, all browsers support on-domain and cross-domain XHR via
@@ -118,14 +118,15 @@ public class HtmlAssets extends AbstractAssets {
     this.platform = platform;
   }
 
-  private void doXdr(final String fullPath, final ResourceCallback<String> callback) {
+  private void doXdr(final String fullPath, final Callback<String> callback) {
     XDomainRequest xdr = XDomainRequest.create();
     xdr.setHandler(new Handler() {
 
       @Override
       public void onTimeout(XDomainRequest xdr) {
         PlayN.log().error("xdr::onTimeout[" + fullPath + "]()");
-        callback.error(new RuntimeException("Error getting " + fullPath + " : " + xdr.getStatus()));
+        callback.onFailure(
+          new RuntimeException("Error getting " + fullPath + " : " + xdr.getStatus()));
       }
 
       @Override
@@ -140,13 +141,14 @@ public class HtmlAssets extends AbstractAssets {
         if (LOG_XHR_SUCCESS) {
           PlayN.log().debug("xdr::onLoad[" + fullPath + "]()");
         }
-        callback.done(xdr.getResponseText());
+        callback.onSuccess(xdr.getResponseText());
       }
 
       @Override
       public void onError(XDomainRequest xdr) {
         PlayN.log().error("xdr::onError[" + fullPath + "]()");
-        callback.error(new RuntimeException("Error getting " + fullPath + " : " + xdr.getStatus()));
+        callback.onFailure(
+          new RuntimeException("Error getting " + fullPath + " : " + xdr.getStatus()));
       }
     });
 
@@ -161,7 +163,7 @@ public class HtmlAssets extends AbstractAssets {
     xdr.send();
   }
 
-  private void doXhr(final String fullPath, final ResourceCallback<String> callback) {
+  private void doXhr(final String fullPath, final Callback<String> callback) {
     XMLHttpRequest xhr = XMLHttpRequest.create();
     xhr.setOnReadyStateChange(new ReadyStateChangeHandler() {
       @Override
@@ -174,8 +176,8 @@ public class HtmlAssets extends AbstractAssets {
             PlayN.log().error(
                 "xhr::onReadyStateChange[" + fullPath + "](readyState = " + readyState
                     + "; status = " + status + ")");
-            callback.error(new RuntimeException("Error getting " + fullPath + " : "
-                + xhr.getStatusText()));
+            callback.onFailure(
+              new RuntimeException("Error getting " + fullPath + " : " + xhr.getStatusText()));
           } else {
             if (LOG_XHR_SUCCESS) {
               PlayN.log().debug(
@@ -185,7 +187,7 @@ public class HtmlAssets extends AbstractAssets {
             // TODO(fredsa): Remove try-catch and materialized exception once issue 6562 is fixed
             // http://code.google.com/p/google-web-toolkit/issues/detail?id=6562
             try {
-              callback.done(xhr.getResponseText());
+              callback.onSuccess(xhr.getResponseText());
             } catch(JavaScriptException e) {
               if (GWT.isProdMode()) {
                 throw e;

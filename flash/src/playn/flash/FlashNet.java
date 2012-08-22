@@ -17,24 +17,13 @@ package playn.flash;
 
 import playn.core.Net;
 import playn.core.PlayN;
-import playn.core.ResourceCallback;
 import playn.core.util.Callback;
 
 public class FlashNet implements Net {
 
   @Override
-  public void get(String url, final Callback<String> callback) {
-    PlayN.assets().getText(url, new ResourceCallback<String>() {
-        @Override
-        public void done(String resource) {
-            callback.onSuccess(resource);
-        }
-
-        @Override
-        public void error(Throwable err) {
-           callback.onFailure(err);
-        }
-    });
+  public void get(String url, Callback<String> callback) {
+    PlayN.assets().getText(url, callback);
   }
 
   @Override

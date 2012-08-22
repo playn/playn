@@ -20,13 +20,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import playn.core.Image;
-import playn.core.ResourceCallback;
 import playn.core.gl.GLContext;
 import playn.core.gl.Scale;
+import playn.core.util.Callback;
 
 public class JavaStaticImage extends JavaImage {
 
-  private List<ResourceCallback<? super Image>> callbacks;
+  private List<Callback<? super Image>> callbacks;
 
   public JavaStaticImage(GLContext ctx, final BufferedImage img, Scale scale) {
     super(ctx, null, scale);
@@ -35,8 +35,8 @@ public class JavaStaticImage extends JavaImage {
       public void run () {
         JavaStaticImage.this.img = img;
         if (callbacks != null) {
-          for (ResourceCallback<? super Image> callback : callbacks)
-            callback.done(JavaStaticImage.this);
+          for (Callback<? super Image> callback : callbacks)
+            callback.onSuccess(JavaStaticImage.this);
           callbacks = null;
         }
       }
@@ -44,12 +44,12 @@ public class JavaStaticImage extends JavaImage {
   }
 
   @Override
-  public void addCallback(ResourceCallback<? super Image> callback) {
+  public void addCallback(Callback<? super Image> callback) {
     if (img != null)
-      callback.done(this);
+      callback.onSuccess(this);
     else {
       if (callbacks == null)
-        callbacks = new ArrayList<ResourceCallback<? super Image>>();
+        callbacks = new ArrayList<Callback<? super Image>>();
       callbacks.add(callback);
     }
   }

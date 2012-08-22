@@ -18,6 +18,8 @@ package playn.core;
 import java.util.HashMap;
 import java.util.Map;
 
+import playn.core.util.Callback;
+
 /**
  * An {@link Assets} wrapper that caches all loaded images and sounds with no expiration mechanism.
  */
@@ -51,7 +53,7 @@ public class CachingAssets implements Assets {
   }
 
   @Override
-  public void getText(String path, ResourceCallback<String> callback) {
+  public void getText(String path, Callback<String> callback) {
     // no caching for text loading
     delegate.getText(path, callback);
   }

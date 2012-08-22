@@ -14,7 +14,6 @@ import playn.core.GroupLayer;
 import playn.core.Image;
 import playn.core.Pattern;
 import playn.core.Surface;
-import playn.core.ResourceCallback;
 import playn.core.SurfaceLayer;
 import static playn.core.PlayN.*;
 

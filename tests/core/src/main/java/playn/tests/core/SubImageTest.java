@@ -13,8 +13,8 @@ import playn.core.ImageLayer;
 import playn.core.ImmediateLayer;
 import playn.core.Surface;
 import playn.core.Layer;
-import playn.core.ResourceCallback;
 import static playn.core.PlayN.*;
+import playn.core.util.Callback;
 
 public class SubImageTest extends Test {
 
@@ -43,8 +43,8 @@ public class SubImageTest extends Test {
 
     // draw subimages of a simple static image
     Image orange = assets().getImage("images/orange.png");
-    orange.addCallback(new ResourceCallback<Image>() {
-      public void done(Image orange) {
+    orange.addCallback(new Callback<Image>() {
+      public void onSuccess(Image orange) {
         fragment("Image", orange, 250, 10);
 
         float pw = orange.width(), ph = orange.height(), phw = pw/2, phh = ph/2;
@@ -88,7 +88,7 @@ public class SubImageTest extends Test {
         addTest(130, 190, graphics().createImageLayer(osci),
                 "ImageLayer with subimage with changing width", 100);
       }
-      public void error(Throwable err) {
+      public void onFailure(Throwable err) {
         log().warn("Failed to load orange image", err);
       }
     });

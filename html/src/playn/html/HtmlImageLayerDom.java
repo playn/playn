@@ -24,7 +24,7 @@ import com.google.gwt.dom.client.Style.Unit;
 import playn.core.Asserts;
 import playn.core.Image;
 import playn.core.ImageLayer;
-import playn.core.ResourceCallback;
+import playn.core.util.Callback;
 
 class HtmlImageLayerDom extends HtmlLayerDom implements ImageLayer {
 
@@ -88,15 +88,15 @@ class HtmlImageLayerDom extends HtmlLayerDom implements ImageLayer {
     element().getStyle().setBackgroundImage("url(" + imgElem.getSrc() + ")");
     element().getStyle().setOverflow(Overflow.HIDDEN);
 
-    img.addCallback(new ResourceCallback<Image>() {
+    img.addCallback(new Callback<Image>() {
       @Override
-      public void done(Image resource) {
+      public void onSuccess(Image resource) {
         applySize();
         applyBackgroundSize();
       }
 
       @Override
-      public void error(Throwable err) {
+      public void onFailure(Throwable err) {
         // Nothing to be done about errors.
       }
     });

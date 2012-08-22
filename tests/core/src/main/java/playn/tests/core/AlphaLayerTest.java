@@ -21,8 +21,8 @@ import playn.core.Color;
 import playn.core.GroupLayer;
 import playn.core.Image;
 import playn.core.ImageLayer;
-import playn.core.ResourceCallback;
 import playn.core.SurfaceLayer;
+import playn.core.util.Callback;
 import static playn.core.PlayN.*;
 
 public class AlphaLayerTest extends Test {
@@ -76,9 +76,9 @@ public class AlphaLayerTest extends Test {
     rootLayer.add(groupLayer);
 
     image1 = assets().getImage(imageSrc);
-    image1.addCallback(new ResourceCallback<Image>() {
+    image1.addCallback(new Callback<Image>() {
       @Override
-      public void done(Image image) {
+      public void onSuccess(Image image) {
         // once the image loads, create our layers
         imageLayer1 = graphics().createImageLayer(image);
         surfaceLayer1 = graphics().createSurfaceLayer(image.width(), image.height());
@@ -128,23 +128,23 @@ public class AlphaLayerTest extends Test {
       }
 
       @Override
-      public void error(Throwable err) {
+      public void onFailure(Throwable err) {
         log().error("Error loading image", err);
       }
     });
 
     // add ground truth of 25% opaque image
     imageGroundTruth = assets().getImage(imageGroundTruthSrc);
-    imageGroundTruth.addCallback(new ResourceCallback<Image>() {
+    imageGroundTruth.addCallback(new Callback<Image>() {
       @Override
-      public void done(Image image) {
+      public void onSuccess(Image image) {
         groundTruthLayer = graphics().createImageLayer(image);
         groundTruthLayer.transform().translate(4 * width, 0);
         rootLayer.add(groundTruthLayer);
       }
 
       @Override
-      public void error(Throwable err) {
+      public void onFailure(Throwable err) {
         log().error("Error loading image", err);
       }
     });

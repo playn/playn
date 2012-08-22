@@ -37,9 +37,9 @@ import pythagoras.f.MathUtil;
 
 import playn.core.AbstractAssets;
 import playn.core.Image;
-import playn.core.ResourceCallback;
 import playn.core.Sound;
 import playn.core.gl.Scale;
+import playn.core.util.Callback;
 import static playn.core.PlayN.log;
 
 public class AndroidAssets extends AbstractAssets {
@@ -116,7 +116,7 @@ public class AndroidAssets extends AbstractAssets {
   }
 
   @Override
-  public void getText(final String path, final ResourceCallback<String> callback) {
+  public void getText(final String path, final Callback<String> callback) {
     try {
       InputStream is = openAsset(path);
       try {
@@ -130,12 +130,12 @@ public class AndroidAssets extends AbstractAssets {
         }
         reader.close();
         String text = fileData.toString();
-        callback.done(text);
+        callback.onSuccess(text);
       } finally {
         is.close();
       }
     } catch (IOException e) {
-      callback.error(e);
+      callback.onFailure(e);
     }
   }
 
@@ -208,12 +208,12 @@ public class AndroidAssets extends AbstractAssets {
   }
 
   public abstract static class DownloaderTask<T> extends AsyncTask<String, Void, T> {
-    private ResourceCallback<T> callback;
+    private Callback<T> callback;
 
     public DownloaderTask() {
     }
 
-    public DownloaderTask(ResourceCallback<T> callback) {
+    public DownloaderTask(Callback<T> callback) {
       this.callback = callback;
     }
 
@@ -229,7 +229,7 @@ public class AndroidAssets extends AbstractAssets {
     @Override
     protected void onPostExecute(T data) {
       if (callback != null) {
-        callback.done(data);
+        callback.onSuccess(data);
       }
     }
   }

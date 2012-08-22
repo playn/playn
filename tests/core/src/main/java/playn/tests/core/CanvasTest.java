@@ -21,7 +21,7 @@ import playn.core.Image;
 import playn.core.ImageLayer;
 import playn.core.Layer;
 import playn.core.Path;
-import playn.core.ResourceCallback;
+import playn.core.util.Callback;
 import static playn.core.PlayN.*;
 
 public class CanvasTest extends Test {
@@ -220,11 +220,11 @@ public class CanvasTest extends Test {
   private void addTestCanvas(String descrip, int width, int height, String imagePath,
                              final ImageDrawer drawer) {
     final CanvasImage target = graphics().createImage(width, height);
-    assets().getImage(imagePath).addCallback(new ResourceCallback<Image>() {
-      public void done(Image image) {
+    assets().getImage(imagePath).addCallback(new Callback<Image>() {
+      public void onSuccess(Image image) {
         drawer.draw(target.canvas(), image);
       }
-      public void error(Throwable err) {
+      public void onFailure(Throwable err) {
         System.err.println("Oops! " + err);
       }
     });

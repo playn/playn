@@ -21,10 +21,10 @@ import android.graphics.RectF;
 
 import playn.core.Image;
 import playn.core.Pattern;
-import playn.core.ResourceCallback;
 import playn.core.gl.GLContext;
 import playn.core.gl.ImageGL;
 import playn.core.gl.Scale;
+import playn.core.util.Callback;
 
 class AndroidImage extends ImageGL implements AndroidGLContext.Refreshable, AndroidCanvas.Drawable {
 
@@ -37,9 +37,9 @@ class AndroidImage extends ImageGL implements AndroidGLContext.Refreshable, Andr
   }
 
   @Override
-  public void addCallback(ResourceCallback<? super Image> callback) {
+  public void addCallback(Callback<? super Image> callback) {
     // we're always ready immediately
-    callback.done(this);
+    callback.onSuccess(this);
   }
 
   @Override

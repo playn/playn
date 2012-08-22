@@ -19,11 +19,8 @@ import flash.display.BitmapData;
 import playn.core.Canvas;
 import playn.core.CanvasImage;
 import playn.core.Image;
-import playn.core.ResourceCallback;
+import playn.core.util.Callback;
 
-/**
- *
- */
 public class FlashCanvasImage extends FlashImage implements CanvasImage {
 
   private FlashCanvas canvas;
@@ -54,15 +51,12 @@ public class FlashCanvasImage extends FlashImage implements CanvasImage {
     return true;
   }
 
-  /* (non-Javadoc)
-   * @see playn.core.Image#addCallback(playn.core.ResourceCallback)
-   */
   @Override
-  public void addCallback(ResourceCallback<? super Image> callback) {
-    callback.done(this);
+  public void addCallback(Callback<? super Image> callback) {
+    callback.onSuccess(this);
   }
 
-    @Override
+  @Override
   BitmapData bitmapData() {
     return canvas.bitmapData();
   }

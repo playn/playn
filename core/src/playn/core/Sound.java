@@ -13,6 +13,8 @@
  */
 package playn.core;
 
+import playn.core.util.Callback;
+
 /**
  * A sound.
  */
@@ -42,21 +44,22 @@ public interface Sound {
       return false;
     }
     @Override
-    public void addCallback(ResourceCallback<? super Sound> callback) {
-      callback.done(this);
+    public void addCallback(Callback<? super Sound> callback) {
+      callback.onSuccess(this);
     }
   }
 
   /** Represents a sound that failed to load. Reports the supplied error to all listeners. */
   public static class Error extends Silence {
     private final Exception error;
+
     public Error (Exception error) {
       this.error = error;
     }
 
     @Override
-    public void addCallback(ResourceCallback<? super Sound> callback) {
-      callback.error(error);
+    public void addCallback(Callback<? super Sound> callback) {
+      callback.onFailure(error);
     }
   }
 
@@ -107,5 +110,5 @@ public interface Sound {
    * already loaded the callback will be notified immediately. The callback is
    * discarded once the sound is loaded.
    */
-  void addCallback(ResourceCallback<? super Sound> callback);
+  void addCallback(Callback<? super Sound> callback);
 }

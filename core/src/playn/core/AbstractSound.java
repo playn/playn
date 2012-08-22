@@ -11,29 +11,30 @@
  * express or implied. See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package playn.core;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import playn.core.util.Callback;
+
 public abstract class AbstractSound implements Sound {
 
-  private List<ResourceCallback<? super Sound>> resourceCallbacks;
+  private List<Callback<? super Sound>> resourceCallbacks;
   private Boolean soundLoaded; // null indicates result not yet known
 
   @Override
-  public final void addCallback(ResourceCallback<? super Sound> callback) {
+  public final void addCallback(Callback<? super Sound> callback) {
     if (soundLoaded != null) {
       if (soundLoaded) {
-        callback.done(AbstractSound.this);
+        callback.onSuccess(AbstractSound.this);
       } else {
-        callback.error(new RuntimeException());
+        callback.onFailure(new RuntimeException());
       }
       return;
     }
     if (resourceCallbacks == null) {
-      resourceCallbacks = new ArrayList<ResourceCallback<? super Sound>>();
+      resourceCallbacks = new ArrayList<Callback<? super Sound>>();
     }
     resourceCallbacks.add(callback);
   }
@@ -43,8 +44,8 @@ public abstract class AbstractSound implements Sound {
     if (resourceCallbacks == null) {
       return;
     }
-    for (ResourceCallback<? super Sound> callback : resourceCallbacks) {
-      callback.error(err);
+    for (Callback<? super Sound> callback : resourceCallbacks) {
+      callback.onFailure(err);
     }
     resourceCallbacks.clear();
   }
@@ -54,8 +55,8 @@ public abstract class AbstractSound implements Sound {
     if (resourceCallbacks == null) {
       return;
     }
-    for (ResourceCallback<? super Sound> callback : resourceCallbacks) {
-      callback.done(AbstractSound.this);
+    for (Callback<? super Sound> callback : resourceCallbacks) {
+      callback.onSuccess(AbstractSound.this);
     }
     resourceCallbacks.clear();
   }

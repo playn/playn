@@ -29,27 +29,27 @@ import pythagoras.f.MathUtil;
 
 import playn.core.Asserts;
 import playn.core.PlayN;
-import playn.core.ResourceCallback;
 import playn.core.Sound;
+import playn.core.util.Callback;
 
 class JavaSound implements Sound {
 
   private Clip clip;
   private boolean looping;
 
-  private List<ResourceCallback<? super Sound>> callbacks = NONE;
+  private List<Callback<? super Sound>> callbacks = NONE;
 
   JavaSound(final String name, final InputStream inputStream) {
     JavaAssets.doResourceAction(new Runnable() {
       public void run () {
         try {
           init(name, inputStream);
-          for (ResourceCallback<? super Sound> callback : callbacks)
-            callback.done(JavaSound.this);
+          for (Callback<? super Sound> callback : callbacks)
+            callback.onSuccess(JavaSound.this);
         } catch (Exception e) {
           PlayN.log().warn("Sound initialization failed '" + name + "': " + e);
-          for (ResourceCallback<? super Sound> callback : callbacks)
-            callback.error(e);
+          for (Callback<? super Sound> callback : callbacks)
+            callback.onFailure(e);
         }
         callbacks = NONE;
       }
@@ -121,12 +121,12 @@ class JavaSound implements Sound {
   }
 
   @Override
-  public void addCallback(ResourceCallback<? super Sound> callback) {
+  public void addCallback(Callback<? super Sound> callback) {
     if (clip != null) {
-      callback.done(this);
+      callback.onSuccess(this);
     } else {
       if (callbacks == NONE)
-        callbacks = new ArrayList<ResourceCallback<? super Sound>>();
+        callbacks = new ArrayList<Callback<? super Sound>>();
       callbacks.add(callback);
     }
   }
@@ -146,6 +146,6 @@ class JavaSound implements Sound {
     return 20 * FloatMath.log10(volume);
   }
 
-  protected static final List<ResourceCallback<? super Sound>> NONE =
-    new ArrayList<ResourceCallback<? super Sound>>();
+  protected static final List<Callback<? super Sound>> NONE =
+    new ArrayList<Callback<? super Sound>>();
 }

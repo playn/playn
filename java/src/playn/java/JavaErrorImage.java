@@ -20,9 +20,9 @@ import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 
 import playn.core.Image;
-import playn.core.ResourceCallback;
 import playn.core.gl.GLContext;
 import playn.core.gl.Scale;
+import playn.core.util.Callback;
 
 class JavaErrorImage extends JavaImage {
 
@@ -38,8 +38,8 @@ class JavaErrorImage extends JavaImage {
   }
 
   @Override
-  public void addCallback(ResourceCallback<? super Image> callback) {
-    callback.error(exception);
+  public void addCallback(Callback<? super Image> callback) {
+    callback.onFailure(exception);
   }
 
   private static BufferedImage createErrorImage(int width, int height) {

@@ -32,9 +32,9 @@ import cli.MonoTouch.UIKit.UIImage;
 import playn.core.AbstractAssets;
 import playn.core.Asserts;
 import playn.core.Image;
-import playn.core.ResourceCallback;
 import playn.core.Sound;
 import playn.core.gl.Scale;
+import playn.core.util.Callback;
 
 public class IOSAssets extends AbstractAssets {
 
@@ -98,15 +98,15 @@ public class IOSAssets extends AbstractAssets {
   }
 
   @Override
-  public void getText(String path, ResourceCallback<String> callback) {
+  public void getText(String path, Callback<String> callback) {
     platform.log().debug("Loading text " + path);
     String fullPath = Path.Combine(pathPrefix, path);
     StreamReader reader = null;
     try {
       reader = new StreamReader(fullPath);
-      callback.done(reader.ReadToEnd());
+      callback.onSuccess(reader.ReadToEnd());
     } catch (Throwable t) {
-      callback.error(t);
+      callback.onFailure(t);
     } finally {
       if (reader != null) {
         reader.Close();

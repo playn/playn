@@ -28,10 +28,10 @@ import pythagoras.f.MathUtil;
 import playn.core.Asserts;
 import playn.core.Image;
 import playn.core.Pattern;
-import playn.core.ResourceCallback;
 import playn.core.gl.GLContext;
 import playn.core.gl.ImageGL;
 import playn.core.gl.Scale;
+import playn.core.util.Callback;
 
 class HtmlImage extends ImageGL implements HtmlCanvas.Drawable {
 
@@ -69,20 +69,20 @@ class HtmlImage extends ImageGL implements HtmlCanvas.Drawable {
   }
 
   @Override
-  public void addCallback(final ResourceCallback<? super Image> callback) {
+  public void addCallback(final Callback<? super Image> callback) {
     if (isReady()) {
-      callback.done(this);
+      callback.onSuccess(this);
     } else {
       HtmlPlatform.addEventListener(img, "load", new EventHandler() {
         @Override
         public void handleEvent(NativeEvent evt) {
-          callback.done(HtmlImage.this);
+          callback.onSuccess(HtmlImage.this);
         }
       }, false);
       HtmlPlatform.addEventListener(img, "error", new EventHandler() {
         @Override
         public void handleEvent(NativeEvent evt) {
-          callback.error(new RuntimeException("Error loading image " + img.getSrc()));
+          callback.onFailure(new RuntimeException("Error loading image " + img.getSrc()));
         }
       }, false);
     }

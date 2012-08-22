@@ -17,8 +17,8 @@ package playn.ios;
 
 import cli.MonoTouch.AVFoundation.AVAudioPlayer;
 
-import playn.core.ResourceCallback;
 import playn.core.Sound;
+import playn.core.util.Callback;
 
 /**
  * An implementation of Sound using the AVAudioPlayer.
@@ -65,8 +65,8 @@ public class IOSSound implements Sound {
   }
 
   @Override
-  public void addCallback(ResourceCallback<? super Sound> callback) {
-    callback.done(this);
+  public void addCallback(Callback<? super Sound> callback) {
+    callback.onSuccess(this);
   }
 
   protected void finalize() {

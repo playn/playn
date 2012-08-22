@@ -21,11 +21,11 @@ import playn.core.CanvasImage;
 import playn.core.Image;
 import playn.core.ImageLayer;
 import playn.core.ImmediateLayer;
-import playn.core.ResourceCallback;
 import playn.core.Surface;
 import playn.core.gl.GLContext;
 import playn.core.gl.GLShader;
 import playn.core.gl.IndexedTrisShader;
+import playn.core.util.Callback;
 import static playn.core.PlayN.*;
 
 /**
@@ -51,11 +51,11 @@ public class ShaderTest extends Test {
     if (graphics().ctx() == null) return;
 
     Image orange = assets().getImage("images/orange.png");
-    orange.addCallback(new ResourceCallback<Image>() {
-      public void done(Image orange) {
+    orange.addCallback(new Callback<Image>() {
+      public void onSuccess(Image orange) {
         init(orange);
       }
-      public void error(Throwable err) {
+      public void onFailure(Throwable err) {
         log().warn("Failed to load orange image", err);
       }
     });
