@@ -98,7 +98,7 @@ public class JavaAssets extends AbstractAssets {
         BufferedImage image = ImageIO.read(requireResource(rsrc.path));
         // if image is at a higher scale factor than the view, scale it to the view display factor
         Scale viewScale = platform.graphics().ctx().scale, imageScale = rsrc.scale;
-        float viewImageRatio = viewScale.factor / imageScale.factor ;
+        float viewImageRatio = viewScale.factor / imageScale.factor;
         if (viewImageRatio < 1) {
           image = scaleImage(image, viewImageRatio);
           imageScale = viewScale;
@@ -112,7 +112,31 @@ public class JavaAssets extends AbstractAssets {
       }
     }
     platform.log().warn("Could not load image: " + pathPrefix + path, error);
-    return graphics.createErrorImage(error != null ? error : new FileNotFoundException(path));
+    return createErrorImage(error != null ? error : new FileNotFoundException(path));
+  }
+
+  @Override
+  public Image getRemoteImage(final String url, float width, float height) {
+    final JavaAsyncImage image = platform.graphics().createAsyncImage(width, height);
+    new Thread() {
+      public void run () {
+        try {
+          final BufferedImage bufimg = ImageIO.read(new URL(url));
+          platform.invokeLater(new Runnable() {
+            public void run () {
+              image.setImage(bufimg);
+            }
+          });
+        } catch (final Exception error) {
+          platform.invokeLater(new Runnable() {
+            public void run () {
+              image.setError(error);
+            }
+          });
+        }
+      }
+    }.start();
+    return image;
   }
 
   @Override
@@ -137,6 +161,11 @@ public class JavaAssets extends AbstractAssets {
         }
       }
     });
+  }
+
+  @Override
+  protected Image createErrorImage(Throwable cause, float width, float height) {
+    return platform.graphics().createErrorImage(cause, width, height);
   }
 
   InputStream getAssetStream(String path) throws IOException {

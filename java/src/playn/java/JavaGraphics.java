@@ -143,8 +143,12 @@ public class JavaGraphics extends GraphicsGL {
     return new JavaStaticImage(ctx, source, scale);
   }
 
-  protected JavaImage createErrorImage(Exception cause) {
-    return new JavaErrorImage(ctx, cause);
+  protected JavaAsyncImage createAsyncImage(float width, float height) {
+    return new JavaAsyncImage(ctx, width, height);
+  }
+
+  protected JavaImage createErrorImage(Throwable cause, float width, float height) {
+    return new JavaErrorImage(ctx, cause, width, height);
   }
 
   void init() {

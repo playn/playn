@@ -52,6 +52,22 @@ public class WatchedAssets implements Assets {
   }
 
   @Override
+  public final Image getRemoteImage(String url) {
+    incrementRequestCount();
+    Image image = delegate.getRemoteImage(url);
+    image.addCallback(callback);
+    return image;
+  }
+
+  @Override
+  public final Image getRemoteImage(String url, float width, float height) {
+    incrementRequestCount();
+    Image image = delegate.getRemoteImage(url, width, height);
+    image.addCallback(callback);
+    return image;
+  }
+
+  @Override
   public final Sound getSound(String path) {
     incrementRequestCount();
     Sound sound = delegate.getSound(path);

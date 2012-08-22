@@ -62,6 +62,17 @@ public class FlashAssets extends AbstractAssets {
   }
 
   @Override
+  public Image getRemoteImage(String url) {
+    return adaptImage(url);
+  }
+
+  @Override
+  public Image getRemoteImage(String url, float width, float height) {
+    // TODO: the necessary jiggery pokery to return the desired width/height until load
+    return adaptImage(url);
+  }
+
+  @Override
   public Sound getSound(String path) {
     String url = pathPrefix + path;
     AutoClientBundleWithLookup clientBundle = getBundle(path);
@@ -80,6 +91,12 @@ public class FlashAssets extends AbstractAssets {
   @Override
   public void getText(String path, Callback<String> callback) {
     loadText(pathPrefix + path, callback);
+  }
+
+  @Override
+  protected Image createErrorImage(Throwable cause, float width, float height) {
+    // TODO: proper error image that reports failure to callbacks
+    return new FlashImage("error");
   }
 
   private Sound adaptSound(String url) {

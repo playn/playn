@@ -20,6 +20,18 @@ package playn.core;
  */
 public abstract class AbstractAssets implements Assets {
 
+  @Override
+  public Image getRemoteImage(String url) {
+    return getRemoteImage(url, 0, 0);
+  }
+
+  @Override
+  public Image getRemoteImage(String url, float width, float height) {
+    Exception error = new Exception("Remote image loading not yet supported: " + url +
+                                    "@" + width + "x" + height);
+    return createRemoteErrorImage(error, width, height);
+  }
+
   @Deprecated
   public final boolean isDone() {
     return true;
@@ -29,6 +41,17 @@ public abstract class AbstractAssets implements Assets {
   public final int getPendingRequestCount() {
     return 0;
   }
+
+  protected Image createRemoteErrorImage(Throwable cause, float width, float height) {
+    return (width <= 0 || height <= 0) ? createErrorImage(cause) :
+      createErrorImage(cause, width, height);
+  }
+
+  protected Image createErrorImage(Throwable cause) {
+    return createErrorImage(cause, 50, 50);
+  }
+
+  protected abstract Image createErrorImage(Throwable cause, float width, float height);
 
   /**
    * Normalizes the path, by removing {@code foo/..} pairs until the path contains no {@code ..}s.

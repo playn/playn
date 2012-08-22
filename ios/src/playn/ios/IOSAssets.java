@@ -27,6 +27,12 @@ import cli.System.IO.Stream;
 import cli.System.IO.StreamReader;
 
 import cli.MonoTouch.Foundation.NSData;
+import cli.MonoTouch.Foundation.NSError;
+import cli.MonoTouch.Foundation.NSMutableData;
+import cli.MonoTouch.Foundation.NSUrl;
+import cli.MonoTouch.Foundation.NSUrlConnection;
+import cli.MonoTouch.Foundation.NSUrlConnectionDelegate;
+import cli.MonoTouch.Foundation.NSUrlRequest;
 import cli.MonoTouch.UIKit.UIImage;
 
 import playn.core.AbstractAssets;
@@ -79,8 +85,44 @@ public class IOSAssets extends AbstractAssets {
                    // is a production backend, so we want to try to make things work
       }
     }
-    // TODO: return an error image
-    return new IOSImage(platform.graphics().ctx, new UIImage(), Scale.ONE);
+    return createErrorImage(error);
+  }
+
+  @Override
+  public Image getRemoteImage(String url, float width, float height) {
+    final IOSAsyncImage image = new IOSAsyncImage(platform.graphics().ctx, Scale.ONE, width, height);
+    new NSUrlConnection(new NSUrlRequest(new NSUrl(url)), new NSUrlConnectionDelegate() {
+      private NSMutableData data = new NSMutableData();
+      @Override
+      public void ReceivedData(NSUrlConnection conn, NSData data) {
+        this.data.AppendData(data);
+      }
+      @Override
+      public void FailedWithError (NSUrlConnection conn, NSError error) {
+        onFailure(new Exception(error.get_LocalizedDescription()));
+      }
+      @Override
+      public void FinishedLoading (NSUrlConnection conn) {
+        try {
+          final UIImage uiImage = UIImage.LoadFromData(this.data);
+          platform.invokeLater(new Runnable() {
+            public void run () {
+              image.setImage(uiImage);
+            }
+          });
+        } catch (Throwable cause) {
+          onFailure(cause);
+        }
+      }
+      protected void onFailure (final Throwable cause) {
+        platform.invokeLater(new Runnable() {
+          public void run () {
+            image.setError(cause);
+          }
+        });
+      }
+    }, true);
+    return image;
   }
 
   @Override
@@ -112,5 +154,10 @@ public class IOSAssets extends AbstractAssets {
         reader.Close();
       }
     }
+  }
+
+  @Override
+  protected Image createErrorImage(Throwable cause, float width, float height) {
+    return new IOSErrorImage(platform.graphics().ctx, cause, width, height);
   }
 }

@@ -32,6 +32,22 @@ public interface Assets {
   Image getImage(String path);
 
   /**
+   * Loads and returns the image at the specified URL. The width and height of the image will be
+   * unset (0) until the image is loaded. <em>Note:</em> on non-HTML platforms, this spawns a new
+   * thread for each loaded image. Thus, attempts to load large numbers of remote images
+   * simultaneously may result in poor performance.
+   */
+  Image getRemoteImage(String url);
+
+  /**
+   * Loads and returns the image at the specified URL. The width and height of the image will be
+   * the supplied {@code width} and {@code height} until the image is loaded. <em>Note:</em> on
+   * non-HTML platforms, this spawns a new thread for each loaded image. Thus, attempts to load
+   * large numbers of remote images simultaneously may result in poor performance.
+   */
+  Image getRemoteImage(String url, float width, float height);
+
+  /**
    * Return a Sound, given a path to the sound resource.
    *
    * @param path a path to the resource

@@ -28,7 +28,7 @@ import playn.core.util.Callback;
 
 class AndroidImage extends ImageGL implements AndroidGLContext.Refreshable, AndroidCanvas.Drawable {
 
-  private final Bitmap bitmap;
+  protected Bitmap bitmap; // only mutated in AndroidAsyncImage
 
   AndroidImage(GLContext ctx, Bitmap bitmap, Scale scale) {
     super(ctx, scale);

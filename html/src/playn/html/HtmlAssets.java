@@ -31,6 +31,8 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.xhr.client.ReadyStateChangeHandler;
 import com.google.gwt.xhr.client.XMLHttpRequest;
 
+import pythagoras.f.MathUtil;
+
 import playn.core.AbstractAssets;
 import playn.core.AutoClientBundleWithLookup;
 import playn.core.Image;
@@ -75,6 +77,19 @@ public class HtmlAssets extends AbstractAssets {
   }
 
   @Override
+  public Image getRemoteImage(String url) {
+    return adaptImage(url);
+  }
+
+  @Override
+  public Image getRemoteImage(String url, float width, float height) {
+    HtmlImage image = adaptImage(url);
+    image.img.setWidth(MathUtil.iceil(width));
+    image.img.setHeight(MathUtil.iceil(height));
+    return image;
+  }
+
+  @Override
   public Sound getSound(String path) {
     String url = pathPrefix + path;
     AutoClientBundleWithLookup clientBundle = getBundle(path);
@@ -112,6 +127,15 @@ public class HtmlAssets extends AbstractAssets {
         throw e;
       }
     }
+  }
+
+  @Override
+  protected Image createErrorImage(Throwable cause, float width, float height) {
+    ImageElement img = Document.get().createImageElement();
+    img.setWidth(MathUtil.iceil(width));
+    img.setHeight(MathUtil.iceil(height));
+    // TODO: proper error image that reports failure to callbacks
+    return new HtmlImage(platform.graphics().ctx(), img);
   }
 
   HtmlAssets(HtmlPlatform platform) {
@@ -248,12 +272,11 @@ public class HtmlAssets extends AbstractAssets {
     return clientBundle;
   }
 
-  private Image adaptImage(String url) {
+  private HtmlImage adaptImage(String url) {
     ImageElement img = Document.get().createImageElement();
     /*
-     * When the server provides an appropriate {@literal
-     * Access-Control-Allow-Origin} response header, allow images to be served
-     * cross origin on supported, CORS enabled, browsers.
+     * When the server provides an appropriate {@literal Access-Control-Allow-Origin} response
+     * header, allow images to be served cross origin on supported, CORS enabled, browsers.
      */
     setCrossOrigin(img, "anonymous");
     img.setSrc(url);

@@ -40,6 +40,7 @@ class LayerClickTest extends Test {
   @Override
   public void init() {
     Image orange = assets().getImage("images/orange.png");
+    Image mdb = assets().getRemoteImage("https://graph.facebook.com/samskivert/picture");
 
     final ImageLayer layer1 = graphics().createImageLayer(orange);
     layer1.setScale(2);
@@ -63,7 +64,7 @@ class LayerClickTest extends Test {
       layer2.addListener((Pointer.Listener)new Mover(layer2));
     }
 
-    final ImageLayer layer3 = graphics().createImageLayer(orange);
+    final ImageLayer layer3 = graphics().createImageLayer(mdb);
     layer3.setRotation(-FloatMath.PI/4);
     layer3.setTranslation(50, 150);
     graphics().rootLayer().add(layer3);

@@ -100,9 +100,31 @@ public class AndroidAssets extends AbstractAssets {
       }
     }
     platform.log().warn("Could not load image: " + pathPrefix + path, error);
-    // TODO: create error image which reports failure to callbacks
-    // error != null ? error : new FileNotFoundException(path);
-    return new AndroidImage(platform.graphics().ctx, createErrorBitmap(), Scale.ONE);
+    return createErrorImage(error != null ? error : new FileNotFoundException(path));
+  }
+
+  @Override
+  public Image getRemoteImage(final String url, float width, float height) {
+    final AndroidAsyncImage image = new AndroidAsyncImage(platform.graphics().ctx, width, height);
+    new Thread() {
+      public void run () {
+        try {
+          final Bitmap bitmap = downloadBitmap(url);
+          platform.invokeLater(new Runnable() {
+            public void run () {
+              image.setBitmap(bitmap);
+            }
+          });
+        } catch (final Exception error) {
+          platform.invokeLater(new Runnable() {
+            public void run () {
+              image.setError(error);
+            }
+          });
+        }
+      }
+    }.start();
+    return image;
   }
 
   @Override
@@ -137,6 +159,11 @@ public class AndroidAssets extends AbstractAssets {
     } catch (IOException e) {
       callback.onFailure(e);
     }
+  }
+
+  @Override
+  protected Image createErrorImage(Throwable cause, float width, float height) {
+    return new AndroidErrorImage(platform.graphics().ctx, cause, width, height);
   }
 
   /**
@@ -193,84 +220,40 @@ public class AndroidAssets extends AbstractAssets {
     return BitmapFactory.decodeStream(is, null, options);
   }
 
-  private Bitmap createErrorBitmap() {
-    int height = 100, width = 100;
-    Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_4444);
-    android.graphics.Canvas c = new android.graphics.Canvas(bitmap);
-    android.graphics.Paint p = new android.graphics.Paint();
-    p.setColor(android.graphics.Color.RED);
-    for (int yy = 0; yy <= height / 15; yy++) {
-      for (int xx = 0; xx <= width / 45; xx++) {
-        c.drawText("ERROR", xx * 45, yy * 15, p);
-      }
-    }
-    return bitmap;
-  }
-
-  public abstract static class DownloaderTask<T> extends AsyncTask<String, Void, T> {
-    private Callback<T> callback;
-
-    public DownloaderTask() {
-    }
-
-    public DownloaderTask(Callback<T> callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    // Actual download method, run in the task thread
-    protected T doInBackground(String... params) {
-      // params comes from the execute() call: params[0] is the url.
-      return download(params[0]);
-    }
-
-    public abstract T download(String url);
-
-    @Override
-    protected void onPostExecute(T data) {
-      if (callback != null) {
-        callback.onSuccess(data);
-      }
-    }
-  }
-
   // Taken from
   // http://android-developers.blogspot.com/2010/07/multithreading-for-performance.html
-  public Bitmap downloadBitmap(String url) {
-    final AndroidHttpClient client = AndroidHttpClient.newInstance("Android");
-    final HttpGet getRequest = new HttpGet(url);
+  private Bitmap downloadBitmap(String url) throws Exception {
+    AndroidHttpClient client = AndroidHttpClient.newInstance("Android");
+    HttpGet getRequest = new HttpGet(url);
 
     try {
       HttpResponse response = client.execute(getRequest);
-      final int statusCode = response.getStatusLine().getStatusCode();
-      if (statusCode != HttpStatus.SC_OK) {
-        Log.w("ImageDownloader", "Error " + statusCode + " while retrieving bitmap from " + url);
-        return null;
+      int statusCode = response.getStatusLine().getStatusCode();
+      if (statusCode != HttpStatus.SC_OK)
+        throw new Exception("Error " + statusCode + " while retrieving bitmap from " + url);
+
+      HttpEntity entity = response.getEntity();
+      if (entity == null)
+        throw new Exception("Error: getEntity returned null for " + url);
+
+      InputStream inputStream = null;
+      try {
+        inputStream = entity.getContent();
+        return decodeBitmap(inputStream);
+      } finally {
+        if (inputStream != null)
+          inputStream.close();
+        entity.consumeContent();
       }
 
-      final HttpEntity entity = response.getEntity();
-      if (entity != null) {
-        InputStream inputStream = null;
-        try {
-          inputStream = entity.getContent();
-          return decodeBitmap(inputStream);
-        } finally {
-          if (inputStream != null) {
-            inputStream.close();
-          }
-          entity.consumeContent();
-        }
-      }
     } catch (Exception e) {
-      // Could provide a more explicit error message for IOException or
-      // IllegalStateException
+      // Could provide a more explicit error message for IOException or IllegalStateException
       getRequest.abort();
       Log.w("ImageDownloader", "Error while retrieving bitmap from " + url, e);
+      throw e;
+
     } finally {
-      if (client != null) {
-        client.close();
-      }
+      client.close();
     }
-    return null;
   }
 }

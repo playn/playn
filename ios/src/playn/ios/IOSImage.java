@@ -26,7 +26,7 @@ import playn.core.gl.Scale;
  */
 public class IOSImage extends IOSAbstractImage {
 
-  private final UIImage image;
+  protected UIImage image; // only mutated by IOSAsyncImage
 
   public IOSImage (GLContext ctx, UIImage image, Scale scale) {
     super(ctx, scale);

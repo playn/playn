@@ -19,6 +19,8 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 
+import pythagoras.f.MathUtil;
+
 import playn.core.Image;
 import playn.core.gl.GLContext;
 import playn.core.gl.Scale;
@@ -26,13 +28,13 @@ import playn.core.util.Callback;
 
 class JavaErrorImage extends JavaImage {
 
-  private final Exception exception;
+  private final Throwable exception;
 
-  public JavaErrorImage(GLContext ctx, Exception assetLoadException) {
+  public JavaErrorImage(GLContext ctx, Throwable assetLoadException, float width, float height) {
     // the caller will be notified that this image failed to load, but we also create an error
     // image so that subsequent attempts to use this image won't result in numerous follow-on
     // errors when the caller attempts to call width/height/etc.
-    super(ctx, createErrorImage(100, 100), Scale.ONE);
+    super(ctx, createErrorImage(MathUtil.iceil(width), MathUtil.iceil(height)), Scale.ONE);
     this.exception = assetLoadException != null ? assetLoadException :
       new RuntimeException("Error loading image");
   }

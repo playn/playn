@@ -43,6 +43,26 @@ public class CachingAssets implements Assets {
   }
 
   @Override
+  public Image getRemoteImage(String url) {
+    Object object = null;
+    if ((object = cache.get(url)) == null) {
+      object = delegate.getRemoteImage(url);
+      cache.put(url, object);
+    }
+    return (Image) object;
+  }
+
+  @Override
+  public Image getRemoteImage(String url, float width, float height) {
+    Object object = null;
+    if ((object = cache.get(url)) == null) {
+      object = delegate.getRemoteImage(url, width, height);
+      cache.put(url, object);
+    }
+    return (Image) object;
+  }
+
+  @Override
   public Sound getSound(String path) {
     Object object = null;
     if ((object = cache.get(path)) == null) {
