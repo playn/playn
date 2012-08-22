@@ -14,7 +14,6 @@
 package playn.java;
 
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.sound.sampled.AudioFormat;
@@ -31,27 +30,25 @@ import playn.core.Asserts;
 import playn.core.PlayN;
 import playn.core.Sound;
 import playn.core.util.Callback;
+import playn.core.util.Callbacks;
 
 class JavaSound implements Sound {
 
   private Clip clip;
   private boolean looping;
 
-  private List<Callback<? super Sound>> callbacks = NONE;
+  private List<Callback<? super Sound>> callbacks;
 
   JavaSound(final String name, final InputStream inputStream) {
     JavaAssets.doResourceAction(new Runnable() {
       public void run () {
         try {
           init(name, inputStream);
-          for (Callback<? super Sound> callback : callbacks)
-            callback.onSuccess(JavaSound.this);
+          callbacks = Callbacks.dispatchSuccessClear(callbacks, JavaSound.this);
         } catch (Exception e) {
           PlayN.log().warn("Sound initialization failed '" + name + "': " + e);
-          for (Callback<? super Sound> callback : callbacks)
-            callback.onFailure(e);
+          callbacks = Callbacks.dispatchFailureClear(callbacks, e);
         }
-        callbacks = NONE;
       }
     });
   }
@@ -125,9 +122,7 @@ class JavaSound implements Sound {
     if (clip != null) {
       callback.onSuccess(this);
     } else {
-      if (callbacks == NONE)
-        callbacks = new ArrayList<Callback<? super Sound>>();
-      callbacks.add(callback);
+      callbacks = Callbacks.createAdd(callbacks, callback);
     }
   }
 
@@ -145,7 +140,4 @@ class JavaSound implements Sound {
   protected static float toGain (float volume) {
     return 20 * FloatMath.log10(volume);
   }
-
-  protected static final List<Callback<? super Sound>> NONE =
-    new ArrayList<Callback<? super Sound>>();
 }

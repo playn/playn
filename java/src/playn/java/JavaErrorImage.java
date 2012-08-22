@@ -38,6 +38,11 @@ class JavaErrorImage extends JavaImage {
   }
 
   @Override
+  public boolean isReady() {
+    return false;
+  }
+
+  @Override
   public void addCallback(Callback<? super Image> callback) {
     callback.onFailure(exception);
   }
@@ -56,10 +61,5 @@ class JavaErrorImage extends JavaImage {
       g.dispose();
     }
     return img;
-  }
-
-  @Override
-  public boolean isReady() {
-    return false;
   }
 }

@@ -13,51 +13,34 @@
  */
 package playn.core;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import playn.core.util.Callback;
+import playn.core.util.Callbacks;
 
 public abstract class AbstractSound implements Sound {
 
-  private List<Callback<? super Sound>> resourceCallbacks;
+  private List<Callback<? super Sound>> callbacks;
   private Boolean soundLoaded; // null indicates result not yet known
 
   @Override
   public final void addCallback(Callback<? super Sound> callback) {
     if (soundLoaded != null) {
-      if (soundLoaded) {
+      if (soundLoaded)
         callback.onSuccess(AbstractSound.this);
-      } else {
-        callback.onFailure(new RuntimeException());
-      }
-      return;
-    }
-    if (resourceCallbacks == null) {
-      resourceCallbacks = new ArrayList<Callback<? super Sound>>();
-    }
-    resourceCallbacks.add(callback);
+      else
+        callback.onFailure(new RuntimeException("Sound already failed to load."));
+    } else
+      callbacks = Callbacks.createAdd(callbacks, callback);
   }
 
   protected void onLoadError(Throwable err) {
     this.soundLoaded = false;
-    if (resourceCallbacks == null) {
-      return;
-    }
-    for (Callback<? super Sound> callback : resourceCallbacks) {
-      callback.onFailure(err);
-    }
-    resourceCallbacks.clear();
+    callbacks = Callbacks.dispatchFailureClear(callbacks, err);
   }
 
   protected void onLoadComplete() {
     this.soundLoaded = true;
-    if (resourceCallbacks == null) {
-      return;
-    }
-    for (Callback<? super Sound> callback : resourceCallbacks) {
-      callback.onSuccess(AbstractSound.this);
-    }
-    resourceCallbacks.clear();
+    callbacks = Callbacks.dispatchSuccessClear(callbacks, this);
   }
 }

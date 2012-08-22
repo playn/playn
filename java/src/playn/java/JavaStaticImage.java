@@ -16,13 +16,13 @@
 package playn.java;
 
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
 import java.util.List;
 
 import playn.core.Image;
 import playn.core.gl.GLContext;
 import playn.core.gl.Scale;
 import playn.core.util.Callback;
+import playn.core.util.Callbacks;
 
 public class JavaStaticImage extends JavaImage {
 
@@ -34,11 +34,7 @@ public class JavaStaticImage extends JavaImage {
     JavaAssets.doResourceAction(new Runnable() {
       public void run () {
         JavaStaticImage.this.img = img;
-        if (callbacks != null) {
-          for (Callback<? super Image> callback : callbacks)
-            callback.onSuccess(JavaStaticImage.this);
-          callbacks = null;
-        }
+        callbacks = Callbacks.dispatchSuccessClear(callbacks, JavaStaticImage.this);
       }
     });
   }
@@ -47,10 +43,7 @@ public class JavaStaticImage extends JavaImage {
   public void addCallback(Callback<? super Image> callback) {
     if (img != null)
       callback.onSuccess(this);
-    else {
-      if (callbacks == null)
-        callbacks = new ArrayList<Callback<? super Image>>();
-      callbacks.add(callback);
-    }
+    else
+      callbacks = Callbacks.createAdd(callbacks, callback);
   }
 }
