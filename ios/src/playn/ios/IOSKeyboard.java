@@ -63,9 +63,9 @@ public class IOSKeyboard implements Keyboard {
     }
 
     // TODO: Customize these per getText() call?
-    field.set_AutocorrectionType(UITextAutocorrectionType.wrap(UITextAutocorrectionType.No));
+    field.set_AutocorrectionType(UITextAutocorrectionType.wrap(UITextAutocorrectionType.Yes));
     field.set_AutocapitalizationType(
-      UITextAutocapitalizationType.wrap(UITextAutocapitalizationType.None));
+      UITextAutocapitalizationType.wrap(UITextAutocapitalizationType.Sentences));
     field.set_SecureTextEntry(false); // TODO: if nothing else, can do this one as a TextType
 
     view.add_Clicked(new cli.System.EventHandler$$00601_$$$_Lcli__MonoTouch__UIKit__UIButtonEventArgs_$$$$_(
