@@ -318,6 +318,11 @@ public interface Mouse {
   void setEnabled(boolean enabled);
 
   /**
+   * Returns the currently configured global mouse listener, or null.
+   */
+  Listener listener ();
+
+  /**
    * Sets the listener that will receive mouse events. Setting the listener to
    * <code>null</code> will cause mouse events to stop being fired.
    */

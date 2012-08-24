@@ -38,6 +38,11 @@ public abstract class PointerImpl implements Pointer {
   }
 
   @Override
+  public Listener listener () {
+    return listener;
+  }
+
+  @Override
   public void setListener(Listener listener) {
     this.listener = listener;
   }

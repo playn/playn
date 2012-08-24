@@ -107,6 +107,11 @@ public interface Pointer {
   void setEnabled(boolean enabled);
 
   /**
+   * Returns the currently configured global pointer listener, or null.
+   */
+  Listener listener ();
+
+  /**
    * Sets the listener that will receive pointer events. Setting the listener to {@code null} will
    * cause pointer events to stop being fired.
    */

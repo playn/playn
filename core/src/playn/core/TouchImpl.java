@@ -47,6 +47,11 @@ public class TouchImpl implements Touch {
   }
 
   @Override
+  public Listener listener () {
+    return listener;
+  }
+
+  @Override
   public void setListener(Listener listener) {
     this.listener = listener;
   }

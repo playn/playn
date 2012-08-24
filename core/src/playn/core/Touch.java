@@ -199,6 +199,11 @@ public interface Touch {
   void setEnabled(boolean enabled);
 
   /**
+   * Returns the currently configured global touch listener, or null.
+   */
+  Listener listener ();
+
+  /**
    * Sets the listener that will receive touch events. Setting the listener to
    * <code>null</code> will cause touch events to stop being fired.
    */
