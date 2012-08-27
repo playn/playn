@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
+import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -229,8 +230,15 @@ public class AndroidAssets extends AbstractAssets {
     try {
       HttpResponse response = client.execute(getRequest);
       int statusCode = response.getStatusLine().getStatusCode();
-      if (statusCode != HttpStatus.SC_OK)
+      if (statusCode != HttpStatus.SC_OK) {
+        // we could check the status, but we'll just assume that if there's a Location header,
+        // we should follow it
+        Header[] headers = response.getHeaders("Location");
+        if (headers != null && headers.length > 0) {
+          return downloadBitmap(headers[headers.length-1].getValue());
+        }
         throw new Exception("Error " + statusCode + " while retrieving bitmap from " + url);
+      }
 
       HttpEntity entity = response.getEntity();
       if (entity == null)
