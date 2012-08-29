@@ -26,7 +26,12 @@ interface Dispatcher {
         AbstractLayer layer, Class<L> listenerType, E event,
         AbstractLayer.Interaction<L, E> interaction) {
       @SuppressWarnings("unchecked") E localized = (E)event.localize(layer);
-      layer.interact(listenerType, interaction, localized);
+      try {
+        layer.interact(listenerType, interaction, localized);
+      } catch (Throwable t) {
+        PlayN.log().warn("Interaction failure [layer=" + layer + ", iact=" + interaction +
+                         ", event=" + localized + "]", t);
+      }
     }
   };
 
@@ -37,10 +42,15 @@ interface Dispatcher {
         AbstractLayer layer, Class<L> listenerType, E event,
         AbstractLayer.Interaction<L, E> interaction) {
       @SuppressWarnings("unchecked") E localized = (E)event.localize(layer);
-      layer.interact(listenerType, interaction, localized);
-      while (layer.parent() != null && !localized.flags().getPropagationStopped()) {
-        layer = (AbstractLayer)layer.parent();
+      try {
         layer.interact(listenerType, interaction, localized);
+        while (layer.parent() != null && !localized.flags().getPropagationStopped()) {
+          layer = (AbstractLayer)layer.parent();
+          layer.interact(listenerType, interaction, localized);
+        }
+      } catch (Throwable t) {
+        PlayN.log().warn("Interaction failure [layer=" + layer + ", iact=" + interaction +
+                         ", event=" + localized + "]", t);
       }
     }
   };
