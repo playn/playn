@@ -39,28 +39,30 @@ class JavaTextLayout extends AbstractTextLayout {
   public JavaTextLayout(JavaGraphics gfx, String text, TextFormat format) {
     super(gfx, format);
 
-    // normalize newlines in the text (Windows: CRLF -> LF, Mac OS pre-X: CR -> LF)
-    text = text.replace("\r\n", "\n").replace('\r', '\n');
+    if (text.length() > 0) {
+      // normalize newlines in the text (Windows: CRLF -> LF, Mac OS pre-X: CR -> LF)
+      text = text.replace("\r\n", "\n").replace('\r', '\n');
 
-    // set up an attributed character iterator so that we can measure the text
-    AttributedString astring = new AttributedString(text);
-    if (format.font != null) {
-      astring.addAttribute(TextAttribute.FONT, ((JavaFont)format.font).jfont);
-    }
-
-    if (format.shouldWrap() || text.indexOf('\n') != -1) {
-      LineBreakMeasurer measurer = new LineBreakMeasurer(astring.getIterator(), dummyFontContext);
-      char eol = '\n'; // TODO: platform line endings?
-      int lastPos = text.length();
-      while (measurer.getPosition() < lastPos) {
-        int nextRet = text.indexOf(eol, measurer.getPosition()+1);
-        if (nextRet == -1) {
-          nextRet = lastPos;
-        }
-        layouts.add(measurer.nextLayout(format.wrapWidth, nextRet, false));
+      // set up an attributed character iterator so that we can measure the text
+      AttributedString astring = new AttributedString(text);
+      if (format.font != null) {
+        astring.addAttribute(TextAttribute.FONT, ((JavaFont)format.font).jfont);
       }
-    } else {
-      layouts.add(new TextLayout(astring.getIterator(), dummyFontContext));
+
+      if (format.shouldWrap() || text.indexOf('\n') != -1) {
+        LineBreakMeasurer measurer = new LineBreakMeasurer(astring.getIterator(), dummyFontContext);
+        char eol = '\n'; // TODO: platform line endings?
+        int lastPos = text.length();
+        while (measurer.getPosition() < lastPos) {
+          int nextRet = text.indexOf(eol, measurer.getPosition()+1);
+          if (nextRet == -1) {
+            nextRet = lastPos;
+          }
+          layouts.add(measurer.nextLayout(format.wrapWidth, nextRet, false));
+        }
+      } else {
+        layouts.add(new TextLayout(astring.getIterator(), dummyFontContext));
+      }
     }
 
     // compute our width and height
