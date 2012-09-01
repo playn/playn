@@ -99,6 +99,8 @@ public interface Graphics {
   /**
    * Lays out the supplied text using the specified format. The text may subsequently be rendered
    * on a canvas via {@link Canvas#fillText(TextLayout,float,float)}.
+   *
+   * @param text a non-empty string to be laid out according to {@code format}.
    */
   TextLayout layoutText(String text, TextFormat format);
 
