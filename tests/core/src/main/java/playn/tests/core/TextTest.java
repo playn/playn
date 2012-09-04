@@ -48,6 +48,12 @@ public class TextTest extends Test {
     x += addExamples("Vector otln", OUTLINE_VEC, x);
     x += addExamples("Shadow UL", SHADOW_UL, x);
     x += addExamples("Shadow LR", SHADOW_LR, x);
+
+    // test laying out the empty string
+    TextLayout layout = graphics().layoutText("", new TextFormat());
+    ImageLayer layer = makeTextLayer(
+      "Empty string size " + layout.width() + "x" + layout.height(), FILL, baseFormat);
+    graphics().rootLayer().addAt(layer, 10, 330);
   }
 
   protected float addExamples(String name, TextRenderer renderer, float x) {

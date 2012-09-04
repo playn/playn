@@ -24,7 +24,6 @@ import playn.core.TextLayout;
 import java.util.ArrayList;
 import java.util.List;
 
-import playn.core.Asserts;
 import static playn.core.PlayN.graphics;
 
 class HtmlTextLayout implements TextLayout {
@@ -44,8 +43,6 @@ class HtmlTextLayout implements TextLayout {
   }
 
   HtmlTextLayout(Context2d ctx, String text, TextFormat format) {
-    Asserts.checkArgument(text.length() > 0, "Cannot layout the empty string.");
-
     Font font = getFont(format);
     this.format = format;
     this.metrics = ((HtmlGraphics)graphics()).getFontMetrics(font);

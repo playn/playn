@@ -42,18 +42,22 @@ class JavaTextLayout extends AbstractTextLayout {
     // normalize newlines in the text (Windows: CRLF -> LF, Mac OS pre-X: CR -> LF)
     text = text.replace("\r\n", "\n").replace('\r', '\n');
 
+    // we do some fiddling to work around the fact that TextLayout chokes on the empty string
+    boolean isEmptyString = text.length() == 0;
+    String ltext = isEmptyString ? " " : text;
+
     // set up an attributed character iterator so that we can measure the text
-    AttributedString astring = new AttributedString(text);
+    AttributedString astring = new AttributedString(ltext);
     if (format.font != null) {
       astring.addAttribute(TextAttribute.FONT, ((JavaFont)format.font).jfont);
     }
 
-    if (format.shouldWrap() || text.indexOf('\n') != -1) {
+    if (format.shouldWrap() || ltext.indexOf('\n') != -1) {
       LineBreakMeasurer measurer = new LineBreakMeasurer(astring.getIterator(), dummyFontContext);
       char eol = '\n'; // TODO: platform line endings?
-      int lastPos = text.length();
+      int lastPos = ltext.length();
       while (measurer.getPosition() < lastPos) {
-        int nextRet = text.indexOf(eol, measurer.getPosition()+1);
+        int nextRet = ltext.indexOf(eol, measurer.getPosition()+1);
         if (nextRet == -1) {
           nextRet = lastPos;
         }
@@ -73,7 +77,7 @@ class JavaTextLayout extends AbstractTextLayout {
       }
       theight += (layout.getAscent() + layout.getDescent());
     }
-    width = twidth;
+    width = isEmptyString ? 0 : twidth;
     height = theight;
   }
 
