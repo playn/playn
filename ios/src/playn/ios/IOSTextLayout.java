@@ -177,7 +177,7 @@ class IOSTextLayout extends AbstractTextLayout {
   private float strokeWidth;
 
   public IOSTextLayout(IOSGraphics gfx, String text, TextFormat format) {
-    super(gfx, format);
+    super(gfx, text, format);
     this.gfx = gfx;
     // normalize newlines in the text (Windows: CRLF -> LF, Mac OS pre-X: CR -> LF)
     this.text = text.replace("\r\n", "\n").replace('\r', '\n');

@@ -21,6 +21,7 @@ import java.util.List;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 
+import playn.core.Asserts;
 import playn.core.TextFormat;
 import playn.core.TextLayout;
 
@@ -63,6 +64,8 @@ class AndroidTextLayout implements TextLayout {
   }
 
   AndroidTextLayout(String text, TextFormat format) {
+    Asserts.checkArgument(text.length() > 0, "Cannot layout the empty string.");
+
     this.format = format;
     this.font = (format.font == null) ? AndroidFont.DEFAULT : (AndroidFont)format.font;
 

@@ -37,7 +37,7 @@ class JavaTextLayout extends AbstractTextLayout {
   private List<TextLayout> layouts = new ArrayList<TextLayout>();
 
   public JavaTextLayout(JavaGraphics gfx, String text, TextFormat format) {
-    super(gfx, format);
+    super(gfx, text, format);
 
     // normalize newlines in the text (Windows: CRLF -> LF, Mac OS pre-X: CR -> LF)
     text = text.replace("\r\n", "\n").replace('\r', '\n');

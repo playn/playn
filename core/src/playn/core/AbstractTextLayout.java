@@ -43,8 +43,9 @@ public abstract class AbstractTextLayout implements playn.core.TextLayout {
     return format;
   }
 
-  protected AbstractTextLayout(Graphics gfx, TextFormat format) {
+  protected AbstractTextLayout(Graphics gfx, String text, TextFormat format) {
     this.format = format;
     this.pad = 1/gfx.scaleFactor();
+    Asserts.checkArgument(text.length() > 0, "Cannot layout the empty string.");
   }
 }

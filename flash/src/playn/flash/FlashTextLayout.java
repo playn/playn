@@ -15,12 +15,14 @@
  */
 package playn.flash;
 
-import playn.core.Font;
-import playn.core.TextFormat;
-import playn.core.TextLayout;
 import java.util.ArrayList;
 import java.util.List;
 
+import playn.core.Font;
+import playn.core.TextFormat;
+import playn.core.TextLayout;
+
+import playn.core.Asserts;
 import static playn.core.PlayN.graphics;
 
 class FlashTextLayout implements TextLayout {
@@ -40,6 +42,8 @@ class FlashTextLayout implements TextLayout {
   }
 
   FlashTextLayout(FlashCanvas.Context2d ctx, String text, TextFormat format) {
+    Asserts.checkArgument(text.length() > 0, "Cannot layout the empty string.");
+
     Font font = getFont(format);
     this.format = format;
     this.metrics = ((FlashGraphics)graphics()).getFontMetrics(font);
