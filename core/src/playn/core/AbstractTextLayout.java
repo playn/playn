@@ -18,7 +18,7 @@ package playn.core;
 /**
  * Base {@link TextLayout} implementation shared among platforms.
  */
-public abstract class AbstractTextLayout implements playn.core.TextLayout {
+public abstract class AbstractTextLayout implements TextLayout {
 
   protected final TextFormat format;
   // this is used to reserve one pixel of padding around the edge of our rendered text which makes
