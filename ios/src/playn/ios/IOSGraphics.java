@@ -49,7 +49,6 @@ public class IOSGraphics extends GraphicsGL {
   private final GroupLayerGL rootLayer;
   private final int screenWidth, screenHeight;
   private final float touchScale;
-  private final Point touchTemp = new Point();
   private boolean invertSizes;
 
   // a scratch bitmap context used for measuring text
@@ -137,11 +136,6 @@ public class IOSGraphics extends GraphicsGL {
 
   void setOrientation(UIDeviceOrientation orientation) {
     invertSizes = ctx.setOrientation(orientation);
-  }
-
-  IPoint transformTouch(float x, float y) {
-    return ctx.rootTransform().inverseTransform(
-      touchTemp.set(x*touchScale, y*touchScale), touchTemp);
   }
 
   void paint(Game game, float alpha) {

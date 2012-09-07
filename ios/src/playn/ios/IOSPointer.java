@@ -75,10 +75,8 @@ public class IOSPointer extends PointerImpl {
         } else {
           _active = touch;
           PointF loc = touch.LocationInView(touch.get_View());
-          // transform the point based on our current orientation and scale
-          IPoint xloc = graphics.transformTouch(loc.get_X(), loc.get_Y());
           eventw[0] = new Event.Impl(
-            new Events.Flags.Impl(), touch.get_Timestamp() * 1000, xloc.x(), xloc.y(), true);
+            new Events.Flags.Impl(), touch.get_Timestamp() * 1000, loc.get_X(), loc.get_Y(), true);
           stop[0] = true;
         }
       }

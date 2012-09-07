@@ -59,12 +59,10 @@ public class IOSTouch extends TouchImpl {
       public void Invoke (NSObject obj, boolean[] stop) {
         UITouch touch = (UITouch) obj;
         PointF loc = touch.LocationInView(touch.get_View());
-        // transform the point based on our current orientation and scale
-        IPoint xloc = graphics.transformTouch(loc.get_X(), loc.get_Y());
         // on iOS the memory address of the UITouch object is the unique id
         int id = touch.get_Handle().ToInt32();
         events[_idx++] = new Event.Impl(
-          new Events.Flags.Impl(), touch.get_Timestamp() * 1000, xloc.x(), xloc.y(), id);
+          new Events.Flags.Impl(), touch.get_Timestamp() * 1000, loc.get_X(), loc.get_Y(), id);
         stop[0] = false;
       }
       private int _idx = 0;
