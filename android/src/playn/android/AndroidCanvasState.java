@@ -103,6 +103,7 @@ class AndroidCanvasState {
     } else if (pattern != null) {
       paint.setShader(pattern.shader);
     } else {
+      paint.setShader(null);
       paint.setColor(fillColor);
       // Android reuses the A bits of color for alpha so we have to compute the
       // real alpha here
@@ -113,6 +114,7 @@ class AndroidCanvasState {
   }
 
   Paint prepareStroke() {
+    paint.setShader(null);
     paint.setStyle(Style.STROKE);
     paint.setColor(strokeColor);
     // Android reuses the A bits of color for alpha so we have to compute the

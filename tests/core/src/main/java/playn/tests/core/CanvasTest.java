@@ -162,6 +162,21 @@ public class CanvasTest extends Test {
         canvas.fillRoundRect(3, 3, 92.32f, 23.5f, 9.5f);
       }
     });
+
+    addTestCanvas("android fill/stroke bug", 100, 100, new Drawer() {
+      public void draw(Canvas canvas) {
+        float dotRadius = 40;
+        canvas.save();
+        canvas.setFillGradient(graphics().createRadialGradient(
+                                 100 / 3, 100 / 2.5f, dotRadius,
+                                 new int[] { 0xFFFFFFFF, 0xFFCC66FF }, new float[] { 0f, 1f }));
+        canvas.fillCircle(50, 50, dotRadius);
+        canvas.restore();
+        canvas.setStrokeColor(0xFF000000);
+        canvas.setStrokeWidth(1.5f);
+        canvas.strokeCircle(50, 50, dotRadius);
+      }
+    });
   }
 
   @Override
