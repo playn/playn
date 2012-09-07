@@ -293,6 +293,10 @@ public class IOSPlatform extends AbstractPlatform {
     mainWindow.MakeKeyAndVisible();
   }
 
+  public UIView uiOverlay() {
+    return uiOverlay;
+  }
+
   // make these accessible to IOSApplicationDelegate
   protected void onPause() {
     super.onPause();
