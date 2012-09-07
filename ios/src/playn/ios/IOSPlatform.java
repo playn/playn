@@ -21,6 +21,8 @@ import java.io.PrintStream;
 import java.util.HashMap;
 import java.util.Map;
 
+import cli.MonoTouch.CoreGraphics.CGAffineTransform;
+import cli.MonoTouch.UIKit.UIView;
 import cli.System.Drawing.RectangleF;
 
 import cli.MonoTouch.Foundation.NSUrl;
@@ -38,6 +40,7 @@ import playn.core.MouseStub;
 import playn.core.PlayN;
 import playn.core.RegularExpression;
 import playn.core.json.JsonImpl;
+import pythagoras.f.FloatMath;
 
 /**
  * Provides access to all the PlayN services on iOS.
@@ -148,6 +151,7 @@ public class IOSPlatform extends AbstractPlatform {
   private final UIApplication app;
   private final UIWindow mainWindow;
   private final IOSGameView gameView;
+  private final UIView uiOverlay;
 
   protected IOSPlatform(UIApplication app, SupportedOrients orients, boolean iPadLikePhone) {
     super(new IOSLog());
@@ -177,6 +181,9 @@ public class IOSPlatform extends AbstractPlatform {
 
     mainWindow = new UIWindow(bounds);
     mainWindow.Add(gameView = new IOSGameView(this, bounds, deviceScale));
+
+    uiOverlay = new UIView(bounds);
+    gameView.Add(uiOverlay);
 
     // if the game supplied a proper delegate, configure it (for lifecycle notifications)
     if (app.get_Delegate() instanceof IOSApplicationDelegate)
@@ -308,6 +315,36 @@ public class IOSPlatform extends AbstractPlatform {
       return; // ignore unsupported (or Unknown) orientations
     graphics.setOrientation(orientation);
     UIInterfaceOrientation sorient = ORIENT_MAP.get(orientation);
+
+    CGAffineTransform trans = CGAffineTransform.MakeIdentity();
+    boolean landscape = false;
+    switch (orientation.Value) {
+    default:
+    case UIDeviceOrientation.Portrait:
+      break;
+    case UIDeviceOrientation.PortraitUpsideDown:
+      trans.Rotate(FloatMath.PI);
+      break;
+    case UIDeviceOrientation.LandscapeLeft:
+      landscape = true;
+      trans.Rotate(FloatMath.PI / 2);
+      break;
+    case UIDeviceOrientation.LandscapeRight:
+      landscape = true;
+      trans.Rotate(-FloatMath.PI / 2);
+      break;
+    }
+    uiOverlay.set_Transform(trans);
+
+    RectangleF overlayBounds = uiOverlay.get_Bounds();
+    if ((overlayBounds.get_Width() > overlayBounds.get_Height()) != landscape) {
+      // swap the width and height
+      float width = overlayBounds.get_Width();
+      overlayBounds.set_Width(overlayBounds.get_Height());
+      overlayBounds.set_Height(width);
+      uiOverlay.set_Bounds(overlayBounds);
+    }
+
     if (!sorient.equals(app.get_StatusBarOrientation())) {
       app.SetStatusBarOrientation(sorient, !app.get_StatusBarHidden());
     }
