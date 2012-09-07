@@ -25,6 +25,7 @@ import cli.MonoTouch.CoreGraphics.CGImageAlphaInfo;
 import cli.MonoTouch.UIKit.UIDeviceOrientation;
 import cli.MonoTouch.UIKit.UIImage;
 import cli.OpenTK.Graphics.ES20.All;
+import cli.OpenTK.Graphics.ES20.ErrorCode;
 import cli.OpenTK.Graphics.ES20.GL;
 
 import pythagoras.f.FloatMath;
@@ -221,8 +222,8 @@ public class IOSGLContext extends GLContext {
   @Override
   public void checkGLError(String op) {
     if (CHECK_ERRORS) {
-      All error;
-      while (!(error = GL.GetError()).Equals(All.wrap(All.NoError))) {
+      ErrorCode error;
+      while (!(error = GL.GetError()).Equals(ErrorCode.wrap(ErrorCode.NoError))) {
         PlayN.log().error(op + ": glError " + error);
       }
     }
