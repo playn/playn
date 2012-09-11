@@ -53,7 +53,7 @@ public class IOSFont extends AbstractFont {
     ctFont = new CTFont(iosName(), size);
   }
 
-  String iosName() {
+  public String iosName() {
     return getVariant(name, style);
   }
 
