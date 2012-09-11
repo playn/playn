@@ -18,7 +18,6 @@ import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.Style.Overflow;
 import com.google.gwt.dom.client.Style.Unit;
 
-import playn.core.CanvasLayer;
 import playn.core.Game;
 import playn.core.GroupLayer;
 import playn.core.Image;

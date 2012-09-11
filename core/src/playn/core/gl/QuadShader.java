@@ -117,7 +117,6 @@ public class QuadShader extends GLShader {
       verts = ctx.createFloatBuffer(maxQuads*VERTICES_PER_QUAD*VERTEX_SIZE);
       elems = ctx.createShortBuffer(maxQuads*ELEMENTS_PER_QUAD);
 
-      float[] tv1 = {0.0f, 0.0f}, tv2 = {1.0f, 0.0f}, tv3 = {0.0f, 1.0f}, tv4 = {1.0f, 1.0f};
       for (int ii = 0; ii < maxQuads; ii++) {
         verts.add(0, 0).add(ii);
         verts.add(1, 0).add(ii);

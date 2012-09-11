@@ -71,6 +71,7 @@ class FlashTextLayout implements TextLayout {
     switch (font.style()) {
     case ITALIC:      width += metrics.emwidth/8; break;
     case BOLD_ITALIC: width += metrics.emwidth/6; break;
+    default: break; // nada
     }
   }
 
@@ -120,6 +121,7 @@ class FlashTextLayout implements TextLayout {
       case BOLD:        bold = "bold";   break;
       case ITALIC:      italic = "italic"; break;
       case BOLD_ITALIC: bold = "bold"; italic = "italic"; break;
+      default: break; // nada
     }
 
     ctx.setFont(italic + " " + bold + " " + font.size() + " " + font.name());

@@ -21,12 +21,10 @@ import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
 import javax.sound.sampled.FloatControl;
-import javax.sound.sampled.LineUnavailableException;
 
 import pythagoras.f.FloatMath;
 import pythagoras.f.MathUtil;
 
-import playn.core.Asserts;
 import playn.core.PlayN;
 import playn.core.Sound;
 import playn.core.util.Callback;

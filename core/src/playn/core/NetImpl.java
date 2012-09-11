@@ -15,8 +15,6 @@
  */
 package playn.core;
 
-import playn.core.util.Callback;
-
 /**
  * An abstract implementation of {@link Net} shared by multiple backends.
  */

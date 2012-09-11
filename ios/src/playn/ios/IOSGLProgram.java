@@ -23,7 +23,6 @@ import cli.OpenTK.Graphics.ES20.GL;
 import playn.core.gl.GLBuffer;
 import playn.core.gl.GLProgram;
 import playn.core.gl.GLShader;
-import static playn.core.PlayN.log;
 
 public class IOSGLProgram implements GLProgram {
 

@@ -22,7 +22,6 @@ import com.google.gwt.core.client.JavaScriptObject;
 
 import playn.core.Asserts;
 import playn.core.Canvas;
-import playn.core.PlayN;
 import playn.core.Gradient;
 import playn.core.Image;
 import playn.core.Path;

@@ -24,7 +24,6 @@ import pythagoras.f.MathUtil;
 
 import playn.core.Asserts;
 import playn.core.CanvasImage;
-import playn.core.CanvasLayer;
 import playn.core.Font;
 import playn.core.Gradient;
 import playn.core.Graphics;
@@ -32,8 +31,6 @@ import playn.core.GroupLayer;
 import playn.core.Image;
 import playn.core.ImageLayer;
 import playn.core.ImmediateLayer;
-import playn.core.Path;
-import playn.core.Pattern;
 import playn.core.PlayN;
 import playn.core.SurfaceLayer;
 import playn.core.TextFormat;
@@ -70,6 +67,7 @@ class FlashGraphics implements Graphics {
           case BOLD:        bold = "bold";   break;
           case ITALIC:      italic = "italic"; break;
           case BOLD_ITALIC: bold = "bold"; italic = "italic"; break;
+          default: break; // nada
       }
 
       dummyCtx.setFont(italic + " " + bold + " " + font.size() + " " + font.name());

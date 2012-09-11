@@ -19,7 +19,6 @@ import com.google.gwt.dom.client.Element;
 import com.google.gwt.webgl.client.WebGLContextAttributes;
 import com.google.gwt.webgl.client.WebGLRenderingContext;
 
-import playn.core.CanvasLayer;
 import playn.core.Game;
 import playn.core.GroupLayer;
 import playn.core.Image;
@@ -36,7 +35,6 @@ class HtmlGraphicsGL extends HtmlGraphics {
 
   private final CanvasElement canvas;
   private final HtmlGLContext ctx;
-  private HtmlGL20 gl20;
   private final GroupLayerGL rootLayer;
 
   HtmlGraphicsGL(HtmlPlatform platform, HtmlPlatform.Configuration config) throws RuntimeException {

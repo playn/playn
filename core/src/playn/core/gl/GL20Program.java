@@ -17,8 +17,6 @@ package playn.core.gl;
 
 import java.nio.FloatBuffer;
 
-import static playn.core.PlayN.log;
-
 /**
  * A shader program implementation built on the {@link GL20} API.
  */

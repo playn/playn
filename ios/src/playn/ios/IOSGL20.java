@@ -15,13 +15,7 @@
  */
 package playn.ios;
 
-import cli.MonoTouch.CoreGraphics.CGBitmapContext;
-import cli.MonoTouch.CoreGraphics.CGImage;
-import cli.MonoTouch.CoreGraphics.CGImageAlphaInfo;
-import cli.MonoTouch.UIKit.UIDeviceOrientation;
-import cli.MonoTouch.UIKit.UIImage;
 import cli.OpenTK.Graphics.ES20.GL;
-import cli.System.IntPtr;
 import cli.System.Runtime.InteropServices.GCHandle;
 import cli.System.Runtime.InteropServices.GCHandleType;
 import static cli.OpenTK.Graphics.ES20.All.*;

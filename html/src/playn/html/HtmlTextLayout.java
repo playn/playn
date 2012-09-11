@@ -73,6 +73,7 @@ class HtmlTextLayout implements TextLayout {
     switch (font.style()) {
     case ITALIC:      width += metrics.emwidth/8; break;
     case BOLD_ITALIC: width += metrics.emwidth/6; break;
+    default: break; // nada
     }
   }
 
@@ -121,6 +122,7 @@ class HtmlTextLayout implements TextLayout {
     case BOLD:        style = "bold";   break;
     case ITALIC:      style = "italic"; break;
     case BOLD_ITALIC: style = "bold italic"; break;
+    default: break; // nada
     }
 
     ctx.setFont(style + " " + font.size() + "px " + font.name());

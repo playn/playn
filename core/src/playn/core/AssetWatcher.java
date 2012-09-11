@@ -78,7 +78,6 @@ public class AssetWatcher {
   /**
    * Adds an image resource to be watched.
    */
-  @SuppressWarnings("unchecked")
   public void add(Image image) {
     Asserts.checkState(!start || listener == null);
     ++total;
@@ -88,7 +87,6 @@ public class AssetWatcher {
   /**
    * Adds a sound resource to be watched.
    */
-  @SuppressWarnings("unchecked")
   public void add(Sound sound) {
     Asserts.checkState(!start || listener == null);
     ++total;

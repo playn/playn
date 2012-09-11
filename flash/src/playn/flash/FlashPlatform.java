@@ -29,7 +29,6 @@ import playn.core.Game;
 import playn.core.Graphics;
 import playn.core.Json;
 import playn.core.Keyboard;
-import playn.core.Log;
 import playn.core.Mouse;
 import playn.core.Net;
 import playn.core.PlayN;

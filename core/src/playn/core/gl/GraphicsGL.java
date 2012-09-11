@@ -15,7 +15,6 @@
  */
 package playn.core.gl;
 
-import playn.core.CanvasLayer;
 import playn.core.Graphics;
 import playn.core.GroupLayer;
 import playn.core.Image;

@@ -31,9 +31,6 @@ import playn.core.Font;
 import playn.core.Game;
 import playn.core.Gradient;
 import playn.core.Graphics;
-import playn.core.Image;
-import playn.core.Path;
-import playn.core.Pattern;
 import playn.core.TextFormat;
 import playn.core.TextLayout;
 import playn.core.gl.GL20;
@@ -177,6 +174,8 @@ public abstract class HtmlGraphics implements Graphics {
       case ITALIC:
         measureElement.getStyle().setFontStyle(Style.FontStyle.ITALIC);
         break;
+      default:
+        break; // nada
       }
       float height = measureElement.getOffsetHeight();
       measureElement.setInnerText(EMWIDTH_TEXT);

@@ -32,7 +32,6 @@ public class GameViewGL extends GLSurfaceView implements SurfaceHolder.Callback 
   private static volatile int contextId = 1;
 
   private final AndroidGL20 gl20;
-  private final AndroidRendererGL renderer;
   private final GameActivity activity;
   private GameLoop loop;
   private boolean gameSizeSet = false; // Set by AndroidGraphics
@@ -81,7 +80,7 @@ public class GameViewGL extends GLSurfaceView implements SurfaceHolder.Callback 
       // FIXME: Need to use android3.0 as a Maven artifact for this to work
       // setPreserveEGLContextOnPause(true);
     }
-    this.setRenderer(renderer = new AndroidRendererGL());
+    this.setRenderer(new AndroidRendererGL());
     setRenderMode(RENDERMODE_CONTINUOUSLY);
   }
 

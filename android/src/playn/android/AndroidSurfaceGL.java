@@ -57,6 +57,7 @@ public class AndroidSurfaceGL extends SurfaceGL
         ByteBuffer pixelBuffer = ByteBuffer.allocate(texWidth * texHeight * 4);
         FileInputStream in = new FileInputStream(cachedPixels);
         in.read(pixelBuffer.array());
+        in.close();
         int bufferTex = actx.createTexture(false, false);
         actx.gl.glTexImage2D(GL20.GL_TEXTURE_2D, 0, GL20.GL_RGBA, texWidth, texHeight, 0,
                              GL20.GL_RGBA, GL20.GL_UNSIGNED_BYTE, pixelBuffer);

@@ -23,7 +23,6 @@ import com.allen_sauer.gwt.voices.client.Sound.LoadState;
 import pythagoras.f.MathUtil;
 
 import playn.core.AbstractSound;
-import playn.core.Asserts;
 
 class HtmlSound extends AbstractSound {
 

@@ -22,12 +22,9 @@ import org.lwjgl.opengl.Display;
 
 import playn.core.AbstractPlatform;
 import playn.core.Analytics;
-import playn.core.Audio;
-import playn.core.Events;
 import playn.core.Game;
 import playn.core.Json;
 import playn.core.Keyboard;
-import playn.core.Log;
 import playn.core.Mouse;
 import playn.core.Net;
 import playn.core.PlayN;
