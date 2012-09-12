@@ -24,9 +24,7 @@ import cli.MonoTouch.CoreGraphics.CGImage;
 import cli.MonoTouch.CoreGraphics.CGImageAlphaInfo;
 import cli.MonoTouch.UIKit.UIDeviceOrientation;
 import cli.MonoTouch.UIKit.UIImage;
-import cli.OpenTK.Graphics.ES20.All;
-import cli.OpenTK.Graphics.ES20.ErrorCode;
-import cli.OpenTK.Graphics.ES20.GL;
+import cli.OpenTK.Graphics.ES20.*; // a zillion little types
 
 import pythagoras.f.FloatMath;
 
@@ -64,9 +62,10 @@ public class IOSGLContext extends GLContext {
 
   void viewDidInit(int defaultFrameBuffer) {
     this.defaultFrameBuffer = defaultFrameBuffer;
-    GL.Disable(All.wrap(All.CullFace));
-    GL.Enable(All.wrap(All.Blend));
-    GL.BlendFunc(All.wrap(All.One), All.wrap(All.OneMinusSrcAlpha));
+    GL.Disable(EnableCap.wrap(EnableCap.CullFace));
+    GL.Enable(EnableCap.wrap(EnableCap.Blend));
+    GL.BlendFunc(BlendingFactorSrc.wrap(BlendingFactorSrc.One),
+                 BlendingFactorDest.wrap(BlendingFactorDest.OneMinusSrcAlpha));
     GL.ClearColor(0, 0, 0, 1);
     quadShader = createQuadShader();
     trisShader = new IndexedTrisShader(this);
@@ -103,21 +102,21 @@ public class IOSGLContext extends GLContext {
   @Override
   public int getInteger(int param) {
     int[] out = new int[1];
-    GL.GetInteger(All.wrap(param), out);
+    GL.GetInteger(GetPName.wrap(param), out);
     return out[0];
   }
 
   @Override
   public float getFloat(int param) {
     float[] out = new float[1];
-    GL.GetFloat(All.wrap(param), out);
+    GL.GetFloat(GetPName.wrap(param), out);
     return out[0];
   }
 
   @Override
   public boolean getBoolean(int param) {
     boolean[] out = new boolean[1];
-    GL.GetBoolean(All.wrap(param), out);
+    GL.GetBoolean(GetPName.wrap(param), out);
     return out[0];
   }
 
@@ -146,12 +145,13 @@ public class IOSGLContext extends GLContext {
     int[] texw = new int[1];
     GL.GenTextures(1, texw);
     int tex = texw[0];
-    GL.BindTexture(All.wrap(All.Texture2D), tex);
-    GL.TexParameter(All.wrap(All.Texture2D), All.wrap(All.TextureMinFilter), minFilter);
-    GL.TexParameter(All.wrap(All.Texture2D), All.wrap(All.TextureMagFilter), magFilter);
-    GL.TexParameter(All.wrap(All.Texture2D), All.wrap(All.TextureWrapS),
+    TextureTarget tt = TextureTarget.wrap(TextureTarget.Texture2D);
+    GL.BindTexture(tt, tex);
+    GL.TexParameter(tt, TextureParameterName.wrap(TextureParameterName.TextureMinFilter), minFilter);
+    GL.TexParameter(tt, TextureParameterName.wrap(TextureParameterName.TextureMagFilter), magFilter);
+    GL.TexParameter(tt, TextureParameterName.wrap(TextureParameterName.TextureWrapS),
                     repeatX ? All.Repeat : All.ClampToEdge);
-    GL.TexParameter(All.wrap(All.Texture2D), All.wrap(All.TextureWrapT),
+    GL.TexParameter(tt, TextureParameterName.wrap(TextureParameterName.TextureWrapT),
                     repeatY ? All.Repeat : All.ClampToEdge);
     return tex;
   }
@@ -159,19 +159,20 @@ public class IOSGLContext extends GLContext {
   @Override
   public int createTexture(int width, int height, boolean repeatX, boolean repeatY) {
     int tex = createTexture(repeatX, repeatY);
-    GL.TexImage2D(All.wrap(All.Texture2D), 0, All.Rgba, width, height, 0, All.wrap(All.Rgba),
-                  All.wrap(All.UnsignedByte), null);
+    GL.TexImage2D(TextureTarget.wrap(TextureTarget.Texture2D), 0,
+                  PixelInternalFormat.wrap(PixelInternalFormat.Rgba), width, height, 0,
+                  PixelFormat.wrap(PixelFormat.Rgba), PixelType.wrap(PixelType.UnsignedByte), null);
     return tex;
   }
 
   @Override
   public void activeTexture(int glTextureN) {
-    GL.ActiveTexture(All.wrap(glTextureN));
+    GL.ActiveTexture(TextureUnit.wrap(glTextureN));
   }
 
   @Override
   public void bindTexture(int tex) {
-    GL.BindTexture(All.wrap(All.Texture2D), tex);
+    GL.BindTexture(TextureTarget.wrap(TextureTarget.Texture2D), tex);
   }
 
   @Override
@@ -198,19 +199,19 @@ public class IOSGLContext extends GLContext {
       break;
     }
     checkGLError("GL.Scissor");
-    GL.Enable(All.wrap(All.ScissorTest));
+    GL.Enable(EnableCap.wrap(EnableCap.ScissorTest));
   }
 
   @Override
   public void endClipped() {
     flush(); // flush our clipped calls with SCISSOR_TEST still enabled
-    GL.Disable(All.wrap(All.ScissorTest));
+    GL.Disable(EnableCap.wrap(EnableCap.ScissorTest));
   }
 
   @Override
   public void clear(float r, float g, float b, float a) {
     GL.ClearColor(r, g, b, a);
-    GL.Clear(All.ColorBufferBit);
+    GL.Clear(ClearBufferMask.wrap(ClearBufferMask.ColorBufferBit));
   }
 
   @Override
@@ -239,9 +240,10 @@ public class IOSGLContext extends GLContext {
     GL.GenFramebuffers(1, fbufw);
 
     int fbuf = fbufw[0];
-    GL.BindFramebuffer(All.wrap(All.Framebuffer), fbuf);
-    GL.FramebufferTexture2D(All.wrap(All.Framebuffer), All.wrap(All.ColorAttachment0),
-                            All.wrap(All.Texture2D), tex, 0);
+    GL.BindFramebuffer(FramebufferTarget.wrap(FramebufferTarget.Framebuffer), fbuf);
+    GL.FramebufferTexture2D(FramebufferTarget.wrap(FramebufferTarget.Framebuffer),
+                            FramebufferSlot.wrap(FramebufferSlot.ColorAttachment0),
+                            TextureTarget.wrap(TextureTarget.Texture2D), tex, 0);
     return fbuf;
   }
 
@@ -250,7 +252,7 @@ public class IOSGLContext extends GLContext {
     // this is called during early initialization before we know our default frame buffer id, but
     // we can just skip binding in that case because our default frame buffer is already bound
     if (frameBuffer != -1)
-      GL.BindFramebuffer(All.wrap(All.Framebuffer), frameBuffer);
+      GL.BindFramebuffer(FramebufferTarget.wrap(FramebufferTarget.Framebuffer), frameBuffer);
     GL.Viewport(0, 0, width, height);
   }
 
@@ -287,14 +289,16 @@ public class IOSGLContext extends GLContext {
   }
 
   void updateTexture(int tex, int width, int height, IntPtr data) {
-    GL.TexImage2D(All.wrap(All.Texture2D), 0, All.Rgba, width, height, 0, All.wrap(All.Rgba),
-                  All.wrap(All.UnsignedByte), data);
+    GL.TexImage2D(TextureTarget.wrap(TextureTarget.Texture2D), 0,
+                  PixelInternalFormat.wrap(PixelInternalFormat.Rgba), width, height, 0,
+                  PixelFormat.wrap(PixelFormat.Rgba), PixelType.wrap(PixelType.UnsignedByte), data);
   }
 
   void preparePaint() {
     checkGLError("preparePaint start");
     bindFramebuffer();
-    GL.Clear(All.ColorBufferBit | All.DepthBufferBit); // clear to transparent
+    GL.Clear(ClearBufferMask.wrap(ClearBufferMask.ColorBufferBit | // clear to transparent
+                                  ClearBufferMask.DepthBufferBit));
     checkGLError("preparePaint end");
   }
 
