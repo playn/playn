@@ -176,7 +176,7 @@ public class HtmlJson extends JsonImpl implements Json {
       for (int i = 0; i < length(); i++) {
         java.lang.Object o = get0(i);
         if (o == null || isValueString(o))
-          sink.value((String)o);
+          sink.value(unwrapString0(o));
         else if (isValueArray(o))
           sink.array((Json.Array) o);
         else if (isValueObject(o))
@@ -347,7 +347,7 @@ public class HtmlJson extends JsonImpl implements Json {
       for (String key : keys()) {
         java.lang.Object o = get0(key);
         if (o == null || isValueString(o))
-          sink.value(key, (String)o);
+          sink.value(key, unwrapString0(o));
         else if (isValueArray(o))
           sink.array(key, (Json.Array) o);
         else if (isValueObject(o))
@@ -443,6 +443,10 @@ public class HtmlJson extends JsonImpl implements Json {
   public static boolean isObjectAnObject(java.lang.Object o) {
     return o instanceof JavaScriptObject && isValueObject(wrap0(o));
   }
+
+  private static native String unwrapString0(java.lang.Object value) /*-{
+    return value;
+  }-*/;
 
   private static native boolean isValueArray(java.lang.Object value) /*-{
     return (@com.google.gwt.core.client.GWT::isProdMode()() ? value : value[0]) instanceof Array;
