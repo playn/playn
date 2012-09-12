@@ -38,12 +38,19 @@ public class IOSFont extends AbstractFont {
    * variant directly. This variant mapping process exists only to simplify cross-platform
    * development. </p>
    */
-  public static final void registerVariant(String name, Style style, String variantName) {
+  public static void registerVariant(String name, Style style, String variantName) {
     Map<String,String> styleVariants = _variants.get(style);
     if (styleVariants == null) {
       _variants.put(style, styleVariants = new HashMap<String,String>());
     }
     styleVariants.put(name, variantName);
+  }
+
+  /**
+   * Returns the font used when no font is configured.
+   */
+  public static IOSFont defaultFont () {
+    return IOSGraphics.defaultFont;
   }
 
   final CTFont ctFont;
