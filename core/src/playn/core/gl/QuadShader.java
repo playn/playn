@@ -63,6 +63,16 @@ public class QuadShader extends GLShader {
 
   private final int maxQuads;
 
+  /**
+   * Returns false if the GL context doesn't support sufficient numbers of vertex uniform vectors
+   * to allow this shader to run with good performance, true otherwise.
+   */
+  public static boolean isLikelyToPerform(GLContext ctx) {
+    int maxVecs = ctx.getInteger(GL20.GL_MAX_VERTEX_UNIFORM_VECTORS) - 1;
+    // assume we're better off with indexed tris if we can't push at least 16 quads at a time
+    return (maxVecs >= 16*VEC4S_PER_QUAD);
+  }
+
   public QuadShader(GLContext ctx) {
     super(ctx);
 

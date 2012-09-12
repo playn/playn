@@ -68,13 +68,7 @@ public class IOSGLContext extends GLContext {
     GL.Enable(All.wrap(All.Blend));
     GL.BlendFunc(All.wrap(All.One), All.wrap(All.OneMinusSrcAlpha));
     GL.ClearColor(0, 0, 0, 1);
-    try {
-      quadShader = new QuadShader(this);
-      quadShader.createCores(); // force core creation to test whether it fails
-    } catch (Throwable t) {
-      platform.log().warn("Failed to create QuadShader: " + t);
-      quadShader = new IndexedTrisShader(this);
-    }
+    quadShader = createQuadShader();
     trisShader = new IndexedTrisShader(this);
   }
 

@@ -247,6 +247,21 @@ public abstract class GLContext {
    */
   protected abstract void bindFramebufferImpl(int fbuf, int width, int height);
 
+  protected GLShader createQuadShader () {
+    if (QuadShader.isLikelyToPerform(this)) {
+      try {
+        GLShader quadShader = new QuadShader(this);
+        quadShader.createCores(); // force core creation to test whether it fails
+        return quadShader;
+      } catch (Throwable t) {
+        platform.log().warn("Failed to create QuadShader: " + t);
+      }
+    } else {
+      platform.log().info("GPU/driver lacks sufficient vertex uniform vectors for QuadShader.");
+    }
+    return new IndexedTrisShader(this);
+  }
+
   protected abstract GLShader quadShader();
   protected abstract GLShader trisShader();
 }
