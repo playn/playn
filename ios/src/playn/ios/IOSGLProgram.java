@@ -19,6 +19,10 @@ import cli.System.IntPtr;
 
 import cli.OpenTK.Graphics.ES20.All;
 import cli.OpenTK.Graphics.ES20.GL;
+import cli.OpenTK.Graphics.ES20.ProgramParameter;
+import cli.OpenTK.Graphics.ES20.ShaderParameter;
+import cli.OpenTK.Graphics.ES20.ShaderType;
+import cli.OpenTK.Graphics.ES20.VertexAttribPointerType;
 
 import playn.core.gl.GLBuffer;
 import playn.core.gl.GLProgram;
@@ -35,20 +39,20 @@ public class IOSGLProgram implements GLProgram {
       if (program == 0)
         throw new RuntimeException("Failed to create program: " + GL.GetError());
 
-      vertexShader = compileShader(All.wrap(All.VertexShader), vertexSource);
+      vertexShader = compileShader(ShaderType.wrap(ShaderType.VertexShader), vertexSource);
       GL.AttachShader(program, vertexShader);
       ctx.checkGLError("Attached vertex shader");
 
-      fragmentShader = compileShader(All.wrap(All.FragmentShader), fragmentSource);
+      fragmentShader = compileShader(ShaderType.wrap(ShaderType.FragmentShader), fragmentSource);
       GL.AttachShader(program, fragmentShader);
       ctx.checkGLError("Attached fragment shader");
 
       GL.LinkProgram(program);
       int[] linkStatus = new int[1];
-      GL.GetProgram(program, All.wrap(All.LinkStatus), linkStatus);
+      GL.GetProgram(program, ProgramParameter.wrap(ProgramParameter.LinkStatus), linkStatus);
       if (linkStatus[0] != All.True) {
         int[] llength = new int[1];
-        GL.GetProgram(program, All.wrap(All.InfoLogLength), llength);
+        GL.GetProgram(program, ProgramParameter.wrap(ProgramParameter.InfoLogLength), llength);
         cli.System.Text.StringBuilder log = new cli.System.Text.StringBuilder(llength[0]);
         GL.GetProgramInfoLog(program, llength[0], llength, log);
         throw new RuntimeException("Failed to link program: " + log.ToString());
@@ -166,7 +170,8 @@ public class IOSGLProgram implements GLProgram {
     return (loc < 0) ? null : new GLShader.Attrib() {
       public void bind(int stride, int offset) {
         GL.EnableVertexAttribArray(loc);
-        GL.VertexAttribPointer(loc, size, All.wrap(type), false, stride, new IntPtr(offset));
+        GL.VertexAttribPointer(
+          loc, size, VertexAttribPointerType.wrap(type), false, stride, new IntPtr(offset));
       }
     };
   }
@@ -183,17 +188,17 @@ public class IOSGLProgram implements GLProgram {
     GL.DeleteProgram(program);
   }
 
-  private int compileShader(All type, final String shaderSource) {
+  private int compileShader(ShaderType type, final String shaderSource) {
     int shader = GL.CreateShader(type);
     if (shader == 0)
       throw new RuntimeException("Failed to create shader: " + GL.GetError());
     GL.ShaderSource(shader, 1, new String[] { shaderSource }, null);
     GL.CompileShader(shader);
     int[] compiled = new int[1];
-    GL.GetShader(shader, All.wrap(All.CompileStatus), compiled);
+    GL.GetShader(shader, ShaderParameter.wrap(ShaderParameter.CompileStatus), compiled);
     if (compiled[0] == All.False) {
       int[] llength = new int[1];
-      GL.GetShader(shader, All.wrap(All.InfoLogLength), llength);
+      GL.GetShader(shader, ShaderParameter.wrap(ShaderParameter.InfoLogLength), llength);
       cli.System.Text.StringBuilder log = new cli.System.Text.StringBuilder(llength[0]);
       GL.GetShaderInfoLog(shader, llength[0], llength, log);
       GL.DeleteShader(shader);

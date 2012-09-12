@@ -20,6 +20,10 @@ import cli.System.Runtime.InteropServices.GCHandle;
 import cli.System.Runtime.InteropServices.GCHandleType;
 
 import cli.OpenTK.Graphics.ES20.All;
+import cli.OpenTK.Graphics.ES20.BeginMode;
+import cli.OpenTK.Graphics.ES20.BufferTarget;
+import cli.OpenTK.Graphics.ES20.BufferUsage;
+import cli.OpenTK.Graphics.ES20.DrawElementsType;
 import cli.OpenTK.Graphics.ES20.GL;
 
 import playn.core.InternalTransform;
@@ -118,7 +122,8 @@ public abstract class IOSGLBuffer implements GLBuffer {
 
     @Override
     public void drawElements(int mode, int count) {
-      GL.DrawElements(All.wrap(mode), count, All.wrap(All.UnsignedShort), new IntPtr(0));
+      GL.DrawElements(BeginMode.wrap(mode), count,
+                      DrawElementsType.wrap(DrawElementsType.UnsignedShort), new IntPtr(0));
     }
 
     @Override
@@ -160,13 +165,14 @@ public abstract class IOSGLBuffer implements GLBuffer {
 
   @Override
   public void bind(int target) {
-    GL.BindBuffer(All.wrap(target), bufferId);
+    GL.BindBuffer(BufferTarget.wrap(target), bufferId);
   }
 
   @Override
   public int send(int target, int usage) {
     // TODO: why is byteSize an IntPtr? File MonoTouch bug?
-    GL.BufferData(All.wrap(target), new IntPtr(byteSize()), pointer(), All.wrap(usage));
+    GL.BufferData(BufferTarget.wrap(target), new IntPtr(byteSize()), pointer(),
+                  BufferUsage.wrap(usage));
     int oposition = position;
     position = 0;
     return oposition;

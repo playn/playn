@@ -22,6 +22,7 @@ import cli.System.EventArgs;
 import cli.OpenTK.FrameEventArgs;
 import cli.OpenTK.Graphics.ES20.All;
 import cli.OpenTK.Graphics.ES20.GL;
+import cli.OpenTK.Graphics.ES20.FramebufferTarget;
 import cli.OpenTK.Platform.iPhoneOS.iPhoneOSGameView;
 
 import cli.MonoTouch.CoreAnimation.CAEAGLLayer;
@@ -107,7 +108,7 @@ public class IOSGameView extends iPhoneOSGameView {
     // run a single frame so that we have something in our framebuffer when iOS stops displaying
     // our splash screen and starts displaying our app
     platform.update(0);
-    GL.BindFramebuffer(All.wrap(All.Framebuffer), get_Framebuffer());
+    GL.BindFramebuffer(FramebufferTarget.wrap(FramebufferTarget.Framebuffer), get_Framebuffer());
     MakeCurrent();
     platform.paint();
     SwapBuffers();
