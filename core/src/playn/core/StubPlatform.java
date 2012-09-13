@@ -44,21 +44,21 @@ import playn.core.util.Callback;
  */
 public class StubPlatform implements Platform {
 
-  private final Log log = new Log() {
-    private void log(String msg, Throwable e) {
-      System.err.println(msg);
+  private final Log log = new LogImpl() {
+    @Override
+    protected void logImpl(Level level, String msg, Throwable e) {
+      String prefix;
+      switch (level) {
+      default:
+      case DEBUG: prefix = "D: "; break;
+      case INFO: prefix = ""; break;
+      case WARN: prefix = "W: "; break;
+      case ERROR: prefix = "E: "; break;
+      }
+      System.err.println(prefix + msg);
       if (e != null)
         e.printStackTrace(System.err);
     }
-
-    @Override public void debug(String msg) { debug(msg, null); }
-    @Override public void debug(String msg, Throwable e) { log("D: " + msg, e); }
-    @Override public void info(String msg) { info(msg, null); }
-    @Override public void info(String msg, Throwable e) { log(msg, e); }
-    @Override public void error(String msg) { error(msg, null); }
-    @Override public void error(String msg, Throwable e) { log("E: " + msg, e); }
-    @Override public void warn(String msg) { warn(msg, null); }
-    @Override public void warn(String msg, Throwable e) { log("W: " + msg, e); }
   };
 
   private Storage storage = new Storage() {

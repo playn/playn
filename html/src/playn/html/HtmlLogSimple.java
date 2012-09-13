@@ -29,53 +29,15 @@ class HtmlLogSimple extends HtmlLog {
   }
 
   @Override
-  public void debug(String msg) {
-    sendToConsole("DEBUG: " + msg, null);
-  }
-
-  @Override
-  public void debug(String msg, Throwable e) {
-    sendToConsole("DEBUG: " + msg, e);
-  }
-
-  @Override
-  public void error(String msg) {
-    sendToConsole("ERROR: " + msg, null);
-  }
-
-  @Override
-  public void error(String msg, Throwable e) {
-    sendToConsole("ERROR: " + msg, e);
-  }
-
-  @Override
-  public void info(String msg) {
-    sendToConsole("INFO: " + msg, null);
-  }
-
-  @Override
-  public void info(String msg, Throwable e) {
-    sendToConsole("INFO: " + msg, e);
-  }
-
-  @Override
-  public void warn(String msg) {
-    sendToConsole("WARN: " + msg, null);
-  }
-
-  @Override
-  public void warn(String msg, Throwable e) {
-    sendToConsole("WARN: " + msg, e);
-  }
-
-  private void sendToConsole(String msg, Throwable e) {
+  protected void logImpl(Level level, String msg, Throwable e) {
+    String lmsg = level + ": " + msg;
     // keep console output intact by using System.out for both
-    System.out.println(msg);
+    System.out.println(lmsg);
     if (e != null) {
       e.printStackTrace(System.out);
     }
     // also send it to the browser's console
-    sendToBrowserConsole(msg, e);
+    sendToBrowserConsole(lmsg, e);
   }
 
   private native void sendToBrowserConsole(String msg, Throwable e) /*-{

@@ -17,54 +17,13 @@ package playn.ios;
 
 import cli.System.Console;
 
-import playn.core.Log;
+import playn.core.LogImpl;
 
-public class IOSLog implements Log {
-
-  @Override
-  public void debug(String msg) {
-    Console.WriteLine("DEBUG: " + msg);
-  }
+public class IOSLog extends LogImpl {
 
   @Override
-  public void debug(String msg, Throwable e) {
-    debug(msg);
-    if (e != null)
-      Console.WriteLine(e);
-  }
-
-  @Override
-  public void info(String msg) {
-    Console.WriteLine(msg);
-  }
-
-  @Override
-  public void info(String msg, Throwable e) {
-    info(msg);
-    if (e != null)
-      Console.WriteLine(e);
-  }
-
-  @Override
-  public void warn(String msg) {
-    Console.WriteLine("WARN: " + msg);
-  }
-
-  @Override
-  public void warn(String msg, Throwable e) {
-    warn(msg);
-    if (e != null)
-      Console.WriteLine(e);
-  }
-
-  @Override
-  public void error(String msg) {
-    Console.WriteLine("ERROR: " + msg);
-  }
-
-  @Override
-  public void error(String msg, Throwable e) {
-    error(msg);
+  protected void logImpl(Level level, String msg, Throwable e) {
+    Console.WriteLine(level + ": " + msg);
     if (e != null)
       Console.WriteLine(e);
   }

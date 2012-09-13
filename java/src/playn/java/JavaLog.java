@@ -15,53 +15,24 @@
  */
 package playn.java;
 
-import playn.core.Log;
+import playn.core.LogImpl;
 
-class JavaLog implements Log {
-
-  @Override
-  public void error(String msg) {
-    error(msg, null);
-  }
+class JavaLog extends LogImpl {
 
   @Override
-  public void error(String msg, Throwable e) {
-    System.err.println(msg);
-    if (e != null) {
-      e.printStackTrace(System.err);
+  protected void logImpl(Level level, String msg, Throwable e) {
+    switch (level) {
+    default:
+      System.err.println(msg);
+      if (e != null)
+        e.printStackTrace(System.err);
+      break;
+    case WARN:
+    case ERROR:
+      System.out.println(msg);
+      if (e != null)
+        e.printStackTrace(System.out);
+      break;
     }
-  }
-
-  @Override
-  public void debug(String msg) {
-    info(msg);
-  }
-
-  @Override
-  public void debug(String msg, Throwable e) {
-    info(msg, e);
-  }
-
-  @Override
-  public void info(String msg) {
-    info(msg, null);
-  }
-
-  @Override
-  public void info(String msg, Throwable e) {
-    System.out.println(msg);
-    if (e != null) {
-      e.printStackTrace(System.out);
-    }
-  }
-
-  @Override
-  public void warn(String msg) {
-    error(msg);
-  }
-
-  @Override
-  public void warn(String msg, Throwable e) {
-    error(msg, e);
   }
 }

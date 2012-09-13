@@ -15,54 +15,16 @@
  */
 package playn.flash;
 
-import playn.core.Log;
+import playn.core.LogImpl;
 
-class FlashLog implements Log {
-
-  public FlashLog() {
-  }
+class FlashLog extends LogImpl {
 
   @Override
-  public void error(String msg) {
-    log(msg, null);
+  protected void logImpl(Level level, String msg, Throwable e) {
+    flashLog(msg, e);
   }
 
-  @Override
-  public void error(String msg, Throwable e) {
-    log(msg, e);
-  }
-
-  @Override
-  public void info(String msg) {
-    log(msg, null);
-  }
-
-  @Override
-  public void info(String msg, Throwable e) {
-    log(msg, e);
-  }
-
-  @Override
-  public void warn(String msg) {
-    log(msg, null);
-  }
-
-  @Override
-  public void warn(String msg, Throwable e) {
-    log(msg, e);
-  }
-
-  @Override
-  public void debug(String msg) {
-    log(msg, null);
-  }
-
-  @Override
-  public void debug(String msg, Throwable e) {
-    log(msg, e);
-  }
-
-  private native void log(String msg, Throwable e) /*-{
+  private native void flashLog(String msg, Throwable e) /*-{
     var logMsg = msg + (e == null ? "" : (" " + e));
     flash.external.ExternalInterface.call("window.console.log", logMsg);
   }-*/;

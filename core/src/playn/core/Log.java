@@ -20,36 +20,28 @@ package playn.core;
  */
 public interface Log {
 
-  /**
-   * An error message.
-   *
-   * @param msg the message to display
-   *
-   * @param e the exception to log
-   */
-  void error(String msg, Throwable e);
+  /** Tags a log message with a level. */
+  enum Level { DEBUG, INFO, WARN, ERROR };
+
+  /** Allows for collection of log messages (in addition to standard logging).
+   * See {@link #setCollector}. */
+  interface Collector {
+    /**
+     * Called when a message is logged.
+     *
+     * @param level the level at which the message was logged.
+     * @param msg the message that was logged.
+     * @param e the exception logged with the message, or null.
+     */
+    void logged(Level level, String msg, Throwable e);
+  }
 
   /**
-   * An error message.
-   *
-   * @param msg the message to display
+   * Configures a log message collector. This allows games to intercept (and record and submit with
+   * bug reports, for example) all messages logged via the PlayN logging system. This will include
+   * errors logged internally by PlayN code.
    */
-  void error(String msg);
-
-  /**
-   * An informational message.
-   *
-   * @param msg the message to display
-   */
-  void info(String msg);
-
-  /**
-   * /** An info message.
-   *
-   * @param msg the message to display
-   * @param e the exception to log
-   */
-  void info(String msg, Throwable e);
+  void setCollector(Collector collector);
 
   /**
    * An debug message.
@@ -67,6 +59,21 @@ public interface Log {
   void debug(String msg, Throwable e);
 
   /**
+   * An informational message.
+   *
+   * @param msg the message to display
+   */
+  void info(String msg);
+
+  /**
+   * /** An info message.
+   *
+   * @param msg the message to display
+   * @param e the exception to log
+   */
+  void info(String msg, Throwable e);
+
+  /**
    * An warning message.
    *
    * @param msg the message to display
@@ -80,4 +87,19 @@ public interface Log {
    * @param e the exception to log
    */
   void warn(String msg, Throwable e);
+
+  /**
+   * An error message.
+   *
+   * @param msg the message to display
+   */
+  void error(String msg);
+
+  /**
+   * An error message.
+   *
+   * @param msg the message to display
+   * @param e the exception to log
+   */
+  void error(String msg, Throwable e);
 }

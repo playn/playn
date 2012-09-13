@@ -15,47 +15,19 @@
  */
 package playn.android;
 
-import playn.core.Log;
+import android.util.Log;
 
-class AndroidLog implements Log {
+import playn.core.LogImpl;
 
-  @Override
-  public void debug(String msg) {
-    android.util.Log.d("playn", msg);
-  }
+class AndroidLog extends LogImpl {
 
   @Override
-  public void debug(String msg, Throwable e) {
-    android.util.Log.d("playn", msg, e);
-  }
-
-  @Override
-  public void info(String msg) {
-    android.util.Log.i("playn", msg);
-  }
-
-  @Override
-  public void info(String msg, Throwable e) {
-    android.util.Log.i("playn", msg, e);
-  }
-
-  @Override
-  public void warn(String msg) {
-    android.util.Log.w("playn", msg);
-  }
-
-  @Override
-  public void warn(String msg, Throwable e) {
-    android.util.Log.w("playn", msg, e);
-  }
-
-  @Override
-  public void error(String msg) {
-    android.util.Log.e("playn", msg);
-  }
-
-  @Override
-  public void error(String msg, Throwable e) {
-    android.util.Log.e("playn", msg, e);
+  protected void logImpl(Level level, String msg, Throwable e) {
+    switch (level) {
+    case DEBUG: Log.d("playn", msg, e); break;
+    default:    Log.i("playn", msg, e); break;
+    case  WARN: Log.w("playn", msg, e); break;
+    case ERROR: Log.e("playn", msg, e); break;
+    }
   }
 }

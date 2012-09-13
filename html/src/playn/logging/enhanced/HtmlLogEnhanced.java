@@ -32,42 +32,12 @@ class HtmlLogEnhanced extends HtmlLog {
   }
 
   @Override
-  public void debug(String msg) {
-    com.allen_sauer.gwt.log.client.Log.debug(msg);
-  }
-
-  @Override
-  public void debug(String msg, Throwable e) {
-    com.allen_sauer.gwt.log.client.Log.debug(msg, e);
-  }
-
-  @Override
-  public void error(String msg) {
-    com.allen_sauer.gwt.log.client.Log.error(msg);
-  }
-
-  @Override
-  public void error(String msg, Throwable e) {
-    com.allen_sauer.gwt.log.client.Log.error(msg, e);
-  }
-
-  @Override
-  public void info(String msg) {
-    com.allen_sauer.gwt.log.client.Log.info(msg);
-  }
-
-  @Override
-  public void info(String msg, Throwable e) {
-    com.allen_sauer.gwt.log.client.Log.info(msg, e);
-  }
-
-  @Override
-  public void warn(String msg) {
-    com.allen_sauer.gwt.log.client.Log.warn(msg);
-  }
-
-  @Override
-  public void warn(String msg, Throwable e) {
-    com.allen_sauer.gwt.log.client.Log.warn(msg, e);
+  protected void logImpl(Level level, String msg, Throwable e) {
+    switch (level) {
+    case DEBUG: Log.debug(msg, e); break;
+    default:    Log.info(msg, e); break;
+    case  WARN: Log.warn(msg, e); break;
+    case ERROR: Log.error(msg, e); break;
+    }
   }
 }
