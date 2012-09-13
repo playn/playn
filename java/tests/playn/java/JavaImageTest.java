@@ -3,15 +3,11 @@
 
 package playn.java;
 
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
-
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
 import playn.core.PlayN;
+import playn.core.Log;
 import playn.core.Image;
 import playn.tests.AbstractPlayNTest;
 
@@ -22,7 +18,20 @@ public class JavaImageTest extends AbstractPlayNTest {
 
   @Test
   public void testMissingImage() {
-    Image missing = PlayN.assets().getImage("missing.png");
+    final StringBuilder buf = new StringBuilder();
+    PlayN.log().setCollector(new Log.Collector() {
+      public void logged(Log.Level level, String msg, Throwable cause) {
+        buf.append(msg).append("\n");
+      }
+    });
+
+    Image missing;
+    try {
+      missing = PlayN.assets().getImage("missing.png");
+    } finally {
+      PlayN.log().setCollector(null);
+    }
+
     assertNotNull(missing);
 
     // ensure that width/height do not NPE
@@ -31,23 +40,9 @@ public class JavaImageTest extends AbstractPlayNTest {
 
     // TODO: depending on the error text is somewhat fragile, but I want to be sure that a
     // reasonably appropriate error was logged
-    String errlog = capErr.toString();
+    String errlog = buf.toString();
     assertTrue(errlog.startsWith("Could not load image"));
     assertTrue(errlog.contains("missing.png"));
-  }
 
-  @Before
-  public void captureStdOutErr() {
-    stockErr = System.err;
-    System.setErr(new PrintStream(capErr = new ByteArrayOutputStream()));
   }
-
-  @After
-  public void restoreStdOutErr() {
-    System.setErr(stockErr);
-    capErr = null;
-  }
-
-  private PrintStream stockErr;
-  private ByteArrayOutputStream capErr;
 }
