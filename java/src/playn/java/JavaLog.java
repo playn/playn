@@ -23,13 +23,13 @@ class JavaLog extends LogImpl {
   protected void logImpl(Level level, String msg, Throwable e) {
     switch (level) {
     default:
-      System.err.println(msg);
+      System.out.println(msg);
       if (e != null)
         e.printStackTrace(System.err);
       break;
     case WARN:
     case ERROR:
-      System.out.println(msg);
+      System.err.println(msg);
       if (e != null)
         e.printStackTrace(System.out);
       break;
