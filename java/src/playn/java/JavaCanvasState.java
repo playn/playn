@@ -115,24 +115,19 @@ class JavaCanvasState {
   }
 
   private java.awt.Composite convertComposite(Canvas.Composite composite, float alpha) {
-    AlphaComposite ret;
     switch (composite) {
-      case DST_ATOP: ret = AlphaComposite.DstAtop; break;
-      case DST_IN: ret = AlphaComposite.DstIn; break;
-      case DST_OUT: ret = AlphaComposite.DstOut; break;
-      case DST_OVER: ret = AlphaComposite.DstOver; break;
-      case SRC: ret = AlphaComposite.Src; break;
-      case SRC_ATOP: ret = AlphaComposite.SrcAtop; break;
-      case SRC_IN: ret = AlphaComposite.SrcIn; break;
-      case SRC_OUT: ret = AlphaComposite.SrcOut; break;
-      case SRC_OVER: ret = AlphaComposite.SrcOver; break;
-      case XOR: ret = AlphaComposite.Xor; break;
-      default: ret = AlphaComposite.Src; break;
-    }
-    if (alpha != 1) {
-      return ret.derive(alpha);
-    } else {
-      return ret;
+    case DST_ATOP: return AlphaComposite.DstAtop.derive(alpha);
+    case DST_IN: return AlphaComposite.DstIn.derive(alpha);
+    case DST_OUT: return AlphaComposite.DstOut.derive(alpha);
+    case DST_OVER: return AlphaComposite.DstOver.derive(alpha);
+    case SRC: return AlphaComposite.Src.derive(alpha);
+    case SRC_ATOP: return AlphaComposite.SrcAtop.derive(alpha);
+    case SRC_IN: return AlphaComposite.SrcIn.derive(alpha);
+    case SRC_OUT: return AlphaComposite.SrcOut.derive(alpha);
+    case SRC_OVER: return AlphaComposite.SrcOver.derive(alpha);
+    case XOR: return AlphaComposite.Xor.derive(alpha);
+    case MULTIPLY: return BlendComposite.Multiply.derive(alpha);
+    default: return AlphaComposite.Src.derive(alpha);
     }
   }
 

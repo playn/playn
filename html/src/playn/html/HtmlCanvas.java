@@ -379,6 +379,7 @@ class HtmlCanvas implements Canvas {
         return "source-atop";
       case XOR:
         return "xor";
+      // MULTIPLY not supported
     }
     return "copy";
   }

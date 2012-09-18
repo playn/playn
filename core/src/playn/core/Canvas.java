@@ -124,6 +124,14 @@ public interface Canvas {
      * [Sa + Da - 2 * Sa * Da, Sc * (1 - Da) + (1 - Sa) * Dc]
      */
     XOR,
+
+    /**
+     * A * B. Multiplies the source and destination images. <b>NOTE:</b> this is not supported by
+     * the HTML5 and Flash backends.
+     *
+     * [Sa * Da, Sc * Dc]
+     */
+    MULTIPLY,
   }
 
   /**

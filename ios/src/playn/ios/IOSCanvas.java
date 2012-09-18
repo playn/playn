@@ -447,6 +447,7 @@ public class IOSCanvas implements Canvas {
     compToBlend.put(Composite.DST_OUT, CGBlendMode.DestinationOut);
     compToBlend.put(Composite.SRC_ATOP, CGBlendMode.SourceAtop);
     compToBlend.put(Composite.XOR, CGBlendMode.XOR);
+    compToBlend.put(Composite.MULTIPLY, CGBlendMode.Multiply);
   }
 
   private static Map<LineCap,Integer> decodeCap = new HashMap<LineCap,Integer>();
