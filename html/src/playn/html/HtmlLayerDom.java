@@ -21,6 +21,7 @@ import com.google.gwt.dom.client.Style.Position;
 import com.google.gwt.dom.client.Style.Visibility;
 
 import playn.core.AbstractLayer;
+import playn.core.Layer;
 import playn.core.StockInternalTransform;
 
 class HtmlLayerDom extends AbstractLayer {
@@ -74,22 +75,19 @@ class HtmlLayerDom extends AbstractLayer {
   }
 
   @Override
-  public void setAlpha(float alpha) {
+  public Layer setAlpha(float alpha) {
     if (this.alpha != alpha) {
       super.setAlpha(alpha);
       elem.getStyle().setOpacity(this.alpha);
     }
+    return this;
   }
 
   @Override
-  public void setVisible(boolean visible) {
+  public Layer setVisible(boolean visible) {
     super.setVisible(visible);
     elem.getStyle().setDisplay(visible ? Display.BLOCK : Display.NONE);
-  }
-
-  @Override
-  public void setOrigin(float x, float y) {
-    super.setOrigin(x, y);
+    return this;
   }
 
   Element element() {

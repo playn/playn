@@ -21,6 +21,7 @@ import flash.gwt.FlashImport;
 
 import playn.core.AbstractLayer;
 import playn.core.InternalTransform;
+import playn.core.Layer;
 import playn.core.StockInternalTransform;
 
 @FlashImport({"flash.display.Sprite"})
@@ -34,15 +35,17 @@ public class FlashLayer extends AbstractLayer {
   }
 
   @Override
-  public void setVisible(boolean visible) {
+  public Layer setVisible(boolean visible) {
     super.setVisible(visible);
     display().setVisible(visible);
+    return this;
   }
 
   @Override
-  public void setAlpha(float alpha) {
+  public Layer setAlpha(float alpha) {
     super.setAlpha(alpha);
     display().setAlpha(alpha);
+    return this;
   }
 
   DisplayObject display() {

@@ -77,8 +77,10 @@ public interface Layer {
   /**
    * Configures this layer's visibility: if true, it will be rendered as normal, if false it and
    * its children will not be rendered.
+   *
+   * @return a reference to this layer for call chaining.
    */
-  void setVisible(boolean visible);
+  Layer setVisible(boolean visible);
 
   /**
    * Returns true if this layer reacts to clicks and touches. If a layer is interactive, it will
@@ -94,8 +96,10 @@ public interface Layer {
    * non-interactive automatically if an event is dispatched to it and it discovers that it has no
    * interactive children. Manual management of interactivity is thus generally only useful for
    * "leaf" nodes in the scene graph.
+   *
+   * @return a reference to this layer for call chaining.
    */
-  void setInteractive(boolean interactive);
+  Layer setInteractive(boolean interactive);
 
   /**
    * Return the global alpha value for this layer.
@@ -120,8 +124,10 @@ public interface Layer {
    * Values outside the range [0,1] will be clamped to the range [0,1].
    *
    * @param alpha alpha value in range [0,1] where 0 is transparent and 1 is opaque
+   *
+   * @return a reference to this layer for call chaining.
    */
-  void setAlpha(float alpha);
+  Layer setAlpha(float alpha);
 
   /**
    * Returns the x-component of the layer's origin.
@@ -140,8 +146,10 @@ public interface Layer {
    *
    * @param x origin on x axis
    * @param y origin on y axis
+   *
+   * @return a reference to this layer for call chaining.
    */
-  void setOrigin(float x, float y);
+  Layer setOrigin(float x, float y);
 
   /**
    * Sets the depth of this layer. Within a single {@link GroupLayer}, layers are rendered from
@@ -151,8 +159,10 @@ public interface Layer {
 
   /**
    * Updates this layer's depth.
+   *
+   * @return a reference to this layer for call chaining.
    */
-  void setDepth(float depth);
+  Layer setDepth(float depth);
 
   /**
    * Sets the translation of the layer. The current translation can be read via {@link #transform}.
@@ -162,8 +172,10 @@ public interface Layer {
    *
    * @param x translation on x axis
    * @param y translation on y axis
+   *
+   * @return a reference to this layer for call chaining.
    */
-  void setTranslation(float x, float y);
+  Layer setTranslation(float x, float y);
 
   /**
    * Sets the scale of the layer. The current scale can be read via {@link #transform}.
@@ -174,8 +186,10 @@ public interface Layer {
    * <p> Note that a scale of {@code 1} is equivalent to no scale. </p>
    *
    * @param x non-zero scale value
+   *
+   * @return a reference to this layer for call chaining.
    */
-  void setScale(float x);
+  Layer setScale(float x);
 
   /**
    * Sets the scale of the layer. The current scale can be read via {@link #transform}.
@@ -187,8 +201,10 @@ public interface Layer {
    *
    * @param x non-zero scale value on the x axis
    * @param y non-zero scale value on the y axis
+   *
+   * @return a reference to this layer for call chaining.
    */
-  void setScale(float x, float y);
+  Layer setScale(float x, float y);
 
   /**
    * Sets the rotation of the layer. The current rotation can be read via {@link #transform}.
@@ -197,8 +213,10 @@ public interface Layer {
    * will be rotated by this angle. </p>
    *
    * @param angle angle to rotate, in radians
+   *
+   * @return a reference to this layer for call chaining.
    */
-  void setRotation(float angle);
+  Layer setRotation(float angle);
 
   /**
    * Tests whether the supplied (layer relative) point "hits" this layer or any of its children. By
@@ -224,8 +242,10 @@ public interface Layer {
   /**
    * Configures a custom hit tester for this layer. May also be called with null to clear out any
    * custom hit tester.
+   *
+   * @return a reference to this layer for call chaining.
    */
-  void setHitTester (HitTester tester);
+  Layer setHitTester (HitTester tester);
 
   /**
    * Registers a listener with this layer that will be notified if a click/touch event happens
@@ -281,8 +301,10 @@ public interface Layer {
    * will cause the default shader to be used. Configuring a shader on a group layer will cause
    * that shader to be used when rendering the group layer's children, unless the child has a
    * custom shader configured itself.
+   *
+   * @return a reference to this layer for call chaining.
    */
-  void setShader(GLShader shader);
+  Layer setShader(GLShader shader);
 
   /**
    * Interface for {@link Layer}s containing explicit sizes.

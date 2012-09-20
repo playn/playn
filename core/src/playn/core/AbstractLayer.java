@@ -94,8 +94,9 @@ public abstract class AbstractLayer implements Layer {
   }
 
   @Override
-  public void setVisible(boolean visible) {
+  public Layer setVisible(boolean visible) {
     setFlag(Flag.VISIBLE, visible);
+    return this;
   }
 
   @Override
@@ -104,13 +105,14 @@ public abstract class AbstractLayer implements Layer {
   }
 
   @Override
-  public void setInteractive(boolean interactive) {
-    if (interactive() == interactive) // NOOP!
-      return;
-    // if we're being made interactive, active our parent as well, if we have one
-    if (interactive && parent != null)
-      parent.setInteractive(interactive);
-    setFlag(Flag.INTERACTIVE, interactive);
+  public Layer setInteractive(boolean interactive) {
+    if (interactive() != interactive) {
+      // if we're being made interactive, active our parent as well, if we have one
+      if (interactive && parent != null)
+        parent.setInteractive(interactive);
+      setFlag(Flag.INTERACTIVE, interactive);
+    }
+    return this;
   }
 
   @Override
@@ -119,7 +121,7 @@ public abstract class AbstractLayer implements Layer {
   }
 
   @Override
-  public void setAlpha(float alpha) {
+  public Layer setAlpha(float alpha) {
     if (alpha < 0) {
       this.alpha = 0;
     } else if (alpha > 1) {
@@ -127,6 +129,7 @@ public abstract class AbstractLayer implements Layer {
     } else {
       this.alpha = alpha;
     }
+    return this;
   }
 
   @Override
@@ -140,9 +143,10 @@ public abstract class AbstractLayer implements Layer {
   }
 
   @Override
-  public void setOrigin(float x, float y) {
+  public Layer setOrigin(float x, float y) {
     this.originX = x;
     this.originY = y;
+    return this;
   }
 
   @Override
@@ -151,7 +155,7 @@ public abstract class AbstractLayer implements Layer {
   }
 
   @Override
-  public void setDepth(float depth) {
+  public Layer setDepth(float depth) {
     float oldDepth = this.depth;
     if (depth != oldDepth) {
       this.depth = depth;
@@ -159,28 +163,33 @@ public abstract class AbstractLayer implements Layer {
         ((ParentLayer)parent).depthChanged(this, oldDepth);
       }
     }
+    return this;
   }
 
   @Override
-  public void setRotation(float angle) {
+  public Layer setRotation(float angle) {
     transform.setRotation(angle);
+    return this;
   }
 
   @Override
-  public void setScale(float s) {
+  public Layer setScale(float s) {
     Asserts.checkArgument(s != 0, "Scale must be non-zero");
     transform.setUniformScale(s);
+    return this;
   }
 
   @Override
-  public void setScale(float x, float y) {
+  public Layer setScale(float x, float y) {
     Asserts.checkArgument(x != 0 && y != 0, "Scale must be non-zero (got x=%s, y=%s)", x, y);
     transform.setScale(x, y);
+    return this;
   }
 
   @Override
-  public void setTranslation(float x, float y) {
+  public Layer setTranslation(float x, float y) {
     transform.setTranslation(x, y);
+    return this;
   }
 
   @Override
@@ -194,8 +203,9 @@ public abstract class AbstractLayer implements Layer {
   }
 
   @Override
-  public void setHitTester (HitTester tester) {
+  public Layer setHitTester (HitTester tester) {
     hitTester = tester;
+    return this;
   }
 
   @Override
@@ -224,8 +234,9 @@ public abstract class AbstractLayer implements Layer {
   }
 
   @Override
-  public void setShader(GLShader shader) {
+  public Layer setShader(GLShader shader) {
     // NOOP
+    return this;
   }
 
   // width() and height() exist so that we can share hitTest among all layer implementations;

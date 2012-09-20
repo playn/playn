@@ -17,6 +17,7 @@ package playn.core.gl;
 
 import playn.core.AbstractLayer;
 import playn.core.InternalTransform;
+import playn.core.Layer;
 import playn.core.gl.GLShader;
 
 public abstract class LayerGL extends AbstractLayer {
@@ -27,7 +28,7 @@ public abstract class LayerGL extends AbstractLayer {
   protected GLShader shader;
 
   @Override
-  public void setShader(GLShader shader) {
+  public Layer setShader(GLShader shader) {
     if (this.shader != null) {
       this.shader.release();
     }
@@ -35,6 +36,7 @@ public abstract class LayerGL extends AbstractLayer {
     if (this.shader != null) {
       this.shader.reference();
     }
+    return this;
   }
 
   @Override
