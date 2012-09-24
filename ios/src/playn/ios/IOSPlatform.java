@@ -183,6 +183,7 @@ public class IOSPlatform extends AbstractPlatform {
     mainWindow.Add(gameView = new IOSGameView(this, bounds, deviceScale));
 
     uiOverlay = new UIView(bounds);
+    uiOverlay.set_MultipleTouchEnabled(true);
     gameView.Add(uiOverlay);
 
     // if the game supplied a proper delegate, configure it (for lifecycle notifications)
