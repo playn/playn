@@ -16,10 +16,13 @@
 package playn.java;
 
 import java.awt.Graphics2D;
+import java.awt.Shape;
 import java.awt.TexturePaint;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
+
+import pythagoras.f.MathUtil;
 
 import playn.core.Asserts;
 import playn.core.Image;
@@ -98,10 +101,11 @@ abstract class JavaImage extends ImageGL implements JavaCanvas.Drawable {
     // now render the image through a clip and with a scaling transform, so that only the desired
     // source rect is rendered, and is rendered into the desired target region
     float scaleX = dw/sw, scaleY = dh/sh;
-    gfx.setClip(new Rectangle2D.Float(dx, dy, dw, dh));
+    Shape oclip = gfx.getClip();
+    gfx.clipRect(MathUtil.ifloor(dx), MathUtil.ifloor(dy), MathUtil.iceil(dw), MathUtil.iceil(dh));
     gfx.drawImage(img, new AffineTransform(scaleX, 0f, 0f, scaleY,
                                            dx-sx*scaleX, dy-sy*scaleY), null);
-    gfx.setClip(null);
+    gfx.setClip(oclip);
   }
 
   @Override
