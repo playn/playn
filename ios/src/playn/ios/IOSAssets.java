@@ -132,20 +132,25 @@ public class IOSAssets extends AbstractAssets {
   }
 
   @Override
-  public void getText(String path, Callback<String> callback) {
-    platform.log().debug("Loading text " + path);
-    String fullPath = Path.Combine(pathPrefix, path);
-    StreamReader reader = null;
-    try {
-      reader = new StreamReader(fullPath);
-      callback.onSuccess(reader.ReadToEnd());
-    } catch (Throwable t) {
-      callback.onFailure(t);
-    } finally {
-      if (reader != null) {
-        reader.Close();
+  public void getText(String path, final Callback<String> callback) {
+    ThreadPool.QueueUserWorkItem(new WaitCallback(new WaitCallback.Method() {
+      public void Invoke(Object path) {
+        String fullPath = (String) path;
+        platform.log().debug("Loading text " + fullPath);
+
+        StreamReader reader = null;
+        try {
+          reader = new StreamReader(fullPath);
+          platform.notifySuccess(callback, reader.ReadToEnd());
+        } catch (Throwable t) {
+          platform.notifyFailure(callback, t);
+        } finally {
+          if (reader != null) {
+            reader.Close();
+          }
+        }
       }
-    }
+    }), Path.Combine(pathPrefix, path));
   }
 
   @Override
