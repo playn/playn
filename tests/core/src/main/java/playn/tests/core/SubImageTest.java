@@ -97,8 +97,10 @@ public class SubImageTest extends Test {
   @Override
   public void update(float delta) {
     elapsed += delta;
-    float osciCurWidth = Math.abs(FloatMath.sin(elapsed/1000)) * osci.parent().width();
-    osci.setBounds(0, 0, osciCurWidth, osci.parent().height());
+    if (osci != null) {
+      float osciCurWidth = Math.abs(FloatMath.sin(elapsed/1000)) * osci.parent().width();
+      osci.setBounds(0, 0, osciCurWidth, osci.parent().height());
+    }
   }
 
   protected void fragment(String source, Image image, float ox, float oy) {
