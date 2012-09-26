@@ -25,6 +25,8 @@ import cli.System.IO.FileStream;
 import cli.System.IO.Path;
 import cli.System.IO.Stream;
 import cli.System.IO.StreamReader;
+import cli.System.Threading.ThreadPool;
+import cli.System.Threading.WaitCallback;
 
 import cli.MonoTouch.Foundation.NSData;
 import cli.MonoTouch.Foundation.NSError;
@@ -45,7 +47,10 @@ import playn.core.util.Callback;
 public class IOSAssets extends AbstractAssets {
 
   private String pathPrefix = "";
+  private boolean asyncImageLoading = false;
+
   private final IOSPlatform platform;
+  private final SyncLoader syncLoader = new SyncLoader(); // we only need one
 
   public IOSAssets(IOSPlatform platform) {
     this.platform = platform;
@@ -65,32 +70,28 @@ public class IOSAssets extends AbstractAssets {
     pathPrefix = Path.Combine(components);
   }
 
+  /**
+   * Configures asynchronous image loading. By default, images are loaded synchronously, so that
+   * the caller can immediately access the image's width/height and immediately render the image.
+   * Calling this with {@code true} causes images to be loaded asynchronously, via a separate
+   * thread pool.
+   */
+  public void setAsyncImageLoading(boolean asyncImageLoading) {
+    this.asyncImageLoading = asyncImageLoading;
+  }
+
   @Override
   public Image getImage(String path) {
     String fullPath = Path.Combine(pathPrefix, path);
-    Throwable error = null;
-    for (Scale.ScaledResource rsrc : platform.graphics().ctx().scale.getScaledResources(fullPath)) {
-      if (!File.Exists(rsrc.path)) continue;
-      platform.log().debug("Loading image: " + rsrc.path);
-      try {
-        Stream stream = new FileStream(rsrc.path, FileMode.wrap(FileMode.Open),
-                                       FileAccess.wrap(FileAccess.Read),
-                                       FileShare.wrap(FileShare.Read));
-        NSData data = NSData.FromStream(stream);
-        return new IOSImage(platform.graphics().ctx, UIImage.LoadFromData(data), rsrc.scale);
-      } catch (Throwable t) {
-        platform.log().warn("Failed to load image: " + rsrc.path, t);
-        error = t; // note this error if this is the lowest resolution image, but fall back to
-                   // lower resolution images if not; in the Java backend we'd fail here, but this
-                   // is a production backend, so we want to try to make things work
-      }
-    }
-    return createErrorImage(error);
+    if (asyncImageLoading)
+      return new AsyncLoader().run(fullPath);
+    else
+      return syncLoader.run(fullPath);
   }
 
   @Override
   public Image getRemoteImage(String url, float width, float height) {
-    final IOSAsyncImage image = new IOSAsyncImage(platform.graphics().ctx, Scale.ONE, width, height);
+    final IOSAsyncImage image = new IOSAsyncImage(platform.graphics().ctx, width, height);
     new NSUrlConnection(new NSUrlRequest(new NSUrl(url)), new NSUrlConnectionDelegate() {
       private NSMutableData data = new NSMutableData();
       @Override
@@ -104,22 +105,13 @@ public class IOSAssets extends AbstractAssets {
       @Override
       public void FinishedLoading (NSUrlConnection conn) {
         try {
-          final UIImage uiImage = UIImage.LoadFromData(this.data);
-          platform.invokeLater(new Runnable() {
-            public void run () {
-              image.setImage(uiImage);
-            }
-          });
+          setImageLater(image, UIImage.LoadFromData(this.data), Scale.ONE);
         } catch (Throwable cause) {
           onFailure(cause);
         }
       }
       protected void onFailure (final Throwable cause) {
-        platform.invokeLater(new Runnable() {
-          public void run () {
-            image.setError(cause);
-          }
-        });
+        setErrorLater(image, cause);
       }
     }, true);
     return image;
@@ -159,5 +151,87 @@ public class IOSAssets extends AbstractAssets {
   @Override
   protected Image createErrorImage(Throwable cause, float width, float height) {
     return new IOSErrorImage(platform.graphics().ctx, cause, width, height);
+  }
+
+  private void setImageLater(final IOSAsyncImage image, final UIImage uiImage, final Scale scale) {
+    platform.invokeLater(new Runnable() {
+      public void run () {
+        image.setImage(uiImage, scale);
+      }
+    });
+  }
+
+  private void setErrorLater(final IOSAsyncImage image, final Throwable error) {
+    platform.invokeLater(new Runnable() {
+      public void run () {
+        image.setError(error);
+      }
+    });
+  }
+
+  private abstract class ImageLoader {
+    public abstract Image run (String path);
+
+    protected Image load (String path) {
+      Throwable error = null;
+      for (Scale.ScaledResource rsrc : platform.graphics().ctx().scale.getScaledResources(path)) {
+        if (!File.Exists(rsrc.path)) continue;
+        platform.log().debug("Loading image: " + rsrc.path);
+        try {
+          Stream stream = new FileStream(rsrc.path, FileMode.wrap(FileMode.Open),
+                                         FileAccess.wrap(FileAccess.Read),
+                                         FileShare.wrap(FileShare.Read));
+          NSData data = NSData.FromStream(stream);
+          return imageLoaded(UIImage.LoadFromData(data), rsrc.scale);
+        } catch (Throwable t) {
+          platform.log().warn("Failed to load image: " + rsrc.path, t);
+          error = t; // note this error if this is the lowest resolution image, but fall back to
+          // lower resolution images if not; in the Java backend we'd fail here, but this
+          // is a production backend, so we want to try to make things work
+        }
+      }
+      return loadFailed(error);
+    }
+
+    protected abstract Image imageLoaded(UIImage uiImage, Scale scale);
+    protected abstract Image loadFailed(Throwable error);
+  }
+
+  private class SyncLoader extends ImageLoader {
+    @Override
+    public Image run (String path) {
+      return load(path);
+    }
+    @Override
+    protected Image imageLoaded(UIImage uiImage, Scale scale) {
+      return new IOSImage(platform.graphics().ctx, uiImage, scale);
+    }
+    @Override
+    protected Image loadFailed(Throwable error) {
+      return createErrorImage(error);
+    }
+  }
+
+  private class AsyncLoader extends ImageLoader {
+    private IOSAsyncImage image = new IOSAsyncImage(platform.graphics().ctx, 0, 0);
+    @Override
+    public Image run (String path) {
+      ThreadPool.QueueUserWorkItem(new WaitCallback(new WaitCallback.Method() {
+        public void Invoke(Object path) {
+          load((String) path);
+        }
+      }), path);
+      return image;
+    }
+    @Override
+    protected Image imageLoaded(final UIImage uiImage, final Scale scale) {
+      setImageLater(image, uiImage, scale);
+      return image;
+    }
+    @Override
+    protected Image loadFailed(final Throwable error) {
+      setErrorLater(image, error);
+      return image;
+    }
   }
 }

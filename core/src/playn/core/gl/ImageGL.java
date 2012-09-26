@@ -24,8 +24,9 @@ public abstract class ImageGL implements Image {
 
   protected final GLContext ctx;
 
-  /** This image's scale factor. */
-  protected final Scale scale;
+  /** This image's scale factor. This is effectively final, but can't be marked final because it
+   * can be updated post-construction due to asynchronous image loading. */
+  protected Scale scale;
 
   /** The current count of references to this image. */
   protected int refs;

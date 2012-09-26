@@ -34,8 +34,8 @@ public class IOSAsyncImage extends IOSImage {
   private List<Callback<? super Image>> callbacks;
   private Throwable error;
 
-  public IOSAsyncImage (GLContext ctx, Scale scale, float preWidth, float preHeight) {
-    super(ctx, null, scale);
+  public IOSAsyncImage (GLContext ctx, float preWidth, float preHeight) {
+    super(ctx, null, Scale.ONE);
     this.preWidth = preWidth;
     this.preHeight = preHeight;
   }
@@ -65,8 +65,9 @@ public class IOSAsyncImage extends IOSImage {
       callbacks = Callbacks.createAdd(callbacks, callback);
   }
 
-  void setImage(UIImage image) {
+  void setImage(UIImage image, Scale scale) {
     this.image = image;
+    this.scale = scale;
     callbacks = Callbacks.dispatchSuccessClear(callbacks, this);
   }
 
