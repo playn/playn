@@ -23,6 +23,10 @@ public interface Sound {
   /** A sound that does nothing. Useful for optionally playing sound or no sound. */
   public static class Silence implements Sound {
     @Override
+    public boolean prepare() {
+      return false;
+    }
+    @Override
     public boolean play() {
       return false;
     }
@@ -62,6 +66,15 @@ public interface Sound {
       callback.onFailure(error);
     }
   }
+
+  /**
+   * Prepares this sound to be played by preloading it into audio buffers. This expresses a desire
+   * to have subsequent calls to {@link #play} start emitting sound with the lowest possible
+   * latency.
+   *
+   * @return {@literal true} if preloading occurred, false if unsupported or preloading failed
+   */
+  boolean prepare();
 
   /**
    * If possible, begin playback of this audio stream. The audio system will make best efforts to

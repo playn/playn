@@ -15,98 +15,49 @@
  */
 package playn.ios;
 
-import java.util.List;
-
 import cli.MonoTouch.AVFoundation.AVAudioPlayer;
 
-import playn.core.Sound;
-import playn.core.util.Callback;
-import playn.core.util.Callbacks;
+import playn.core.AbstractSound;
 
 /**
  * An implementation of Sound using the AVAudioPlayer.
  */
-public class IOSSound implements Sound {
-
-  private List<Callback<? super Sound>> callbacks;
-  private AVAudioPlayer player;
-  private boolean playOnLoad;
-  private Throwable error;
-
-  // @Override
-  // public boolean prepare() {
-  //   if (player == null) return false;
-  //   return player.PrepareToPlay();
-  // }
+public class IOSSound extends AbstractSound<AVAudioPlayer> {
 
   @Override
-  public boolean play() {
-    if (player == null) {
-      playOnLoad = true;
-      return false;
-    }
-    player.set_CurrentTime(0);
-    return player.Play();
+  protected boolean prepareImpl() {
+    return impl.PrepareToPlay();
   }
 
   @Override
-  public void stop() {
-    if (player == null) {
-      playOnLoad = false;
-      return;
-    }
-    player.Stop();
-    player.set_CurrentTime(0);
+  protected boolean playingImpl() {
+    return impl.get_Playing();
   }
 
   @Override
-  public void setLooping(boolean looping) {
-    if (player == null) return;
-    player.set_NumberOfLoops(looping ? -1 : 0);
+  protected boolean playImpl() {
+    impl.set_CurrentTime(0);
+    return impl.Play();
   }
 
   @Override
-  public float volume() {
-    return (player == null) ? 0 : player.get_Volume();
+  protected void stopImpl() {
+    impl.Stop();
+    impl.set_CurrentTime(0);
   }
 
   @Override
-  public void setVolume(float volume) {
-    if (player == null) return;
-    player.set_Volume(volume);
+  protected void setLoopingImpl(boolean looping) {
+    impl.set_NumberOfLoops(looping ? -1 : 0);
   }
 
   @Override
-  public boolean isPlaying() {
-    return (player == null) ? false : player.get_Playing();
-  }
-
-  @Override
-  public void addCallback(Callback<? super Sound> callback) {
-    if (player != null)
-      callback.onSuccess(this);
-    else if (error != null)
-      callback.onFailure(error);
-    else
-      callbacks = Callbacks.createAdd(callbacks, callback);
-  }
-
-  void setPlayer(AVAudioPlayer player) {
-    this.player = player;
-    if (playOnLoad) {
-      playOnLoad = false;
-      play();
-    }
-    callbacks = Callbacks.dispatchSuccessClear(callbacks, this);
-  }
-
-  void setError(Throwable error) {
-    this.error = error;
-    callbacks = Callbacks.dispatchFailureClear(callbacks, error);
+  protected void setVolumeImpl(float volume) {
+    impl.set_Volume(volume);
   }
 
   protected void finalize() {
-    if (player != null)
-      player.Dispose(); // meh
+    if (impl != null)
+      impl.Dispose(); // meh
   }
 }

@@ -22,34 +22,28 @@ import cli.MonoTouch.AVFoundation.AVAudioPlayer;
 import cli.MonoTouch.Foundation.NSError;
 import cli.MonoTouch.Foundation.NSUrl;
 
-import playn.core.Audio;
+import playn.core.AudioImpl;
 import playn.core.Sound;
 
-public class IOSAudio implements Audio {
-
-  private final IOSPlatform platform;
+public class IOSAudio extends AudioImpl {
 
   public IOSAudio(IOSPlatform platform) {
-    this.platform = platform;
+    super(platform);
   }
 
   Sound createSound(String path) {
     final IOSSound sound = new IOSSound();
     ThreadPool.QueueUserWorkItem(new WaitCallback(new WaitCallback.Method() {
       public void Invoke(Object arg) {
-        final String path = (String) arg;
-        final NSError[] error = new NSError[1];
-        final AVAudioPlayer player = AVAudioPlayer.FromUrl(NSUrl.FromFilename(path), error);
-        platform.invokeLater(new Runnable() {
-          public void run () {
-            if (error[0] == null) {
-              sound.setPlayer(player);
-            } else {
-              platform.log().warn("Error loading sound [" + path + ", " + error[0] + "]");
-              sound.setError(new Exception(error[0].ToString()));
-            }
-          }
-        });
+        String path = (String) arg;
+        NSError[] error = new NSError[1];
+        AVAudioPlayer player = AVAudioPlayer.FromUrl(NSUrl.FromFilename(path), error);
+        if (error[0] == null) {
+          dispatchLoaded(sound, player);
+        } else {
+          platform.log().warn("Error loading sound [" + path + ", " + error[0] + "]");
+          dispatchLoadError(sound, new Exception(error[0].ToString()));
+        }
       }
     }), path);
     return sound;

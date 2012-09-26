@@ -21,7 +21,7 @@ import playn.core.Audio;
 class FlashAudio implements Audio {
 
   FlashSound createSound(String url) {
-    return FlashSound.createSound(url);
+    return new FlashSound(url);
   }
 
 }

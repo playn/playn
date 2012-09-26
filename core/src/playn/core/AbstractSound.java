@@ -15,32 +15,96 @@ package playn.core;
 
 import java.util.List;
 
+import pythagoras.f.MathUtil;
+
 import playn.core.util.Callback;
 import playn.core.util.Callbacks;
 
-public abstract class AbstractSound implements Sound {
+public abstract class AbstractSound<I> implements Sound {
 
-  private List<Callback<? super Sound>> callbacks;
-  private Boolean soundLoaded; // null indicates result not yet known
+  protected List<Callback<? super Sound>> callbacks;
+  protected Throwable error;
+  protected boolean playing, looping;
+  protected float volume = 1;
+  protected I impl;
+
+  public void onLoaded(I impl) {
+    this.impl = impl;
+    callbacks = Callbacks.dispatchSuccessClear(callbacks, this);
+    setVolumeImpl(volume);
+    setLoopingImpl(looping);
+    if (playing)
+      playImpl();
+  }
+
+  public void onLoadError(Throwable error) {
+    this.error = error;
+    callbacks = Callbacks.dispatchFailureClear(callbacks, error);
+  }
+
+  @Override
+  public boolean prepare() {
+    return (impl != null) ? prepareImpl() : false;
+  }
+
+  @Override
+  public boolean isPlaying() {
+    return (impl != null) ? playingImpl() : playing;
+  }
+
+  @Override
+  public boolean play() {
+    this.playing = true;
+    if (impl != null)
+      return playImpl();
+    else
+      return false;
+  }
+
+  @Override
+  public void stop() {
+    this.playing = false;
+    if (impl != null)
+      stopImpl();
+  }
+
+  @Override
+  public void setLooping(boolean looping) {
+    this.looping = looping;
+    if (impl != null)
+      setLoopingImpl(looping);
+  }
+
+  @Override
+  public float volume() {
+    return volume;
+  }
+
+  @Override
+  public void setVolume(float volume) {
+    this.volume = MathUtil.clamp(volume, 0, 1);
+    if (impl != null)
+      setVolumeImpl(this.volume);
+  }
 
   @Override
   public final void addCallback(Callback<? super Sound> callback) {
-    if (soundLoaded != null) {
-      if (soundLoaded)
-        callback.onSuccess(AbstractSound.this);
-      else
-        callback.onFailure(new RuntimeException("Sound already failed to load."));
-    } else
+    if (impl != null)
+      callback.onSuccess(this);
+    else if (error != null)
+      callback.onFailure(error);
+    else
       callbacks = Callbacks.createAdd(callbacks, callback);
   }
 
-  protected void onLoadError(Throwable err) {
-    this.soundLoaded = false;
-    callbacks = Callbacks.dispatchFailureClear(callbacks, err);
+  protected boolean prepareImpl() {
+    return false;
   }
-
-  protected void onLoadComplete() {
-    this.soundLoaded = true;
-    callbacks = Callbacks.dispatchSuccessClear(callbacks, this);
+  protected boolean playingImpl() {
+    return playing;
   }
+  protected abstract boolean playImpl();
+  protected abstract void stopImpl();
+  protected abstract void setLoopingImpl(boolean looping);
+  protected abstract void setVolumeImpl(float volume);
 }

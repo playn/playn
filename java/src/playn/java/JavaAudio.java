@@ -17,11 +17,46 @@ package playn.java;
 
 import java.io.InputStream;
 
-import playn.core.Audio;
+import javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
 
-class JavaAudio implements Audio {
+import playn.core.AudioImpl;
 
-  JavaSound createSound(String name, InputStream in) {
-    return new JavaSound(name, in);
+class JavaAudio extends AudioImpl {
+
+  public JavaAudio(JavaPlatform platform) {
+    super(platform);
+  }
+
+  JavaSound createSound(final String name, final InputStream in) {
+    final JavaSound sound = new JavaSound();
+    new Thread() {
+      public void run () {
+        try {
+          Clip clip = AudioSystem.getClip();
+          AudioInputStream ais = AudioSystem.getAudioInputStream(in);
+          if (name.endsWith(".mp3")) {
+            AudioFormat baseFormat = ais.getFormat();
+            AudioFormat decodedFormat = new AudioFormat(
+              AudioFormat.Encoding.PCM_SIGNED,
+              baseFormat.getSampleRate(),
+              16, // we have to force sample size to 16
+              baseFormat.getChannels(),
+              baseFormat.getChannels()*2,
+              baseFormat.getSampleRate(),
+              false // big endian
+              );
+            ais = AudioSystem.getAudioInputStream(decodedFormat, ais);
+          }
+          clip.open(ais);
+          dispatchLoaded(sound, clip);
+        } catch (Exception e) {
+          dispatchLoadError(sound, e);
+        }
+      }
+    }.start();
+    return sound;
   }
 }

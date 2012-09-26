@@ -13,127 +13,64 @@
  */
 package playn.java;
 
-import java.io.InputStream;
-import java.util.List;
-
-import javax.sound.sampled.AudioFormat;
-import javax.sound.sampled.AudioInputStream;
-import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
 import javax.sound.sampled.FloatControl;
 
 import pythagoras.f.FloatMath;
-import pythagoras.f.MathUtil;
 
-import playn.core.PlayN;
-import playn.core.Sound;
-import playn.core.util.Callback;
-import playn.core.util.Callbacks;
+import playn.core.AbstractSound;
 
-class JavaSound implements Sound {
+class JavaSound extends AbstractSound<Clip> {
 
-  private Clip clip;
-  private boolean looping;
-
-  private List<Callback<? super Sound>> callbacks;
-
-  JavaSound(final String name, final InputStream inputStream) {
-    JavaAssets.doResourceAction(new Runnable() {
-      public void run () {
-        try {
-          init(name, inputStream);
-          callbacks = Callbacks.dispatchSuccessClear(callbacks, JavaSound.this);
-        } catch (Exception e) {
-          PlayN.log().warn("Sound initialization failed '" + name + "': " + e);
-          callbacks = Callbacks.dispatchFailureClear(callbacks, e);
-        }
-      }
-    });
-  }
-
-  private void init(String name, InputStream inputStream) throws Exception {
-    clip = AudioSystem.getClip();
-    AudioInputStream ais = AudioSystem.getAudioInputStream(inputStream);
-    if (name.endsWith(".mp3")) {
-      AudioFormat baseFormat = ais.getFormat();
-      AudioFormat decodedFormat = new AudioFormat(
-        AudioFormat.Encoding.PCM_SIGNED,
-        baseFormat.getSampleRate(),
-        16, // we have to force sample size to 16
-        baseFormat.getChannels(),
-        baseFormat.getChannels()*2,
-        baseFormat.getSampleRate(),
-        false // big endian
-        );
-      ais = AudioSystem.getAudioInputStream(decodedFormat, ais);
-    }
-    clip.open(ais);
+  @Override
+  protected boolean playingImpl() {
+    return impl.isActive();
   }
 
   @Override
-  public boolean play() {
-    if (clip == null) {
-      return false;
-    }
-    clip.setFramePosition(0);
+  protected boolean playImpl() {
+    impl.setFramePosition(0);
     if (looping) {
-      clip.loop(Clip.LOOP_CONTINUOUSLY);
+      impl.loop(Clip.LOOP_CONTINUOUSLY);
     } else {
-      clip.start();
+      impl.start();
     }
     return true;
   }
 
   @Override
-  public void stop() {
-    if (clip == null) {
-      return;
-    }
-    clip.stop();
-    clip.flush();
+  protected void stopImpl() {
+    impl.stop();
+    impl.flush();
   }
 
   @Override
-  public void setLooping(boolean looping) {
-    this.looping = looping;
+  protected void setLoopingImpl(boolean looping) {
+    // nothing to do here, we pass looping to impl.play()
   }
 
   @Override
-  public float volume() {
-    FloatControl volctrl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
-    return toVolume(volctrl.getValue());
+  protected void setVolumeImpl(float volume) {
+    FloatControl volctrl = (FloatControl) impl.getControl(FloatControl.Type.MASTER_GAIN);
+    volctrl.setValue(toGain(volume));
   }
 
-  @Override
-  public void setVolume(float volume) {
-    FloatControl volctrl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
-    volctrl.setValue(toGain(MathUtil.clamp(volume, 0, 1)));
-  }
-
-  @Override
-  public boolean isPlaying() {
-    return (clip != null) && clip.isActive();
-  }
-
-  @Override
-  public void addCallback(Callback<? super Sound> callback) {
-    if (clip != null) {
-      callback.onSuccess(this);
-    } else {
-      callbacks = Callbacks.createAdd(callbacks, callback);
-    }
-  }
+  // @Override
+  // public float volume() {
+  //   FloatControl volctrl = (FloatControl) impl.getControl(FloatControl.Type.MASTER_GAIN);
+  //   return toVolume(volctrl.getValue());
+  // }
 
   protected void finalize() {
-    if (clip != null) {
-      clip.close();
-      clip = null;
+    if (impl != null) {
+      impl.close();
+      impl = null;
     }
   }
 
-  protected static float toVolume (float gain) {
-    return FloatMath.pow(10, gain/20);
-  }
+  // protected static float toVolume (float gain) {
+  //   return FloatMath.pow(10, gain/20);
+  // }
 
   protected static float toGain (float volume) {
     return 20 * FloatMath.log10(volume);

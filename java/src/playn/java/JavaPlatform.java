@@ -115,7 +115,7 @@ public class JavaPlatform extends AbstractPlatform {
   }
 
   private final JavaAnalytics analytics = new JavaAnalytics();
-  private final JavaAudio audio = new JavaAudio();
+  private final JavaAudio audio = new JavaAudio(this);
   private final JavaNet net = new JavaNet(this);
   private final JavaRegularExpression regex = new JavaRegularExpression();
   private final JavaStorage storage;

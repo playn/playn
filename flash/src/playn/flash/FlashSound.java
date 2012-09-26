@@ -23,11 +23,8 @@ import flash.events.EventType;
 import flash.gwt.FlashImport;
 import playn.core.AbstractSound;
 
-class FlashSound extends AbstractSound {
+class FlashSound extends AbstractSound<FlashSound.NativeSound> {
 
-  private NativeSound sound;
-  private boolean looping;
-  private boolean isPlaying;
   private SoundChannel soundChannel;
 
   @FlashImport({"flash.media.SoundChannel"})
@@ -45,85 +42,63 @@ class FlashSound extends AbstractSound {
     }-*/;
   }
 
-  @FlashImport({"flash.net.URLRequest", "flash.media.Sound", "flash.events.Event", "flash.events.IOErrorEvent"})
+  @FlashImport({
+    "flash.net.URLRequest", "flash.media.Sound", "flash.events.Event", "flash.events.IOErrorEvent"
+  })
   final static class NativeSound extends JavaScriptObject {
-    protected NativeSound() {
-    }
+    protected NativeSound() {}
 
-    public static native NativeSound createSound(String uri, FlashSound flashSound) /*-{
+    public static native void loadSound(String uri, FlashSound flashSound) /*-{
       var s = new flash.media.Sound();
-
       s.addEventListener(Event.COMPLETE, function(event) {
-        flashSound.@playn.core.AbstractSound::onLoadComplete()();
+        flashSound.@playn.core.AbstractSound::onLoaded(Ljava/lang/Object;)(s);
       });
-
       s.addEventListener(IOErrorEvent.IO_ERROR, function(event) {
         flashSound.@playn.core.AbstractSound::onLoadError(Ljava/lang/Throwable;)(new Error("IOErrorEvent.IO_ERROR"));
       });
-
       s.load(new URLRequest(uri));
-      return s;
     }-*/;
 
     public native SoundChannel play(boolean looping) /*-{
       return this.play(0, looping ? 99999999 : 0);
     }-*/;
-
   }
 
-  public static FlashSound createSound(String uri) {
-    FlashSound flashSound = new FlashSound();
-    flashSound.setNativeSound(NativeSound.createSound(uri, flashSound));
-    return flashSound;
-  }
-
-  public FlashSound() {
-  }
-
-  private void setNativeSound(NativeSound sound) {
-    this.sound = sound;
+  public FlashSound(String url) {
+    NativeSound.loadSound(url, this);
   }
 
   @Override
-  public void stop() {
-    isPlaying = false;
-    if (soundChannel != null) {
-      soundChannel.stop();
-    }
-  }
-
-  @Override
-  public void setLooping(boolean looping) {
-    this.looping = looping;
-  }
-
-  @Override
-  public boolean isPlaying() {
-    return isPlaying;
-  }
-
-  @Override
-  public float volume() {
-    return (soundChannel == null) ? 0 : soundChannel.volume();
-  }
-
-  @Override
-  public void setVolume(float volume) {
-    if (soundChannel != null) {
-      soundChannel.setVolume(volume);
-    }
-  }
-
-  @Override
-  public boolean play() {
-    soundChannel = sound.play(looping);
-    isPlaying = true;
+  protected boolean playImpl() {
+    soundChannel = impl.play(looping);
+    soundChannel.setVolume(volume);
     soundChannel.addEventListener(SoundChannel.SOUND_COMPLETE, new EventHandler<Event>() {
       @Override
       public void handleEvent(Event evt) {
-        isPlaying = false;
+        playing = false;
+        soundChannel = null;
       }
     }, false, 0, false);
     return true;
+  }
+
+  @Override
+  protected void stopImpl() {
+    if (soundChannel != null) {
+      soundChannel.stop();
+      soundChannel = null;
+    }
+  }
+
+  @Override
+  protected void setLoopingImpl(boolean looping) {
+    // nothing to do here, we pass looping into impl.play()
+  }
+
+  @Override
+  protected void setVolumeImpl(float volume) {
+    if (soundChannel != null) {
+      soundChannel.setVolume(volume);
+    }
   }
 }

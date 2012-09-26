@@ -15,179 +15,94 @@
  */
 package playn.android;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-
 import android.media.MediaPlayer;
-import android.media.MediaPlayer.OnErrorListener;
-import android.util.Log;
-
-import pythagoras.f.MathUtil;
-
-import static playn.core.PlayN.log;
 
 /**
- * An implementation of AndroidSound using the Android MediaPlayer
- * class.
+ * An implementation of AndroidSound using the Android MediaPlayer class.
  */
-public class AndroidCompressedSound extends AndroidSound {
+public class AndroidCompressedSound extends AndroidSound<MediaPlayer> {
 
-  private final File cachedFile;
-  private boolean paused, prepared, looping, playOnPrepare;
-  private float volume = 0.99f;
+  private final AndroidAudio audio;
+  private final AndroidAudio.Resolver<MediaPlayer> resolver;
   private int position;
-  private MediaPlayer mp;
 
-  public AndroidCompressedSound(AndroidAssets assets, String path) throws IOException {
-    String extension = path.substring(path.lastIndexOf('.'));
-    this.cachedFile = assets.cacheAsset(
-      path, "sound-" + Integer.toHexString(hashCode()) + extension);
-
-    try {
-      resetMp();
-    } catch(IOException e) {
-      log().error("IOException thrown building MediaPlayer for sound.");
-      onLoadError(e);
-    }
+  AndroidCompressedSound(AndroidAudio audio, AndroidAudio.Resolver<MediaPlayer> resolver) {
+    this.audio = audio;
+    this.resolver = resolver;
+    resolve();
   }
 
-  /**
-   * Play the sound. Calling multiple times in succession will reset
-   * playback each time instead of playing multiple instances of
-   * the sound.
-   */
   @Override
-  public boolean play() {
-    if (!prepared) {
-      playOnPrepare = true;
-    } else {
-      mp.seekTo(position);  //Play from stored position if there is one
-      mp.start();
-      position = 0;
-    }
+  public void onLoaded(MediaPlayer impl) {
+    super.onLoaded(impl);
+    impl.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+      public void onCompletion(MediaPlayer mp) {
+        audio.onStopped(AndroidCompressedSound.this);
+      }
+    });
+  }
+
+  @Override
+  protected boolean playingImpl() {
+    return impl.isPlaying();
+  }
+
+  @Override
+  protected boolean playImpl() {
+    audio.onPlaying(this);
+    impl.seekTo(position); // play from stored position if there is one
+    impl.start();
+    position = 0;
     return true;
   }
 
-  /**
-   * Stop playback and reset the playhead position.
-   */
   @Override
-  public void stop() {
-    if (mp == null) return;
-    mp.pause();
-    mp.seekTo(0);
+  protected void stopImpl() {
+    audio.onStopped(this);
+    impl.pause();
   }
 
   @Override
-  public void setLooping(boolean looping) {
-    this.looping = looping;
-    if (mp != null) mp.setLooping(looping);
+  protected void setLoopingImpl(boolean looping) {
+    impl.setLooping(looping);
   }
 
   @Override
-  public float volume() {
-    return volume;
+  protected void setVolumeImpl(float volume) {
+    impl.setVolume(volume, volume);
   }
 
-  @Override
-  public void setVolume(float volume) {
-    this.volume = MathUtil.clamp(volume, 0, 1);
-    if (mp != null) mp.setVolume(this.volume, this.volume);
+  private void resolve() {
+    resolver.resolve(AndroidCompressedSound.this);
   }
 
-  @Override
-  public boolean isPlaying() {
-    return mp == null ? false : mp.isPlaying();
-  }
+  // The following methods are called by AndroidAudio during the Activity lifecycle
 
-  /*
-   * The following methods are called by AndroidAudio
-   * during the Activity lifecycle
-   */
   @Override
   void onPause() {
-    if (mp == null) {
-      return;
-    } else {
-      if (mp.isPlaying()) {
-        position = mp.getCurrentPosition();
-        paused = true;
+    if (impl != null) {
+      // note our current play position
+      if (impl.isPlaying()) {
+        position = impl.getCurrentPosition();
       }
-      mp.release();
+      // release our media player and reset ourselves to the unloaded state
+      impl.release();
+      impl = null;
     }
   }
 
   @Override
   void onResume() {
-    try {
-      resetMp();
-      if (paused) { //If the sound was playing when onPause() was called
-        paused = false;
-        play();  //Queue up to play when prepared.
-      }
-    } catch (IOException e) {
-      log().error("IOException thrown resetting MediaPlayer for sound in onResume()");
-    }
+    resolve(); // re-resolve our media player
   }
 
   @Override
   void onDestroy() {
-    cachedFile.delete();
-    if (mp != null) {
-      mp.stop();
-      mp.release();
-    }
-  }
-
-  void prepared() {
-    prepared = true;
-    Log.d("playn", "Prepared");
-    onLoadComplete();
-    if (playOnPrepare) {
-      playOnPrepare = false;
-      play();
-    }
-  }
-
-  private void resetMp() throws IOException {
-    mp = new MediaPlayer();
-    prepared = false;
-    FileInputStream ins = new FileInputStream(cachedFile);
-    try {
-      mp.setDataSource(ins.getFD());
-      mp.setOnPreparedListener(new SoundPreparedListener(this));
-      mp.setOnErrorListener(new OnErrorListener() {
-        @Override
-        public boolean onError(MediaPlayer mp, int what, int extra) {
-          log().error("Error preparing MediaPlayer while loading sound.");
-          onLoadError(new RuntimeException("Error preparing MediaPlayer while loading sound"));
-          return false;
-        }
-      });
-      mp.setLooping(looping);
-      mp.setVolume(volume, volume);
-      mp.prepareAsync();
-    } finally {
-      ins.close();
-    }
-  }
-
-  @Override
-  public void finalize() {
-    onDestroy();
-  }
-
-  private class SoundPreparedListener implements MediaPlayer.OnPreparedListener {
-    AndroidCompressedSound sound;
-
-    SoundPreparedListener(AndroidCompressedSound sound) {
-      this.sound = sound;
-    }
-
-    @Override
-    public void onPrepared(MediaPlayer mp) {
-        if (sound != null) sound.prepared();
+    if (impl != null) {
+      if (impl.isPlaying())
+        impl.stop();
+      impl.release();
+      impl = null;
     }
   }
 }

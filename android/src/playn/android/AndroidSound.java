@@ -17,26 +17,16 @@ package playn.android;
 
 import playn.core.AbstractSound;
 
-abstract class AndroidSound extends AbstractSound {
-  public AndroidSound() { }
-
-  @Override
-  public abstract boolean play();
-
-  @Override
-  public abstract void stop();
-
-  @Override
-  public abstract void setLooping(boolean looping);
-  @Override
-  public abstract void setVolume(float volume);
-
-  @Override
-  public abstract boolean isPlaying();
+abstract class AndroidSound<I> extends AbstractSound<I> {
 
   abstract void onPause();
 
   abstract void onResume();
 
   abstract void onDestroy();
+
+  @Override
+  protected void finalize() {
+    onDestroy();
+  }
 }

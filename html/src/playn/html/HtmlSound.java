@@ -22,36 +22,32 @@ import com.allen_sauer.gwt.voices.client.Sound.LoadState;
 
 import pythagoras.f.MathUtil;
 
+import com.allen_sauer.gwt.voices.client.Sound;
+
 import playn.core.AbstractSound;
 
-class HtmlSound extends AbstractSound {
+class HtmlSound extends AbstractSound<Sound> {
 
-  private final com.allen_sauer.gwt.voices.client.Sound sound;
-
-  private boolean playing;
-
-  HtmlSound(com.allen_sauer.gwt.voices.client.Sound sound) {
-    this.sound = sound;
+  HtmlSound(final Sound sound) {
     sound.addEventHandler(new SoundHandler() {
-        @Override
+      @Override
       public void onSoundLoadStateChange(SoundLoadStateChangeEvent event) {
         LoadState loadState = event.getLoadState();
         switch (loadState) {
-          case LOAD_STATE_UNINITIALIZED:
-          case LOAD_STATE_SUPPORTED_NOT_READY:
-            // ignore
-            break;
-          case LOAD_STATE_SUPPORTED_AND_READY:
-          case LOAD_STATE_SUPPORT_NOT_KNOWN:
-          case LOAD_STATE_SUPPORTED_MAYBE_READY:
-            onLoadComplete();
-            break;
-          case LOAD_STATE_NOT_SUPPORTED:
-            onLoadError(new RuntimeException(loadState.name()));
-            break;
-          default:
-            throw new RuntimeException("Unrecognized sound load state "
-                + loadState.name());
+        case LOAD_STATE_UNINITIALIZED:
+        case LOAD_STATE_SUPPORTED_NOT_READY:
+          // ignore
+          break;
+        case LOAD_STATE_SUPPORTED_AND_READY:
+        case LOAD_STATE_SUPPORT_NOT_KNOWN:
+        case LOAD_STATE_SUPPORTED_MAYBE_READY:
+          onLoaded(sound);
+          break;
+        case LOAD_STATE_NOT_SUPPORTED:
+          onLoadError(new RuntimeException(loadState.name()));
+          break;
+        default:
+          throw new RuntimeException("Unrecognized sound load state " + loadState.name());
         }
       }
 
@@ -63,36 +59,22 @@ class HtmlSound extends AbstractSound {
   }
 
   @Override
-  public boolean play() {
-    playing = true;
-    return sound.play();
+  protected boolean playImpl() {
+    return impl.play();
   }
 
   @Override
-  public void stop() {
-    sound.stop();
-    playing = false;
+  protected void stopImpl() {
+    impl.stop();
   }
 
   @Override
-  public void setLooping(boolean looping) {
-    sound.setLooping(looping);
+  protected void setLoopingImpl(boolean looping) {
+    impl.setLooping(looping);
   }
 
   @Override
-  public float volume() {
-    return sound.getVolume() / 100f;
+  protected void setVolumeImpl(float volume) {
+    impl.setVolume((int) (volume * 100));
   }
-
-  @Override
-  public void setVolume(float volume) {
-    volume = MathUtil.clamp(volume, 0, 1);
-    sound.setVolume((int) (volume * 100));
-  }
-
-  @Override
-  public boolean isPlaying() {
-    return playing;
-  }
-
 }
