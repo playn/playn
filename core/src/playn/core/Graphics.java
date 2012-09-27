@@ -36,14 +36,16 @@ public interface Graphics {
   GroupLayer createGroupLayer();
 
   /**
-   * Creates a clipped group layer, with the initial specified size.
+   * Creates a clipped group layer, with the initial specified size. See the note about clipping
+   * regions in {@link #createImmediateLayer(int, int, ImmediateLayer.Renderer)}.
    */
   GroupLayer.Clipped createGroupLayer(float width, float height);
 
   /**
-   * Creates an immediate layer that is clipped to the specified rectangular region. <em>NOTE:</em>
-   * clipping regions <em>do not</em> nest. If you place a clipped ImmediateRegion inside this
-   * clipped group, or another clipped group, it will behave unpredictably. Don't do that.
+   * Creates an immediate layer that is clipped to the specified rectangular region.<p>
+   * <em>NOTE:</em> clipping regions <em>do not</em> nest. If you place a clipped ImmediateRegion
+   * inside this clipped group, or another clipped group, it will behave unpredictably. Don't do
+   * that.</p>
    *
    * @param width the horizontal extent of the layer's drawable region.
    * @param height the vertical extent of the layer's drawable region.
