@@ -29,9 +29,9 @@ import static playn.core.PlayN.graphics;
 public class ClippedGroupTest extends Test {
 
   private float elapsed;
-  private GroupLayer.Clipped g1, g2, g3, g4;
+  private GroupLayer.Clipped g1, g2, g3, g4, g5;
   private ImageLayer i1;
-  private GroupLayer inner;
+  private GroupLayer inner, g5Inner;
   private SurfaceLayer s1;
 
   @Override
@@ -63,6 +63,7 @@ public class ClippedGroupTest extends Test {
         outline(surf, g2);
         outline(surf, g3);
         outline(surf, g4);
+        outline(surf, g5);
       }
       protected void outline (Surface surf, Layer.HasSize ly) {
         drawRect(surf, ly.tx() - ly.originX(), ly.ty() - ly.originY(), ly.width(), ly.height());
@@ -104,6 +105,16 @@ public class ClippedGroupTest extends Test {
     s1.setOrigin(s1.width()/2, s1.height()/2);
     g4.addAt(s1, 50, 50);
     rootLayer.addAt(g4, 400, 25);
+
+    // put a large clipped group inside a small one
+    g5Inner = graphics().createGroupLayer(150, 150);
+    g5Inner.addAt(graphics().createImageLayer(img).setScale(2), -img.width(), -img.height());
+    g5Inner.addAt(graphics().createImageLayer(img).setScale(2), -img.width(), img.height());
+    g5Inner.addAt(graphics().createImageLayer(img).setScale(2), img.width(), -img.height());
+    g5Inner.addAt(graphics().createImageLayer(img).setScale(2), img.width(), img.height());
+    g5 = graphics().createGroupLayer(100, 100);
+    g5.addAt(g5Inner, -25, -25);
+    rootLayer.addAt(g5, 525, 25);
   }
 
   @Override
@@ -113,5 +124,6 @@ public class ClippedGroupTest extends Test {
     s1.setRotation(elapsed * FloatMath.PI/2);
     g2.setWidth(Math.max(1f, Math.abs(100 * FloatMath.sin(elapsed))));
     inner.setOrigin(FloatMath.sin(elapsed * 2f) * 50, FloatMath.cos(elapsed * 2f) * 50);
+    g5Inner.setTranslation(-25 + 50 * FloatMath.cos(elapsed), -25 + 50 * FloatMath.sin(elapsed));
   }
 }
