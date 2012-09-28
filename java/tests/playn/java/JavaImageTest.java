@@ -27,7 +27,7 @@ public class JavaImageTest extends AbstractPlayNTest {
 
     Image missing;
     try {
-      missing = PlayN.assets().getImage("missing.png");
+      missing = PlayN.assets().getImageSync("missing.png");
     } finally {
       PlayN.log().setCollector(null);
     }
@@ -41,8 +41,9 @@ public class JavaImageTest extends AbstractPlayNTest {
     // TODO: depending on the error text is somewhat fragile, but I want to be sure that a
     // reasonably appropriate error was logged
     String errlog = buf.toString();
-    assertTrue(errlog.startsWith("Could not load image"));
-    assertTrue(errlog.contains("missing.png"));
-
+    assertTrue(errlog + " must contain 'Could not load image'",
+               errlog.startsWith("Could not load image"));
+    assertTrue(errlog + " must contain 'missing.png'",
+               errlog.contains("missing.png"));
   }
 }
