@@ -14,16 +14,24 @@ object PlayNBuild extends Build {
       publishArtifact in (Compile, packageDoc) := false, // no scaladocs; it fails
       resolvers    += "Forplay Legacy" at "http://forplay.googlecode.com/svn/mavenrepo",
       // everybody gets their source and tests directories rewritten
-      unmanagedSourceDirectories in Compile <+= baseDirectory / "src",
-      unmanagedSourceDirectories in Test <+= baseDirectory / "tests"
+      javaSource in Compile <<= baseDirectory / "src",
+      javaSource in Test <<= baseDirectory / "tests",
+      // no parallel test execution to avoid confusions
+      parallelExecution in Test := false
     )
     override def projectSettings (name :String) = name match {
       case "core" => Seq(
         // adds source files to our jar file (needed by GWT)
         unmanagedResourceDirectories in Compile <+= baseDirectory / "src",
         unmanagedBase <<= baseDirectory { base => base / "disabled" },
+        // tests depends on resource files mixed into source directory, yay!
+        unmanagedResourceDirectories in Test <+= baseDirectory / "tests",
         libraryDependencies ++= Seq(
-          // scala test dependencies
+          "com.novocode" % "junit-interface" % "0.7" % "test->default"
+        )
+      )
+      case "java" => Seq(
+        libraryDependencies ++= Seq(
  	        "com.novocode" % "junit-interface" % "0.7" % "test->default"
         )
       )
