@@ -145,7 +145,7 @@ public class JavaAssets extends AbstractAssets<BufferedImage> {
         break; // the image was broken not missing, stop here
       }
     }
-    platform.log().warn("Could not load image: " + fullPath, error);
+    platform.log().warn("Could not load image: " + fullPath + " [error=" + error + "]");
     return recv.loadFailed(error != null ? error : new FileNotFoundException(fullPath));
   }
 
