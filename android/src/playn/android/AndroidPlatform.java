@@ -17,6 +17,7 @@ package playn.android;
 
 import android.content.Intent;
 import android.net.Uri;
+import android.os.AsyncTask;
 
 import playn.core.AbstractPlatform;
 import playn.core.Game;
@@ -67,6 +68,16 @@ public class AndroidPlatform extends AbstractPlatform {
     storage = new AndroidStorage(activity);
     touch = new TouchImpl();
     touchHandler = new AndroidTouchEventHandler(graphics, activity.gameView());
+  }
+
+  @Override
+  public void invokeAsync(final Runnable action) {
+    new AsyncTask<Void,Void,Void>() {
+      public Void doInBackground(Void... params) {
+        action.run();
+        return null;
+      }
+    }.execute();
   }
 
   @Override

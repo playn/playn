@@ -63,7 +63,7 @@ public class FlashPlatform extends AbstractPlatform {
     }, capture);
   }-*/;
 
-  private final FlashAssets assets = new FlashAssets();
+  private final FlashAssets assets = new FlashAssets(this);
   private final FlashAudio audio;
   private final HtmlRegularExpression regularExpression;
   private final FlashGraphics graphics;
@@ -104,7 +104,7 @@ public class FlashPlatform extends AbstractPlatform {
   }
 
   @Override
-  public Audio audio() {
+  public FlashAudio audio() {
     return audio;
   }
 

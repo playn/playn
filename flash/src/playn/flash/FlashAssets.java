@@ -25,18 +25,25 @@ import com.google.gwt.resources.client.ResourcePrototype;
 import flash.gwt.FlashImport;
 
 import playn.core.AbstractAssets;
+import playn.core.AsyncImage;
 import playn.core.AutoClientBundleWithLookup;
 import playn.core.Image;
-import playn.core.PlayN;
 import playn.core.Sound;
+import playn.core.gl.Scale;
 import playn.core.util.Callback;
 
 @FlashImport({"flash.net.URLLoader", "flash.net.URLRequest"})
-public class FlashAssets extends AbstractAssets {
+public class FlashAssets extends AbstractAssets<Void> {
 
   private final Map<String, AutoClientBundleWithLookup> clientBundles =
     new HashMap<String, AutoClientBundleWithLookup>();
+  private final FlashPlatform platform;
   private String pathPrefix = "";
+
+  public FlashAssets(FlashPlatform platform) {
+    super(platform);
+    this.platform = platform;
+  }
 
   public void setPathPrefix(String prefix) {
     pathPrefix = prefix;
@@ -47,9 +54,14 @@ public class FlashAssets extends AbstractAssets {
   }
 
   @Override
+  public Image getImageSync(String path) {
+    throw new UnsupportedOperationException("getImageSync(" + path + ")");
+  }
+
+  @Override
   public Image getImage(String path) {
     String url = pathPrefix + path;
-    PlayN.log().info("Looking to load " + url);
+    platform.log().info("Looking to load " + url);
     AutoClientBundleWithLookup clientBundle = getBundle(path);
     if (clientBundle != null) {
       String key = getKey(path);
@@ -89,6 +101,11 @@ public class FlashAssets extends AbstractAssets {
   }
 
   @Override
+  public String getTextSync(String path) throws Exception {
+    throw new UnsupportedOperationException("getTextSync(" + path + ")");
+  }
+
+  @Override
   public void getText(String path, Callback<String> callback) {
     loadText(pathPrefix + path, callback);
   }
@@ -99,9 +116,23 @@ public class FlashAssets extends AbstractAssets {
     return new FlashImage("error");
   }
 
+  @Override
+  protected Image createStaticImage(Void iimpl, Scale scale) {
+    throw new UnsupportedOperationException("unused");
+  }
+
+  @Override
+  protected AsyncImage<Void> createAsyncImage(float width, float height) {
+    throw new UnsupportedOperationException("unused");
+  }
+
+  @Override
+  protected Image loadImage(String path, ImageReceiver<Void> recv) {
+    throw new UnsupportedOperationException("unused");
+  }
+
   private Sound adaptSound(String url) {
-    FlashAudio audio = (FlashAudio) PlayN.audio();
-    FlashSound sound = audio.createSound(url);
+    FlashSound sound = platform.audio().createSound(url);
     return sound;
   }
 
@@ -134,7 +165,7 @@ public class FlashAssets extends AbstractAssets {
   }
 
   private Image adaptImage(String url) {
-    PlayN.log().info("Loading " + url);
+    platform.log().info("Loading " + url);
     return new FlashImage(url);
   }
 

@@ -25,8 +25,6 @@ import cli.System.IO.FileStream;
 import cli.System.IO.Path;
 import cli.System.IO.Stream;
 import cli.System.IO.StreamReader;
-import cli.System.Threading.ThreadPool;
-import cli.System.Threading.WaitCallback;
 
 import cli.MonoTouch.Foundation.NSData;
 import cli.MonoTouch.Foundation.NSError;
@@ -39,20 +37,20 @@ import cli.MonoTouch.UIKit.UIImage;
 
 import playn.core.AbstractAssets;
 import playn.core.Asserts;
+import playn.core.AsyncImage;
 import playn.core.Image;
 import playn.core.Sound;
 import playn.core.gl.Scale;
 import playn.core.util.Callback;
 
-public class IOSAssets extends AbstractAssets {
-
-  private String pathPrefix = "";
-  private boolean asyncImageLoading = false;
+public class IOSAssets extends AbstractAssets<UIImage> {
 
   private final IOSPlatform platform;
-  private final SyncLoader syncLoader = new SyncLoader(); // we only need one
+
+  private String pathPrefix = "";
 
   public IOSAssets(IOSPlatform platform) {
+    super(platform);
     this.platform = platform;
   }
 
@@ -68,25 +66,6 @@ public class IOSAssets extends AbstractAssets {
                             "Path components must not contain path separators: " + component);
     }
     pathPrefix = Path.Combine(components);
-  }
-
-  /**
-   * Configures asynchronous image loading. By default, images are loaded synchronously, so that
-   * the caller can immediately access the image's width/height and immediately render the image.
-   * Calling this with {@code true} causes images to be loaded asynchronously, via a separate
-   * thread pool.
-   */
-  public void setAsyncImageLoading(boolean asyncImageLoading) {
-    this.asyncImageLoading = asyncImageLoading;
-  }
-
-  @Override
-  public Image getImage(String path) {
-    String fullPath = Path.Combine(pathPrefix, path);
-    if (asyncImageLoading)
-      return new AsyncLoader().run(fullPath);
-    else
-      return syncLoader.run(fullPath);
   }
 
   @Override
@@ -132,111 +111,50 @@ public class IOSAssets extends AbstractAssets {
   }
 
   @Override
-  public void getText(String path, final Callback<String> callback) {
-    ThreadPool.QueueUserWorkItem(new WaitCallback(new WaitCallback.Method() {
-      public void Invoke(Object path) {
-        String fullPath = (String) path;
-        platform.log().debug("Loading text " + fullPath);
-
-        StreamReader reader = null;
-        try {
-          reader = new StreamReader(fullPath);
-          platform.notifySuccess(callback, reader.ReadToEnd());
-        } catch (Throwable t) {
-          platform.notifyFailure(callback, t);
-        } finally {
-          if (reader != null) {
-            reader.Close();
-          }
-        }
+  public String getTextSync(String path) throws Exception {
+    String fullPath = Path.Combine(pathPrefix, path);
+    platform.log().debug("Loading text " + fullPath);
+    StreamReader reader = null;
+    try {
+      reader = new StreamReader(fullPath);
+      return reader.ReadToEnd();
+    } finally {
+      if (reader != null) {
+        reader.Close();
       }
-    }), Path.Combine(pathPrefix, path));
+    }
   }
 
   @Override
-  protected Image createErrorImage(Throwable cause, float width, float height) {
-    return new IOSErrorImage(platform.graphics().ctx, cause, width, height);
+  protected Image createStaticImage(UIImage uiImage, Scale scale) {
+    return new IOSImage(platform.graphics().ctx, uiImage, scale);
   }
 
-  private void setImageLater(final IOSAsyncImage image, final UIImage uiImage, final Scale scale) {
-    platform.invokeLater(new Runnable() {
-      public void run () {
-        image.setImage(uiImage, scale);
+  @Override
+  protected AsyncImage<UIImage> createAsyncImage(float width, float height) {
+    return new IOSAsyncImage(platform.graphics().ctx, width, height);
+  }
+
+  @Override
+  protected Image loadImage(String path, ImageReceiver<UIImage> recv) {
+    Throwable error = null;
+    String fullPath = Path.Combine(pathPrefix, path);
+    for (Scale.ScaledResource rsrc : platform.graphics().ctx().scale.getScaledResources(fullPath)) {
+      if (!File.Exists(rsrc.path)) continue;
+      platform.log().debug("Loading image: " + rsrc.path);
+      try {
+        Stream stream = new FileStream(rsrc.path, FileMode.wrap(FileMode.Open),
+                                       FileAccess.wrap(FileAccess.Read),
+                                       FileShare.wrap(FileShare.Read));
+        NSData data = NSData.FromStream(stream);
+        return recv.imageLoaded(UIImage.LoadFromData(data), rsrc.scale);
+      } catch (Throwable t) {
+        platform.log().warn("Failed to load image: " + rsrc.path, t);
+        error = t; // note this error if this is the lowest resolution image, but fall back to
+        // lower resolution images if not; in the Java backend we'd fail here, but this
+        // is a production backend, so we want to try to make things work
       }
-    });
-  }
-
-  private void setErrorLater(final IOSAsyncImage image, final Throwable error) {
-    platform.invokeLater(new Runnable() {
-      public void run () {
-        image.setError(error);
-      }
-    });
-  }
-
-  private abstract class ImageLoader {
-    public abstract Image run (String path);
-
-    protected Image load (String path) {
-      Throwable error = null;
-      for (Scale.ScaledResource rsrc : platform.graphics().ctx().scale.getScaledResources(path)) {
-        if (!File.Exists(rsrc.path)) continue;
-        platform.log().debug("Loading image: " + rsrc.path);
-        try {
-          Stream stream = new FileStream(rsrc.path, FileMode.wrap(FileMode.Open),
-                                         FileAccess.wrap(FileAccess.Read),
-                                         FileShare.wrap(FileShare.Read));
-          NSData data = NSData.FromStream(stream);
-          return imageLoaded(UIImage.LoadFromData(data), rsrc.scale);
-        } catch (Throwable t) {
-          platform.log().warn("Failed to load image: " + rsrc.path, t);
-          error = t; // note this error if this is the lowest resolution image, but fall back to
-          // lower resolution images if not; in the Java backend we'd fail here, but this
-          // is a production backend, so we want to try to make things work
-        }
-      }
-      return loadFailed(error);
     }
-
-    protected abstract Image imageLoaded(UIImage uiImage, Scale scale);
-    protected abstract Image loadFailed(Throwable error);
-  }
-
-  private class SyncLoader extends ImageLoader {
-    @Override
-    public Image run (String path) {
-      return load(path);
-    }
-    @Override
-    protected Image imageLoaded(UIImage uiImage, Scale scale) {
-      return new IOSImage(platform.graphics().ctx, uiImage, scale);
-    }
-    @Override
-    protected Image loadFailed(Throwable error) {
-      return createErrorImage(error);
-    }
-  }
-
-  private class AsyncLoader extends ImageLoader {
-    private IOSAsyncImage image = new IOSAsyncImage(platform.graphics().ctx, 0, 0);
-    @Override
-    public Image run (String path) {
-      ThreadPool.QueueUserWorkItem(new WaitCallback(new WaitCallback.Method() {
-        public void Invoke(Object path) {
-          load((String) path);
-        }
-      }), path);
-      return image;
-    }
-    @Override
-    protected Image imageLoaded(final UIImage uiImage, final Scale scale) {
-      setImageLater(image, uiImage, scale);
-      return image;
-    }
-    @Override
-    protected Image loadFailed(final Throwable error) {
-      setErrorLater(image, error);
-      return image;
-    }
+    return recv.loadFailed(error);
   }
 }

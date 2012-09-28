@@ -17,13 +17,11 @@ package playn.android;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
 import android.media.MediaPlayer.OnErrorListener;
 import android.media.MediaPlayer;
-import android.os.AsyncTask;
 
 import playn.core.AudioImpl;
 
@@ -34,20 +32,21 @@ class AndroidAudio extends AudioImpl {
   }
 
   private final Set<AndroidSound<?>> playing = new HashSet<AndroidSound<?>>();
+  private final AndroidPlatform platform;
 
   public AndroidAudio(AndroidPlatform platform) {
     super(platform);
+    this.platform = platform;
   }
 
-  AndroidSound<?> createSound(final String path) throws IOException {
+  AndroidSound<?> createSound(final String path) {
     // MediaPlayer should really be used to play compressed sounds and other file formats
     // AudioTrack cannot handle. However, the MediaPlayer implementation is currently the only
     // version of AndroidSound we have written, so we'll use it here regardless of format.
     return new AndroidCompressedSound(this, new Resolver<MediaPlayer>() {
       // this cache file will get cleaned up in our activity's onDestroy
       private String extension = path.substring(path.lastIndexOf('.'));
-      private File cachedFile = ((AndroidPlatform) platform).assets().cacheAsset(
-        path, "sound-" + Integer.toHexString(hashCode()) + extension);
+      private File cachedFile;
 
       public void resolve (final AndroidSound<MediaPlayer> sound) {
         // we need to create the media player before starting the background task because the media
@@ -55,9 +54,14 @@ class AndroidAudio extends AudioImpl {
         // it was created; resolve() will be called from the main PlayN thread and we want
         // callbacks to be dispatched on that same thread
         final MediaPlayer mp = new MediaPlayer();
-        new AsyncTask<Void,Void,Void>() {
-          public Void doInBackground(Void... params) {
+        platform.invokeAsync(new Runnable() {
+          public void run () {
             try {
+              // lazily create our cached audio file
+              if (cachedFile == null) {
+                cachedFile = platform.assets().cacheAsset(
+                  path, "sound-" + Integer.toHexString(hashCode()) + extension);
+              }
               FileInputStream ins = new FileInputStream(cachedFile);
               try {
                 mp.setDataSource(ins.getFD());
@@ -82,9 +86,8 @@ class AndroidAudio extends AudioImpl {
             } catch (Exception e) {
               dispatchLoadError(sound, e);
             }
-            return null;
           }
-        }.execute();
+        });
       }
     });
   }

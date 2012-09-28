@@ -34,14 +34,16 @@ import com.google.gwt.xhr.client.XMLHttpRequest;
 import pythagoras.f.MathUtil;
 
 import playn.core.AbstractAssets;
+import playn.core.AsyncImage;
 import playn.core.AutoClientBundleWithLookup;
 import playn.core.Image;
 import playn.core.PlayN;
 import playn.core.Sound;
+import playn.core.gl.Scale;
 import playn.core.util.Callback;
 import playn.html.XDomainRequest.Handler;
 
-public class HtmlAssets extends AbstractAssets {
+public class HtmlAssets extends AbstractAssets<Void> {
 
   /**
    * Whether or not to log successful progress of {@code XMLHTTPRequest} and
@@ -60,6 +62,11 @@ public class HtmlAssets extends AbstractAssets {
 
   public void addClientBundle(String regExp, AutoClientBundleWithLookup clientBundle) {
     clientBundles.put(regExp, clientBundle);
+  }
+
+  @Override
+  public Image getImageSync(String path) {
+    throw new UnsupportedOperationException("getImageSync(" + path + ")");
   }
 
   @Override
@@ -106,6 +113,11 @@ public class HtmlAssets extends AbstractAssets {
   }
 
   @Override
+  public String getTextSync(String path) throws Exception {
+    throw new UnsupportedOperationException("getTextSync(" + path + ")");
+  }
+
+  @Override
   public void getText(final String path, final Callback<String> callback) {
     final String fullPath = pathPrefix + path;
     /*
@@ -138,7 +150,23 @@ public class HtmlAssets extends AbstractAssets {
     return new HtmlImage(platform.graphics().ctx(), img);
   }
 
+  @Override
+  protected Image createStaticImage(Void iimpl, Scale scale) {
+    throw new UnsupportedOperationException("unused");
+  }
+
+  @Override
+  protected AsyncImage<Void> createAsyncImage(float width, float height) {
+    throw new UnsupportedOperationException("unused");
+  }
+
+  @Override
+  protected Image loadImage(String path, ImageReceiver<Void> recv) {
+    throw new UnsupportedOperationException("unused");
+  }
+
   HtmlAssets(HtmlPlatform platform) {
+    super(platform);
     this.platform = platform;
   }
 

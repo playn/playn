@@ -44,6 +44,14 @@ public class WatchedAssets implements Assets {
   }
 
   @Override
+  public final Image getImageSync(String path) {
+    incrementRequestCount();
+    Image image = delegate.getImageSync(path);
+    image.addCallback(callback);
+    return image;
+  }
+
+  @Override
   public final Image getImage(String path) {
     incrementRequestCount();
     Image image = delegate.getImage(path);
@@ -73,6 +81,12 @@ public class WatchedAssets implements Assets {
     Sound sound = delegate.getSound(path);
     sound.addCallback(callback);
     return sound;
+  }
+
+  @Override
+  public String getTextSync(String path) throws Exception {
+    // no tracking for text loading
+    return delegate.getTextSync(path);
   }
 
   @Override

@@ -28,6 +28,7 @@ import com.google.common.io.Resources;
 import pythagoras.f.MathUtil;
 
 import playn.core.AbstractAssets;
+import playn.core.AsyncImage;
 import playn.core.Image;
 import playn.core.Sound;
 import playn.core.gl.Scale;
@@ -36,23 +37,15 @@ import playn.core.util.Callback;
 /**
  * Loads Java assets via the classpath.
  */
-public class JavaAssets extends AbstractAssets {
-
-  /** Makes asset loading asynchronous to mimic the behavior of the HTML backend. */
-  private static final boolean asyncLoad = Boolean.getBoolean("playn.java.asyncLoad");
+public class JavaAssets extends AbstractAssets<BufferedImage> {
 
   private final JavaPlatform platform;
+
   private String pathPrefix = "";
   private Scale assetScale = null;
 
-  static void doResourceAction(Runnable action) {
-    if (asyncLoad)
-      EventQueue.invokeLater(action);
-    else
-      action.run();
-  }
-
-  public JavaAssets (JavaPlatform platform) {
+  public JavaAssets(JavaPlatform platform) {
+    super(platform);
     this.platform = platform;
   }
 
@@ -90,52 +83,17 @@ public class JavaAssets extends AbstractAssets {
   }
 
   @Override
-  public Image getImage(String path) {
-    JavaGraphics graphics = platform.graphics();
-    Exception error = null;
-    for (Scale.ScaledResource rsrc : assetScale().getScaledResources(pathPrefix + path)) {
-      try {
-        BufferedImage image = ImageIO.read(requireResource(rsrc.path));
-        // if image is at a higher scale factor than the view, scale it to the view display factor
-        Scale viewScale = platform.graphics().ctx().scale, imageScale = rsrc.scale;
-        float viewImageRatio = viewScale.factor / imageScale.factor;
-        if (viewImageRatio < 1) {
-          image = scaleImage(image, viewImageRatio);
-          imageScale = viewScale;
-        }
-        return graphics.createStaticImage(image, imageScale);
-      } catch (FileNotFoundException fnfe) {
-        error = fnfe; // keep going, checking for lower resolution images
-      } catch (Exception e) {
-        error = e;
-        break; // the image was broken not missing, stop here
-      }
-    }
-    platform.log().warn("Could not load image: " + pathPrefix + path, error);
-    return createErrorImage(error != null ? error : new FileNotFoundException(path));
-  }
-
-  @Override
   public Image getRemoteImage(final String url, float width, float height) {
     final JavaAsyncImage image = platform.graphics().createAsyncImage(width, height);
-    new Thread() {
+    platform.invokeAsync(new Runnable() {
       public void run () {
         try {
-          final BufferedImage bufimg = ImageIO.read(new URL(url));
-          platform.invokeLater(new Runnable() {
-            public void run () {
-              image.setImage(bufimg);
-            }
-          });
-        } catch (final Exception error) {
-          platform.invokeLater(new Runnable() {
-            public void run () {
-              image.setError(error);
-            }
-          });
+          setImageLater(image, ImageIO.read(new URL(url)), Scale.ONE);
+        } catch (Exception error) {
+          setErrorLater(image, error);
         }
       }
-    }.start();
+    });
     return image;
   }
 
@@ -151,21 +109,44 @@ public class JavaAssets extends AbstractAssets {
   }
 
   @Override
-  public void getText(final String path, final Callback<String> callback) {
-    doResourceAction(new Runnable() {
-      public void run() {
-        try {
-          callback.onSuccess(Resources.toString(requireResource(pathPrefix + path), Charsets.UTF_8));
-        } catch (Exception e) {
-          callback.onFailure(e);
-        }
-      }
-    });
+  public String getTextSync(String path) throws Exception {
+    return Resources.toString(requireResource(pathPrefix + path), Charsets.UTF_8);
   }
 
   @Override
-  protected Image createErrorImage(Throwable cause, float width, float height) {
-    return platform.graphics().createErrorImage(cause, width, height);
+  protected Image createStaticImage(BufferedImage bufimg, Scale scale) {
+    return platform.graphics().createStaticImage(bufimg, scale);
+  }
+
+  @Override
+  protected AsyncImage<BufferedImage> createAsyncImage(float width, float height) {
+    return platform.graphics().createAsyncImage(width, height);
+  }
+
+  @Override
+  protected Image loadImage(String path, ImageReceiver<BufferedImage> recv) {
+    String fullPath = pathPrefix + path;
+    Exception error = null;
+    for (Scale.ScaledResource rsrc : assetScale().getScaledResources(fullPath)) {
+      try {
+        BufferedImage image = ImageIO.read(requireResource(rsrc.path));
+        // if image is at a higher scale factor than the view, scale to the view display factor
+        Scale viewScale = platform.graphics().ctx().scale, imageScale = rsrc.scale;
+        float viewImageRatio = viewScale.factor / imageScale.factor;
+        if (viewImageRatio < 1) {
+          image = scaleImage(image, viewImageRatio);
+          imageScale = viewScale;
+        }
+        return recv.imageLoaded(image, imageScale);
+      } catch (FileNotFoundException fnfe) {
+        error = fnfe; // keep going, checking for lower resolution images
+      } catch (Exception e) {
+        error = e;
+        break; // the image was broken not missing, stop here
+      }
+    }
+    platform.log().warn("Could not load image: " + fullPath, error);
+    return recv.loadFailed(error != null ? error : new FileNotFoundException(fullPath));
   }
 
   InputStream getAssetStream(String path) throws IOException {
@@ -176,7 +157,7 @@ public class JavaAssets extends AbstractAssets {
     return in;
   }
 
-  protected URL requireResource(String path) throws FileNotFoundException {
+  private URL requireResource(String path) throws FileNotFoundException {
     URL url = getClass().getClassLoader().getResource(path);
     if (url == null) {
       throw new FileNotFoundException(path);
@@ -184,7 +165,7 @@ public class JavaAssets extends AbstractAssets {
     return url;
   }
 
-  private BufferedImage scaleImage (BufferedImage image, float viewImageRatio) {
+  private BufferedImage scaleImage(BufferedImage image, float viewImageRatio) {
     int swidth = MathUtil.iceil(viewImageRatio * image.getWidth());
     int sheight = MathUtil.iceil(viewImageRatio * image.getHeight());
     BufferedImage scaled = new BufferedImage(swidth, sheight, BufferedImage.TYPE_INT_ARGB);
@@ -194,7 +175,7 @@ public class JavaAssets extends AbstractAssets {
     return scaled;
   }
 
-  private Scale assetScale () {
+  private Scale assetScale() {
     return (assetScale != null) ? assetScale : platform.graphics().ctx().scale;
   }
 }

@@ -174,6 +174,8 @@ public abstract class GLContext {
     bindFramebuffer(defaultFrameBuffer(), defaultFbufWidth, defaultFbufHeight);
   }
 
+  private Exception last;
+
   /** Stores the metadata for the currently bound frame buffer, and binds the supplied framebuffer.
    * This must be followed by a call to {@link #popFramebuffer}. Also, it is not allowed to push a
    * framebuffer if a framebuffer is already pushed. Only one level of nesting is supported. */
@@ -190,7 +192,7 @@ public abstract class GLContext {
   public void popFramebuffer() {
     Asserts.checkState(pushedFramebuffer != -1, "Have no pushed framebuffer");
     bindFramebuffer(pushedFramebuffer, pushedWidth, pushedHeight);
-    pushedFramebuffer = 0;
+    pushedFramebuffer = -1;
   }
 
   /** Returns the supplied shader if non-null, or the default quad shader if null. */

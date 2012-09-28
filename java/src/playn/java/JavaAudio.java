@@ -32,7 +32,7 @@ class JavaAudio extends AudioImpl {
 
   JavaSound createSound(final String name, final InputStream in) {
     final JavaSound sound = new JavaSound();
-    new Thread() {
+    ((JavaPlatform) platform).invokeAsync(new Runnable() {
       public void run () {
         try {
           Clip clip = AudioSystem.getClip();
@@ -56,7 +56,7 @@ class JavaAudio extends AudioImpl {
           dispatchLoadError(sound, e);
         }
       }
-    }.start();
+    });
     return sound;
   }
 }

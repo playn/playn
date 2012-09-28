@@ -37,18 +37,20 @@ import pythagoras.f.MathUtil;
 
 import playn.core.AbstractAssets;
 import playn.core.Image;
+import playn.core.AsyncImage;
 import playn.core.Sound;
 import playn.core.gl.Scale;
 import playn.core.util.Callback;
 import static playn.core.PlayN.log;
 
-public class AndroidAssets extends AbstractAssets {
+public class AndroidAssets extends AbstractAssets<Bitmap> {
 
   private final AndroidPlatform platform;
   private String pathPrefix = null;
   private Scale assetScale = null;
 
   AndroidAssets(AndroidPlatform platform) {
+    super(platform);
     this.platform = platform;
   }
 
@@ -70,16 +72,65 @@ public class AndroidAssets extends AbstractAssets {
   }
 
   @Override
-  public Image getImage(String path) {
+  public Image getRemoteImage(final String url, float width, float height) {
+    final AndroidAsyncImage image = new AndroidAsyncImage(platform.graphics().ctx, width, height);
+    platform.invokeAsync(new Runnable() {
+      public void run () {
+        try {
+          setImageLater(image, downloadBitmap(url), Scale.ONE);
+        } catch (Exception error) {
+          setErrorLater(image, error);
+        }
+      }
+    });
+    return image;
+  }
+
+  @Override
+  public Sound getSound(String path) {
+    return platform.audio().createSound(path + ".mp3");
+  }
+
+  @Override
+  public String getTextSync(String path) throws Exception {
+    InputStream is = openAsset(path);
+    try {
+      StringBuilder fileData = new StringBuilder(1000);
+      BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+      char[] buf = new char[1024];
+      int numRead = 0;
+      while ((numRead = reader.read(buf)) != -1) {
+        String readData = String.valueOf(buf, 0, numRead);
+        fileData.append(readData);
+      }
+      reader.close();
+      return fileData.toString();
+    } finally {
+      is.close();
+    }
+  }
+
+  @Override
+  protected Image createStaticImage(Bitmap bitmap, Scale scale) {
+    return new AndroidImage(platform.graphics().ctx, bitmap, scale);
+  }
+
+  @Override
+  protected AsyncImage<Bitmap> createAsyncImage(float width, float height) {
+    return new AndroidAsyncImage(platform.graphics().ctx, width, height);
+  }
+
+  @Override
+  protected Image loadImage(String path, ImageReceiver<Bitmap> recv) {
     Exception error = null;
     for (Scale.ScaledResource rsrc : assetScale().getScaledResources(path)) {
       try {
         InputStream is = openAsset(rsrc.path);
         try {
           Bitmap bitmap = decodeBitmap(is);
-          // if this image is at a higher scale factor than the view, scale the bitmap down to the
-          // view display factor (because otherwise the GPU will end up doing that every time the
-          // bitmap is drawn, and it will do a crappy job of it)
+          // if this image is at a higher scale factor than the view, scale the bitmap down to
+          // the view display factor (because otherwise the GPU will end up doing that every time
+          // the bitmap is drawn, and it will do a crappy job of it)
           Scale viewScale = platform.graphics().ctx.scale, imageScale = rsrc.scale;
           float viewImageRatio = viewScale.factor / imageScale.factor ;
           if (viewImageRatio < 1) {
@@ -88,7 +139,7 @@ public class AndroidAssets extends AbstractAssets {
             bitmap = Bitmap.createScaledBitmap(bitmap, swidth, sheight, true);
             imageScale = viewScale;
           }
-          return new AndroidImage(platform.graphics().ctx, bitmap, imageScale);
+          return recv.imageLoaded(bitmap, imageScale);
         } finally {
           is.close();
         }
@@ -100,70 +151,7 @@ public class AndroidAssets extends AbstractAssets {
       }
     }
     platform.log().warn("Could not load image: " + pathPrefix + path, error);
-    return createErrorImage(error != null ? error : new FileNotFoundException(path));
-  }
-
-  @Override
-  public Image getRemoteImage(final String url, float width, float height) {
-    final AndroidAsyncImage image = new AndroidAsyncImage(platform.graphics().ctx, width, height);
-    new Thread() {
-      public void run () {
-        try {
-          final Bitmap bitmap = downloadBitmap(url);
-          platform.invokeLater(new Runnable() {
-            public void run () {
-              image.setBitmap(bitmap);
-            }
-          });
-        } catch (final Exception error) {
-          platform.invokeLater(new Runnable() {
-            public void run () {
-              image.setError(error);
-            }
-          });
-        }
-      }
-    }.start();
-    return image;
-  }
-
-  @Override
-  public Sound getSound(String path) {
-    try {
-      return platform.audio().createSound(path + ".mp3");
-    } catch (IOException e) {
-      log().error("Unable to load sound: " + path, e);
-      return new Sound.Error(e);
-    }
-  }
-
-  @Override
-  public void getText(final String path, final Callback<String> callback) {
-    try {
-      InputStream is = openAsset(path);
-      try {
-        StringBuilder fileData = new StringBuilder(1000);
-        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-        char[] buf = new char[1024];
-        int numRead = 0;
-        while ((numRead = reader.read(buf)) != -1) {
-          String readData = String.valueOf(buf, 0, numRead);
-          fileData.append(readData);
-        }
-        reader.close();
-        String text = fileData.toString();
-        callback.onSuccess(text);
-      } finally {
-        is.close();
-      }
-    } catch (IOException e) {
-      callback.onFailure(e);
-    }
-  }
-
-  @Override
-  protected Image createErrorImage(Throwable cause, float width, float height) {
-    return new AndroidErrorImage(platform.graphics().ctx, cause, width, height);
+    return recv.loadFailed(error != null ? error : new FileNotFoundException(path));
   }
 
   /**

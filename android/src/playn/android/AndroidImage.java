@@ -68,7 +68,7 @@ class AndroidImage extends ImageGL implements AndroidGLContext.Refreshable, Andr
 
   @Override
   public boolean isReady() {
-    return true;
+    return (bitmap != null);
   }
 
   @Override

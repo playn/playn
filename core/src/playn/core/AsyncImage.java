@@ -13,23 +13,18 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package playn.java;
+package playn.core;
 
-import java.awt.image.BufferedImage;
-
-import playn.core.Image;
-import playn.core.gl.GLContext;
 import playn.core.gl.Scale;
-import playn.core.util.Callback;
 
-public class JavaStaticImage extends JavaImage {
+/**
+ * An interface used by {@link AbstractAssets}. Not part of PlayN public API.
+ */
+public interface AsyncImage<I> extends Image {
 
-  public JavaStaticImage(GLContext ctx, final BufferedImage img, Scale scale) {
-    super(ctx, img, scale);
-  }
+  /** Notifies this async image that its implementation image is available. */
+  void setImage(I impl, Scale scale);
 
-  @Override
-  public void addCallback(Callback<? super Image> callback) {
-    callback.onSuccess(this); // we're always ready
-  }
+  /** Notifies this async image that its implementation image failed to load. */
+  void setError(Throwable error);
 }

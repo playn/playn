@@ -19,6 +19,7 @@ import java.util.List;
 
 import cli.MonoTouch.UIKit.UIImage;
 
+import playn.core.AsyncImage;
 import playn.core.Image;
 import playn.core.gl.GLContext;
 import playn.core.gl.Scale;
@@ -28,7 +29,7 @@ import playn.core.util.Callbacks;
 /**
  * Implements {@link Image} based on an asynchronously loaded bitmap.
  */
-public class IOSAsyncImage extends IOSImage {
+public class IOSAsyncImage extends IOSImage implements AsyncImage<UIImage> {
 
   private final float preWidth, preHeight;
   private List<Callback<? super Image>> callbacks;
@@ -57,22 +58,25 @@ public class IOSAsyncImage extends IOSImage {
 
   @Override
   public void addCallback(Callback<? super Image> callback) {
-    if (image != null)
-      callback.onSuccess(this);
-    else if (error != null)
+    if (error != null)
       callback.onFailure(error);
+    else if (image != null)
+      callback.onSuccess(this);
     else
       callbacks = Callbacks.createAdd(callbacks, callback);
   }
 
-  void setImage(UIImage image, Scale scale) {
+  @Override
+  public void setImage(UIImage image, Scale scale) {
     this.image = image;
     this.scale = scale;
     callbacks = Callbacks.dispatchSuccessClear(callbacks, this);
   }
 
-  void setError(Throwable error) {
+  @Override
+  public void setError(Throwable error) {
     this.error = error;
+    this.image = new UIImage(); // TODO: create error image
     callbacks = Callbacks.dispatchFailureClear(callbacks, error);
   }
 }

@@ -15,10 +15,58 @@
  */
 package playn.core;
 
+import playn.core.gl.Scale;
+import playn.core.util.Callback;
+
 /**
  * Base {@link Assets} implementation shared among platforms.
+ *
+ * @param IMG the type of underlying image used by the image loading mechanism.
  */
-public abstract class AbstractAssets implements Assets {
+public abstract class AbstractAssets<IMG> implements Assets {
+
+  private final AbstractPlatform platform;
+
+  protected interface ImageReceiver<I> {
+    Image imageLoaded(I bufimg, Scale scale);
+    Image loadFailed(Throwable error);
+  }
+
+  @Override
+  public Image getImageSync(String path) {
+    return loadImage(path, new ImageReceiver<IMG>() {
+      @Override
+      public Image imageLoaded(IMG impl, Scale scale) {
+        return createStaticImage(impl, scale);
+      }
+      @Override
+      public Image loadFailed(Throwable error) {
+        return createErrorImage(error);
+      }
+    });
+  }
+
+  @Override
+  public Image getImage(final String path) {
+    final AsyncImage<IMG> image = createAsyncImage(0, 0);
+    platform.invokeAsync(new Runnable() {
+      public void run () {
+        loadImage(path, new ImageReceiver<IMG>() {
+          @Override
+          public Image imageLoaded(final IMG impl, final Scale scale) {
+            setImageLater(image, impl, scale);
+            return image;
+          }
+          @Override
+          public Image loadFailed(final Throwable error) {
+            setErrorLater(image, error);
+            return image;
+          }
+        });
+      }
+    });
+    return image;
+  }
 
   @Override
   public Image getRemoteImage(String url) {
@@ -32,6 +80,19 @@ public abstract class AbstractAssets implements Assets {
     return createRemoteErrorImage(error, width, height);
   }
 
+  @Override
+  public void getText(final String path, final Callback<String> callback) {
+    platform.invokeAsync(new Runnable() {
+      public void run () {
+        try {
+          platform.notifySuccess(callback, getTextSync(path));
+        } catch (Throwable t) {
+          platform.notifyFailure(callback, t);
+        }
+      }
+    });
+  }
+
   @Deprecated
   public final boolean isDone() {
     return true;
@@ -42,6 +103,28 @@ public abstract class AbstractAssets implements Assets {
     return 0;
   }
 
+  protected AbstractAssets(AbstractPlatform platform) {
+    this.platform = platform;
+  }
+
+  /**
+   * Creates an {@link Image} with the immediately-ready underlying image and scale.
+   */
+  protected abstract Image createStaticImage(IMG iimpl, Scale scale);
+
+  /**
+   * Creates an {@link Image} that will be provided with its underlying image (or error)
+   * asynchronously.
+   */
+  protected abstract AsyncImage<IMG> createAsyncImage(float width, float height);
+
+  /**
+   * Synchronously loads the underyling image at the specified path, passing the resulting image to
+   * the supplied receiver, or notifying it of failure. NOTE: this may be called from a worker
+   * thread.
+   */
+  protected abstract Image loadImage(String path, ImageReceiver<IMG> recv);
+
   protected Image createRemoteErrorImage(Throwable cause, float width, float height) {
     return (width <= 0 || height <= 0) ? createErrorImage(cause) :
       createErrorImage(cause, width, height);
@@ -51,7 +134,27 @@ public abstract class AbstractAssets implements Assets {
     return createErrorImage(cause, 50, 50);
   }
 
-  protected abstract Image createErrorImage(Throwable cause, float width, float height);
+  protected Image createErrorImage(Throwable cause, float width, float height) {
+    AsyncImage<IMG> image = createAsyncImage(width, height);
+    image.setError(cause);
+    return image;
+  }
+
+  protected void setImageLater(final AsyncImage<IMG> image, final IMG impl, final Scale scale) {
+    platform.invokeLater(new Runnable() {
+      public void run () {
+        image.setImage(impl, scale);
+      }
+    });
+  }
+
+  protected void setErrorLater(final AsyncImage<?> image, final Throwable error) {
+    platform.invokeLater(new Runnable() {
+      public void run () {
+        image.setError(error);
+      }
+    });
+  }
 
   /**
    * Normalizes the path, by removing {@code foo/..} pairs until the path contains no {@code ..}s.

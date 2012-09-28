@@ -65,6 +65,14 @@ public abstract class AbstractPlatform implements Platform {
     });
   }
 
+  /**
+   * Invokes the supplied action on a separate thread. Used by {@link AbstractAssets} for
+   * asynchronous asset loading.
+   */
+  public void invokeAsync(Runnable action) {
+    throw new UnsupportedOperationException();
+  }
+
   protected AbstractPlatform(Log log) {
     this.log = log;
     this.runQueue = new RunQueue(log);

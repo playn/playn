@@ -144,10 +144,6 @@ public class JavaGraphics extends GraphicsGL {
     return new JavaAsyncImage(ctx, width, height);
   }
 
-  protected JavaImage createErrorImage(Throwable cause, float width, float height) {
-    return new JavaErrorImage(ctx, cause, width, height);
-  }
-
   void init() {
     ctx.init();
   }

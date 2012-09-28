@@ -33,6 +33,16 @@ public class CachingAssets implements Assets {
   }
 
   @Override
+  public Image getImageSync(String path) {
+    Object object = null;
+    if ((object = cache.get(path)) == null) {
+      object = delegate.getImageSync(path);
+      cache.put(path, object);
+    }
+    return (Image) object;
+  }
+
+  @Override
   public Image getImage(String path) {
     Object object = null;
     if ((object = cache.get(path)) == null) {
@@ -70,6 +80,12 @@ public class CachingAssets implements Assets {
       cache.put(path, object);
     }
     return (Sound) object;
+  }
+
+  @Override
+  public String getTextSync(String path) throws Exception {
+    // no caching for text loading
+    return delegate.getTextSync(path);
   }
 
   @Override

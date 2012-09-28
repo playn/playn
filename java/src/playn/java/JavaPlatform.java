@@ -16,6 +16,9 @@
 package playn.java;
 
 import java.io.IOException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import org.lwjgl.LWJGLException;
 import org.lwjgl.opengl.Display;
@@ -126,6 +129,8 @@ public class JavaPlatform extends AbstractPlatform {
   private final JavaMouse mouse = new JavaMouse(this);
   private final JavaAssets assets = new JavaAssets(this);
 
+  private final ExecutorService _exec = Executors.newFixedThreadPool(4);
+
   private int updateRate = 0;
   private float accum = updateRate;
   private double lastUpdateTime;
@@ -144,6 +149,11 @@ public class JavaPlatform extends AbstractPlatform {
    */
   public void setTitle(String title) {
     Display.setTitle(title);
+  }
+
+  @Override
+  public void invokeAsync(Runnable action) {
+    _exec.execute(action);
   }
 
   @Override
@@ -304,7 +314,18 @@ public class JavaPlatform extends AbstractPlatform {
       Display.update();
     }
 
+    // let the game run any of its exit hooks
     onExit();
+
+    // shutdown our thread pool
+    try {
+      _exec.shutdown();
+      _exec.awaitTermination(1, TimeUnit.SECONDS);
+    } catch (InterruptedException ie) {
+      // nothing to do here except go ahead and exit
+    }
+
+    // and finally stick a fork in the JVM
     System.exit(0);
   }
 }

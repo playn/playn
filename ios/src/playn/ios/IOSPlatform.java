@@ -21,16 +21,20 @@ import java.io.PrintStream;
 import java.util.HashMap;
 import java.util.Map;
 
-import cli.MonoTouch.CoreGraphics.CGAffineTransform;
-import cli.MonoTouch.UIKit.UIView;
 import cli.System.Drawing.RectangleF;
+import cli.System.Threading.ThreadPool;
+import cli.System.Threading.WaitCallback;
 
+import cli.MonoTouch.CoreGraphics.CGAffineTransform;
 import cli.MonoTouch.Foundation.NSUrl;
 import cli.MonoTouch.UIKit.UIApplication;
 import cli.MonoTouch.UIKit.UIDeviceOrientation;
 import cli.MonoTouch.UIKit.UIInterfaceOrientation;
 import cli.MonoTouch.UIKit.UIScreen;
+import cli.MonoTouch.UIKit.UIView;
 import cli.MonoTouch.UIKit.UIWindow;
+
+import pythagoras.f.FloatMath;
 
 import playn.core.AbstractPlatform;
 import playn.core.Game;
@@ -40,7 +44,6 @@ import playn.core.MouseStub;
 import playn.core.PlayN;
 import playn.core.RegularExpression;
 import playn.core.json.JsonImpl;
-import pythagoras.f.FloatMath;
 
 /**
  * Provides access to all the PlayN services on iOS.
@@ -193,6 +196,15 @@ public class IOSPlatform extends AbstractPlatform {
     // configure our orientation to a supported default, a notification will come in later that
     // will adjust us to the device's current orientation
     onOrientationChange(orients.defaultOrient);
+  }
+
+  @Override
+  public void invokeAsync(final Runnable action) {
+    ThreadPool.QueueUserWorkItem(new WaitCallback(new WaitCallback.Method() {
+      public void Invoke(Object unused) {
+        action.run();
+      }
+    }));
   }
 
   @Override
