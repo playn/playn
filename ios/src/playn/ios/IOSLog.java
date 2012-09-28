@@ -15,6 +15,9 @@
  */
 package playn.ios;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+
 import cli.System.Console;
 
 import playn.core.LogImpl;
@@ -24,7 +27,11 @@ public class IOSLog extends LogImpl {
   @Override
   protected void logImpl(Level level, String msg, Throwable e) {
     Console.WriteLine(level + ": " + msg);
-    if (e != null)
-      Console.WriteLine(e);
+
+    if (e != null) {
+      StringWriter sw = new StringWriter();
+      e.printStackTrace(new PrintWriter(sw));
+      Console.WriteLine(sw.toString());
+    }
   }
 }
