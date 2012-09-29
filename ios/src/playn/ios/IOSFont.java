@@ -105,9 +105,9 @@ public class IOSFont extends AbstractFont {
     registerVariant("Georgia", Style.ITALIC, "Georgia Italic");
     registerVariant("Georgia", Style.BOLD, "Georgia Bold");
     registerVariant("Georgia", Style.BOLD_ITALIC, "Georgia Bold Italic");
-    registerVariant("Helvetica", Style.BOLD, "Helvetica Bold");
-    registerVariant("Helvetica", Style.ITALIC, "Helvetica Oblique");
-    registerVariant("Helvetica", Style.BOLD_ITALIC, "Helvetica Bold Oblique");
+    registerVariant("Helvetica", Style.BOLD, "Helvetica-Bold");
+    registerVariant("Helvetica", Style.ITALIC, "Helvetica-Oblique");
+    registerVariant("Helvetica", Style.BOLD_ITALIC, "Helvetica-Bold-Oblique");
     registerVariant("Helvetica Neue", Style.BOLD, "Helvetica Neue Bold");
     registerVariant("Helvetica Neue", Style.ITALIC, "Helvetica Neue Italic");
     registerVariant("Helvetica Neue", Style.BOLD_ITALIC, "Helvetica Neue Bold Italic");
