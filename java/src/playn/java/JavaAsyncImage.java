@@ -48,7 +48,7 @@ public class JavaAsyncImage extends JavaImage implements AsyncImage<BufferedImag
 
   @Override
   public float height() {
-    return (img == null) ? preHeight : super.width();
+    return (img == null) ? preHeight : super.height();
   }
 
   @Override

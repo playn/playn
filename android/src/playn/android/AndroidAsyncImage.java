@@ -47,7 +47,7 @@ public class AndroidAsyncImage extends AndroidImage implements AsyncImage<Bitmap
 
   @Override
   public float height() {
-    return (bitmap == null) ? preHeight : super.width();
+    return (bitmap == null) ? preHeight : super.height();
   }
 
   @Override
