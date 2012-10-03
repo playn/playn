@@ -6,6 +6,7 @@ package playn.tests.core;
 import java.util.ArrayList;
 import java.util.List;
 
+import pythagoras.f.FloatMath;
 import pythagoras.f.Rectangle;
 
 import playn.core.ImmediateLayer;
@@ -20,7 +21,9 @@ import static playn.core.PlayN.*;
 public class SurfaceTest extends Test {
 
   private List<SurfaceLayer> dots = new ArrayList<SurfaceLayer>();
+  private SurfaceLayer paintUpped;
   private Rectangle dotBox;
+  private float elapsed;
 
   @Override
   public String getName() {
@@ -147,11 +150,22 @@ public class SurfaceTest extends Test {
       // System.err.println("Created dot at " + dot.transform());
       graphics().rootLayer().add(dot);
     }
+
+    // add a surface layer that is updated on every call to paint (a bad practice, but one that
+    // should actually work)
+    paintUpped = graphics().createSurfaceLayer(100, 100);
+    ypos = ygap + addTest(315, ypos, paintUpped, "SurfaceLayer updated in paint()");
   }
 
   protected float addTest(float lx, float ly, ImmediateLayer.Renderer renderer,
                           float lwidth, float lheight, String descrip) {
     return addTest(lx, ly, graphics().createImmediateLayer(renderer), lwidth, lheight, descrip);
+  }
+
+  @Override
+  public void update(float delta) {
+    super.update(delta);
+    elapsed += delta;
   }
 
   @Override
@@ -163,6 +177,16 @@ public class SurfaceTest extends Test {
         dot.setTranslation(dotBox.x + random()*(dotBox.width-10),
                            dotBox.y + random()*(dotBox.height-10));
       }
+    }
+
+    if (paintUpped != null) {
+      float sin = Math.abs(FloatMath.sin(elapsed)), cos = Math.abs(FloatMath.cos(elapsed));
+      int sinColor = (int)(sin * 255), cosColor = (int)(cos * 255);
+      int c1 = (0xFF << 24) | (sinColor << 16) | (cosColor << 8);
+      int c2 = (0xFF << 24) | (cosColor << 16) | (sinColor << 8);
+      paintUpped.surface().clear();
+      paintUpped.surface().setFillColor(c1).fillRect(0, 0, 50, 50);
+      paintUpped.surface().setFillColor(c2).fillRect(50, 50, 50, 50);
     }
   }
 
