@@ -48,7 +48,7 @@ public class JavaNet extends NetImpl {
 
   @Override
   public void get(final String urlStr, final Callback<String> callback) {
-    new Thread("JavaNet.get(" + urlStr + ")") {
+    platform.invokeAsync(new Runnable() {
       @Override
       public void run() {
         try {
@@ -68,12 +68,17 @@ public class JavaNet extends NetImpl {
           platform.notifyFailure(callback, e);
         }
       }
-    }.start();
+      @Override
+      public String toString() {
+        return "JavaNet.get(" + urlStr + ")";
+      }
+    });
   }
 
   @Override
   public void post(final String urlStr, final String data, final Callback<String> callback) {
-    new Thread("JavaNet.post(" + urlStr + ")") {
+    platform.invokeAsync(new Runnable() {
+      @Override
       public void run() {
         try {
           URL url = new URL(canonicalizeUrl(urlStr));
@@ -95,7 +100,11 @@ public class JavaNet extends NetImpl {
           platform.notifyFailure(callback, e);
         }
       }
-    }.start();
+      @Override
+      public String toString() {
+        return "JavaNet.post(" + urlStr + ")";
+      }
+    });
   }
 
   void update() {
