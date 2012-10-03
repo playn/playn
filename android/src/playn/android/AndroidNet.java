@@ -26,6 +26,10 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.params.BasicHttpParams;
+import org.apache.http.params.HttpParams;
+import org.apache.http.params.HttpProtocolParams;
+import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 
 import playn.core.NetImpl;
@@ -49,15 +53,19 @@ class AndroidNet extends NetImpl {
 
   private void doHttp(final boolean isPost, final String url, final String data,
                       final Callback<String> callback) {
-    new Thread("AndroidNet.doHttp") {
+    platform.invokeAsync(new Runnable() {
+      @Override
       public void run() {
-        HttpClient httpclient = new DefaultHttpClient();
+        HttpParams params = new BasicHttpParams();
+        HttpProtocolParams.setContentCharset(params, HTTP.UTF_8);
+        HttpProtocolParams.setHttpElementCharset(params, HTTP.UTF_8);
+        HttpClient httpclient = new DefaultHttpClient(params);
         HttpRequestBase req = null;
         if (isPost) {
           HttpPost httppost = new HttpPost(url);
           if (data != null) {
             try {
-              httppost.setEntity(new StringEntity(data));
+              httppost.setEntity(new StringEntity(data, HTTP.UTF_8));
             } catch (UnsupportedEncodingException e) {
               platform.notifyFailure(callback, e);
             }
@@ -79,6 +87,10 @@ class AndroidNet extends NetImpl {
           platform.notifyFailure(callback, e);
         }
       }
-    }.start();
+      @Override
+      public String toString() {
+        return "AndroidNet.doHttp(" + isPost + ", " + url + ")";
+      }
+    });
   }
 }
