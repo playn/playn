@@ -202,7 +202,11 @@ public class IOSPlatform extends AbstractPlatform {
   public void invokeAsync(final Runnable action) {
     ThreadPool.QueueUserWorkItem(new WaitCallback(new WaitCallback.Method() {
       public void Invoke(Object unused) {
-        action.run();
+        try {
+          action.run();
+        } catch (Throwable t) {
+          log.warn("Async task failure [task=" + action + "]", t);
+        }
       }
     }));
   }
