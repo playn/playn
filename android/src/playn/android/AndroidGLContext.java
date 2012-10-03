@@ -46,6 +46,10 @@ class AndroidGLContext extends GL20Context {
     init();
   }
 
+  void onResume() {
+    init(); // re-initialize our shaders, etc.
+  }
+
   void onSurfaceCreated() {
     init(); // reinitialize GL
     for (Refreshable ref : refreshables.keySet()) {

@@ -183,6 +183,7 @@ public class AndroidPlatform extends AbstractPlatform {
   }
   protected void onResume() {
     super.onResume();
+    graphics.ctx.onResume();
   }
 
   void update(float delta) {
