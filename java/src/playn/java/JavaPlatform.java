@@ -234,12 +234,15 @@ public class JavaPlatform extends AbstractPlatform {
   @Override
   public void openURL(String url) {
     System.out.println("Opening url: " + url);
-    String browser = "chrome ";
-    if (System.getProperty("os.name", "-").contains("indows"))
-      browser = "rundll32 url.dll,FileProtocolHandler ";
+    String browser, os = System.getProperty("os.name", "-");
+    if (os.contains("indows")) browser = "rundll32 url.dll,FileProtocolHandler ";
+    else if (os.contains("Mac OS")) browser = "open ";
+    else browser = "chrome ";
+
     try {
       Runtime.getRuntime().exec(browser + url);
     } catch (IOException e) {
+      log.warn("Failed to open web page [browser=" + browser + ", error=" + e + "]");
     }
   }
 
