@@ -15,7 +15,9 @@
  */
 package playn.java;
 
+import java.awt.Desktop;
 import java.io.IOException;
+import java.net.URI;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -233,16 +235,10 @@ public class JavaPlatform extends AbstractPlatform {
 
   @Override
   public void openURL(String url) {
-    System.out.println("Opening url: " + url);
-    String browser, os = System.getProperty("os.name", "-");
-    if (os.contains("indows")) browser = "rundll32 url.dll,FileProtocolHandler ";
-    else if (os.contains("Mac OS")) browser = "open ";
-    else browser = "chrome ";
-
     try {
-      Runtime.getRuntime().exec(browser + url);
-    } catch (IOException e) {
-      log.warn("Failed to open web page [browser=" + browser + ", error=" + e + "]");
+      Desktop.getDesktop().browse(URI.create(url));
+    } catch (Exception e) {
+      log.warn("Failed to open URL [url=" + url + ", error=" + e + "]");
     }
   }
 
