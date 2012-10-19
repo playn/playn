@@ -15,6 +15,11 @@
  */
 package playn.tests.core;
 
+import playn.core.Image;
+import playn.core.Keyboard.TextType;
+import playn.core.Pointer;
+import playn.core.Pointer.Event;
+import playn.core.PlayN;
 import playn.core.TextFormat;
 import playn.core.Canvas;
 import playn.core.CanvasImage;
@@ -22,7 +27,9 @@ import playn.core.Font;
 import playn.core.GroupLayer;
 import playn.core.ImageLayer;
 import playn.core.TextLayout;
+import playn.core.util.Callback;
 import static playn.core.PlayN.graphics;
+import static playn.core.PlayN.keyboard;
 
 public class TextTest extends Test {
 
@@ -54,6 +61,24 @@ public class TextTest extends Test {
     ImageLayer layer = makeTextLayer(
       "Empty string size " + layout.width() + "x" + layout.height(), FILL, baseFormat);
     graphics().rootLayer().addAt(layer, 10, 330);
+
+    class Field extends Pointer.Adapter implements Callback<String> {
+      final StringBuilder value = new StringBuilder("Click here to change text");
+      final ImageLayer layer = makeTextLayer(value.toString(), FILL, baseFormat); {
+        layer.addListener(this);
+      }
+      public void onPointerEnd(Event event) {
+        keyboard().getText(TextType.DEFAULT, "Test text", value.toString(), this);
+      }
+      public void onSuccess(String result) {
+        if (result == null) return;
+        value.setLength(0);
+        value.append(result.replace("\\n", "\n")); // line break parsing for testing
+        layer.setImage(makeTextImage(value.toString(), FILL, baseFormat));
+      }
+      public void onFailure(Throwable cause) {}
+    }
+    graphics().rootLayer().addAt(new Field().layer, 10, 380);
   }
 
   protected float addExamples(String name, TextRenderer renderer, float x) {
@@ -77,6 +102,10 @@ public class TextTest extends Test {
   }
 
   protected ImageLayer makeTextLayer(String text, TextRenderer renderer, TextFormat format) {
+    return graphics().createImageLayer(makeTextImage(text, renderer, format));
+  }
+
+  protected Image makeTextImage(String text, TextRenderer renderer, TextFormat format) {
     TextLayout layout = graphics().layoutText(text, format);
     float twidth = renderer.adjustWidth(layout.width());
     float theight = renderer.adjustHeight(layout.height());
@@ -84,7 +113,7 @@ public class TextTest extends Test {
     image.canvas().setStrokeColor(0xFFFFCCCC);
     image.canvas().strokeRect(0, 0, twidth, theight);
     renderer.render(image.canvas(), layout);
-    return graphics().createImageLayer(image);
+    return image;
   }
 
   protected static abstract class TextRenderer {
