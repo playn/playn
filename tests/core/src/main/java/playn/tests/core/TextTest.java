@@ -73,8 +73,8 @@ public class TextTest extends Test {
       public void onSuccess(String result) {
         if (result == null) return;
         value.setLength(0);
-        value.append(result.replace("\\n", "\n")); // line break parsing for testing
-        layer.setImage(makeTextImage(value.toString(), FILL, baseFormat));
+        value.append(result);
+        layer.setImage(makeTextImage(value.toString().replace("\\n", "\n"), FILL, baseFormat));
       }
       public void onFailure(Throwable cause) {}
     }
