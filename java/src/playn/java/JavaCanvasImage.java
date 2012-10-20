@@ -58,4 +58,10 @@ class JavaCanvasImage extends JavaImage implements CanvasImage {
     }
     return super.ensureTexture(repeatX, repeatY);
   }
+
+  @Override
+  public void setRgb(int startX, int startY, int width, int height, int[] rgbArray, int offset,
+                     int scanSize) {
+    img.setRGB(startX, startY, width, height, rgbArray, offset, scanSize);
+  }
 }

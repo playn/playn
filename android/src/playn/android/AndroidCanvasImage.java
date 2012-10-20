@@ -47,4 +47,11 @@ class AndroidCanvasImage extends AndroidImage implements CanvasImage {
     }
     return super.ensureTexture(repeatX, repeatY);
   }
+  
+  @Override
+  public void setRgb(int startX, int startY, int width, int height, int[] rgbArray, int offset,
+                     int scanSize) {
+    bitmap().setPixels(rgbArray, offset, scanSize, startX, startY, width, height);
+  }
+
 }

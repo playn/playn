@@ -60,4 +60,15 @@ public class FlashCanvasImage extends FlashImage implements CanvasImage {
   BitmapData bitmapData() {
     return canvas.bitmapData();
   }
+    
+  @Override
+  public void setRgb(int startX, int startY, int width, int height, int[] rgbArray, int offset,
+                     int scanSize) {
+    for (int y = 0; y < height; y++) {
+      for (int x = 0; x < width; x++) {
+        imageData.setPixel32(startX + x, startY + y, rgbArray[offset + x]);
+      }
+      offset += scanSize;
+    }
+  }
 }

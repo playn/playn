@@ -15,6 +15,10 @@
  */
 package playn.html;
 
+import com.google.gwt.canvas.dom.client.CanvasPixelArray;
+import com.google.gwt.canvas.dom.client.Context2d;
+import com.google.gwt.canvas.dom.client.ImageData;
+
 import playn.core.Canvas;
 import playn.core.CanvasImage;
 import playn.core.gl.GLContext;
@@ -40,5 +44,25 @@ class HtmlCanvasImage extends HtmlImage implements CanvasImage {
       clearTexture();
     }
     return super.ensureTexture(repeatX, repeatY);
+  }
+
+  @Override
+  public void setRgb(int startX, int startY, int width, int height,
+      int[] rgbArray, int offset, int scanSize) {
+    Context2d ctx = canvas.canvas().getContext2d();
+    ImageData imageData = ctx.getImageData(startX, startY, width, height);
+    CanvasPixelArray pixelData = imageData.getData();
+    int i = 0;
+    int dst = offset;
+    for (int y = 0; y < height; y++) {
+      for (int x = 0; x < width; x ++) {
+        int rgba = rgbArray[dst + x];
+        pixelData.set(i++, (rgba >> 16) & 255);
+        pixelData.set(i++, (rgba >> 8) & 255);
+        pixelData.set(i++, (rgba) & 255);
+        pixelData.set(i++, (rgba >> 24) & 255);
+      }
+      dst += scanSize;
+    }
   }
 }

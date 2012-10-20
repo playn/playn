@@ -24,4 +24,25 @@ public interface CanvasImage extends Image {
    * Gets this image's canvas.
    */
   public Canvas canvas();
+  
+  /**
+   * Sets pixel data for a rectangular area of this image. This method may perform poorly, in
+   * particular on HTML and Flash platforms - avoid using this if possible.
+   *
+   * The pixel format is {@code (alpha << 24 | red << 16 | green << 8 | blue)}, where
+   * alpha, red, green and blue are the corresponding channel values, ranging from 0 to 255
+   * inclusive.
+   *
+   * Currently not implemented for iOS.
+   *
+   * @param startX x-coordinate of the upper left corner of the area.
+   * @param startY y-coordinate of the upper left corner of the area.
+   * @param width width of the area.
+   * @param height height of the area.
+   * @param rgbArray will be filled with the pixel data from the area
+   * @param offset fill start offset in rgbArray.
+   * @param scanSize number of pixels in a row in rgbArray.
+   */
+  void setRgb(int startX, int startY, int width, int height, int[] rgbArray,
+              int offset, int scanSize);
 }

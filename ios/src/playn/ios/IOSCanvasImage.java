@@ -67,4 +67,11 @@ public class IOSCanvasImage extends IOSAbstractImage implements CanvasImage {
   protected void updateTexture(int tex) {
     ((IOSGLContext) ctx).updateTexture(tex, canvas.texWidth(), canvas.texHeight(), canvas.data());
   }
+  
+  @Override
+  public void setRgb(int startX, int startY, int width, int height, int[] rgbArray, int offset,
+                     int scanSize) {
+    throw new UnsupportedOperationException();
+  }
+  
 }
