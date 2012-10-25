@@ -57,10 +57,6 @@ abstract class JavaImage extends ImageGL implements JavaCanvas.Drawable {
 
   @Override
   public Region subImage(float sx, float sy, float swidth, float sheight) {
-    Asserts.checkArgument(sx >= 0 && sy >= 0 && swidth > 0 && sheight > 0 &&
-                          (sx + swidth) <= width() && (sy + sheight) <= height(),
-                          "Invalid bounds for subimage [image=" + width() + "x" + height() +
-                          ", subImage=" + swidth + "x" + sheight + "+" + sx + "+" + sy + "]");
     return new JavaImageRegion(this, sx, sy, swidth, sheight);
   }
 
