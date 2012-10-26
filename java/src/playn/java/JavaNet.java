@@ -33,6 +33,7 @@ import playn.core.util.Callback;
 public class JavaNet extends NetImpl {
 
   private static final int BUF_SIZE = 4096;
+  private static final String ENCODING = "UTF-8";
   private List<JavaWebSocket> sockets = new ArrayList<JavaWebSocket>();
 
   public JavaNet(JavaPlatform platform) {
@@ -57,9 +58,7 @@ public class JavaNet extends NetImpl {
           if (conn instanceof HttpURLConnection) {
             processResponse((HttpURLConnection) conn, callback);
           } else {
-            InputStream stream = conn.getInputStream();
-            InputStreamReader reader = new InputStreamReader(stream);
-            platform.notifySuccess(callback, readFully(reader));
+            platform.notifySuccess(callback, readContent(conn));
           }
 
         } catch (MalformedURLException e) {
@@ -87,10 +86,10 @@ public class JavaNet extends NetImpl {
           conn.setDoOutput(true);
           conn.setDoInput(true);
           conn.setAllowUserInteraction(false);
-          conn.setRequestProperty("Content-type", "text/xml; charset=UTF-8");
+          conn.setRequestProperty("Content-type", "text/xml; charset=" + ENCODING);
 
           conn.connect();
-          conn.getOutputStream().write(data.getBytes("UTF-8"));
+          conn.getOutputStream().write(data.getBytes(ENCODING));
           conn.getOutputStream().close();
           processResponse(conn, callback);
 
@@ -123,8 +122,7 @@ public class JavaNet extends NetImpl {
       if (code != HttpURLConnection.HTTP_OK) {
         throw new HttpException(code, conn.getResponseMessage());
       } else {
-        String result = readFully(new InputStreamReader(conn.getInputStream()));
-        platform.notifySuccess(callback, result);
+        platform.notifySuccess(callback, readContent(conn));
       }
     } finally {
       conn.disconnect();
@@ -145,7 +143,9 @@ public class JavaNet extends NetImpl {
     return "127.0.0.1:8080";
   }
 
-  private String readFully(Reader reader) throws IOException {
+  private String readContent(URLConnection conn) throws IOException {
+    String encoding = conn.getContentEncoding() == null ? ENCODING : conn.getContentEncoding();
+    InputStreamReader reader = new InputStreamReader(conn.getInputStream(), encoding);
     StringBuffer result = new StringBuffer();
     char[] buf = new char[BUF_SIZE];
     int len = 0;
