@@ -72,16 +72,20 @@ public class AndroidPlatform extends AbstractPlatform {
 
   @Override
   public void invokeAsync(final Runnable action) {
-    new AsyncTask<Void,Void,Void>() {
-      public Void doInBackground(Void... params) {
-        try {
-          action.run();
-        } catch (Exception e) {
-          log.warn("Async task failure [task=" + action + "]", e);
-        }
-        return null;
+    activity.runOnUiThread(new Runnable() {
+      public void run () {
+        new AsyncTask<Void,Void,Void>() {
+          @Override public Void doInBackground(Void... params) {
+            try {
+              action.run();
+            } catch (Exception e) {
+              log.warn("Async task failure [task=" + action + "]", e);
+            }
+            return null;
+          }
+        }.execute();
       }
-    }.execute();
+    });
   }
 
   @Override
