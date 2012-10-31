@@ -29,9 +29,11 @@ import cli.MonoTouch.CoreGraphics.CGAffineTransform;
 import cli.MonoTouch.Foundation.NSUrl;
 import cli.MonoTouch.UIKit.UIApplication;
 import cli.MonoTouch.UIKit.UIDeviceOrientation;
+import cli.MonoTouch.UIKit.UIEvent;
 import cli.MonoTouch.UIKit.UIInterfaceOrientation;
 import cli.MonoTouch.UIKit.UIScreen;
 import cli.MonoTouch.UIKit.UIView;
+import cli.MonoTouch.UIKit.UIViewController;
 import cli.MonoTouch.UIKit.UIWindow;
 
 import pythagoras.f.FloatMath;
@@ -153,6 +155,7 @@ public class IOSPlatform extends AbstractPlatform {
   private final SupportedOrients orients;
   private final UIApplication app;
   private final UIWindow mainWindow;
+  private final IOSRootViewController rootViewController;
   private final IOSGameView gameView;
   private final UIView uiOverlay;
 
@@ -184,6 +187,8 @@ public class IOSPlatform extends AbstractPlatform {
 
     mainWindow = new UIWindow(bounds);
     mainWindow.Add(gameView = new IOSGameView(this, bounds, deviceScale));
+    rootViewController = new IOSRootViewController(this);
+    mainWindow.set_RootViewController(rootViewController);
 
     uiOverlay = new UIView(bounds);
     uiOverlay.set_MultipleTouchEnabled(true);
@@ -308,6 +313,10 @@ public class IOSPlatform extends AbstractPlatform {
     gameView.Run(1000d / game.updateRate());
     // make our main window visible
     mainWindow.MakeKeyAndVisible();
+  }
+
+  public UIViewController rootViewController() {
+    return rootViewController;
   }
 
   public UIView uiOverlay() {
