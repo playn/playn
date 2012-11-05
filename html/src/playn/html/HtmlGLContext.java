@@ -17,10 +17,12 @@ package playn.html;
 
 import com.google.gwt.dom.client.CanvasElement;
 import com.google.gwt.dom.client.ImageElement;
-import com.google.gwt.typedarrays.client.Float32Array;
-import com.google.gwt.typedarrays.client.Int32Array;
-import com.google.gwt.typedarrays.client.Uint16Array;
-import com.google.gwt.typedarrays.client.Uint8Array;
+import com.google.gwt.typedarrays.shared.Float32Array;
+import com.google.gwt.typedarrays.shared.Int32Array;
+import com.google.gwt.typedarrays.shared.TypedArrays;
+import com.google.gwt.typedarrays.shared.Uint16Array;
+import com.google.gwt.typedarrays.shared.Uint8Array;
+import com.google.gwt.webgl.client.ArrayUtils;
 import com.google.gwt.webgl.client.WebGLRenderingContext;
 
 import static com.google.gwt.webgl.client.WebGLRenderingContext.*;
@@ -57,28 +59,28 @@ public class HtmlGLContext extends GL20Context {
   }
 
   private void tryBasicGLCalls() throws RuntimeException {
-    // test that our Float32 arrays work (a technique found in other WebGL checks)
-    Float32Array testFloat32Array = Float32Array.create(new float[]{0.0f, 1.0f, 2.0f});
+   // test that our Float32 arrays work (a technique found in other WebGL checks)
+    Float32Array testFloat32Array = ArrayUtils.createFloat32Array(new float[]{0.0f, 1.0f, 2.0f});
     if (testFloat32Array.get(0) != 0.0f || testFloat32Array.get(1) != 1.0f
         || testFloat32Array.get(2) != 2.0f) {
       throw new RuntimeException("Typed Float32Array check failed");
     }
 
     // test that our Int32 arrays work
-    Int32Array testInt32Array = Int32Array.create(new int[]{0, 1, 2});
+    Int32Array testInt32Array = ArrayUtils.createInt32Array(new int[]{0, 1, 2});
     if (testInt32Array.get(0) != 0 || testInt32Array.get(1) != 1 || testInt32Array.get(2) != 2) {
       throw new RuntimeException("Typed Int32Array check failed");
     }
 
     // test that our Uint16 arrays work
-    Uint16Array testUint16Array = Uint16Array.create(new int[]{0, 1, 2});
+    Uint16Array testUint16Array = ArrayUtils.createUint16Array(new int[]{0, 1, 2});
     if (testUint16Array.get(0) != 0 || testUint16Array.get(1) != 1 ||
         testUint16Array.get(2) != 2) {
       throw new RuntimeException("Typed Uint16Array check failed");
     }
 
     // test that our Uint8 arrays work
-    Uint8Array testUint8Array = Uint8Array.create(new int[]{0, 1, 2});
+    Uint8Array testUint8Array = ArrayUtils.createUint8Array(new int[]{0, 1, 2});
     if (testUint8Array.get(0) != 0 || testUint8Array.get(1) != 1 || testUint8Array.get(2) != 2) {
       throw new RuntimeException("Typed Uint8Array check failed");
     }
@@ -91,7 +93,7 @@ public class HtmlGLContext extends GL20Context {
     if (err != NO_ERROR) {
       throw new RuntimeException("Read back GL test failed to clear color (error " + err + ")");
     }
-    Uint8Array pixelData = Uint8Array.create(4);
+    Uint8Array pixelData = TypedArrays.createUint8Array(4);
     glc.readPixels(0, 0, 1, 1, RGBA, UNSIGNED_BYTE, pixelData);
     if (pixelData.get(0) != 255 || pixelData.get(1) != 255 || pixelData.get(2) != 255) {
       throw new RuntimeException("Read back GL test failed to read back correct color");

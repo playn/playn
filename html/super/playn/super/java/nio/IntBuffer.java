@@ -17,8 +17,9 @@
 
 package java.nio;
 
-import com.google.gwt.typedarrays.client.ArrayBufferView;
-import com.google.gwt.typedarrays.client.Int32Array;
+import com.google.gwt.typedarrays.shared.ArrayBufferView;
+import com.google.gwt.typedarrays.shared.Int32Array;
+import com.google.gwt.typedarrays.shared.TypedArrays;
 
 /** A buffer of ints.
  * <p>
@@ -61,8 +62,9 @@ public final class IntBuffer extends Buffer
       super((byteBuffer.capacity() >> 2));
       this.byteBuffer = byteBuffer;
       this.byteBuffer.clear();
-      this.intArray = Int32Array.create(byteBuffer.byteArray.getBuffer(),
-                                        byteBuffer.byteArray.getByteOffset(), capacity);
+      this.intArray = TypedArrays.createInt32Array(
+          byteBuffer.byteArray.buffer(), 
+          byteBuffer.byteArray.byteOffset(), capacity);
     }
 
     /** Compacts this int buffer.

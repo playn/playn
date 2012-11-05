@@ -15,7 +15,9 @@
  ******************************************************************************/
 package playn.html;
 
-import com.google.gwt.typedarrays.client.ArrayBufferView;
+import com.google.gwt.typedarrays.shared.ArrayBufferView;
+
+
 
 /** 
  * This class allows us to get direct access to the typed array used by the 

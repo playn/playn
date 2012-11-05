@@ -17,8 +17,9 @@
 
 package java.nio;
 
-import com.google.gwt.typedarrays.client.ArrayBufferView;
-import com.google.gwt.typedarrays.client.Int16Array;
+import com.google.gwt.typedarrays.shared.ArrayBufferView;
+import com.google.gwt.typedarrays.shared.Int16Array;
+import com.google.gwt.typedarrays.shared.TypedArrays;
 
 /** A buffer of shorts.
  * <p> A short buffer can be created in either of the following ways: </p>
@@ -58,8 +59,9 @@ public final class ShortBuffer extends Buffer
       super((byteBuffer.capacity() >> 1));
       this.byteBuffer = byteBuffer;
       this.byteBuffer.clear();
-      this.shortArray = Int16Array.create(byteBuffer.byteArray.getBuffer(),
-          byteBuffer.byteArray.getByteOffset(), capacity);
+      this.shortArray = TypedArrays.createInt16Array(
+          byteBuffer.byteArray.buffer(),
+          byteBuffer.byteArray.byteOffset(), capacity);
     }
 
     /** Compacts this short buffer.

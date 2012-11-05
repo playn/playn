@@ -2,7 +2,7 @@ package playn.html;
 
 import java.nio.ByteBuffer;
 
-import com.google.gwt.typedarrays.client.ArrayBuffer;
+import com.google.gwt.typedarrays.shared.ArrayBuffer;
 
 /**
  * Allows us to wrap an existing typed array buffer in a ByteBuffer.

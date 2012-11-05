@@ -16,8 +16,8 @@
 package playn.html.websocket;
 
 import com.google.gwt.core.client.JavaScriptObject;
-import com.google.gwt.typedarrays.client.ArrayBuffer;
-import com.google.gwt.typedarrays.client.ArrayBufferView;
+import com.google.gwt.typedarrays.shared.ArrayBuffer;
+import com.google.gwt.typedarrays.shared.ArrayBufferView;
 
 public class WebSocket extends JavaScriptObject {
 

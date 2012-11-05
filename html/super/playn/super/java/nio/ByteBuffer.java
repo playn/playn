@@ -19,9 +19,10 @@ package java.nio;
 
 import java.nio.ByteOrder;
 
-import com.google.gwt.typedarrays.client.ArrayBuffer;
-import com.google.gwt.typedarrays.client.ArrayBufferView;
-import com.google.gwt.typedarrays.client.Int8Array;
+import com.google.gwt.typedarrays.shared.ArrayBuffer;
+import com.google.gwt.typedarrays.shared.ArrayBufferView;
+import com.google.gwt.typedarrays.shared.Int8Array;
+import com.google.gwt.typedarrays.shared.TypedArrays;
 
 /** A buffer for bytes.
  * <p> A byte buffer can be created in either one of the following ways: </p>
@@ -68,8 +69,8 @@ public final class ByteBuffer extends Buffer implements Comparable<ByteBuffer>, 
     
     static ByteBuffer copy (ByteBuffer other, int markOfOther) {
       ByteBuffer buf = new ByteBuffer(
-        other.byteArray.getBuffer(), other.capacity(),
-          other.byteArray.getByteOffset());
+        other.byteArray.buffer(), other.capacity(),
+          other.byteArray.byteOffset());
       buf.limit = other.limit();
       buf.position = other.position();
       buf.mark = markOfOther;
@@ -81,17 +82,17 @@ public final class ByteBuffer extends Buffer implements Comparable<ByteBuffer>, 
      *
      * @param capacity the capacity of the buffer. */
     ByteBuffer (int capacity) {
-        this(ArrayBuffer.create(capacity));
+        this(TypedArrays.createArrayBuffer(capacity));
     }
 
     ByteBuffer (ArrayBuffer buf) {
-        super(buf.getByteLength());
-        byteArray = Int8Array.create(buf);
+        super(buf.byteLength());
+        byteArray = TypedArrays.createInt8Array(buf);
     }
 
     ByteBuffer (ArrayBuffer buffer, int capacity, int offset) {
         super(capacity);
-        byteArray = Int8Array.create(buffer, offset, capacity);
+        byteArray = TypedArrays.createInt8Array(buffer, offset, capacity);
     }
 
 //    /** Returns a char buffer which is based on the remaining content of this byte buffer.
@@ -912,7 +913,7 @@ public final class ByteBuffer extends Buffer implements Comparable<ByteBuffer>, 
      */
     public ByteBuffer slice () {
       ByteBuffer slice = new ByteBuffer(
-        byteArray.getBuffer(), remaining(), byteArray.getByteOffset() + position);
+        byteArray.buffer(), remaining(), byteArray.byteOffset() + position);
       slice.order = order;
       return slice;
     }

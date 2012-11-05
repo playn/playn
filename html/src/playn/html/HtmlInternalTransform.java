@@ -13,7 +13,9 @@
  */
 package playn.html;
 
-import com.google.gwt.typedarrays.client.Float32Array;
+import com.google.gwt.typedarrays.shared.Float32Array;
+import com.google.gwt.typedarrays.shared.TypedArrays;
+import com.google.gwt.webgl.client.ArrayUtils;
 
 import pythagoras.f.AbstractTransform;
 import pythagoras.f.AffineTransform;
@@ -325,7 +327,7 @@ public class HtmlInternalTransform extends AbstractTransform implements Internal
 
   @Override
   public HtmlInternalTransform copy() {
-    return new HtmlInternalTransform(Float32Array.create(matrix));
+    return new HtmlInternalTransform(TypedArrays.createFloat32Array(matrix.buffer()));
   }
 
   @Override
@@ -408,7 +410,7 @@ public class HtmlInternalTransform extends AbstractTransform implements Internal
   }
 
   private HtmlInternalTransform(float[] matrix) {
-    this(Float32Array.create(matrix));
+    this(ArrayUtils.createFloat32Array(matrix));
   }
 
   private HtmlInternalTransform(Float32Array matrix) {

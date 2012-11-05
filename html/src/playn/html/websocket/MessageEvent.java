@@ -16,7 +16,7 @@
 package playn.html.websocket;
 
 import com.google.gwt.dom.client.NativeEvent;
-import com.google.gwt.typedarrays.client.ArrayBuffer;
+import com.google.gwt.typedarrays.shared.ArrayBuffer;
 
 public class MessageEvent extends NativeEvent {
 

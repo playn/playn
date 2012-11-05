@@ -7,9 +7,11 @@ import com.google.gwt.dom.client.CanvasElement;
 import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.ImageElement;
 import com.google.gwt.dom.client.NativeEvent;
-import com.google.gwt.typedarrays.client.Float32Array;
-import com.google.gwt.typedarrays.client.Int32Array;
+import com.google.gwt.typedarrays.shared.Float32Array;
+import com.google.gwt.typedarrays.shared.Int32Array;
+import com.google.gwt.typedarrays.shared.TypedArrays;
 import com.google.gwt.user.client.Timer;
+import com.google.gwt.webgl.client.ArrayUtils;
 import com.google.gwt.webgl.client.WebGLBuffer;
 import com.google.gwt.webgl.client.WebGLFramebuffer;
 import com.google.gwt.webgl.client.WebGLProgram;
@@ -226,7 +228,7 @@ public class WebGLDemo implements EntryPoint {
         -42/2f,42/2f,z,
         42/2f,42/2f,z,
     };
-    gl.bufferSubData(ARRAY_BUFFER, 0, Float32Array.create(positions));
+    gl.bufferSubData(ARRAY_BUFFER, 0, ArrayUtils.createFloat32Array(positions));
 
     // attribute vec2 texCoord;
     float[] texCoords = new float[] {
@@ -235,12 +237,12 @@ public class WebGLDemo implements EntryPoint {
         0.0f, 0.0f,
         1.0f, 0.0f,
     };
-    gl.bufferSubData(ARRAY_BUFFER, 12 * Float32Array.BYTES_PER_ELEMENT, Float32Array.create(texCoords));
+    gl.bufferSubData(ARRAY_BUFFER, 12 * Float32Array.BYTES_PER_ELEMENT, ArrayUtils.createFloat32Array(texCoords));
 
     // create the index buffer.
     int[] indices = new int[] { 0, 1, 2, 3 };
     indexBuffer = gl.createBuffer();
     gl.bindBuffer(ELEMENT_ARRAY_BUFFER, indexBuffer);
-    gl.bufferData(ELEMENT_ARRAY_BUFFER, Int32Array.create(indices), STREAM_DRAW);
+    gl.bufferData(ELEMENT_ARRAY_BUFFER, ArrayUtils.createInt32Array(indices), STREAM_DRAW);
   }
 }

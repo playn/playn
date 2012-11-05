@@ -24,13 +24,14 @@ import playn.core.util.Buffers;
 
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayInteger;
-import com.google.gwt.typedarrays.client.ArrayBufferView;
-import com.google.gwt.typedarrays.client.Float32Array;
-import com.google.gwt.typedarrays.client.Int16Array;
-import com.google.gwt.typedarrays.client.Int32Array;
-import com.google.gwt.typedarrays.client.Int8Array;
-import com.google.gwt.typedarrays.client.Uint16Array;
-import com.google.gwt.typedarrays.client.Uint8Array;
+import com.google.gwt.typedarrays.shared.ArrayBufferView;
+import com.google.gwt.typedarrays.shared.Float32Array;
+import com.google.gwt.typedarrays.shared.Int16Array;
+import com.google.gwt.typedarrays.shared.Int32Array;
+import com.google.gwt.typedarrays.shared.Int8Array;
+import com.google.gwt.typedarrays.shared.TypedArrays;
+import com.google.gwt.typedarrays.shared.Uint16Array;
+import com.google.gwt.typedarrays.shared.Uint8Array;
 import com.google.gwt.webgl.client.WebGLBuffer;
 import com.google.gwt.webgl.client.WebGLFramebuffer;
 import com.google.gwt.webgl.client.WebGLObject;
@@ -299,21 +300,21 @@ public final class HtmlGL20 implements playn.core.gl.GL20 {
       return webGLArray;
     }
 
-    int byteOffset = webGLArray.getByteOffset() + buffer.position() * bufferElementSize;
+    int byteOffset = webGLArray.byteOffset() + buffer.position() * bufferElementSize;
 
     switch (type) {
     case FLOAT:
-      return Float32Array.create(webGLArray.getBuffer(), byteOffset, byteSize / 4);
+      return TypedArrays.createFloat32Array(webGLArray.buffer(), byteOffset, byteSize / 4);
     case UNSIGNED_BYTE:
-      return Uint8Array.create(webGLArray.getBuffer(), byteOffset, byteSize);
+      return TypedArrays.createUint8Array(webGLArray.buffer(), byteOffset, byteSize);
     case UNSIGNED_SHORT:
-      return Uint16Array.create(webGLArray.getBuffer(), byteOffset, byteSize / 2);
+      return TypedArrays.createUint16Array(webGLArray.buffer(), byteOffset, byteSize / 2);
     case INT:
-      return Int32Array.create(webGLArray.getBuffer(), byteOffset, byteSize / 4);
+      return TypedArrays.createInt32Array(webGLArray.buffer(), byteOffset, byteSize / 4);
     case SHORT:
-      return Int16Array.create(webGLArray.getBuffer(), byteOffset, byteSize / 2);
+      return TypedArrays.createInt16Array(webGLArray.buffer(), byteOffset, byteSize / 2);
     case BYTE:
-      return Int8Array.create(webGLArray.getBuffer(), byteOffset, byteSize);
+      return TypedArrays.createInt8Array(webGLArray.buffer(), byteOffset, byteSize);
     default:
       throw new IllegalArgumentException("Type: " + type);
     }
@@ -533,7 +534,7 @@ public final class HtmlGL20 implements playn.core.gl.GL20 {
   public void glGetIntegerv(int pname, IntBuffer params) {
     Int32Array result = (Int32Array) gl.getParameterv(pname);
     int pos = params.position();
-    int len = result.getLength();
+    int len = result.length();
     for (int i = 0; i < len; i++) {
       params.put(pos + i, result.get(i));
     }
@@ -865,7 +866,7 @@ public final class HtmlGL20 implements playn.core.gl.GL20 {
   @Override
   public void glGetUniformfv(int program, int location, FloatBuffer params) {
     Float32Array v = gl.getUniformv(getProgram(program), getUniformLocation(location));
-    for (int i = 0; i < v.getLength(); i++) {
+    for (int i = 0; i < v.length(); i++) {
       params.put(params.position() + i, v.get(i));
     }
   }
@@ -873,7 +874,7 @@ public final class HtmlGL20 implements playn.core.gl.GL20 {
   @Override
   public void glGetUniformiv(int program, int location, IntBuffer params) {
     Int32Array v = gl.getUniformv(getProgram(program), getUniformLocation(location));
-    for (int i = 0; i < v.getLength(); i++) {
+    for (int i = 0; i < v.length(); i++) {
       params.put(params.position() + i, v.get(i));
     }
   }
@@ -887,7 +888,7 @@ public final class HtmlGL20 implements playn.core.gl.GL20 {
   @Override
   public void glGetVertexAttribfv(int index, int pname, FloatBuffer params) {
     Float32Array v = gl.getVertexAttribv(index, pname);
-    for (int i = 0; i < v.getLength(); i++) {
+    for (int i = 0; i < v.length(); i++) {
       params.put(params.position() + i, v.get(i));
     }
   }

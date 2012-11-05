@@ -13,10 +13,17 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package com.google.gwt.typedarrays.client;
+package com.google.gwt.webgl.client;
 
 import com.google.gwt.core.client.JsArrayInteger;
 import com.google.gwt.core.client.JsArrayNumber;
+import com.google.gwt.typedarrays.client.Float32ArrayNative;
+import com.google.gwt.typedarrays.client.JsUtils;
+import com.google.gwt.typedarrays.shared.ArrayBufferView;
+import com.google.gwt.typedarrays.shared.Float32Array;
+import com.google.gwt.typedarrays.shared.Int32Array;
+import com.google.gwt.typedarrays.shared.Uint16Array;
+import com.google.gwt.typedarrays.shared.Uint8Array;
 
 public class ArrayUtils {
 
@@ -85,5 +92,29 @@ public class ArrayUtils {
   }
 
   private ArrayUtils() {
+  }
+
+  public static Float32Array createFloat32Array(float[] array) {
+    return JsUtils.createFloat32Array(toJsArray(array));
+  }
+
+  public static Int32Array createInt32Array(int[] array) {
+    return JsUtils.createInt32Array(toJsArray(array));
+  }
+
+  public static Uint16Array createUint16Array(short[] array) {
+    return JsUtils.createUint16Array(toJsArrayUnsigned(array));
+  }
+
+  public static Uint16Array createUint16Array(int[] array) {
+    return JsUtils.createUint16Array(toJsArray(array));
+  }
+
+  public static Uint8Array createUint8Array(byte[] array) {
+    return JsUtils.createUint8Array(toJsArrayUnsigned(array));
+  }
+
+  public static Uint8Array createUint8Array(int[] array) {
+    return JsUtils.createUint8Array(toJsArray(array));
   }
 }

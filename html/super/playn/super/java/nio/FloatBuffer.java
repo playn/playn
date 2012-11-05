@@ -17,8 +17,9 @@
 
 package java.nio;
 
-import com.google.gwt.typedarrays.client.ArrayBufferView;
-import com.google.gwt.typedarrays.client.Float32Array;
+import com.google.gwt.typedarrays.shared.ArrayBufferView;
+import com.google.gwt.typedarrays.shared.Float32Array;
+import com.google.gwt.typedarrays.shared.TypedArrays;
 
 /** A buffer of floats.
  * <p>
@@ -59,8 +60,8 @@ public final class FloatBuffer extends Buffer
       super((byteBuffer.capacity() >> 2));
       this.byteBuffer = byteBuffer;
       this.byteBuffer.clear();
-      this.floatArray = Float32Array.create(
-        byteBuffer.byteArray.getBuffer(), byteBuffer.byteArray.getByteOffset(), capacity);
+      this.floatArray = TypedArrays.createFloat32Array(
+        byteBuffer.byteArray.buffer(), byteBuffer.byteArray.byteOffset(), capacity);
     }
 
     /** Compacts this float buffer.

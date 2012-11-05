@@ -15,8 +15,9 @@ package playn.html;
 
 import java.nio.ByteBuffer;
 
-import com.google.gwt.typedarrays.client.ArrayBuffer;
-import com.google.gwt.typedarrays.client.Uint8Array;
+import com.google.gwt.typedarrays.shared.ArrayBuffer;
+import com.google.gwt.typedarrays.shared.Uint8Array;
+import com.google.gwt.typedarrays.shared.TypedArrays;
 
 import playn.core.Net;
 
@@ -75,8 +76,8 @@ public class HtmlWebSocket implements Net.WebSocket {
     // ArrayBufferView ta = ((HasArrayBufferView) trick).getTypedArray();
     // Int8Array view = Int8Array.create(ta.getBuffer(), ta.getByteOffset(), len)
     // ws.send(view);
-    ArrayBuffer buf = ArrayBuffer.create(len);
-    Uint8Array view = Uint8Array.create(buf);
+    ArrayBuffer buf = TypedArrays.createArrayBuffer(len);
+    Uint8Array view = TypedArrays.createUint8Array(buf);
     for (int i = 0; i < len; i++) {
       view.set(i, data.get(i));
     }

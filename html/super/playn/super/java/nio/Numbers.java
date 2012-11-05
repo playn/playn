@@ -15,16 +15,17 @@
  */
 package java.nio;
 
-import com.google.gwt.typedarrays.client.Float32Array;
-import com.google.gwt.typedarrays.client.Float64Array;
-import com.google.gwt.typedarrays.client.Int32Array;
-import com.google.gwt.typedarrays.client.Int8Array;
+import com.google.gwt.typedarrays.shared.Float32Array;
+import com.google.gwt.typedarrays.shared.Float64Array;
+import com.google.gwt.typedarrays.shared.Int32Array;
+import com.google.gwt.typedarrays.shared.Int8Array;
+import com.google.gwt.typedarrays.shared.TypedArrays;
 
 class Numbers {
-	static Int8Array wba = Int8Array.create(8);
-	static Int32Array wia = Int32Array.create(wba.getBuffer(), 0, 2);
-	static Float32Array wfa = Float32Array.create(wba.getBuffer(), 0, 2);
-	static Float64Array wda = Float64Array.create(wba.getBuffer(), 0, 1);
+	static Int8Array wba = TypedArrays.createInt8Array(8);
+	static Int32Array wia = TypedArray.createInt32Array(wba.buffer(), 0, 2);
+	static Float32Array wfa = TypedArrays.createFloat32Array(wba.buffer(), 0, 2);
+	static Float64Array wda = TypedArrays.createFloat64Array(wba.buffer(), 0, 1);
 
 	public static final int floatToIntBits(float f) {
 		wfa.set(0, f);
