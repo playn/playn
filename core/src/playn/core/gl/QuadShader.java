@@ -68,17 +68,21 @@ public class QuadShader extends GLShader {
    * to allow this shader to run with good performance, true otherwise.
    */
   public static boolean isLikelyToPerform(GLContext ctx) {
-    int maxVecs = ctx.getInteger(GL20.GL_MAX_VERTEX_UNIFORM_VECTORS) - 1;
+    int maxVecs = usableMaxUniformVectors(ctx);
     // assume we're better off with indexed tris if we can't push at least 16 quads at a time
     return (maxVecs >= 16*VEC4S_PER_QUAD);
+  }
+
+  private static int usableMaxUniformVectors(GLContext ctx) {
+    // this returns the maximum number of vec4s; then we subtract one vec2 to account for the
+    // uScreenSize uniform, and two more because some GPUs seem to need one for our vec3 attr
+    return ctx.getInteger(GL20.GL_MAX_VERTEX_UNIFORM_VECTORS) - 3;
   }
 
   public QuadShader(GLContext ctx) {
     super(ctx);
 
-    // this returns the maximum number of vec4s; then we subtract one vec2 to account for the
-    // uScreenSize uniform
-    int maxVecs = ctx.getInteger(GL20.GL_MAX_VERTEX_UNIFORM_VECTORS) - 1;
+    int maxVecs = usableMaxUniformVectors(ctx);
     if (maxVecs < VEC4S_PER_QUAD)
       throw new RuntimeException(
         "GL_MAX_VERTEX_UNIFORM_VECTORS too low: have " + maxVecs +
