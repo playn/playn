@@ -30,7 +30,7 @@ object PlayNBuild extends Build {
           "com.novocode" % "junit-interface" % "0.7" % "test->default"
         )
       )
-      case "java" => Seq(
+      case "java" | "android" => Seq(
         libraryDependencies ++= Seq(
  	        "com.novocode" % "junit-interface" % "0.7" % "test->default"
         )

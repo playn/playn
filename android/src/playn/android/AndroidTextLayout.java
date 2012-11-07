@@ -98,9 +98,20 @@ class AndroidTextLayout implements TextLayout {
     float[] measuredWidth = new float[1];
     int start = 0, end = text.length();
     while (start < end) {
-      int count = paint.breakText(text, start, end, true, format.wrapWidth, measuredWidth);
       // breakText only breaks on characters; we want to break on word boundaries
+      int count = paint.breakText(text, start, end, true, format.wrapWidth, measuredWidth);
+
+      // breakText exhibits a bug where ligaturized text sequences (e.g. "fi") are counted as a
+      // single character in the returned count when in reality they consume multiple characters of
+      // the source text; so we use a hacky table of known ligatures for the font in question to
+      // adjust the count if the text passed to breakText contains any known ligatures
       int lineEnd = start+count;
+      if (lineEnd < end && font.ligatureHacks.length > 0) {
+        int adjust = accountForLigatures(text, start, count, font.ligatureHacks);
+        count += adjust;
+        lineEnd += adjust;
+      }
+
       // if we matched the rest of the line, things are simple
       if (lineEnd == end) {
         lines.add(new Line(text.substring(start, lineEnd), measuredWidth[0]));
@@ -126,7 +137,8 @@ class AndroidTextLayout implements TextLayout {
             --lineEnd;
           }
           String line = text.substring(start, lineEnd);
-          lines.add(new Line(line, paint.measureText(line)));
+          float size = paint.measureText(line);
+          lines.add(new Line(line, size));
           start = lineEnd;
         }
 
@@ -149,5 +161,21 @@ class AndroidTextLayout implements TextLayout {
       canvas.drawText(line.text, x + rx, y + yoff, paint);
       yoff += metrics.descent + metrics.leading;
     }
+  }
+
+  static int accountForLigatures (String text, int start, int count, String[] ligatures) {
+    int adjust = 0;
+    for (String lig : ligatures) {
+      // for every instance of this ligature, add its extra characters to the adjustment
+      int llen = lig.length(), idx = start;
+      while ((idx = text.indexOf(lig, idx)) != -1) {
+        if (idx+1 > start+count) break;
+        int extra = llen-1;
+        adjust += extra;
+        count += extra;
+        idx += llen;
+      }
+    }
+    return adjust;
   }
 }

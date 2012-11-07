@@ -17,24 +17,29 @@ package playn.android;
 
 import android.graphics.Typeface;
 
+import java.util.Collections;
 import java.util.EnumMap;
 import java.util.Map;
+import java.util.Set;
 
 import playn.core.AbstractFont;
 
 class AndroidFont extends AbstractFont {
 
-  public static AndroidFont DEFAULT = new AndroidFont("Default", Style.PLAIN, 14, Typeface.DEFAULT);
+  private static final String[] NO_HACKS = {};
+
+  public static AndroidFont DEFAULT = new AndroidFont(
+    "Default", Style.PLAIN, 14, Typeface.DEFAULT, null);
 
   public final Typeface typeface;
+  public final String[] ligatureHacks;
 
-  public AndroidFont(String name, Style style, float size) {
-    this(name, style, size, Typeface.create(name, TO_ANDROID_STYLE.get(style)));
-  }
-
-  public AndroidFont(String name, Style style, float size, Typeface typeface) {
+  public AndroidFont(String name, Style style, float size, Typeface typeface,
+                     String[] ligatureHacks) {
     super(name, style, size);
-    this.typeface = typeface;
+    this.typeface = (typeface != null) ? typeface :
+      Typeface.create(name, TO_ANDROID_STYLE.get(style));
+    this.ligatureHacks = (ligatureHacks != null) ? ligatureHacks : NO_HACKS;
   }
 
   protected static final Map<Style,Integer> TO_ANDROID_STYLE =

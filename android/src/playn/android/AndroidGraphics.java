@@ -61,6 +61,8 @@ public class AndroidGraphics extends GraphicsGL {
   private boolean sizeSetManually = false;
   private Map<Pair<String,Font.Style>,Typeface> fonts =
     new HashMap<Pair<String,Font.Style>,Typeface>();
+  private Map<Pair<String,Font.Style>,String[]> ligatureHacks =
+    new HashMap<Pair<String,Font.Style>,String[]>();
 
   public AndroidGraphics(AndroidPlatform platform, AndroidGL20 gfx, float scaleFactor) {
     this.platform = platform;
@@ -82,14 +84,21 @@ public class AndroidGraphics extends GraphicsGL {
    * one might {@code registerFont("myfont.ttf", "My Font", Font.Style.PLAIN)} and
    * {@code registerFont("myfontb.ttf", "My Font", Font.Style.BOLD)} to provide both the plain and
    * bold variants of a particular font.
+   * @param ligatureGlyphs any known text sequences that are converted into a single ligature
+   * character in this font. This works around an Android bug where measuring text for wrapping
+   * that contains character sequences that are converted into ligatures (e.g. "fi" or "ae")
+   * incorrectly reports the number of characters "consumed" from the to-be-wrapped string.
    */
-  public void registerFont(String path, String name, Font.Style style) {
+  public void registerFont(String path, String name, Font.Style style, String... ligatureGlyphs) {
     try {
-      // Android has no way to load a font from an input stream so we have to first copy the data
-      // into a file and then load from there; awesome!
       Typeface face = Typeface.createFromFile(
+        // Android has no way to load a font from an input stream so we have to first copy the data
+        // into a file and then load from there; awesome!
         platform.assets().cacheAsset(path, name + path.substring(path.lastIndexOf('.'))));
-      fonts.put(Pair.create(name, style), face);
+      Pair<String,Font.Style> key = Pair.create(name, style);
+      fonts.put(key, face);
+      ligatureHacks.put(key, ligatureGlyphs);
+
     } catch (Exception e) {
         platform.log().warn("Failed to load font [name=" + name + ", path=" + path + "]", e);
     }
@@ -115,9 +124,8 @@ public class AndroidGraphics extends GraphicsGL {
 
   @Override
   public Font createFont(String name, Font.Style style, float size) {
-    Typeface face = fonts.get(Pair.create(name, style));
-    return (face == null) ? new AndroidFont(name, style, size) :
-      new AndroidFont(name, style, size, face);
+    Pair<String,Font.Style> key = Pair.create(name, style);
+    return new AndroidFont(name, style, size, fonts.get(key), ligatureHacks.get(key));
   }
 
   @Override
