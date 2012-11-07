@@ -64,7 +64,7 @@ public class AndroidSurfaceGL extends SurfaceGL
         // bind our surface framebuffer and render the saved texture data into it
         bindFramebuffer();
         ctx.quadShader(null).prepareTexture(bufferTex, 1).addQuad(
-          StockInternalTransform.IDENTITY, 0, height, width, 0, 0, 0, 1, 1);
+          StockInternalTransform.IDENTITY, 0, texHeight, texWidth, 0, 0, 0, 1, 1);
         // rebind the default frame buffer (which will flush the rendering operation)
         ctx.bindFramebuffer();
         ctx.destroyTexture(bufferTex);
@@ -85,6 +85,7 @@ public class AndroidSurfaceGL extends SurfaceGL
       ByteBuffer pixelBuffer = ByteBuffer.allocate(texWidth * texHeight * 4);
       actx.gl.glReadPixels(0, 0, texWidth, texHeight, GL20.GL_RGBA, GL20.GL_UNSIGNED_BYTE,
                            pixelBuffer);
+      actx.checkGLError("glReadPixels");
       try {
         cachedPixels = new File(cacheDir, "surface-" + Integer.toHexString(hashCode()));
         FileOutputStream out = new FileOutputStream(cachedPixels);
@@ -95,7 +96,6 @@ public class AndroidSurfaceGL extends SurfaceGL
         cachedPixels = null;
       }
       pixelBuffer = null;
-      actx.checkGLError("store Pixels");
     } catch (OutOfMemoryError e) {
       PlayN.log().error("OutOfMemoryError reading cached Surface to buffer.");
       cachedPixels = null;
