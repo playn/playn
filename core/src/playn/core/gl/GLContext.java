@@ -25,7 +25,7 @@ public abstract class GLContext {
 
   protected final Platform platform;
   private GLShader curShader;
-  private int lastFramebuffer;
+  private int lastFramebuffer, epoch;
   private int pushedFramebuffer = -1, pushedWidth, pushedHeight;
 
   /** The (actual screen pixel) width and height of our default frame buffer. */
@@ -174,8 +174,6 @@ public abstract class GLContext {
     bindFramebuffer(defaultFrameBuffer(), defaultFbufWidth, defaultFbufHeight);
   }
 
-  private Exception last;
-
   /** Stores the metadata for the currently bound frame buffer, and binds the supplied framebuffer.
    * This must be followed by a call to {@link #popFramebuffer}. Also, it is not allowed to push a
    * framebuffer if a framebuffer is already pushed. Only one level of nesting is supported. */
@@ -232,6 +230,22 @@ public abstract class GLContext {
 
   protected void viewWasResized () {
     bindFramebufferImpl(defaultFrameBuffer(), defaultFbufWidth, defaultFbufHeight);
+  }
+
+  /**
+   * Increments our GL context epoch. This should be called by platform backends when the GL
+   * context has been lost and a new one created.
+   */
+  protected void incrementEpoch () {
+    ++epoch;
+  }
+
+  /**
+   * Returns the current GL context epoch. This is used to invalidate shaders when we lose and
+   * regain our GL context.
+   */
+  protected int epoch () {
+    return epoch;
   }
 
   /**

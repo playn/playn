@@ -100,11 +100,21 @@ public abstract class GLShader {
   protected int refs;
   protected Core texCore, colorCore, curCore;
   protected Extras texExtras, colorExtras, curExtras;
+  private int texEpoch, colorEpoch;
 
   /** Prepares this shader to render the specified texture, etc. */
   public GLShader prepareTexture(int tex, float alpha) {
+    // if our GL context has been lost and regained we may need to recreate our core
+    if (texEpoch != ctx.epoch()) {
+      ctx.platform.log().info("Dropping tex shader due to epoch change.");
+      // we don't destroy because the underlying resources are gone and destroying using our stale
+      // handles might result in destroying some newly created resources
+      texCore = null;
+      texExtras = null;
+    }
     // create our core lazily so that we ensure we're on the GL thread when it happens
     if (texCore == null) {
+      this.texEpoch = ctx.epoch();
       this.texCore = createTextureCore();
       this.texExtras = createTextureExtras(texCore.prog);
     }
@@ -120,8 +130,17 @@ public abstract class GLShader {
 
   /** Prepares this shader to render the specified color, etc. */
   public GLShader prepareColor(int color, float alpha) {
+    // if our GL context has been lost and regained we may need to recreate our core
+    if (colorEpoch != ctx.epoch()) {
+      ctx.platform.log().info("Dropping color shader due to epoch change.");
+      // we don't destroy because the underlying resources are gone and destroying using our stale
+      // handles might result in destroying some newly created resources
+      colorCore = null;
+      colorExtras = null;
+    }
     // create our core lazily so that we ensure we're on the GL thread when it happens
     if (colorCore == null) {
+      this.colorEpoch = ctx.epoch();
       this.colorCore = createColorCore();
       this.colorExtras = createColorExtras(colorCore.prog);
     }
