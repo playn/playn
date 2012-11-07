@@ -89,9 +89,10 @@ class AndroidTextLayout implements TextLayout {
     for (Line line : lines) {
       twidth = Math.max(twidth, line.width);
     }
-    width = twidth;
+    width = twidth + LEFT_FUDGE + RIGHT_FUDGE;
     height = lines.size() * (-metrics.ascent + metrics.descent) +
-      (lines.size()-1) * metrics.leading; // leading only applies to lines after 0
+      // leading only applies to lines after 0
+      (lines.size()-1) * metrics.leading + TOP_FUDGE;
   }
 
   void breakLine(String text) {
@@ -154,11 +155,11 @@ class AndroidTextLayout implements TextLayout {
     paint.setTypeface(font.typeface);
     paint.setTextSize(font.size());
 
-    float yoff = 0;
+    float yoff = TOP_FUDGE;
     for (Line line : lines) {
-      float rx = format.align.getX(line.width, width);
+      float rx = format.align.getX(line.width, width-LEFT_FUDGE-RIGHT_FUDGE);
       yoff -= metrics.ascent;
-      canvas.drawText(line.text, x + rx, y + yoff, paint);
+      canvas.drawText(line.text, x + rx + LEFT_FUDGE, y + yoff, paint);
       yoff += metrics.descent + metrics.leading;
     }
   }
@@ -178,4 +179,8 @@ class AndroidTextLayout implements TextLayout {
     }
     return adjust;
   }
+
+  protected static final float TOP_FUDGE = 1;
+  protected static final float LEFT_FUDGE = 1;
+  protected static final float RIGHT_FUDGE = 2;
 }
