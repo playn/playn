@@ -127,19 +127,7 @@ public class AndroidAssets extends AbstractAssets<Bitmap> {
       try {
         InputStream is = openAsset(rsrc.path);
         try {
-          Bitmap bitmap = decodeBitmap(is);
-          // if this image is at a higher scale factor than the view, scale the bitmap down to
-          // the view display factor (because otherwise the GPU will end up doing that every time
-          // the bitmap is drawn, and it will do a crappy job of it)
-          Scale viewScale = platform.graphics().ctx.scale, imageScale = rsrc.scale;
-          float viewImageRatio = viewScale.factor / imageScale.factor ;
-          if (viewImageRatio < 1) {
-            int swidth = MathUtil.iceil(viewImageRatio * bitmap.getWidth());
-            int sheight = MathUtil.iceil(viewImageRatio * bitmap.getHeight());
-            bitmap = Bitmap.createScaledBitmap(bitmap, swidth, sheight, true);
-            imageScale = viewScale;
-          }
-          return recv.imageLoaded(bitmap, imageScale);
+          return recv.imageLoaded(decodeBitmap(is), rsrc.scale);
         } finally {
           is.close();
         }
