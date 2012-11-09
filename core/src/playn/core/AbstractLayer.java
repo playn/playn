@@ -182,6 +182,18 @@ public abstract class AbstractLayer implements Layer {
   }
 
   @Override
+  public Layer setTx(float x) {
+    transform.setTx(x);
+    return this;
+  }
+
+  @Override
+  public Layer setTy(float y) {
+    transform.setTy(y);
+    return this;
+  }
+
+  @Override
   public Layer setTranslation(float x, float y) {
     transform.setTranslation(x, y);
     return this;

@@ -175,6 +175,26 @@ public interface Layer {
   float ty();
 
   /**
+   * Sets the translation of the layer's transform matrix so x coordinates in the layer will be
+   * translated by this amount.
+   *
+   * @param x translation on x axis
+   *
+   * @return a reference to this layer for call chaining.
+   */
+  Layer setTx(float tx);
+
+  /**
+   * Sets the translation of the layer's transform matrix so y coordinates in the layer will be
+   * translated by this amount.
+   *
+   * @param y translation on y axis
+   *
+   * @return a reference to this layer for call chaining.
+   */
+  Layer setTy(float ty);
+
+  /**
    * Sets the translation of the layer's transformation matrix so coordinates in the layer will be
    * translated by this amount.
    *
