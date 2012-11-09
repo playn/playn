@@ -65,8 +65,7 @@ public class ClippedGroupTest extends Test {
         outline(surf, g4);
       }
       protected void outline (Surface surf, Layer.HasSize ly) {
-        drawRect(surf, ly.transform().tx() - ly.originX(), ly.transform().ty() - ly.originY(),
-                 ly.width(), ly.height());
+        drawRect(surf, ly.tx() - ly.originX(), ly.ty() - ly.originY(), ly.width(), ly.height());
       }
       protected void drawRect(Surface surf, float x, float y, float w, float h) {
         float left = x-1, top = y-1, right = x+w+2, bot = y+h+2;

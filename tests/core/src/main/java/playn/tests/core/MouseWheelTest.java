@@ -56,7 +56,7 @@ public class MouseWheelTest extends Test
 
     bg.addListener(new Mouse.LayerAdapter() {
       @Override public void onMouseWheelScroll (WheelEvent event) {
-        float y = il.transform().ty() + event.velocity();
+        float y = il.ty() + event.velocity();
         y = Math.max(0, Math.min(y, HEIGHT));
         il.setTranslation(0, y);
       }

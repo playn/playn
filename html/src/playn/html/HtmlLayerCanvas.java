@@ -18,6 +18,7 @@ package playn.html;
 import com.google.gwt.canvas.dom.client.Context2d;
 
 import playn.core.AbstractLayer;
+import playn.core.InternalTransform;
 import playn.core.StockInternalTransform;
 
 abstract class HtmlLayerCanvas extends AbstractLayer {
@@ -31,6 +32,7 @@ abstract class HtmlLayerCanvas extends AbstractLayer {
 
   void transform(Context2d ctx) {
     ctx.translate(originX, originY);
+    InternalTransform transform = (InternalTransform) transform();
     ctx.transform(transform.m00(), transform.m01(), transform.m10(),
         transform.m11(), transform.tx() - originX, transform.ty() - originY);
     ctx.translate(-originX, -originY);

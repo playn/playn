@@ -13,6 +13,7 @@
  */
 package playn.core;
 
+import pythagoras.f.FloatMath;
 import pythagoras.f.Point;
 import pythagoras.f.Transform;
 
@@ -29,6 +30,7 @@ public abstract class AbstractLayer implements Layer {
   // to extract the values from the affine transform matrix (which is expensive, doesn't preserve
   // sign, and wraps rotation around at pi)
   private float scaleX = 1,  scaleY = 1, rotation = 0;
+  private InternalTransform transform;
 
   /** Used to dispatch pointer/touch/mouse events to layers. */
   public interface Interaction<L, E> {
@@ -51,7 +53,8 @@ public abstract class AbstractLayer implements Layer {
     DESTROYED(1 << 0),
     VISIBLE(1 << 1),
     INTERACTIVE(1 << 2),
-    SHOWN(1 << 3); // used by HtmlLayerDom
+    SHOWN(1 << 3), // used by HtmlLayerDom
+    XFDIRTY(1 << 4);
 
     public final int bitmask;
 
@@ -62,7 +65,6 @@ public abstract class AbstractLayer implements Layer {
 
   private GroupLayer parent;
 
-  protected InternalTransform transform;
   protected float originX, originY;
   protected float alpha;
   protected float depth;
@@ -173,12 +175,12 @@ public abstract class AbstractLayer implements Layer {
 
   @Override
   public float tx() {
-    return transform().tx();
+    return transform.tx();
   }
 
   @Override
   public float ty() {
-    return transform().ty();
+    return transform.ty();
   }
 
   @Override
@@ -208,7 +210,7 @@ public abstract class AbstractLayer implements Layer {
   public Layer setRotation(float angle) {
     if (rotation != angle) {
       rotation = angle;
-      transform.setRotation(angle);
+      setFlag(Flag.XFDIRTY, true);
     }
     return this;
   }
@@ -225,8 +227,7 @@ public abstract class AbstractLayer implements Layer {
 
   @Override
   public Layer setScale(float s) {
-    setScaleX(s);
-    return setScaleY(s);
+    return setScale(s, s);
   }
 
   @Override
@@ -234,7 +235,7 @@ public abstract class AbstractLayer implements Layer {
     Asserts.checkArgument(sx != 0, "Scale must be non-zero (got sx=%s)", sx);
     if (scaleX != sx) {
       scaleX = sx;
-      transform.setScaleX(sx);
+      setFlag(Flag.XFDIRTY, true);
     }
     return this;
   }
@@ -244,15 +245,20 @@ public abstract class AbstractLayer implements Layer {
     Asserts.checkArgument(sy != 0, "Scale must be non-zero (got sy=%s)", sy);
     if (scaleY != sy) {
       scaleY = sy;
-      transform.setScaleY(sy);
+      setFlag(Flag.XFDIRTY, true);
     }
     return this;
   }
 
   @Override
   public Layer setScale(float sx, float sy) {
-    setScaleX(sx);
-    return setScaleY(sy);
+    Asserts.checkArgument(sx != 0 && sy != 0, "Scale must be non-zero (got sx=%s, sy=%s)", sx, sy);
+    if (sx != scaleX || sy != scaleY) {
+      scaleX = sx;
+      scaleY = sy;
+      setFlag(Flag.XFDIRTY, true);
+    }
+    return this;
   }
 
   @Override
@@ -273,6 +279,14 @@ public abstract class AbstractLayer implements Layer {
 
   @Override
   public Transform transform() {
+    if (isSet(Flag.XFDIRTY)) {
+      float sina = FloatMath.sin(rotation), cosa = FloatMath.cos(rotation);
+      float m00 =  cosa * scaleX, m01 = sina * scaleY;
+      float m10 = -sina * scaleX, m11 = cosa * scaleY;
+      float tx = transform.tx(), ty = transform.ty();
+      transform.setTransform(m00, m01, m10, m11, tx, ty);
+      setFlag(Flag.XFDIRTY, false);
+    }
     return transform;
   }
 

@@ -21,6 +21,7 @@ import pythagoras.f.MathUtil;
 
 import playn.core.CanvasSurface;
 import playn.core.ImmediateLayer;
+import playn.core.InternalTransform;
 
 import static playn.core.PlayN.graphics;
 
@@ -50,12 +51,12 @@ class FlashImmediateLayerCanvas extends FlashLayer implements ImmediateLayer {
 
     @Override
     public float scaledWidth() {
-      return transform().scaleX() * width();
+      return scaleX() * width();
     }
 
     @Override
     public float scaledHeight() {
-      return transform().scaleY() * height();
+      return scaleY() * height();
     }
 
     @Override
@@ -96,6 +97,7 @@ class FlashImmediateLayerCanvas extends FlashLayer implements ImmediateLayer {
 
   void transform(FlashCanvas.Context2d ctx) {
     ctx.translate(originX, originY);
+    InternalTransform transform = (InternalTransform) transform();
     ctx.transform(transform.m00(), transform.m01(), transform.m10(),
         transform.m11(), transform.tx() - originX, transform.ty() - originY);
     ctx.translate(-originX, -originY);

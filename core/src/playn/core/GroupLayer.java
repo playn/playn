@@ -52,7 +52,7 @@ public interface GroupLayer extends Layer {
    * Adds the supplied layer to this group layer, adjusting its translation (relative to this group
    * layer) to the supplied values. This is equivalent to:
    * <pre>{@code
-   * layer.transform().setTranslation(tx, ty);
+   * layer.setTranslation(tx, ty);
    * group.add(layer);
    * }</pre>
    * but is such a common operation that this helper method is provided.

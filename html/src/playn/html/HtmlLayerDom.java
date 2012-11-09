@@ -21,6 +21,7 @@ import com.google.gwt.dom.client.Style.Position;
 import com.google.gwt.dom.client.Style.Visibility;
 
 import playn.core.AbstractLayer;
+import playn.core.InternalTransform;
 import playn.core.Layer;
 import playn.core.StockInternalTransform;
 
@@ -100,6 +101,7 @@ class HtmlLayerDom extends AbstractLayer {
       elem.getStyle().setVisibility(Visibility.VISIBLE);
     }
 
+    InternalTransform transform = (InternalTransform) transform();
     float m00 = transform.m00();
     float m01 = transform.m01();
     float m10 = transform.m10();

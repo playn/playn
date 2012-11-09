@@ -64,12 +64,12 @@ public class GroupLayerGL extends LayerGL implements GroupLayer, ParentLayer {
 
     @Override
     public float scaledWidth() {
-      return transform.scaleX() * width();
+      return scaleX() * width();
     }
 
     @Override
     public float scaledHeight() {
-      return transform.scaleY() * height();
+      return scaleY() * height();
     }
 
     @Override

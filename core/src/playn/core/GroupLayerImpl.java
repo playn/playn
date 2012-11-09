@@ -67,7 +67,7 @@ public class GroupLayerImpl<L extends AbstractLayer>
   }
 
   public void addAt(GroupLayer self, Layer layer, float tx, float ty) {
-    layer.transform().setTranslation(tx, ty);
+    layer.setTranslation(tx, ty);
     self.add(layer);
   }
 

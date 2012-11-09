@@ -53,7 +53,7 @@ public abstract class LayerGL extends AbstractLayer {
 
   protected InternalTransform localTransform(InternalTransform parentTransform) {
     savedLocal.set(parentTransform);
-    return savedLocal.concatenate(transform, originX, originY);
+    return savedLocal.concatenate(transform(), originX, originY);
   }
 
   public abstract void paint(InternalTransform curTransform, float curAlpha, GLShader curShader);

@@ -57,12 +57,12 @@ class HtmlSurfaceLayerCanvas extends HtmlLayerCanvas implements SurfaceLayer {
 
   @Override
   public float scaledWidth() {
-    return transform().scaleX() * width();
+    return scaleX() * width();
   }
 
   @Override
   public float scaledHeight() {
-    return transform().scaleY() * height();
+    return scaleY() * height();
   }
 
   @Override
@@ -71,10 +71,8 @@ class HtmlSurfaceLayerCanvas extends HtmlLayerCanvas implements SurfaceLayer {
 
     ctx.save();
     transform(ctx);
-
     ctx.setGlobalAlpha(parentAlpha * alpha);
     ctx.drawImage(canvas.canvas(), 0, 0);
-
     ctx.restore();
   }
 }

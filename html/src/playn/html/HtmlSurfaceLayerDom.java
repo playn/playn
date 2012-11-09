@@ -65,11 +65,11 @@ class HtmlSurfaceLayerDom extends HtmlLayerDom implements SurfaceLayer {
 
   @Override
   public float scaledWidth() {
-    return transform().scaleX() * width();
+    return scaleX() * width();
   }
 
   @Override
   public float scaledHeight() {
-    return transform().scaleY() * height();
+    return scaleY() * height();
   }
 }

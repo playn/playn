@@ -65,7 +65,7 @@ public class FlashLayer extends AbstractLayer {
 //    display().setX((int) originX);
 //    display().setY((int) originY);
     InternalTransform x = new StockInternalTransform();
-    x.concatenate(transform, originX, originY);
+    x.concatenate(transform(), originX, originY);
     display().setTransform(x.m00(), x.m01(), x.m10(), x.m11(), x.tx(), x.ty());
   }
 }

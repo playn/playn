@@ -67,12 +67,12 @@ public class ImmediateLayerGL extends LayerGL implements ImmediateLayer {
 
     @Override
     public float scaledWidth() {
-      return transform().scaleX() * width();
+      return scaleX() * width();
     }
 
     @Override
     public float scaledHeight() {
-      return transform().scaleY() * height();
+      return scaleY() * height();
     }
 
     @Override
