@@ -106,7 +106,6 @@ public abstract class GLShader {
   public GLShader prepareTexture(int tex, float alpha) {
     // if our GL context has been lost and regained we may need to recreate our core
     if (texEpoch != ctx.epoch()) {
-      ctx.platform.log().info("Dropping tex shader due to epoch change.");
       // we don't destroy because the underlying resources are gone and destroying using our stale
       // handles might result in destroying some newly created resources
       texCore = null;
@@ -132,7 +131,6 @@ public abstract class GLShader {
   public GLShader prepareColor(int color, float alpha) {
     // if our GL context has been lost and regained we may need to recreate our core
     if (colorEpoch != ctx.epoch()) {
-      ctx.platform.log().info("Dropping color shader due to epoch change.");
       // we don't destroy because the underlying resources are gone and destroying using our stale
       // handles might result in destroying some newly created resources
       colorCore = null;
