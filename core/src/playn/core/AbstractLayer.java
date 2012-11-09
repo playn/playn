@@ -25,6 +25,11 @@ import playn.core.gl.GLShader;
  */
 public abstract class AbstractLayer implements Layer {
 
+  // these values are cached in the layer to make the getters return sane values rather than have
+  // to extract the values from the affine transform matrix (which is expensive, doesn't preserve
+  // sign, and wraps rotation around at pi)
+  private float scaleX = 1,  scaleY = 1, rotation = 0;
+
   /** Used to dispatch pointer/touch/mouse events to layers. */
   public interface Interaction<L, E> {
     void interact(L listener, E argument);
@@ -167,14 +172,48 @@ public abstract class AbstractLayer implements Layer {
   }
 
   @Override
+  public float tx() {
+    return transform().tx();
+  }
+
+  @Override
+  public float ty() {
+    return transform().ty();
+  }
+
+  @Override
+  public Layer setTranslation(float x, float y) {
+    transform.setTranslation(x, y);
+    return this;
+  }
+
+  @Override
+  public float rotation() {
+    return rotation;
+  }
+
+  @Override
   public Layer setRotation(float angle) {
+    rotation = angle;
     transform.setRotation(angle);
     return this;
   }
 
   @Override
+  public float scaleX() {
+    return scaleX;
+  }
+
+  @Override
+  public float scaleY() {
+    return scaleY;
+  }
+
+  @Override
   public Layer setScale(float s) {
     Asserts.checkArgument(s != 0, "Scale must be non-zero");
+    scaleX = s;
+    scaleY = s;
     transform.setUniformScale(s);
     return this;
   }
@@ -182,13 +221,9 @@ public abstract class AbstractLayer implements Layer {
   @Override
   public Layer setScale(float x, float y) {
     Asserts.checkArgument(x != 0 && y != 0, "Scale must be non-zero (got x=%s, y=%s)", x, y);
+    scaleX = x;
+    scaleY = y;
     transform.setScale(x, y);
-    return this;
-  }
-
-  @Override
-  public Layer setTranslation(float x, float y) {
-    transform.setTranslation(x, y);
     return this;
   }
 

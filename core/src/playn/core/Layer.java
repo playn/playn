@@ -165,10 +165,18 @@ public interface Layer {
   Layer setDepth(float depth);
 
   /**
-   * Sets the translation of the layer. The current translation can be read via {@link #transform}.
-   *
-   * <p> This sets the translation of the layer's transformation matrix so coordinates in the layer
-   * will be translated by this amount. </p>
+   * Returns this layer's current translation in the x direction.
+   */
+  float tx();
+
+  /**
+   * Returns this layer's current translation in the y direction.
+   */
+  float ty();
+
+  /**
+   * Sets the translation of the layer's transformation matrix so coordinates in the layer will be
+   * translated by this amount.
    *
    * @param x translation on x axis
    * @param y translation on y axis
@@ -176,6 +184,26 @@ public interface Layer {
    * @return a reference to this layer for call chaining.
    */
   Layer setTranslation(float x, float y);
+
+  /**
+   * Returns this layer's current scale in the x direction. <em>Note:</em> this is the most recent
+   * value supplied to {@link #setScale(float)} or {@link setScale(float,float)}, it is
+   * <em>not</em> extracted from the underlying transform. Thus the sign of the scale returned by
+   * this method is preserved. It's also substantially cheaper than extracting the scale from the
+   * affine transform matrix. This also means that if you change the scale directly on the {@link
+   * #transform} that scale <em>will not</em> be returned by this method.
+   */
+  float scaleX();
+
+  /**
+   * Returns this layer's current scale in the y direction. <em>Note:</em> this is the most recent
+   * value supplied to {@link #setScale(float)} or {@link setScale(float,float)}, it is
+   * <em>not</em> extracted from the underlying transform. Thus the sign of the scale returned by
+   * this method is preserved. It's also substantially cheaper than extracting the scale from the
+   * affine transform matrix. This also means that if you change the scale directly on the {@link
+   * #transform} that scale <em>will not</em> be returned by this method.
+   */
+  float scaleY();
 
   /**
    * Sets the scale of the layer. The current scale can be read via {@link #transform}.
@@ -205,6 +233,16 @@ public interface Layer {
    * @return a reference to this layer for call chaining.
    */
   Layer setScale(float x, float y);
+
+  /**
+   * Returns this layer's current rotation. <em>Note:</em> this is the most recent value supplied
+   * to {@link #setRotation}, it is <em>not</em> extracted from the underlying transform. Thus the
+   * value may lie outside the range [-pi, pi] and the most recently set value is preserved. It's
+   * also substantially cheaper than extracting the rotation from the affine transform matrix. This
+   * also means that if you change the scale directly on the {@link #transform} that rotation
+   * <em>will not</em> be returned by this method.
+   */
+  float rotation();
 
   /**
    * Sets the rotation of the layer. The current rotation can be read via {@link #transform}.
