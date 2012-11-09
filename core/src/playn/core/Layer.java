@@ -64,8 +64,16 @@ public interface Layer {
   GroupLayer parent();
 
   /**
-   * Returns the layer's transformation matrix. This provides access to the layer's current
-   * translation, scale and rotation.
+   * Returns the layer's current transformation matrix. If any changes have been made to the
+   * layer's scale, rotation or translation, they will be applied to the transform matrix before it
+   * is returned.
+   *
+   * <p><em>Note:</em> any direct modifications to this matrix <em>except</em> modifications to its
+   * translation, will be overwritten if a call is subsequently made to {@link #setScale(float)},
+   * {@link #setScale(float,float)}, {@link #setScaleX}, {@link setScaleY} or {@link #setRotation}.
+   * If you intend to manipulate a layer's transform matrix directly, <em>do not</em> call those
+   * other methods. Also do not expect {@link #scaleX}, {@link #scaleY}, or {@link #rotation} to
+   * reflect the direct changes you've made to the transform matrix. They will not. </p>
    */
   Transform transform();
 
@@ -175,8 +183,13 @@ public interface Layer {
   float ty();
 
   /**
-   * Sets the translation of the layer's transform matrix so x coordinates in the layer will be
-   * translated by this amount.
+   * Sets the x translation of this layer.
+   *
+   * <p><em>Note:</em> all transform changes are deferred until {@link #transform} is called
+   * (which happens during rendering, if not before) at which point the current scale, rotation and
+   * translation are composed into an affine transform matrix. This means that, for example,
+   * setting rotation and then setting scale will not flip the rotation like it would were these
+   * applied to the transform matrix one operation at a time. </p>
    *
    * @param x translation on x axis
    *
@@ -185,8 +198,13 @@ public interface Layer {
   Layer setTx(float tx);
 
   /**
-   * Sets the translation of the layer's transform matrix so y coordinates in the layer will be
-   * translated by this amount.
+   * Sets the y translation of this layer.
+   *
+   * <p><em>Note:</em> all transform changes are deferred until {@link #transform} is called
+   * (which happens during rendering, if not before) at which point the current scale, rotation and
+   * translation are composed into an affine transform matrix. This means that, for example,
+   * setting rotation and then setting scale will not flip the rotation like it would were these
+   * applied to the transform matrix one operation at a time. </p>
    *
    * @param y translation on y axis
    *
@@ -195,8 +213,13 @@ public interface Layer {
   Layer setTy(float ty);
 
   /**
-   * Sets the translation of the layer's transformation matrix so coordinates in the layer will be
-   * translated by this amount.
+   * Sets the x and y translation of this layer.
+   *
+   * <p><em>Note:</em> all transform changes are deferred until {@link #transform} is called
+   * (which happens during rendering, if not before) at which point the current scale, rotation and
+   * translation are composed into an affine transform matrix. This means that, for example,
+   * setting rotation and then setting scale will not flip the rotation like it would were these
+   * applied to the transform matrix one operation at a time. </p>
    *
    * @param x translation on x axis
    * @param y translation on y axis
@@ -226,8 +249,14 @@ public interface Layer {
   float scaleY();
 
   /**
-   * Configures the scale of the layer's transformation matrix so x and y coordinates in the layer
-   * will be multiplied by this scale. Note that a scale of {@code 1} is equivalent to no scale.
+   * Sets the current x and y scale of this layer to {@code scale}.. Note that a scale of {@code 1}
+   * is equivalent to no scale.
+   *
+   * <p><em>Note:</em> all transform changes are deferred until {@link #transform} is called
+   * (which happens during rendering, if not before) at which point the current scale, rotation and
+   * translation are composed into an affine transform matrix. This means that, for example,
+   * setting rotation and then setting scale will not flip the rotation like it would were these
+   * applied to the transform matrix one operation at a time. </p>
    *
    * @param scale non-zero scale value
    * @return a reference to this layer for call chaining.
@@ -235,8 +264,14 @@ public interface Layer {
   Layer setScale(float scale);
 
   /**
-   * Configures the scale of the layer's transformation matrix so x coordinates in the layer will
-   * be multiplied by this scale. Note that a scale of {@code 1} is equivalent to no scale.
+   * Sets the current x scale of this layer. Note that a scale of {@code 1} is equivalent to no
+   * scale.
+   *
+   * <p><em>Note:</em> all transform changes are deferred until {@link #transform} is called
+   * (which happens during rendering, if not before) at which point the current scale, rotation and
+   * translation are composed into an affine transform matrix. This means that, for example,
+   * setting rotation and then setting scale will not flip the rotation like it would were these
+   * applied to the transform matrix one operation at a time. </p>
    *
    * @param scaleX non-zero scale value
    * @return a reference to this layer for call chaining.
@@ -244,8 +279,14 @@ public interface Layer {
   Layer setScaleX(float scaleX);
 
   /**
-   * Configures the scale of the layer's transformation matrix so y coordinates in the layer will
-   * be multiplied by this scale. Note that a scale of {@code 1} is equivalent to no scale.
+   * Sets the current y scale of this layer. Note that a scale of {@code 1} is equivalent to no
+   * scale.
+   *
+   * <p><em>Note:</em> all transform changes are deferred until {@link #transform} is called
+   * (which happens during rendering, if not before) at which point the current scale, rotation and
+   * translation are composed into an affine transform matrix. This means that, for example,
+   * setting rotation and then setting scale will not flip the rotation like it would were these
+   * applied to the transform matrix one operation at a time. </p>
    *
    * @param scaleY non-zero scale value
    * @return a reference to this layer for call chaining.
@@ -253,9 +294,14 @@ public interface Layer {
   Layer setScaleY(float scaleY);
 
   /**
-   * Configures the scale of the layer's transformation matrix so x and y coordinates in the layer
-   * will be multiplied by {@code scaleX} and {@code scaleY} respectively. Note that a scale of
-   * {@code 1} is equivalent to no scale.
+   * Sets the current x and y scale of this layer. Note that a scale of {@code 1} is equivalent to
+   * no scale.
+   *
+   * <p><em>Note:</em> all transform changes are deferred until {@link #transform} is called
+   * (which happens during rendering, if not before) at which point the current scale, rotation and
+   * translation are composed into an affine transform matrix. This means that, for example,
+   * setting rotation and then setting scale will not flip the rotation like it would were these
+   * applied to the transform matrix one operation at a time. </p>
    *
    * @param scaleX non-zero scale value on the x axis
    * @param scaleY non-zero scale value on the y axis
@@ -275,10 +321,13 @@ public interface Layer {
   float rotation();
 
   /**
-   * Sets the rotation of the layer. The current rotation can be read via {@link #transform}.
+   * Sets the current rotation of this layer, in radians.
    *
-   * <p> This sets the rotation of the layer's transformation matrix so coordinates in the layer
-   * will be rotated by this angle. </p>
+   * <p><em>Note:</em> all transform changes are deferred until {@link #transform} is called
+   * (which happens during rendering, if not before) at which point the current scale, rotation and
+   * translation are composed into an affine transform matrix. This means that, for example,
+   * setting rotation and then setting scale will not flip the rotation like it would were these
+   * applied to the transform matrix one operation at a time. </p>
    *
    * @param angle angle to rotate, in radians
    *
@@ -313,7 +362,7 @@ public interface Layer {
    *
    * @return a reference to this layer for call chaining.
    */
-  Layer setHitTester (HitTester tester);
+  Layer setHitTester(HitTester tester);
 
   /**
    * Registers a listener with this layer that will be notified if a click/touch event happens
