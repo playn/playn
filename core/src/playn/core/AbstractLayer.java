@@ -194,8 +194,10 @@ public abstract class AbstractLayer implements Layer {
 
   @Override
   public Layer setRotation(float angle) {
-    rotation = angle;
-    transform.setRotation(angle);
+    if (rotation != angle) {
+      rotation = angle;
+      transform.setRotation(angle);
+    }
     return this;
   }
 
@@ -211,19 +213,20 @@ public abstract class AbstractLayer implements Layer {
 
   @Override
   public Layer setScale(float s) {
-    Asserts.checkArgument(s != 0, "Scale must be non-zero");
-    scaleX = s;
-    scaleY = s;
-    transform.setUniformScale(s);
-    return this;
+    return setScale(s, s);
   }
 
   @Override
   public Layer setScale(float x, float y) {
     Asserts.checkArgument(x != 0 && y != 0, "Scale must be non-zero (got x=%s, y=%s)", x, y);
-    scaleX = x;
-    scaleY = y;
-    transform.setScale(x, y);
+    if (scaleX != x) {
+      scaleX = x;
+      transform.setScaleX(x);
+    }
+    if (scaleY != y) {
+      scaleY = y;
+      transform.setScaleY(y);
+    }
     return this;
   }
 
