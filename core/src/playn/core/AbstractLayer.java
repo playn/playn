@@ -213,21 +213,34 @@ public abstract class AbstractLayer implements Layer {
 
   @Override
   public Layer setScale(float s) {
-    return setScale(s, s);
+    setScaleX(s);
+    return setScaleY(s);
   }
 
   @Override
-  public Layer setScale(float x, float y) {
-    Asserts.checkArgument(x != 0 && y != 0, "Scale must be non-zero (got x=%s, y=%s)", x, y);
-    if (scaleX != x) {
-      scaleX = x;
-      transform.setScaleX(x);
-    }
-    if (scaleY != y) {
-      scaleY = y;
-      transform.setScaleY(y);
+  public Layer setScaleX(float sx) {
+    Asserts.checkArgument(sx != 0, "Scale must be non-zero (got sx=%s)", sx);
+    if (scaleX != sx) {
+      scaleX = sx;
+      transform.setScaleX(sx);
     }
     return this;
+  }
+
+  @Override
+  public Layer setScaleY(float sy) {
+    Asserts.checkArgument(sy != 0, "Scale must be non-zero (got sy=%s)", sy);
+    if (scaleY != sy) {
+      scaleY = sy;
+      transform.setScaleY(sy);
+    }
+    return this;
+  }
+
+  @Override
+  public Layer setScale(float sx, float sy) {
+    setScaleX(sx);
+    return setScaleY(sy);
   }
 
   @Override

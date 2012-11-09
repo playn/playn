@@ -206,33 +206,43 @@ public interface Layer {
   float scaleY();
 
   /**
-   * Sets the scale of the layer. The current scale can be read via {@link #transform}.
+   * Configures the scale of the layer's transformation matrix so x and y coordinates in the layer
+   * will be multiplied by this scale. Note that a scale of {@code 1} is equivalent to no scale.
    *
-   * <p> This sets the scale of the layer's transformation matrix so coordinates in the layer will
-   * be multiplied by this scale. </p>
-   *
-   * <p> Note that a scale of {@code 1} is equivalent to no scale. </p>
-   *
-   * @param x non-zero scale value
-   *
+   * @param scale non-zero scale value
    * @return a reference to this layer for call chaining.
    */
-  Layer setScale(float x);
+  Layer setScale(float scale);
 
   /**
-   * Sets the scale of the layer. The current scale can be read via {@link #transform}.
+   * Configures the scale of the layer's transformation matrix so x coordinates in the layer will
+   * be multiplied by this scale. Note that a scale of {@code 1} is equivalent to no scale.
    *
-   * <p> This sets the scale of the layer's transformation matrix so coordinates in the layer will
-   * be multiplied by this scale. </p>
+   * @param scaleX non-zero scale value
+   * @return a reference to this layer for call chaining.
+   */
+  Layer setScaleX(float scaleX);
+
+  /**
+   * Configures the scale of the layer's transformation matrix so y coordinates in the layer will
+   * be multiplied by this scale. Note that a scale of {@code 1} is equivalent to no scale.
    *
-   * <p> Note that a scale of {@code 1} is equivalent to no scale. </p>
+   * @param scaleY non-zero scale value
+   * @return a reference to this layer for call chaining.
+   */
+  Layer setScaleY(float scaleY);
+
+  /**
+   * Configures the scale of the layer's transformation matrix so x and y coordinates in the layer
+   * will be multiplied by {@code scaleX} and {@code scaleY} respectively. Note that a scale of
+   * {@code 1} is equivalent to no scale.
    *
-   * @param x non-zero scale value on the x axis
-   * @param y non-zero scale value on the y axis
+   * @param scaleX non-zero scale value on the x axis
+   * @param scaleY non-zero scale value on the y axis
    *
    * @return a reference to this layer for call chaining.
    */
-  Layer setScale(float x, float y);
+  Layer setScale(float scaleX, float scaleY);
 
   /**
    * Returns this layer's current rotation. <em>Note:</em> this is the most recent value supplied
