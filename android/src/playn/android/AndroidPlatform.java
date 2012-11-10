@@ -40,6 +40,7 @@ public class AndroidPlatform extends AbstractPlatform {
 
   Game game;
   GameActivity activity;
+  private boolean paused;
 
   private final AndroidAnalytics analytics;
   private final AndroidAssets assets;
@@ -68,6 +69,18 @@ public class AndroidPlatform extends AbstractPlatform {
     storage = new AndroidStorage(activity);
     touch = new TouchImpl();
     touchHandler = new AndroidTouchEventHandler(graphics, activity.gameView());
+  }
+
+  @Override
+  public void invokeLater(Runnable runnable) {
+    // if we're paused, we need to run these on the main app thread instead of queueing them up for
+    // processing on the run queue, because the run queue isn't processed while we're paused; the
+    // main thread will ensure they're run serially, but also that they don't linger until the next
+    // time the app is resumed (if that happens at all)
+    if (paused)
+      activity.runOnUiThread(runnable);
+    else
+      super.invokeLater(runnable);
   }
 
   @Override
@@ -188,9 +201,11 @@ public class AndroidPlatform extends AbstractPlatform {
   // allow these to be called by GameViewGL
   protected void onPause() {
     super.onPause();
+    paused = true;
   }
   protected void onResume() {
     super.onResume();
+    paused = false;
   }
 
   void update(float delta) {
