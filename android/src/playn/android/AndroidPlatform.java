@@ -18,6 +18,7 @@ package playn.android;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.util.Log;
 
 import playn.core.AbstractPlatform;
 import playn.core.Game;
