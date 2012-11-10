@@ -30,7 +30,7 @@ import playn.core.json.JsonImpl;
 
 public class AndroidPlatform extends AbstractPlatform {
 
-  public static final boolean DEBUG_LOGS = true;
+  public static final boolean DEBUG_LOGS = false;
 
   public static AndroidPlatform register(AndroidGL20 gl20, GameActivity activity) {
     AndroidPlatform platform = new AndroidPlatform(activity, gl20);
@@ -69,6 +69,10 @@ public class AndroidPlatform extends AbstractPlatform {
     storage = new AndroidStorage(activity);
     touch = new TouchImpl();
     touchHandler = new AndroidTouchEventHandler(graphics, activity.gameView());
+  }
+
+  static void debugLog(String message) {
+    if (DEBUG_LOGS) Log.d("playn", message);
   }
 
   @Override

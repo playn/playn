@@ -94,7 +94,7 @@ class AndroidAudio extends AudioImpl {
 
   public void onPause() {
     if (!playing.isEmpty())
-      platform.log().debug("Pausing " + playing.size() + " playing sounds.");
+      AndroidPlatform.debugLog("Pausing " + playing.size() + " playing sounds.");
     for (AndroidSound<?> sound : playing) {
       sound.onPause();
     }
@@ -106,7 +106,7 @@ class AndroidAudio extends AudioImpl {
     Set<AndroidSound<?>> wasPlaying = new HashSet<AndroidSound<?>>(playing);
     playing.clear();
     if (!wasPlaying.isEmpty())
-      platform.log().debug("Resuming " + wasPlaying.size() + " playing sounds.");
+      AndroidPlatform.debugLog("Resuming " + wasPlaying.size() + " playing sounds.");
     for (AndroidSound<?> sound : wasPlaying) {
       sound.onResume();
     }
@@ -120,12 +120,12 @@ class AndroidAudio extends AudioImpl {
   }
 
   void onPlaying(AndroidSound<?> sound) {
-    platform.log().debug("Playing " + sound);
+    AndroudPlatform.debugLog("Playing " + sound);
     playing.add(sound);
   }
 
   void onStopped(AndroidSound<?> sound) {
-    platform.log().debug("Stopped " + sound);
+    AndroidPlatform.debugLog("Stopped " + sound);
     playing.remove(sound);
   }
 }

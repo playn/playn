@@ -41,16 +41,14 @@ public class GameLoop implements Runnable {
 
   public void start() {
     if (!running.get()) {
-      if (AndroidPlatform.DEBUG_LOGS)
-        log().debug("Starting game loop");
+      AndroidPlatform.debugLog("Starting game loop");
       this.updateRate = platform.game.updateRate();
       running.set(true);
     }
   }
 
   public void pause() {
-    if (AndroidPlatform.DEBUG_LOGS)
-      log().debug("Pausing game loop");
+    AndroidPlatform.debugLog("Pausing game loop");
     running.set(false);
   }
 

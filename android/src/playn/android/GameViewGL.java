@@ -50,8 +50,7 @@ public class GameViewGL extends GLSurfaceView implements SurfaceHolder.Callback 
     @Override
     public void onSurfaceChanged(GL10 gl, int width, int height) {
       gl20.glViewport(0, 0, width, height);
-      if (AndroidPlatform.DEBUG_LOGS)
-        Log.d("playn", "Surface dimensions changed to ( " + width + " , " + height + ")");
+      AndroidPlatform.debugLog("Surface dimensions changed to ( " + width + " , " + height + ")");
     }
 
     @Override
@@ -98,13 +97,12 @@ public class GameViewGL extends GLSurfaceView implements SurfaceHolder.Callback 
         width = width > minWidth ? width : minWidth;
         height = height > minHeight ? height : minHeight;
         setMeasuredDimension(width, height);
-        if (AndroidPlatform.DEBUG_LOGS)
-          Log.d("playn", "Using game-specified sizing. (" + width + " , " + height + ")");
+        AndroidPlatform.debugLog("Using game-specified sizing. (" + width + " , " + height + ")");
         return;
       }
     }
 
-    if (AndroidPlatform.DEBUG_LOGS) Log.d("playn", "Using default sizing.");
+    AndroidPlatform.debugLog("Using default sizing.");
     super.onMeasure(widthMeasureSpec, heightMeasureSpec);
   }
 

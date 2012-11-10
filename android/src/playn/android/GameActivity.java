@@ -154,7 +154,7 @@ public abstract class GameActivity extends Activity {
 
   @Override
   protected void onPause() {
-    if (AndroidPlatform.DEBUG_LOGS) Log.d("playn", "onPause");
+    AndroidPlatform.debugLog("onPause");
     gameView.notifyVisibilityChanged(View.INVISIBLE);
     if (platform() != null)
       platform().audio().onPause();
@@ -163,7 +163,7 @@ public abstract class GameActivity extends Activity {
 
   @Override
   protected void onResume() {
-    if (AndroidPlatform.DEBUG_LOGS) Log.d("playn", "onResume");
+    AndroidPlatform.debugLog("onResume");
     gameView.notifyVisibilityChanged(View.VISIBLE);
     if (platform() != null)
       platform().audio().onResume();
