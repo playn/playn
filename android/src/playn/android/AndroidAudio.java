@@ -120,7 +120,7 @@ class AndroidAudio extends AudioImpl {
   }
 
   void onPlaying(AndroidSound<?> sound) {
-    AndroudPlatform.debugLog("Playing " + sound);
+    AndroidPlatform.debugLog("Playing " + sound);
     playing.add(sound);
   }
 
