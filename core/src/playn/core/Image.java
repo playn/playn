@@ -43,8 +43,8 @@ public interface Image {
 
   /**
    * Adds a callback to be notified when this image has loaded. If the image is
-   * already loaded, the callback will be notified immediately. The callback is
-   * discarded once the image is loaded.
+   * already loaded, the callback will be notified immediately; otherwise on the main playn
+   * thread at a later time. The callback is discarded once the image is loaded.
    */
   void addCallback(Callback<? super Image> callback);
 
