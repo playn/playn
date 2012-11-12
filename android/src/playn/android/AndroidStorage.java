@@ -21,21 +21,33 @@ import android.app.Activity;
 import android.content.SharedPreferences;
 
 public class AndroidStorage implements Storage {
-  private static final String PREFS_NAME = "playn";
-  private SharedPreferences settings;
 
-  public AndroidStorage(Activity activity) {
-    settings = activity.getSharedPreferences(PREFS_NAME, 0);
+  private static final String PREFS_NAME = "playn";
+  private final AndroidPlatform platform;
+  private SharedPreferences settings;
+  private SharedPreferences.Editor pendingEditor;
+
+  public AndroidStorage(AndroidPlatform platform) {
+    this.platform = platform;
+    this.settings = platform.activity.getSharedPreferences(PREFS_NAME, 0);
   }
 
   @Override
   public void setItem(String key, String data) throws RuntimeException {
-    settings.edit().putString(key, data).commit();
+    if (platform.paused()) {
+      settings.edit().putString(key, data).commit();
+    } else {
+      getEditor().putString(key, data);
+    }
   }
 
   @Override
   public void removeItem(String key) {
-    settings.edit().remove(key).commit();
+    if (platform.paused()) {
+      settings.edit().remove(key).commit();
+    } else {
+      getEditor().remove(key);
+    }
   }
 
   @Override
@@ -51,5 +63,20 @@ public class AndroidStorage implements Storage {
   @Override
   public boolean isPersisted() {
     return true;
+  }
+
+  private SharedPreferences.Editor getEditor() {
+    if (pendingEditor == null) {
+      platform.log().info("Creating pending editor");
+      pendingEditor = settings.edit();
+      platform.invokeLater(new Runnable() {
+        public void run () {
+          platform.log().info("Committing pending edit");
+          pendingEditor.commit();
+          pendingEditor = null;
+        }
+      });
+    }
+    return pendingEditor;
   }
 }

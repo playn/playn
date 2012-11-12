@@ -67,7 +67,7 @@ public class AndroidPlatform extends AbstractPlatform {
     keyboard = new AndroidKeyboard(this);
     net = new AndroidNet(this);
     pointer = new AndroidPointer();
-    storage = new AndroidStorage(activity);
+    storage = new AndroidStorage(this);
     touch = new TouchImpl();
     touchHandler = new AndroidTouchEventHandler(graphics, activity.gameView());
   }
@@ -211,6 +211,10 @@ public class AndroidPlatform extends AbstractPlatform {
   protected void onResume() {
     super.onResume();
     paused = false;
+  }
+
+  boolean paused() {
+    return paused;
   }
 
   void update(float delta) {
