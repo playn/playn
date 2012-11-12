@@ -67,11 +67,9 @@ public class AndroidStorage implements Storage {
 
   private SharedPreferences.Editor getEditor() {
     if (pendingEditor == null) {
-      platform.log().info("Creating pending editor");
       pendingEditor = settings.edit();
       platform.invokeLater(new Runnable() {
         public void run () {
-          platform.log().info("Committing pending edit");
           pendingEditor.commit();
           pendingEditor = null;
         }
