@@ -70,7 +70,7 @@ public interface Layer {
    *
    * <p><em>Note:</em> any direct modifications to this matrix <em>except</em> modifications to its
    * translation, will be overwritten if a call is subsequently made to {@link #setScale(float)},
-   * {@link #setScale(float,float)}, {@link #setScaleX}, {@link setScaleY} or {@link #setRotation}.
+   * {@link #setScale(float,float)}, {@link #setScaleX}, {@link #setScaleY} or {@link #setRotation}.
    * If you intend to manipulate a layer's transform matrix directly, <em>do not</em> call those
    * other methods. Also do not expect {@link #scaleX}, {@link #scaleY}, or {@link #rotation} to
    * reflect the direct changes you've made to the transform matrix. They will not. </p>
