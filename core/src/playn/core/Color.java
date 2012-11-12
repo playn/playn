@@ -33,4 +33,32 @@ public class Color {
   public static int rgb(int r, int g, int b) {
     return argb(0xff, r, g, b);
   }
+
+  /**
+   * Extracts the alpha, in range [0, 255], from the given packed color.
+   */
+  public static final int alpha (int color) {
+    return (color >> 24) & 0xFF;
+  }
+
+  /**
+   * Extracts the red component, in range [0, 255], from the given packed color.
+   */
+  public static final int red (int color) {
+    return (color >> 16) & 0xFF;
+  }
+
+  /**
+   * Extracts the green component, in range [0, 255], from the given packed color.
+   */
+  public static final int green (int color) {
+    return (color >> 8) & 0xFF;
+  }
+
+  /**
+   * Extracts the blue component, in range [0, 255], from the given packed color.
+   */
+  public static final int blue (int color) {
+    return color & 0xFF;
+  }
 }
