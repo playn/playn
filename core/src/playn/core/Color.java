@@ -61,4 +61,12 @@ public class Color {
   public static final int blue (int color) {
     return color & 0xFF;
   }
+
+  /**
+   * Returns a new color that's a copy of the given color, but with the new alpha value, in
+   * range [0, 255].
+   */
+  public static int withAlpha (int color, int alpha) {
+    return (color & 0x00ffffff) | (alpha << 24);
+  }
 }
