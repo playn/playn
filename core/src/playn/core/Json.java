@@ -158,6 +158,17 @@ public interface Json {
     boolean getBoolean(int index, boolean dflt);
 
     /**
+     * Gets the float value at the given index, or <code>0</code> if there is no value at this
+     * index.
+     */
+    float getNumber(int index);
+
+    /**
+     * Gets the float value at the given index, or the default if there is no value at this index.
+     */
+    float getNumber(int index, float dflt);
+
+    /**
      * Gets the double value at the given index, or <code>0</code> if there is no value at this
      * index.
      */
@@ -180,15 +191,20 @@ public interface Json {
     int getInt(int index, int dflt);
 
     /**
-     * Gets the float value at the given index, or <code>0</code> if there is no value at this
-     * index.
+     * Gets the long value at the given index, or <code>0</code> if there is no value at this
+     * index. <em>NOTE:</em> this is not accurate on the HTML backend as all numbers are
+     * represented as doubles, which cannot represent all possible long values. This is included
+     * for projects that use only the other backends and need long values.
      */
-    float getNumber(int index);
+    long getLong(int index);
 
     /**
-     * Gets the float value at the given index, or the default if there is no value at this index.
+     * Gets the long value at the given index, or the default if there is no value at this index.
+     * <em>NOTE:</em> this is not accurate on the HTML backend as all numbers are represented as
+     * doubles, which cannot represent all possible long values. This is included for projects that
+     * use only the other backends and need long values.
      */
-    float getNumber(int index, float dflt);
+    long getLong(int index, long dflt);
 
     /**
      * Gets the string value at the given index, or <code>null</code> if there is no value at this
@@ -307,6 +323,16 @@ public interface Json {
     boolean getBoolean(String key, boolean dflt);
 
     /**
+     * Gets the float value at the given key, or <code>0</code> if there is no value at this key.
+     */
+    float getNumber(String key);
+
+    /**
+     * Gets the float value at the given key, or the default if there is no value at this key.
+     */
+    float getNumber(String key, float dflt);
+
+    /**
      * Gets the double value at the given key, or <code>0</code> if there is no value at this key.
      */
     double getDouble(String key);
@@ -327,14 +353,20 @@ public interface Json {
     int getInt(String key, int dflt);
 
     /**
-     * Gets the float value at the given key, or <code>0</code> if there is no value at this key.
+     * Gets the long value at the given key, or <code>0</code> if there is no value at this key.
+     * <em>NOTE:</em> this is not accurate on the HTML backend as all numbers are represented as
+     * doubles, which cannot represent all possible long values. This is included for projects that
+     * use only the other backends and need long values.
      */
-    float getNumber(String key);
+    long getLong(String key);
 
     /**
-     * Gets the float value at the given key, or the default if there is no value at this key.
+     * Gets the long value at the given key, or the default if there is no value at this key.
+     * <em>NOTE:</em> this is not accurate on the HTML backend as all numbers are represented as
+     * doubles, which cannot represent all possible long values. This is included for projects that
+     * use only the other backends and need long values.
      */
-    float getNumber(String key, float dflt);
+    long getLong(String key, long dflt);
 
     /**
      * Gets the string value at the given key, or <code>null</code> if there is no value at this

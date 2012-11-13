@@ -67,6 +67,16 @@ public class HtmlJson extends JsonImpl implements Json {
     };
 
     @Override
+    public float getNumber(int index) {
+      return (float) getDouble(index, 0);
+    }
+
+    @Override
+    public float getNumber(int index, float dflt) {
+      return (float) getDouble(index, dflt);
+    }
+
+    @Override
     public double getDouble(int index) {
       return getDouble(index, 0);
     }
@@ -87,13 +97,13 @@ public class HtmlJson extends JsonImpl implements Json {
     }
 
     @Override
-    public float getNumber(int index) {
-      return (float) getDouble(index, 0);
+    public long getLong(int index) {
+      return (long) getDouble(index, 0);
     }
 
     @Override
-    public float getNumber(int index, float dflt) {
-      return (float) getDouble(index, dflt);
+    public long getLong(int index, long dflt) {
+      return (long) getDouble(index, dflt);
     }
 
     @Override
@@ -230,6 +240,16 @@ public class HtmlJson extends JsonImpl implements Json {
     };
 
     @Override
+    public float getNumber(String key) {
+      return (float) getDouble(key, 0);
+    }
+
+    @Override
+    public float getNumber(String key, float dflt) {
+      return (float) getDouble(key, dflt);
+    }
+
+    @Override
     public double getDouble(String key) {
       return getDouble(key, 0);
     }
@@ -250,13 +270,13 @@ public class HtmlJson extends JsonImpl implements Json {
     }
 
     @Override
-    public float getNumber(String key) {
-      return (float) getDouble(key, 0);
+    public long getLong(String key) {
+      return (long) getDouble(key, 0);
     }
 
     @Override
-    public float getNumber(String key, float dflt) {
-      return (float) getDouble(key, dflt);
+    public long getLong(String key, long dflt) {
+      return (long) getDouble(key, dflt);
     }
 
     @Override

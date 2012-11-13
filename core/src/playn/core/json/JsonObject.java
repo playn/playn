@@ -123,6 +123,22 @@ class JsonObject implements Json.Object {
   }
 
   /**
+   * Returns the {@link Long} at the given key, or 0 if it does not exist or is the wrong type.
+   */
+  public long getLong(String key) {
+    return getLong(key, 0L);
+  }
+
+  /**
+   * Returns the {@link Long} at the given key, or the default if it does not exist or is the
+   * wrong type.
+   */
+  public long getLong(String key, long default_) {
+    Object o = get(key);
+    return o instanceof Number ? ((Number) o).longValue() : default_;
+  }
+
+  /**
    * Returns the {@link JsonObject} at the given key, or null if it does not exist or is the wrong
    * type.
    */

@@ -149,6 +149,22 @@ class JsonArray implements Json.Array {
   }
 
   /**
+   * Returns the {@link Long} at the given index, or 0 if it does not exist or is the wrong type.
+   */
+  public long getLong(int key) {
+    return getLong(key, 0);
+  }
+
+  /**
+   * Returns the {@link Long} at the given index, or the default if it does not exist or is the
+   * wrong type.
+   */
+  public long getLong(int key, long default_) {
+    Object o = get(key);
+    return o instanceof Number ? ((Number)o).longValue() : default_;
+  }
+
+  /**
    * Returns the {@link JsonObject} at the given index, or null if it does not exist or is the wrong type.
    */
   public Json.Object getObject(int key) {
