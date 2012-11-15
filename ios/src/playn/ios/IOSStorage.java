@@ -30,6 +30,7 @@ import cli.System.Data.IDataReader;
 import java.util.ArrayList;
 import java.util.List;
 
+import playn.core.BatchImpl;
 import playn.core.PlayN;
 import playn.core.Storage;
 
@@ -148,6 +149,13 @@ public class IOSStorage implements Storage {
     } catch (Throwable t) {
       throw new RuntimeException("removeItem(" + key + ") failed: " + t);
     }
+  }
+
+  @Override
+  public Batch startBatch() {
+    // TODO: we could bundle it all into one SQL command (or batches of them), but the individual
+    // SQL commands are already pretty fast, so it might not be necessary
+    return new BatchImpl(this);
   }
 
   private DbParameter createParam(DbCommand cmd, String name, String value) {

@@ -20,6 +20,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.util.Properties;
 
+import playn.core.BatchImpl;
 import playn.core.Storage;
 
 /**
@@ -56,6 +57,21 @@ class JavaStorage implements Storage {
   @Override
   public String getItem(String key) {
     return properties.getProperty(key);
+  }
+
+  @Override
+  public Batch startBatch() {
+    return new BatchImpl(this) {
+      protected void setImpl(String key, String data) {
+        properties.setProperty(key, data);
+      }
+      protected void removeImpl(String key, String data) {
+        properties.remove(key);
+      }
+      protected void onAfterCommit() {
+        maybePersistProperties(properties);
+      }
+    };
   }
 
   @Override

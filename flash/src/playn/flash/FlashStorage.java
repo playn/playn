@@ -20,6 +20,7 @@ import com.google.gwt.core.client.JavaScriptObject;
 
 import flash.net.SharedObject;
 
+import playn.core.BatchImpl;
 import playn.core.Storage;
 
 public class FlashStorage implements Storage {
@@ -46,6 +47,11 @@ public class FlashStorage implements Storage {
   public void setItem(String key, String data) throws RuntimeException {
     set(shared.getData(), key, data);
     shared.flush(0);
+  }
+
+  @Override
+  public Batch startBatch() {
+    return new BatchImpl(this);
   }
 
   @Override

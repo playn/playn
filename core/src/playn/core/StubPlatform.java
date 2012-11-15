@@ -73,6 +73,9 @@ public class StubPlatform implements Platform {
     @Override public String getItem(String key) {
       return _data.get(key);
     }
+    @Override public Batch startBatch() {
+      return new BatchImpl(this);
+    }
     @Override public Iterable<String> keys() {
       return _data.keySet();
     }

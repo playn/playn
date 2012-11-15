@@ -16,37 +16,57 @@
 package playn.core;
 
 /**
- * Storage interface. This interface can be used to store settings and user data
- * in a key/value String pair.
- *
- * This will attempt to store persistently, but will fall back to an in-memory
- * Map. Use {@link #isPersisted()} to check if the data is being persisted.
+ * Stores settings in a key/value map. This will attempt to store persistently, but will fall back
+ * to an in-memory map. Use {@link #isPersisted} to check if the data are being persisted.
  */
 public interface Storage {
 
   /**
-   * Sets the value in the Storage associated with the specified key to the
-   * specified data.
-   *
-   * @param key the key to a value in the Storage
-   * @param data the value associated with the key
+   * Represents a batch of edits to be applied to storage in one transaction. Individual edits are
+   * expensive on some platforms, and this batch interface allows multiple edits to be applied
+   * substantially more efficiently (more than an order of magnitude) on those platforms. If you're
+   * going to make hundreds or thousands of changes at once, use this mechanism.
    */
-  public void setItem(String key, String data) throws RuntimeException;
+  interface Batch {
+    /** Adds an update to the batch. */
+    void setItem(String key, String data);
+
+    /** Adds an deletion to the batch. */
+    void removeItem(String key);
+
+    /** Commits the batch, applying all queued changes. Attempts to call {@link #setItem} or
+     * {@link #removeItem} after a call to this method will fail. */
+    void commit();
+  }
+
+  /**
+   * Sets the value associated with the specified key to {@code data}.
+   *
+   * @param key identifies the value.
+   * @param data the value associated with the key, which must not be null.
+   */
+  public void setItem(String key, String data);
 
   /**
    * Removes the item in the Storage associated with the specified key.
    *
-   * @param key the key to a value in the Storage
+   * @param key identifies the value.
    */
   public void removeItem(String key);
 
   /**
-   * Returns the item in the Storage associated with the specified key.
+   * Returns the item associated with {@code key}, or null if no item is associated with it.
    *
-   * @param key the key to a value in the Storage
-   * @return the value associated with the given key
+   * @param key identifies the value.
+   * @return the value associated with the given key, or null.
    */
   public String getItem(String key);
+
+  /**
+   * Creates a {@link Batch} that can be used to effect multiple changes to storage in a single,
+   * more efficient, operation.
+   */
+  public Batch startBatch();
 
   /**
    * Returns an object that can be used to iterate over all storage keys. <em>Note:</em> changes
@@ -56,7 +76,7 @@ public interface Storage {
   public Iterable<String> keys();
 
   /**
-   * Returns true if the Storage data will be persistent across restarts.
+   * Returns true if storage data will be persistent across restarts.
    */
   public boolean isPersisted();
 }

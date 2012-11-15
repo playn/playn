@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import playn.core.BatchImpl;
 import playn.core.Storage;
 
 /**
@@ -68,6 +69,11 @@ class HtmlStorage implements Storage {
       // ignore
     }
     return null;
+  }
+
+  @Override
+  public Batch startBatch() {
+    return new BatchImpl(this);
   }
 
   @Override

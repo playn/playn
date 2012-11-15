@@ -16,16 +16,19 @@
 package playn.android;
 
 import java.util.ArrayList;
-import playn.core.Storage;
+import java.util.Map;
+
 import android.app.Activity;
 import android.content.SharedPreferences;
+
+import playn.core.BatchImpl;
+import playn.core.Storage;
 
 public class AndroidStorage implements Storage {
 
   private static final String PREFS_NAME = "playn";
   private final AndroidPlatform platform;
   private SharedPreferences settings;
-  private SharedPreferences.Editor pendingEditor;
 
   public AndroidStorage(AndroidPlatform platform) {
     this.platform = platform;
@@ -34,25 +37,37 @@ public class AndroidStorage implements Storage {
 
   @Override
   public void setItem(String key, String data) throws RuntimeException {
-    if (platform.paused()) {
-      settings.edit().putString(key, data).commit();
-    } else {
-      getEditor().putString(key, data);
-    }
+    settings.edit().putString(key, data).commit();
   }
 
   @Override
   public void removeItem(String key) {
-    if (platform.paused()) {
-      settings.edit().remove(key).commit();
-    } else {
-      getEditor().remove(key);
-    }
+    settings.edit().remove(key).commit();
   }
 
   @Override
   public String getItem(String key) {
     return settings.getString(key, null);
+  }
+
+  @Override
+  public Batch startBatch() {
+    return new BatchImpl(this) {
+      private SharedPreferences.Editor edit;
+      protected void onBeforeCommit() {
+        edit = settings.edit();
+      }
+      protected void setImpl(String key, String data) {
+        edit.putString(key, data);
+      }
+      protected void removeImpl(String key, String data) {
+        edit.remove(key);
+      }
+      protected void onAfterCommit() {
+        edit.commit();
+        edit = null;
+      }
+    };
   }
 
   @Override
@@ -63,18 +78,5 @@ public class AndroidStorage implements Storage {
   @Override
   public boolean isPersisted() {
     return true;
-  }
-
-  private SharedPreferences.Editor getEditor() {
-    if (pendingEditor == null) {
-      pendingEditor = settings.edit();
-      platform.invokeLater(new Runnable() {
-        public void run () {
-          pendingEditor.commit();
-          pendingEditor = null;
-        }
-      });
-    }
-    return pendingEditor;
   }
 }
