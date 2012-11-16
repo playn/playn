@@ -30,6 +30,10 @@ class AndroidCanvasState {
   // Cached xfer modes to avoid creating objects
   static PorterDuffXfermode[] xfermodes;
 
+  /** The default configuration for a paint instance used by a canvas. {@link AndroidGraphics} may
+   * twiddle these values via configurator methods. */
+  static int PAINT_FLAGS = Paint.ANTI_ALIAS_FLAG|Paint.SUBPIXEL_TEXT_FLAG;
+
   Paint paint;
   int fillColor;
   int strokeColor;
@@ -47,8 +51,8 @@ class AndroidCanvasState {
   }
 
   AndroidCanvasState() {
-    this(new Paint(Paint.ANTI_ALIAS_FLAG), 0xff000000, 0xffffffff, null, null, Composite.SRC_OVER,
-        1f);
+    this(new Paint(PAINT_FLAGS),
+         0xff000000, 0xffffffff, null, null, Composite.SRC_OVER, 1f);
   }
 
   AndroidCanvasState(AndroidCanvasState toCopy) {

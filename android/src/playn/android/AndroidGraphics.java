@@ -22,6 +22,7 @@ import android.app.ActivityManager;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.LinearGradient;
+import android.graphics.Paint;
 import android.graphics.PixelFormat;
 import android.graphics.RadialGradient;
 import android.graphics.Shader.TileMode;
@@ -102,6 +103,15 @@ public class AndroidGraphics extends GraphicsGL {
     } catch (Exception e) {
         platform.log().warn("Failed to load font [name=" + name + ", path=" + path + "]", e);
     }
+  }
+
+  /**
+   * Configures the default bitmap filtering (smoothing) setting used when rendering images to a
+   * canvas. The default is not to smooth the bitmaps, pass true to make smoothing the default.
+   */
+  public void setCanvasFilterBitmaps(boolean filterBitmaps) {
+    if (filterBitmaps) AndroidCanvasState.PAINT_FLAGS |= Paint.FILTER_BITMAP_FLAG;
+    else AndroidCanvasState.PAINT_FLAGS &= ~Paint.FILTER_BITMAP_FLAG;
   }
 
   @Override
