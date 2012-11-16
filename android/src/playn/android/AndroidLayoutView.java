@@ -33,17 +33,11 @@ public class AndroidLayoutView extends LinearLayout {
   @Override
   public void onSizeChanged(int w, int h, int oldw, int oldh) {
     super.onSizeChanged(w, h, oldw, oldh);
-    Log.i("playn", "Screen sized changed to ( " + w + " , " + h + ")");
+    Log.d("playn", "Screen size changed [width=" + w + ", height=" + h +
+          ", orient=" + getResources().getConfiguration().orientation + "]");
     AndroidPlatform platform = activity.platform();
-    if (platform != null) {
-      platform.graphics().refreshScreenSize();
-    } else {
+    if (platform == null) {
       AndroidGraphics.setStartingScreenSize(w, h);
     }
-  }
-
-  @Override
-  public void onLayout(boolean changed, int l, int t, int r, int b) {
-    super.onLayout(changed, l, t, r, b);
   }
 }
