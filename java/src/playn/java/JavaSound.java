@@ -52,7 +52,7 @@ class JavaSound extends AbstractSound<Clip> {
   @Override
   protected void setVolumeImpl(float volume) {
     FloatControl volctrl = (FloatControl) impl.getControl(FloatControl.Type.MASTER_GAIN);
-    volctrl.setValue(toGain(volume));
+    volctrl.setValue(toGain(volume, volctrl.getMinimum(), volctrl.getMaximum()));
   }
 
   // @Override
@@ -72,7 +72,7 @@ class JavaSound extends AbstractSound<Clip> {
   //   return FloatMath.pow(10, gain/20);
   // }
 
-  protected static float toGain (float volume) {
-    return 20 * FloatMath.log10(volume);
+  protected static float toGain (float volume, float min, float max) {
+    return FloatMath.clamp(20 * FloatMath.log10(volume), min, max);
   }
 }
