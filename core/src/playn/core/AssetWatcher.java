@@ -24,18 +24,26 @@ import playn.core.util.Callback;
 public class AssetWatcher {
 
   /**
-   * Listener interface for AssetWatcher.
+   * A listener that is notified of asset loading progress and failures.
    */
-  public interface Listener {
+  public abstract class Listener {
     /**
-     * Called when all assets are done loading (or had an error).
+     * Informs the listener of progress as each asset load completes or fails.
      */
-    void done();
+    public void progress (int loaded, int errors, int total) {
+      // default implementation does nothing
+    }
+
+    /**
+     * Called when all assets are done loading (or had an error). This will be called after the
+     * final call to {@link #progress}.
+     */
+    public abstract void done();
 
     /**
      * Called for each asset that failed to load.
      */
-    void error(Throwable e);
+    public abstract void error(Throwable e);
   }
 
   private int total, loaded, errors;
@@ -46,7 +54,7 @@ public class AssetWatcher {
     @Override
     public void onSuccess(Object resource) {
       ++loaded;
-      maybeDone();
+      update();
     }
 
     @Override
@@ -54,7 +62,7 @@ public class AssetWatcher {
       ++errors;
       if (listener != null)
         listener.error(e);
-      maybeDone();
+      update();
     }
   };
 
@@ -109,14 +117,14 @@ public class AssetWatcher {
    */
   public void start() {
     start = true;
-    maybeDone();
+    update();
   }
 
-  private void maybeDone() {
-    if (isDone()) {
-      if (listener != null) {
-        listener.done();
-      }
-    }
+  private void update() {
+    if (listener == null)
+      return;
+    listener.progress(loaded, errors, total);
+    if (isDone())
+      listener.done();
   }
 }
