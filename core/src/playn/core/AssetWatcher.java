@@ -26,7 +26,7 @@ public class AssetWatcher {
   /**
    * A listener that is notified of asset loading progress and failures.
    */
-  public abstract class Listener {
+  public static abstract class Listener {
     /**
      * Informs the listener of progress as each asset load completes or fails.
      */
