@@ -128,8 +128,9 @@ public interface Graphics {
   int height();
 
   /**
-   * Sets the size of the drawable surface, in pixels.
+   * @deprecated Set the size at initialization time, using per-backend mechanisms.
    */
+  @Deprecated
   void setSize(int width, int height);
 
   /**

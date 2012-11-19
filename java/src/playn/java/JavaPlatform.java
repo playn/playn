@@ -53,6 +53,12 @@ public class JavaPlatform extends AbstractPlatform {
     /** Dictates the name of the temporary file used by {@link JavaStorage}. Configure this if you
      * want to run multiple sessions without overwriting one another's storage. */
     public String storageFileName = "playn";
+
+    /** The width of the PlayN window, in pixels. */
+    public int width = 640;
+
+    /** The height of the PlayN window, in pixels. */
+    public int height = 480;
   }
 
   /**

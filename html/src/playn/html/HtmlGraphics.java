@@ -138,10 +138,9 @@ public abstract class HtmlGraphics implements Graphics {
     return Document.get().getDocumentElement().getClientWidth();
   }
 
-  @Override
+  @Deprecated @Override
   public void setSize(int width, int height) {
-    rootElement.getStyle().setWidth(width, Unit.PX);
-    rootElement.getStyle().setHeight(height, Unit.PX);
+    // nothing doing
   }
 
   @Override

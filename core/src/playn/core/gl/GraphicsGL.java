@@ -28,11 +28,6 @@ import playn.core.SurfaceLayer;
 public abstract class GraphicsGL implements Graphics {
 
   @Override
-  public void setSize(int width, int height) {
-    ctx().setSize(width, height);
-  }
-
-  @Override
   public int width() {
     return ctx().viewWidth;
   }

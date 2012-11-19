@@ -62,9 +62,6 @@ public class HtmlPlatform extends AbstractPlatform {
     protected AgentInfo() {}
   }
 
-  static final int DEFAULT_WIDTH = 640;
-  static final int DEFAULT_HEIGHT = 480;
-
   /** Indicates whether this browser supports JavaScript typed arrays. */
   static final boolean hasTypedArraySupport = hasTypedArraySupport();
 
@@ -200,7 +197,6 @@ public class HtmlPlatform extends AbstractPlatform {
       pointer = new HtmlPointer(graphics.rootElement());
       mouse = new HtmlMouse(graphics.rootElement());
       touch = new HtmlTouch(graphics.rootElement());
-      graphics.setSize(HtmlPlatform.DEFAULT_WIDTH, HtmlPlatform.DEFAULT_HEIGHT);
 
     } catch (Throwable e) {
       log.error("init()", e);

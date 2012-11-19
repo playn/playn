@@ -80,13 +80,6 @@ class HtmlGraphicsCanvas extends HtmlGraphics {
   }
 
   @Override
-  public void setSize(int width, int height) {
-    super.setSize(width, height);
-    canvas.setWidth(width);
-    canvas.setHeight(height);
-  }
-
-  @Override
   public int width() {
     return canvas.getOffsetWidth();
   }

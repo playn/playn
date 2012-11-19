@@ -83,7 +83,7 @@ class FlashGraphics implements Graphics {
     FlashCanvas.CanvasElement canvasElement = FlashCanvas.CanvasElement.create();
     canvas = new FlashCanvas(screenWidth(), screenHeight(), canvasElement.getContext());
     ctx = canvas.getContext2d();
-    setSize (screenWidth(), screenHeight());
+    ctx.resize(screenWidth(), screenHeight());
     Sprite.getRootSprite().getStage().setScaleMode(StageScaleMode.NO_SCALE);
     Sprite.getRootSprite().getStage().setStageAlign(StageAlign.TOP_LEFT);
     Sprite.getRootSprite().addChild((Sprite) canvasElement.cast());
@@ -183,9 +183,9 @@ class FlashGraphics implements Graphics {
     return screenHeight();
   }
 
-  @Override
+  @Deprecated @Override
   public void setSize(int width, int height) {
-    ctx.resize(width, height);
+    // nothing doing
   }
 
   @Override

@@ -58,7 +58,6 @@ public class AndroidGraphics extends GraphicsGL {
   private final Point touchTemp = new Point();
 
   private int screenWidth, screenHeight;
-  private boolean sizeSetManually = false;
   private Map<Pair<String,Font.Style>,Typeface> fonts =
     new HashMap<Pair<String,Font.Style>,Typeface>();
   private Map<Pair<String,Font.Style>,String[]> ligatureHacks =
