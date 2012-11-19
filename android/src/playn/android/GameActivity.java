@@ -17,10 +17,6 @@ package playn.android;
 
 import java.io.File;
 
-import playn.core.Events;
-import playn.core.Key;
-import playn.core.Keyboard;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ComponentName;
@@ -28,7 +24,7 @@ import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.Bundle;
-import android.util.Log;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
@@ -36,15 +32,21 @@ import android.view.ViewGroup.LayoutParams;
 import android.view.WindowManager;
 import android.widget.LinearLayout;
 
+import playn.core.Events;
+import playn.core.Key;
+import playn.core.Keyboard;
+import playn.core.PlayN;
+
 /**
  * TODO: save/restore state
  */
 public abstract class GameActivity extends Activity {
-  private final int REQUIRED_CONFIG_CHANGES = ActivityInfo.CONFIG_ORIENTATION
-      | ActivityInfo.CONFIG_KEYBOARD_HIDDEN;
 
+  private final int REQUIRED_CONFIG_CHANGES =
+    ActivityInfo.CONFIG_ORIENTATION | ActivityInfo.CONFIG_KEYBOARD_HIDDEN;
+
+  private AndroidPlatform platform;
   private GameViewGL gameView;
-  private AndroidLayoutView viewLayout;
   private AndroidTouchEventHandler touchHandler;
   private Context context;
 
@@ -58,35 +60,27 @@ public abstract class GameActivity extends Activity {
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
 
-    context = getApplicationContext();
+    this.context = getApplicationContext();
 
     // Build the AndroidPlatform and register this activity.
-    AndroidGL20 gl20;
-    if (isHoneycombOrLater() || !AndroidGL20Native.available) {
-      gl20 = new AndroidGL20();
-    } else {
-      // Provide our own native bindings for some missing methods.
-      gl20 = new AndroidGL20Native();
-    }
-
-    // Build a View to hold the surface view and report changes to the screen size.
-    viewLayout = new AndroidLayoutView(this);
-    gameView = new GameViewGL(gl20, this, context);
-    touchHandler = new AndroidTouchEventHandler(gameView);
-    viewLayout.addView(gameView);
+    AndroidGL20 gl20 = (isHoneycombOrLater() || !AndroidGL20Native.available) ?
+      new AndroidGL20() :      // uses platform methods for everything
+      new AndroidGL20Native(); // uses our own native bindings for some missing methods
+    this.platform = new AndroidPlatform(this, gl20);
+    this.gameView = new GameViewGL(platform, gl20, context);
+    this.touchHandler = new AndroidTouchEventHandler(platform);
+    PlayN.setPlatform(platform);
 
     // Build the Window and View
+    int windowFlags = WindowManager.LayoutParams.FLAG_FULLSCREEN;
     if (isHoneycombOrLater()) {
-      // Use the raw constant rather than the flag to avoid blowing up on
-      // earlier Android
-      int flagHardwareAccelerated = 0x1000000;
-      getWindow().setFlags(flagHardwareAccelerated, flagHardwareAccelerated);
+      // Use the raw constant rather than the flag to avoid blowing up on earlier Android
+      windowFlags |= 0x1000000; // flagHardwareAccelerated
     }
+    getWindow().setFlags(windowFlags, windowFlags);
 
-    getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
-        WindowManager.LayoutParams.FLAG_FULLSCREEN);
-    LayoutParams params = new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT);
-    getWindow().setContentView(viewLayout, params);
+    // Create our layout and configure the window.
+    setContentView(gameView);
 
     // Default to landscape orientation.
     if (usePortraitOrientation()) {
@@ -106,7 +100,7 @@ public abstract class GameActivity extends Activity {
                 + "      android:configChanges=\"keyboardHidden|orientation\"").show();
       }
     } catch (NameNotFoundException e) {
-      Log.w("playn", "Cannot access game AndroidManifest.xml file.");
+      platform.log().warn("Cannot access game AndroidManifest.xml file.");
     }
   }
 
@@ -124,24 +118,29 @@ public abstract class GameActivity extends Activity {
     return 1; // TODO: determine scale factor automatically?
   }
 
-  public LinearLayout viewLayout() {
-    return viewLayout;
-  }
-
   public GameViewGL gameView() {
     return gameView;
   }
 
+  boolean isHoneycombOrLater() {
+    return android.os.Build.VERSION.SDK_INT >= 11;
+  }
+
   protected AndroidPlatform platform() {
-    return gameView.platform;
+    return platform;
   }
 
   protected Context context() {
     return context;
   }
 
-  boolean isHoneycombOrLater() {
-    return android.os.Build.VERSION.SDK_INT >= 11;
+  protected void setContentView(GameViewGL view) {
+    LinearLayout layout = new LinearLayout(this);
+    layout.setBackgroundColor(0xFF000000);
+    layout.setGravity(Gravity.CENTER);
+    layout.addView(gameView);
+    LayoutParams params = new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT);
+    getWindow().setContentView(layout, params);
   }
 
   @Override
@@ -149,7 +148,7 @@ public abstract class GameActivity extends Activity {
     for (File file : getCacheDir().listFiles()) {
       file.delete();
     }
-    platform().audio().onDestroy();
+    platform.audio().onDestroy();
     super.onDestroy();
   }
 
@@ -157,8 +156,7 @@ public abstract class GameActivity extends Activity {
   protected void onPause() {
     AndroidPlatform.debugLog("onPause");
     gameView.notifyVisibilityChanged(View.INVISIBLE);
-    if (platform() != null)
-      platform().audio().onPause();
+    platform.audio().onPause();
     super.onPause();
   }
 
@@ -166,8 +164,7 @@ public abstract class GameActivity extends Activity {
   protected void onResume() {
     AndroidPlatform.debugLog("onResume");
     gameView.notifyVisibilityChanged(View.VISIBLE);
-    if (platform() != null)
-      platform().audio().onResume();
+    platform.audio().onResume();
     super.onResume();
   }
 

@@ -40,10 +40,8 @@ class AndroidGLContext extends GL20Context {
   private Map<Refreshable, Void> refreshables =
     Collections.synchronizedMap(new WeakHashMap<Refreshable, Void>());
 
-  AndroidGLContext(AndroidPlatform platform, AndroidGL20 gfx, float scaleFactor,
-                   int screenWidth, int screenHeight) {
-    super(platform, gfx, scaleFactor, screenWidth, screenHeight, CHECK_ERRORS);
-    init();
+  AndroidGLContext(AndroidPlatform platform, AndroidGL20 gfx) {
+    super(platform, gfx, platform.activity.scaleFactor(), CHECK_ERRORS);
   }
 
   void onSurfaceCreated() {

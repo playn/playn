@@ -25,10 +25,10 @@ import playn.core.Touch;
 
 class AndroidTouchEventHandler {
 
-  private final GameViewGL gameView;
+  private final AndroidPlatform platform;
 
-  AndroidTouchEventHandler(GameViewGL gameView) {
-    this.gameView = gameView;
+  AndroidTouchEventHandler(AndroidPlatform platform) {
+    this.platform = platform;
   }
 
   public void onMotionEvent(MotionEvent nativeEvent) {
@@ -39,34 +39,34 @@ class AndroidTouchEventHandler {
     final Touch.Event.Impl[] touches = parseMotionEvent(nativeEvent, flags);
 
     // then process it (issuing game callbacks) on the GL/Game thread
-    gameView.platform.invokeLater(new Runnable() {
+    platform.invokeLater(new Runnable() {
       public void run() {
         Touch.Event pointerEvent = touches[0];
         switch (action & MotionEvent.ACTION_MASK) {
         case MotionEvent.ACTION_DOWN:
-          gameView.platform.touch().onTouchStart(touches);
-          gameView.platform.pointer().onPointerStart(
+          platform.touch().onTouchStart(touches);
+          platform.pointer().onPointerStart(
             new Pointer.Event.Impl(flags, time, pointerEvent.x(), pointerEvent.y(), true));
           break;
         case MotionEvent.ACTION_UP:
-          gameView.platform.touch().onTouchEnd(touches);
-          gameView.platform.pointer().onPointerEnd(
+          platform.touch().onTouchEnd(touches);
+          platform.pointer().onPointerEnd(
             new Pointer.Event.Impl(flags, time, pointerEvent.x(), pointerEvent.y(), true));
           break;
         case MotionEvent.ACTION_POINTER_DOWN:
-          gameView.platform.touch().onTouchStart(getChangedTouches(action, touches));
+          platform.touch().onTouchStart(getChangedTouches(action, touches));
           break;
         case MotionEvent.ACTION_POINTER_UP:
-          gameView.platform.touch().onTouchEnd(getChangedTouches(action, touches));
+          platform.touch().onTouchEnd(getChangedTouches(action, touches));
           break;
         case MotionEvent.ACTION_MOVE:
-          gameView.platform.touch().onTouchMove(touches);
-          gameView.platform.pointer().onPointerDrag(
+          platform.touch().onTouchMove(touches);
+          platform.pointer().onPointerDrag(
             new Pointer.Event.Impl(flags, time, pointerEvent.x(), pointerEvent.y(), true));
           break;
         case MotionEvent.ACTION_CANCEL:
-          gameView.platform.touch().onTouchCancel(touches);
-          gameView.platform.pointer().onPointerCancel(
+          platform.touch().onTouchCancel(touches);
+          platform.pointer().onPointerCancel(
             new Pointer.Event.Impl(flags, time, pointerEvent.x(), pointerEvent.y(), true));
           break;
         // case MotionEvent.ACTION_OUTSIDE:
@@ -97,7 +97,7 @@ class AndroidTouchEventHandler {
     int id;
     for (int t = 0; t < eventPointerCount; t++) {
       int pointerIndex = t;
-      IPoint xy = gameView.platform.graphics().transformTouch(
+      IPoint xy = platform.graphics().transformTouch(
         event.getX(pointerIndex), event.getY(pointerIndex));
       pressure = event.getPressure(pointerIndex);
       size = event.getSize(pointerIndex);

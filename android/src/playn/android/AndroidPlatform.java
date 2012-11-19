@@ -33,12 +33,6 @@ public class AndroidPlatform extends AbstractPlatform {
 
   public static final boolean DEBUG_LOGS = false;
 
-  public static AndroidPlatform register(AndroidGL20 gl20, GameActivity activity) {
-    AndroidPlatform platform = new AndroidPlatform(activity, gl20);
-    PlayN.setPlatform(platform);
-    return platform;
-  }
-
   Game game;
   GameActivity activity;
   private boolean paused;
@@ -59,7 +53,7 @@ public class AndroidPlatform extends AbstractPlatform {
     this.activity = activity;
 
     audio = new AndroidAudio(this);
-    graphics = new AndroidGraphics(this, gl20, activity.scaleFactor());
+    graphics = new AndroidGraphics(this, gl20);
     analytics = new AndroidAnalytics();
     assets = new AndroidAssets(this);
     json = new JsonImpl();
@@ -205,6 +199,15 @@ public class AndroidPlatform extends AbstractPlatform {
   protected void onResume() {
     super.onResume();
     paused = false;
+  }
+
+  void onSizeChanged(int width, int height) {
+    graphics.onSizeChanged(width, height);
+    // we delay the initialization of the game code until our UI is first laid out, so that the
+    // game always sees a valid initial screen size
+    if (game == null) {
+      activity.main();
+    }
   }
 
   boolean paused() {

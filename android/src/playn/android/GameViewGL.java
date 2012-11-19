@@ -31,11 +31,9 @@ public class GameViewGL extends GLSurfaceView implements SurfaceHolder.Callback 
 
   private static volatile int contextId = 1;
 
+  private final AndroidPlatform platform;
   private final AndroidGL20 gl20;
-  private final GameActivity activity;
   private GameLoop loop;
-  private boolean gameSizeSet = false; // Set by AndroidGraphics
-  AndroidPlatform platform;
 
   private class AndroidRendererGL implements Renderer {
     @Override
@@ -56,9 +54,7 @@ public class GameViewGL extends GLSurfaceView implements SurfaceHolder.Callback 
     @Override
     public void onDrawFrame(GL10 gl) {
       // Wait until onDrawFrame to make sure all the metrics are in place at this point.
-      if (platform == null) {
-        platform = AndroidPlatform.register(gl20, activity);
-        activity.main();
+      if (loop == null) {
         loop = new GameLoop(platform);
         loop.start();
       }
@@ -68,46 +64,19 @@ public class GameViewGL extends GLSurfaceView implements SurfaceHolder.Callback 
     }
   }
 
-  public GameViewGL(AndroidGL20 _gl20, GameActivity activity, Context context) {
+  public GameViewGL(AndroidPlatform platform, AndroidGL20 gl20, Context context) {
     super(context);
-    this.gl20 = _gl20;
-    this.activity = activity;
+    this.platform = platform;
+    this.gl20 = gl20;
     getHolder().addCallback(this);
     setFocusable(true);
     setEGLContextClientVersion(2);
-    if (activity.isHoneycombOrLater()) {
-      // FIXME: Need to use android3.0 as a Maven artifact for this to work
-      // setPreserveEGLContextOnPause(true);
-    }
+    // FIXME: Need to use android3.0 as a Maven artifact for this to work
+    // if (platform.activity.isHoneycombOrLater()) {
+    //   setPreserveEGLContextOnPause(true);
+    // }
     this.setRenderer(new AndroidRendererGL());
     setRenderMode(RENDERMODE_CONTINUOUSLY);
-  }
-
-  @Override
-  public void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-    // Default to filling all the available space when the game is first loads
-    if (platform != null && gameSizeSet) {
-      int width = platform.graphics().width();
-      int height = platform.graphics().height();
-      if (width == 0 || height == 0) {
-        Log.e("playn", "Invalid game size set: (" + width + " , " + height + ")");
-      } else {
-        int minWidth = getSuggestedMinimumWidth();
-        int minHeight = getSuggestedMinimumHeight();
-        width = width > minWidth ? width : minWidth;
-        height = height > minHeight ? height : minHeight;
-        setMeasuredDimension(width, height);
-        AndroidPlatform.debugLog("Using game-specified sizing. (" + width + " , " + height + ")");
-        return;
-      }
-    }
-
-    AndroidPlatform.debugLog("Using default sizing.");
-    super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-  }
-
-  void gameSizeSet() {
-    gameSizeSet = true;
   }
 
   static int contextId() {
@@ -155,6 +124,12 @@ public class GameViewGL extends GLSurfaceView implements SurfaceHolder.Callback 
         }
       });
     }
+  }
+
+  @Override
+  protected void onSizeChanged(int width, int height, int owidth, int oheight) {
+    super.onSizeChanged(width, height, owidth, oheight);
+    platform.onSizeChanged(width, height);
   }
 
   void onKeyDown(final Keyboard.Event event) {
