@@ -64,10 +64,13 @@ class AndroidTouchEventHandler {
           gameView.platform.pointer().onPointerDrag(
             new Pointer.Event.Impl(flags, time, pointerEvent.x(), pointerEvent.y(), true));
           break;
-          // case MotionEvent.ACTION_CANCEL:
-          //   break;
-          // case MotionEvent.ACTION_OUTSIDE:
-          //   break;
+        case MotionEvent.ACTION_CANCEL:
+          gameView.platform.touch().onTouchCancel(touches);
+          gameView.platform.pointer().onPointerCancel(
+            new Pointer.Event.Impl(flags, time, pointerEvent.x(), pointerEvent.y(), true));
+          break;
+        // case MotionEvent.ACTION_OUTSIDE:
+        //   break;
         }
       }
     });

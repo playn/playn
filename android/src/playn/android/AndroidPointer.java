@@ -18,6 +18,7 @@ package playn.android;
 import playn.core.PointerImpl;
 
 class AndroidPointer extends PointerImpl {
+
   // true when we are in a drag sequence (after pointer start but before pointer end)
   private boolean inDragSequence = false;
 
@@ -35,5 +36,10 @@ class AndroidPointer extends PointerImpl {
   void onPointerEnd(Event.Impl event) {
     inDragSequence = false;
     onPointerEnd(event, false);
+  }
+
+  void onPointerCancel(Event.Impl event) {
+    inDragSequence = false;
+    onPointerCancel(event, false);
   }
 }
