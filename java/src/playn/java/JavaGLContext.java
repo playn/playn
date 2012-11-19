@@ -40,7 +40,8 @@ class JavaGLContext extends GL20Context {
   public static final boolean CHECK_ERRORS = Boolean.getBoolean("playn.glerrors");
 
   JavaGLContext(JavaPlatform platform, float scaleFactor, int screenWidth, int screenHeight) {
-    super(platform, new JavaGL20(), scaleFactor, screenWidth, screenHeight, CHECK_ERRORS);
+    super(platform, new JavaGL20(), scaleFactor, CHECK_ERRORS);
+    setSize(screenWidth, screenHeight);
   }
 
   @Override

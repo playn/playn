@@ -49,7 +49,7 @@ public class JavaGraphics extends GraphicsGL {
     // initialization of LWJGL; this allows tests to run against non-graphics services without
     // needing to configure LWJGL native libraries
     if (config.headless)
-      this.ctx = new GL20Context(platform, null, config.scaleFactor, DEF_WIDTH, DEF_HEIGHT, false) {
+      this.ctx = new GL20Context(platform, null, config.scaleFactor, false) {
         @Override
         protected void viewWasResized () {}
       };

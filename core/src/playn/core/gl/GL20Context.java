@@ -34,12 +34,10 @@ public class GL20Context extends GLContext {
   private int minFilter = GL_LINEAR, magFilter = GL_LINEAR;
   private GLShader quadShader, trisShader;
 
-  public GL20Context(Platform platform, GL20 gl, float scaleFactor,
-                     int screenWidth, int screenHeight, boolean checkErrors) {
+  public GL20Context(Platform platform, GL20 gl, float scaleFactor, boolean checkErrors) {
     super(platform, scaleFactor);
     this.gl = gl;
     this.checkErrors = checkErrors;
-    setSize(screenWidth, screenHeight);
     // create our root transform with our scale factor
     rootXform = createTransform();
     rootXform.uniformScale(scaleFactor);

@@ -37,11 +37,11 @@ public class HtmlGLContext extends GL20Context {
   private final WebGLRenderingContext glc;
 
   HtmlGLContext(HtmlPlatform platform, WebGLRenderingContext gl, CanvasElement canvas) {
-    super(platform, new HtmlGL20(gl), 1, canvas.getWidth(), canvas.getHeight(),
-          HtmlUrlParameters.checkGLErrors);
+    super(platform, new HtmlGL20(gl), 1, HtmlUrlParameters.checkGLErrors);
     this.glc = gl;
     // try basic GL operations to detect failure cases early
     tryBasicGLCalls();
+    setSize(canvas.getWidth(), canvas.getHeight());
     init();
     glc.pixelStorei(UNPACK_PREMULTIPLY_ALPHA_WEBGL, ONE);
   }
