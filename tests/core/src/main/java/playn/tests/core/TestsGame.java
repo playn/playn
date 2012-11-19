@@ -96,7 +96,7 @@ public class TestsGame implements Game {
     keyboard().setListener(new Keyboard.Adapter() {
       @Override
       public void onKeyDown(Keyboard.Event event) {
-        if (event.key() == Key.ESCAPE)
+        if (event.key() == Key.ESCAPE || event.key() == Key.BACK)
           displayMenu();
       }
     });
