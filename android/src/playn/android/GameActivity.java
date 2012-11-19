@@ -45,6 +45,7 @@ public abstract class GameActivity extends Activity {
 
   private GameViewGL gameView;
   private AndroidLayoutView viewLayout;
+  private AndroidTouchEventHandler touchHandler;
   private Context context;
 
   /**
@@ -68,10 +69,10 @@ public abstract class GameActivity extends Activity {
       gl20 = new AndroidGL20Native();
     }
 
-    // Build a View to hold the surface view and report changes to the screen
-    // size.
+    // Build a View to hold the surface view and report changes to the screen size.
     viewLayout = new AndroidLayoutView(this);
     gameView = new GameViewGL(gl20, this, context);
+    touchHandler = new AndroidTouchEventHandler(gameView);
     viewLayout.addView(gameView);
 
     // Build the Window and View
@@ -171,9 +172,9 @@ public abstract class GameActivity extends Activity {
   }
 
   /**
-   * Called automatically to handle keyboard events. Automatically passes through
-   * the parsed keyboard event to {@GameViewGL} for processing in the {@Keyboard}
-   * Listener instance on the render thread.
+   * Called automatically to handle keyboard events. Automatically passes through the parsed
+   * keyboard event to {@GameViewGL} for processing in the {@Keyboard} Listener instance on the
+   * render thread.
    */
   @Override
   public boolean onKeyDown(int keyCode, KeyEvent nativeEvent) {
@@ -200,13 +201,13 @@ public abstract class GameActivity extends Activity {
   }
 
   /**
-   * Called automatically to handle touch events. Automatically passes through
-   * the parsed MotionEvent to {@GameViewGL} for processing in the {@Touch}
-   * and {@Pointer} Listener instances on the render thread.
+   * Called automatically to handle touch events. Queues the touch events to be processed on the
+   * game thread.
    */
   @Override
   public boolean onTouchEvent(MotionEvent event) {
-    return platform().touchEventHandler().onMotionEvent(event);
+    touchHandler.onMotionEvent(event);
+    return false;
   }
 
   // TODO: uncomment the remaining key codes when we upgrade to latest Android jars

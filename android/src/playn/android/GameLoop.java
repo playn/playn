@@ -20,6 +20,7 @@ import static playn.core.PlayN.log;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class GameLoop implements Runnable {
+
   private static final boolean LOG_FPS = false;
   private static final int MAX_DELTA = 100;
 

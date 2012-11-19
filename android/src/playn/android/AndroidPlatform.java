@@ -52,7 +52,6 @@ public class AndroidPlatform extends AbstractPlatform {
   private final AndroidPointer pointer;
   private final AndroidStorage storage;
   private final TouchImpl touch;
-  private final AndroidTouchEventHandler touchHandler;
   private final Json json;
 
   protected AndroidPlatform(GameActivity activity, AndroidGL20 gl20) {
@@ -69,7 +68,6 @@ public class AndroidPlatform extends AbstractPlatform {
     pointer = new AndroidPointer();
     storage = new AndroidStorage(this);
     touch = new TouchImpl();
-    touchHandler = new AndroidTouchEventHandler(graphics, activity.gameView());
   }
 
   static void debugLog(String message) {
@@ -155,10 +153,6 @@ public class AndroidPlatform extends AbstractPlatform {
   @Override
   public TouchImpl touch() {
     return touch;
-  }
-
-  public AndroidTouchEventHandler touchEventHandler() {
-    return touchHandler;
   }
 
   @Override
