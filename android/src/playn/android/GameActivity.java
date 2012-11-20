@@ -173,13 +173,13 @@ public abstract class GameActivity extends Activity {
   @Override
   public boolean onKeyDown(int keyCode, KeyEvent event) {
     keyHandler.onKeyDown(keyCode, event);
-    return false;
+    return super.onKeyDown(keyCode, event);
   }
 
   @Override
   public boolean onKeyUp(int keyCode, KeyEvent event) {
     keyHandler.onKeyUp(keyCode, event);
-    return false;
+    return super.onKeyUp(keyCode, event);
   }
 
   /**
@@ -189,6 +189,6 @@ public abstract class GameActivity extends Activity {
   @Override
   public boolean onTouchEvent(MotionEvent event) {
     touchHandler.onMotionEvent(event);
-    return false;
+    return super.onTouchEvent(event);
   }
 }
