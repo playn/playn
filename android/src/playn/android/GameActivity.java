@@ -101,13 +101,18 @@ public abstract class GameActivity extends Activity {
     }
   }
 
+  @Override
+  public void onBackPressed() {
+    moveTaskToBack(false);
+  }
+
   /**
-   * Determines whether or not a game should run in portrait orientation or not.
-   * Defaults to false. Override this method to return true to use portrait.
+   * Determines whether or not a game should run in portrait orientation or not. Defaults to false.
+   * Override this method to return true to use portrait.
    *
    * @return Whether or not the game will run in portrait orientation
    */
-  public boolean usePortraitOrientation() {
+  protected boolean usePortraitOrientation() {
     return false;
   }
 
