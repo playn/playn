@@ -191,7 +191,7 @@ public class AndroidPlatform extends AbstractPlatform {
     return Type.ANDROID;
   }
 
-  // allow these to be called by GameViewGL
+  // allow these to be called by GameActivity
   protected void onPause() {
     super.onPause();
     paused = true;
@@ -201,17 +201,11 @@ public class AndroidPlatform extends AbstractPlatform {
     paused = false;
   }
 
-  void onSizeChanged(int width, int height) {
-    graphics.onSizeChanged(width, height);
-    // we delay the initialization of the game code until our UI is first laid out, so that the
-    // game always sees a valid initial screen size
-    if (game == null) {
-      activity.main();
-    }
-  }
-
   boolean paused() {
     return paused;
+  }
+  protected void onExit() {
+    super.onExit();
   }
 
   void update(float delta) {

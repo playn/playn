@@ -20,116 +20,85 @@ import javax.microedition.khronos.opengles.GL10;
 
 import android.content.Context;
 import android.opengl.GLSurfaceView;
-import android.util.Log;
 import android.view.SurfaceHolder;
+import android.view.View;
 
 import playn.core.Keyboard;
 import playn.core.Pointer;
 import playn.core.Touch;
 
-public class GameViewGL extends GLSurfaceView implements SurfaceHolder.Callback {
-
-  private static volatile int contextId = 1;
+public class GameViewGL extends GLSurfaceView {
 
   private final AndroidPlatform platform;
   private final AndroidGL20 gl20;
   private GameLoop loop;
 
-  private class AndroidRendererGL implements Renderer {
-    @Override
-    public void onSurfaceCreated(GL10 gl, EGLConfig config) {
-      contextId++;
-      // EGLContext lost, so surfaces need to be rebuilt and redrawn.
-      if (platform != null) {
-        platform.graphics().ctx.onSurfaceCreated();
-      }
-    }
-
-    @Override
-    public void onSurfaceChanged(GL10 gl, int width, int height) {
-      gl20.glViewport(0, 0, width, height);
-      AndroidPlatform.debugLog("Surface dimensions changed to ( " + width + " , " + height + ")");
-    }
-
-    @Override
-    public void onDrawFrame(GL10 gl) {
-      // Wait until onDrawFrame to make sure all the metrics are in place at this point.
-      if (loop == null) {
-        loop = new GameLoop(platform);
-        loop.start();
-      }
-      // Handle updating, clearing the screen, and drawing
-      if (loop.running())
-        loop.run();
-    }
-  }
-
-  public GameViewGL(AndroidPlatform platform, AndroidGL20 gl20, Context context) {
+  public GameViewGL(AndroidPlatform aplatform, AndroidGL20 gl20, Context context) {
     super(context);
-    this.platform = platform;
+    this.platform = aplatform;
     this.gl20 = gl20;
-    getHolder().addCallback(this);
+
     setFocusable(true);
     setEGLContextClientVersion(2);
     // FIXME: Need to use android3.0 as a Maven artifact for this to work
     // if (platform.activity.isHoneycombOrLater()) {
     //   setPreserveEGLContextOnPause(true);
     // }
-    this.setRenderer(new AndroidRendererGL());
+
+    // set up our renderer
+    setRenderer(new Renderer() {
+      @Override
+      public void onSurfaceCreated(GL10 gl, EGLConfig config) {
+        platform.graphics().ctx.onSurfaceCreated();
+      }
+      @Override
+      public void onSurfaceChanged(GL10 gl, int width, int height) {
+        platform.graphics().onSizeChanged(width, height);
+        // we defer the start of the game until we've received our initial surface size; thus we
+        // create our game loop lazily, then initialize the game and start the loop
+        if (loop == null) {
+          startGame();
+        }
+      }
+      @Override
+      public void onDrawFrame(GL10 gl) {
+        if (loop.running())
+          loop.run();
+      }
+    });
     setRenderMode(RENDERMODE_CONTINUOUSLY);
-  }
-
-  static int contextId() {
-    return contextId;
-  }
-
-  /*
-   * Input and lifecycle functions called by the UI thread.
-   */
-  public void notifyVisibilityChanged(int visibility) {
-    Log.i("playn", "notifyVisibilityChanged: " + visibility);
-    if (visibility == INVISIBLE) {
-      if (loop != null)
-        loop.pause();
-      onPause();
-    } else {
-      if (loop != null)
-        loop.start();
-      onResume();
-    }
   }
 
   @Override
   public void onPause() {
-    if (platform != null) {
-      queueEvent(new Runnable() {
-        @Override
-        public void run() {
-          platform.graphics().ctx.onSurfaceLost();
-          platform.onPause();
-        }
-      });
-    }
+    loop.pause();
+    // this is a terribly unfortunate hack; we would like to override surfaceDestroyed and indicate
+    // that our surface was lost only when that method was called, but surfaceDestroyed is not
+    // called when the screen is locked while our game is running (even though we do in fact lose
+    // our GL context at that point); so we have to assume that we ALWAYS lose our GL context when
+    // paused; that's generally true, so we're probably safe in assuming so, but it sucks
+    platform.graphics().ctx.onSurfaceLost();
     super.onPause();
   }
 
   @Override
   public void onResume() {
     super.onResume();
-    if (platform != null) {
-      queueEvent(new Runnable() {
-        @Override
-        public void run() {
-          platform.onResume();
-        }
-      });
-    }
+    // the very first time we're resumed, our loop will still be null because we wait to create it
+    // until after our UI has been laid out and we know the size of the game screen
+    if (loop != null)
+      loop.start();
   }
 
-  @Override
-  protected void onSizeChanged(int width, int height, int owidth, int oheight) {
-    super.onSizeChanged(width, height, owidth, oheight);
-    platform.onSizeChanged(width, height);
+  void startGame() {
+    loop = new GameLoop(platform);
+    queueEvent(new Runnable() {
+      @Override
+      public void run() {
+        platform.activity.main();
+        loop.start();
+      }
+    });
   }
 
   void onKeyDown(final Keyboard.Event event) {

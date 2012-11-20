@@ -59,7 +59,6 @@ public abstract class GameActivity extends Activity {
   @Override
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-
     this.context = getApplicationContext();
 
     // Build the AndroidPlatform and register this activity.
@@ -149,22 +148,33 @@ public abstract class GameActivity extends Activity {
       file.delete();
     }
     platform.audio().onDestroy();
+    platform.onExit();
     super.onDestroy();
   }
 
   @Override
   protected void onPause() {
-    AndroidPlatform.debugLog("onPause");
-    gameView.notifyVisibilityChanged(View.INVISIBLE);
-    platform.audio().onPause();
+    if (AndroidPlatform.DEBUG_LOGS) platform.log().debug("onPause");
+    gameView.onPause();
+    platform.invokeLater(new Runnable() {
+      public void run() {
+        platform.onPause();
+        platform.audio().onPause();
+      }
+    });
     super.onPause();
   }
 
   @Override
   protected void onResume() {
-    AndroidPlatform.debugLog("onResume");
-    gameView.notifyVisibilityChanged(View.VISIBLE);
-    platform.audio().onResume();
+    if (AndroidPlatform.DEBUG_LOGS) platform.log().debug("onResume");
+    gameView.onResume();
+    platform.invokeLater(new Runnable() {
+      public void run() {
+        platform.audio().onResume();
+        platform.onResume();
+      }
+    });
     super.onResume();
   }
 
