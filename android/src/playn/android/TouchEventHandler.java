@@ -23,11 +23,11 @@ import playn.core.Events;
 import playn.core.Pointer;
 import playn.core.Touch;
 
-class AndroidTouchEventHandler {
+class TouchEventHandler {
 
   private final AndroidPlatform platform;
 
-  AndroidTouchEventHandler(AndroidPlatform platform) {
+  TouchEventHandler(AndroidPlatform platform) {
     this.platform = platform;
   }
 
