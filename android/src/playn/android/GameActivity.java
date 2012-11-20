@@ -144,6 +144,7 @@ public abstract class GameActivity extends Activity {
 
   @Override
   protected void onDestroy() {
+    AndroidPlatform.debugLog("onDestroy");
     for (File file : getCacheDir().listFiles()) {
       file.delete();
     }
@@ -154,27 +155,24 @@ public abstract class GameActivity extends Activity {
 
   @Override
   protected void onPause() {
-    if (AndroidPlatform.DEBUG_LOGS) platform.log().debug("onPause");
+    AndroidPlatform.debugLog("onPause");
     gameView.onPause();
-    platform.invokeLater(new Runnable() {
-      public void run() {
-        platform.onPause();
-        platform.audio().onPause();
-      }
-    });
+    // TODO: we should really wait for the renderer to stop here, because otherwise
+    // Platform.onPause could be racing with one final frame on the GL thread; however I've seen
+    // scary things about deadlock and other crap by people who have tried to do this "correctly"
+    platform.onPause();
+    platform.audio().onPause();
     super.onPause();
   }
 
   @Override
   protected void onResume() {
-    if (AndroidPlatform.DEBUG_LOGS) platform.log().debug("onResume");
+    AndroidPlatform.debugLog("onResume");
+    // since the GL thread is not running, we go ahead and run these onResumes on the UI thread,
+    // then resume the GL thread as our last action
+    platform.audio().onResume();
+    platform.onResume();
     gameView.onResume();
-    platform.invokeLater(new Runnable() {
-      public void run() {
-        platform.audio().onResume();
-        platform.onResume();
-      }
-    });
     super.onResume();
   }
 

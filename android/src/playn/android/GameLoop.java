@@ -40,6 +40,10 @@ public class GameLoop implements Runnable {
     this.platform = platform;
   }
 
+  public boolean running() {
+    return running.get();
+  }
+
   public void start() {
     if (!running.get()) {
       AndroidPlatform.debugLog("Starting game loop");
@@ -93,9 +97,5 @@ public class GameLoop implements Runnable {
     // 2.3 update. Instead we use an offset from a known time to keep it within
     // int range.
     return (int) (System.currentTimeMillis() - timeOffset);
-  }
-
-  public boolean running() {
-    return running.get();
   }
 }

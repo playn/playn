@@ -50,14 +50,12 @@ public class GameViewGL extends GLSurfaceView {
         GameViewGL.this.platform.graphics().onSizeChanged(width, height);
         // we defer the start of the game until we've received our initial surface size; thus we
         // create our game loop lazily, then initialize the game and start the loop
-        if (loop == null) {
+        if (loop == null)
           startGame();
-        }
       }
       @Override
       public void onDrawFrame(GL10 gl) {
-        if (loop.running())
-          loop.run();
+        loop.run();
       }
     });
     setRenderMode(RENDERMODE_CONTINUOUSLY);
@@ -71,7 +69,11 @@ public class GameViewGL extends GLSurfaceView {
     // called when the screen is locked while our game is running (even though we do in fact lose
     // our GL context at that point); so we have to assume that we ALWAYS lose our GL context when
     // paused; that's generally true, so we're probably safe in assuming so, but it sucks
-    platform.graphics().ctx.onSurfaceLost();
+    queueEvent(new Runnable() {
+      public void run () {
+        platform.graphics().ctx.onSurfaceLost();
+      }
+    });
     super.onPause();
   }
 
