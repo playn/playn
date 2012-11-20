@@ -66,7 +66,7 @@ public abstract class GameActivity extends Activity {
       new AndroidGL20() :      // uses platform methods for everything
       new AndroidGL20Native(); // uses our own native bindings for some missing methods
     this.platform = new AndroidPlatform(this, gl20);
-    this.gameView = new GameViewGL(platform, gl20, context);
+    this.gameView = new GameViewGL(context, platform, gl20);
     this.touchHandler = new AndroidTouchEventHandler(platform);
     PlayN.setPlatform(platform);
 
@@ -186,25 +186,41 @@ public abstract class GameActivity extends Activity {
   @Override
   public boolean onKeyDown(int keyCode, KeyEvent nativeEvent) {
     long time = nativeEvent.getEventTime();
-    Keyboard.Event event = new Keyboard.Event.Impl(
+    final Keyboard.Event event = new Keyboard.Event.Impl(
       new Events.Flags.Impl(), time, keyForCode(keyCode));
-    gameView.onKeyDown(event);
+    platform.invokeLater(new Runnable() {
+      @Override
+      public void run() {
+        platform.keyboard().onKeyDown(event);
+      }
+    });
 
     int unicodeChar = nativeEvent.getUnicodeChar();
     if (unicodeChar != 0) {
-      gameView.onKeyTyped(new Keyboard.TypedEvent.Impl(
-        event.flags(), time, (char)unicodeChar));
+      final Keyboard.TypedEvent typedEvent =
+        new Keyboard.TypedEvent.Impl(event.flags(), time, (char)unicodeChar);
+      platform.invokeLater(new Runnable() {
+        @Override
+        public void run() {
+          platform.keyboard().onKeyTyped(typedEvent);
+        }
+      });
     }
 
-    return event.flags().getPreventDefault();
+    return false;
   }
 
   @Override
   public boolean onKeyUp(int keyCode, KeyEvent nativeEvent) {
-    Keyboard.Event event = new Keyboard.Event.Impl(
+    final Keyboard.Event event = new Keyboard.Event.Impl(
       new Events.Flags.Impl(), nativeEvent.getEventTime(), keyForCode(keyCode));
-    gameView.onKeyUp(event);
-    return event.flags().getPreventDefault();
+    platform.invokeLater(new Runnable() {
+      @Override
+      public void run() {
+        platform.keyboard().onKeyUp(event);
+      }
+    });
+    return false;
   }
 
   /**

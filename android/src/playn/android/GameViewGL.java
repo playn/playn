@@ -20,12 +20,6 @@ import javax.microedition.khronos.opengles.GL10;
 
 import android.content.Context;
 import android.opengl.GLSurfaceView;
-import android.view.SurfaceHolder;
-import android.view.View;
-
-import playn.core.Keyboard;
-import playn.core.Pointer;
-import playn.core.Touch;
 
 public class GameViewGL extends GLSurfaceView {
 
@@ -33,9 +27,9 @@ public class GameViewGL extends GLSurfaceView {
   private final AndroidGL20 gl20;
   private GameLoop loop;
 
-  public GameViewGL(AndroidPlatform aplatform, AndroidGL20 gl20, Context context) {
+  public GameViewGL(Context context, AndroidPlatform platform, AndroidGL20 gl20) {
     super(context);
-    this.platform = aplatform;
+    this.platform = platform;
     this.gl20 = gl20;
 
     setFocusable(true);
@@ -49,11 +43,11 @@ public class GameViewGL extends GLSurfaceView {
     setRenderer(new Renderer() {
       @Override
       public void onSurfaceCreated(GL10 gl, EGLConfig config) {
-        platform.graphics().ctx.onSurfaceCreated();
+        GameViewGL.this.platform.graphics().ctx.onSurfaceCreated();
       }
       @Override
       public void onSurfaceChanged(GL10 gl, int width, int height) {
-        platform.graphics().onSizeChanged(width, height);
+        GameViewGL.this.platform.graphics().onSizeChanged(width, height);
         // we defer the start of the game until we've received our initial surface size; thus we
         // create our game loop lazily, then initialize the game and start the loop
         if (loop == null) {
@@ -97,33 +91,6 @@ public class GameViewGL extends GLSurfaceView {
       public void run() {
         platform.activity.main();
         loop.start();
-      }
-    });
-  }
-
-  void onKeyDown(final Keyboard.Event event) {
-    queueEvent(new Runnable() {
-      @Override
-      public void run() {
-        platform.keyboard().onKeyDown(event);
-      }
-    });
-  }
-
-  void onKeyTyped(final Keyboard.TypedEvent event) {
-    queueEvent(new Runnable() {
-      @Override
-      public void run() {
-        platform.keyboard().onKeyTyped(event);
-      }
-    });
-  }
-
-  void onKeyUp(final Keyboard.Event event) {
-    queueEvent(new Runnable() {
-      @Override
-      public void run() {
-        platform.keyboard().onKeyUp(event);
       }
     });
   }
