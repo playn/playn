@@ -102,43 +102,30 @@ public abstract class GameActivity extends Activity {
   }
 
   @Override
+  public boolean onKeyDown(int keyCode, KeyEvent event) {
+    keyHandler.onKeyDown(keyCode, event);
+    return super.onKeyDown(keyCode, event);
+  }
+
+  @Override
+  public boolean onKeyUp(int keyCode, KeyEvent event) {
+    keyHandler.onKeyUp(keyCode, event);
+    return super.onKeyUp(keyCode, event);
+  }
+
+  @Override
   public void onBackPressed() {
     moveTaskToBack(false);
   }
 
   /**
-   * Determines whether or not a game should run in portrait orientation or not. Defaults to false.
-   * Override this method to return true to use portrait.
-   *
-   * @return Whether or not the game will run in portrait orientation
+   * Called automatically to handle touch events. Queues the touch events to be processed on the
+   * game thread.
    */
-  protected boolean usePortraitOrientation() {
-    return false;
-  }
-
-  protected float scaleFactor() {
-    return 1; // TODO: determine scale factor automatically?
-  }
-
-  public GameViewGL gameView() {
-    return gameView;
-  }
-
-  boolean isHoneycombOrLater() {
-    return android.os.Build.VERSION.SDK_INT >= 11;
-  }
-
-  protected AndroidPlatform platform() {
-    return platform;
-  }
-
-  protected void setContentView(GameViewGL view) {
-    LinearLayout layout = new LinearLayout(this);
-    layout.setBackgroundColor(0xFF000000);
-    layout.setGravity(Gravity.CENTER);
-    layout.addView(gameView);
-    LayoutParams params = new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT);
-    getWindow().setContentView(layout, params);
+  @Override
+  public boolean onTouchEvent(MotionEvent event) {
+    touchHandler.onMotionEvent(event);
+    return super.onTouchEvent(event);
   }
 
   @Override
@@ -175,25 +162,38 @@ public abstract class GameActivity extends Activity {
     super.onResume();
   }
 
-  @Override
-  public boolean onKeyDown(int keyCode, KeyEvent event) {
-    keyHandler.onKeyDown(keyCode, event);
-    return super.onKeyDown(keyCode, event);
-  }
-
-  @Override
-  public boolean onKeyUp(int keyCode, KeyEvent event) {
-    keyHandler.onKeyUp(keyCode, event);
-    return super.onKeyUp(keyCode, event);
-  }
-
   /**
-   * Called automatically to handle touch events. Queues the touch events to be processed on the
-   * game thread.
+   * Determines whether or not a game should run in portrait orientation or not. Defaults to false.
+   * Override this method to return true to use portrait.
+   *
+   * @return Whether or not the game will run in portrait orientation
    */
-  @Override
-  public boolean onTouchEvent(MotionEvent event) {
-    touchHandler.onMotionEvent(event);
-    return super.onTouchEvent(event);
+  protected boolean usePortraitOrientation() {
+    return false;
+  }
+
+  protected float scaleFactor() {
+    return 1; // TODO: determine scale factor automatically?
+  }
+
+  public GameViewGL gameView() {
+    return gameView;
+  }
+
+  boolean isHoneycombOrLater() {
+    return android.os.Build.VERSION.SDK_INT >= 11;
+  }
+
+  protected AndroidPlatform platform() {
+    return platform;
+  }
+
+  protected void setContentView(GameViewGL view) {
+    LinearLayout layout = new LinearLayout(this);
+    layout.setBackgroundColor(0xFF000000);
+    layout.setGravity(Gravity.CENTER);
+    layout.addView(gameView);
+    LayoutParams params = new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT);
+    getWindow().setContentView(layout, params);
   }
 }
