@@ -157,6 +157,7 @@ public class IOSPlatform extends AbstractPlatform {
   private final UIWindow mainWindow;
   private final IOSRootViewController rootViewController;
   private final IOSGameView gameView;
+  private final UIView uiOverlay;
 
   protected IOSPlatform(UIApplication app, SupportedOrients orients, boolean iPadLikePhone) {
     super(new IOSLog());
@@ -185,10 +186,13 @@ public class IOSPlatform extends AbstractPlatform {
     storage = new IOSStorage();
 
     mainWindow = new UIWindow(bounds);
-    mainWindow.Add(gameView = new IOSGameView(this, bounds, deviceScale));
-    rootViewController = new IOSRootViewController(this);
-    rootViewController.get_View().set_MultipleTouchEnabled(true);
+    gameView = new IOSGameView(this, bounds, deviceScale);
+    rootViewController = new IOSRootViewController(this, gameView);
     mainWindow.set_RootViewController(rootViewController);
+
+    uiOverlay = new UIView(bounds);
+    uiOverlay.set_MultipleTouchEnabled(true);
+    gameView.Add(uiOverlay);
 
     // if the game supplied a proper delegate, configure it (for lifecycle notifications)
     if (app.get_Delegate() instanceof IOSApplicationDelegate)
@@ -316,7 +320,7 @@ public class IOSPlatform extends AbstractPlatform {
   }
 
   public UIView uiOverlay() {
-    return rootViewController.get_View();
+    return uiOverlay;
   }
 
   // make these accessible to IOSApplicationDelegate

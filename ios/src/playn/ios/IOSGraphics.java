@@ -140,8 +140,7 @@ public class IOSGraphics extends GraphicsGL {
   }
 
   IPoint transformTouch(float x, float y) {
-    return touchTemp.set(x*touchScale/ctx.scale.factor,
-                         y*touchScale/ctx.scale.factor);
+    return ctx.rootTransform().inverseTransform(touchTemp.set(x, y), touchTemp);
   }
 
   void paint(Game game, float alpha) {

@@ -151,34 +151,6 @@ public class IOSGameView extends iPhoneOSGameView {
     platform.update(delta);
   }
 
-  @Override
-  public void TouchesBegan(NSSet touches, UIEvent event) {
-    super.TouchesBegan(touches, event);
-    platform.touch().onTouchesBegan(touches, event);
-    platform.pointer().onTouchesBegan(touches, event);
-  }
-
-  @Override
-  public void TouchesMoved(NSSet touches, UIEvent event) {
-    super.TouchesMoved(touches, event);
-    platform.touch().onTouchesMoved(touches, event);
-    platform.pointer().onTouchesMoved(touches, event);
-  }
-
-  @Override
-  public void TouchesEnded(NSSet touches, UIEvent event) {
-    super.TouchesEnded(touches, event);
-    platform.touch().onTouchesEnded(touches, event);
-    platform.pointer().onTouchesEnded(touches, event);
-  }
-
-  @Override
-  public void TouchesCancelled(NSSet touches, UIEvent event) {
-    super.TouchesCancelled(touches, event);
-    platform.touch().onTouchesCancelled(touches, event);
-    platform.pointer().onTouchesCancelled(touches, event);
-  }
-
   @ExportAttribute.Annotation("layerClass")
   static cli.MonoTouch.ObjCRuntime.Class LayerClass() {
     return iPhoneOSGameView.GetLayerClass();

@@ -17,6 +17,7 @@ package playn.ios;
 
 import cli.MonoTouch.Foundation.NSSet;
 import cli.MonoTouch.UIKit.UIEvent;
+import cli.MonoTouch.UIKit.UIInterfaceOrientation;
 import cli.MonoTouch.UIKit.UIViewController;
 
 /**
@@ -27,9 +28,26 @@ import cli.MonoTouch.UIKit.UIViewController;
 public class IOSRootViewController extends UIViewController {
 
   private final IOSPlatform platform;
+  private final IOSGameView gameView;
 
-  public IOSRootViewController(IOSPlatform platform) {
+  public IOSRootViewController(IOSPlatform platform, IOSGameView gameView) {
     this.platform = platform;
+    this.gameView = gameView;
+  }
+
+  @Override // iOS 6+
+  public boolean ShouldAutorotate() {
+    return false;
+  }
+
+  @Override // iOS 5-
+  public boolean ShouldAutorotateToInterfaceOrientation(UIInterfaceOrientation orient) {
+    return orient.Value == UIInterfaceOrientation.Portrait;
+  }
+
+  @Override
+  public void LoadView() {
+    set_View(gameView);
   }
 
   @Override
