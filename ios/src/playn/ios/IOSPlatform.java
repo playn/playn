@@ -188,6 +188,7 @@ public class IOSPlatform extends AbstractPlatform {
     mainWindow = new UIWindow(bounds);
     mainWindow.Add(gameView = new IOSGameView(this, bounds, deviceScale));
     rootViewController = new IOSRootViewController(this);
+    rootViewController.get_View().set_MultipleTouchEnabled(true);
     mainWindow.set_RootViewController(rootViewController);
 
     uiOverlay = new UIView(bounds);
