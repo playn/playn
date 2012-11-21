@@ -315,6 +315,10 @@ public class IOSPlatform extends AbstractPlatform {
     mainWindow.MakeKeyAndVisible();
   }
 
+  public UIWindow window () {
+    return mainWindow;
+  }
+
   public UIViewController rootViewController() {
     return rootViewController;
   }
