@@ -159,6 +159,25 @@ public class IOSPlatform extends AbstractPlatform {
   private final IOSGameView gameView;
   private final UIView uiOverlay;
 
+  /** Returns the top-level UIWindow. */
+  public UIWindow window () {
+    return mainWindow;
+  }
+
+  /** Returns the controller for the root view. */
+  public UIViewController rootViewController() {
+    return rootViewController;
+  }
+
+  /**
+   * Returns a view to which native overlays may be added. This view will be properly oriented when
+   * the device orientation changes, so views added to it will also be correctly oriented without
+   * additional effort on the part of the caller.
+   */
+  public UIView uiOverlay() {
+    return uiOverlay;
+  }
+
   protected IOSPlatform(UIApplication app, SupportedOrients orients, boolean iPadLikePhone) {
     super(new IOSLog());
     this.app = app;
@@ -313,18 +332,6 @@ public class IOSPlatform extends AbstractPlatform {
     gameView.Run(1000d / game.updateRate());
     // make our main window visible
     mainWindow.MakeKeyAndVisible();
-  }
-
-  public UIWindow window () {
-    return mainWindow;
-  }
-
-  public UIViewController rootViewController() {
-    return rootViewController;
-  }
-
-  public UIView uiOverlay() {
-    return uiOverlay;
   }
 
   // make these accessible to IOSApplicationDelegate
