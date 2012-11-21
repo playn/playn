@@ -86,6 +86,13 @@ public class TestsGame implements Game {
       }
       @Override
       public void onTouchEnd(Touch.Event[] touches) {
+        clearTouches(touches);
+      }
+      @Override
+      public void onTouchCancel(Touch.Event[] touches) {
+        clearTouches(touches);
+      }
+      protected void clearTouches(Touch.Event[] touches) {
         if (currentTest != null && currentTest.usesPositionalInputs())
           return;
         for (Touch.Event event : touches)
