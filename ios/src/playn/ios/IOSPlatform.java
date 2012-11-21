@@ -157,7 +157,6 @@ public class IOSPlatform extends AbstractPlatform {
   private final UIWindow mainWindow;
   private final IOSRootViewController rootViewController;
   private final IOSGameView gameView;
-  private final UIView uiOverlay;
 
   protected IOSPlatform(UIApplication app, SupportedOrients orients, boolean iPadLikePhone) {
     super(new IOSLog());
@@ -190,10 +189,6 @@ public class IOSPlatform extends AbstractPlatform {
     rootViewController = new IOSRootViewController(this);
     rootViewController.get_View().set_MultipleTouchEnabled(true);
     mainWindow.set_RootViewController(rootViewController);
-
-    uiOverlay = new UIView(bounds);
-    uiOverlay.set_MultipleTouchEnabled(true);
-    gameView.Add(uiOverlay);
 
     // if the game supplied a proper delegate, configure it (for lifecycle notifications)
     if (app.get_Delegate() instanceof IOSApplicationDelegate)
@@ -321,7 +316,7 @@ public class IOSPlatform extends AbstractPlatform {
   }
 
   public UIView uiOverlay() {
-    return uiOverlay;
+    return rootViewController.get_View();
   }
 
   // make these accessible to IOSApplicationDelegate
@@ -365,15 +360,15 @@ public class IOSPlatform extends AbstractPlatform {
       trans.Rotate(-FloatMath.PI / 2);
       break;
     }
-    uiOverlay.set_Transform(trans);
+    uiOverlay().set_Transform(trans);
 
-    RectangleF overlayBounds = uiOverlay.get_Bounds();
+    RectangleF overlayBounds = uiOverlay().get_Bounds();
     if ((overlayBounds.get_Width() > overlayBounds.get_Height()) != landscape) {
       // swap the width and height
       float width = overlayBounds.get_Width();
       overlayBounds.set_Width(overlayBounds.get_Height());
       overlayBounds.set_Height(width);
-      uiOverlay.set_Bounds(overlayBounds);
+      uiOverlay().set_Bounds(overlayBounds);
     }
 
     if (!sorient.equals(app.get_StatusBarOrientation())) {

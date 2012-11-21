@@ -24,8 +24,8 @@ import cli.MonoTouch.UIKit.UIViewController;
  * to many stock iOS things is the root view controller, so we need to provide one even though it's
  * not strictly necessary to meet basic PlayN needs.
  */
-public class IOSRootViewController extends UIViewController
-{
+public class IOSRootViewController extends UIViewController {
+
   private final IOSPlatform platform;
 
   public IOSRootViewController(IOSPlatform platform) {
