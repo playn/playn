@@ -24,6 +24,7 @@ import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.ImageElement;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.dom.client.Style;
+import com.google.gwt.user.client.DOM;
 
 import playn.core.Asserts;
 import playn.core.CanvasImage;
@@ -74,7 +75,9 @@ public abstract class HtmlGraphics implements Graphics {
 
     rootElement = doc.getElementById("playn-root");
     if (rootElement == null) {
-      rootElement = doc.getBody();
+      rootElement = doc.createDivElement();
+      rootElement.setAttribute("style", "width: 640px; height: 480px");
+      doc.getBody().appendChild(rootElement);
     } else {
       // clear the contents of the "playn-root" element, if present
       rootElement.setInnerHTML("");
