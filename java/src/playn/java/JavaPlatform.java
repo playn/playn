@@ -16,7 +16,6 @@
 package playn.java;
 
 import java.awt.Desktop;
-import java.io.IOException;
 import java.net.URI;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -37,6 +36,7 @@ import playn.core.Pointer;
 import playn.core.RegularExpression;
 import playn.core.Storage;
 import playn.core.Touch;
+import playn.core.TouchImpl;
 import playn.core.TouchStub;
 import playn.core.json.JsonImpl;
 
@@ -59,6 +59,9 @@ public class JavaPlatform extends AbstractPlatform {
 
     /** The height of the PlayN window, in pixels. */
     public int height = 480;
+
+    /** If set, emulates Touch and disables Mouse. For testing. */
+    public boolean emulateTouch;
   }
 
   /**
@@ -133,8 +136,9 @@ public class JavaPlatform extends AbstractPlatform {
   private final JsonImpl json = new JsonImpl();
   private final JavaKeyboard keyboard = new JavaKeyboard();
   private final JavaPointer pointer = new JavaPointer();
+  private final TouchImpl touch;
   private final JavaGraphics graphics;
-  private final JavaMouse mouse = new JavaMouse(this);
+  private final JavaMouse mouse;
   private final JavaAssets assets = new JavaAssets(this);
 
   private final ExecutorService _exec = Executors.newFixedThreadPool(4);
@@ -148,6 +152,14 @@ public class JavaPlatform extends AbstractPlatform {
     super(new JavaLog());
     graphics = new JavaGraphics(this, config);
     storage = new JavaStorage(this, config);
+    if (config.emulateTouch) {
+      JavaEmulatedTouch emuTouch = new JavaEmulatedTouch();
+      mouse = emuTouch.createMouse(this);
+      touch = emuTouch;
+    } else {
+      mouse = new JavaMouse(this);
+      touch = new TouchStub();
+    }
   }
 
   /**
@@ -206,7 +218,7 @@ public class JavaPlatform extends AbstractPlatform {
 
   @Override
   public Touch touch() {
-    return new TouchStub();
+    return touch;
   }
 
   @Override
@@ -251,6 +263,7 @@ public class JavaPlatform extends AbstractPlatform {
   @Override
   public void setPropagateEvents(boolean propagate) {
     mouse.setPropagateEvents(propagate);
+    touch.setPropagateEvents(propagate);
     pointer.setPropagateEvents(propagate);
   }
 
