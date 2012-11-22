@@ -39,6 +39,8 @@ class HtmlGraphicsGL extends HtmlGraphics {
 
   HtmlGraphicsGL(HtmlPlatform platform, HtmlPlatform.Configuration config) throws RuntimeException {
     canvas = Document.get().createCanvasElement();
+    canvas.setWidth(rootElement.getOffsetWidth());
+    canvas.setHeight(rootElement.getOffsetHeight());
     rootElement.appendChild(canvas);
     try {
       WebGLContextAttributes attrs = WebGLContextAttributes.create();
