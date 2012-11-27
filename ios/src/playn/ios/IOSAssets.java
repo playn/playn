@@ -141,7 +141,7 @@ public class IOSAssets extends AbstractAssets<UIImage> {
     String fullPath = Path.Combine(pathPrefix, path);
     for (Scale.ScaledResource rsrc : platform.graphics().ctx().scale.getScaledResources(fullPath)) {
       if (!File.Exists(rsrc.path)) continue;
-      platform.log().debug("Loading image: " + rsrc.path);
+      // platform.log().debug("Loading image: " + rsrc.path);
       try {
         Stream stream = new FileStream(rsrc.path, FileMode.wrap(FileMode.Open),
                                        FileAccess.wrap(FileAccess.Read),
