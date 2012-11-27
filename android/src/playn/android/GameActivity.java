@@ -182,15 +182,11 @@ public abstract class GameActivity extends Activity {
    * result is used for the lifetime of the game.
    */
   protected Bitmap.Config preferredBitmapConfig() {
-    // TODO:  This method will require testing over a variety of devices.
     ActivityManager activityManager = (ActivityManager)
       getApplication().getSystemService(Context.ACTIVITY_SERVICE);
     int memoryClass = activityManager.getMemoryClass();
     int format = getWindowManager().getDefaultDisplay().getPixelFormat();
-
-    // For low memory devices (like the HTC Magic), prefer 16-bit bitmaps
-    // FIXME: The memoryClass check is from the Canvas-only implementation and may function
-    // incorrectly with OpenGL
+    // for low memory devices (like the HTC Magic), prefer 16-bit bitmaps
     return (format == PixelFormat.RGBA_4444 || memoryClass <= 16) ?
       Bitmap.Config.ARGB_4444 : Bitmap.Config.ARGB_8888;
   }
