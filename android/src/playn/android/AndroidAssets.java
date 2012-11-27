@@ -45,9 +45,20 @@ import static playn.core.PlayN.log;
 
 public class AndroidAssets extends AbstractAssets<Bitmap> {
 
+  /** See {@link #setBitmapOptionsAdjuster}. */
+  public interface BitmapOptionsAdjuster {
+    /** Adjusts the {@link BitmapFactory#Options} based on the app's special requirements.
+     * @param path the path passed to {@link #getImage} or URL passed to {@link #getRemoteImage}.*/
+    void adjustOptions(String path, BitmapFactory.Options options);
+  }
+
   private final AndroidPlatform platform;
   private String pathPrefix = null;
   private Scale assetScale = null;
+
+  private BitmapOptionsAdjuster optionsAdjuster = new BitmapOptionsAdjuster() {
+    public void adjustOptions(String path, BitmapFactory.Options options) {} // noop!
+  };
 
   AndroidAssets(AndroidPlatform platform) {
     super(platform);
@@ -69,6 +80,15 @@ public class AndroidAssets extends AbstractAssets<Bitmap> {
    */
   public void setAssetScale(float scaleFactor) {
     this.assetScale = new Scale(scaleFactor);
+  }
+
+  /**
+   * Configures a class that will adjust the {@link BitmapFactory#Options} used to decode loaded
+   * bitmaps. An app may wish to use different bitmap configs for different images (say {@code
+   * RGB_565} for its non-transparent images) or adjust the dithering settings.
+   */
+  public void setBitmapOptionsAdjuster(BitmapOptionsAdjuster optionsAdjuster) {
+    this.optionsAdjuster = optionsAdjuster;
   }
 
   @Override
@@ -127,7 +147,7 @@ public class AndroidAssets extends AbstractAssets<Bitmap> {
       try {
         InputStream is = openAsset(rsrc.path);
         try {
-          return recv.imageLoaded(decodeBitmap(is), rsrc.scale);
+          return recv.imageLoaded(decodeBitmap(path, is), rsrc.scale);
         } finally {
           is.close();
         }
@@ -186,13 +206,13 @@ public class AndroidAssets extends AbstractAssets<Bitmap> {
     return is;
   }
 
-  private Bitmap decodeBitmap(InputStream is) {
+  private Bitmap decodeBitmap(String path, InputStream is) {
     BitmapFactory.Options options = new BitmapFactory.Options();
+    options.inScaled = false; // don't scale bitmaps based on device parameters
     options.inDither = true;
-    // Prefer the bitmap config we computed from the window parameter
     options.inPreferredConfig = platform.graphics().preferredBitmapConfig;
-    // Never scale bitmaps based on device parameters
-    options.inScaled = false;
+    // give the game an opportunity to customize the bitmap options based on the image path
+    optionsAdjuster.adjustOptions(path, options);
     return BitmapFactory.decodeStream(is, null, options);
   }
 
@@ -222,7 +242,7 @@ public class AndroidAssets extends AbstractAssets<Bitmap> {
       InputStream inputStream = null;
       try {
         inputStream = entity.getContent();
-        return decodeBitmap(inputStream);
+        return decodeBitmap(url, inputStream);
       } finally {
         if (inputStream != null)
           inputStream.close();
