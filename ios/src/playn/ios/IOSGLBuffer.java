@@ -100,6 +100,13 @@ public abstract class IOSGLBuffer implements GLBuffer {
     }
 
     @Override
+    public void destroy() {
+      super.destroy();
+      if (handle != null)
+        handle.Free();
+    }
+
+    @Override
     IntPtr pointer() {
       return handle.AddrOfPinnedObject();
     }
@@ -147,6 +154,13 @@ public abstract class IOSGLBuffer implements GLBuffer {
     @Override
     public void skip(int count) {
       position += count;
+    }
+
+    @Override
+    public void destroy() {
+      super.destroy();
+      if (handle != null)
+        handle.Free();
     }
 
     @Override
