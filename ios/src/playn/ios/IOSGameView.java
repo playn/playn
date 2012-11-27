@@ -34,6 +34,7 @@ import cli.MonoTouch.OpenGLES.EAGLColorFormat;
 import cli.MonoTouch.OpenGLES.EAGLRenderingAPI;
 import cli.MonoTouch.UIKit.UIDevice;
 import cli.MonoTouch.UIKit.UIEvent;
+import cli.MonoTouch.UIKit.UIWindow;
 
 public class IOSGameView extends iPhoneOSGameView {
 
@@ -42,6 +43,7 @@ public class IOSGameView extends iPhoneOSGameView {
   private final IOSPlatform platform;
   private DateTime lastUpdate = DateTime.get_Now();
   private boolean paused;
+  private boolean createdCtx;
 
   public IOSGameView(IOSPlatform platform, RectangleF bounds, float scale) {
     super(bounds);
@@ -75,6 +77,19 @@ public class IOSGameView extends iPhoneOSGameView {
 
   void onResume() {
     paused = false;
+  }
+
+  @Override
+  public void WillMoveToWindow(UIWindow window) {
+    // this is a temporary workaround to deal with iPhoneOSGameView (unnecessarily) destroying and
+    // recreating our GL context if we're hidden and reshown; the proper solution is to not use
+    // iPhoneOSGameView and do all the same things ourselves directly atop UIView, but that's not
+    // something I'm going to do while fixing an 11th hour crashing bug for the build I should be
+    // submitting to Apple today
+    if (!createdCtx) {
+      super.WillMoveToWindow(window);
+      createdCtx = true;
+    }
   }
 
   @Override
