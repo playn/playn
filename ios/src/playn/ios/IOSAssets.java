@@ -102,7 +102,7 @@ public class IOSAssets extends AbstractAssets<UIImage> {
     for (String encpath : new String[] { path + ".caf", path + ".mp3" }) {
       String fullPath = Path.Combine(pathPrefix, encpath);
       if (!File.Exists(fullPath)) continue;
-      platform.log().debug("Loading sound " + path);
+      // platform.log().debug("Loading sound " + path);
       return platform.audio().createSound(fullPath);
     }
 
@@ -113,7 +113,7 @@ public class IOSAssets extends AbstractAssets<UIImage> {
   @Override
   public String getTextSync(String path) throws Exception {
     String fullPath = Path.Combine(pathPrefix, path);
-    platform.log().debug("Loading text " + fullPath);
+    // platform.log().debug("Loading text " + fullPath);
     StreamReader reader = null;
     try {
       reader = new StreamReader(fullPath);
