@@ -53,7 +53,7 @@ public class AndroidPlatform extends AbstractPlatform {
     this.activity = activity;
 
     audio = new AndroidAudio(this);
-    graphics = new AndroidGraphics(this, gl20);
+    graphics = new AndroidGraphics(this, gl20, activity.preferredBitmapConfig());
     analytics = new AndroidAnalytics();
     assets = new AndroidAssets(this);
     json = new JsonImpl();

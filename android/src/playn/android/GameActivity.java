@@ -18,11 +18,14 @@ package playn.android;
 import java.io.File;
 
 import android.app.Activity;
+import android.app.ActivityManager;
 import android.app.AlertDialog;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.graphics.Bitmap;
+import android.graphics.PixelFormat;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.KeyEvent;
@@ -89,12 +92,12 @@ public abstract class GameActivity extends Activity {
     // Make sure the AndroidManifest.xml is set up correctly.
     try {
       ActivityInfo info = this.getPackageManager().getActivityInfo(
-          new ComponentName(appctx, this.getPackageName() + "." + this.getLocalClassName()), 0);
+        new ComponentName(appctx, this.getPackageName() + "." + this.getLocalClassName()), 0);
       if ((info.configChanges & REQUIRED_CONFIG_CHANGES) != REQUIRED_CONFIG_CHANGES) {
         new AlertDialog.Builder(this).setMessage(
-            "Unable to guarantee application will handle configuration changes. "
-                + "Please add the following line to the Activity manifest: "
-                + "      android:configChanges=\"keyboardHidden|orientation\"").show();
+          "Unable to guarantee application will handle configuration changes. " +
+          "Please add the following line to the Activity manifest: " +
+          "      android:configChanges=\"keyboardHidden|orientation\"").show();
       }
     } catch (NameNotFoundException e) {
       platform.log().warn("Cannot access game AndroidManifest.xml file.");
@@ -170,6 +173,26 @@ public abstract class GameActivity extends Activity {
    */
   protected boolean usePortraitOrientation() {
     return false;
+  }
+
+  /**
+   * Returns the configuration that will be used to decode bitmaps. The default implementation uses
+   * {@code ARGB_8888} unless the device memory class is 16MB or less or the device screen is
+   * itself {@code ARGB_4444}. NOTE: this is called once during platform initialization and the
+   * result is used for the lifetime of the game.
+   */
+  protected Bitmap.Config preferredBitmapConfig() {
+    // TODO:  This method will require testing over a variety of devices.
+    int format = platform.activity.getWindowManager().getDefaultDisplay().getPixelFormat();
+    ActivityManager activityManager = (ActivityManager)
+      platform.activity.getApplication().getSystemService(Context.ACTIVITY_SERVICE);
+    int memoryClass = activityManager.getMemoryClass();
+
+    // For low memory devices (like the HTC Magic), prefer 16-bit bitmaps
+    // FIXME: The memoryClass check is from the Canvas-only implementation and may function
+    // incorrectly with OpenGL
+    return (format == PixelFormat.RGBA_4444 || memoryClass <= 16) ?
+      Bitmap.Config.ARGB_4444 : Bitmap.Config.ARGB_8888;
   }
 
   protected float scaleFactor() {

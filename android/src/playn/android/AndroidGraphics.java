@@ -18,12 +18,9 @@ package playn.android;
 import java.util.HashMap;
 import java.util.Map;
 
-import android.app.ActivityManager;
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.LinearGradient;
 import android.graphics.Paint;
-import android.graphics.PixelFormat;
 import android.graphics.RadialGradient;
 import android.graphics.Shader.TileMode;
 import android.graphics.Typeface;
@@ -50,22 +47,23 @@ import playn.core.gl.SurfaceGL;
 
 public class AndroidGraphics extends GraphicsGL {
 
-  public final AndroidGLContext ctx;
-  public final Bitmap.Config preferredBitmapConfig;
-
-  final GroupLayerGL rootLayer;
   private final AndroidPlatform platform;
   private final Point touchTemp = new Point();
 
-  private int screenWidth, screenHeight;
-  private Map<Pair<String,Font.Style>,Typeface> fonts =
+  private final Map<Pair<String,Font.Style>,Typeface> fonts =
     new HashMap<Pair<String,Font.Style>,Typeface>();
-  private Map<Pair<String,Font.Style>,String[]> ligatureHacks =
+  private final Map<Pair<String,Font.Style>,String[]> ligatureHacks =
     new HashMap<Pair<String,Font.Style>,String[]>();
 
-  public AndroidGraphics(AndroidPlatform platform, AndroidGL20 gfx) {
+  private int screenWidth, screenHeight;
+
+  final AndroidGLContext ctx;
+  final Bitmap.Config preferredBitmapConfig;
+  final GroupLayerGL rootLayer;
+
+  public AndroidGraphics(AndroidPlatform platform, AndroidGL20 gfx, Bitmap.Config bitmapConfig) {
     this.platform = platform;
-    this.preferredBitmapConfig = mapDisplayPixelFormat();
+    this.preferredBitmapConfig = bitmapConfig;
     ctx = new AndroidGLContext(platform, gfx);
     rootLayer = new GroupLayerGL(ctx);
   }
@@ -198,22 +196,5 @@ public class AndroidGraphics extends GraphicsGL {
 
   IPoint transformTouch(float x, float y) {
     return ctx.rootTransform().inverseTransform(touchTemp.set(x, y), touchTemp);
-  }
-
-  /**
-   * Determines the most performant pixel format for the active display.
-   */
-  private Bitmap.Config mapDisplayPixelFormat() {
-    // TODO:  This method will require testing over a variety of devices.
-    int format = platform.activity.getWindowManager().getDefaultDisplay().getPixelFormat();
-    ActivityManager activityManager = (ActivityManager)
-      platform.activity.getApplication().getSystemService(Context.ACTIVITY_SERVICE);
-    int memoryClass = activityManager.getMemoryClass();
-
-    // For low memory devices (like the HTC Magic), prefer 16-bit bitmaps
-    // FIXME: The memoryClass check is from the Canvas-only implementation and may function
-    // incorrectly with OpenGL
-    return (format == PixelFormat.RGBA_4444 || memoryClass <= 16) ?
-      Bitmap.Config.ARGB_4444 : Bitmap.Config.ARGB_8888;
   }
 }
