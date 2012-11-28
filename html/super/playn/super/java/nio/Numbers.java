@@ -23,7 +23,7 @@ import com.google.gwt.typedarrays.shared.TypedArrays;
 
 class Numbers {
 	static Int8Array wba = TypedArrays.createInt8Array(8);
-	static Int32Array wia = TypedArray.createInt32Array(wba.buffer(), 0, 2);
+	static Int32Array wia = TypedArrays.createInt32Array(wba.buffer(), 0, 2);
 	static Float32Array wfa = TypedArrays.createFloat32Array(wba.buffer(), 0, 2);
 	static Float64Array wda = TypedArrays.createFloat64Array(wba.buffer(), 0, 1);
 
