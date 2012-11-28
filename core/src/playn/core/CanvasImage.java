@@ -16,22 +16,21 @@
 package playn.core;
 
 /**
- * An image that can provide a {@link Canvas} that allows you to draw directly into the image.
+ * An image that provides a {@link Canvas} that allows you to draw directly into the image.
  */
 public interface CanvasImage extends Image {
 
   /**
-   * Gets this image's canvas.
+   * Returns this image's canvas.
    */
-  public Canvas canvas();
-  
+  Canvas canvas();
+
   /**
    * Sets pixel data for a rectangular area of this image. This method may perform poorly, in
    * particular on HTML and Flash platforms - avoid using this if possible.
    *
-   * The pixel format is {@code (alpha << 24 | red << 16 | green << 8 | blue)}, where
-   * alpha, red, green and blue are the corresponding channel values, ranging from 0 to 255
-   * inclusive.
+   * The pixel format is {@code (alpha << 24 | red << 16 | green << 8 | blue)}, where alpha, red,
+   * green and blue are the corresponding channel values, ranging from 0 to 255 inclusive.
    *
    * Currently not implemented for iOS.
    *

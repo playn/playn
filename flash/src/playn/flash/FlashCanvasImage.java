@@ -28,7 +28,6 @@ public class FlashCanvasImage extends FlashImage implements CanvasImage {
   public FlashCanvasImage(FlashCanvas canvas) {
     super(canvas.bitmapData());
     this.canvas = canvas;
-
   }
 
   @Override
@@ -57,11 +56,6 @@ public class FlashCanvasImage extends FlashImage implements CanvasImage {
   }
 
   @Override
-  BitmapData bitmapData() {
-    return canvas.bitmapData();
-  }
-    
-  @Override
   public void setRgb(int startX, int startY, int width, int height, int[] rgbArray, int offset,
                      int scanSize) {
     for (int y = 0; y < height; y++) {
@@ -70,5 +64,10 @@ public class FlashCanvasImage extends FlashImage implements CanvasImage {
       }
       offset += scanSize;
     }
+  }
+
+  @Override
+  BitmapData bitmapData() {
+    return canvas.bitmapData();
   }
 }
