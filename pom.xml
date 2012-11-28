@@ -10,7 +10,7 @@
   <groupId>com.googlecode.playn</groupId>
   <artifactId>playn-project</artifactId>
   <packaging>pom</packaging>
-  <version>1.5</version>
+  <version>1.6-SNAPSHOT</version>
   <name>PlayN Project</name>
   <url>http://code.google.com/p/playn</url>
   <description>Cross platform game library for N≥4 platforms.</description>
