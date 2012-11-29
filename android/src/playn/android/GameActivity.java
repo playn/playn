@@ -176,6 +176,14 @@ public abstract class GameActivity extends Activity {
   }
 
   /**
+   * Returns the name to be used for the preferences that back {@link AndroidStorage}. Defaults to
+   * {@code playn}.
+   */
+  protected String prefsName() {
+    return "playn";
+  }
+
+  /**
    * Returns the configuration that will be used to decode bitmaps. The default implementation uses
    * {@code ARGB_8888} unless the device memory class is 16MB or less or the device screen is
    * itself {@code ARGB_4444}. NOTE: this is called once during platform initialization and the

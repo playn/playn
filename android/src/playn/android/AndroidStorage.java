@@ -26,13 +26,12 @@ import playn.core.Storage;
 
 public class AndroidStorage implements Storage {
 
-  private static final String PREFS_NAME = "playn";
   private final AndroidPlatform platform;
   private SharedPreferences settings;
 
   public AndroidStorage(AndroidPlatform platform) {
     this.platform = platform;
-    this.settings = platform.activity.getSharedPreferences(PREFS_NAME, 0);
+    this.settings = platform.activity.getSharedPreferences(platform.activity.prefsName(), 0);
   }
 
   @Override
