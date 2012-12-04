@@ -184,10 +184,10 @@ public class IndexedTrisShader extends GLShader {
       int availVerts = vertices.capacity() / VERTEX_SIZE, availElems = elements.capacity();
       if ((verts > availVerts) || (elems > availElems)) {
         IndexedTrisShader.this.flush();
-        if (vertexCount > availVerts)
-          expandVerts(vertexCount);
-        if (elemCount > availElems)
-          expandElems(elemCount);
+        if (verts > availVerts)
+          expandVerts(verts);
+        if (elems > availElems)
+          expandElems(elems);
         return 0;
       }
       return vertIdx;
