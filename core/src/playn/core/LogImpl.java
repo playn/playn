@@ -21,10 +21,16 @@ package playn.core;
 public abstract class LogImpl implements Log {
 
   private Collector collector;
+  private Level minLevel = Level.DEBUG;
 
   @Override
   public void setCollector(Collector collector) {
     this.collector = collector;
+  }
+
+  @Override
+  public void setMinLevel(Level level) {
+    minLevel = Asserts.checkNotNull(level);
   }
 
   @Override
@@ -70,7 +76,8 @@ public abstract class LogImpl implements Log {
   protected void log(Level level, String msg, Throwable e) {
     if (collector != null)
       collector.logged(level, msg, e);
-    logImpl(level, msg, e);
+    if (level.ordinal() >= minLevel.ordinal())
+      logImpl(level, msg, e);
   }
 
   protected abstract void logImpl(Level level, String msg, Throwable e);

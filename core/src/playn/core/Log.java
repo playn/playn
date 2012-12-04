@@ -44,6 +44,13 @@ public interface Log {
   void setCollector(Collector collector);
 
   /**
+   * Configures the minimum log level that will be logged. Messages at a level lower than
+   * {@code level} will be suppressed. Note that all messages are still passed to any registered
+   * {@link Collector}, but suppressed messages are not sent to the platform logging system.
+   */
+  void setMinLevel (Level level);
+
+  /**
    * An debug message.
    *
    * @param msg the message to display
