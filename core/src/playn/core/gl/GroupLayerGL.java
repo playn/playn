@@ -160,7 +160,7 @@ public class GroupLayerGL extends LayerGL implements GroupLayer, ParentLayer {
     render(localTransform(curTransform), curAlpha * alpha, (shader == null) ? curShader : shader);
   }
 
-  protected void render (InternalTransform xform, float alpha, GLShader shader) {
+  protected void render(InternalTransform xform, float alpha, GLShader shader) {
     for (LayerGL child : impl.children) {
       child.paint(xform, alpha, shader);
     }
