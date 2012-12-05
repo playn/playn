@@ -67,8 +67,7 @@ public class StockInternalTransform extends AffineTransform implements InternalT
   @Override
   public InternalTransform concatenate(float m00, float m01, float m10, float m11, float tx,
       float ty, float originX, float originY) {
-    translate(originX, originY);
-    Transforms.multiply(this, m00, m01, m10, m11, tx - originX, ty - originY, this);
+    Transforms.multiply(this, m00, m01, m10, m11, tx, ty, this);
     translate(-originX, -originY);
     return this;
   }
