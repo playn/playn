@@ -16,7 +16,6 @@
 package playn.ios;
 
 import cli.MonoTouch.CoreGraphics.CGImage;
-import cli.MonoTouch.UIKit.UIImage;
 
 import playn.core.gl.GLContext;
 import playn.core.gl.Scale;
@@ -26,21 +25,21 @@ import playn.core.gl.Scale;
  */
 public class IOSImage extends IOSAbstractImage {
 
-  protected UIImage image; // only mutated by IOSAsyncImage
+  protected CGImage image; // only mutated by IOSAsyncImage
 
-  public IOSImage (GLContext ctx, UIImage image, Scale scale) {
+  public IOSImage (GLContext ctx, CGImage image, Scale scale) {
     super(ctx, scale);
     this.image = image;
   }
 
   @Override
   public float width() {
-    return scale.invScaled(image.get_CGImage().get_Width());
+    return scale.invScaled(image.get_Width());
   }
 
   @Override
   public float height() {
-    return scale.invScaled(image.get_CGImage().get_Height());
+    return scale.invScaled(image.get_Height());
   }
 
   @Override
@@ -50,7 +49,7 @@ public class IOSImage extends IOSAbstractImage {
 
   @Override
   protected CGImage cgImage() {
-    return image.get_CGImage();
+    return image;
   }
 
   @Override

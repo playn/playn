@@ -67,8 +67,8 @@ public class IOSAsyncImage extends IOSImage implements AsyncImage<UIImage> {
   }
 
   @Override
-  public void setImage(UIImage image, Scale scale) {
-    this.image = image;
+  public void setImage(UIImage uiImage, Scale scale) {
+    this.image = uiImage.get_CGImage();
     this.scale = scale;
     callbacks = Callbacks.dispatchSuccessClear(callbacks, this);
   }
@@ -76,7 +76,7 @@ public class IOSAsyncImage extends IOSImage implements AsyncImage<UIImage> {
   @Override
   public void setError(Throwable error) {
     this.error = error;
-    this.image = new UIImage(); // TODO: create error image
+    this.image = new UIImage().get_CGImage(); // TODO: create error image
     callbacks = Callbacks.dispatchFailureClear(callbacks, error);
   }
 }

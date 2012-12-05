@@ -23,7 +23,6 @@ import cli.MonoTouch.CoreGraphics.CGBitmapContext;
 import cli.MonoTouch.CoreGraphics.CGImage;
 import cli.MonoTouch.CoreGraphics.CGImageAlphaInfo;
 import cli.MonoTouch.UIKit.UIDeviceOrientation;
-import cli.MonoTouch.UIKit.UIImage;
 import cli.OpenTK.Graphics.ES20.*; // a zillion little types
 
 import pythagoras.f.FloatMath;
@@ -265,9 +264,8 @@ public class IOSGLContext extends GLContext {
     return trisShader;
   }
 
-  void updateTexture(int tex, UIImage image) {
-    CGImage cimage = image.get_CGImage();
-    int width = cimage.get_Width(), height = cimage.get_Height();
+  void updateTexture(int tex, CGImage image) {
+    int width = image.get_Width(), height = image.get_Height();
     if (width == 0 || height == 0) {
       PlayN.log().warn("Ignoring texture update for empty image (" + width + "x" + height + ").");
       return;
@@ -280,7 +278,7 @@ public class IOSGLContext extends GLContext {
 
     bctx.ClearRect(new RectangleF(0, 0, width, height));
     // bctx.TranslateCTM(0, height - imageSize.Height);
-    bctx.DrawImage(new RectangleF(0, 0, width, height), cimage);
+    bctx.DrawImage(new RectangleF(0, 0, width, height), image);
 
     updateTexture(tex, width, height, data);
 
