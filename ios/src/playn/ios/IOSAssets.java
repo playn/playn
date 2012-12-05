@@ -127,7 +127,7 @@ public class IOSAssets extends AbstractAssets<UIImage> {
 
   @Override
   protected Image createStaticImage(UIImage uiImage, Scale scale) {
-    return new IOSImage(platform.graphics().ctx, uiImage, scale);
+    return new IOSImage(platform.graphics().ctx, uiImage.get_CGImage(), scale);
   }
 
   @Override

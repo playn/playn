@@ -127,7 +127,7 @@ public abstract class IOSAbstractImage extends ImageGL implements Image, IOSCanv
   @Override
   public Image transform(BitmapTransformer xform) {
     UIImage ximage = new UIImage(((IOSBitmapTransformer) xform).transform(cgImage()));
-    return new IOSImage(ctx, ximage, scale);
+    return new IOSImage(ctx, ximage.get_CGImage(), scale);
   }
 
   protected IOSAbstractImage(GLContext ctx, Scale scale) {
