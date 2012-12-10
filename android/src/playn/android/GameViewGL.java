@@ -63,7 +63,10 @@ public class GameViewGL extends GLSurfaceView {
 
   @Override
   public void onPause() {
-    loop.pause();
+    // in theory loop should never be null, but I saw a crash in the field, so somehow someone
+    // managed to start and pause the app before the renderer was able to render a single frame
+    if (loop != null)
+      loop.pause();
     // this is a terribly unfortunate hack; we would like to override surfaceDestroyed and indicate
     // that our surface was lost only when that method was called, but surfaceDestroyed is not
     // called when the screen is locked while our game is running (even though we do in fact lose
