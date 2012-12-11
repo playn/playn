@@ -19,17 +19,17 @@ import android.graphics.Bitmap;
 
 import playn.core.Canvas;
 import playn.core.CanvasImage;
+import playn.core.gl.Scale;
 
 class AndroidCanvasImage extends AndroidImage implements CanvasImage {
 
   private final AndroidCanvas canvas;
 
-  AndroidCanvasImage(AndroidGraphics gfx, float width, float height) {
-    super(gfx.ctx, Bitmap.createBitmap(gfx.ctx.scale.scaledCeil(width),
-                                       gfx.ctx.scale.scaledCeil(height),
-                                       gfx.preferredBitmapConfig), gfx.ctx.scale);
+  AndroidCanvasImage(AndroidGraphics gfx, float width, float height, Scale scale) {
+    super(gfx.ctx, Bitmap.createBitmap(scale.scaledCeil(width), scale.scaledCeil(height),
+                                       gfx.preferredBitmapConfig), scale);
     this.canvas = new AndroidCanvas(bitmap());
-    this.canvas.scale(gfx.ctx.scale.factor, gfx.ctx.scale.factor);
+    this.canvas.scale(scale.factor, scale.factor);
   }
 
   @Override

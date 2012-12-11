@@ -43,6 +43,7 @@ import playn.core.gl.GL20;
 import playn.core.gl.GLContext;
 import playn.core.gl.GraphicsGL;
 import playn.core.gl.GroupLayerGL;
+import playn.core.gl.Scale;
 import playn.core.gl.SurfaceGL;
 
 public class AndroidGraphics extends GraphicsGL {
@@ -55,6 +56,7 @@ public class AndroidGraphics extends GraphicsGL {
   private final Map<Pair<String,Font.Style>,String[]> ligatureHacks =
     new HashMap<Pair<String,Font.Style>,String[]>();
 
+  private Scale canvasScale;
   private int screenWidth, screenHeight;
 
   final AndroidGLContext ctx;
@@ -114,9 +116,19 @@ public class AndroidGraphics extends GraphicsGL {
     else AndroidCanvasState.PAINT_FLAGS &= ~Paint.FILTER_BITMAP_FLAG;
   }
 
+  /**
+   * Configures the scale factor to use for {@link CanvasImage}. By default we use the current
+   * graphics scale factor, which provides maximum resolution. Apps running on memory constrained
+   * devices may wish to lower to lower this scale factor to reduce memory usage.
+   */
+  public void setCanvasScale(Scale scale) {
+    canvasScale = scale;
+  }
+
   @Override
   public CanvasImage createImage(float width, float height) {
-    return new AndroidCanvasImage(this, width, height);
+    Scale scale = (canvasScale == null) ? ctx.scale : canvasScale;
+    return new AndroidCanvasImage(this, width, height, scale);
   }
 
   @Override
