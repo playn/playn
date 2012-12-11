@@ -45,11 +45,20 @@ import static playn.core.PlayN.log;
 
 public class AndroidAssets extends AbstractAssets<Bitmap> {
 
+  /** Extends {@link BitmapFactory.Options} with PlayN asset scale configuration. */
+  public class BitmapOptions extends BitmapFactory.Options {
+    /** The asset scale for the resulting image. This will be populated with the appropriate scale
+     * prior to the call to {@link BitmapOptionsAdjuster#adjustOptions} and can be adjusted by the
+     * adjuster if it, for example, adjusts {@link BitmapFactory.Options#inSampleSize} to
+     * downsample the image. */
+    public Scale scale;
+  }
+
   /** See {@link #setBitmapOptionsAdjuster}. */
   public interface BitmapOptionsAdjuster {
-    /** Adjusts the {@link BitmapFactory#Options} based on the app's special requirements.
+    /** Adjusts the {@link BitmapOptions} based on the app's special requirements.
      * @param path the path passed to {@link #getImage} or URL passed to {@link #getRemoteImage}.*/
-    void adjustOptions(String path, BitmapFactory.Options options);
+    void adjustOptions(String path, BitmapOptions options);
   }
 
   private final AndroidPlatform platform;
@@ -57,7 +66,7 @@ public class AndroidAssets extends AbstractAssets<Bitmap> {
   private Scale assetScale = null;
 
   private BitmapOptionsAdjuster optionsAdjuster = new BitmapOptionsAdjuster() {
-    public void adjustOptions(String path, BitmapFactory.Options options) {} // noop!
+    public void adjustOptions(String path, BitmapOptions options) {} // noop!
   };
 
   AndroidAssets(AndroidPlatform platform) {
@@ -83,9 +92,9 @@ public class AndroidAssets extends AbstractAssets<Bitmap> {
   }
 
   /**
-   * Configures a class that will adjust the {@link BitmapFactory#Options} used to decode loaded
-   * bitmaps. An app may wish to use different bitmap configs for different images (say {@code
-   * RGB_565} for its non-transparent images) or adjust the dithering settings.
+   * Configures a class that will adjust the {@link BitmapOptions} used to decode loaded bitmaps.
+   * An app may wish to use different bitmap configs for different images (say {@code RGB_565} for
+   * its non-transparent images) or adjust the dithering settings.
    */
   public void setBitmapOptionsAdjuster(BitmapOptionsAdjuster optionsAdjuster) {
     this.optionsAdjuster = optionsAdjuster;
@@ -97,7 +106,8 @@ public class AndroidAssets extends AbstractAssets<Bitmap> {
     platform.invokeAsync(new Runnable() {
       public void run () {
         try {
-          setImageLater(image, downloadBitmap(url), Scale.ONE);
+          BitmapOptions options = createOptions(url, Scale.ONE);
+          setImageLater(image, downloadBitmap(url, options), options.scale);
         } catch (Exception error) {
           setErrorLater(image, error);
         }
@@ -147,7 +157,8 @@ public class AndroidAssets extends AbstractAssets<Bitmap> {
       try {
         InputStream is = openAsset(rsrc.path);
         try {
-          return recv.imageLoaded(decodeBitmap(path, is), rsrc.scale);
+          BitmapOptions options = createOptions(path, rsrc.scale);
+          return recv.imageLoaded(BitmapFactory.decodeStream(is, null, options), options.scale);
         } finally {
           is.close();
         }
@@ -206,19 +217,20 @@ public class AndroidAssets extends AbstractAssets<Bitmap> {
     return is;
   }
 
-  private Bitmap decodeBitmap(String path, InputStream is) {
-    BitmapFactory.Options options = new BitmapFactory.Options();
+  private BitmapOptions createOptions(String path, Scale scale) {
+    BitmapOptions options = new BitmapOptions();
     options.inScaled = false; // don't scale bitmaps based on device parameters
     options.inDither = true;
     options.inPreferredConfig = platform.graphics().preferredBitmapConfig;
+    options.scale = scale;
     // give the game an opportunity to customize the bitmap options based on the image path
     optionsAdjuster.adjustOptions(path, options);
-    return BitmapFactory.decodeStream(is, null, options);
+    return options;
   }
 
   // Taken from
   // http://android-developers.blogspot.com/2010/07/multithreading-for-performance.html
-  private Bitmap downloadBitmap(String url) throws Exception {
+  private Bitmap downloadBitmap(String url, BitmapOptions options) throws Exception {
     AndroidHttpClient client = AndroidHttpClient.newInstance("Android");
     HttpGet getRequest = new HttpGet(url);
 
@@ -230,7 +242,7 @@ public class AndroidAssets extends AbstractAssets<Bitmap> {
         // we should follow it
         Header[] headers = response.getHeaders("Location");
         if (headers != null && headers.length > 0) {
-          return downloadBitmap(headers[headers.length-1].getValue());
+          return downloadBitmap(headers[headers.length-1].getValue(), options);
         }
         throw new Exception("Error " + statusCode + " while retrieving bitmap from " + url);
       }
@@ -242,7 +254,7 @@ public class AndroidAssets extends AbstractAssets<Bitmap> {
       InputStream inputStream = null;
       try {
         inputStream = entity.getContent();
-        return decodeBitmap(url, inputStream);
+        return BitmapFactory.decodeStream(inputStream, null, options);
       } finally {
         if (inputStream != null)
           inputStream.close();
