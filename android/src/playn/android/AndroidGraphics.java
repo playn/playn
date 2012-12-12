@@ -32,6 +32,7 @@ import pythagoras.f.IPoint;
 import pythagoras.f.MathUtil;
 import pythagoras.f.Point;
 
+import playn.core.Asserts;
 import playn.core.CanvasImage;
 import playn.core.Font;
 import playn.core.Game;
@@ -56,8 +57,12 @@ public class AndroidGraphics extends GraphicsGL {
   private final Map<Pair<String,Font.Style>,String[]> ligatureHacks =
     new HashMap<Pair<String,Font.Style>,String[]>();
 
-  private Scale canvasScale;
   private int screenWidth, screenHeight;
+  private ScaleFunc canvasScaleFunc = new ScaleFunc() {
+    public Scale computeScale (float width, float height, Scale gfxScale) {
+      return gfxScale;
+    }
+  };
 
   final AndroidGLContext ctx;
   final Bitmap.Config preferredBitmapConfig;
@@ -116,18 +121,28 @@ public class AndroidGraphics extends GraphicsGL {
     else AndroidCanvasState.PAINT_FLAGS &= ~Paint.FILTER_BITMAP_FLAG;
   }
 
+  /** See {@link #setCanvasScaleFunc}. */
+  public interface ScaleFunc {
+    /** Returns the scale to be used by the canvas with the supplied dimensions.
+     * @param width the width of the to-be-created canvas, in logical pixels.
+     * @param height the height of the to-be-created canvas, in logical pixels.
+     * @param gfxScale the default scale factor (defines the scale of the logical pixels). */
+    Scale computeScale (float width, float height, Scale gfxScale);
+  }
+
   /**
-   * Configures the scale factor to use for {@link CanvasImage}. By default we use the current
-   * graphics scale factor, which provides maximum resolution. Apps running on memory constrained
-   * devices may wish to lower to lower this scale factor to reduce memory usage.
+   * Configures the scale factor function to use for {@link CanvasImage}. By default we use the
+   * current graphics scale factor, which provides maximum resolution. Apps running on memory
+   * constrained devices may wish to lower to lower this scale factor to reduce memory usage for
+   * espeically large canvases.
    */
-  public void setCanvasScale(Scale scale) {
-    canvasScale = scale;
+  public void setCanvasScaleFunc(ScaleFunc scaleFunc) {
+    canvasScaleFunc = Asserts.checkNotNull(scaleFunc, "Scale func must not be null");
   }
 
   @Override
   public CanvasImage createImage(float width, float height) {
-    Scale scale = (canvasScale == null) ? ctx.scale : canvasScale;
+    Scale scale = canvasScaleFunc.computeScale(width, height, ctx.scale);
     return new AndroidCanvasImage(this, width, height, scale);
   }
 
