@@ -13,6 +13,8 @@
  */
 package playn.core.gl;
 
+import java.util.List;
+
 import pythagoras.f.Point;
 import pythagoras.f.Vector;
 
@@ -161,8 +163,10 @@ public class GroupLayerGL extends LayerGL implements GroupLayer, ParentLayer {
   }
 
   protected void render(InternalTransform xform, float alpha, GLShader shader) {
-    for (LayerGL child : impl.children) {
-      child.paint(xform, alpha, shader);
+    // iterate manually to avoid creating an Iterator as garbage, this is inner-loop territory
+    List<LayerGL> children = impl.children;
+    for (int ii = 0, ll = children.size(); ii < ll; ii++) {
+      children.get(ii).paint(xform, alpha, shader);
     }
   }
 }

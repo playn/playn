@@ -97,14 +97,14 @@ public class GroupLayerImpl<L extends AbstractLayer>
   }
 
   public void onAdd(GroupLayer self) {
-    for (L child : children) {
-      child.onAdd();
+    for (int ii = 0, ll = children.size(); ii < ll; ii++) {
+      children.get(ii).onAdd();
     }
   }
 
   public void onRemove(GroupLayer self) {
-    for (L child : children) {
-      child.onRemove();
+    for (int ii = 0, ll = children.size(); ii < ll; ii++) {
+      children.get(ii).onRemove();
     }
   }
 
