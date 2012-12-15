@@ -174,7 +174,12 @@ public class AndroidAssets extends AbstractAssets<Bitmap> {
   }
 
   /**
-   * Copies a resource from our APK into a temporary file and returns a handle on that file.
+   * Copies a resource from our APK into a temporary file and returns a handle on that file. If the
+   * cachce file already exists, it will returned as-is. The assumption is that the caller will
+   * provide a unique name, so reusing the cache file is safe and performant. Cache files are all
+   * wiped on app shutdown, so if a cached file becomes corrupted or fails to be properly cached in
+   * the first place (due to transient reasons), the error will only persist until the game is
+   * restarted.
    *
    * @param path the path to the to-be-cached asset.
    * @param cacheName the name to use for the cache file.
@@ -182,21 +187,23 @@ public class AndroidAssets extends AbstractAssets<Bitmap> {
   File cacheAsset(String path, String cacheName) throws IOException {
     InputStream in = openAsset(path);
     File cachedFile = new File(platform.activity.getCacheDir(), cacheName);
-    try {
-      FileOutputStream out = new FileOutputStream(cachedFile);
+    if (!cachedFile.exists()) {
       try {
-        byte[] buffer = new byte[16 * 1024];
-        while (true) {
-          int r = in.read(buffer);
-          if (r < 0)
-            break;
-          out.write(buffer, 0, r);
+        FileOutputStream out = new FileOutputStream(cachedFile);
+        try {
+          byte[] buffer = new byte[16 * 1024];
+          while (true) {
+            int r = in.read(buffer);
+            if (r < 0)
+              break;
+            out.write(buffer, 0, r);
+          }
+        } finally {
+          out.close();
         }
       } finally {
-        out.close();
+        in.close();
       }
-    } finally {
-      in.close();
     }
     return cachedFile;
   }
