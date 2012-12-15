@@ -45,7 +45,6 @@ class AndroidAudio extends AudioImpl {
     // version of AndroidSound we have written, so we'll use it here regardless of format.
     return new AndroidCompressedSound(this, new Resolver<MediaPlayer>() {
       // this cache file will get cleaned up in our activity's onDestroy
-      private String extension = path.substring(path.lastIndexOf('.'));
       private File cachedFile;
 
       public void resolve (final AndroidSound<MediaPlayer> sound) {
@@ -59,8 +58,7 @@ class AndroidAudio extends AudioImpl {
             try {
               // lazily create our cached audio file
               if (cachedFile == null) {
-                cachedFile = platform.assets().cacheAsset(
-                  path, "sound-" + Integer.toHexString(hashCode()) + extension);
+                cachedFile = platform.assets().cacheAsset(path);
               }
               FileInputStream ins = new FileInputStream(cachedFile);
               try {

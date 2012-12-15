@@ -22,6 +22,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
+import java.security.MessageDigest;
 
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
@@ -31,7 +33,6 @@ import org.apache.http.client.methods.HttpGet;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.util.Log;
 
 import pythagoras.f.MathUtil;
 
@@ -174,19 +175,25 @@ public class AndroidAssets extends AbstractAssets<Bitmap> {
   }
 
   /**
-   * Copies a resource from our APK into a temporary file and returns a handle on that file. If the
-   * cachce file already exists, it will returned as-is. The assumption is that the caller will
-   * provide a unique name, so reusing the cache file is safe and performant. Cache files are all
+   * Copies a resource from our APK into a temporary file and returns a handle on that file. The
+   * cache file name is the hash of the to-be-cached asset path with file extension preserved. If
+   * the cache file already exists, it will returned as-is. The assumption is that the asset being
+   * cached is stable, so if it has been cached already, it is safe to reuse. Cache files are all
    * wiped on app shutdown, so if a cached file becomes corrupted or fails to be properly cached in
    * the first place (due to transient reasons), the error will only persist until the game is
    * restarted.
    *
    * @param path the path to the to-be-cached asset.
-   * @param cacheName the name to use for the cache file.
    */
-  File cacheAsset(String path, String cacheName) throws IOException {
+  File cacheAsset(String path) throws IOException {
     InputStream in = openAsset(path);
+    String cacheName = sha1hex(path);
+    int didx = path.lastIndexOf('.');
+    if (didx != -1) {
+      cacheName += path.substring(didx);
+    }
     File cachedFile = new File(platform.activity.getCacheDir(), cacheName);
+    platform.log().debug("Caching " + path + " in " + cachedFile.getPath());
     if (!cachedFile.exists()) {
       try {
         FileOutputStream out = new FileOutputStream(cachedFile);
@@ -271,11 +278,37 @@ public class AndroidAssets extends AbstractAssets<Bitmap> {
     } catch (Exception e) {
       // Could provide a more explicit error message for IOException or IllegalStateException
       getRequest.abort();
-      Log.w("ImageDownloader", "Error while retrieving bitmap from " + url, e);
+      platform.log().warn("Error while retrieving bitmap from " + url, e);
       throw e;
 
     } finally {
       client.close();
     }
   }
+
+  private String sha1hex(String data) {
+    byte[] bytes = null;
+    try {
+      bytes = data.getBytes("UTF-8");
+    } catch (UnsupportedEncodingException uee) {
+      bytes = data.getBytes();
+    }
+    try {
+      return tohex(MessageDigest.getInstance("SHA-1").digest(bytes));
+    } catch (Exception e) {
+      platform.log().warn("Failed to sha1hex '" + data + "'", e);
+      return tohex(bytes); // fall back to a more verbose but non-conflicting hash for our purpose
+    }
+  }
+
+  private static String tohex(byte[] data) {
+    StringBuffer buf = new StringBuffer();
+    for (int ii = 0; ii < data.length; ii++) {
+      int b = data[ii] & 0xFF;
+      buf.append(HEX_DIGS.charAt(b/16)).append(HEX_DIGS.charAt(b%16));
+    }
+    return buf.toString();
+  }
+
+  protected static final String HEX_DIGS = "0123456789abcdef";
 }
