@@ -141,19 +141,16 @@ public class IOSAssets extends AbstractAssets<UIImage> {
     String fullPath = Path.Combine(pathPrefix, path);
     for (Scale.ScaledResource rsrc : platform.graphics().ctx().scale.getScaledResources(fullPath)) {
       if (!File.Exists(rsrc.path)) continue;
+
       // platform.log().debug("Loading image: " + rsrc.path);
-      try {
-        Stream stream = new FileStream(rsrc.path, FileMode.wrap(FileMode.Open),
-                                       FileAccess.wrap(FileAccess.Read),
-                                       FileShare.wrap(FileShare.Read));
-        NSData data = NSData.FromStream(stream);
-        return recv.imageLoaded(UIImage.LoadFromData(data), rsrc.scale);
-      } catch (Throwable t) {
-        platform.log().warn("Failed to load image: " + rsrc.path, t);
-        error = t; // note this error if this is the lowest resolution image, but fall back to
-        // lower resolution images if not; in the Java backend we'd fail here, but this
-        // is a production backend, so we want to try to make things work
-      }
+      UIImage img = UIImage.FromFile(rsrc.path);
+      if (img != null) return recv.imageLoaded(img, rsrc.scale);
+
+      // note this error if this is the lowest resolution image, but fall back to lower resolution
+      // images if not; in the Java backend we'd fail here, but this is a production backend, so we
+      // want to try to make things work
+      platform.log().warn("Failed to load image '" + rsrc.path + "'.");
+      error = new Exception("Failed to load " + rsrc.path);
     }
     return recv.loadFailed(error);
   }
