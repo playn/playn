@@ -193,7 +193,7 @@ public class AndroidAssets extends AbstractAssets<Bitmap> {
       cacheName += path.substring(didx);
     }
     File cachedFile = new File(platform.activity.getCacheDir(), cacheName);
-    platform.log().debug("Caching " + path + " in " + cachedFile.getPath());
+    // platform.log().debug("Caching " + path + " in " + cachedFile.getPath());
     if (!cachedFile.exists()) {
       try {
         FileOutputStream out = new FileOutputStream(cachedFile);
