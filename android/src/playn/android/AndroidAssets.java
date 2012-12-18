@@ -107,7 +107,7 @@ public class AndroidAssets extends AbstractAssets<Bitmap> {
     platform.invokeAsync(new Runnable() {
       public void run () {
         try {
-          BitmapOptions options = createOptions(url, Scale.ONE);
+          BitmapOptions options = createOptions(url, false, Scale.ONE);
           setImageLater(image, downloadBitmap(url, options), options.scale);
         } catch (Exception error) {
           setErrorLater(image, error);
@@ -158,7 +158,7 @@ public class AndroidAssets extends AbstractAssets<Bitmap> {
       try {
         InputStream is = openAsset(rsrc.path);
         try {
-          BitmapOptions options = createOptions(path, rsrc.scale);
+          BitmapOptions options = createOptions(path, true, rsrc.scale);
           return recv.imageLoaded(BitmapFactory.decodeStream(is, null, options), options.scale);
         } finally {
           is.close();
@@ -231,11 +231,13 @@ public class AndroidAssets extends AbstractAssets<Bitmap> {
     return is;
   }
 
-  private BitmapOptions createOptions(String path, Scale scale) {
+  private BitmapOptions createOptions(String path, boolean purgeable, Scale scale) {
     BitmapOptions options = new BitmapOptions();
     options.inScaled = false; // don't scale bitmaps based on device parameters
     options.inDither = true;
     options.inPreferredConfig = platform.graphics().preferredBitmapConfig;
+    options.inPurgeable = purgeable;
+    options.inInputShareable = true;
     options.scale = scale;
     // give the game an opportunity to customize the bitmap options based on the image path
     optionsAdjuster.adjustOptions(path, options);
