@@ -20,8 +20,6 @@ import java.io.InputStream;
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.Clip;
-
 import playn.core.AudioImpl;
 
 class JavaAudio extends AudioImpl {
@@ -35,7 +33,7 @@ class JavaAudio extends AudioImpl {
     ((JavaPlatform) platform).invokeAsync(new Runnable() {
       public void run () {
         try {
-          Clip clip = AudioSystem.getClip();
+          BigClip clip = new BigClip(AudioSystem.getClip());
           AudioInputStream ais = AudioSystem.getAudioInputStream(in);
           if (name.endsWith(".mp3")) {
             AudioFormat baseFormat = ais.getFormat();
