@@ -340,35 +340,6 @@ class BigClip
     return tempData;
   }
 
-  boolean fastForward;
-  boolean fastRewind;
-
-  public void setFastForward (boolean fastForward)
-  {
-    //PlayN.log().debug("FastForward " + fastForward);
-    this.fastForward = fastForward;
-    fastRewind = false;
-    flush();
-  }
-
-  public boolean getFastForward ()
-  {
-    return fastForward;
-  }
-
-  public void setFastRewind (boolean fastRewind)
-  {
-    //PlayN.log().debug("FastRewind " + fastRewind);
-    this.fastRewind = fastRewind;
-    fastForward = false;
-    flush();
-  }
-
-  public boolean getFastRewind ()
-  {
-    return fastRewind;
-  }
-
   @Override public void start ()
   {
     Runnable r = new Runnable() {
@@ -423,24 +394,8 @@ class BigClip
               //PlayN.log().debug("Loop Count: " + countDown);
             }
             timelastPositionSet = System.currentTimeMillis();
-            byte[] newData;
-            if (fastForward) {
-              newData = getEveryNthFrame(tempData, 2);
-            } else if (fastRewind) {
-              byte[] temp = getEveryNthFrame(tempData, 2);
-              newData = reverseFrames(temp);
-              inputStream.reset();
-              totalBytes -= 2 * bytesRead;
-              framePosition -= 2 * framesRead;
-              if (totalBytes < 0) {
-                setFastRewind(false);
-                totalBytes = 0;
-              }
-              inputStream.skip(totalBytes);
-              //PlayN.log().debug("totalBytes " + totalBytes);
-            } else {
-              newData = tempData;
-            }
+
+            byte[] newData = tempData;
             dataLine.write(newData, 0, newData.length);
             if (startOrMove) {
               int len = bufSize / bufferUpdateFactor;
@@ -482,54 +437,6 @@ class BigClip
     // makes thread behaviour compatible with JavaSound post 1.4
     thread.setDaemon(true);
     thread.start();
-  }
-
-  /** Assume the frame size is 4. */
-  public byte[] reverseFrames (byte[] data)
-  {
-    byte[] reversed = new byte[data.length];
-    byte[] frame = new byte[4];
-
-    for (int ii = 0; ii < data.length / 4; ii++) {
-      int first = (data.length) - ((ii + 1) * 4) + 0;
-      int last = (data.length) - ((ii + 1) * 4) + 3;
-      frame[0] = data[first];
-      frame[1] = data[(data.length) - ((ii + 1) * 4) + 1];
-      frame[2] = data[(data.length) - ((ii + 1) * 4) + 2];
-      frame[3] = data[last];
-
-      reversed[ii * 4 + 0] = frame[0];
-      reversed[ii * 4 + 1] = frame[1];
-      reversed[ii * 4 + 2] = frame[2];
-      reversed[ii * 4 + 3] = frame[3];
-      if (ii < 5 || ii > (data.length / 4) - 5) {
-        //PlayN.log().debug("From \t" + first + " \tlast " + last);
-        //PlayN.log().debug("To \t" + ((ii * 4) + 0) + " \tlast " + ((ii * 4) + 3));
-      }
-    }
-
-/*
- * for (int ii=0; ii<data.length; ii++) { reversed[ii] = data[data.length-1-ii]; }
- */
-
-    return reversed;
-  }
-
-  /** Assume the frame size is 4. */
-  public byte[] getEveryNthFrame (byte[] data, int skip)
-  {
-    int length = data.length / skip;
-    length = (length / 4) * 4;
-    //PlayN.log().debug("length " + data.length + " \t" + length);
-    byte[] b = new byte[length];
-    // byte[] frame = new byte[4];
-    for (int ii = 0; ii < b.length / 4; ii++) {
-      b[ii * 4 + 0] = data[ii * skip * 4 + 0];
-      b[ii * 4 + 1] = data[ii * skip * 4 + 1];
-      b[ii * 4 + 2] = data[ii * skip * 4 + 2];
-      b[ii * 4 + 3] = data[ii * skip * 4 + 3];
-    }
-    return b;
   }
 
   @Override public void flush ()
@@ -585,86 +492,5 @@ class BigClip
   @Override public Line.Info getLineInfo ()
   {
     return dataLine.getLineInfo();
-  }
-
-  /**
-   * Determines the single largest sample size of all channels of the current clip. This can be
-   * handy for determining a fraction to scal visual representations.
-   * @return Double between 0 & 1 representing the maximum signal level of any channel.
-   */
-  public double getLargestSampleSize ()
-  {
-
-    int largest = 0;
-    int current;
-
-    boolean signed = (format.getEncoding() == AudioFormat.Encoding.PCM_SIGNED);
-    int bitDepth = format.getSampleSizeInBits();
-    boolean bigEndian = format.isBigEndian();
-
-    int samples = audioData.length * 8 / bitDepth;
-
-    if (signed) {
-      if (bitDepth / 8 == 2) {
-        if (bigEndian) {
-          for (int cc = 0; cc < samples; cc++) {
-            current = (audioData[cc * 2] * 256 + (audioData[cc * 2 + 1] & 0xFF));
-            if (Math.abs(current) > largest) {
-              largest = Math.abs(current);
-            }
-          }
-        } else {
-          for (int cc = 0; cc < samples; cc++) {
-            current = (audioData[cc * 2 + 1] * 256 + (audioData[cc * 2] & 0xFF));
-            if (Math.abs(current) > largest) {
-              largest = Math.abs(current);
-            }
-          }
-        }
-      } else {
-        for (int cc = 0; cc < samples; cc++) {
-          current = (audioData[cc] & 0xFF);
-          if (Math.abs(current) > largest) {
-            largest = Math.abs(current);
-          }
-        }
-      }
-    } else {
-      if (bitDepth / 8 == 2) {
-        if (bigEndian) {
-          for (int cc = 0; cc < samples; cc++) {
-            current = (audioData[cc * 2] * 256 + (audioData[cc * 2 + 1] - 0x80));
-            if (Math.abs(current) > largest) {
-              largest = Math.abs(current);
-            }
-          }
-        } else {
-          for (int cc = 0; cc < samples; cc++) {
-            current = (audioData[cc * 2 + 1] * 256 + (audioData[cc * 2] - 0x80));
-            if (Math.abs(current) > largest) {
-              largest = Math.abs(current);
-            }
-          }
-        }
-      } else {
-        for (int cc = 0; cc < samples; cc++) {
-          if (audioData[cc] > 0) {
-            current = (audioData[cc] - 0x80);
-            if (Math.abs(current) > largest) {
-              largest = Math.abs(current);
-            }
-          } else {
-            current = (audioData[cc] + 0x80);
-            if (Math.abs(current) > largest) {
-              largest = Math.abs(current);
-            }
-          }
-        }
-      }
-    }
-
-    // audioData
-    //PlayN.log().debug("Max signal level: " + (double)largest / (Math.pow(2, bitDepth - 1)));
-    return (double)largest / (Math.pow(2, bitDepth - 1));
   }
 }
