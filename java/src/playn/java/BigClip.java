@@ -17,8 +17,6 @@ import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.SourceDataLine;
 import javax.sound.sampled.UnsupportedAudioFileException;
 
-import playn.core.PlayN;
-
 /**
  * Reformatted and adapted version of BigClip as posted to:
  * http://stackoverflow.com/questions/9470148/how-do-you-play-a-long-audio-clip-in-java
@@ -343,94 +341,81 @@ class BigClip
   @Override public void start ()
   {
     Runnable r = new Runnable() {
-      public void run () {
-        try {
-          /*
-           * Should these open()/close() calls be here, or explicitly called by user program? The
-           * JavaDocs for line suggest that Clip should throw an IllegalArgumentException, so
-           * we'll stick with that and call it explicitly.
-           */
-          dataLine.open();
+      public void run ()
+      {
+        dataLine.start();
 
-          dataLine.start();
+        active = true;
 
-          active = true;
+        int bytesRead = 0;
+        int frameSize = dataLine.getFormat().getFrameSize();
+        int bufSize = dataLine.getBufferSize();
+        boolean startOrMove = true;
+        byte[] data = new byte[bufSize];
+        int offset = framePosition * frameSize;
+        int totalBytes = offset;
+        bytesRead = inputStream.read(new byte[offset], 0, offset);
+        // PlayN.log().debug("bytesRead " + bytesRead);
+        bytesRead = inputStream.read(data, 0, data.length);
 
-          int bytesRead = 0;
-          int frameSize = dataLine.getFormat().getFrameSize();
-          int bufSize = dataLine.getBufferSize();
-          boolean startOrMove = true;
-          byte[] data = new byte[bufSize];
-          int offset = framePosition * frameSize;
-          int totalBytes = offset;
-          bytesRead = inputStream.read(new byte[offset], 0, offset);
-          //PlayN.log().debug("bytesRead " + bytesRead);
-          bytesRead = inputStream.read(data, 0, data.length);
+        // PlayN.log().debug("loopCount " + loopCount);
+        // PlayN.log().debug("countDown " + countDown);
+        // PlayN.log().debug("bytesRead " + bytesRead);
 
-          //PlayN.log().debug("loopCount " + loopCount);
-          //PlayN.log().debug("countDown " + countDown);
-          //PlayN.log().debug("bytesRead " + bytesRead);
-
-          while (bytesRead != -1 && (loopCount == Clip.LOOP_CONTINUOUSLY || countDown > 0) &&
-              active) {
-            //PlayN.log().debug("BigClip.start() loop " + framePosition);
-            totalBytes += bytesRead;
-            int framesRead;
-            byte[] tempData;
-            if (format.getChannels() < 2) {
-              tempData = convertMonoToStereo(data, bytesRead);
-              framesRead = bytesRead / format.getFrameSize();
-              bytesRead *= 2;
-            } else {
-              framesRead = bytesRead / dataLine.getFormat().getFrameSize();
-              tempData = Arrays.copyOfRange(data, 0, bytesRead);
-            }
-
-            framePosition += framesRead;
-            if (framePosition >= loopPointEnd) {
-              framePosition = loopPointStart;
-              inputStream.reset();
-              countDown--;
-              //PlayN.log().debug("Loop Count: " + countDown);
-            }
-            timelastPositionSet = System.currentTimeMillis();
-
-            byte[] newData = tempData;
-            dataLine.write(newData, 0, newData.length);
-            if (startOrMove) {
-              int len = bufSize / bufferUpdateFactor;
-
-              // Step down to the next whole frame.
-              len /= frameSize;
-              len *= frameSize;
-
-              data = new byte[len];
-              startOrMove = false;
-            }
-
-            bytesRead = inputStream.read(data, 0, data.length);
-            if (bytesRead < 0 && (--countDown > 0 || loopCount == Clip.LOOP_CONTINUOUSLY)) {
-              inputStream.read(new byte[offset], 0, offset);
-              //PlayN.log().debug("loopCount " + loopCount);
-              //PlayN.log().debug("countDown " + countDown);
-              inputStream.reset();
-              bytesRead = inputStream.read(data, 0, data.length);
-            }
+        while (bytesRead != -1 && (loopCount == Clip.LOOP_CONTINUOUSLY || countDown > 0)
+          && active) {
+          // PlayN.log().debug("BigClip.start() loop " + framePosition);
+          totalBytes += bytesRead;
+          int framesRead;
+          byte[] tempData;
+          if (format.getChannels() < 2) {
+            tempData = convertMonoToStereo(data, bytesRead);
+            framesRead = bytesRead / format.getFrameSize();
+            bytesRead *= 2;
+          } else {
+            framesRead = bytesRead / dataLine.getFormat().getFrameSize();
+            tempData = Arrays.copyOfRange(data, 0, bytesRead);
           }
 
-          //PlayN.log().debug("BigClip.start() loop ENDED" + framePosition);
-          active = false;
-          countDown = 1;
-          framePosition = 0;
-          inputStream.reset();
-          dataLine.stop();
-          /*
-           * should these open()/close() be here, or explicitly called by user program?
-           */
-          dataLine.close();
-        } catch (LineUnavailableException lue) {
-          PlayN.log().warn("No sound line available!", lue);
+          framePosition += framesRead;
+          if (framePosition >= loopPointEnd) {
+            framePosition = loopPointStart;
+            inputStream.reset();
+            countDown--;
+            // PlayN.log().debug("Loop Count: " + countDown);
+          }
+          timelastPositionSet = System.currentTimeMillis();
+
+          byte[] newData = tempData;
+          dataLine.write(newData, 0, newData.length);
+          if (startOrMove) {
+            int len = bufSize / bufferUpdateFactor;
+
+            // Step down to the next whole frame.
+            len /= frameSize;
+            len *= frameSize;
+
+            data = new byte[len];
+            startOrMove = false;
+          }
+
+          bytesRead = inputStream.read(data, 0, data.length);
+          if (bytesRead < 0 && (--countDown > 0 || loopCount == Clip.LOOP_CONTINUOUSLY)) {
+            inputStream.read(new byte[offset], 0, offset);
+            // PlayN.log().debug("loopCount " + loopCount);
+            // PlayN.log().debug("countDown " + countDown);
+            inputStream.reset();
+            bytesRead = inputStream.read(data, 0, data.length);
+          }
         }
+
+        // PlayN.log().debug("BigClip.start() loop ENDED" + framePosition);
+        active = false;
+        countDown = 1;
+        framePosition = 0;
+        inputStream.reset();
+        dataLine.stop();
+
       }
     };
     thread = new Thread(r);
