@@ -42,12 +42,16 @@ class GetTextTest extends Test {
     ImageLayer instLayer = graphics().createImageLayer(formatText(instructions, false));
     graphics().rootLayer().addAt(instLayer, 50, 50);
 
-    final ImageLayer outputLayer = graphics().createImageLayer(formatText("...", false));
+    String last = storage().getItem("last_text");
+    if (last == null) last = "...";
+
+    final ImageLayer outputLayer = graphics().createImageLayer(formatText(last, false));
     graphics().rootLayer().addAt(outputLayer, 50, 150);
 
     final Callback<String> onGotText = new Callback<String>() {
       public void onSuccess(String text) {
         outputLayer.setImage(formatText(text == null ? "canceled" : text, false));
+        if (text != null) storage().setItem("last_text", text);
       }
       public void onFailure(Throwable cause) {
         outputLayer.setImage(formatText(cause.getMessage(), false));
