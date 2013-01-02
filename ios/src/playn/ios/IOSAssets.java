@@ -152,6 +152,10 @@ public class IOSAssets extends AbstractAssets<UIImage> {
       platform.log().warn("Failed to load image '" + rsrc.path + "'.");
       error = new Exception("Failed to load " + rsrc.path);
     }
+    if (error == null) {
+      platform.log().warn("Missing image '" + fullPath + "'.");
+      error = new FileNotFoundException(fullPath);
+    }
     return recv.loadFailed(error);
   }
 }
