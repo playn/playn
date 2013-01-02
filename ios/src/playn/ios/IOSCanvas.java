@@ -55,6 +55,9 @@ public class IOSCanvas implements Canvas {
   private LinkedList<IOSCanvasState> states = new LinkedList<IOSCanvasState>();
 
   public IOSCanvas(IOSGLContext ctx, float width, float height) {
+    // if our size is invalid, we'll fail below at CGBitmapContext, so fail here more usefully
+    if (width <= 0 || height <= 0) throw new IllegalArgumentException(
+      "Invalid size " + width + "x" + height);
     this.width = width;
     this.height = height;
     states.addFirst(new IOSCanvasState());
