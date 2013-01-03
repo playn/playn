@@ -272,8 +272,6 @@ public abstract class GLContext {
       } catch (Throwable t) {
         platform.log().warn("Failed to create QuadShader: " + t);
       }
-    } else {
-      platform.log().info("GPU/driver lacks sufficient vertex uniform vectors for QuadShader.");
     }
     return new IndexedTrisShader(this);
   }
