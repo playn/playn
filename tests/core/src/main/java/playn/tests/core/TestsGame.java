@@ -53,6 +53,7 @@ public class TestsGame implements Game {
     new PointerMouseTouchTest(),
     new MouseWheelTest(),
     new ShaderTest(),
+    new SoundTest(),
     /*new YourTest(),*/
   };
   private Test currentTest;
