@@ -23,7 +23,16 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-source-plugin</artifactId>
-      </plugin>
+        <executions>
+          <execution>
+            <id>attach-sources</id>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>jar-no-fork</goal>
+            </goals>
+          </execution>
+        </executions>
+     </plugin>
     </plugins>
   </build>
 </project>
