@@ -22,6 +22,8 @@ import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import playn.core.AudioImpl;
 
+import javax.sound.sampled.Clip;
+
 class JavaAudio extends AudioImpl {
 
   public JavaAudio(JavaPlatform platform) {
@@ -33,10 +35,13 @@ class JavaAudio extends AudioImpl {
     ((JavaPlatform) platform).invokeAsync(new Runnable() {
       public void run () {
         try {
-          BigClip clip = new BigClip(AudioSystem.getClip());
           AudioInputStream ais = AudioSystem.getAudioInputStream(in);
+          Clip clip = AudioSystem.getClip();
           if (name.endsWith(".mp3")) {
-            AudioFormat baseFormat = ais.getFormat();
+            clip = new BigClip(clip);
+          }
+          AudioFormat baseFormat = ais.getFormat();
+          if (baseFormat.getEncoding() != AudioFormat.Encoding.PCM_SIGNED) {
             AudioFormat decodedFormat = new AudioFormat(
               AudioFormat.Encoding.PCM_SIGNED,
               baseFormat.getSampleRate(),
