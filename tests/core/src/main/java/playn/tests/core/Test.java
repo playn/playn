@@ -22,6 +22,7 @@ import playn.core.Game;
 import playn.core.ImageLayer;
 import playn.core.TextFormat;
 import playn.core.Layer;
+import playn.core.Pointer;
 import playn.core.TextLayout;
 import static playn.core.PlayN.graphics;
 
@@ -78,13 +79,37 @@ public abstract class Test implements Game {
 
   protected ImageLayer createDescripLayer(String descrip, float width) {
     TextLayout layout = graphics().layoutText(
-      descrip, new TextFormat().withFont(DESCRIP_FONT).withWrapping(
-        width, TextFormat.Alignment.CENTER));
+      descrip, TEXT_FMT.withWrapping(width, TextFormat.Alignment.CENTER));
     CanvasImage image = graphics().createImage(layout.width(), layout.height());
     image.canvas().setFillColor(0xFF000000);
     image.canvas().fillText(layout, 0, 0);
     return graphics().createImageLayer(image);
   }
 
-  protected static Font DESCRIP_FONT = graphics().createFont("Helvetica", Font.Style.PLAIN, 12);
+  protected CanvasImage formatText (String text, boolean border) {
+    TextLayout layout = graphics().layoutText(text, TEXT_FMT);
+    float margin = border ? 10 : 0;
+    float width = layout.width()+2*margin, height = layout.height()+2*margin;
+    CanvasImage image = graphics().createImage(width, height);
+    image.canvas().setStrokeColor(0xFF000000);
+    image.canvas().setFillColor(0xFF000000);
+    image.canvas().fillText(layout, margin, margin);
+    if (border)
+      image.canvas().strokeRect(0, 0, width-1, height-1);
+    return image;
+  }
+
+  protected ImageLayer createButton (String text, final Runnable onClick) {
+    CanvasImage image = formatText(text, true);
+    ImageLayer button = graphics().createImageLayer(image);
+    button.addListener(new Pointer.Adapter() {
+      public void onPointerStart(Pointer.Event event) {
+        onClick.run();
+      }
+    });
+    return button;
+  }
+
+  protected static final TextFormat TEXT_FMT = new TextFormat().withFont(
+    graphics().createFont("Helvetica", Font.Style.PLAIN, 12));
 }

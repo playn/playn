@@ -60,29 +60,13 @@ class GetTextTest extends Test {
 
     float x = 50;
     for (final Keyboard.TextType type : Keyboard.TextType.values()) {
-      CanvasImage image = formatText(type.toString(), true);
-      ImageLayer button = graphics().createImageLayer(image);
-      button.addListener(new Pointer.Adapter() {
-        public void onPointerStart(Pointer.Event event) {
+      ImageLayer button = createButton(type.toString(), new Runnable() {
+        public void run() {
           keyboard().getText(Keyboard.TextType.DEFAULT, "Enter " + type + " text:", "", onGotText);
         }
       });
-
       graphics().rootLayer().addAt(button, x, 100);
-      x += image.width() + 10;
+      x += button.width() + 10;
     }
-  }
-
-  protected CanvasImage formatText (String text, boolean border) {
-    TextLayout layout = graphics().layoutText(text, new TextFormat());
-    float margin = border ? 10 : 0;
-    float width = layout.width()+2*margin, height = layout.height()+2*margin;
-    CanvasImage image = graphics().createImage(width, height);
-    image.canvas().setStrokeColor(0xFF000000);
-    image.canvas().setFillColor(0xFF000000);
-    image.canvas().fillText(layout, margin, margin);
-    if (border)
-      image.canvas().strokeRect(0, 0, width-1, height-1);
-    return image;
   }
 }
