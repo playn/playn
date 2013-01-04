@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
 -->
-<module rename-to='testsgame'>
-  <inherits name='playn.PlayN'/>
+<module rename-to="testsgame">
+  <inherits name="playn.PlayN"/>
   <inherits name="playn.logging.Enhanced" />
+  <inherits name="TestsAssets" />
 
-  <source path='core'/>
-  <source path='html'/>
-  <public path="resources" />
+  <source path="core"/>
+  <source path="html"/>
 
-  <entry-point class='playn.tests.html.TestsGameHtml'/>
+  <entry-point class="playn.tests.html.TestsGameHtml"/>
 </module>

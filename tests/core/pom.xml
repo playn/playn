@@ -25,11 +25,5 @@
         <artifactId>maven-source-plugin</artifactId>
       </plugin>
     </plugins>
-
-    <resources>
-      <resource>
-        <directory>${project.build.sourceDirectory}</directory>
-      </resource>
-    </resources>
   </build>
 </project>
