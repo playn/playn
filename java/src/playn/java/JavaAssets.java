@@ -99,13 +99,17 @@ public class JavaAssets extends AbstractAssets<BufferedImage> {
 
   @Override
   public Sound getSound(String path) {
-    final String soundPath = path + ".mp3";
-    try {
-      return platform.audio().createSound(soundPath, getAssetStream(soundPath));
-    } catch (Exception e) {
-      platform.log().warn("Sound load error " + soundPath + ": " + e);
-      return new Sound.Error(e);
+    Exception err = null;
+    for (String suff : SUFFIXES) {
+      final String soundPath = path + suff;
+      try {
+        return platform.audio().createSound(soundPath, getAssetStream(soundPath));
+      } catch (Exception e) {
+        err = e; // note the error, and loop through and try the next format
+      }
     }
+    platform.log().warn("Sound load error " + path + ": " + err);
+    return new Sound.Error(err);
   }
 
   @Override
@@ -178,4 +182,6 @@ public class JavaAssets extends AbstractAssets<BufferedImage> {
   private Scale assetScale() {
     return (assetScale != null) ? assetScale : platform.graphics().ctx().scale;
   }
+
+  protected static final String[] SUFFIXES = { ".wav", ".mp3" };
 }
