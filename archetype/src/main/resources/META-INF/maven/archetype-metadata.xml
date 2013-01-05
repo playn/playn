@@ -155,37 +155,11 @@
       <fileSets>
         <fileSet filtered="true" packaged="true" encoding="UTF-8">
           <directory>src/main/java</directory>
-          <includes>
-            <include>**/*.java</include>
-          </includes>
         </fileSet>
-        <fileSet packaged="true" encoding="UTF-8">
-          <directory>src/main/java</directory>
-          <includes>
-            <include>**/*.png</include>
-          </includes>
+        <fileSet packaged="false" encoding="UTF-8">
+          <directory>src/main/resources</directory>
         </fileSet>
       </fileSets>
     </module>
-<!--
-    <module id="${rootArtifactId}-java" dir="java" name="${rootArtifactId}-java">
-      <fileSets>
-      </fileSets>
-    </module>
-    <module id="${rootArtifactId}-html" dir="html" name="${rootArtifactId}-html">
-      <fileSets>
-      </fileSets>
-    </module>
-    <module id="${rootArtifactId}-flash" dir="flash" name="${rootArtifactId}-flash">
-    </module>
-    <module id="${rootArtifactId}-android" dir="android" name="${rootArtifactId}-android">
-      <fileSets>
-      </fileSets>
-    </module>
-    <module id="${rootArtifactId}-ios" dir="ios" name="${rootArtifactId}-ios">
-      <fileSets>
-      </fileSets>
-    </module>
--->
   </modules>
 </archetype-descriptor>

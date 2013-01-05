@@ -26,18 +26,17 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-source-plugin</artifactId>
+        <!-- build a -sources.jar always, rather than only on deploy -->
+        <executions>
+          <execution>
+            <id>attach-sources</id>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>jar-no-fork</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
-
-    <resources>
-      <!-- include the source files in our main jar for use by GWT -->
-      <resource>
-        <directory>${project.build.sourceDirectory}</directory>
-      </resource>
-      <!-- and continue to include our standard resources -->
-      <resource>
-        <directory>${basedir}/src/main/resources</directory>
-      </resource>
-    </resources>
   </build>
 </project>

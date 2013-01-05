@@ -27,6 +27,13 @@
     </dependency>
 
     <dependency>
+      <groupId>${groupId}</groupId>
+      <artifactId>${rootArtifactId}-core</artifactId>
+      <version>${project.version}</version>
+      <classifier>sources</classifier>
+    </dependency>
+
+    <dependency>
       <groupId>com.googlecode.playn</groupId>
       <artifactId>playn-flash</artifactId>
       <version>${playn.version}</version>

@@ -12,7 +12,6 @@ public class ${JavaGameClassName}Activity extends GameActivity {
 
   @Override
   public void main(){
-    platform().assets().setPathPrefix("${packageInPathFormat}/resources");
     PlayN.run(new ${JavaGameClassName}());
   }
 }

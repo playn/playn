@@ -11,8 +11,7 @@ import ${package}.core.${JavaGameClassName};
 public class ${JavaGameClassName}Java {
 
   public static void main(String[] args) {
-    JavaPlatform platform = JavaPlatform.register();
-    platform.assets().setPathPrefix("${packageInPathFormat}/resources");
+    JavaPlatform.register();
     PlayN.run(new ${JavaGameClassName}());
   }
 }
