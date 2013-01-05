@@ -47,7 +47,7 @@ public class IOSAssets extends AbstractAssets<UIImage> {
 
   private final IOSPlatform platform;
 
-  private String pathPrefix = "";
+  private String pathPrefix = "assets/";
 
   public IOSAssets(IOSPlatform platform) {
     super(platform);

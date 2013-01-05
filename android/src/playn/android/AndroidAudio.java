@@ -20,6 +20,7 @@ import java.io.FileInputStream;
 import java.util.HashSet;
 import java.util.Set;
 
+import android.content.res.AssetFileDescriptor;
 import android.media.MediaPlayer.OnErrorListener;
 import android.media.MediaPlayer;
 
@@ -44,9 +45,6 @@ class AndroidAudio extends AudioImpl {
     // AudioTrack cannot handle. However, the MediaPlayer implementation is currently the only
     // version of AndroidSound we have written, so we'll use it here regardless of format.
     return new AndroidCompressedSound(this, new Resolver<MediaPlayer>() {
-      // this cache file will get cleaned up in our activity's onDestroy
-      private File cachedFile;
-
       public void resolve (final AndroidSound<MediaPlayer> sound) {
         // we need to create the media player before starting the background task because the media
         // player will dispatch callbacks based on the looper associated with the thread on which
@@ -56,13 +54,9 @@ class AndroidAudio extends AudioImpl {
         platform.invokeAsync(new Runnable() {
           public void run () {
             try {
-              // lazily create our cached audio file
-              if (cachedFile == null) {
-                cachedFile = platform.assets().cacheAsset(path);
-              }
-              FileInputStream ins = new FileInputStream(cachedFile);
+              AssetFileDescriptor fd = platform.assets().openAssetFd(path);
               try {
-                mp.setDataSource(ins.getFD());
+                mp.setDataSource(fd.getFileDescriptor());
                 mp.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
                   @Override
                   public void onPrepared(final MediaPlayer mp) {
@@ -79,7 +73,7 @@ class AndroidAudio extends AudioImpl {
                 });
                 mp.prepareAsync();
               } finally {
-                ins.close();
+                fd.close();
               }
             } catch (Exception e) {
               dispatchLoadError(sound, e);

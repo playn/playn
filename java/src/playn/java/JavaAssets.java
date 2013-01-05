@@ -41,7 +41,7 @@ public class JavaAssets extends AbstractAssets<BufferedImage> {
 
   private final JavaPlatform platform;
 
-  private String pathPrefix = "";
+  private String pathPrefix = "assets/";
   private Scale assetScale = null;
 
   public JavaAssets(JavaPlatform platform) {

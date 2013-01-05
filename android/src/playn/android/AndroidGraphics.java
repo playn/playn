@@ -99,11 +99,8 @@ public class AndroidGraphics extends GraphicsGL {
    */
   public void registerFont(String path, String name, Font.Style style, String... ligatureGlyphs) {
     try {
-      // Android has no way to load a font from an input stream so we have to first copy the data
-      // into a file and then load from there; awesome!
-      Typeface face = Typeface.createFromFile(platform.assets().cacheAsset(path));
       Pair<String,Font.Style> key = Pair.create(name, style);
-      fonts.put(key, face);
+      fonts.put(key, platform.assets().getTypeface(path));
       ligatureHacks.put(key, ligatureGlyphs);
 
     } catch (Exception e) {

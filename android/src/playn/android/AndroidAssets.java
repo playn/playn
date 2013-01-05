@@ -31,8 +31,11 @@ import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.HttpGet;
 
+import android.content.res.AssetFileDescriptor;
+import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Typeface;
 
 import pythagoras.f.MathUtil;
 
@@ -63,7 +66,8 @@ public class AndroidAssets extends AbstractAssets<Bitmap> {
   }
 
   private final AndroidPlatform platform;
-  private String pathPrefix = null;
+  private final AssetManager assetMgr;
+  private String pathPrefix = ""; // 'assets/' is always prepended by AssetManager
   private Scale assetScale = null;
 
   private BitmapOptionsAdjuster optionsAdjuster = new BitmapOptionsAdjuster() {
@@ -73,6 +77,7 @@ public class AndroidAssets extends AbstractAssets<Bitmap> {
   AndroidAssets(AndroidPlatform platform) {
     super(platform);
     this.platform = platform;
+    this.assetMgr = platform.activity.getResources().getAssets();
   }
 
   public void setPathPrefix(String prefix) {
@@ -174,45 +179,12 @@ public class AndroidAssets extends AbstractAssets<Bitmap> {
     return recv.loadFailed(error != null ? error : new FileNotFoundException(path));
   }
 
-  /**
-   * Copies a resource from our APK into a temporary file and returns a handle on that file. The
-   * cache file name is the hash of the to-be-cached asset path with file extension preserved. If
-   * the cache file already exists, it will returned as-is. The assumption is that the asset being
-   * cached is stable, so if it has been cached already, it is safe to reuse. Cache files are all
-   * wiped on app shutdown, so if a cached file becomes corrupted or fails to be properly cached in
-   * the first place (due to transient reasons), the error will only persist until the game is
-   * restarted.
-   *
-   * @param path the path to the to-be-cached asset.
-   */
-  File cacheAsset(String path) throws IOException {
-    InputStream in = openAsset(path);
-    String cacheName = sha1hex(path);
-    int didx = path.lastIndexOf('.');
-    if (didx != -1) {
-      cacheName += path.substring(didx);
-    }
-    File cachedFile = new File(platform.activity.getCacheDir(), cacheName);
-    // platform.log().debug("Caching " + path + " in " + cachedFile.getPath());
-    if (!cachedFile.exists()) {
-      try {
-        FileOutputStream out = new FileOutputStream(cachedFile);
-        try {
-          byte[] buffer = new byte[16 * 1024];
-          while (true) {
-            int r = in.read(buffer);
-            if (r < 0)
-              break;
-            out.write(buffer, 0, r);
-          }
-        } finally {
-          out.close();
-        }
-      } finally {
-        in.close();
-      }
-    }
-    return cachedFile;
+  Typeface getTypeface(String path) {
+    return Typeface.createFromAsset(assetMgr, normalizePath(pathPrefix + path));
+  }
+
+  AssetFileDescriptor openAssetFd(String path) throws IOException {
+    return assetMgr.openFd(normalizePath(pathPrefix + path));
   }
 
   private Scale assetScale () {
@@ -225,7 +197,7 @@ public class AndroidAssets extends AbstractAssets<Bitmap> {
    */
   private InputStream openAsset(String path) throws IOException {
     String fullPath = normalizePath(pathPrefix + path);
-    InputStream is = getClass().getClassLoader().getResourceAsStream(fullPath);
+    InputStream is = assetMgr.open(fullPath, AssetManager.ACCESS_STREAMING);
     if (is == null)
       throw new FileNotFoundException("Missing resource: " + fullPath);
     return is;
@@ -287,30 +259,4 @@ public class AndroidAssets extends AbstractAssets<Bitmap> {
       client.close();
     }
   }
-
-  private String sha1hex(String data) {
-    byte[] bytes = null;
-    try {
-      bytes = data.getBytes("UTF-8");
-    } catch (UnsupportedEncodingException uee) {
-      bytes = data.getBytes();
-    }
-    try {
-      return tohex(MessageDigest.getInstance("SHA-1").digest(bytes));
-    } catch (Exception e) {
-      platform.log().warn("Failed to sha1hex '" + data + "'", e);
-      return tohex(bytes); // fall back to a more verbose but non-conflicting hash for our purpose
-    }
-  }
-
-  private static String tohex(byte[] data) {
-    StringBuffer buf = new StringBuffer();
-    for (int ii = 0; ii < data.length; ii++) {
-      int b = data[ii] & 0xFF;
-      buf.append(HEX_DIGS.charAt(b/16)).append(HEX_DIGS.charAt(b%16));
-    }
-    return buf.toString();
-  }
-
-  protected static final String HEX_DIGS = "0123456789abcdef";
 }
