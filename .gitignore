@@ -27,3 +27,5 @@ target
 /tests/html/war/manualtestsgame
 /tests/html/gwt-unitCache
 /tests/flash/war/WEB-INF/classes
+/tests/android/assets
+/tests/ios/assets
