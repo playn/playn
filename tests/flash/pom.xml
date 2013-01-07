@@ -35,6 +35,12 @@
 
     <dependency>
       <groupId>com.googlecode.playn</groupId>
+      <artifactId>playn-tests-assets</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.googlecode.playn</groupId>
       <artifactId>playn-flash</artifactId>
       <version>${project.version}</version>
     </dependency>

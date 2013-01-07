@@ -24,7 +24,6 @@ public class TestsGameActivity extends GameActivity {
 
   @Override
   public void main(){
-    platform().assets().setPathPrefix("assets");
     PlayN.run(new TestsGame());
   }
 }

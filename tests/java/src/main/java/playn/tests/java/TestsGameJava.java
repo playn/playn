@@ -28,7 +28,6 @@ public class TestsGameJava {
       config.scaleFactor = Float.parseFloat(args[0]);
     }
     JavaPlatform platform = JavaPlatform.register(config);
-    platform.assets().setPathPrefix("assets");
     platform.setTitle("Tests");
     PlayN.run(new TestsGame());
   }
