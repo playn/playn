@@ -95,6 +95,30 @@
         </configuration>
       </plugin>
 
+      <!-- this symlinks some shared test code into tests/...; we can't commit
+           a symlink in Git (breaks on Windows), so this should be more robust -->
+      <plugin>
+        <groupId>com.pyx4j</groupId>
+        <artifactId>maven-junction-plugin</artifactId>
+        <version>1.0.3</version>
+        <executions>
+          <execution>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>link</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <links>
+            <link>
+              <src>${basedir}/../core/tests/playn/shared/json</src>
+              <dst>${basedir}/tests/playn/shared/json</dst>
+            </link>
+          </links>
+        </configuration>
+      </plugin>
+
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>gwt-maven-plugin</artifactId>

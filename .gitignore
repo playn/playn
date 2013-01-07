@@ -1,8 +1,8 @@
+*.iml
+.DS_Store
 .classpath
 .project
-*.iml
 .settings
-.DS_Store
 target
 
 # /android/
@@ -12,6 +12,9 @@ target
 # /core/
 /core/bin
 /core/.gwt
+
+# /html/
+/html/tests/playn/shared/json
 
 # /server/
 /server/bin
