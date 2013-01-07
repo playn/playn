@@ -55,27 +55,26 @@ class AndroidAudio extends AudioImpl {
           public void run () {
             try {
               AssetFileDescriptor fd = platform.assets().openAssetFd(path);
-              try {
-                mp.setDataSource(fd.getFileDescriptor());
-                mp.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-                  @Override
-                  public void onPrepared(final MediaPlayer mp) {
-                    dispatchLoaded(sound, mp);
-                  }
-                });
-                mp.setOnErrorListener(new OnErrorListener() {
-                  @Override
-                  public boolean onError(MediaPlayer mp, int what, int extra) {
-                    sound.onLoadError(new Exception("MediaPlayer prepare failure [what=" + what +
-                                                    ", extra=" + extra + "]"));
-                    return false;
-                  }
-                });
-                mp.prepareAsync();
-              } finally {
-                fd.close();
-              }
+              mp.setDataSource(fd.getFileDescriptor(), fd.getStartOffset(), fd.getLength());
+              fd.close();
+              mp.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+                @Override
+                public void onPrepared(final MediaPlayer mp) {
+                  dispatchLoaded(sound, mp);
+                }
+              });
+              mp.setOnErrorListener(new OnErrorListener() {
+                @Override
+                public boolean onError(MediaPlayer mp, int what, int extra) {
+                  String errmsg = "MediaPlayer prepare failure [what=" + what + ", x=" + extra + "]";
+                  platform.log().warn(errmsg);
+                  dispatchLoadError(sound, new Exception(errmsg));
+                  return false;
+                }
+              });
+              mp.prepareAsync();
             } catch (Exception e) {
+              platform.log().warn("Sound load error '" + path + "'", e);
               dispatchLoadError(sound, e);
             }
           }
