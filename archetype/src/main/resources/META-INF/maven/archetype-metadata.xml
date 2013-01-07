@@ -151,13 +151,17 @@
   </fileSets>
 
   <modules>
+    <module id="${rootArtifactId}-assets" dir="assets" name="${rootArtifactId}-assets">
+      <fileSets>
+        <fileSet packaged="false" encoding="UTF-8">
+          <directory>src/main/resources</directory>
+        </fileSet>
+      </fileSets>
+    </module>
     <module id="${rootArtifactId}-core" dir="core" name="${rootArtifactId}-core">
       <fileSets>
         <fileSet filtered="true" packaged="true" encoding="UTF-8">
           <directory>src/main/java</directory>
-        </fileSet>
-        <fileSet packaged="false" encoding="UTF-8">
-          <directory>src/main/resources</directory>
         </fileSet>
       </fileSets>
     </module>

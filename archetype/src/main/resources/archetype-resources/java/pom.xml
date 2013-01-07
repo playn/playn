@@ -25,6 +25,12 @@
     </dependency>
 
     <dependency>
+      <groupId>${groupId}</groupId>
+      <artifactId>${rootArtifactId}-assets</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <dependency>
       <groupId>com.googlecode.playn</groupId>
       <artifactId>playn-java</artifactId>
       <version>${playn.version}</version>

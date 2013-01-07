@@ -34,6 +34,28 @@
     <finalName>${project.artifactId}</finalName>
     <plugins>
       <plugin>
+        <groupId>com.pyx4j</groupId>
+        <artifactId>maven-junction-plugin</artifactId>
+        <version>1.0.3</version>
+        <executions>
+          <execution>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>link</goal>
+            </goals>
+          </execution>
+        </executions>
+        <!-- generate a symlink to our assets directory in the proper location -->
+        <configuration>
+          <links>
+            <link>
+              <src>${basedir}/../assets/src/main/resources/assets</src>
+              <dst>${basedir}/assets</dst>
+            </link>
+          </links>
+        </configuration>
+      </plugin>
+      <plugin>
         <groupId>com.samskivert</groupId>
         <artifactId>ikvm-maven-plugin</artifactId>
         <version>1.1.4</version>
