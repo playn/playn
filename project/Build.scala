@@ -67,10 +67,11 @@ object PlayNBuild extends Build {
   lazy val flash = builder("flash")
   lazy val android = builder("android")
   lazy val ios = builder("ios")
+  lazy val testsAssets = builder("tests-assets")
   lazy val testsCore = builder("tests-core")
   lazy val testsJava = builder("tests-java")
 
   // one giant fruit roll-up to bring them all together
   lazy val playn = Project("playn", file(".")) aggregate(
-    core, gwtbox2d, webgl, java, html, flash, android, ios, testsCore, testsJava)
+    core, gwtbox2d, webgl, java, html, flash, android, ios, testsAssets, testsCore, testsJava)
 }
