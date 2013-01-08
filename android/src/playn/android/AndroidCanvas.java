@@ -267,8 +267,7 @@ class AndroidCanvas implements Canvas {
   @Override
   public Canvas setTransform(float m11, float m12, float m21, float m22, float dx, float dy) {
     Matrix m = new Matrix();
-    // TODO(jgw): Is this the right order?
-    m.setValues(new float[] {m11, m12, 0, m21, 0, m22, dx, dy, 1});
+    m.setValues(new float[] {m11, m12, dx, m21, m22, dy, 0, 0, 1});
     canvas.setMatrix(m);
     return this;
   }
