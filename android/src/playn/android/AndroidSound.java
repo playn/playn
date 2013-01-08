@@ -22,11 +22,4 @@ abstract class AndroidSound<I> extends AbstractSound<I> {
   abstract void onPause();
 
   abstract void onResume();
-
-  abstract void onDestroy();
-
-  @Override
-  protected void finalize() {
-    onDestroy();
-  }
 }

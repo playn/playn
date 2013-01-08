@@ -72,6 +72,13 @@ public class AndroidCompressedSound extends AndroidSound<MediaPlayer> {
     impl.setVolume(volume, volume);
   }
 
+  @Override
+  protected void releaseImpl() {
+    if (impl.isPlaying())
+      impl.stop();
+    impl.release();
+  }
+
   private void resolve() {
     resolver.resolve(AndroidCompressedSound.this);
   }
@@ -94,15 +101,5 @@ public class AndroidCompressedSound extends AndroidSound<MediaPlayer> {
   @Override
   void onResume() {
     resolve(); // re-resolve our media player
-  }
-
-  @Override
-  void onDestroy() {
-    if (impl != null) {
-      if (impl.isPlaying())
-        impl.stop();
-      impl.release();
-      impl = null;
-    }
   }
 }

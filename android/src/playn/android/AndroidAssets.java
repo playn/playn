@@ -128,6 +128,11 @@ public class AndroidAssets extends AbstractAssets<Bitmap> {
   }
 
   @Override
+  public Sound getMusic(String path) {
+    return platform.audio().createMusic(path + ".mp3");
+  }
+
+  @Override
   public String getTextSync(String path) throws Exception {
     InputStream is = openAsset(path);
     try {

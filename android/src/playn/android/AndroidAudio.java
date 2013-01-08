@@ -17,13 +17,18 @@ package playn.android;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import android.content.res.AssetFileDescriptor;
+import android.media.AudioManager;
 import android.media.MediaPlayer.OnErrorListener;
 import android.media.MediaPlayer;
+import android.media.SoundPool;
 
+import playn.core.AbstractSound;
 import playn.core.AudioImpl;
 
 class AndroidAudio extends AudioImpl {
@@ -34,13 +39,93 @@ class AndroidAudio extends AudioImpl {
 
   private final Set<AndroidSound<?>> playing = new HashSet<AndroidSound<?>>();
   private final AndroidPlatform platform;
+  private final Map<Integer,PooledSound> loadingSounds = new HashMap<Integer,PooledSound>();
+  private final SoundPool pool;
 
-  public AndroidAudio(AndroidPlatform platform) {
+  private class PooledSound extends AbstractSound<Integer> {
+    public final int soundId;
+    private int streamId;
+
+    public PooledSound(int soundId) {
+      this.soundId = soundId;
+    }
+
+    @Override
+    public String toString() {
+      return "pooled:" + soundId;
+    }
+
+    @Override
+    protected boolean playingImpl() {
+      return false; // no way to tell
+    }
+
+    @Override
+    protected boolean playImpl() {
+      streamId = pool.play(soundId, volume, volume, 1, looping ? -1 : 0, 1);
+      return (streamId != 0);
+    }
+
+    @Override
+    protected void stopImpl() {
+      if (streamId != 0) {
+        pool.stop(streamId);
+        streamId = 0;
+      }
+    }
+
+    @Override
+    protected void setLoopingImpl(boolean looping) {
+      if (streamId != 0) {
+        pool.setLoop(streamId, looping ? -1 : 0);
+      }
+    }
+
+    @Override
+    protected void setVolumeImpl(float volume) {
+      if (streamId != 0) {
+        pool.setVolume(streamId, volume, volume);
+      }
+    }
+
+    @Override
+    protected void releaseImpl() {
+      pool.unload(soundId);
+    }
+  };
+
+  public AndroidAudio(final AndroidPlatform platform) {
     super(platform);
     this.platform = platform;
+    this.pool = new SoundPool(platform.activity.maxSimultaneousSounds(),
+                              AudioManager.STREAM_MUSIC, 0);
+    this.pool.setOnLoadCompleteListener(new SoundPool.OnLoadCompleteListener() {
+      public void onLoadComplete(SoundPool soundPool, int soundId, int status) {
+        PooledSound sound = loadingSounds.remove(soundId);
+        if (sound == null) {
+          platform.log().warn("Got load complete for unknown sound [id=" + soundId + "]");
+        } else if (status == 0) {
+          dispatchLoaded(sound, soundId);
+        } else {
+          dispatchLoadError(sound, new Exception("Sound load failed [errcode=" + status + "]"));
+        }
+      }
+    });
   }
 
-  AndroidSound<?> createSound(final String path) {
+  AbstractSound<?> createSound(final String path) {
+    PooledSound sound;
+    try {
+      sound = new PooledSound(pool.load(platform.assets().openAssetFd(path), 1));
+      loadingSounds.put(sound.soundId, sound);
+    } catch (Exception e) {
+      sound = new PooledSound(0);
+      sound.onLoadError(e);
+    }
+    return sound;
+  }
+
+  AbstractSound<?> createMusic(final String path) {
     // MediaPlayer should really be used to play compressed sounds and other file formats
     // AudioTrack cannot handle. However, the MediaPlayer implementation is currently the only
     // version of AndroidSound we have written, so we'll use it here regardless of format.
@@ -84,6 +169,10 @@ class AndroidAudio extends AudioImpl {
   }
 
   public void onPause() {
+    // handle our pooled sounds
+    pool.autoPause();
+
+    // now handle our musics
     if (!playing.isEmpty())
       AndroidPlatform.debugLog("Pausing " + playing.size() + " playing sounds.");
     for (AndroidSound<?> sound : playing) {
@@ -92,6 +181,9 @@ class AndroidAudio extends AudioImpl {
   }
 
   public void onResume() {
+    // handle our pooled sounds
+    pool.autoResume();
+
     // copy and clear out the playing set, the playing sounds will re-add themselves once they are
     // (asynchronously) re-resolved and resume playing
     Set<AndroidSound<?>> wasPlaying = new HashSet<AndroidSound<?>>(playing);
@@ -105,9 +197,10 @@ class AndroidAudio extends AudioImpl {
 
   public void onDestroy() {
     for (AndroidSound<?> sound : playing) {
-      sound.onDestroy();
+      sound.release();
     }
     playing.clear();
+    pool.release();
   }
 
   void onPlaying(AndroidSound<?> sound) {

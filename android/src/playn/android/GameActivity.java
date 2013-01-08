@@ -203,6 +203,11 @@ public abstract class GameActivity extends Activity {
     return 1; // TODO: determine scale factor automatically?
   }
 
+  /** Configures the maximum simultaneous sounds that may be played back. */
+  protected int maxSimultaneousSounds() {
+    return 8;
+  }
+
   public GameViewGL gameView() {
     return gameView;
   }
