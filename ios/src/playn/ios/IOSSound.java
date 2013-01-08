@@ -56,8 +56,8 @@ public class IOSSound extends AbstractSound<AVAudioPlayer> {
     impl.set_Volume(volume);
   }
 
-  protected void finalize() {
-    if (impl != null)
-      impl.Dispose(); // meh
+  @Override
+  protected void releaseImpl() {
+    impl.Dispose();
   }
 }

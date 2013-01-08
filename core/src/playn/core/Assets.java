@@ -61,13 +61,28 @@ public interface Assets {
   Image getRemoteImage(String url, float width, float height);
 
   /**
-   * Asynchronously loads and returns a sound. If a request to play the sound is made before the
-   * sound is loaded, it will be noted and the sound will be played when loading has completed.
+   * Asynchronously loads and returns a short sound effect.
+   *
+   * <p> Note: if a request to play the sound is made before the sound is loaded, it will be noted
+   * and the sound will be played when loading has completed.
    *
    * @param path the path to the sound resource. NOTE: this should not include a file extension,
-   * PlayN will automatically add {@code .mp3}, (or {@code .aif} on iOS).
+   * PlayN will automatically add {@code .mp3}, (or {@code .caf} on iOS).
    */
   Sound getSound(String path);
+
+  /**
+   * Asynchronously loads and returns a music resource. On some platforms, the backend will use a
+   * different implementation from {@link #getSound} which is better suited to the much larger size
+   * of music audio data.
+   *
+   * <p> Note: if a request to play the sound is made before the sound is loaded, it will be noted
+   * and the sound will be played when loading has completed.
+   *
+   * @param path the path to the sound resource. NOTE: this should not include a file extension,
+   * PlayN will automatically add {@code .mp3}, (or {@code .caf} on iOS).
+   */
+  Sound getMusic(String path);
 
   /**
    * Returns a text asset, encoded in UTF-8.

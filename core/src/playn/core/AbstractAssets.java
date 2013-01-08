@@ -81,6 +81,11 @@ public abstract class AbstractAssets<IMG> implements Assets {
   }
 
   @Override
+  public Sound getMusic(String path) {
+    return getSound(path);
+  }
+
+  @Override
   public void getText(final String path, final Callback<String> callback) {
     platform.invokeAsync(new Runnable() {
       public void run () {

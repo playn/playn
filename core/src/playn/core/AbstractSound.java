@@ -88,6 +88,14 @@ public abstract class AbstractSound<I> implements Sound {
   }
 
   @Override
+  public void release() {
+    if (impl != null) {
+      releaseImpl();
+      impl = null;
+    }
+  }
+
+  @Override
   public final void addCallback(Callback<? super Sound> callback) {
     if (impl != null)
       callback.onSuccess(this);
@@ -95,6 +103,10 @@ public abstract class AbstractSound<I> implements Sound {
       callback.onFailure(error);
     else
       callbacks = Callbacks.createAdd(callbacks, callback);
+  }
+
+  protected void finalize() {
+    release();
   }
 
   protected boolean prepareImpl() {
@@ -107,4 +119,5 @@ public abstract class AbstractSound<I> implements Sound {
   protected abstract void stopImpl();
   protected abstract void setLoopingImpl(boolean looping);
   protected abstract void setVolumeImpl(float volume);
+  protected abstract void releaseImpl();
 }

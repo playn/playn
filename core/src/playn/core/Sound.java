@@ -48,6 +48,9 @@ public interface Sound {
       return false;
     }
     @Override
+    public void release() {
+    }
+    @Override
     public void addCallback(Callback<? super Sound> callback) {
       callback.onSuccess(this);
     }
@@ -117,6 +120,13 @@ public interface Sound {
    * @return {@literal true} if the audio stream is currently playing
    */
   boolean isPlaying();
+
+  /**
+   * Releases resources used by this sound. It will no longer be usable after release. This will
+   * also happen automatically when this sound is garbage collected, but one may need to manually
+   * release sounds sooner to avoid running out of audio resources.
+   */
+  void release();
 
   /**
    * Adds a callback to be notified when this sound has loaded. If the sound is

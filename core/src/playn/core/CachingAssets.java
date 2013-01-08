@@ -83,6 +83,16 @@ public class CachingAssets implements Assets {
   }
 
   @Override
+  public Sound getMusic(String path) {
+    Object object = null;
+    if ((object = cache.get(path)) == null) {
+      object = delegate.getMusic(path);
+      cache.put(path, object);
+    }
+    return (Sound) object;
+  }
+
+  @Override
   public String getTextSync(String path) throws Exception {
     // no caching for text loading
     return delegate.getTextSync(path);

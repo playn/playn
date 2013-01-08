@@ -84,6 +84,14 @@ public class WatchedAssets implements Assets {
   }
 
   @Override
+  public final Sound getMusic(String path) {
+    incrementRequestCount();
+    Sound sound = delegate.getMusic(path);
+    sound.addCallback(callback);
+    return sound;
+  }
+
+  @Override
   public String getTextSync(String path) throws Exception {
     // no tracking for text loading
     return delegate.getTextSync(path);

@@ -101,4 +101,9 @@ class FlashSound extends AbstractSound<FlashSound.NativeSound> {
       soundChannel.setVolume(volume);
     }
   }
+
+  @Override
+  protected void releaseImpl() {
+    // TODO: anything?
+  }
 }

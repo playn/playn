@@ -77,4 +77,9 @@ class HtmlSound extends AbstractSound<Sound> {
   protected void setVolumeImpl(float volume) {
     impl.setVolume((int) (volume * 100));
   }
+
+  @Override
+  protected void releaseImpl() {
+    // TODO: anything?
+  }
 }
