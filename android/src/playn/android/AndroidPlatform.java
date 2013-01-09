@@ -49,7 +49,7 @@ public class AndroidPlatform extends AbstractPlatform {
   private final Json json;
 
   protected AndroidPlatform(GameActivity activity, AndroidGL20 gl20) {
-    super(new AndroidLog());
+    super(new AndroidLog(activity));
     this.activity = activity;
 
     audio = new AndroidAudio(this);

@@ -21,13 +21,19 @@ import playn.core.LogImpl;
 
 class AndroidLog extends LogImpl {
 
+  private final String logIdent;
+
+  public AndroidLog(GameActivity activity) {
+    this.logIdent = activity.logIdent();
+  }
+
   @Override
   protected void logImpl(Level level, String msg, Throwable e) {
     switch (level) {
-    case DEBUG: Log.d("playn", msg, e); break;
-    default:    Log.i("playn", msg, e); break;
-    case  WARN: Log.w("playn", msg, e); break;
-    case ERROR: Log.e("playn", msg, e); break;
+    case DEBUG: Log.d(logIdent, msg, e); break;
+    default:    Log.i(logIdent, msg, e); break;
+    case  WARN: Log.w(logIdent, msg, e); break;
+    case ERROR: Log.e(logIdent, msg, e); break;
     }
   }
 }
