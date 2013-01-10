@@ -383,8 +383,10 @@ public abstract class AbstractLayer implements Layer {
     return new Connection() {
       public void disconnect() {
         rootInteractor = removeInteractor(rootInteractor, newint);
-        // if we have no more interactors, become non-interactive
-        if (rootInteractor == null)
+        // if we have no more interactors, become non-interactive. But not if we're a
+        // GroupLayer; we may be interactive for the sake of our children. In that case,
+        // we'll lazily realize and deal with it later
+        if (rootInteractor == null && !(AbstractLayer.this instanceof GroupLayer))
           setInteractive(false);
       }
     };
