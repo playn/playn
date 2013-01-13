@@ -38,6 +38,13 @@ class HtmlGraphicsDom extends HtmlGraphics {
   }
 
   @Override
+  public void setRootSize(int width, int height) {
+    super.setRootSize(width, height);
+    rootLayer.element().getStyle().setWidth(width, Unit.PX);
+    rootLayer.element().getStyle().setHeight(height, Unit.PX);
+  }
+
+  @Override
   public GroupLayer createGroupLayer() {
     return new HtmlGroupLayerDom();
   }

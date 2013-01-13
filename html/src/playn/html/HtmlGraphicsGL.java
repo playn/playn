@@ -67,6 +67,14 @@ class HtmlGraphicsGL extends HtmlGraphics {
   }
 
   @Override
+  public void setRootSize(int width, int height) {
+    super.setRootSize(width, height);
+    canvas.setWidth(width);
+    canvas.setHeight(height);
+    ctx.setSize(width, height);
+  }
+
+  @Override
   public GroupLayer createGroupLayer() {
     return new GroupLayerGL(ctx);
   }

@@ -92,6 +92,16 @@ public abstract class HtmlGraphics implements Graphics {
     rootElement.appendChild(measureElement);
   }
 
+  /**
+   * Sizes or resizes the root element that contains the PlayN view.
+   * @param width the new width, in pixels, of the view.
+   * @param height the new height, in pixels, of the view.
+   */
+  public void setRootSize(int width, int height) {
+    rootElement.getStyle().setWidth(width, Unit.PX);
+    rootElement.getStyle().setHeight(height, Unit.PX);
+  }
+
   @Override
   public CanvasImage createImage(float width, float height) {
     return new HtmlCanvasImage(ctx(), new HtmlCanvas(width, height));
