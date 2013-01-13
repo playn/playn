@@ -30,14 +30,14 @@ class JavaAudio extends AudioImpl {
     super(platform);
   }
 
-  JavaSound createSound(final String name, final InputStream in) {
+  JavaSound createSound(final String name, final InputStream in, final boolean music) {
     final JavaSound sound = new JavaSound();
     ((JavaPlatform) platform).invokeAsync(new Runnable() {
       public void run () {
         try {
           AudioInputStream ais = AudioSystem.getAudioInputStream(in);
           Clip clip = AudioSystem.getClip();
-          if (name.endsWith(".mp3")) {
+          if (music) {
             clip = new BigClip(clip);
           }
           AudioFormat baseFormat = ais.getFormat();

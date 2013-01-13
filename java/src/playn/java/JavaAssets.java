@@ -99,17 +99,12 @@ public class JavaAssets extends AbstractAssets<BufferedImage> {
 
   @Override
   public Sound getSound(String path) {
-    Exception err = null;
-    for (String suff : SUFFIXES) {
-      final String soundPath = path + suff;
-      try {
-        return platform.audio().createSound(soundPath, getAssetStream(soundPath));
-      } catch (Exception e) {
-        err = e; // note the error, and loop through and try the next format
-      }
-    }
-    platform.log().warn("Sound load error " + path + ": " + err);
-    return new Sound.Error(err);
+    return getSound(path, false);
+  }
+
+  @Override
+  public Sound getMusic(String path) {
+    return getSound(path, true);
   }
 
   @Override
@@ -159,6 +154,20 @@ public class JavaAssets extends AbstractAssets<BufferedImage> {
       throw new FileNotFoundException(path);
     }
     return in;
+  }
+
+  private Sound getSound(String path, boolean music) {
+    Exception err = null;
+    for (String suff : SUFFIXES) {
+      final String soundPath = path + suff;
+      try {
+        return platform.audio().createSound(soundPath, getAssetStream(soundPath), music);
+      } catch (Exception e) {
+        err = e; // note the error, and loop through and try the next format
+      }
+    }
+    platform.log().warn("Sound load error " + path + ": " + err);
+    return new Sound.Error(err);
   }
 
   private URL requireResource(String path) throws FileNotFoundException {
