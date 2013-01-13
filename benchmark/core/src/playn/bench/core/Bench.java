@@ -33,7 +33,6 @@ public class Bench implements Game {
 
   @Override
   public void init() {
-    graphics().setSize(800, 600);
     nextTest();
   }
 

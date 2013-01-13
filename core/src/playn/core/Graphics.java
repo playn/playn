@@ -128,12 +128,6 @@ public interface Graphics {
   int height();
 
   /**
-   * @deprecated Set the size at initialization time, using per-backend mechanisms.
-   */
-  @Deprecated
-  void setSize(int width, int height);
-
-  /**
    * Returns the display scale factor. This will be 1 except on HiDPI devices that have been
    * configured to use HiDPI mode, where it will probably be 2, but could be some other scale
    * depending on how things were configured when initializing the platform.

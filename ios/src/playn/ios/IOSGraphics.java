@@ -120,11 +120,6 @@ public class IOSGraphics extends GraphicsGL {
     return rootLayer;
   }
 
-  @Deprecated @Override
-  public void setSize(int width, int height) {
-    // nothing doing
-  }
-
   @Override
   public GL20 gl20() {
     return ctx.gl;

@@ -38,8 +38,8 @@ class HtmlGraphicsDom extends HtmlGraphics {
   }
 
   @Override
-  public void setRootSize(int width, int height) {
-    super.setRootSize(width, height);
+  public void setSize(int width, int height) {
+    super.setSize(width, height);
     rootLayer.element().getStyle().setWidth(width, Unit.PX);
     rootLayer.element().getStyle().setHeight(height, Unit.PX);
   }

@@ -94,6 +94,14 @@ class FlashGraphics implements Graphics {
   }
 
   FlashGroupLayer rootLayer;
+
+  /**
+   * Changes the size of the Flash stage on which PlayN is running.
+   */
+  public void setSize(int width, int height) {
+    ctx.resize(width, height);
+  }
+
   @Override
   public GroupLayer rootLayer() {
     return rootLayer;
@@ -181,11 +189,6 @@ class FlashGraphics implements Graphics {
   @Override
   public int height() {
     return screenHeight();
-  }
-
-  @Deprecated @Override
-  public void setSize(int width, int height) {
-    // nothing doing
   }
 
   @Override

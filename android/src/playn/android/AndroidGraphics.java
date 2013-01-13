@@ -191,11 +191,6 @@ public class AndroidGraphics extends GraphicsGL {
     return rootLayer;
   }
 
-  @Deprecated @Override
-  public void setSize(int width, int height) {
-    // no longer supported
-  }
-
   @Override
   public GL20 gl20() {
     return ctx.gl;

@@ -70,6 +70,13 @@ public class JavaGraphics extends GraphicsGL {
     }
   }
 
+  /**
+   * Changes the size of the PlayN window.
+   */
+  public void setSize(int width, int height) {
+    ctx.setSize(width, height);
+  }
+
   @Override
   public GroupLayerGL rootLayer() {
     return rootLayer;
@@ -114,11 +121,6 @@ public class JavaGraphics extends GraphicsGL {
   @Override
   public int screenHeight() {
     return Display.getDesktopDisplayMode().getHeight();
-  }
-
-  @Deprecated @Override
-  public void setSize(int width, int height) {
-    // nothing doing
   }
 
   @Override

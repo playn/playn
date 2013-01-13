@@ -97,7 +97,7 @@ public abstract class HtmlGraphics implements Graphics {
    * @param width the new width, in pixels, of the view.
    * @param height the new height, in pixels, of the view.
    */
-  public void setRootSize(int width, int height) {
+  public void setSize(int width, int height) {
     rootElement.getStyle().setWidth(width, Unit.PX);
     rootElement.getStyle().setHeight(height, Unit.PX);
   }
@@ -149,11 +149,6 @@ public abstract class HtmlGraphics implements Graphics {
   @Override
   public int screenWidth() {
     return Document.get().getDocumentElement().getClientWidth();
-  }
-
-  @Deprecated @Override
-  public void setSize(int width, int height) {
-    // nothing doing
   }
 
   @Override
