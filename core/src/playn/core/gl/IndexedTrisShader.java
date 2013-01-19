@@ -68,6 +68,11 @@ public class IndexedTrisShader extends GLShader {
   }
 
   @Override
+  public String toString() {
+    return "itris/" + texCore + "/" + colorCore;
+  }
+
+  @Override
   protected Core createTextureCore() {
     return new ITCore(vertexShader(), textureFragmentShader());
   }
@@ -176,6 +181,11 @@ public class IndexedTrisShader extends GLShader {
         vertices.add(m00, m01, m10, m11, tx, ty).add(xys[ii], xys[ii+1]).add(sxys[ii], sxys[ii+1]);
       for (int ii = 0, ll = indices.length; ii < ll; ii++)
         elements.add(vertIdx+indices[ii]);
+    }
+
+    @Override
+    public String toString() {
+      return "cq=" + (elements.capacity()/6);
     }
 
     protected int beginPrimitive(int vertexCount, int elemCount) {

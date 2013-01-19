@@ -90,6 +90,11 @@ public class QuadShader extends GLShader {
     this.maxQuads = maxVecs / VEC4S_PER_QUAD;
   }
 
+  @Override
+  public String toString() {
+    return "quad/" + maxQuads;
+  }
+
   /**
    * Returns the vertex shader program. Note that this program <em>must</em> preserve the use of
    * the existing attributes and uniforms. You can add new uniforms and attributes, but you cannot
