@@ -72,6 +72,7 @@ public class GL20Context extends GLContext {
     bindFramebuffer();
     rootLayer.paint(rootXform, 1, null); // paint all the layers
     useShader(null, false); // flush any pending shader
+    if (STATS_ENABLED) stats.frames++;
   }
 
   @Override
@@ -102,6 +103,7 @@ public class GL20Context extends GLContext {
 
   @Override
   public GLProgram createProgram(String vertShader, String fragShader) {
+    if (STATS_ENABLED) stats.shaderCreates++;
     return new GL20Program(this, gl, vertShader, fragShader);
   }
 
@@ -129,6 +131,7 @@ public class GL20Context extends GLContext {
     gl.glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, minFilter);
     gl.glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, repeatX ? GL_REPEAT : GL_CLAMP_TO_EDGE);
     gl.glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, repeatY ? GL_REPEAT : GL_CLAMP_TO_EDGE);
+    if (STATS_ENABLED) stats.texCreates++;
     return tex[0];
   }
 
@@ -149,6 +152,7 @@ public class GL20Context extends GLContext {
   public void bindTexture(int tex) {
     // TODO: track last bound texture, and avoid calling if it didn't change?
     gl.glBindTexture(GL_TEXTURE_2D, tex);
+    if (STATS_ENABLED) stats.texBinds++;
   }
 
   @Override
@@ -198,6 +202,7 @@ public class GL20Context extends GLContext {
     gl.glGenFramebuffers(1, fbuf, 0);
     gl.glBindFramebuffer(GL_FRAMEBUFFER, fbuf[0]);
     gl.glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, tex, 0);
+    if (STATS_ENABLED) stats.frameBufferCreates++;
     return fbuf[0];
   }
 
@@ -205,6 +210,7 @@ public class GL20Context extends GLContext {
   protected void bindFramebufferImpl(int fbuf, int width, int height) {
     gl.glBindFramebuffer(GL_FRAMEBUFFER, fbuf);
     gl.glViewport(0, 0, width, height);
+    if (STATS_ENABLED) stats.frameBufferBinds++;
   }
 
   @Override

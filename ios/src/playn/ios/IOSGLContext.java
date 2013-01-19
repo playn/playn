@@ -121,6 +121,7 @@ public class IOSGLContext extends GLContext {
 
   @Override
   public GLProgram createProgram(String vertShader, String fragShader) {
+    if (STATS_ENABLED) stats.shaderCreates++;
     return new IOSGLProgram(this, vertShader, fragShader);
   }
 
@@ -152,6 +153,7 @@ public class IOSGLContext extends GLContext {
                     repeatX ? All.Repeat : All.ClampToEdge);
     GL.TexParameter(tt, TextureParameterName.wrap(TextureParameterName.TextureWrapT),
                     repeatY ? All.Repeat : All.ClampToEdge);
+    if (STATS_ENABLED) stats.texCreates++;
     return tex;
   }
 
@@ -172,6 +174,7 @@ public class IOSGLContext extends GLContext {
   @Override
   public void bindTexture(int tex) {
     GL.BindTexture(TextureTarget.wrap(TextureTarget.Texture2D), tex);
+    if (STATS_ENABLED) stats.texBinds++;
   }
 
   @Override
@@ -243,6 +246,7 @@ public class IOSGLContext extends GLContext {
     GL.FramebufferTexture2D(FramebufferTarget.wrap(FramebufferTarget.Framebuffer),
                             FramebufferSlot.wrap(FramebufferSlot.ColorAttachment0),
                             TextureTarget.wrap(TextureTarget.Texture2D), tex, 0);
+    if (STATS_ENABLED) stats.frameBufferCreates++;
     return fbuf;
   }
 
@@ -253,6 +257,7 @@ public class IOSGLContext extends GLContext {
     if (frameBuffer != -1)
       GL.BindFramebuffer(FramebufferTarget.wrap(FramebufferTarget.Framebuffer), frameBuffer);
     GL.Viewport(0, 0, width, height);
+    if (STATS_ENABLED) stats.frameBufferBinds++;
   }
 
   @Override
@@ -306,6 +311,7 @@ public class IOSGLContext extends GLContext {
     rootLayer.paint(rootTransform, 1, null); // paint all the layers
     checkGLError("updateLayers end");
     useShader(null, false); // guarantee a flush
+    if (STATS_ENABLED) stats.frames++;
   }
 
   private static int toGL(Filter filter) {

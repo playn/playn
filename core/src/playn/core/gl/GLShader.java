@@ -122,6 +122,7 @@ public abstract class GLShader {
       curCore = texCore;
       curExtras = texExtras;
       texCore.prepare(ctx.curFbufWidth, ctx.curFbufHeight);
+      if (GLContext.STATS_ENABLED) ctx.stats.shaderBinds++;
     }
     texExtras.prepare(tex, alpha, justActivated);
     return this;
@@ -147,6 +148,7 @@ public abstract class GLShader {
       curCore = colorCore;
       curExtras = colorExtras;
       colorCore.prepare(ctx.curFbufWidth, ctx.curFbufHeight);
+      if (GLContext.STATS_ENABLED) ctx.stats.shaderBinds++;
     }
     colorExtras.prepare(color, alpha, justActivated);
     return this;
@@ -156,6 +158,7 @@ public abstract class GLShader {
   public void flush() {
     curExtras.willFlush();
     curCore.flush();
+    if (GLContext.STATS_ENABLED) ctx.stats.shaderFlushes++;
   }
 
   /** Adds an axis-aligned quad to the current render operation. {@code left, top, right, bottom}
@@ -168,6 +171,7 @@ public abstract class GLShader {
                     right, top,    sr, st,
                     left,  bottom, sl, sb,
                     right, bottom, sr, sb);
+    if (GLContext.STATS_ENABLED) ctx.stats.quadsRendered++;
   }
 
   /** Adds an axis-aligned quad to the current render operation. {@code left, top, right, bottom}
@@ -179,6 +183,7 @@ public abstract class GLShader {
                     right, top,    sr, st,
                     left,  bottom, sl, sb,
                     right, bottom, sr, sb);
+    if (GLContext.STATS_ENABLED) ctx.stats.quadsRendered++;
   }
 
   /**
@@ -193,6 +198,7 @@ public abstract class GLShader {
   public void addTriangles(InternalTransform local, float[] xys, float tw, float th, int[] indices) {
     curCore.addTriangles(local.m00(), local.m01(), local.m10(), local.m11(), local.tx(), local.ty(),
                          xys, tw, th, indices);
+    if (GLContext.STATS_ENABLED) ctx.stats.trisRendered += indices.length/3;
   }
 
   /**
@@ -207,6 +213,7 @@ public abstract class GLShader {
   public void addTriangles(InternalTransform local, float[] xys, float[] sxys, int[] indices) {
     curCore.addTriangles(local.m00(), local.m01(), local.m10(), local.m11(), local.tx(), local.ty(),
                          xys, sxys, indices);
+    if (GLContext.STATS_ENABLED) ctx.stats.trisRendered += indices.length/3;
   }
 
   /**

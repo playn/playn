@@ -23,6 +23,40 @@ public abstract class GLContext {
   /** Used to configure texture image scaling. */
   public static enum Filter { LINEAR, NEAREST };
 
+  /** Used to track and report rendering statistics. */
+  public static class Stats {
+    public int frames;
+
+    public int shaderCreates;
+    public int frameBufferCreates;
+    public int texCreates;
+
+    public int shaderBinds;
+    public int frameBufferBinds;
+    public int texBinds;
+
+    public int quadsRendered;
+    public int trisRendered;
+    public int shaderFlushes;
+
+    /** Resets all counters. */
+    public void reset() {
+      frames = 0;
+      shaderCreates = 0;
+      frameBufferCreates = 0;
+      texCreates = 0;
+      shaderBinds = 0;
+      frameBufferBinds = 0;
+      texBinds = 0;
+      quadsRendered = 0;
+      trisRendered = 0;
+      shaderFlushes = 0;
+    }
+  }
+
+  protected static final boolean STATS_ENABLED = false;
+  protected final Stats stats = new Stats();
+
   protected final Platform platform;
   private GLShader curShader;
   private int lastFramebuffer, epoch;
@@ -221,6 +255,14 @@ public abstract class GLContext {
     flush();
     curShader = shader;
     return true;
+  }
+
+  /**
+   * Returns the current rendering stats. These will be all zeros unless the library was compiled
+   * with stats enabled (which is not the default).
+   */
+  public Stats stats() {
+    return stats;
   }
 
   protected GLContext(Platform platform, float scaleFactor) {
