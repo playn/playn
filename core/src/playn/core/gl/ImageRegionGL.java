@@ -15,6 +15,7 @@
  */
 package playn.core.gl;
 
+import playn.core.Asserts;
 import playn.core.Image;
 import playn.core.util.Callback;
 
@@ -48,6 +49,11 @@ public abstract class ImageRegionGL extends ImageGL implements Image.Region {
   @Override
   public void clearTexture() {
     parent.clearTexture();
+    Asserts.checkState(tex == 0, "ImageRegionGL somehow got non-zero 'tex'!");
+    if (reptex > 0) {
+      ctx.destroyTexture(reptex);
+      reptex = 0;
+    }
   }
 
   @Override
