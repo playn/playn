@@ -92,37 +92,51 @@ public class IOSPlatform extends AbstractPlatform {
     }
   };
 
+  /** Used to configure the iOS platform. */
+  public static class Config {
+    /** Indicates which orients are supported by your app. You should also configure this
+     * information in your {@code Info.plist} file. */
+    public SupportedOrients orients = SupportedOrients.PORTRAITS;
+
+    /** If true, an iPad will be treated like a 2x Retina device with resolution 384x512 and which
+     * will use @2x images. A Retina iPad will also have resolution 384x512 and will use @4x images
+     * if they exist, then fall back to @2x (and default (1x) if necessary). If false, iPad will be
+     * treated as a non-Retina device with resolution 768x1024 and will use default (1x) images,
+     * and a Retina iPad will be treated as a Retina device with resolution 768x1024 and will use
+     * @2x images. */
+    public boolean iPadLikePhone = false;
+  }
+
   /**
-   * Registers your application. Defaults to supporting {@link SupportedOrients#PORTRAITS} and
-   * native iPad resolution.
+   * Registers your application using the default configuration.
    */
   public static IOSPlatform register(UIApplication app) {
-    return register(app, SupportedOrients.PORTRAITS);
+    return register(app, new Config());
   }
 
   /**
-   * Registers your application with the specified supported orientations and native iPad
-   * resolution.
+   * Registers your application using the supplied configuration.
    */
-  public static IOSPlatform register(UIApplication app, SupportedOrients orients) {
-    return register(app, orients, false);
-  }
-
-  /**
-   * Registers your application with the specified supported orientations.
-   *
-   * @param iPadLikePhone if true, an iPad will be treated like a 2x Retina device with resolution
-   * 384x512 and which will use @2x images. A Retina iPad will also have resolution 384x512 and
-   * will use @4x images if they exist, then fall back to @2x (and default (1x) if necessary). If
-   * false, iPad will be treated as a non-Retina device with resolution 768x1024 and will use
-   * default (1x) images, and a Retina iPad will be treated as a Retina device with resolution
-   * 768x1024 and will use @2x images.
-   */
-  public static IOSPlatform register(UIApplication app, SupportedOrients orients,
-                                     boolean iPadLikePhone) {
-    IOSPlatform platform = new IOSPlatform(app, orients, iPadLikePhone);
+  public static IOSPlatform register(UIApplication app, Config config) {
+    IOSPlatform platform = new IOSPlatform(app, config);
     PlayN.setPlatform(platform);
     return platform;
+  }
+
+  @Deprecated
+  public static IOSPlatform register(UIApplication app, SupportedOrients orients) {
+    Config config = new Config();
+    config.orients = orients;
+    return register(app, config);
+  }
+
+  @Deprecated
+  public static IOSPlatform register(UIApplication app, SupportedOrients orients,
+                                     boolean iPadLikePhone) {
+    Config config = new Config();
+    config.orients = orients;
+    config.iPadLikePhone = iPadLikePhone;
+    return register(app, config);
   }
 
   static {
@@ -178,15 +192,15 @@ public class IOSPlatform extends AbstractPlatform {
     return uiOverlay;
   }
 
-  protected IOSPlatform(UIApplication app, SupportedOrients orients, boolean iPadLikePhone) {
+  protected IOSPlatform(UIApplication app, Config config) {
     super(new IOSLog());
     this.app = app;
-    this.orients = orients;
+    this.orients = config.orients;
 
     float deviceScale = UIScreen.get_MainScreen().get_Scale();
     RectangleF bounds = UIScreen.get_MainScreen().get_Bounds();
     int screenWidth = (int)bounds.get_Width(), screenHeight = (int)bounds.get_Height();
-    boolean useHalfSize = (screenWidth >= 768) && iPadLikePhone;
+    boolean useHalfSize = (screenWidth >= 768) && config.iPadLikePhone;
     float viewScale = (useHalfSize ? 2 : 1) * deviceScale;
     if (useHalfSize) {
       screenWidth /= 2;
