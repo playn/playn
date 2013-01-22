@@ -353,9 +353,10 @@ public class IOSCanvas implements Canvas {
     return this;
   }
 
-  @Override
+  @Deprecated @Override
   public Canvas setTransform(float m11, float m12, float m21, float m22, float dx, float dy) {
-    // TODO
+    // this cannot be implemented on iOS; it's not possible to reset the transform and you can't
+    // set it; you can only concatenate to it
     return this;
   }
 
@@ -398,7 +399,7 @@ public class IOSCanvas implements Canvas {
 
   @Override
   public Canvas transform(float m11, float m12, float m21, float m22, float dx, float dy) {
-    // TODO
+    bctx.ConcatCTM(new CGAffineTransform(m11, m12, m21, m22, dx, dy));
     return this;
   }
 

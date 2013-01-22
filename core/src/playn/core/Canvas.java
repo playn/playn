@@ -354,8 +354,14 @@ public interface Canvas {
   Canvas setStrokeWidth(float strokeWidth);
 
   /**
-   * Sets the transformation matrix directly, replacing the existing matrix.
+   * @deprecated You almost certainly do not want to do this because this will wipe out any
+   * pre-configured HiDPI transform and break automatic handling of HiDPI screens. You should
+   * instead use {@link #transform}, and possibly {@link #save} and {@link #restore} if you need to
+   * return to the "identity" (which is in quotes because the identity on a HiDPI screen will not
+   * be the the actual identity matrix). This also cannot be implemented on iOS, and so does not
+   * work on that platform.
    */
+  @Deprecated
   Canvas setTransform(float m11, float m12, float m21, float m22, float dx, float dy);
 
   /**

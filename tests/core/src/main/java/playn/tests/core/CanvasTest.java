@@ -15,13 +15,18 @@
  */
 package playn.tests.core;
 
+import pythagoras.f.FloatMath;
+
 import playn.core.Canvas;
 import playn.core.CanvasImage;
 import playn.core.Image;
+import playn.core.Font;
 import playn.core.ImageLayer;
 import playn.core.Layer;
 import playn.core.Path;
 import playn.core.util.Callback;
+import playn.core.TextFormat;
+import playn.core.TextLayout;
 import static playn.core.PlayN.*;
 
 public class CanvasTest extends Test {
@@ -175,6 +180,19 @@ public class CanvasTest extends Test {
         canvas.setStrokeColor(0xFF000000);
         canvas.setStrokeWidth(1.5f);
         canvas.strokeCircle(50, 50, dotRadius);
+      }
+    });
+
+    addTestCanvas("transform test", 100, 100, new Drawer() {
+      public void draw(Canvas canvas) {
+        canvas.setFillColor(0xFFCCCCCC).fillRect(0, 0, 50, 50);
+        canvas.setFillColor(0xFFCCCCCC).fillRect(50, 50, 50, 50);
+        TextLayout capF = graphics().layoutText(
+          "F", new TextFormat().withFont(graphics().createFont("Helvetica", Font.Style.BOLD, 48)));
+        float theta = -FloatMath.PI/4, tsin = FloatMath.sin(theta), tcos = FloatMath.cos(theta);
+        canvas.setFillColor(0xFF000000).fillText(capF, 0, 0);
+        canvas.transform(tcos, -tsin, tsin, tcos, 50, 50);
+        canvas.setFillColor(0xFF000000).fillText(capF, 0, 0);
       }
     });
   }

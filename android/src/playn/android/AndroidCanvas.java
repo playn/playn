@@ -264,7 +264,7 @@ class AndroidCanvas implements Canvas {
     return this;
   }
 
-  @Override
+  @Deprecated @Override
   public Canvas setTransform(float m11, float m12, float m21, float m22, float dx, float dy) {
     Matrix m = new Matrix();
     m.setValues(new float[] {m11, m12, dx, m21, m22, dy, 0, 0, 1});
