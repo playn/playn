@@ -105,6 +105,13 @@ public class IOSPlatform extends AbstractPlatform {
      * and a Retina iPad will be treated as a Retina device with resolution 768x1024 and will use
      * @2x images. */
     public boolean iPadLikePhone = false;
+
+    /** Indicates the frequency at which the game should be rendered (and updated). Defaults to
+     * one, which means one render per device screen refresh (maximum FPS). Higher values (like 2)
+     * can be used to reduce the update rate to half or third FPS for games that can't run at full
+     * FPS. As the iOS docs say: a game that runs at a consistent but slow frame rate is better
+     * than a game that runs at an erratic frame rate. */
+    public int frameInterval = 1;
   }
 
   /**
@@ -167,6 +174,7 @@ public class IOSPlatform extends AbstractPlatform {
   private float accum, alpha;
 
   private final SupportedOrients orients;
+  private final int frameInterval;
   private final UIApplication app;
   private final UIWindow mainWindow;
   private final IOSRootViewController rootViewController;
@@ -196,6 +204,7 @@ public class IOSPlatform extends AbstractPlatform {
     super(new IOSLog());
     this.app = app;
     this.orients = config.orients;
+    this.frameInterval = config.frameInterval;
 
     float deviceScale = UIScreen.get_MainScreen().get_Scale();
     RectangleF bounds = UIScreen.get_MainScreen().get_Bounds();
@@ -342,8 +351,8 @@ public class IOSPlatform extends AbstractPlatform {
     this.game = game;
     // initialize the game and start things off
     game.init();
-    // start the main game loop (TODO: support 0 update rate)
-    gameView.Run(1000d / game.updateRate());
+    // start the main game loop
+    gameView.RunWithFrameInterval(frameInterval);
     // make our main window visible
     mainWindow.MakeKeyAndVisible();
   }
