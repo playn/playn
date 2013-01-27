@@ -154,6 +154,11 @@ public interface Canvas {
   Canvas clear();
 
   /**
+   * Clears the specified region to rgba(0, 0, 0, 0).
+   */
+  Canvas clearRect(float x, float y, float width, float height);
+
+  /**
    * Intersects the current clip with the specified path.
    */
   Canvas clip(Path clipPath);

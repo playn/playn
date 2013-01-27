@@ -135,6 +135,13 @@ public class IOSCanvas implements Canvas {
   }
 
   @Override
+  public Canvas clearRect(float x, float y, float width, float height) {
+    bctx.ClearRect(new RectangleF(x, y, width, height));
+    isDirty = true;
+    return this;
+  }
+
+  @Override
   public Canvas clip(Path clipPath) {
     bctx.AddPath(((IOSPath) clipPath).cgPath);
     bctx.Clip();

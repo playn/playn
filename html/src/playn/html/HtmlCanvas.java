@@ -71,6 +71,13 @@ class HtmlCanvas implements Canvas {
   }
 
   @Override
+  public Canvas clearRect(float x, float y, float width, float height) {
+    ctx.clearRect(x, y, width, height);
+    dirty = true;
+    return this;
+  }
+
+  @Override
   public Canvas clip(Path path) {
     Asserts.checkArgument(path instanceof HtmlPath);
     ((HtmlPath) path).replay(ctx);

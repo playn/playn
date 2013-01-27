@@ -54,7 +54,7 @@ public abstract class GLContext {
     }
   }
 
-  protected static final boolean STATS_ENABLED = false;
+  protected static final boolean STATS_ENABLED = true;
   protected final Stats stats = new Stats();
 
   protected final Platform platform;

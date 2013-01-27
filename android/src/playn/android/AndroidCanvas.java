@@ -60,6 +60,18 @@ class AndroidCanvas implements Canvas {
   }
 
   @Override
+  public Canvas clearRect(float x, float y, float width, float height) {
+    canvas.save(canvas.CLIP_SAVE_FLAG);
+    canvas.clipRect(x, y, x + width, y + height);
+    // drawColor: "Fill the entire canvas' bitmap (restricted to the current clip) with the
+    // specified color and porter-duff xfermode."
+    canvas.drawColor(0, PorterDuff.Mode.SRC);
+    canvas.restore();
+    dirty = true;
+    return this;
+  }
+
+  @Override
   public Canvas clip(Path clipPath) {
     Asserts.checkArgument(clipPath instanceof AndroidPath);
     canvas.clipPath(((AndroidPath) clipPath).path);

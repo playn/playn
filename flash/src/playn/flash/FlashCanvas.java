@@ -20,6 +20,8 @@ import flash.gwt.FlashImport;
 
 import com.google.gwt.core.client.JavaScriptObject;
 
+import pythagoras.f.MathUtil;
+
 import playn.core.Asserts;
 import playn.core.Canvas;
 import playn.core.Gradient;
@@ -276,6 +278,15 @@ class FlashCanvas implements Canvas {
 
   @Override
   public Canvas clear() {
+    context2d.clearRect(0, 0, MathUtil.iceil(width), MathUtil.iceil(height));
+    dirty = true;
+    return this;
+  }
+
+  @Override
+  public Canvas clearRect(float x, float y, float width, float height) {
+    context2d.clearRect(MathUtil.ifloor(x), MathUtil.ifloor(y),
+                        MathUtil.iceil(width), MathUtil.iceil(height));
     dirty = true;
     return this;
   }

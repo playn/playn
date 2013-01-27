@@ -85,6 +85,14 @@ class JavaCanvas implements Canvas {
   }
 
   @Override
+  public Canvas clearRect(float x, float y, float width, float height) {
+    gfx.clearRect(MathUtil.ifloor(x), MathUtil.ifloor(y),
+                  MathUtil.iceil(width), MathUtil.iceil(height));
+    isDirty = true;
+    return this;
+  }
+
+  @Override
   public Canvas clip(Path path) {
     Asserts.checkArgument(path instanceof JavaPath);
     currentState().clipper = (JavaPath) path;
