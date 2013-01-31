@@ -356,6 +356,9 @@ public class World {
 			m_bodyList = body.m_next;
 		}
 		
+		body.m_prev = null;
+		body.m_next = null;
+		
 		--m_bodyCount;
 		// TODO djm recycle body
 	}
@@ -452,6 +455,9 @@ public class World {
 		if (j == m_jointList) {
 			m_jointList = j.m_next;
 		}
+		
+		j.m_next = null;
+		j.m_prev = null;
 		
 		// Disconnect from island graph.
 		Body bodyA = j.m_bodyA;

@@ -179,6 +179,9 @@ public class ContactManager implements PairCallback {
 			m_contactList = c.m_next;
 		}
 		
+		c.m_next = null;
+		c.m_prev = null;
+		
 		// Remove from body 1
 		if (c.m_nodeA.prev != null) {
 			c.m_nodeA.prev.next = c.m_nodeA.next;
