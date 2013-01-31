@@ -21,6 +21,7 @@ import com.google.gwt.canvas.dom.client.ImageData;
 
 import playn.core.Canvas;
 import playn.core.CanvasImage;
+import playn.core.Image;
 import playn.core.gl.GLContext;
 
 class HtmlCanvasImage extends HtmlImage implements CanvasImage {
