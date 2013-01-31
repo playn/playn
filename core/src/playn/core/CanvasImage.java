@@ -26,6 +26,13 @@ public interface CanvasImage extends Image {
   Canvas canvas();
 
   /**
+   * Returns a snapshot of this canvas image that is no longer mutable. Subsequent changes to this
+   * canvas will not be reflected in the returned image. If you are going to render a canvas image
+   * into another canvas image a lot, using a snapshot can improve performance.
+   */
+  Image snapshot();
+
+  /**
    * Sets pixel data for a rectangular area of this image. This method may perform poorly, in
    * particular on HTML and Flash platforms - avoid using this if possible.
    *

@@ -19,6 +19,7 @@ import android.graphics.Bitmap;
 
 import playn.core.Canvas;
 import playn.core.CanvasImage;
+import playn.core.Image;
 import playn.core.gl.Scale;
 
 class AndroidCanvasImage extends AndroidImage implements CanvasImage {
@@ -35,6 +36,11 @@ class AndroidCanvasImage extends AndroidImage implements CanvasImage {
   @Override
   public Canvas canvas() {
     return canvas;
+  }
+
+  @Override
+  public Image snapshot() {
+    return new AndroidImage(ctx, bitmap().copy(bitmap().getConfig(), false), scale);
   }
 
   @Override

@@ -19,6 +19,7 @@ import cli.MonoTouch.CoreGraphics.CGImage;
 
 import playn.core.Canvas;
 import playn.core.CanvasImage;
+import playn.core.Image;
 
 /**
  * Provides {@link Canvas} rendering into an image.
@@ -35,6 +36,11 @@ public class IOSCanvasImage extends IOSAbstractImage implements CanvasImage {
   @Override
   public Canvas canvas() {
     return canvas;
+  }
+
+  @Override
+  public Image snapshot() {
+    return new IOSImage(ctx, canvas.cgImage(), scale);
   }
 
   @Override

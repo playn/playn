@@ -18,6 +18,8 @@ package playn.java;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
+import java.awt.image.ColorModel;
+import java.awt.image.WritableRaster;
 
 import playn.core.Canvas;
 import playn.core.CanvasImage;
@@ -41,6 +43,15 @@ class JavaCanvasImage extends JavaImage implements CanvasImage {
   @Override
   public Canvas canvas() {
     return canvas;
+  }
+
+  @Override
+  public Image snapshot() {
+    ColorModel cm = img.getColorModel();
+    boolean isAlphaPremultiplied = img.isAlphaPremultiplied();
+    WritableRaster raster = img.copyData(null);
+    BufferedImage snap = new BufferedImage(cm, raster, isAlphaPremultiplied, null);
+    return new JavaStaticImage(ctx, snap, scale);
   }
 
   @Override
