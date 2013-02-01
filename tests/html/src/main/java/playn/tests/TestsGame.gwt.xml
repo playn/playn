@@ -15,7 +15,7 @@
 -->
 <module rename-to="testsgame">
   <inherits name="playn.PlayN"/>
-  <inherits name="playn.logging.Enhanced" />
+  <!--<inherits name="playn.logging.Enhanced" />-->
   <inherits name="TestsAssets" />
 
   <source path="core"/>

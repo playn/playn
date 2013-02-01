@@ -42,11 +42,13 @@
       <version>${project.version}</version>
     </dependency>
 
+<!--
     <dependency>
       <groupId>com.allen-sauer.gwt.log</groupId>
       <artifactId>gwt-log</artifactId>
       <version>3.1.8</version>
     </dependency>
+-->
   </dependencies>
 
   <build>
