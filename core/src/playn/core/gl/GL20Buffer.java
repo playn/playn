@@ -95,6 +95,11 @@ public abstract class GL20Buffer implements GLBuffer {
       return this;
     }
 
+    @Override
+    public String toString() {
+      return "floatbuf:" + bufferId;
+    }
+
     protected Buffer buffer() {
       return buffer;
     }
@@ -149,6 +154,11 @@ public abstract class GL20Buffer implements GLBuffer {
       gl.glDrawElements(mode, count, GL20.GL_UNSIGNED_SHORT, 0);
     }
 
+    @Override
+    public String toString() {
+      return "shortbuf:" + bufferId;
+    }
+
     protected Buffer buffer() {
       return buffer;
     }
@@ -157,7 +167,7 @@ public abstract class GL20Buffer implements GLBuffer {
   }
 
   protected final GL20 gl;
-  private final int bufferId;
+  protected final int bufferId;
 
   @Override
   public void bind(int target) {
