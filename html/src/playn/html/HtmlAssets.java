@@ -55,9 +55,26 @@ public class HtmlAssets extends AbstractAssets<Void> {
   private final Map<String, AutoClientBundleWithLookup> clientBundles =
     new HashMap<String, AutoClientBundleWithLookup>();
   private String pathPrefix = "";
+  private ImageManifest imageManifest;
+
+  /** See {@link #setImageManifest}. */
+  public interface ImageManifest {
+    /** Returns {@code {width, height}} for the image at {@code path}. The path <em>will not</em>
+     * contain any configured path prefix; it will be the path passed to {@link #getImageSync}. */
+    float[] imageSize(String path);
+  }
 
   public void setPathPrefix(String prefix) {
     pathPrefix = prefix;
+  }
+
+  /** Configures our image manifest. This is used to support {@link #getImageSync} in the HTML
+   * backend. Images for which manifest entries exist will be synchronously loadable and will be
+   * configured with their correct size immediately. Their image data will still be loaded
+   * asynchronously, but games that were written to use sync loaded images will most likely work
+   * with this small hack. */
+  public void setImageManifest(ImageManifest manifest) {
+    imageManifest = manifest;
   }
 
   public void addClientBundle(String regExp, AutoClientBundleWithLookup clientBundle) {
@@ -66,7 +83,19 @@ public class HtmlAssets extends AbstractAssets<Void> {
 
   @Override
   public Image getImageSync(String path) {
-    throw new UnsupportedOperationException("getImageSync(" + path + ")");
+    if (imageManifest == null)
+      throw new UnsupportedOperationException("getImageSync(" + path + ")");
+    else {
+      float[] size = imageManifest.imageSize(path);
+      if (size == null)
+        return createErrorImage(new Throwable("Image missing from manifest: " + path));
+      else {
+        HtmlImage image = (HtmlImage)getImage(path);
+        image.img.setWidth(MathUtil.iceil(size[0]));
+        image.img.setHeight(MathUtil.iceil(size[0]));
+        return image;
+      }
+    }
   }
 
   @Override
