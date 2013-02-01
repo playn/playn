@@ -124,8 +124,8 @@ public class TestsGame implements Game {
   }
 
   void displayMenu() {
+    clearRoot();
     GroupLayer root = graphics().rootLayer();
-    root.clear();
     root.add(createWhiteBackground());
 
     float gap = 20, x = gap, y = gap, maxHeight = 0;
@@ -158,7 +158,7 @@ public class TestsGame implements Game {
     currentTest = test;
 
     // setup root layer for next test
-    graphics().rootLayer().clear();
+    clearRoot();
     graphics().rootLayer().add(createWhiteBackground());
 
     log().info("Starting " + currentTest.getName());
@@ -181,6 +181,11 @@ public class TestsGame implements Game {
   @Override
   public int updateRate() {
     return (currentTest == null) ? 25 : currentTest.updateRate();
+  }
+
+  protected void clearRoot() {
+    GroupLayer root = graphics().rootLayer();
+    for (int ii = root.size()-1; ii >= 0; ii--) root.get(ii).destroy();
   }
 
   protected ImmediateLayer createWhiteBackground() {
