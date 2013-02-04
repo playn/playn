@@ -13,7 +13,6 @@
  */
 package playn.java;
 
-import java.awt.EventQueue;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.FileNotFoundException;
@@ -32,7 +31,6 @@ import playn.core.AsyncImage;
 import playn.core.Image;
 import playn.core.Sound;
 import playn.core.gl.Scale;
-import playn.core.util.Callback;
 
 /**
  * Loads Java assets via the classpath.
