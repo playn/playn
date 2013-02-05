@@ -105,6 +105,16 @@ public abstract class GameActivity extends Activity {
   }
 
   @Override
+  public void onWindowFocusChanged(boolean hasFocus) {
+    AndroidPlatform.debugLog("onWindowFocusChanged(" + hasFocus + ")");
+    if (hasFocus) {
+      platform.audio().onResume();
+    } else {
+      platform.audio().onPause();
+    }
+  }
+
+  @Override
   public boolean onKeyDown(int keyCode, KeyEvent event) {
     keyHandler.onKeyDown(keyCode, event);
     return super.onKeyDown(keyCode, event);
@@ -121,10 +131,6 @@ public abstract class GameActivity extends Activity {
     moveTaskToBack(false);
   }
 
-  /**
-   * Called automatically to handle touch events. Queues the touch events to be processed on the
-   * game thread.
-   */
   @Override
   public boolean onTouchEvent(MotionEvent event) {
     touchHandler.onMotionEvent(event);
@@ -150,7 +156,6 @@ public abstract class GameActivity extends Activity {
     // Platform.onPause could be racing with one final frame on the GL thread; however I've seen
     // scary things about deadlock and other crap by people who have tried to do this "correctly"
     platform.onPause();
-    platform.audio().onPause();
     super.onPause();
   }
 
@@ -159,7 +164,6 @@ public abstract class GameActivity extends Activity {
     AndroidPlatform.debugLog("onResume");
     // since the GL thread is not running, we go ahead and run these onResumes on the UI thread,
     // then resume the GL thread as our last action
-    platform.audio().onResume();
     platform.onResume();
     gameView.onResume();
     super.onResume();
