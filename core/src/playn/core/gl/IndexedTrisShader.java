@@ -37,8 +37,7 @@ public class IndexedTrisShader extends GLShader {
     "    a_Translation[0], a_Translation[1], 1);\n" +
     "  gl_Position = vec4(transform * vec3(a_Position, 1.0), 1);\n" +
     // Scale from screen coordinates to [0, 2].
-    "  gl_Position.x /= (u_ScreenSize.x / 2.0);\n" +
-    "  gl_Position.y /= (u_ScreenSize.y / 2.0);\n" +
+    "  gl_Position.xy /= (u_ScreenSize.xy / 2.0);\n" +
     // Offset to [-1, 1] and flip y axis to put origin at top-left.
     "  gl_Position.x -= 1.0;\n" +
     "  gl_Position.y = 1.0 - gl_Position.y;\n" +
