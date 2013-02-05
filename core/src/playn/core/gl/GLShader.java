@@ -409,8 +409,10 @@ public abstract class GLShader {
     public void prepare(int tex, float alpha, boolean justActivated) {
       ctx.checkGLError("textureShader.prepare start");
       boolean stateChanged = (tex != lastTex || alpha != lastAlpha);
-      if (!justActivated && stateChanged)
+      if (!justActivated && stateChanged) {
         flush();
+        ctx.checkGLError("textureShader.prepare flush");
+      }
       if (stateChanged) {
         uAlpha.bind(alpha);
         lastAlpha = alpha;
@@ -445,8 +447,10 @@ public abstract class GLShader {
     public void prepare(int color, float alpha, boolean justActivated) {
       ctx.checkGLError("colorShader.prepare start");
       boolean stateChanged = (color != lastColor || alpha != lastAlpha);
-      if (!justActivated && stateChanged)
+      if (!justActivated && stateChanged) {
         flush();
+        ctx.checkGLError("colorShader.prepare flush");
+      }
       if (stateChanged) {
         float a = ((color >> 24) & 0xff) / 255f;
         float r = ((color >> 16) & 0xff) / 255f;
