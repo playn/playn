@@ -26,6 +26,8 @@ import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.dom.client.Style;
 import com.google.gwt.user.client.DOM;
 
+import pythagoras.f.Point;
+
 import playn.core.Asserts;
 import playn.core.CanvasImage;
 import playn.core.Font;
@@ -35,6 +37,7 @@ import playn.core.Graphics;
 import playn.core.TextFormat;
 import playn.core.TextLayout;
 import playn.core.gl.GL20;
+import playn.core.gl.Scale;
 
 public abstract class HtmlGraphics implements Graphics {
 
@@ -59,6 +62,7 @@ public abstract class HtmlGraphics implements Graphics {
   protected final CanvasElement dummyCanvas;
   protected Element rootElement;
   private final Context2d dummyCtx;
+  private final Point mousePoint = new Point();
 
   private final Element measureElement;
   private final Map<Font,HtmlFontMetrics> fontMetrics = new HashMap<Font,HtmlFontMetrics>();
@@ -104,7 +108,8 @@ public abstract class HtmlGraphics implements Graphics {
 
   @Override
   public CanvasImage createImage(float width, float height) {
-    return new HtmlCanvasImage(ctx(), new HtmlCanvas(width, height));
+    return new HtmlCanvasImage(ctx(), new HtmlCanvas(scale().scaledCeil(width),
+                                                     scale().scaledCeil(height)));
   }
 
   @Override
@@ -166,6 +171,11 @@ public abstract class HtmlGraphics implements Graphics {
     return null;
   }
 
+  Scale scale() {
+    HtmlGLContext ctx = ctx();
+    return (ctx == null) ? Scale.ONE : ctx.scale;
+  }
+
   HtmlFontMetrics getFontMetrics(Font font) {
     HtmlFontMetrics metrics = fontMetrics.get(font);
     if (metrics == null) {
@@ -191,6 +201,10 @@ public abstract class HtmlGraphics implements Graphics {
       fontMetrics.put(font, metrics);
     }
     return metrics;
+  }
+
+  Point transformMouse(float x, float y) {
+    return mousePoint.set(x / scale().factor, y / scale().factor);
   }
 
   abstract Element rootElement();

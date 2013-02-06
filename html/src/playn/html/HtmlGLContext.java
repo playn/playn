@@ -27,6 +27,8 @@ import com.google.gwt.webgl.client.WebGLRenderingContext;
 
 import static com.google.gwt.webgl.client.WebGLRenderingContext.*;
 
+import pythagoras.f.MathUtil;
+
 import playn.core.InternalTransform;
 import playn.core.gl.GL20Context;
 import playn.core.gl.GLContext;
@@ -38,12 +40,14 @@ public class HtmlGLContext extends GL20Context {
 
   private final WebGLRenderingContext glc;
 
-  HtmlGLContext(HtmlPlatform platform, WebGLRenderingContext gl, CanvasElement canvas) {
-    super(platform, new HtmlGL20(gl), 1, HtmlUrlParameters.checkGLErrors);
+  HtmlGLContext(HtmlPlatform platform, float scaleFactor, WebGLRenderingContext gl,
+                CanvasElement canvas) {
+    super(platform, new HtmlGL20(gl), scaleFactor, HtmlUrlParameters.checkGLErrors);
     this.glc = gl;
     // try basic GL operations to detect failure cases early
     tryBasicGLCalls();
-    setSize(canvas.getWidth(), canvas.getHeight());
+    setSize(MathUtil.iceil(canvas.getWidth() / scaleFactor),
+            MathUtil.iceil(canvas.getHeight() / scaleFactor));
     init();
     glc.pixelStorei(UNPACK_PREMULTIPLY_ALPHA_WEBGL, ONE);
   }

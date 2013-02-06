@@ -57,7 +57,7 @@ class HtmlGraphicsGL extends HtmlGraphics {
                                    (gl == null ? "null" : gl.getError()) + "]");
       }
 
-      ctx = new HtmlGLContext(platform, gl, canvas);
+      ctx = new HtmlGLContext(platform, config.scaleFactor, gl, canvas);
       rootLayer = new GroupLayerGL(ctx);
     } catch (RuntimeException re) {
       // Give up. HtmlPlatform will catch the exception and fall back to dom/canvas.
@@ -117,12 +117,12 @@ class HtmlGraphicsGL extends HtmlGraphics {
 
   @Override
   public int width() {
-    return canvas.getWidth();
+    return ctx.viewWidth;
   }
 
   @Override
   public int height() {
-    return canvas.getHeight();
+    return ctx.viewHeight;
   }
 
   @Override

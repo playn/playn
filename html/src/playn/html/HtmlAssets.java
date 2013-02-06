@@ -55,6 +55,7 @@ public class HtmlAssets extends AbstractAssets<Void> {
   private final Map<String, AutoClientBundleWithLookup> clientBundles =
     new HashMap<String, AutoClientBundleWithLookup>();
   private String pathPrefix = "";
+  private Scale assetScale = null;
   private ImageManifest imageManifest;
 
   /** See {@link #setImageManifest}. */
@@ -77,6 +78,15 @@ public class HtmlAssets extends AbstractAssets<Void> {
     imageManifest = manifest;
   }
 
+  /**
+   * Configures the default scale to use for assets. This allows one to specify an intermediate
+   * graphics scale (like 1.5) and scale the 2x imagery down to 1.5x instead of scaling the 1.5x
+   * imagery up (or displaying nothing at all).
+   */
+  public void setAssetScale(float scaleFactor) {
+    this.assetScale = new Scale(scaleFactor);
+  }
+
   public void addClientBundle(String regExp, AutoClientBundleWithLookup clientBundle) {
     clientBundles.put(regExp, clientBundle);
   }
@@ -86,20 +96,25 @@ public class HtmlAssets extends AbstractAssets<Void> {
     if (imageManifest == null)
       throw new UnsupportedOperationException("getImageSync(" + path + ")");
     else {
-      float[] size = imageManifest.imageSize(path);
-      if (size == null)
-        return createErrorImage(new Throwable("Image missing from manifest: " + path));
-      else {
-        HtmlImage image = (HtmlImage)getImage(path);
+      for (Scale.ScaledResource rsrc : assetScale().getScaledResources(path)) {
+        float[] size = imageManifest.imageSize(rsrc.path);
+        if (size == null) continue; // try other scales
+        platform.log().info("Loading image " + rsrc.path + " " + rsrc.scale);
+        HtmlImage image = getImage(rsrc.path, rsrc.scale);
         image.img.setWidth(MathUtil.iceil(size[0]));
         image.img.setHeight(MathUtil.iceil(size[0]));
         return image;
       }
+      return createErrorImage(new Throwable("Image missing from manifest: " + path));
     }
   }
 
   @Override
   public Image getImage(String path) {
+    return getImage(path, Scale.ONE);
+  }
+
+  protected HtmlImage getImage(String path, Scale scale) {
     String url = pathPrefix + path;
     AutoClientBundleWithLookup clientBundle = getBundle(path);
     if (clientBundle != null) {
@@ -109,17 +124,17 @@ public class HtmlAssets extends AbstractAssets<Void> {
         url = resource.getURL();
       }
     }
-    return adaptImage(url);
+    return adaptImage(url, scale);
   }
 
   @Override
   public Image getRemoteImage(String url) {
-    return adaptImage(url);
+    return adaptImage(url, Scale.ONE);
   }
 
   @Override
   public Image getRemoteImage(String url, float width, float height) {
-    HtmlImage image = adaptImage(url);
+    HtmlImage image = adaptImage(url, Scale.ONE);
     image.img.setWidth(MathUtil.iceil(width));
     image.img.setHeight(MathUtil.iceil(height));
     return image;
@@ -176,7 +191,7 @@ public class HtmlAssets extends AbstractAssets<Void> {
     img.setWidth(MathUtil.iceil(width));
     img.setHeight(MathUtil.iceil(height));
     // TODO: proper error image that reports failure to callbacks
-    return new HtmlImage(platform.graphics().ctx(), img);
+    return new HtmlImage(platform.graphics().ctx(), Scale.ONE, img);
   }
 
   @Override
@@ -197,6 +212,10 @@ public class HtmlAssets extends AbstractAssets<Void> {
   HtmlAssets(HtmlPlatform platform) {
     super(platform);
     this.platform = platform;
+  }
+
+  private Scale assetScale() {
+    return (assetScale != null) ? assetScale : platform.graphics().scale();
   }
 
   private void doXdr(final String fullPath, final Callback<String> callback) {
@@ -329,7 +348,7 @@ public class HtmlAssets extends AbstractAssets<Void> {
     return clientBundle;
   }
 
-  private HtmlImage adaptImage(String url) {
+  private HtmlImage adaptImage(String url, Scale scale) {
     ImageElement img = Document.get().createImageElement();
     /*
      * When the server provides an appropriate {@literal Access-Control-Allow-Origin} response
@@ -337,7 +356,7 @@ public class HtmlAssets extends AbstractAssets<Void> {
      */
     setCrossOrigin(img, "anonymous");
     img.setSrc(url);
-    return new HtmlImage(platform.graphics().ctx(), img);
+    return new HtmlImage(platform.graphics().ctx(), scale, img);
   }
 
   /**

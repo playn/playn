@@ -17,17 +17,21 @@ import com.google.gwt.core.client.JsArray;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.NativeEvent;
 
+import pythagoras.f.Point;
+
 import playn.core.Events;
 import playn.core.PlayN;
 import playn.core.TouchImpl;
 
 class HtmlTouch extends TouchImpl {
 
+  private final HtmlPlatform platform;
   private final Element rootElement;
   // true when we are in a touch sequence (after touch start but before touch end)
   private boolean inTouchSequence = false;
 
-  HtmlTouch(Element rootElement) {
+  HtmlTouch(HtmlPlatform platform, Element rootElement) {
+    this.platform = platform;
     this.rootElement = rootElement;
 
     // capture touch start on the root element, only.
@@ -88,8 +92,9 @@ class HtmlTouch extends TouchImpl {
       com.google.gwt.dom.client.Touch touch = nativeTouches.get(t);
       float x = touch.getRelativeX(rootElement);
       float y = touch.getRelativeY(rootElement);
+      Point xy = platform.graphics().transformMouse(x, y);
       int id = getTouchIdentifier(nativeEvent, t);
-      touches[t] = new Event.Impl(flags, PlayN.currentTime(), x, y, id);
+      touches[t] = new Event.Impl(flags, PlayN.currentTime(), xy.x, xy.y, id);
     }
     return touches;
   }

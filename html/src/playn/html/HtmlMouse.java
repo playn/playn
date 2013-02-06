@@ -17,21 +17,24 @@ import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.NativeEvent;
 
+import pythagoras.f.Point;
+
 import playn.core.Events;
 import playn.core.PlayN;
 import playn.core.MouseImpl;
-import pythagoras.f.Point;
 
 class HtmlMouse extends MouseImpl {
 
-  private Listener listener;
-  // true when we are in a drag sequence (after mouse down but before mouse up)
-  boolean inDragSequence = false;
-  boolean isRequestingMouseLock;
+  private final HtmlPlatform platform;
   private final Element rootElement;
-  private final Point lastMousePt = new Point();
 
-  HtmlMouse(final Element rootElement) {
+  private final Point lastMousePt = new Point();
+  // true when we are in a drag sequence (after mouse down but before mouse up)
+  private boolean inDragSequence = false;
+  private boolean isRequestingMouseLock;
+
+  HtmlMouse(final HtmlPlatform platform, final Element rootElement) {
+    this.platform = platform;
     this.rootElement = rootElement;
 
     // Needed so the right mouse button becomes available
@@ -44,8 +47,9 @@ class HtmlMouse extends MouseImpl {
     }, false);
     abstract class XYEventHandler implements EventHandler {
       public void handleEvent(NativeEvent ev) {
-        handleEvent(ev, HtmlInput.getRelativeX(ev, rootElement),
-                    HtmlInput.getRelativeY(ev, rootElement));
+        Point xy = platform.graphics().transformMouse(HtmlInput.getRelativeX(ev, rootElement),
+                                                      HtmlInput.getRelativeY(ev, rootElement));
+        handleEvent(ev, xy.x, xy.y);
       }
       public abstract void handleEvent(NativeEvent ev, float x, float y);
     }
@@ -144,7 +148,7 @@ class HtmlMouse extends MouseImpl {
   private native int getMovementX(NativeEvent nativeEvent) /*-{
     return nativeEvent.webkitMovementX;
   }-*/;
-  
+
   private native int getMovementY(NativeEvent nativeEvent) /*-{
       return nativeEvent.webkitMovementY;
   }-*/;
@@ -160,7 +164,7 @@ class HtmlMouse extends MouseImpl {
     var pointer = navigator.pointer || navigator.mozPointer || navigator.webkitPointer;
     var self = this;
     if(pointer) {
-      pointer.lock(element, function() { 
+      pointer.lock(element, function() {
       }, function(e) {
       });
     }
@@ -248,9 +252,9 @@ class HtmlMouse extends MouseImpl {
   @Override
   public native boolean isLocked() /*-{
     var pointer = navigator.webkitPointer || navigator.mozPointer || navigator.pointer;
-    return pointer && pointer.isLocked || false; 
+    return pointer && pointer.isLocked || false;
   }-*/;
-  
+
   @Override
   public native boolean isLockSupported() /*-{
     return !!(navigator.webkitPointer || navigator.mozPointer || navigator.pointer);

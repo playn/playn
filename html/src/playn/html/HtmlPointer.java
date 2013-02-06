@@ -16,16 +16,21 @@ package playn.html;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.dom.client.*;
 
+import pythagoras.f.Point;
+
 import playn.core.Events;
 import playn.core.PlayN;
 import playn.core.Pointer;
 import playn.core.PointerImpl;
 
 class HtmlPointer extends PointerImpl implements Pointer {
+
+  private final HtmlPlatform platform;
   // true when we are in a drag sequence (after pointer start but before pointer end)
   private boolean inDragSequence = false;
 
-  HtmlPointer(final Element rootElement) {
+  HtmlPointer(HtmlPlatform platform, final Element rootElement) {
+    this.platform = platform;
     // capture touch start on the root element, only.
     HtmlInput.captureEvent(rootElement, "touchstart", new EventHandler() {
       @Override
@@ -106,14 +111,16 @@ class HtmlPointer extends PointerImpl implements Pointer {
     });
   }
 
-  private static Event.Impl eventFromMouse(final Element rootElement, NativeEvent nativeEvent) {
+  private Event.Impl eventFromMouse(final Element rootElement, NativeEvent nativeEvent) {
     float x = HtmlInput.getRelativeX(nativeEvent, rootElement);
     float y = HtmlInput.getRelativeY(nativeEvent, rootElement);
-    return new Event.Impl(new Events.Flags.Impl(), PlayN.currentTime(), x, y, false);
+    Point xy = platform.graphics().transformMouse(x, y);
+    return new Event.Impl(new Events.Flags.Impl(), PlayN.currentTime(), xy.x, xy.y, false);
   }
 
-  private static Event.Impl eventFromTouch(final Element rootElement, Touch touch) {
+  private Event.Impl eventFromTouch(final Element rootElement, Touch touch) {
     float x = touch.getRelativeX(rootElement), y = touch.getRelativeY(rootElement);
-    return new Event.Impl(new Events.Flags.Impl(), PlayN.currentTime(), x, y, true);
+    Point xy = platform.graphics().transformMouse(x, y);
+    return new Event.Impl(new Events.Flags.Impl(), PlayN.currentTime(), xy.x, xy.y, true);
   }
 }
