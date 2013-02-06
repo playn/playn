@@ -124,6 +124,7 @@ public class TestsGame implements Game {
   }
 
   void displayMenu() {
+    clearTest();
     clearRoot();
     GroupLayer root = graphics().rootLayer();
     root.add(createWhiteBackground());
@@ -152,9 +153,15 @@ public class TestsGame implements Game {
     return layer;
   }
 
-  void startTest (Test test) {
-    if (currentTest != null)
+  void clearTest() {
+    if (currentTest != null) {
       currentTest.dispose();
+      currentTest = null;
+    }
+  }
+
+  void startTest(Test test) {
+    clearTest();
     currentTest = test;
 
     // setup root layer for next test
