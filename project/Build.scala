@@ -4,6 +4,11 @@ import samskivert.ProjectBuilder
 import net.thunderklaus.GwtPlugin._
 
 object PlayNBuild extends Build {
+  val testSettings = seq(
+    publishLocal := false,
+    publish := false
+  )
+
   val builder = new ProjectBuilder("pom.xml") {
     override val globalSettings = Seq(
       crossPaths   := false,
@@ -62,8 +67,10 @@ object PlayNBuild extends Build {
         // adds source files to our jar file (needed by GWT)
         unmanagedResourceDirectories in Compile <+= baseDirectory / "src"
       )
-      case "tests-java" => LWJGLPlugin.lwjglSettings
-      case "tests-html" => gwtSettings ++ seq(
+      case "tests-assets" => testSettings
+      case "tests-core" => testSettings
+      case "tests-java" => LWJGLPlugin.lwjglSettings ++ testSettings
+      case "tests-html" => gwtSettings ++ testSettings ++ seq(
         gwtVersion := pom.getAttr("gwt.version").get,
         javaOptions in Gwt ++= Seq("-mx512M"), // give GWT mo' memory
         libraryDependencies ++= Seq(
