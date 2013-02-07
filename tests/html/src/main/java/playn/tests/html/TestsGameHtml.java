@@ -27,7 +27,7 @@ public class TestsGameHtml extends HtmlGame {
 
   @Override
   public void start() {
-    HtmlPlatform.Configuration config = new HtmlPlatform.Configuration();
+    HtmlPlatform.Config config = new HtmlPlatform.Config();
     try {
       config.scaleFactor = Float.parseFloat(Window.Location.getParameter("scale"));
     } catch (Exception e) {} // oh well

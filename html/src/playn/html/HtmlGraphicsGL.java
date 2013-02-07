@@ -37,7 +37,7 @@ class HtmlGraphicsGL extends HtmlGraphics {
   private final HtmlGLContext ctx;
   private final GroupLayerGL rootLayer;
 
-  HtmlGraphicsGL(HtmlPlatform platform, HtmlPlatform.Configuration config) throws RuntimeException {
+  HtmlGraphicsGL(HtmlPlatform platform, HtmlPlatform.Config config) throws RuntimeException {
     canvas = Document.get().createCanvasElement();
     canvas.setWidth(rootElement.getOffsetWidth());
     canvas.setHeight(rootElement.getOffsetHeight());
