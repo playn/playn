@@ -15,6 +15,8 @@
  */
 package playn.tests.html;
 
+import com.google.gwt.user.client.Window;
+
 import playn.core.PlayN;
 import playn.html.HtmlGame;
 import playn.html.HtmlPlatform;
@@ -25,7 +27,11 @@ public class TestsGameHtml extends HtmlGame {
 
   @Override
   public void start() {
-    HtmlPlatform platform = HtmlPlatform.register();
+    HtmlPlatform.Configuration config = new HtmlPlatform.Configuration();
+    try {
+      config.scaleFactor = Float.parseFloat(Window.Location.getParameter("scale"));
+    } catch (Exception e) {} // oh well
+    HtmlPlatform platform = HtmlPlatform.register(config);
     platform.setTitle("Tests");
     platform.assets().setPathPrefix("testsgame/");
     HtmlPlatform.disableRightClickContextMenu();
