@@ -142,6 +142,11 @@ class HtmlImage extends ImageGL implements HtmlCanvas.Drawable {
   @Override
   public void draw(Context2d ctx, float sx, float sy, float sw, float sh,
             float dx, float dy, float dw, float dh) {
+    // adjust our source rect to account for the scale factor
+    sx *= scale.factor;
+    sy *= scale.factor;
+    sw *= scale.factor;
+    sh *= scale.factor;
     ctx.drawImage(img, sx, sy, sw, sh, dx, dy, dw, dh);
   }
 
