@@ -102,7 +102,7 @@ public class HtmlAssets extends AbstractAssets<Void> {
         platform.log().info("Loading image " + rsrc.path + " " + rsrc.scale);
         HtmlImage image = getImage(rsrc.path, rsrc.scale);
         image.img.setWidth(MathUtil.iceil(size[0]));
-        image.img.setHeight(MathUtil.iceil(size[0]));
+        image.img.setHeight(MathUtil.iceil(size[1]));
         return image;
       }
       return createErrorImage(new Throwable("Image missing from manifest: " + path));
