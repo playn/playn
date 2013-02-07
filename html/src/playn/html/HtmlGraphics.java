@@ -71,31 +71,6 @@ public abstract class HtmlGraphics implements Graphics {
     "THEQUICKBROWNFOXJUMPEDOVERTHELAZYDOGthequickbrownfoxjumpedoverthelazydog";
   private static final String EMWIDTH_TEXT = "m";
 
-  protected HtmlGraphics() {
-    Document doc = Document.get();
-
-    dummyCanvas = doc.createCanvasElement();
-    dummyCtx = dummyCanvas.getContext2d();
-
-    rootElement = doc.getElementById("playn-root");
-    if (rootElement == null) {
-      rootElement = doc.createDivElement();
-      rootElement.setAttribute("style", "width: 640px; height: 480px");
-      doc.getBody().appendChild(rootElement);
-    } else {
-      // clear the contents of the "playn-root" element, if present
-      rootElement.setInnerHTML("");
-    }
-
-    // create a hidden element used to measure font heights
-    measureElement = doc.createDivElement();
-    measureElement.getStyle().setVisibility(Style.Visibility.HIDDEN);
-    measureElement.getStyle().setPosition(Style.Position.ABSOLUTE);
-    measureElement.getStyle().setTop(-500, Unit.PX);
-    measureElement.getStyle().setOverflow(Style.Overflow.VISIBLE);
-    rootElement.appendChild(measureElement);
-  }
-
   /**
    * Sizes or resizes the root element that contains the PlayN view.
    * @param width the new width, in pixels, of the view.
@@ -104,6 +79,20 @@ public abstract class HtmlGraphics implements Graphics {
   public void setSize(int width, int height) {
     rootElement.getStyle().setWidth(width, Unit.PX);
     rootElement.getStyle().setHeight(height, Unit.PX);
+  }
+
+  /**
+   * Registers metrics for the specified font in the specified style and size. This overrides the
+   * default font metrics calculation (which is hacky and inaccurate). If you want to ensure
+   * somewhat consistent font layout across browsers, you should register font metrics for every
+   * combination of font, style and size that you use in your app.
+   *
+   * @param lineHeight the height of a line of text in the specified font (in pixels).
+   */
+  public void registerFontMetrics(String name, Font.Style style, float size, float lineHeight) {
+    HtmlFont font = new HtmlFont(name, style, size);
+    HtmlFontMetrics metrics = getFontMetrics(font); // get emwidth via default measurement
+    fontMetrics.put(font, new HtmlFontMetrics(lineHeight, metrics.emwidth));
   }
 
   @Override
@@ -169,6 +158,31 @@ public abstract class HtmlGraphics implements Graphics {
   @Override
   public HtmlGLContext ctx() {
     return null;
+  }
+
+  protected HtmlGraphics() {
+    Document doc = Document.get();
+
+    dummyCanvas = doc.createCanvasElement();
+    dummyCtx = dummyCanvas.getContext2d();
+
+    rootElement = doc.getElementById("playn-root");
+    if (rootElement == null) {
+      rootElement = doc.createDivElement();
+      rootElement.setAttribute("style", "width: 640px; height: 480px");
+      doc.getBody().appendChild(rootElement);
+    } else {
+      // clear the contents of the "playn-root" element, if present
+      rootElement.setInnerHTML("");
+    }
+
+    // create a hidden element used to measure font heights
+    measureElement = doc.createDivElement();
+    measureElement.getStyle().setVisibility(Style.Visibility.HIDDEN);
+    measureElement.getStyle().setPosition(Style.Position.ABSOLUTE);
+    measureElement.getStyle().setTop(-500, Unit.PX);
+    measureElement.getStyle().setOverflow(Style.Overflow.VISIBLE);
+    rootElement.appendChild(measureElement);
   }
 
   Scale scale() {
