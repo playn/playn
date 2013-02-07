@@ -99,7 +99,6 @@ public class HtmlAssets extends AbstractAssets<Void> {
       for (Scale.ScaledResource rsrc : assetScale().getScaledResources(path)) {
         float[] size = imageManifest.imageSize(rsrc.path);
         if (size == null) continue; // try other scales
-        platform.log().info("Loading image " + rsrc.path + " " + rsrc.scale);
         HtmlImage image = getImage(rsrc.path, rsrc.scale);
         image.img.setWidth(MathUtil.iceil(size[0]));
         image.img.setHeight(MathUtil.iceil(size[1]));
