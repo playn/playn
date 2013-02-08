@@ -24,27 +24,32 @@ import playn.core.Image;
 import playn.core.ImageLayer;
 import playn.core.ImmediateLayer;
 import playn.core.SurfaceLayer;
+import playn.core.gl.Scale;
 
 class HtmlGraphicsCanvas extends HtmlGraphics {
 
+  private final Scale scale;
   private final HtmlGroupLayerCanvas rootLayer;
   private final CanvasElement canvas;
   private final Context2d ctx;
 
-  public HtmlGraphicsCanvas() {
+  public HtmlGraphicsCanvas(HtmlPlatform.Config config) {
+    scale = new Scale(config.scaleFactor);
+    rootLayer = new HtmlGroupLayerCanvas();
     canvas = Document.get().createCanvasElement();
     canvas.setWidth(rootElement.getOffsetWidth());
     canvas.setHeight(rootElement.getOffsetHeight());
     rootElement.appendChild(canvas);
     ctx = canvas.getContext2d();
-    rootLayer = new HtmlGroupLayerCanvas();
+    ctx.scale(config.scaleFactor, config.scaleFactor);
   }
 
   @Override
   public void setSize(int width, int height) {
-    super.setSize(width, height);
-    canvas.setWidth(width);
-    canvas.setHeight(height);
+    int swidth = scale.scaledCeil(width), sheight = scale.scaledCeil(height);
+    super.setSize(swidth, sheight);
+    canvas.setWidth(swidth);
+    canvas.setHeight(sheight);
   }
 
   @Override
@@ -90,12 +95,17 @@ class HtmlGraphicsCanvas extends HtmlGraphics {
 
   @Override
   public int width() {
-    return canvas.getOffsetWidth();
+    return (int)scale.invScaled(canvas.getOffsetWidth());
   }
 
   @Override
   public int height() {
-    return canvas.getOffsetHeight();
+    return (int)scale.invScaled(canvas.getOffsetHeight());
+  }
+
+  @Override
+  Scale scale() {
+    return scale;
   }
 
   @Override

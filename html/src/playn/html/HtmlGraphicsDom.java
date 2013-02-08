@@ -24,6 +24,7 @@ import playn.core.Image;
 import playn.core.ImageLayer;
 import playn.core.ImmediateLayer;
 import playn.core.SurfaceLayer;
+import playn.core.gl.Scale;
 
 class HtmlGraphicsDom extends HtmlGraphics {
 
@@ -93,6 +94,11 @@ class HtmlGraphicsDom extends HtmlGraphics {
   @Override
   public int width() {
     return rootLayer.element().getOffsetWidth();
+  }
+
+  @Override
+  Scale scale() {
+    return Scale.ONE;
   }
 
   @Override

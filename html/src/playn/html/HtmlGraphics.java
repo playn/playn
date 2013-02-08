@@ -148,7 +148,7 @@ public abstract class HtmlGraphics implements Graphics {
 
   @Override
   public float scaleFactor() {
-    return 1;
+    return scale().factor;
   }
 
   @Override
@@ -186,10 +186,7 @@ public abstract class HtmlGraphics implements Graphics {
     rootElement.appendChild(measureElement);
   }
 
-  Scale scale() {
-    HtmlGLContext ctx = ctx();
-    return (ctx == null) ? Scale.ONE : ctx.scale;
-  }
+  abstract Scale scale();
 
   HtmlFontMetrics getFontMetrics(Font font) {
     HtmlFontMetrics metrics = fontMetrics.get(font);

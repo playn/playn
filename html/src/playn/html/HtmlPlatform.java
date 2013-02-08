@@ -353,14 +353,14 @@ public class HtmlPlatform extends AbstractPlatform {
     try {
       switch (config.mode) {
       case CANVAS:
-        return new HtmlGraphicsCanvas();
+        return new HtmlGraphicsCanvas(config);
       case DOM:
         return new HtmlGraphicsDom();
       case WEBGL:
         return new HtmlGraphicsGL(this, config);
       default:
       case AUTODETECT:
-        return hasGLSupport() ? new HtmlGraphicsGL(this, config) : new HtmlGraphicsCanvas();
+        return hasGLSupport() ? new HtmlGraphicsGL(this, config) : new HtmlGraphicsCanvas(config);
       }
 
     // HtmlGraphicsGL ctor throws a runtime exception if the context creation fails.
@@ -370,7 +370,7 @@ public class HtmlPlatform extends AbstractPlatform {
       log().info("GL context creation failed with an unknown error." + t);
     }
 
-    return new HtmlGraphicsCanvas();
+    return new HtmlGraphicsCanvas(config);
   }
 
   private native JavaScriptObject getWindow() /*-{
