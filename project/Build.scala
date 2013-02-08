@@ -1,13 +1,24 @@
+import java.io.File
 import sbt._
 import Keys._
 import samskivert.ProjectBuilder
 import net.thunderklaus.GwtPlugin._
 
 object PlayNBuild extends Build {
+  // our source and tests are in non-standard places
+  val srcDirSettings = seq(
+    javaSource in Compile <<= baseDirectory / "src",
+    javaSource in Test <<= baseDirectory / "tests"
+  )
+  // avoid publishing our test projects to Ivy
   val testSettings = seq(
     publishLocal := false,
     publish := false
   )
+
+  def excludePath (path :String) :FileFilter = new FileFilter {
+    def accept (f :File) :Boolean = f.getAbsolutePath.contains(path)
+  }
 
   val builder = new ProjectBuilder("pom.xml") {
     override val globalSettings = Seq(
@@ -23,12 +34,7 @@ object PlayNBuild extends Build {
       parallelExecution in Test := false
     )
     override def projectSettings (name :String, pom :pomutil.POM) = name match {
-      case "core" => Seq(
-        // our source and tests are in non-standard places
-        javaSource in Compile <<= baseDirectory / "src",
-        javaSource in Test <<= baseDirectory / "tests",
-        // adds source files to our jar file (needed by GWT)
-        unmanagedResourceDirectories in Compile <+= baseDirectory / "src",
+      case "core" => srcDirSettings ++ seq(
         unmanagedBase <<= baseDirectory { base => base / "disabled" },
         // tests depends on resource files mixed into source directory, yay!
         unmanagedResourceDirectories in Test <+= baseDirectory / "tests",
@@ -36,36 +42,21 @@ object PlayNBuild extends Build {
           "com.novocode" % "junit-interface" % "0.7" % "test->default"
         )
       )
-      case "java" | "android" => seq(
-        // our source and tests are in non-standard places
-        javaSource in Compile <<= baseDirectory / "src",
-        javaSource in Test <<= baseDirectory / "tests",
+      case "java" | "android" => srcDirSettings ++ seq(
         libraryDependencies ++= Seq(
  	        "com.novocode" % "junit-interface" % "0.7" % "test->default"
         )
       )
-      case "gwtbox2d" => Seq(
-        // our source and tests are in non-standard places
-        javaSource in Compile <<= baseDirectory / "src",
-        javaSource in Test <<= baseDirectory / "tests",
-        // exclude GWT generator code
-        excludeFilter in unmanagedSources ~= { _ || "PoolingStackGenerator.java" },
-        // adds source files to our jar file (needed by GWT)
-        unmanagedResourceDirectories in Compile <+= baseDirectory / "src"
+      case "gwtbox2d" => srcDirSettings ++ seq(
+        // exclude GWT generator and supersource code
+        excludeFilter in unmanagedSources ~= {
+          _ || "PoolingStackGenerator.java" || excludePath("org/jbox2d/emul")
+        }
       )
-      case "webgl" => Seq(
-        // our source and tests are in non-standard places
-        javaSource in Compile <<= baseDirectory / "src",
-        javaSource in Test <<= baseDirectory / "tests",
-        // adds source files to our jar file (needed by GWT)
-        unmanagedResourceDirectories in Compile <+= baseDirectory / "src"
-      )
-      case "html" => Seq(
-        // our source and tests are in non-standard places
-        javaSource in Compile <<= baseDirectory / "src",
-        javaSource in Test <<= baseDirectory / "tests",
-        // adds source files to our jar file (needed by GWT)
-        unmanagedResourceDirectories in Compile <+= baseDirectory / "src"
+      case "webgl" => srcDirSettings
+      case "html" => srcDirSettings ++ seq(
+        // exclude GWT supersource code
+        excludeFilter in unmanagedSources ~= { _ || excludePath("playn/super") }
       )
       case "tests-assets" => testSettings
       case "tests-core" => testSettings

@@ -46,6 +46,27 @@
       <version>${playn.version}</version>
     </dependency>
 
+    <dependency>
+      <groupId>com.googlecode.playn</groupId>
+      <artifactId>playn-html</artifactId>
+      <version>${playn.version}</version>
+      <classifier>sources</classifier>
+    </dependency>
+
+    <dependency>
+      <groupId>com.googlecode.playn</groupId>
+      <artifactId>playn-core</artifactId>
+      <version>${playn.version}</version>
+      <classifier>sources</classifier>
+    </dependency>
+
+    <dependency>
+      <groupId>com.googlecode.playn</groupId>
+      <artifactId>playn-webgl</artifactId>
+      <version>${playn.version}</version>
+      <classifier>sources</classifier>
+    </dependency>
+
     <!-- Start Google App Engine dependencies -->
     <!-- These can be removed if you don't wish to deploy to Google App Engine -->
     <dependency>

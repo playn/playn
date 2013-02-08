@@ -63,7 +63,7 @@ public final class IntBuffer extends Buffer
       this.byteBuffer = byteBuffer;
       this.byteBuffer.clear();
       this.intArray = TypedArrays.createInt32Array(
-          byteBuffer.byteArray.buffer(), 
+          byteBuffer.byteArray.buffer(),
           byteBuffer.byteArray.byteOffset(), capacity);
     }
 

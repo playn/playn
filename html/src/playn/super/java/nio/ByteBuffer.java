@@ -33,7 +33,7 @@ import com.google.gwt.typedarrays.shared.TypedArrays;
  * </ul>
  */
 public final class ByteBuffer extends Buffer implements Comparable<ByteBuffer>, playn.html.HasArrayBufferView, playn.html.TypedArrayHelper.Wrapper {
-  
+
     Int8Array byteArray;
 
     /** The byte order of this buffer, default is {@code BIG_ENDIAN}. */
@@ -66,7 +66,7 @@ public final class ByteBuffer extends Buffer implements Comparable<ByteBuffer>, 
     public ByteBuffer wrap(ArrayBuffer arrayBuffer) {
        return new ByteBuffer(arrayBuffer);
     }
-    
+
     static ByteBuffer copy (ByteBuffer other, int markOfOther) {
       ByteBuffer buf = new ByteBuffer(
         other.byteArray.buffer(), other.capacity(),
@@ -937,8 +937,8 @@ public final class ByteBuffer extends Buffer implements Comparable<ByteBuffer>, 
 //    public ByteBuffer stringToByteBuffer (String s) {
 //        return new StringByteBuffer(s);
 //    }
-    
-    
+
+
     public ArrayBufferView getTypedArray () {
       return byteArray;
     }
@@ -950,7 +950,7 @@ public final class ByteBuffer extends Buffer implements Comparable<ByteBuffer>, 
     public int getElementType() {
       return 0x1400; // GL_BYTE
     }
-  
+
     public boolean isReadOnly() {
       return false;
     }

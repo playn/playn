@@ -28,24 +28,26 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-source-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>attach-sources</id>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>jar-no-fork</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
         <configuration>
           <excludes>
+            <exclude>**/emul/**</exclude>
             <exclude>**/generator/**</exclude>
           </excludes>
         </configuration>
       </plugin>
     </plugins>
-    <resources>
-      <resource>
-        <directory>${basedir}/src</directory>
-      </resource>
-      <resource>
-        <directory>${basedir}/gwtemul</directory>
-      </resource>
-    </resources>
   </build>
 </project>
