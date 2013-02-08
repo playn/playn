@@ -23,15 +23,16 @@ import playn.core.Canvas;
 import playn.core.CanvasImage;
 import playn.core.Image;
 import playn.core.gl.GLContext;
+import playn.core.gl.Scale;
 
 class HtmlCanvasImage extends HtmlImage implements CanvasImage {
 
   private HtmlCanvas canvas;
 
-  public HtmlCanvasImage(GLContext ctx, HtmlCanvas canvas) {
-    super(ctx, ctx.scale, canvas.canvas());
+  public HtmlCanvasImage(GLContext ctx, Scale scale, HtmlCanvas canvas) {
+    super(ctx, scale, canvas.canvas());
     this.canvas = canvas;
-    canvas.scale(ctx.scale.factor, ctx.scale.factor);
+    canvas.scale(scale.factor, scale.factor);
   }
 
   @Override

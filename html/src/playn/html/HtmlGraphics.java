@@ -97,8 +97,9 @@ public abstract class HtmlGraphics implements Graphics {
 
   @Override
   public CanvasImage createImage(float width, float height) {
-    return new HtmlCanvasImage(ctx(), new HtmlCanvas(scale().scaledCeil(width),
-                                                     scale().scaledCeil(height)));
+    Scale scale = scale();
+    float sw = scale.scaledCeil(width), sh = scale.scaledCeil(height);
+    return new HtmlCanvasImage(ctx(), scale, new HtmlCanvas(sw, sh));
   }
 
   @Override
