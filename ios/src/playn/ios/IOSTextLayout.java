@@ -75,7 +75,7 @@ class IOSTextLayout extends AbstractTextLayout {
   // would expect it to be reported), and it is non-zero.
 
   private abstract class IOSTextStamp {
-    public float width, height;
+    public float width, height, ascent, descent, leading;
 
     public abstract int lineCount();
     public abstract void paint(CGBitmapContext bctx, float x, float y);
@@ -86,11 +86,13 @@ class IOSTextLayout extends AbstractTextLayout {
     private final CTLine[] lines;
     private final PointF[] origins;
     private final float adjustX;
-    private final float ascent, lineHeight;
+    private final float lineHeight;
 
     Wrapped(IOSFont font, CTStringAttributes attribs, String text) {
       this.ascent = font.ctFont.get_AscentMetric();
-      this.lineHeight = ascent + font.ctFont.get_DescentMetric() + font.ctFont.get_LeadingMetric();
+      this.descent = font.ctFont.get_DescentMetric();
+      this.leading = font.ctFont.get_LeadingMetric();
+      this.lineHeight = ascent + descent + leading;
 
       NSAttributedString atext = new NSAttributedString(text, attribs);
       CTFramesetter fs = new CTFramesetter(atext);
@@ -110,7 +112,7 @@ class IOSTextLayout extends AbstractTextLayout {
         }
         this.adjustX = -minX;
         this.width = maxX - minX;
-        this.height = lineHeight * lines.length - font.ctFont.get_LeadingMetric();
+        this.height = lineHeight * lines.length - leading;
 
       } finally {
         fs.Dispose();
@@ -142,14 +144,15 @@ class IOSTextLayout extends AbstractTextLayout {
   private class Single extends IOSTextStamp {
     private final CTLine line;
     private final RectangleF bounds;
-    private final float ascent;
 
     Single(IOSFont font, CTStringAttributes attribs, String text) {
       this.ascent = font.ctFont.get_AscentMetric();
+      this.descent = font.ctFont.get_DescentMetric();
+      this.leading = font.ctFont.get_LeadingMetric();
       this.line = new CTLine(new NSAttributedString(text, attribs));
       this.bounds = line.GetImageBounds(gfx.scratchCtx);
       this.width = bounds.get_X() + bounds.get_Width();
-      this.height = ascent + font.ctFont.get_DescentMetric();
+      this.height = ascent + descent;
     }
 
     @Override
@@ -188,6 +191,21 @@ class IOSTextLayout extends AbstractTextLayout {
   @Override
   public int lineCount() {
     return fillStamp.lineCount();
+  }
+
+  @Override
+  public float ascent () {
+    return fillStamp.ascent;
+  }
+
+  @Override
+  public float descent () {
+    return fillStamp.descent;
+  }
+
+  @Override
+  public float leading () {
+    return fillStamp.leading;
   }
 
   void stroke(CGBitmapContext bctx, float x, float y, float strokeWidth, int strokeColor) {

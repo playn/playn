@@ -91,6 +91,24 @@ class FlashTextLayout implements TextLayout {
   }
 
   @Override
+  public float ascent () {
+    // TODO
+    return 0;
+  }
+
+  @Override
+  public float descent () {
+    // TODO
+    return 0;
+  }
+
+  @Override
+  public float leading () {
+    // TODO
+    return 0;
+  }
+
+  @Override
   public TextFormat format() {
     return format;
   }

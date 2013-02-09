@@ -30,6 +30,15 @@ public interface TextLayout {
   /** The number of lines of text contained in this layout (after wrapping). */
   int lineCount();
 
+  /** The space from the top of a line of text to the baseline. */
+  float ascent ();
+
+  /** The space from the baseline to the bottom of a line of text. */
+  float descent ();
+
+  /** The space between the bottom of one line of text and the top of the next line of text. */
+  float leading ();
+
   /** The {@link TextFormat} used to lay out this text. */
   TextFormat format();
 }

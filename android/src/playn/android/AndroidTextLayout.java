@@ -58,6 +58,21 @@ class AndroidTextLayout implements TextLayout {
   }
 
   @Override
+  public float ascent () {
+    return metrics.ascent;
+  }
+
+  @Override
+  public float descent () {
+    return metrics.descent;
+  }
+
+  @Override
+  public float leading () {
+    return metrics.leading;
+  }
+
+  @Override
   public TextFormat format() {
     return format;
   }

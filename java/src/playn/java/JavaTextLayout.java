@@ -86,6 +86,21 @@ class JavaTextLayout extends AbstractTextLayout {
     return layouts.size();
   }
 
+  @Override
+  public float ascent () {
+    return layouts.size() == 0 ? 0 : layouts.get(0).getAscent();
+  }
+
+  @Override
+  public float descent () {
+    return layouts.size() == 0 ? 0 : layouts.get(0).getDescent();
+  }
+
+  @Override
+  public float leading () {
+    return layouts.size() == 0 ? 0 : layouts.get(0).getLeading();
+  }
+
   void stroke(Graphics2D gfx, float x, float y) {
     paint(gfx, x+pad, y+pad, true);
   }
