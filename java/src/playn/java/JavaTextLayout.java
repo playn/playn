@@ -29,6 +29,7 @@ import java.util.List;
 
 import playn.core.AbstractTextLayout;
 import playn.core.TextFormat;
+import pythagoras.f.Rectangle;
 
 class JavaTextLayout extends AbstractTextLayout {
 
@@ -87,17 +88,27 @@ class JavaTextLayout extends AbstractTextLayout {
   }
 
   @Override
-  public float ascent () {
+  public Rectangle lineBounds(int line) {
+    if (line < 0 || layouts.size() <= line) return null;
+    Rectangle2D bounds = layouts.get(line).getBounds();
+    float lineWidth = getWidth(bounds);
+    float x = (float)-bounds.getX() + format.align.getX(lineWidth, width);
+    float y = line == 0 ? 0 : line * (ascent() + descent() + leading());
+    return new Rectangle(x, y, lineWidth, (float)bounds.getHeight());
+  }
+
+  @Override
+  public float ascent() {
     return layouts.size() == 0 ? 0 : layouts.get(0).getAscent();
   }
 
   @Override
-  public float descent () {
+  public float descent() {
     return layouts.size() == 0 ? 0 : layouts.get(0).getDescent();
   }
 
   @Override
-  public float leading () {
+  public float leading() {
     return layouts.size() == 0 ? 0 : layouts.get(0).getLeading();
   }
 

@@ -31,6 +31,7 @@ import cli.System.Drawing.RectangleF;
 
 import playn.core.AbstractTextLayout;
 import playn.core.TextFormat;
+import pythagoras.f.Rectangle;
 
 class IOSTextLayout extends AbstractTextLayout {
 
@@ -78,6 +79,7 @@ class IOSTextLayout extends AbstractTextLayout {
     public float width, height, ascent, descent, leading;
 
     public abstract int lineCount();
+    public abstract Rectangle lineBounds(int line);
     public abstract void paint(CGBitmapContext bctx, float x, float y);
   }
 
@@ -125,6 +127,15 @@ class IOSTextLayout extends AbstractTextLayout {
     }
 
     @Override
+    public Rectangle lineBounds (int line) {
+      if (line < 0 || lines.length <= line) return null;
+      // TODO: maybe cache bounds for lines?
+      RectangleF bounds = lines[line].GetImageBounds(gfx.scratchCtx);
+      return new Rectangle(origins[line].get_X(), line * lineHeight, bounds.get_Width(),
+        bounds.get_Height());
+    }
+
+    @Override
     public void paint(CGBitmapContext bctx, float x, float y) {
       float dx = x + adjustX, dy = y + ascent;
       bctx.SaveState();
@@ -161,6 +172,11 @@ class IOSTextLayout extends AbstractTextLayout {
     }
 
     @Override
+    public Rectangle lineBounds(int line) {
+      return line != 0 ? null : new Rectangle(0, 0, width, height);
+    }
+
+    @Override
     public void paint(CGBitmapContext bctx, float x, float y) {
       float dy = y + ascent;
       bctx.TranslateCTM(x, dy);
@@ -194,17 +210,22 @@ class IOSTextLayout extends AbstractTextLayout {
   }
 
   @Override
-  public float ascent () {
+  public Rectangle lineBounds(int line) {
+    return fillStamp.lineBounds(line);
+  }
+
+  @Override
+  public float ascent() {
     return fillStamp.ascent;
   }
 
   @Override
-  public float descent () {
+  public float descent() {
     return fillStamp.descent;
   }
 
   @Override
-  public float leading () {
+  public float leading() {
     return fillStamp.leading;
   }
 
@@ -238,7 +259,6 @@ class IOSTextLayout extends AbstractTextLayout {
     // the "view C# as Java" abstraction is suffering a bit here; please avert your eyes
     pstyle.set_Alignment(new cli.System.Nullable$$00601_$$$_Lcli__MonoTouch__CoreText__CTTextAlignment_$$$$_(toCT(format.align)));
     attribs.set_ParagraphStyle(new CTParagraphStyle(pstyle));
-    // TODO: add underline here?
 
     if (format.shouldWrap() || text.indexOf('\n') != -1) {
       return new Wrapped(font, attribs, text);

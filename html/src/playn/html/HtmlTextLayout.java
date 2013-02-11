@@ -20,6 +20,7 @@ import com.google.gwt.canvas.dom.client.Context2d;
 import playn.core.Font;
 import playn.core.TextFormat;
 import playn.core.TextLayout;
+import pythagoras.f.Rectangle;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -93,19 +94,25 @@ class HtmlTextLayout implements TextLayout {
   }
 
   @Override
-  public float ascent () {
+  public Rectangle lineBounds(int line) {
+    // TODO
+    return null;
+  }
+
+  @Override
+  public float ascent() {
     // TODO
     return 0;
   }
 
   @Override
-  public float descent () {
+  public float descent() {
     // TODO
     return 0;
   }
 
   @Override
-  public float leading () {
+  public float leading() {
     // TODO
     return 0;
   }

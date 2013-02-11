@@ -15,6 +15,8 @@
  */
 package playn.core;
 
+import pythagoras.f.Rectangle;
+
 /**
  * Contains metrics and metadata for a laid out body of text. The text may subsequently be rendered
  * to a canvas.
@@ -29,6 +31,10 @@ public interface TextLayout {
 
   /** The number of lines of text contained in this layout (after wrapping). */
   int lineCount();
+
+  /** The bounds of the text on the given line. May return null if the requested line does not
+   * exist. */
+  Rectangle lineBounds(int line);
 
   /** The space from the top of a line of text to the baseline. */
   float ascent ();
