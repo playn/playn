@@ -94,7 +94,7 @@ class JavaTextLayout extends AbstractTextLayout {
     float lineWidth = getWidth(bounds);
     float x = (float)-bounds.getX() + format.align.getX(lineWidth, width);
     float y = line == 0 ? 0 : line * (ascent() + descent() + leading());
-    return new Rectangle(x, y, lineWidth, ascent() + descent());
+    return new Rectangle(x+pad, y+pad, lineWidth, ascent()+descent());
   }
 
   @Override
