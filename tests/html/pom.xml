@@ -49,20 +49,6 @@
       <classifier>sources</classifier>
     </dependency>
 
-    <dependency>
-      <groupId>com.googlecode.playn</groupId>
-      <artifactId>playn-core</artifactId>
-      <version>${project.version}</version>
-      <classifier>sources</classifier>
-    </dependency>
-
-    <dependency>
-      <groupId>com.googlecode.playn</groupId>
-      <artifactId>playn-webgl</artifactId>
-      <version>${project.version}</version>
-      <classifier>sources</classifier>
-    </dependency>
-
 <!--
     <dependency>
       <groupId>com.allen-sauer.gwt.log</groupId>
