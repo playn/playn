@@ -32,8 +32,7 @@ public interface TextLayout {
   /** The number of lines of text contained in this layout (after wrapping). */
   int lineCount();
 
-  /** The bounds of the text on the given line. May return null if the requested line does not
-   * exist. */
+  /** The bounds of the text on the given line. */
   Rectangle lineBounds(int line);
 
   /** The space from the top of a line of text to the baseline. */

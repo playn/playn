@@ -60,7 +60,6 @@ class AndroidTextLayout implements TextLayout {
 
   @Override
   public Rectangle lineBounds(int lineIdx) {
-    if (lineIdx < 0 || lines.size() >= lineIdx) return null;
     Line line = lines.get(lineIdx);
     float x = LEFT_FUDGE + format.align.getX(line.width, width-LEFT_FUDGE-RIGHT_FUDGE);
     float y = TOP_FUDGE + lineIdx * (ascent() + descent() + leading());

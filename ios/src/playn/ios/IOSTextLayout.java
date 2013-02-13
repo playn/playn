@@ -128,7 +128,6 @@ class IOSTextLayout extends AbstractTextLayout {
 
     @Override
     public Rectangle lineBounds (int line) {
-      if (line < 0 || lines.length <= line) return null;
       // TODO: maybe cache bounds for lines?
       RectangleF bounds = lines[line].GetImageBounds(gfx.scratchCtx);
       return new Rectangle(origins[line].get_X()+pad, line*lineHeight+pad, bounds.get_Width(),
@@ -173,7 +172,7 @@ class IOSTextLayout extends AbstractTextLayout {
 
     @Override
     public Rectangle lineBounds(int line) {
-      return line != 0 ? null : new Rectangle(pad, pad, width, height);
+      return new Rectangle(pad, pad, width, height);
     }
 
     @Override

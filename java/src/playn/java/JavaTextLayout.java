@@ -89,7 +89,6 @@ class JavaTextLayout extends AbstractTextLayout {
 
   @Override
   public Rectangle lineBounds(int line) {
-    if (line < 0 || layouts.size() <= line) return null;
     Rectangle2D bounds = layouts.get(line).getBounds();
     float lineWidth = getWidth(bounds);
     float x = (float)-bounds.getX() + format.align.getX(lineWidth, width);
