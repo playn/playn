@@ -53,7 +53,7 @@ object PlayNBuild extends Build {
           _ || "PoolingStackGenerator.java" || excludePath("org/jbox2d/emul")
         }
       )
-      case "webgl" => srcDirSettings
+      case "webgl" | "flash" | "ios" => srcDirSettings
       case "html" => srcDirSettings ++ seq(
         // exclude GWT supersource code
         excludeFilter in unmanagedSources ~= { _ || excludePath("playn/super") }
