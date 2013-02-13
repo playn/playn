@@ -13,10 +13,14 @@
  */
 package playn.core.gl;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import playn.core.Asserts;
 import playn.core.InternalTransform;
 import playn.core.Platform;
 import playn.core.StockInternalTransform;
+import pythagoras.i.Rectangle;
 
 public abstract class GLContext {
 
@@ -61,6 +65,8 @@ public abstract class GLContext {
   private GLShader curShader;
   private int lastFramebuffer, epoch;
   private int pushedFramebuffer = -1, pushedWidth, pushedHeight;
+  private List<Rectangle> scissors = new ArrayList<Rectangle>();
+  private int scissorDepth;
 
   /** The (actual screen pixel) width and height of our default frame buffer. */
   protected int defaultFbufWidth, defaultFbufHeight;
@@ -277,6 +283,50 @@ public abstract class GLContext {
    */
   public String trisShaderInfo() {
     return trisShader().toString();
+  }
+
+  /**
+   * Adds the given rectangle to the scissors stack, intersecting with the previous one
+   * if it exists. Intended for use by subclasses to implement {@link #startClipped()} and
+   * {@link #endClipped()}.
+   * <p>NOTE: calls to this method <b>must</b> be matched by a corresponding call
+   * {@link #popScissorState()}, or all hell will break loose.</p>
+   * @return the new clipping rectangle to use
+   */
+  protected Rectangle pushScissorState (int x, int y, int width, int height) {
+      // grow the scissors buffer if necessary
+      if (scissorDepth == scissors.size()) {
+        scissors.add(new Rectangle());
+      }
+
+      Rectangle r = scissors.get(scissorDepth);
+      if (scissorDepth == 0) {
+        r.setBounds(x, y, width, height);
+      } else {
+        // intersect current with previous
+        Rectangle pr = scissors.get(scissorDepth - 1);
+        r.setLocation(Math.max(pr.x, x), Math.max(pr.y, y));
+        r.setSize(Math.min(pr.maxX(), x + width - 1) - r.x,
+            Math.min(pr.maxY(), y + height - 1) - r.y);
+      }
+      scissorDepth++;
+      return r;
+  }
+
+  /**
+   * Removes the most recently pushed scissor state and returns the rectangle that should now
+   * be used for clipping, or null if clipping should be disabled.
+   */
+  protected Rectangle popScissorState () {
+      scissorDepth--;
+      return scissorDepth == 0 ? null : scissors.get(scissorDepth - 1);
+  }
+
+  /**
+   * Returns the current scissor stack size. Zero means no scissors are currently pushed.
+   */
+  protected int getScissorDepth () {
+      return scissorDepth;
   }
 
   protected GLContext(Platform platform, float scaleFactor) {

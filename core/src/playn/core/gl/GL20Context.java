@@ -19,6 +19,7 @@ import java.nio.ByteBuffer;
 
 import playn.core.InternalTransform;
 import playn.core.Platform;
+import pythagoras.i.Rectangle;
 import static playn.core.PlayN.log;
 import static playn.core.gl.GL20.*;
 
@@ -164,14 +165,17 @@ public class GL20Context extends GLContext {
   @Override
   public void startClipped(int x, int y, int width, int height) {
     flush(); // flush any pending unclipped calls
-    gl.glScissor(x, curFbufHeight - y - height, width, height);
-    gl.glEnable(GL_SCISSOR_TEST);
+    Rectangle r = pushScissorState(x, curFbufHeight - y - height, width, height);
+    gl.glScissor(r.x, r.y, r.width, r.height);
+    if (getScissorDepth() == 1) gl.glEnable(GL_SCISSOR_TEST);
   }
 
   @Override
   public void endClipped() {
     flush(); // flush our clipped calls with SCISSOR_TEST still enabled
-    gl.glDisable(GL_SCISSOR_TEST);
+    Rectangle r = popScissorState();
+    if (r == null) gl.glDisable(GL_SCISSOR_TEST);
+    else gl.glScissor(r.x, r.y, r.width, r.height);
   }
 
   @Override

@@ -37,10 +37,6 @@ public interface Graphics {
 
   /**
    * Creates a clipped group layer, with the initial specified size.
-   *
-   * <p><em>NOTE:</em> clipping regions <em>do not</em> nest. If you place a clipped
-   * ImmediateLayer, or another clipped group, inside this clipped group it will behave
-   * unpredictably. Don't do that.</p>
    */
   GroupLayer.Clipped createGroupLayer(float width, float height);
 

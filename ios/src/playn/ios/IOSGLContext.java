@@ -26,6 +26,7 @@ import cli.MonoTouch.UIKit.UIDeviceOrientation;
 import cli.OpenTK.Graphics.ES20.*; // a zillion little types
 
 import pythagoras.f.FloatMath;
+import pythagoras.i.Rectangle;
 
 import playn.core.InternalTransform;
 import playn.core.PlayN;
@@ -185,29 +186,36 @@ public class IOSGLContext extends GLContext {
   @Override
   public void startClipped(int x, int y, int width, int height) {
     flush(); // flush any pending unclipped calls
+    Rectangle r;
     switch (orient) {
     default:
     case UIDeviceOrientation.Portrait:
-      GL.Scissor(x, curFbufHeight-y-height, width, height);
+      r = pushScissorState(x, curFbufHeight-y-height, width, height);
       break;
     case UIDeviceOrientation.PortraitUpsideDown:
-      GL.Scissor(x-width, curFbufHeight-y, width, height);
+      r = pushScissorState(x-width, curFbufHeight-y, width, height);
       break;
     case UIDeviceOrientation.LandscapeLeft:
-      GL.Scissor(x-width, curFbufHeight-y-height, width, height);
+      r = pushScissorState(x-width, curFbufHeight-y-height, width, height);
       break;
     case UIDeviceOrientation.LandscapeRight:
-      GL.Scissor(x, curFbufHeight-y, width, height);
+      r = pushScissorState(x, curFbufHeight-y, width, height);
       break;
     }
+    GL.Scissor(r.x, r.y, r.width, r.height);
     checkGLError("GL.Scissor");
-    GL.Enable(EnableCap.wrap(EnableCap.ScissorTest));
+    if (getScissorDepth() == 1) GL.Enable(EnableCap.wrap(EnableCap.ScissorTest));
   }
 
   @Override
   public void endClipped() {
     flush(); // flush our clipped calls with SCISSOR_TEST still enabled
-    GL.Disable(EnableCap.wrap(EnableCap.ScissorTest));
+    Rectangle r = popScissorState();
+    if (r == null) GL.Disable(EnableCap.wrap(EnableCap.ScissorTest));
+    else {
+        GL.Scissor(r.x, r.y, r.width, r.height);
+        checkGLError("GL.Scissor");
+    }
   }
 
   @Override
