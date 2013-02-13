@@ -31,6 +31,7 @@ class JsonWriterBase<SELF extends JsonSink<SELF>> implements JsonSink<SELF> {
   private Stack<Boolean> states = new Stack<Boolean>();
   private boolean first = true;
   private boolean inObject;
+  private boolean verboseFormat;
 
   JsonWriterBase(Appendable appendable) {
     this.appendable = appendable;
@@ -42,6 +43,15 @@ class JsonWriterBase<SELF extends JsonSink<SELF>> implements JsonSink<SELF> {
   @SuppressWarnings("unchecked")
   private SELF castThis() {
     return (SELF) this;
+  }
+
+  /**
+   * Tells the writer whether to use a verbose, more human-readable {@link String}
+   * representation.
+   */
+  public SELF useVerboseFormat(boolean verboseFormat) {
+      this.verboseFormat = verboseFormat;
+      return castThis();
   }
 
   @Override
@@ -251,6 +261,8 @@ class JsonWriterBase<SELF extends JsonSink<SELF>> implements JsonSink<SELF> {
     inObject = false;
     first = true;
     raw('[');
+    if (verboseFormat)
+      raw('\n');
     return castThis();
   }
 
@@ -261,6 +273,8 @@ class JsonWriterBase<SELF extends JsonSink<SELF>> implements JsonSink<SELF> {
     inObject = true;
     first = true;
     raw('{');
+    if (verboseFormat)
+      raw('\n');
     return castThis();
   }
 
@@ -271,6 +285,8 @@ class JsonWriterBase<SELF extends JsonSink<SELF>> implements JsonSink<SELF> {
     inObject = false;
     first = true;
     raw('[');
+    if (verboseFormat)
+      raw('\n');
     return castThis();
   }
 
@@ -281,6 +297,8 @@ class JsonWriterBase<SELF extends JsonSink<SELF>> implements JsonSink<SELF> {
     inObject = true;
     first = true;
     raw('{');
+    if (verboseFormat)
+      raw('\n');
     return castThis();
   }
 
@@ -289,14 +307,22 @@ class JsonWriterBase<SELF extends JsonSink<SELF>> implements JsonSink<SELF> {
     if (states.size() == 0)
       throw new JsonWriterException("Invalid call to end()");
 
-    if (inObject) {
+    boolean wasInObject = inObject;
+
+    first = false;
+    inObject = states.pop();
+
+    if (verboseFormat) {
+      raw('\n');
+      indent();
+    }
+
+    if (wasInObject) {
       raw('}');
     } else {
       raw(']');
     }
 
-    first = false;
-    inObject = states.pop();
     return castThis();
   }
 
@@ -311,6 +337,13 @@ class JsonWriterBase<SELF extends JsonSink<SELF>> implements JsonSink<SELF> {
       throw new JsonWriterException("Unclosed JSON objects and/or arrays when closing writer");
     if (first)
       throw new JsonWriterException("Nothing was written to the JSON writer");
+  }
+
+  private void indent() {
+    // indent 2 spaces per level we've descended
+    for (int level=0; level < states.size(); ++level) {
+      raw("  ");
+    }
   }
 
   private void raw(String s) {
@@ -336,7 +369,11 @@ class JsonWriterBase<SELF extends JsonSink<SELF>> implements JsonSink<SELF> {
       if (states.size() == 0)
         throw new JsonWriterException("Invalid call to emit a value in a finished JSON writer");
       raw(',');
+      if (verboseFormat)
+        raw('\n');
     }
+    if (verboseFormat)
+      indent();
   }
 
   private void preValue() {

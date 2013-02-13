@@ -34,6 +34,12 @@ public interface Json {
      * {@link String}.
      */
     String write();
+
+    /**
+     * Tells the writer whether to use a verbose, more human-readable {@link String}
+     * representation.
+     */
+    Writer useVerboseFormat(boolean verbose);
   }
 
   /**
