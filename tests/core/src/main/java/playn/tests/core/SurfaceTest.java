@@ -54,6 +54,12 @@ public class SurfaceTest extends Test {
     watcher.start();
   }
 
+  @Override
+  public void dispose() {
+    dots.clear();
+    paintUpped = null;
+  }
+
   protected void addTests (final Image orange, Image tile) {
     final Pattern pattern = tile.toPattern();
 
