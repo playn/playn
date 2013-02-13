@@ -76,12 +76,13 @@ public class ShaderTest extends Test {
 
           "uniform sampler2D u_Texture;\n" +
           "varying vec2 v_TexCoord;\n" +
-          "uniform float u_Alpha;\n" +
+          "varying vec4 v_Color;\n" +
 
           "void main(void) {\n" +
           "  vec4 textureColor = texture2D(u_Texture, v_TexCoord);\n" +
+          "  textureColor.rgb *= v_Color.rgb;\n" +
           "  float grey = dot(textureColor.rgb, vec3(0.299, 0.587, 0.114));\n" +
-          "  gl_FragColor = vec4(grey * vec3(1.2, 1.0, 0.8), textureColor.a) * u_Alpha;\n" +
+          "  gl_FragColor = vec4(grey * vec3(1.2, 1.0, 0.8), textureColor.a) * v_Color.a;\n" +
           "}";
       }
     });
@@ -90,14 +91,11 @@ public class ShaderTest extends Test {
     // create a shader that rotates things around the (3D) y axis
     IndexedTrisShader rotShader = new IndexedTrisShader(graphics().ctx()) {
       @Override protected String vertexShader() {
-        return "uniform vec2 u_ScreenSize;\n" +
+        return VERT_UNIFS +
           "uniform float u_Angle;\n" +
           "uniform vec2 u_Eye;\n" +
-          "attribute vec4 a_Matrix;\n" +
-          "attribute vec2 a_Translation;\n" +
-          "attribute vec2 a_Position;\n" +
-          "attribute vec2 a_TexCoord;\n" +
-          "varying vec2 v_TexCoord;\n" +
+          VERT_ATTRS +
+          VERT_VARS +
 
           "void main(void) {\n" +
           // Rotate the vertex per our 3D rotation
@@ -134,7 +132,8 @@ public class ShaderTest extends Test {
           "  pos.y = 1.0 - pos.y;\n" +
           "  gl_Position = pos;\n" +
 
-          "  v_TexCoord = a_TexCoord;\n" +
+          VERT_SETTEX +
+          VERT_SETCOLOR +
           "}";
       }
 

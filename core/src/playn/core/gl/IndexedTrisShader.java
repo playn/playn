@@ -20,40 +20,59 @@ package playn.core.gl;
  */
 public class IndexedTrisShader extends GLShader {
 
-  /** The GLSL code for our vertex shader. */
-  public static final String VERTEX_SHADER =
-    "uniform vec2 u_ScreenSize;\n" +
+  /** Declares the uniform variables for our shader. */
+  public static final String VERT_UNIFS =
+    "uniform vec2 u_ScreenSize;\n";
 
+  /** Declares the attribute variables for our shader. */
+  public static final String VERT_ATTRS =
     "attribute vec4 a_Matrix;\n" +
     "attribute vec2 a_Translation;\n" +
     "attribute vec2 a_Position;\n" +
     "attribute vec2 a_TexCoord;\n" +
-    "attribute vec2 a_Tint;\n" +
+    "attribute vec2 a_Tint;\n";
 
+  /** Declares the varying variables for our shader. */
+  public static final String VERT_VARS =
     "varying vec2 v_TexCoord;\n" +
-    "varying vec4 v_Color;\n" +
+    "varying vec4 v_Color;\n";
 
-    "void main(void) {\n" +
+  /** The shader code that computes {@code gl_Position}. */
+  public static final String VERT_SETPOS =
     // Transform the vertex.
-    "  mat3 transform = mat3(\n" +
-    "    a_Matrix[0], a_Matrix[1], 0,\n" +
-    "    a_Matrix[2], a_Matrix[3], 0,\n" +
-    "    a_Translation[0], a_Translation[1], 1);\n" +
-    "  gl_Position = vec4(transform * vec3(a_Position, 1.0), 1);\n" +
+    "mat3 transform = mat3(\n" +
+    "  a_Matrix[0], a_Matrix[1], 0,\n" +
+    "  a_Matrix[2], a_Matrix[3], 0,\n" +
+    "  a_Translation[0], a_Translation[1], 1);\n" +
+    "gl_Position = vec4(transform * vec3(a_Position, 1.0), 1);\n" +
     // Scale from screen coordinates to [0, 2].
-    "  gl_Position.xy /= (u_ScreenSize.xy / 2.0);\n" +
+    "gl_Position.xy /= (u_ScreenSize.xy / 2.0);\n" +
     // Offset to [-1, 1] and flip y axis to put origin at top-left.
-    "  gl_Position.x -= 1.0;\n" +
-    "  gl_Position.y = 1.0 - gl_Position.y;\n" +
+    "gl_Position.x -= 1.0;\n" +
+    "gl_Position.y = 1.0 - gl_Position.y;\n";
 
-    "  v_TexCoord = a_TexCoord;\n" +
+  /** The shader code that computes {@code v_TexCoord}. */
+  public static final String VERT_SETTEX =
+    "v_TexCoord = a_TexCoord;\n";
 
+  /** The shader code that computes {@code v_Color}. */
+  public static final String VERT_SETCOLOR =
     // tint is encoded as two floats A*R and G*B where A, R, G, B are (0 - 255)
-    "  float red = mod(a_Tint.x, 256.0);\n" +
-    "  float alpha = (a_Tint.x - red) / 256.0;\n" +
-    "  float blue = mod(a_Tint.y, 256.0);\n" +
-    "  float green = (a_Tint.y - blue) / 256.0;\n" +
-    "  v_Color = vec4(red / 255.0, green / 255.0, blue / 255.0, alpha / 255.0);\n" +
+    "float red = mod(a_Tint.x, 256.0);\n" +
+    "float alpha = (a_Tint.x - red) / 256.0;\n" +
+    "float blue = mod(a_Tint.y, 256.0);\n" +
+    "float green = (a_Tint.y - blue) / 256.0;\n" +
+    "v_Color = vec4(red / 255.0, green / 255.0, blue / 255.0, alpha / 255.0);\n";
+
+  /** The GLSL code for our vertex shader. */
+  public static final String VERTEX_SHADER =
+    VERT_UNIFS +
+    VERT_ATTRS +
+    VERT_VARS +
+    "void main(void) {\n" +
+    VERT_SETPOS +
+    VERT_SETTEX +
+    VERT_SETCOLOR +
     "}";
 
   private static final int VERTEX_SIZE = 12; // 12 floats per vertex
