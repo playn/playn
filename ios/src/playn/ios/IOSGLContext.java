@@ -78,7 +78,7 @@ public class IOSGLContext extends GLContext {
     case UIDeviceOrientation.Portrait:
       return false;
     case UIDeviceOrientation.PortraitUpsideDown:
-      rootTransform.translate(-viewWidth, -viewHeight);
+      rootTransform.translate(viewWidth, viewHeight);
       rootTransform.scale(-1, -1);
       return false;
     case UIDeviceOrientation.LandscapeLeft:
