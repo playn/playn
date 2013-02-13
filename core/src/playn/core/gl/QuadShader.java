@@ -26,33 +26,43 @@ public class QuadShader extends GLShader {
   /** The GLSL code for quad-specific vertex shader. */
   public static final String VERTEX_SHADER =
     "uniform vec2 u_ScreenSize;\n" +
-    "uniform vec4 u_Data[3*_MAX_QUADS_];\n" +
+    "uniform vec4 u_Data[_VEC4S_PER_QUAD_*_MAX_QUADS_];\n" +
+
     "attribute vec3 a_Vertex;\n" +
+
     "varying vec2 v_TexCoord;\n" +
+    "varying vec4 v_Color;\n" +
 
     "void main(void) {\n" +
     // Extract the transform &c data for this quad.
-    "int index = 3*int(a_Vertex.z);\n" +
-    "vec4 mat = u_Data[index+0];\n" +
-    "vec4 txc = u_Data[index+1];\n" +
-    "vec4 tcs = u_Data[index+2];\n" +
+    "  int index = _VEC4S_PER_QUAD_*int(a_Vertex.z);\n" +
+    "  vec4 mat = u_Data[index+0];\n" +
+    "  vec4 txc = u_Data[index+1];\n" +
+    "  vec4 tcs = u_Data[index+2];\n" +
+
+    // tint is encoded as two floats A*R and G*B where A, R, G, B are (0 - 255)
+    "  float red = mod(tcs.z, 256.0);\n" +
+    "  float alpha = (tcs.z - red) / 256.0;\n" +
+    "  float blue = mod(tcs.w, 256.0);\n" +
+    "  float green = (tcs.w - blue) / 256.0;\n" +
+    "  v_Color = vec4(red / 255.0, green / 255.0, blue / 255.0, alpha / 255.0);\n" +
 
     // Transform the vertex.
-    "mat3 transform = mat3(\n" +
-    "  mat.x, mat.y, 0,\n" +
-    "  mat.z, mat.w, 0,\n" +
-    "  txc.x, txc.y, 1);\n" +
-    "gl_Position = vec4(transform * vec3(a_Vertex.xy, 1), 1);\n" +
+    "  mat3 transform = mat3(\n" +
+    "    mat.x, mat.y, 0,\n" +
+    "    mat.z, mat.w, 0,\n" +
+    "    txc.x, txc.y, 1);\n" +
+    "  gl_Position = vec4(transform * vec3(a_Vertex.xy, 1), 1);\n" +
 
     // Scale from screen coordinates to [0, 2].
-    "gl_Position.xy /= u_ScreenSize.xy;\n" +
+    "  gl_Position.xy /= u_ScreenSize.xy;\n" +
 
     // Offset to [-1, 1] and flip y axis to put origin at top-left.
-    "gl_Position.x -= 1.0;\n" +
-    "gl_Position.y = 1.0 - gl_Position.y;\n" +
+    "  gl_Position.x -= 1.0;\n" +
+    "  gl_Position.y = 1.0 - gl_Position.y;\n" +
 
     // Compute our texture coordinate.
-    "v_TexCoord = a_Vertex.xy * tcs.xy + txc.zw;\n" +
+    "  v_TexCoord = a_Vertex.xy * tcs.xy + txc.zw;\n" +
     "}";
 
   private static final int VERTICES_PER_QUAD = 4;
@@ -100,7 +110,8 @@ public class QuadShader extends GLShader {
    * remove or change the defaults.
    */
   protected String vertexShader() {
-    return VERTEX_SHADER.replace("_MAX_QUADS_", ""+maxQuads);
+    return VERTEX_SHADER.replace("_MAX_QUADS_", ""+maxQuads).
+      replace("_VEC4S_PER_QUAD_", ""+VEC4S_PER_QUAD);
   }
 
   @Override
@@ -119,7 +130,9 @@ public class QuadShader extends GLShader {
     private final Attrib aVertices;
     private final GLBuffer.Float verts, data;
     private final GLBuffer.Short elems;
+
     private int quadCounter;
+    private float arTint, gbTint;
 
     public QuadCore(String vertShader, String fragShader) {
       super(vertShader, fragShader);
@@ -152,12 +165,18 @@ public class QuadShader extends GLShader {
     }
 
     @Override
-    public void prepare(int fbufWidth, int fbufHeight) {
+    public void activate(int fbufWidth, int fbufHeight) {
       prog.bind();
       uScreenSize.bind(fbufWidth/2f, fbufHeight/2f);
       verts.bind(GL_ARRAY_BUFFER);
       aVertices.bind(0, 0);
       elems.bind(GL_ELEMENT_ARRAY_BUFFER);
+    }
+
+    @Override
+    public void prepare(int tint, boolean justActivated) {
+      this.arTint = (tint >> 16) & 0xFFFF;
+      this.gbTint = tint & 0xFFFF;
     }
 
     @Override
@@ -187,7 +206,7 @@ public class QuadShader extends GLShader {
       data.add(m00*dw, m01*dw, m10*dh, m11*dh, tx + m00*x1 + m10*y1, ty + m01*x1 + m11*y1);
       data.add(sx1, sy1);
       data.add(sx2 - sx1, sy3 - sy1);
-      data.skip(2);
+      data.add(arTint, gbTint);
       quadCounter++;
 
       if (quadCounter >= maxQuads)

@@ -77,9 +77,9 @@ class HtmlLayerDom extends AbstractLayer {
 
   @Override
   public Layer setAlpha(float alpha) {
-    if (this.alpha != alpha) {
+    if (alpha() != alpha) {
       super.setAlpha(alpha);
-      elem.getStyle().setOpacity(this.alpha);
+      elem.getStyle().setOpacity(alpha);
     }
     return this;
   }

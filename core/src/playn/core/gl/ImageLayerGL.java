@@ -17,6 +17,7 @@ import playn.core.Asserts;
 import playn.core.Image;
 import playn.core.ImageLayer;
 import playn.core.InternalTransform;
+import playn.core.Tint;
 
 public class ImageLayerGL extends LayerGL implements ImageLayer {
 
@@ -106,11 +107,13 @@ public class ImageLayerGL extends LayerGL implements ImageLayer {
   }
 
   @Override
-  public void paint(InternalTransform curTransform, float curAlpha, GLShader curShader) {
+  public void paint(InternalTransform curTransform, int curTint, GLShader curShader) {
     if (!visible() || img == null) return;
 
+    if (tint != Tint.NOOP_TINT)
+      curTint = Tint.combine(curTint, tint);
     img.draw((shader == null) ? curShader : shader, localTransform(curTransform),
-             0, 0, width(), height(), repeatX, repeatY, curAlpha * alpha);
+             0, 0, width(), height(), repeatX, repeatY, curTint);
   }
 
   @Override

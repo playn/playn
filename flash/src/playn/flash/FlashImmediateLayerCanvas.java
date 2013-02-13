@@ -90,7 +90,7 @@ class FlashImmediateLayerCanvas extends FlashLayer implements ImmediateLayer {
 
     ctx.save();
     transform(ctx);
-    ctx.setGlobalAlpha(parentAlpha * alpha);
+    ctx.setGlobalAlpha(parentAlpha * alpha());
     render(ctx);
     ctx.restore();
   }

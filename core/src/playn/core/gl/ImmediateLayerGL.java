@@ -20,6 +20,7 @@ import pythagoras.f.Vector;
 
 import playn.core.ImmediateLayer;
 import playn.core.InternalTransform;
+import playn.core.Tint;
 import static playn.core.PlayN.*;
 
 public class ImmediateLayerGL extends LayerGL implements ImmediateLayer {
@@ -115,14 +116,18 @@ public class ImmediateLayerGL extends LayerGL implements ImmediateLayer {
   }
 
   @Override
-  public void paint(InternalTransform curTransform, float curAlpha, GLShader curShader) {
+  public void paint(InternalTransform curTransform, int curTint, GLShader curShader) {
     if (!visible()) return;
+
     InternalTransform xform = localTransform(curTransform);
     surface.topTransform().set(xform);
-    surface.setAlpha(curAlpha * alpha);
+    if (tint != Tint.NOOP_TINT)
+      curTint = Tint.combine(curTint, tint);
+    surface.setTint(curTint);
     surface.setShader((shader == null) ? curShader : shader);
     render(xform);
     surface.setShader(null);
+    // TODO: restore tint?
   }
 
   protected void render(InternalTransform xform) {

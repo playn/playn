@@ -71,7 +71,7 @@ class HtmlSurfaceLayerCanvas extends HtmlLayerCanvas implements SurfaceLayer {
 
     ctx.save();
     transform(ctx);
-    ctx.setGlobalAlpha(parentAlpha * alpha);
+    ctx.setGlobalAlpha(parentAlpha * alpha());
     ctx.drawImage(canvas.canvas(), 0, 0);
     ctx.restore();
   }

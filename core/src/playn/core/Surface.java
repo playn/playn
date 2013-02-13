@@ -68,12 +68,26 @@ public interface Surface {
   Surface setTransform(float m11, float m12, float m21, float m22, float dx, float dy);
 
   /**
-   * Set the global alpha value to be used for all rendering.
+   * Set the alpha component of this surface's current tint. Note that this value will be quantized
+   * to an integer between 0 and 255. Also see {@link #setTint}.
+   *
    * <p>Values outside the range [0,1] will be clamped to the range [0,1].</p>
    *
    * @param alpha value in range [0,1] where 0 is transparent and 1 is opaque.
    */
   Surface setAlpha(float alpha);
+
+  /**
+   * Sets the tint for this layer, as {@code ARGB}.
+   *
+   * <p> <em>NOTE:</em> this will overwrite any value configured via {@link #setAlpha}. Either
+   * include your desired alpha in the high bits of {@code tint} or call {@link #setAlpha} after
+   * calling this method. </p>
+   *
+   * <p> <em>NOTE:</em> the RGB components of a layer's tint only work on GL-based backends. It is
+   * not possible to tint layers using the HTML5 canvas and Flash backends. </p>
+   */
+  Surface setTint(int tint);
 
   /**
    * Sets the color to be used for fill operations. This replaces any existing fill gradient or

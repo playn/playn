@@ -19,6 +19,7 @@ import playn.core.Asserts;
 import playn.core.Image;
 import playn.core.InternalTransform;
 import playn.core.Pattern;
+import playn.core.Tint;
 
 public abstract class ImageGL implements Image {
 
@@ -90,13 +91,13 @@ public abstract class ImageGL implements Image {
    * Draws this image with the supplied transform in the specified target dimensions.
    */
   void draw(GLShader shader, InternalTransform xform, float dx, float dy, float dw, float dh,
-            boolean repeatX, boolean repeatY, float alpha) {
+            boolean repeatX, boolean repeatY, int tint) {
     int tex = ensureTexture(repeatX, repeatY);
     if (tex > 0) {
       float sl = x(), st = y();
       float sr = sl + (repeatX ? dw : width()), sb = st + (repeatY ? dh : height());
       float texWidth = texWidth(repeatX), texHeight = texHeight(repeatY);
-      ctx.quadShader(shader).prepareTexture(tex, alpha).addQuad(
+      ctx.quadShader(shader).prepareTexture(tex, tint).addQuad(
         xform, dx, dy, dx + dw, dy + dh,
         sl / texWidth, st / texHeight, sr / texWidth, sb / texHeight);
     }
@@ -106,12 +107,12 @@ public abstract class ImageGL implements Image {
    * Draws this image with the supplied transform, and source and target dimensions.
    */
   void draw(GLShader shader, InternalTransform xform, float dx, float dy, float dw, float dh,
-            float sx, float sy, float sw, float sh, float alpha) {
+            float sx, float sy, float sw, float sh, int tint) {
     int tex = ensureTexture(false, false);
     if (tex > 0) {
       sx += x(); sy += y();
       float texWidth = texWidth(false), texHeight = texHeight(false);
-      ctx.quadShader(shader).prepareTexture(tex, alpha).addQuad(
+      ctx.quadShader(shader).prepareTexture(tex, tint).addQuad(
         xform, dx, dy, dx + dw, dy + dh,
         sx / texWidth, sy / texHeight, (sx + sw) / texWidth, (sy + sh) / texHeight);
     }
@@ -206,7 +207,7 @@ public abstract class ImageGL implements Image {
     try {
       // render the non-repeated texture into the framebuffer properly scaled
       ctx.clear(0, 0, 0, 0);
-      ctx.quadShader(null).prepareTexture(tex, 1).addQuad(
+      ctx.quadShader(null).prepareTexture(tex, Tint.NOOP_TINT).addQuad(
         ctx.createTransform(), 0, height, width, 0, 0, 0, 1, 1);
     } finally {
       // we no longer need this framebuffer; rebind the previous framebuffer and delete ours

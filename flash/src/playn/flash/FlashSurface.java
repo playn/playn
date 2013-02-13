@@ -144,6 +144,12 @@ public class FlashSurface implements Surface {
   }
 
   @Override
+  public Surface setTint(int tint) {
+    // NOOP: tint not supported in Flash backend
+    return this;
+  }
+
+  @Override
   public Surface setFillColor(int color) {
     context2d.setFillStyle("rgba("
                            + ((color >> 16) & 0xff) + ","

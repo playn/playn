@@ -31,6 +31,7 @@ import pythagoras.i.Rectangle;
 import playn.core.InternalTransform;
 import playn.core.PlayN;
 import playn.core.StockInternalTransform;
+import playn.core.Tint;
 import playn.core.gl.GL20;
 import playn.core.gl.GLBuffer;
 import playn.core.gl.GLContext;
@@ -316,7 +317,7 @@ public class IOSGLContext extends GLContext {
   void paintLayers(GroupLayerGL rootLayer) {
     checkGLError("updateLayers start");
     bindFramebuffer();
-    rootLayer.paint(rootTransform, 1, null); // paint all the layers
+    rootLayer.paint(rootTransform, Tint.NOOP_TINT, null); // paint all the layers
     checkGLError("updateLayers end");
     useShader(null, false); // guarantee a flush
     if (STATS_ENABLED) stats.frames++;

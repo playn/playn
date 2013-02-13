@@ -24,6 +24,7 @@ import playn.core.GroupLayerImpl;
 import playn.core.InternalTransform;
 import playn.core.Layer;
 import playn.core.ParentLayer;
+import playn.core.Tint;
 
 public class GroupLayerGL extends LayerGL implements GroupLayer, ParentLayer {
 
@@ -75,7 +76,7 @@ public class GroupLayerGL extends LayerGL implements GroupLayer, ParentLayer {
     }
 
     @Override
-    protected void render (InternalTransform xform, float alpha, GLShader shader) {
+    protected void render(InternalTransform xform, int curTint, GLShader shader) {
       xform.translate(originX, originY);
       xform.transform(pos.set(-originX, -originY), pos);
       xform.transform(size.set(width, height), size);
@@ -83,7 +84,7 @@ public class GroupLayerGL extends LayerGL implements GroupLayer, ParentLayer {
       ctx.startClipped((int) pos.x, (int) pos.y,
                        Math.round(Math.abs(size.x)), Math.round(Math.abs(size.y)));
       try {
-        super.render(xform, alpha, shader);
+        super.render(xform, curTint, shader);
       } finally {
         ctx.endClipped();
       }
@@ -157,16 +158,19 @@ public class GroupLayerGL extends LayerGL implements GroupLayer, ParentLayer {
   }
 
   @Override
-  public void paint(InternalTransform curTransform, float curAlpha, GLShader curShader) {
+  public void paint(InternalTransform curTransform, int curTint, GLShader curShader) {
     if (!visible()) return;
-    render(localTransform(curTransform), curAlpha * alpha, (shader == null) ? curShader : shader);
+
+    if (tint != Tint.NOOP_TINT)
+      curTint = Tint.combine(curTint, tint);
+    render(localTransform(curTransform), curTint, (shader == null) ? curShader : shader);
   }
 
-  protected void render(InternalTransform xform, float alpha, GLShader shader) {
+  protected void render(InternalTransform xform, int curTint, GLShader shader) {
     // iterate manually to avoid creating an Iterator as garbage, this is inner-loop territory
     List<LayerGL> children = impl.children;
     for (int ii = 0, ll = children.size(); ii < ll; ii++) {
-      children.get(ii).paint(xform, alpha, shader);
+      children.get(ii).paint(xform, curTint, shader);
     }
   }
 }

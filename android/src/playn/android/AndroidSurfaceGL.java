@@ -23,6 +23,7 @@ import java.nio.ByteBuffer;
 
 import playn.core.PlayN;
 import playn.core.StockInternalTransform;
+import playn.core.Tint;
 import playn.core.gl.GL20;
 import playn.core.gl.SurfaceGL;
 
@@ -63,7 +64,7 @@ public class AndroidSurfaceGL extends SurfaceGL
                              GL20.GL_RGBA, GL20.GL_UNSIGNED_BYTE, pixelBuffer);
         // bind our surface framebuffer and render the saved texture data into it
         bindFramebuffer();
-        ctx.quadShader(null).prepareTexture(bufferTex, 1).addQuad(
+        ctx.quadShader(null).prepareTexture(bufferTex, Tint.NOOP_TINT).addQuad(
           StockInternalTransform.IDENTITY, 0, texHeight, texWidth, 0, 0, 0, 1, 1);
         // rebind the default frame buffer (which will flush the rendering operation)
         ctx.bindFramebuffer();

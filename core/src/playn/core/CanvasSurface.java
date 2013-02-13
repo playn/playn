@@ -132,6 +132,12 @@ public class CanvasSurface implements Surface {
   }
 
   @Override
+  public Surface setTint(int tint) {
+    // NOOP: tint not supported by canvas-backends
+    return this;
+  }
+
+  @Override
   public Surface setFillColor(int color) {
     canvas.setFillColor(color);
     canvas.setStrokeColor(color);
@@ -146,7 +152,7 @@ public class CanvasSurface implements Surface {
 
   @Override
   public Surface setShader(GLShader shader) {
-    // NOOP
+    // NOOP: shaders not supported by canvas-backends
     return this;
   }
 

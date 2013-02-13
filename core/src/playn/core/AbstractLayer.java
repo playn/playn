@@ -14,6 +14,7 @@
 package playn.core;
 
 import pythagoras.f.FloatMath;
+import pythagoras.f.MathUtil;
 import pythagoras.f.Point;
 import pythagoras.f.Transform;
 
@@ -66,7 +67,7 @@ public abstract class AbstractLayer implements Layer {
   private GroupLayer parent;
 
   protected float originX, originY;
-  protected float alpha;
+  protected int tint;
   protected float depth;
   protected int flags;
   protected Interactor<?> rootInteractor;
@@ -78,7 +79,7 @@ public abstract class AbstractLayer implements Layer {
 
   protected AbstractLayer(InternalTransform transform) {
     this.transform = transform;
-    alpha = 1;
+    tint = Tint.NOOP_TINT;
     setFlag(Flag.VISIBLE, true);
   }
 
@@ -124,18 +125,24 @@ public abstract class AbstractLayer implements Layer {
 
   @Override
   public float alpha() {
-    return alpha;
+    return (tint >> 24) / (float)0xFF;
   }
 
   @Override
   public Layer setAlpha(float alpha) {
-    if (alpha < 0) {
-      this.alpha = 0;
-    } else if (alpha > 1) {
-      this.alpha = 1;
-    } else {
-      this.alpha = alpha;
-    }
+    int ialpha = (int)(0xFF * MathUtil.clamp(alpha, 0, 1));
+    this.tint = (ialpha << 24) | (tint & 0xFFFFFF);
+    return this;
+  }
+
+  @Override
+  public int tint() {
+    return tint;
+  }
+
+  @Override
+  public Layer setTint(int tint) {
+    this.tint = tint;
     return this;
   }
 

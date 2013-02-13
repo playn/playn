@@ -17,9 +17,11 @@ package playn.core.gl;
 
 import java.nio.ByteBuffer;
 
+import pythagoras.i.Rectangle;
+
 import playn.core.InternalTransform;
 import playn.core.Platform;
-import pythagoras.i.Rectangle;
+import playn.core.Tint;
 import static playn.core.PlayN.log;
 import static playn.core.gl.GL20.*;
 
@@ -71,7 +73,7 @@ public class GL20Context extends GLContext {
   public void paintLayers(GroupLayerGL rootLayer) {
     checkGLError("paintLayers");
     bindFramebuffer();
-    rootLayer.paint(rootXform, 1, null); // paint all the layers
+    rootLayer.paint(rootXform, Tint.NOOP_TINT, null); // paint all the layers
     useShader(null, false); // flush any pending shader
     if (STATS_ENABLED) stats.frames++;
   }

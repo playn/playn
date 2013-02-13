@@ -16,6 +16,7 @@
 package playn.core.gl;
 
 import playn.core.InternalTransform;
+import playn.core.Tint;
 import playn.core.gl.GLShader;
 
 public class SurfaceGL extends AbstractSurfaceGL {
@@ -44,11 +45,13 @@ public class SurfaceGL extends AbstractSurfaceGL {
     return height;
   }
 
-  protected void paint(InternalTransform xform, float alpha, GLShader shader) {
+  protected void paint(InternalTransform xform, int curTint, GLShader shader) {
+    if (tint != Tint.NOOP_TINT)
+      curTint = Tint.combine(curTint, tint);
     // Draw this layer to the screen upside-down, because its contents are flipped (This happens
     // because it uses the same vertex program as everything else, which flips vertically to put
     // the origin at the top-left).
-    ctx.quadShader(shader).prepareTexture(tex, alpha).addQuad(
+    ctx.quadShader(shader).prepareTexture(tex, curTint).addQuad(
       xform, 0, height, width, 0, 0, 0, 1, 1);
   }
 

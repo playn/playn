@@ -26,6 +26,7 @@ import playn.core.Image;
 import playn.core.InternalTransform;
 import playn.core.Pattern;
 import playn.core.Surface;
+import playn.core.Tint;
 
 /**
  * The bulk of the {@link Surface} implementation, shared by {@link SurfaceGL} which renders into a
@@ -37,7 +38,7 @@ abstract class AbstractSurfaceGL implements Surface {
   protected final List<InternalTransform> transformStack = new ArrayList<InternalTransform>();
 
   protected int fillColor;
-  protected float alpha = 1;
+  protected int tint = Tint.NOOP_TINT;
   protected ImageGL fillPattern;
   protected GLShader shader;
 
@@ -64,7 +65,7 @@ abstract class AbstractSurfaceGL implements Surface {
   public Surface drawImage(Image image, float x, float y, float dw, float dh) {
     bindFramebuffer();
     ((ImageGL) image).draw(shader, topTransform(), x, y, dw, dh,
-                           0, 0, image.width(), image.height(), alpha);
+                           0, 0, image.width(), image.height(), tint);
     return this;
   }
 
@@ -72,7 +73,7 @@ abstract class AbstractSurfaceGL implements Surface {
   public Surface drawImage(Image image, float dx, float dy, float dw, float dh,
                            float sx, float sy, float sw, float sh) {
     bindFramebuffer();
-    ((ImageGL) image).draw(shader, topTransform(), dx, dy, dw, dh, sx, sy, sw, sh, alpha);
+    ((ImageGL) image).draw(shader, topTransform(), dx, dy, dw, dh, sx, sy, sw, sh, tint);
     return this;
   }
 
@@ -109,12 +110,12 @@ abstract class AbstractSurfaceGL implements Surface {
     if (fillPattern != null) {
       int tex = fillPattern.ensureTexture(true, true);
       if (tex > 0) {
-        shader.prepareTexture(tex, alpha);
+        shader.prepareTexture(tex, tint);
         shader.addQuad(l, 0, 0, length, width,
                        0, 0, length/fillPattern.width(), width/fillPattern.height());
       }
     } else {
-      shader.prepareColor(fillColor, alpha);
+      shader.prepareColor(Tint.combine(fillColor, tint));
       shader.addQuad(l, 0, 0, length, width, 0, 0, 1, 1);
     }
     return this;
@@ -128,12 +129,12 @@ abstract class AbstractSurfaceGL implements Surface {
     if (fillPattern != null) {
       int tex = fillPattern.ensureTexture(true, true);
       if (tex > 0) {
-        shader.prepareTexture(tex, alpha);
+        shader.prepareTexture(tex, tint);
         float tw = fillPattern.width(), th = fillPattern.height(), r = x+width, b = y+height;
         shader.addQuad(topTransform(), x, y, x+width, y+height, x / tw, y / th, r / tw, b / th);
       }
     } else {
-      shader.prepareColor(fillColor, alpha);
+      shader.prepareColor(Tint.combine(fillColor, tint));
       shader.addQuad(topTransform(), x, y, x+width, y+height, 0, 0, 1, 1);
     }
     return this;
@@ -147,11 +148,11 @@ abstract class AbstractSurfaceGL implements Surface {
     if (fillPattern != null) {
       int tex = fillPattern.ensureTexture(true, true);
       if (tex > 0) {
-        shader.prepareTexture(tex, alpha);
+        shader.prepareTexture(tex, tint);
         shader.addTriangles(topTransform(), xys, fillPattern.width(), fillPattern.height(), indices);
       }
     } else {
-      shader.prepareColor(fillColor, alpha);
+      shader.prepareColor(Tint.combine(fillColor, tint));
       shader.addTriangles(topTransform(), xys, 1, 1, indices);
     }
     return this;
@@ -165,7 +166,7 @@ abstract class AbstractSurfaceGL implements Surface {
       throw new IllegalStateException("No fill pattern currently set");
     int tex = fillPattern.ensureTexture(true, true);
     if (tex > 0) {
-      GLShader shader = ctx.trisShader(this.shader).prepareTexture(tex, alpha);
+      GLShader shader = ctx.trisShader(this.shader).prepareTexture(tex, tint);
       shader.addTriangles(topTransform(), xys, sxys, indices);
     }
     return this;
@@ -206,7 +207,14 @@ abstract class AbstractSurfaceGL implements Surface {
 
   @Override
   public Surface setAlpha(float alpha) {
-    this.alpha = MathUtil.clamp(alpha, 0, 1);
+    int ialpha = (int)(0xFF * MathUtil.clamp(alpha, 0, 1));
+    this.tint = (ialpha << 24) | (tint & 0xFFFFFF);
+    return this;
+  }
+
+  @Override
+  public Surface setTint(int tint) {
+    this.tint = tint;
     return this;
   }
 

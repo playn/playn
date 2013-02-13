@@ -104,7 +104,7 @@ class HtmlImageLayerCanvas extends HtmlLayerCanvas implements ImageLayer {
 
     ctx.save();
     transform(ctx);
-    ctx.setGlobalAlpha(parentAlpha * alpha);
+    ctx.setGlobalAlpha(parentAlpha * alpha());
 
     float width = width();
     float height = height();

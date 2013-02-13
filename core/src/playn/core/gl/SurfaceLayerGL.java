@@ -17,6 +17,7 @@ import playn.core.Asserts;
 import playn.core.InternalTransform;
 import playn.core.Surface;
 import playn.core.SurfaceLayer;
+import playn.core.Tint;
 
 public class SurfaceLayerGL extends LayerGL implements SurfaceLayer {
 
@@ -44,10 +45,11 @@ public class SurfaceLayerGL extends LayerGL implements SurfaceLayer {
   }
 
   @Override
-  public void paint(InternalTransform parentTransform, float parentAlpha, GLShader curShader) {
+  public void paint(InternalTransform parentTransform, int curTint, GLShader curShader) {
     if (!visible()) return;
-    surface.paint(localTransform(parentTransform), parentAlpha * alpha,
-                  (shader == null) ? curShader : shader);
+    if (tint != Tint.NOOP_TINT)
+      curTint = Tint.combine(curTint, tint);
+    surface.paint(localTransform(parentTransform), curTint, (shader == null) ? curShader : shader);
   }
 
   @Override

@@ -17,6 +17,7 @@ package playn.core.gl;
 
 import playn.core.Asserts;
 import playn.core.Image;
+import playn.core.Tint;
 import playn.core.util.Callback;
 
 public abstract class ImageRegionGL extends ImageGL implements Image.Region {
@@ -171,7 +172,7 @@ public abstract class ImageRegionGL extends ImageGL implements Image.Region {
       ctx.clear(0, 0, 0, 0);
       float tw = texWidth(false), th = texHeight(false);
       float sl = this.x, st = this.y, sr = sl + this.width, sb = st + this.height;
-      GLShader shader = ctx.quadShader(null).prepareTexture(tex, 1);
+      GLShader shader = ctx.quadShader(null).prepareTexture(tex, Tint.NOOP_TINT);
       shader.addQuad(ctx.createTransform(), 0, height, width, 0,
                      sl / tw, st / th, sr / tw, sb / th);
     } finally {

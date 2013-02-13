@@ -157,8 +157,8 @@ public class ShaderTest extends Test {
         }
 
         @Override
-        public void prepare(int fbufWidth, int fbufHeight) {
-          super.prepare(fbufWidth, fbufHeight);
+        public void activate(int fbufWidth, int fbufHeight) {
+          super.activate(fbufWidth, fbufHeight);
           uAngle.bind(elapsed * FloatMath.PI);
           uEye.bind(0, orange.height()/2);
         }

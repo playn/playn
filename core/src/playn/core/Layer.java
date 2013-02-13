@@ -123,19 +123,37 @@ public interface Layer {
   float alpha();
 
   /**
-   * Set the global alpha value for this layer.
-   * <p>
-   * The global alpha value for a layer controls the opacity of the layer but does not affect the
-   * current drawing operation. I.e., when {@link Game#paint(float)} is called and the {@link Layer}
-   * is drawn, this alpha value is applied to the alpha channel of the Layer.
-   * <p>
-   * Values outside the range [0,1] will be clamped to the range [0,1].
+   * Sets the alpha component of this layer's current tint. Note that this value will be quantized
+   * to an integer between 0 and 255. Also see {@link #setTint}.
    *
-   * @param alpha alpha value in range [0,1] where 0 is transparent and 1 is opaque
+   * <p> Values outside the range [0,1] will be clamped to the range [0,1]. </p>
+   *
+   * @param alpha alpha value in range [0,1] where 0 is transparent and 1 is opaque.
    *
    * @return a reference to this layer for call chaining.
    */
   Layer setAlpha(float alpha);
+
+  /** Returns the current tint for this layer, as {@code ARGB}. */
+  int tint();
+
+  /**
+   * Sets the tint for this layer, as {@code ARGB}.
+   *
+   * <p> <em>NOTE:</em> this will overwrite any value configured via {@link #setAlpha}. Either
+   * include your desired alpha in the high bits of {@code tint} or call {@link #setAlpha} after
+   * calling this method. </p>
+   *
+   * <p> <em>NOTE:</em> the RGB components of a layer's tint only work on GL-based backends. It is
+   * not possible to tint layers using the HTML5 canvas and Flash backends. </p>
+   *
+   * <p> The tint for a layer controls the opacity of the layer but does not affect the current
+   * drawing operation. I.e., when {@link Game#paint(float)} is called and the {@link Layer} is
+   * drawn, this tint is applied when rendering the layer. </p>
+   *
+   * @return a reference to this layer for call chaining.
+   */
+  Layer setTint(int tint);
 
   /**
    * Returns the x-component of the layer's origin.
