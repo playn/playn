@@ -113,7 +113,7 @@ public class IndexedTrisShader extends GLShader {
     private final GLBuffer.Float vertices;
     private final GLBuffer.Short elements;
 
-    private float tint;
+    private int tint;
 
     public ITCore(String vertShader, String fragShader) {
       super(vertShader, fragShader);
@@ -150,7 +150,7 @@ public class IndexedTrisShader extends GLShader {
 
     @Override
     public void prepare(int tint, boolean justActivated) {
-      this.tint = Float.intBitsToFloat(tint);
+      this.tint = tint;
     }
 
     @Override
