@@ -107,6 +107,12 @@ public abstract class IOSGLBuffer implements GLBuffer {
     }
 
     @Override
+    public Float add(int value) {
+      data[position++] = java.lang.Float.intBitsToFloat(value);
+      return this;
+    }
+
+    @Override
     IntPtr pointer() {
       return handle.AddrOfPinnedObject();
     }

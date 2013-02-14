@@ -46,6 +46,11 @@ public interface GLBuffer {
      * @param length the number of values from {@code data} to add.
      * @return this buffer for call chaining. */
     Float add(float[] data, int offset, int length);
+
+    /** Adds an int to this float buffer. TODO: rename this buffer from Float to something that
+     * reflects that it's for passing general data to a shader (compared to the Short buffer which
+     * is for passing elements). */
+    Float add(int value);
   }
 
   /** A buffer of 16-bit unsigned integers. */
