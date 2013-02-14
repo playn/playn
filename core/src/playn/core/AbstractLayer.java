@@ -68,6 +68,10 @@ public abstract class AbstractLayer implements Layer {
 
   protected float originX, originY;
   protected int tint;
+  // we keep a copy of alpha as a float so that we can return the exact alpha passed to setAlpha()
+  // from alpha() to avoid funny business in clients due to the quantization; the actual alpha as
+  // rendered by the shader will be quantized, but the eye won't know the difference
+  protected float alpha;
   protected float depth;
   protected int flags;
   protected Interactor<?> rootInteractor;
@@ -125,11 +129,12 @@ public abstract class AbstractLayer implements Layer {
 
   @Override
   public float alpha() {
-    return (tint >> 24) / (float)0xFF;
+    return alpha;
   }
 
   @Override
   public Layer setAlpha(float alpha) {
+    this.alpha = alpha;
     int ialpha = (int)(0xFF * MathUtil.clamp(alpha, 0, 1));
     this.tint = (ialpha << 24) | (tint & 0xFFFFFF);
     return this;
@@ -143,6 +148,7 @@ public abstract class AbstractLayer implements Layer {
   @Override
   public Layer setTint(int tint) {
     this.tint = tint;
+    this.alpha = ((tint >> 24) & 0xFF) / 255f;
     return this;
   }
 
