@@ -128,8 +128,8 @@ public class QuadShader extends GLShader {
     private final Uniform2f uScreenSize;
     private final Uniform4fv uData;
     private final Attrib aVertices;
-    private final GLBuffer.Float verts, data;
-    private final GLBuffer.Short elems;
+    private final GLBuffer.Float data;
+    private final GLBuffer.Short verts, elems;
 
     private int quadCounter;
     private float arTint, gbTint;
@@ -142,10 +142,10 @@ public class QuadShader extends GLShader {
       // compile the shader and get our uniform and attribute
       uScreenSize = prog.getUniform2f("u_ScreenSize");
       uData = prog.getUniform4fv("u_Data");
-      aVertices = prog.getAttrib("a_Vertex", VERTEX_SIZE, GL_FLOAT);
+      aVertices = prog.getAttrib("a_Vertex", VERTEX_SIZE, GL_SHORT);
 
       // create our stock supply of unit quads and stuff them into our buffers
-      verts = ctx.createFloatBuffer(maxQuads*VERTICES_PER_QUAD*VERTEX_SIZE);
+      verts = ctx.createShortBuffer(maxQuads*VERTICES_PER_QUAD*VERTEX_SIZE);
       elems = ctx.createShortBuffer(maxQuads*ELEMENTS_PER_QUAD);
 
       for (int ii = 0; ii < maxQuads; ii++) {
