@@ -134,6 +134,13 @@ public abstract class IOSGLBuffer implements GLBuffer {
     }
 
     @Override
+    public Short add(int x, int y) {
+      data[position++] = (short) x;
+      data[position++] = (short) y;
+      return this;
+    }
+
+    @Override
     public void drawElements(int mode, int count) {
       GL.DrawElements(BeginMode.wrap(mode), count,
                       DrawElementsType.wrap(DrawElementsType.UnsignedShort), new IntPtr(0));

@@ -164,6 +164,12 @@ public abstract class GL20Buffer implements GLBuffer {
     }
 
     @Override
+    public Short add(int x, int y) {
+      buffer.put((short)x).put((short)y);
+      return this;
+    }
+
+    @Override
     public void drawElements(int mode, int count) {
       gl.glDrawElements(mode, count, GL20.GL_UNSIGNED_SHORT, 0);
     }
