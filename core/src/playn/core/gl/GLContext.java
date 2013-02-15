@@ -275,14 +275,14 @@ public abstract class GLContext {
    * Returns debugging info on the quad shader. Useful for performance analysis.
    */
   public String quadShaderInfo() {
-    return quadShader().toString();
+    return String.valueOf(quadShader());
   }
 
   /**
    * Returns debugging info on the triangles shader. Useful for performance analysis.
    */
   public String trisShaderInfo() {
-    return trisShader().toString();
+    return String.valueOf(trisShader());
   }
 
   /**
