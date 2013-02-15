@@ -130,6 +130,18 @@ public class TestsGame implements Game {
     root.add(createWhiteBackground());
 
     float gap = 20, x = gap, y = gap, maxHeight = 0;
+
+    String info = "Renderer: ";
+    if (graphics().ctx() == null) {
+      info += "canvas";
+    } else {
+      info += "gl (quads=" + graphics().ctx().quadShaderInfo() + " tris=" +
+        graphics().ctx().trisShaderInfo() + ")";
+    }
+    CanvasImage infoImg = Test.formatText(info, false);
+    graphics().rootLayer().addAt(graphics().createImageLayer(infoImg), x, y);
+    y += infoImg.height() + gap;
+
     for (Test test : tests) {
       ImageLayer button = createButton(test);
       if (x + button.width() > graphics().width() - gap) {

@@ -77,7 +77,7 @@ public abstract class Test implements Game {
     return y + layer.height();
   }
 
-  protected ImageLayer createDescripLayer(String descrip, float width) {
+  protected static ImageLayer createDescripLayer(String descrip, float width) {
     TextLayout layout = graphics().layoutText(
       descrip, TEXT_FMT.withWrapping(width, TextFormat.Alignment.CENTER));
     CanvasImage image = graphics().createImage(layout.width(), layout.height());
@@ -86,7 +86,7 @@ public abstract class Test implements Game {
     return graphics().createImageLayer(image);
   }
 
-  protected CanvasImage formatText (String text, boolean border) {
+  protected static CanvasImage formatText (String text, boolean border) {
     TextLayout layout = graphics().layoutText(text, TEXT_FMT);
     float margin = border ? 10 : 0;
     float width = layout.width()+2*margin, height = layout.height()+2*margin;
@@ -99,7 +99,7 @@ public abstract class Test implements Game {
     return image;
   }
 
-  protected ImageLayer createButton (String text, final Runnable onClick) {
+  protected static ImageLayer createButton (String text, final Runnable onClick) {
     CanvasImage image = formatText(text, true);
     ImageLayer button = graphics().createImageLayer(image);
     button.addListener(new Pointer.Adapter() {
