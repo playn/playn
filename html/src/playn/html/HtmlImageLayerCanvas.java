@@ -100,7 +100,7 @@ class HtmlImageLayerCanvas extends HtmlLayerCanvas implements ImageLayer {
 
   @Override
   public void paint(Context2d ctx, float parentAlpha) {
-    if (!visible() || !img.isReady()) return;
+    if (!visible() || img == null || !img.isReady()) return;
 
     ctx.save();
     transform(ctx);
