@@ -67,11 +67,11 @@ public abstract class AbstractLayer implements Layer {
   private GroupLayer parent;
 
   protected float originX, originY;
-  protected int tint;
+  protected int tint = Tint.NOOP_TINT;
   // we keep a copy of alpha as a float so that we can return the exact alpha passed to setAlpha()
   // from alpha() to avoid funny business in clients due to the quantization; the actual alpha as
   // rendered by the shader will be quantized, but the eye won't know the difference
-  protected float alpha;
+  protected float alpha = 1;
   protected float depth;
   protected int flags;
   protected Interactor<?> rootInteractor;
@@ -83,7 +83,6 @@ public abstract class AbstractLayer implements Layer {
 
   protected AbstractLayer(InternalTransform transform) {
     this.transform = transform;
-    tint = Tint.NOOP_TINT;
     setFlag(Flag.VISIBLE, true);
   }
 
