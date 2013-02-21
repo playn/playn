@@ -26,26 +26,9 @@ import playn.core.util.Callback;
 import static playn.core.PlayN.*;
 
 public class AlphaLayerTest extends Test {
-  GroupLayer rootLayer;
 
-  static float width = 100;
-  static float height = 100;
+  static float width = 100, height = 100;
   static int offset = 5;
-  static String imageSrc = "images/alphalayertest.png";
-  static String imageGroundTruthSrc = "images/alphalayertest_expected.png";
-
-  Image image1;
-  Image imageGroundTruth;
-  GroupLayer groupLayer;
-  ImageLayer imageLayer1;
-  SurfaceLayer surfaceLayer1;
-  ImageLayer canvasLayer1;
-  ImageLayer imageLayer2;
-  SurfaceLayer surfaceLayer2;
-  ImageLayer canvasLayer2;
-  ImageLayer canvasLayer3;
-  ImageLayer canvasLayer4;
-  ImageLayer groundTruthLayer;
 
   @Override
   public String getName() {
@@ -59,72 +42,93 @@ public class AlphaLayerTest extends Test {
 
   @Override
   public void init() {
-    rootLayer = graphics().rootLayer();
+    final GroupLayer rootLayer = graphics().rootLayer();
+    final float fullWidth = 6*width, fullHeight = 3*height;
 
     // add a half white, half blue background
-    SurfaceLayer bg = graphics().createSurfaceLayer((int) (5 * width), (int) (4 * height));
+    SurfaceLayer bg = graphics().createSurfaceLayer((int) fullWidth, (int) fullHeight);
     bg.surface().setFillColor(Color.rgb(255, 255, 255));
     bg.surface().fillRect(0, 0, bg.surface().width(), bg.surface().height());
     bg.surface().setFillColor(Color.rgb(0, 0, 255));
-    bg.surface().fillRect(0, bg.surface().height() / 2, bg.surface().width(),
-        bg.surface().height() / 2);
+    bg.surface().fillRect(0, 2*height, bg.surface().width(), height);
     rootLayer.add(bg);
 
+    addDescrip("all layers contained in group layer with a=0.5\n" +
+               "thus, fully composited a=0.25", offset, fullHeight+5, fullWidth);
+
     // add a 50% transparent group layer
-    groupLayer = graphics().createGroupLayer();
+    final GroupLayer groupLayer = graphics().createGroupLayer();
     groupLayer.setAlpha(0.5f);
     rootLayer.add(groupLayer);
 
-    image1 = assets().getImage(imageSrc);
-    image1.addCallback(new Callback<Image>() {
+    assets().getImage("images/alphalayertest.png").addCallback(new Callback<Image>() {
       @Override
       public void onSuccess(Image image) {
-        // once the image loads, create our layers
-        imageLayer1 = graphics().createImageLayer(image);
-        surfaceLayer1 = graphics().createSurfaceLayer(image.width(), image.height());
-        surfaceLayer1.surface().drawImage(image, 0, 0);
+        // add the layers over the white background
+        float x = offset;
+
+        groupLayer.addAt(graphics().createImageLayer(image).setAlpha(0.5f), x, offset);
+        addDescrip("image\nimg layer a=0.5", x, offset + height, width);
+        x += width;
+
+        SurfaceLayer surf1 = graphics().createSurfaceLayer(image.width(), image.height());
+        surf1.surface().setAlpha(0.5f).drawImage(image, 0, 0);
+        groupLayer.addAt(surf1, x, offset);
+        addDescrip("image a=0.5\nsurf layer a=1", x, offset + height, width);
+        x += width;
+
+        SurfaceLayer surf2 = graphics().createSurfaceLayer(image.width(), image.height());
+        surf2.surface().drawImage(image, 0, 0);
+        groupLayer.addAt(surf2.setAlpha(0.5f), x, offset);
+        addDescrip("image a=1\nsurf layer a=0.5", x, offset + height, width);
+        x += width;
+
         CanvasImage canvas1 = graphics().createImage(image.width(), image.height());
         canvas1.canvas().drawImage(image, 0, 0);
-        canvasLayer1 = graphics().createImageLayer(canvas1);
-        imageLayer2 = graphics().createImageLayer(image);
-        surfaceLayer2 = graphics().createSurfaceLayer(image.width(), image.height());
-        surfaceLayer2.surface().drawImage(image, 0, 0);
+        groupLayer.addAt(graphics().createImageLayer(canvas1).setAlpha(0.5f), x, offset);
+        addDescrip("canvas a=1\nimg layer a=0.5", x, offset + height, width);
+        x += width;
+
         CanvasImage canvas2 = graphics().createImage(image.width(), image.height());
-        canvas2.canvas().drawImage(image, 0, 0);
-        canvasLayer2 = graphics().createImageLayer(canvas2);
-        CanvasImage canvas3 = graphics().createImage(image.width(), image.height());
-        canvas3.canvas().drawImage(image, 0, 0);
-        canvasLayer3 = graphics().createImageLayer(canvas3);
-        canvasLayer3.setAlpha(0.5f);
-        CanvasImage canvas4 = graphics().createImage(image.width(), image.height());
-        canvas4.canvas().drawImage(image, 0, 0);
-        canvasLayer4 = graphics().createImageLayer(canvas4);
-        canvasLayer4.setAlpha(0.5f);
+        canvas2.canvas().setAlpha(0.5f).drawImage(image, 0, 0);
+        groupLayer.addAt(graphics().createImageLayer(canvas2), x, offset);
+        addDescrip("canvas a=0.5\nimg layer a=1", x, offset + height, width);
+        x += width;
 
-        // add layers to the groupLayer
-        imageLayer1.transform().translate(offset, offset);
-        imageLayer1.setAlpha(0.5f);
-        groupLayer.add(imageLayer1);
-        surfaceLayer1.transform().translate(offset + width, offset);
-        surfaceLayer1.setAlpha(0.5f);
-        groupLayer.add(surfaceLayer1);
-        canvasLayer1.transform().translate(offset + 2 * width, offset);
-        canvasLayer1.setAlpha(0.5f);
-        groupLayer.add(canvasLayer1);
-        canvasLayer3.transform().translate(offset + 3 * width, offset);
-        groupLayer.add(canvasLayer3);
+        // add the same layers over the blue background
+        x = offset;
 
-        imageLayer2.transform().translate(offset, offset + 2 * height);
-        imageLayer2.setAlpha(0.5f);
-        groupLayer.add(imageLayer2);
-        surfaceLayer2.transform().translate(offset + width, offset + 2 * height);
-        surfaceLayer2.setAlpha(0.5f);
-        groupLayer.add(surfaceLayer2);
-        canvasLayer2.transform().translate(offset + 2 * width, offset + 2 * height);
-        canvasLayer2.setAlpha(0.5f);
-        groupLayer.add(canvasLayer2);
-        canvasLayer4.transform().translate(offset + 3 * width, offset + 2 * height);
-        groupLayer.add(canvasLayer4);
+        groupLayer.addAt(graphics().createImageLayer(image).setAlpha(0.5f), x, offset + 2 * height);
+        x += width;
+
+        SurfaceLayer surf1b = graphics().createSurfaceLayer(image.width(), image.height());
+        surf1b.surface().setAlpha(0.5f).drawImage(image, 0, 0);
+        groupLayer.addAt(surf1b, x, offset + 2 * height);
+        x += width;
+
+        SurfaceLayer surf2b = graphics().createSurfaceLayer(image.width(), image.height());
+        surf2b.surface().drawImage(image, 0, 0);
+        groupLayer.addAt(surf2b.setAlpha(0.5f), x, offset + 2 * height);
+        x += width;
+
+        CanvasImage canvas1b = graphics().createImage(image.width(), image.height());
+        canvas1b.canvas().drawImage(image, 0, 0);
+        groupLayer.addAt(graphics().createImageLayer(canvas1b).setAlpha(0.5f),
+                         x, offset + 2 * height);
+        x += width;
+
+        CanvasImage canvas2b = graphics().createImage(image.width(), image.height());
+        canvas2b.canvas().setAlpha(0.5f).drawImage(image, 0, 0);
+        groupLayer.addAt(graphics().createImageLayer(canvas2b), x, offset + 2 * height);
+
+        // add some copies of the image at 1, 0.5, 0.25 and 0.125 alpha
+        x = offset + width;
+        for (float alpha : new float[] { 1, 1/2f, 1/4f, 1/8f }) {
+          float y = fullHeight+50;
+          rootLayer.addAt(graphics().createImageLayer(image).setAlpha(alpha), x, y);
+          addDescrip("image a=" + alpha, x, y+height/2, width/2);
+          x += width;
+        }
       }
 
       @Override
@@ -134,13 +138,11 @@ public class AlphaLayerTest extends Test {
     });
 
     // add ground truth of 25% opaque image
-    imageGroundTruth = assets().getImage(imageGroundTruthSrc);
-    imageGroundTruth.addCallback(new Callback<Image>() {
+    assets().getImage("images/alphalayertest_expected.png").addCallback(new Callback<Image>() {
       @Override
       public void onSuccess(Image image) {
-        groundTruthLayer = graphics().createImageLayer(image);
-        groundTruthLayer.transform().translate(4 * width, 0);
-        rootLayer.add(groundTruthLayer);
+        rootLayer.addAt(graphics().createImageLayer(image), 5*width, 0);
+        addDescrip("ground truth", 5*width, offset+height, width);
       }
 
       @Override
