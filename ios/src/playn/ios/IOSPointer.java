@@ -52,7 +52,7 @@ public class IOSPointer extends PointerImpl {
     Event.Impl ev = toPointerEvent(touches, event);
     if (ev != null) {
       onPointerEnd(ev, false);
-      _active = null;
+      _active = 0;
     }
   }
 
@@ -60,7 +60,7 @@ public class IOSPointer extends PointerImpl {
     Event.Impl ev = toPointerEvent(touches, event);
     if (ev != null) {
       onPointerCancel(ev, false);
-      _active = null;
+      _active = 0;
     }
   }
 
@@ -69,11 +69,12 @@ public class IOSPointer extends PointerImpl {
     touches.Enumerate(new NSSetEnumerator(new NSSetEnumerator.Method() {
       public void Invoke (NSObject obj, boolean[] stop) {
         UITouch touch = (UITouch) obj;
+        int handle = touch.get_Handle().ToInt32();
         // if we have an active touch, we only care about that touch
-        if (_active != null && touch != _active) {
+        if (_active != 0 && handle != _active) {
           stop[0] = false;
         } else {
-          _active = touch;
+          _active = handle;
           PointF loc = touch.LocationInView(touch.get_View());
           // transform the point based on our current scale
           IPoint xloc = graphics.transformTouch(loc.get_X(), loc.get_Y());
@@ -86,5 +87,5 @@ public class IOSPointer extends PointerImpl {
     return eventw[0];
   }
 
-  private UITouch _active;
+  private int _active;
 }
