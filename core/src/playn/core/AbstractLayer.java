@@ -350,6 +350,14 @@ public abstract class AbstractLayer implements Layer {
     this.parent = parent;
   }
 
+  public String toString () {
+    StringBuilder bldr = new StringBuilder(getClass().getSimpleName());
+    bldr.append(" [hashCode=").append(hashCode());
+    bldr.append(", tx=").append(transform());
+    if (hitTester != null) bldr.append(", hitTester=").append(hitTester);
+    return bldr.toString();
+  }
+
   protected boolean isSet(Flag flag) {
     return (flags & flag.bitmask) != 0;
   }
