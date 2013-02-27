@@ -147,6 +147,12 @@ public class IOSGLContext extends GLContext {
     int[] texw = new int[1];
     GL.GenTextures(1, texw);
     int tex = texw[0];
+    if (tex == 0) {
+      throw new IllegalStateException(
+        "Attempted to generate texture before GL was initialized. " +
+        "You cannot create and render SurfaceLayer in Game.init() on iOS.");
+    }
+
     TextureTarget tt = TextureTarget.wrap(TextureTarget.Texture2D);
     GL.BindTexture(tt, tex);
     GL.TexParameter(tt, TextureParameterName.wrap(TextureParameterName.TextureMinFilter), minFilter);
@@ -251,6 +257,12 @@ public class IOSGLContext extends GLContext {
     GL.GenFramebuffers(1, fbufw);
 
     int fbuf = fbufw[0];
+    if (fbuf == 0) {
+      throw new IllegalStateException(
+        "Attempted to generate frame buffer before GL was initialized. " +
+        "You cannot create SurfaceLayer in Game.init() on iOS.");
+    }
+
     GL.BindFramebuffer(FramebufferTarget.wrap(FramebufferTarget.Framebuffer), fbuf);
     GL.FramebufferTexture2D(FramebufferTarget.wrap(FramebufferTarget.Framebuffer),
                             FramebufferSlot.wrap(FramebufferSlot.ColorAttachment0),
