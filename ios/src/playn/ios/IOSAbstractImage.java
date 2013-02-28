@@ -36,6 +36,14 @@ import playn.core.util.Callback;
 public abstract class IOSAbstractImage extends ImageGL implements Image, IOSCanvas.Drawable {
 
   /**
+   * Creates a {@code UIImage} based on our underlying image data. This is useful when you need to
+   * pass PlayN images to iOS APIs.
+   */
+  public UIImage toUIImage() {
+    return UIImage.FromImage(cgImage());
+  }
+
+  /**
    * Returns a core graphics image that can be used to paint this image into a canvas.
    */
   protected abstract CGImage cgImage();
