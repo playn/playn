@@ -351,7 +351,8 @@ public abstract class AbstractLayer implements Layer {
   }
 
   public String toString () {
-    StringBuilder bldr = new StringBuilder(getClass().getSimpleName());
+    String cname = getClass().getName();
+    StringBuilder bldr = new StringBuilder(cname.substring(cname.lastIndexOf(".")+1));
     bldr.append(" [hashCode=").append(hashCode());
     bldr.append(", tx=").append(transform());
     if (hitTester != null) bldr.append(", hitTester=").append(hitTester);
