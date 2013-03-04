@@ -78,10 +78,11 @@ class AndroidNet extends NetImpl {
           HttpResponse response = httpclient.execute(req);
           StatusLine status = response.getStatusLine();
           int code = status.getStatusCode();
+          String body = EntityUtils.toString(response.getEntity());
           if (code == HttpStatus.SC_OK) {
-            platform.notifySuccess(callback, EntityUtils.toString(response.getEntity()));
+            platform.notifySuccess(callback, body);
           } else {
-            platform.notifyFailure(callback, new HttpException(code, status.getReasonPhrase()));
+            platform.notifyFailure(callback, new HttpException(code, body));
           }
         } catch (Exception e) {
           platform.notifyFailure(callback, e);
