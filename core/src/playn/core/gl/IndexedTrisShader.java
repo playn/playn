@@ -19,7 +19,6 @@ package playn.core.gl;
  * A {@link GLShader} implementation that decomposes quads into indexed triangles.
  */
 public class IndexedTrisShader extends GLShader {
-
   /** Declares the uniform variables for our shader. */
   public static final String VERT_UNIFS =
     "uniform vec2 u_ScreenSize;\n";
@@ -75,13 +74,24 @@ public class IndexedTrisShader extends GLShader {
     VERT_SETCOLOR +
     "}";
 
-  private static final int VERTEX_SIZE = 12; // floats per vertex
   private static final int START_VERTS = 16*4;
   private static final int EXPAND_VERTS = 16*4;
   private static final int START_ELEMS = 6*START_VERTS/4;
   private static final int EXPAND_ELEMS = 6*EXPAND_VERTS/4;
   private static final int FLOAT_SIZE_BYTES = 4;
-  private static final int VERTEX_STRIDE = VERTEX_SIZE * FLOAT_SIZE_BYTES;
+
+  /**
+   * Returns the floats per vertex.
+   */
+  protected int vertexSize ()
+  {
+      return 12;
+  }
+
+  protected int vertexStride ()
+  {
+      return vertexSize() * FLOAT_SIZE_BYTES;
+  }
 
   public IndexedTrisShader(GLContext ctx) {
     super(ctx);
@@ -132,7 +142,7 @@ public class IndexedTrisShader extends GLShader {
       aColor = prog.getAttrib("a_Color", 2, GL20.GL_FLOAT);
 
       // create our vertex and index buffers
-      vertices = ctx.createFloatBuffer(START_VERTS*VERTEX_SIZE);
+      vertices = ctx.createFloatBuffer(START_VERTS*vertexSize());
       elements = ctx.createShortBuffer(START_ELEMS);
     }
 
@@ -142,12 +152,14 @@ public class IndexedTrisShader extends GLShader {
       uScreenSize.bind(fbufWidth, fbufHeight);
 
       vertices.bind(GL20.GL_ARRAY_BUFFER);
-      aMatrix.bind(VERTEX_STRIDE, 0);
-      aTranslation.bind(VERTEX_STRIDE, 16);
-      aPosition.bind(VERTEX_STRIDE, 24);
+      aMatrix.bind(vertexStride(), 0);
+      aTranslation.bind(vertexStride(), 16);
+
+      aPosition.bind(vertexStride(), 24);
+
       if (aTexCoord != null)
-        aTexCoord.bind(VERTEX_STRIDE, 32);
-      aColor.bind(VERTEX_STRIDE, 40);
+        aTexCoord.bind(vertexStride(), 32);
+      aColor.bind(vertexStride(), 40);
 
       elements.bind(GL20.GL_ELEMENT_ARRAY_BUFFER);
       ctx.checkGLError("Shader.prepare bind");
@@ -180,6 +192,10 @@ public class IndexedTrisShader extends GLShader {
       elements.destroy();
     }
 
+    protected void addExtraVertexAttribs(GLBuffer.Float vertices) {
+      vertices.add(arTint, gbTint);
+    }
+
     @Override
     public void addQuad(float m00, float m01, float m10, float m11, float tx, float ty,
                         float x1, float y1, float sx1, float sy1,
@@ -187,10 +203,14 @@ public class IndexedTrisShader extends GLShader {
                         float x3, float y3, float sx3, float sy3,
                         float x4, float y4, float sx4, float sy4) {
       int vertIdx = beginPrimitive(4, 6);
-      vertices.add(m00, m01, m10, m11, tx, ty).add(x1, y1).add(sx1, sy1).add(arTint, gbTint);
-      vertices.add(m00, m01, m10, m11, tx, ty).add(x2, y2).add(sx2, sy2).add(arTint, gbTint);
-      vertices.add(m00, m01, m10, m11, tx, ty).add(x3, y3).add(sx3, sy3).add(arTint, gbTint);
-      vertices.add(m00, m01, m10, m11, tx, ty).add(x4, y4).add(sx4, sy4).add(arTint, gbTint);
+      vertices.add(m00, m01, m10, m11, tx, ty).add(x1, y1).add(sx1, sy1);
+      addExtraVertexAttribs(vertices);
+      vertices.add(m00, m01, m10, m11, tx, ty).add(x2, y2).add(sx2, sy2);
+      addExtraVertexAttribs(vertices);
+      vertices.add(m00, m01, m10, m11, tx, ty).add(x3, y3).add(sx3, sy3);
+      addExtraVertexAttribs(vertices);
+      vertices.add(m00, m01, m10, m11, tx, ty).add(x4, y4).add(sx4, sy4);
+      addExtraVertexAttribs(vertices);
 
       elements.add(vertIdx+0);
       elements.add(vertIdx+1);
@@ -206,7 +226,8 @@ public class IndexedTrisShader extends GLShader {
       int vertIdx = beginPrimitive(xys.length/2, indices.length);
       for (int ii = 0, ll = xys.length; ii < ll; ii += 2) {
         float x = xys[ii], y = xys[ii+1];
-        vertices.add(m00, m01, m10, m11, tx, ty).add(x, y).add(x/tw, y/th).add(arTint, gbTint);
+        vertices.add(m00, m01, m10, m11, tx, ty).add(x, y).add(x/tw, y/th);
+        addExtraVertexAttribs(vertices);
       }
       for (int ii = 0, ll = indices.length; ii < ll; ii++)
         elements.add(vertIdx+indices[ii]);
@@ -216,9 +237,10 @@ public class IndexedTrisShader extends GLShader {
     public void addTriangles(float m00, float m01, float m10, float m11, float tx, float ty,
                              float[] xys, float[] sxys, int[] indices) {
       int vertIdx = beginPrimitive(xys.length/2, indices.length);
-      for (int ii = 0, ll = xys.length; ii < ll; ii += 2)
-        vertices.add(m00, m01, m10, m11, tx, ty).add(xys[ii], xys[ii+1]).add(sxys[ii], sxys[ii+1]).
-          add(arTint, gbTint);
+      for (int ii = 0, ll = xys.length; ii < ll; ii += 2) {
+        vertices.add(m00, m01, m10, m11, tx, ty).add(xys[ii], xys[ii+1]).add(sxys[ii], sxys[ii+1]);
+        addExtraVertexAttribs(vertices);
+      }
       for (int ii = 0, ll = indices.length; ii < ll; ii++)
         elements.add(vertIdx+indices[ii]);
     }
@@ -229,9 +251,9 @@ public class IndexedTrisShader extends GLShader {
     }
 
     protected int beginPrimitive(int vertexCount, int elemCount) {
-      int vertIdx = vertices.position() / VERTEX_SIZE;
+      int vertIdx = vertices.position() / vertexSize();
       int verts = vertIdx + vertexCount, elems = elements.position() + elemCount;
-      int availVerts = vertices.capacity() / VERTEX_SIZE, availElems = elements.capacity();
+      int availVerts = vertices.capacity() / vertexSize(), availElems = elements.capacity();
       if ((verts > availVerts) || (elems > availElems)) {
         IndexedTrisShader.this.flush();
         if (verts > availVerts)
@@ -244,10 +266,10 @@ public class IndexedTrisShader extends GLShader {
     }
 
     private void expandVerts(int vertCount) {
-      int newVerts = vertices.capacity() / VERTEX_SIZE;
+      int newVerts = vertices.capacity() / vertexSize();
       while (newVerts < vertCount)
         newVerts += EXPAND_VERTS;
-      vertices.expand(newVerts*VERTEX_SIZE);
+      vertices.expand(newVerts*vertexSize());
     }
 
     private void expandElems(int elemCount) {
