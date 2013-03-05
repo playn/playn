@@ -100,16 +100,4 @@ public interface Assets {
    * @param path the path to the text asset.
    */
   void getText(String path, Callback<String> callback);
-
-  /**
-   * @deprecated Use {@link WatchedAssets}.
-   */
-  @Deprecated
-  boolean isDone();
-
-  /**
-   * @deprecated Use {@link WatchedAssets}.
-   */
-  @Deprecated
-  int getPendingRequestCount();
 }

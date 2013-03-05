@@ -360,13 +360,6 @@ public class IOSCanvas implements Canvas {
     return this;
   }
 
-  @Deprecated @Override
-  public Canvas setTransform(float m11, float m12, float m21, float m22, float dx, float dy) {
-    // this cannot be implemented on iOS; it's not possible to reset the transform and you can't
-    // set it; you can only concatenate to it
-    return this;
-  }
-
   @Override
   public Canvas strokeCircle(float x, float y, float radius) {
     bctx.StrokeEllipseInRect(new RectangleF(x-radius, y-radius, 2*radius, 2*radius));

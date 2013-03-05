@@ -103,14 +103,4 @@ public class CachingAssets implements Assets {
     // no caching for text loading
     delegate.getText(path, callback);
   }
-
-  @Deprecated
-  public boolean isDone() {
-    return delegate.isDone();
-  }
-
-  @Deprecated
-  public int getPendingRequestCount() {
-    return delegate.getPendingRequestCount();
-  }
 }

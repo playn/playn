@@ -47,10 +47,6 @@ public class HtmlPlatform extends AbstractPlatform {
     public boolean experimentalFullscreen = false;
   }
 
-  /* @deprecated Use {@link Config}. */
-  @Deprecated public static class Configuration extends Config {
-  }
-
   /** Used by {@link #register(Mode)}. */
   public static enum Mode {
     WEBGL, CANVAS, DOM, AUTODETECT;
@@ -80,23 +76,6 @@ public class HtmlPlatform extends AbstractPlatform {
    */
   public static HtmlPlatform register() {
     return register(new Config());
-  }
-
-  /**
-   * Prepares the HTML platform for operation.
-   * @deprecated use register(Config) instead.
-   *
-   * @param mode indicates whether to force the use of WebGL, force the use of Canvas, or to
-   * autodetect whether the browser supports WebGL and use it if possible.
-   */
-  @Deprecated
-  public static HtmlPlatform register(Mode mode) {
-    Config config = new Config();
-    config.mode = mode;
-    HtmlPlatform platform = new HtmlPlatform(config);
-    PlayN.setPlatform(platform);
-    platform.init();
-    return platform;
   }
 
   /**

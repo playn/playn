@@ -89,22 +89,6 @@ public class JavaPlatform extends AbstractPlatform {
     return instance;
   }
 
-  /** @deprecated Use {@link JavaPlatform#register(Config)}. */
-  @Deprecated
-  public static JavaPlatform register(float scaleFactor) {
-    Config config = new Config();
-    config.scaleFactor = scaleFactor;
-    return register(config);
-  }
-
-  /** @deprecated Use {@link JavaPlatform#register(Config)}. */
-  @Deprecated
-  public static JavaPlatform registerHeadless() {
-    Config config = new Config();
-    config.headless = true;
-    return register(config);
-  }
-
   // Maximum delta time to consider between update() calls (in milliseconds). If the delta between
   // two update()s is greater than MAX_DELTA, we clamp to MAX_DELTA.
   private static final float MAX_DELTA = 100;

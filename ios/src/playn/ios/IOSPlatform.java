@@ -130,22 +130,6 @@ public class IOSPlatform extends AbstractPlatform {
     return platform;
   }
 
-  @Deprecated
-  public static IOSPlatform register(UIApplication app, SupportedOrients orients) {
-    Config config = new Config();
-    config.orients = orients;
-    return register(app, config);
-  }
-
-  @Deprecated
-  public static IOSPlatform register(UIApplication app, SupportedOrients orients,
-                                     boolean iPadLikePhone) {
-    Config config = new Config();
-    config.orients = orients;
-    config.iPadLikePhone = iPadLikePhone;
-    return register(app, config);
-  }
-
   static {
     // disable output to System.out/err as that will result in a crash due to iOS disallowing
     // writes to stdout/stderr

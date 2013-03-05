@@ -277,12 +277,6 @@ class HtmlCanvas implements Canvas {
     return this;
   }
 
-  @Deprecated @Override
-  public Canvas setTransform(float m11, float m12, float m21, float m22, float dx, float dy) {
-    ctx.setTransform(m11, m12, m21, m22, dx, dy);
-    return this;
-  }
-
   @Override
   public Canvas strokeCircle(float x, float y, float radius) {
     ctx.beginPath();

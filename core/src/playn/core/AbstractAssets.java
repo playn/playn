@@ -98,16 +98,6 @@ public abstract class AbstractAssets<IMG> implements Assets {
     });
   }
 
-  @Deprecated
-  public final boolean isDone() {
-    return true;
-  }
-
-  @Deprecated
-  public final int getPendingRequestCount() {
-    return 0;
-  }
-
   protected AbstractAssets(AbstractPlatform platform) {
     this.platform = platform;
   }
