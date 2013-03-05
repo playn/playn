@@ -193,23 +193,28 @@ public abstract class HtmlGraphics implements Graphics {
 
     if (config.experimentalFullscreen) {
       Window.addResizeHandler(new ResizeHandler() {
-      @Override
-      public void onResize(ResizeEvent event) {
-        if (fullScreenWidth() == event.getWidth() && fullScreenHeight() == event.getHeight()) {
-          experimentalScale = Math.min((float) fullScreenWidth() / (float) width(), (float) fullScreenHeight() / (float) height());
-          int yOfs = (int) ((fullScreenHeight() - height() * experimentalScale) / 3.f); // less distance to the top
-          int xOfs = (int) ((fullScreenWidth() - width() * experimentalScale) / 2.f);
-          rootElement().setAttribute("style",
-              "width:"+experimentalScale * width()+"px;height:"+ experimentalScale*height()+ "px;position:absolute;left:"+xOfs+"px;top:"+yOfs);
-          // This is needed to work around a focus bug in Chrome :(
-          Window.alert("Switching to fullscreen mode.");
-          Document.get().getBody().addClassName("fullscreen");
-        } else {
-          experimentalScale = 1;
-          rootElement().removeAttribute("style");
-          Document.get().getBody().removeClassName("fullscreen");
-        }
-      }});
+        @Override
+        public void onResize(ResizeEvent event) {
+          if (fullScreenWidth() == event.getWidth() && fullScreenHeight() == event.getHeight()) {
+            experimentalScale = Math.min((float) fullScreenWidth() / (float) width(),
+                                         (float) fullScreenHeight() / (float) height());
+            // less distance to the top
+            int yOfs = (int) ((fullScreenHeight() - height() * experimentalScale) / 3.f);
+            int xOfs = (int) ((fullScreenWidth() - width() * experimentalScale) / 2.f);
+            rootElement().setAttribute(
+              "style",
+              "width:" + experimentalScale * width() + "px; " +
+              "height:" + experimentalScale*height() + "px; " +
+              "position:absolute; left:" + xOfs + "px; top:" + yOfs);
+            // This is needed to work around a focus bug in Chrome :(
+            Window.alert("Switching to fullscreen mode.");
+            Document.get().getBody().addClassName("fullscreen");
+          } else {
+            experimentalScale = 1;
+            rootElement().removeAttribute("style");
+            Document.get().getBody().removeClassName("fullscreen");
+          }
+        }});
     }
   }
 
