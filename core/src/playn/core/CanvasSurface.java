@@ -156,9 +156,9 @@ public class CanvasSurface implements Surface {
     return this;
   }
 
-  @Override
+  @Deprecated @Override
   public Surface setTransform(float m11, float m12, float m21, float m22, float dx, float dy) {
-    canvas.setTransform(m11, m12, m21, m22, dx, dy);
+    // NOOP: no longer supported by canvas
     return this;
   }
 

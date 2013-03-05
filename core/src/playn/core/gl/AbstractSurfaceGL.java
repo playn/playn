@@ -199,7 +199,7 @@ abstract class AbstractSurfaceGL implements Surface {
     return this;
   }
 
-  @Override
+  @Deprecated @Override
   public Surface setTransform(float m00, float m01, float m10, float m11, float tx, float ty) {
     topTransform().setTransform(m00, m01, m10, m11, tx, ty);
     return this;
