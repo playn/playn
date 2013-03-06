@@ -12,7 +12,9 @@ namespace ${package}
   public partial class AppDelegate : IOSApplicationDelegate {
     public override bool FinishedLaunching (UIApplication app, NSDictionary options) {
       app.SetStatusBarHidden(true, true);
-      IOSPlatform.register(app, IOSPlatform.SupportedOrients.PORTRAITS);
+      var pconfig = new IOSPlatform.Config();
+      // use pconfig to customize iOS platform, if needed
+      IOSPlatform.register(app, pconfig);
       PlayN.run(new ${JavaGameClassName}());
       return true;
     }

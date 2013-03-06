@@ -11,7 +11,9 @@ import ${package}.core.${JavaGameClassName};
 public class ${JavaGameClassName}Java {
 
   public static void main(String[] args) {
-    JavaPlatform.register();
+    JavaPlatform.Config config = new JavaPlatform.Config();
+    // use config to customize the Java platform, if needed
+    JavaPlatform.register(config);
     PlayN.run(new ${JavaGameClassName}());
   }
 }
