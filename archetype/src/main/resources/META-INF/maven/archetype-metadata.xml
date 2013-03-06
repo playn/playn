@@ -137,7 +137,7 @@
       <directory>ios</directory>
       <includes>
         <include>Info.plist</include>
-        <include>*.cs</include>
+        <include>**/*.cs</include>
         <include>*.csproj</include>
         <include>*.sln</include>
       </includes>
