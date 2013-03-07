@@ -19,6 +19,7 @@ package playn.core.gl;
  * A {@link GLShader} implementation that decomposes quads into indexed triangles.
  */
 public class IndexedTrisShader extends GLShader {
+
   /** Declares the uniform variables for our shader. */
   public static final String VERT_UNIFS =
     "uniform vec2 u_ScreenSize;\n";
@@ -80,19 +81,6 @@ public class IndexedTrisShader extends GLShader {
   private static final int EXPAND_ELEMS = 6*EXPAND_VERTS/4;
   private static final int FLOAT_SIZE_BYTES = 4;
 
-  /**
-   * Returns the floats per vertex.
-   */
-  protected int vertexSize ()
-  {
-      return 12;
-  }
-
-  protected int vertexStride ()
-  {
-      return vertexSize() * FLOAT_SIZE_BYTES;
-  }
-
   public IndexedTrisShader(GLContext ctx) {
     super(ctx);
   }
@@ -109,6 +97,17 @@ public class IndexedTrisShader extends GLShader {
   @Override
   public String toString() {
     return "itris/" + texCore + "/" + colorCore;
+  }
+
+  /**
+   * Returns the number of floats per vertex.
+   */
+  protected int vertexSize() {
+      return 12;
+  }
+
+  protected int vertexStride() {
+      return vertexSize() * FLOAT_SIZE_BYTES;
   }
 
   @Override
@@ -192,10 +191,6 @@ public class IndexedTrisShader extends GLShader {
       elements.destroy();
     }
 
-    protected void addExtraVertexAttribs(GLBuffer.Float vertices) {
-      vertices.add(arTint, gbTint);
-    }
-
     @Override
     public void addQuad(float m00, float m01, float m10, float m11, float tx, float ty,
                         float x1, float y1, float sx1, float sy1,
@@ -248,6 +243,10 @@ public class IndexedTrisShader extends GLShader {
     @Override
     public String toString() {
       return "cq=" + (elements.capacity()/6);
+    }
+
+    protected void addExtraVertexAttribs(GLBuffer.Float vertices) {
+      vertices.add(arTint, gbTint);
     }
 
     protected int beginPrimitive(int vertexCount, int elemCount) {
