@@ -340,7 +340,7 @@ public abstract class AbstractLayer implements Layer {
   }
 
   public void onAdd() {
-    Asserts.checkState(!destroyed(), "Illegal to use destroyed layers");
+    if (destroyed()) throw new IllegalStateException("Illegal to use destroyed layer: " + this);
   }
 
   public void onRemove() {
