@@ -65,9 +65,9 @@ public class QuadShader extends GLShader {
   private static final int VERTICES_PER_QUAD = 4;
   private static final int ELEMENTS_PER_QUAD = 6;
   private static final int VERTEX_SIZE = 3; // 3 floats per vertex
-  private static final int VEC4S_PER_QUAD = 3; // 3 vec4s per matrix
+  private static final int BASE_VEC4S_PER_QUAD = 3; // 3 vec4s per matrix
 
-  private final int maxQuads;
+  protected final int maxQuads;
 
   /**
    * Returns false if the GL context doesn't support sufficient numbers of vertex uniform vectors
@@ -76,7 +76,7 @@ public class QuadShader extends GLShader {
   public static boolean isLikelyToPerform(GLContext ctx) {
     int maxVecs = usableMaxUniformVectors(ctx);
     // assume we're better off with indexed tris if we can't push at least 16 quads at a time
-    return (maxVecs >= 16*VEC4S_PER_QUAD);
+    return (maxVecs >= 16*BASE_VEC4S_PER_QUAD);
   }
 
   private static int usableMaxUniformVectors(GLContext ctx) {
@@ -88,17 +88,30 @@ public class QuadShader extends GLShader {
   public QuadShader(GLContext ctx) {
     super(ctx);
 
-    int maxVecs = usableMaxUniformVectors(ctx);
-    if (maxVecs < VEC4S_PER_QUAD)
+    int maxVecs = usableMaxUniformVectors(ctx) - extraVec4s();
+    if (maxVecs < vec4sPerQuad())
       throw new RuntimeException(
         "GL_MAX_VERTEX_UNIFORM_VECTORS too low: have " + maxVecs +
-        ", need at least " + VEC4S_PER_QUAD);
-    this.maxQuads = maxVecs / VEC4S_PER_QUAD;
+        ", need at least " + vec4sPerQuad());
+    this.maxQuads = maxVecs / vec4sPerQuad();
   }
 
   @Override
   public String toString() {
     return "quad/" + maxQuads;
+  }
+
+  protected int vec4sPerQuad() {
+    return BASE_VEC4S_PER_QUAD;
+  }
+
+  /**
+   * Returns how many vec4s this shader uses above and beyond those in the base implementation.
+   * If you add any extra attributes or uniforms, your subclass will need to account for them
+   * here.
+   */
+  protected int extraVec4s() {
+    return 0;
   }
 
   /**
@@ -108,7 +121,7 @@ public class QuadShader extends GLShader {
    */
   protected String vertexShader() {
     return VERTEX_SHADER.replace("_MAX_QUADS_", ""+maxQuads).
-      replace("_VEC4S_PER_QUAD_", ""+VEC4S_PER_QUAD);
+      replace("_VEC4S_PER_QUAD_", ""+vec4sPerQuad());
   }
 
   @Override
@@ -134,7 +147,7 @@ public class QuadShader extends GLShader {
     public QuadCore(String vertShader, String fragShader) {
       super(vertShader, fragShader);
 
-      data = ctx.createFloatBuffer(maxQuads*VEC4S_PER_QUAD*4);
+      data = ctx.createFloatBuffer(maxQuads*vec4sPerQuad()*4);
 
       // compile the shader and get our uniform and attribute
       uScreenSize = prog.getUniform2f("u_ScreenSize");
@@ -180,7 +193,7 @@ public class QuadShader extends GLShader {
     public void flush() {
       if (quadCounter == 0)
         return;
-      uData.bind(data, quadCounter * VEC4S_PER_QUAD);
+      uData.bind(data, quadCounter * vec4sPerQuad());
       elements.drawElements(GL20.GL_TRIANGLES, ELEMENTS_PER_QUAD*quadCounter);
       quadCounter = 0;
     }
@@ -203,11 +216,15 @@ public class QuadShader extends GLShader {
       data.add(m00*dw, m01*dw, m10*dh, m11*dh, tx + m00*x1 + m10*y1, ty + m01*x1 + m11*y1);
       data.add(sx1, sy1);
       data.add(sx2 - sx1, sy3 - sy1);
-      data.add(arTint, gbTint);
+      addExtraData(data);
       quadCounter++;
 
       if (quadCounter >= maxQuads)
         QuadShader.this.flush();
+    }
+
+    protected void addExtraData(GLBuffer.Float data) {
+      data.add(arTint, gbTint);
     }
   }
 }
