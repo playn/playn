@@ -15,9 +15,6 @@
  */
 package playn.core.gl;
 
-import playn.core.gl.GLShader;
-import static playn.core.gl.GL20.*;
-
 /**
  * A {@link GLShader} implementation that only handles quads.
  */
@@ -142,7 +139,7 @@ public class QuadShader extends GLShader {
       // compile the shader and get our uniform and attribute
       uScreenSize = prog.getUniform2f("u_ScreenSize");
       uData = prog.getUniform4fv("u_Data");
-      aVertex = prog.getAttrib("a_Vertex", VERTEX_SIZE, GL_SHORT);
+      aVertex = prog.getAttrib("a_Vertex", VERTEX_SIZE, GL20.GL_SHORT);
 
       // create our stock supply of unit quads and stuff them into our buffers
       vertices = ctx.createShortBuffer(maxQuads*VERTICES_PER_QUAD*VERTEX_SIZE);
@@ -158,19 +155,19 @@ public class QuadShader extends GLShader {
         elements.add(base+1).add(base+3).add(base+2);
       }
 
-      vertices.bind(GL_ARRAY_BUFFER);
-      vertices.send(GL_ARRAY_BUFFER, GL_STATIC_DRAW);
-      elements.bind(GL_ELEMENT_ARRAY_BUFFER);
-      elements.send(GL_ELEMENT_ARRAY_BUFFER, GL_STATIC_DRAW);
+      vertices.bind(GL20.GL_ARRAY_BUFFER);
+      vertices.send(GL20.GL_ARRAY_BUFFER, GL20.GL_STATIC_DRAW);
+      elements.bind(GL20.GL_ELEMENT_ARRAY_BUFFER);
+      elements.send(GL20.GL_ELEMENT_ARRAY_BUFFER, GL20.GL_STATIC_DRAW);
     }
 
     @Override
     public void activate(int fbufWidth, int fbufHeight) {
       prog.bind();
       uScreenSize.bind(fbufWidth/2f, fbufHeight/2f);
-      vertices.bind(GL_ARRAY_BUFFER);
+      vertices.bind(GL20.GL_ARRAY_BUFFER);
       aVertex.bind(0, 0);
-      elements.bind(GL_ELEMENT_ARRAY_BUFFER);
+      elements.bind(GL20.GL_ELEMENT_ARRAY_BUFFER);
     }
 
     @Override
@@ -184,7 +181,7 @@ public class QuadShader extends GLShader {
       if (quadCounter == 0)
         return;
       uData.bind(data, quadCounter * VEC4S_PER_QUAD);
-      elements.drawElements(GL_TRIANGLES, ELEMENTS_PER_QUAD*quadCounter);
+      elements.drawElements(GL20.GL_TRIANGLES, ELEMENTS_PER_QUAD*quadCounter);
       quadCounter = 0;
     }
 
