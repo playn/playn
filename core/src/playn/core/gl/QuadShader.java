@@ -127,9 +127,9 @@ public class QuadShader extends GLShader {
   protected class QuadCore extends Core {
     private final Uniform2f uScreenSize;
     private final Uniform4fv uData;
-    private final Attrib aVertices;
+    private final Attrib aVertex;
     private final GLBuffer.Float data;
-    private final GLBuffer.Short verts, elems;
+    private final GLBuffer.Short vertices, elements;
 
     private int quadCounter;
     private float arTint, gbTint;
@@ -142,35 +142,35 @@ public class QuadShader extends GLShader {
       // compile the shader and get our uniform and attribute
       uScreenSize = prog.getUniform2f("u_ScreenSize");
       uData = prog.getUniform4fv("u_Data");
-      aVertices = prog.getAttrib("a_Vertex", VERTEX_SIZE, GL_SHORT);
+      aVertex = prog.getAttrib("a_Vertex", VERTEX_SIZE, GL_SHORT);
 
       // create our stock supply of unit quads and stuff them into our buffers
-      verts = ctx.createShortBuffer(maxQuads*VERTICES_PER_QUAD*VERTEX_SIZE);
-      elems = ctx.createShortBuffer(maxQuads*ELEMENTS_PER_QUAD);
+      vertices = ctx.createShortBuffer(maxQuads*VERTICES_PER_QUAD*VERTEX_SIZE);
+      elements = ctx.createShortBuffer(maxQuads*ELEMENTS_PER_QUAD);
 
       for (int ii = 0; ii < maxQuads; ii++) {
-        verts.add(0, 0).add(ii);
-        verts.add(1, 0).add(ii);
-        verts.add(0, 1).add(ii);
-        verts.add(1, 1).add(ii);
+        vertices.add(0, 0).add(ii);
+        vertices.add(1, 0).add(ii);
+        vertices.add(0, 1).add(ii);
+        vertices.add(1, 1).add(ii);
         int base = ii * VERTICES_PER_QUAD;
-        elems.add(base+0).add(base+1).add(base+2);
-        elems.add(base+1).add(base+3).add(base+2);
+        elements.add(base+0).add(base+1).add(base+2);
+        elements.add(base+1).add(base+3).add(base+2);
       }
 
-      verts.bind(GL_ARRAY_BUFFER);
-      verts.send(GL_ARRAY_BUFFER, GL_STATIC_DRAW);
-      elems.bind(GL_ELEMENT_ARRAY_BUFFER);
-      elems.send(GL_ELEMENT_ARRAY_BUFFER, GL_STATIC_DRAW);
+      vertices.bind(GL_ARRAY_BUFFER);
+      vertices.send(GL_ARRAY_BUFFER, GL_STATIC_DRAW);
+      elements.bind(GL_ELEMENT_ARRAY_BUFFER);
+      elements.send(GL_ELEMENT_ARRAY_BUFFER, GL_STATIC_DRAW);
     }
 
     @Override
     public void activate(int fbufWidth, int fbufHeight) {
       prog.bind();
       uScreenSize.bind(fbufWidth/2f, fbufHeight/2f);
-      verts.bind(GL_ARRAY_BUFFER);
-      aVertices.bind(0, 0);
-      elems.bind(GL_ELEMENT_ARRAY_BUFFER);
+      vertices.bind(GL_ARRAY_BUFFER);
+      aVertex.bind(0, 0);
+      elements.bind(GL_ELEMENT_ARRAY_BUFFER);
     }
 
     @Override
@@ -184,15 +184,15 @@ public class QuadShader extends GLShader {
       if (quadCounter == 0)
         return;
       uData.bind(data, quadCounter * VEC4S_PER_QUAD);
-      elems.drawElements(GL_TRIANGLES, ELEMENTS_PER_QUAD*quadCounter);
+      elements.drawElements(GL_TRIANGLES, ELEMENTS_PER_QUAD*quadCounter);
       quadCounter = 0;
     }
 
     @Override
     public void destroy() {
       super.destroy();
-      verts.destroy();
-      elems.destroy();
+      vertices.destroy();
+      elements.destroy();
       data.destroy();
     }
 
