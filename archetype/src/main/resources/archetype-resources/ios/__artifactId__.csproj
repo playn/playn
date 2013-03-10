@@ -64,6 +64,8 @@
     <MtouchLink>Full</MtouchLink>
     <MtouchI18n />
     <MtouchArch>ARMv7</MtouchArch>
+    <BuildIpa>True</BuildIpa>
+    <IpaPackageName />
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
