@@ -22,6 +22,8 @@ import pythagoras.f.Point;
  */
 public class Events {
 
+  private static Point scratchPoint = new Point();
+
   /** Defines some information for how event processing may be controlled. One instance may
    * be shared among multiple events.
    * TODO: better name than flags? ProcessControls is more accurate but too long.
@@ -221,9 +223,9 @@ public class Events {
           this.localX = x;
           this.localY = y;
         } else {
-          Point local = Layer.Util.screenToLayer(hit, x, y);
-          this.localX = local.x;
-          this.localY = local.y;
+          Layer.Util.screenToLayer(hit, scratchPoint.set(x, y), scratchPoint);
+          this.localX = scratchPoint.x;
+          this.localY = scratchPoint.y;
         }
       }
 
