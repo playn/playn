@@ -126,24 +126,31 @@ public class GL20Context extends GLContext {
   }
 
   @Override
-  public int createTexture(boolean repeatX, boolean repeatY) {
+  public int createTexture(boolean repeatX, boolean repeatY, boolean mipmaps) {
     int[] tex = new int[1];
     gl.glGenTextures(1, tex, 0);
     gl.glBindTexture(GL_TEXTURE_2D, tex[0]);
-    gl.glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, magFilter);
-    gl.glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, minFilter);
-    gl.glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, repeatX ? GL_REPEAT : GL_CLAMP_TO_EDGE);
-    gl.glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, repeatY ? GL_REPEAT : GL_CLAMP_TO_EDGE);
+    gl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, magFilter);
+    gl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, mipmapify(minFilter, mipmaps));
+    gl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, repeatX ? GL_REPEAT : GL_CLAMP_TO_EDGE);
+    gl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, repeatY ? GL_REPEAT : GL_CLAMP_TO_EDGE);
     if (STATS_ENABLED) stats.texCreates++;
     return tex[0];
   }
 
   @Override
-  public int createTexture(int width, int height, boolean repeatX, boolean repeatY) {
-    int tex = createTexture(repeatX, repeatY);
+  public int createTexture(int width, int height,
+                           boolean repeatX, boolean repeatY, boolean mm) {
+    int tex = createTexture(repeatX, repeatY, mm);
     gl.glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE,
                     (ByteBuffer) null);
     return tex;
+  }
+
+  @Override
+  public void generateMipmap(int tex) {
+    gl.glBindTexture(GL_TEXTURE_2D, tex);
+    gl.glGenerateMipmap(GL_TEXTURE_2D);
   }
 
   @Override
@@ -233,6 +240,18 @@ public class GL20Context extends GLContext {
     default:
     case  LINEAR: return GL_LINEAR;
     case NEAREST: return GL_NEAREST;
+    }
+  }
+
+  private static int mipmapify (int filter, boolean mipmaps) {
+    if (!mipmaps)
+      return filter;
+    // we don't do trilinear filtering (i.e. GL_LINEAR_MIPMAP_LINEAR);
+    // it's expensive and not super useful when only rendering in 2D
+    switch (filter) {
+    case GL_NEAREST: return GL_NEAREST_MIPMAP_NEAREST;
+    case GL_LINEAR: return GL_LINEAR_MIPMAP_NEAREST;
+    default: return filter;
     }
   }
 }

@@ -164,7 +164,7 @@ public abstract class ImageRegionGL extends ImageGL implements Image.Region {
     int tex = parent.ensureTexture(false, false);
 
     // create our texture and point a new framebuffer at it
-    reptex = ctx.createTexture(width, height, repeatX, repeatY);
+    reptex = ctx.createTexture(width, height, repeatX, repeatY, mipmapped);
     int fbuf = ctx.createFramebuffer(reptex);
     ctx.pushFramebuffer(fbuf, width, height);
     try {
@@ -175,6 +175,9 @@ public abstract class ImageRegionGL extends ImageGL implements Image.Region {
       GLShader shader = ctx.quadShader(null).prepareTexture(tex, Tint.NOOP_TINT);
       shader.addQuad(ctx.createTransform(), 0, height, width, 0,
                      sl / tw, st / th, sr / tw, sb / th);
+      shader.flush();
+      // if we're mipmapped, we can now generate our mipmaps
+      if (mipmapped) ctx.generateMipmap(reptex);
     } finally {
       // we no longer need this framebuffer; rebind the previous framebuffer and delete ours
       ctx.popFramebuffer();

@@ -136,11 +136,15 @@ public abstract class GLContext {
   public abstract void deleteFramebuffer(int fbuf);
 
   /** Creates a texture with the specified repeat behavior. */
-  public abstract int createTexture(boolean repeatX, boolean repeatY);
+  public abstract int createTexture(boolean repeatX, boolean repeatY, boolean mipmaps);
 
   /** Creates a texture of the specified size, with the specified repeat behavior, into which we
    * can subsequently render. */
-  public abstract int createTexture(int width, int height, boolean repeatX, boolean repeatY);
+  public abstract int createTexture(int width, int height,
+                                    boolean repeatX, boolean repeatY, boolean mipmaps);
+
+  /** Generates mipmaps for the specified texture. */
+  public abstract void generateMipmap(int tex);
 
   /** Activates the specified texture unit.
    * @param glTextureN the texture unit to active (e.g. {@link GL20#GL_TEXTURE0}). */

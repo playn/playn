@@ -59,7 +59,7 @@ public class AndroidSurfaceGL extends SurfaceGL
         FileInputStream in = new FileInputStream(cachedPixels);
         in.read(pixelBuffer.array());
         in.close();
-        int bufferTex = actx.createTexture(false, false);
+        int bufferTex = actx.createTexture(false, false, false);
         actx.gl.glTexImage2D(GL20.GL_TEXTURE_2D, 0, GL20.GL_RGBA, texWidth, texHeight, 0,
                              GL20.GL_RGBA, GL20.GL_UNSIGNED_BYTE, pixelBuffer);
         // bind our surface framebuffer and render the saved texture data into it

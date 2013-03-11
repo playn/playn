@@ -35,35 +35,8 @@ public abstract class ImageGL implements Image {
   /** Our texture and repeatable texture handles. */
   protected int tex, reptex;
 
-  /**
-   * Creates a texture for this image (if one does not already exist) and returns it. May return
-   * 0 if the underlying image data is not yet ready.
-   */
-  public int ensureTexture(boolean repeatX, boolean repeatY) {
-    if (!isReady()) {
-      return 0;
-    } else if (repeatX || repeatY) {
-      scaleTexture(repeatX, repeatY);
-      return reptex;
-    } else {
-      loadTexture();
-      return tex;
-    }
-  }
-
-  /**
-   * Releases this image's texture memory.
-   */
-  public void clearTexture() {
-    if (tex > 0) {
-      ctx.destroyTexture(tex);
-      tex = 0;
-    }
-    if (reptex > 0) {
-      ctx.destroyTexture(reptex);
-      reptex = 0;
-    }
-  }
+  /** Whether to generate mipmaps for this image. */
+  protected boolean mipmapped;
 
   /**
    * Increments this image's reference count. Called by {@link ImageLayerGL} to let the image know
@@ -84,6 +57,38 @@ public abstract class ImageGL implements Image {
     Asserts.checkState(refs > 0, "Released an image with no references!");
     if (--refs == 0) {
       clearTexture();
+    }
+  }
+
+  @Override
+  public void setMipmapped (boolean mipmapped) {
+    Asserts.checkState(tex == 0 && reptex == 0,
+                       "Mipmapping must be configured before the image is used.");
+    this.mipmapped = mipmapped;
+  }
+
+  @Override
+  public int ensureTexture(boolean repeatX, boolean repeatY) {
+    if (!isReady()) {
+      return 0;
+    } else if (repeatX || repeatY || mipmapped) {
+      scaleTexture(repeatX, repeatY);
+      return reptex;
+    } else {
+      loadTexture();
+      return tex;
+    }
+  }
+
+  @Override
+  public void clearTexture() {
+    if (tex > 0) {
+      ctx.destroyTexture(tex);
+      tex = 0;
+    }
+    if (reptex > 0) {
+      ctx.destroyTexture(reptex);
+      reptex = 0;
     }
   }
 
@@ -167,7 +172,10 @@ public abstract class ImageGL implements Image {
   private void loadTexture() {
     if (tex > 0)
       return;
-    tex = ctx.createTexture(false, false);
+    // the mipmaps flag is always false here because we only ever generate mipmaps for our
+    // power-of-two textures; scaleTexture will use tex to create the POT texture, so tex should
+    // not have mipmaps enabled, or it will hose up that process
+    tex = ctx.createTexture(false, false, false);
     updateTexture(tex);
   }
 
@@ -186,8 +194,9 @@ public abstract class ImageGL implements Image {
 
     // no need to scale if our source data is already a power of two
     if ((width == 0) && (height == 0)) {
-      reptex = ctx.createTexture(scaledWidth, scaledHeight, repeatX, repeatY);
+      reptex = ctx.createTexture(scaledWidth, scaledHeight, repeatX, repeatY, mipmapped);
       updateTexture(reptex);
+      if (mipmapped) ctx.generateMipmap(reptex);
       return;
     }
 
@@ -201,14 +210,18 @@ public abstract class ImageGL implements Image {
       height = scaledHeight;
 
     // create our texture and point a new framebuffer at it
-    reptex = ctx.createTexture(width, height, repeatX, repeatY);
+    reptex = ctx.createTexture(width, height, repeatX, repeatY, mipmapped);
     int fbuf = ctx.createFramebuffer(reptex);
     ctx.pushFramebuffer(fbuf, width, height);
     try {
       // render the non-repeated texture into the framebuffer properly scaled
       ctx.clear(0, 0, 0, 0);
-      ctx.quadShader(null).prepareTexture(tex, Tint.NOOP_TINT).addQuad(
-        ctx.createTransform(), 0, height, width, 0, 0, 0, 1, 1);
+      GLShader shader = ctx.quadShader(null).prepareTexture(tex, Tint.NOOP_TINT);
+      shader.addQuad(ctx.createTransform(), 0, height, width, 0, 0, 0, 1, 1);
+      shader.flush();
+      // if we're mipmapped, we can now generate our mipmaps
+      if (mipmapped) ctx.generateMipmap(reptex);
+
     } finally {
       // we no longer need this framebuffer; rebind the previous framebuffer and delete ours
       ctx.popFramebuffer();

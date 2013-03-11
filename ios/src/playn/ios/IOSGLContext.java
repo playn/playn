@@ -143,7 +143,7 @@ public class IOSGLContext extends GLContext {
   }
 
   @Override
-  public int createTexture(boolean repeatX, boolean repeatY) {
+  public int createTexture(boolean repeatX, boolean repeatY, boolean mipmaps) {
     int[] texw = new int[1];
     GL.GenTextures(1, texw);
     int tex = texw[0];
@@ -155,7 +155,8 @@ public class IOSGLContext extends GLContext {
 
     TextureTarget tt = TextureTarget.wrap(TextureTarget.Texture2D);
     GL.BindTexture(tt, tex);
-    GL.TexParameter(tt, TextureParameterName.wrap(TextureParameterName.TextureMinFilter), minFilter);
+    GL.TexParameter(tt, TextureParameterName.wrap(TextureParameterName.TextureMinFilter),
+                    mipmapify(minFilter, mipmaps));
     GL.TexParameter(tt, TextureParameterName.wrap(TextureParameterName.TextureMagFilter), magFilter);
     GL.TexParameter(tt, TextureParameterName.wrap(TextureParameterName.TextureWrapS),
                     repeatX ? All.Repeat : All.ClampToEdge);
@@ -166,12 +167,19 @@ public class IOSGLContext extends GLContext {
   }
 
   @Override
-  public int createTexture(int width, int height, boolean repeatX, boolean repeatY) {
-    int tex = createTexture(repeatX, repeatY);
+  public int createTexture(int width, int height, boolean repeatX, boolean repeatY, boolean mm) {
+    int tex = createTexture(repeatX, repeatY, mm);
     GL.TexImage2D(TextureTarget.wrap(TextureTarget.Texture2D), 0,
                   PixelInternalFormat.wrap(PixelInternalFormat.Rgba), width, height, 0,
                   PixelFormat.wrap(PixelFormat.Rgba), PixelType.wrap(PixelType.UnsignedByte), null);
     return tex;
+  }
+
+  @Override
+  public void generateMipmap(int tex) {
+    TextureTarget tt = TextureTarget.wrap(TextureTarget.Texture2D);
+    GL.BindTexture(tt, tex);
+    GL.GenerateMipmap(tt);
   }
 
   @Override
@@ -340,6 +348,18 @@ public class IOSGLContext extends GLContext {
     default:
     case  LINEAR: return All.Linear;
     case NEAREST: return All.Nearest;
+    }
+  }
+
+  private static int mipmapify (int filter, boolean mipmaps) {
+    if (!mipmaps)
+      return filter;
+    // we don't do trilinear filtering (i.e. GL_LINEAR_MIPMAP_LINEAR);
+    // it's expensive and not super useful when only rendering in 2D
+    switch (filter) {
+    case All.Nearest: return All.NearestMipmapNearest;
+    case All.Linear: return All.LinearMipmapNearest;
+    default: return filter;
     }
   }
 }

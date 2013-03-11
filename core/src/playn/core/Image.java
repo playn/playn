@@ -118,6 +118,13 @@ public interface Image {
   Image transform(BitmapTransformer xform);
 
   /**
+   * Configures the use of mipmaps when rendering this image at scales less than 1. This only
+   * applies to GL-based backends (it is a NOOP on other backends). It must also be called before
+   * the image is rendered by any layer or by being drawn to a surface.
+   */
+  void setMipmapped (boolean mipmapped);
+
+  /**
    * Creates a texture for this image (if one does not already exist) and returns its OpenGL
    * texture id. Returns 0 if the underlying image data is not yet ready or if this platform does
    * not use OpenGL. If either {@code repeatX} or {@code repeatY} are true, the underlying image

@@ -111,6 +111,11 @@ class FlashImage implements Image {
   }
 
   @Override
+  public void setMipmapped (boolean mipmapped) {
+    // not supported
+  }
+
+  @Override
   public int ensureTexture(boolean repeatX, boolean repeatY) {
     return 0; // not supported
   }

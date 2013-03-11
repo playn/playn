@@ -47,6 +47,7 @@ public class TestsGame implements Game {
     new GetTextTest(),
     new ImageTypeTest(),
     new AlphaLayerTest(),
+    new ImageScalingTest(),
     new DepthTest(),
     new ClearBackgroundTest(),
     new LayerClickTest(),
