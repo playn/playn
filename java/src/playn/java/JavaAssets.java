@@ -146,7 +146,7 @@ public class JavaAssets extends AbstractAssets<BufferedImage> {
     return recv.loadFailed(error != null ? error : new FileNotFoundException(fullPath));
   }
 
-  InputStream getAssetStream(String path) throws IOException {
+  protected InputStream getAssetStream(String path) throws IOException {
     InputStream in = getClass().getClassLoader().getResourceAsStream(pathPrefix + path);
     if (in == null) {
       throw new FileNotFoundException(path);
@@ -154,7 +154,7 @@ public class JavaAssets extends AbstractAssets<BufferedImage> {
     return in;
   }
 
-  private Sound getSound(String path, boolean music) {
+  protected Sound getSound(String path, boolean music) {
     Exception err = null;
     for (String suff : SUFFIXES) {
       final String soundPath = path + suff;
@@ -168,7 +168,7 @@ public class JavaAssets extends AbstractAssets<BufferedImage> {
     return new Sound.Error(err);
   }
 
-  private URL requireResource(String path) throws FileNotFoundException {
+  protected URL requireResource(String path) throws FileNotFoundException {
     URL url = getClass().getClassLoader().getResource(path);
     if (url == null) {
       throw new FileNotFoundException(path);
@@ -176,7 +176,7 @@ public class JavaAssets extends AbstractAssets<BufferedImage> {
     return url;
   }
 
-  private BufferedImage scaleImage(BufferedImage image, float viewImageRatio) {
+  protected BufferedImage scaleImage(BufferedImage image, float viewImageRatio) {
     int swidth = MathUtil.iceil(viewImageRatio * image.getWidth());
     int sheight = MathUtil.iceil(viewImageRatio * image.getHeight());
     BufferedImage scaled = new BufferedImage(swidth, sheight, BufferedImage.TYPE_INT_ARGB);
@@ -186,7 +186,7 @@ public class JavaAssets extends AbstractAssets<BufferedImage> {
     return scaled;
   }
 
-  private Scale assetScale() {
+  protected Scale assetScale() {
     return (assetScale != null) ? assetScale : platform.graphics().ctx().scale;
   }
 
