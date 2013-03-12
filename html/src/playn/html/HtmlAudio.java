@@ -13,9 +13,9 @@
  */
 package playn.html;
 
-import com.allen_sauer.gwt.voices.client.FlashSound;
 import com.allen_sauer.gwt.voices.client.Sound;
 import com.allen_sauer.gwt.voices.client.SoundController;
+import com.allen_sauer.gwt.voices.client.SoundType;
 import com.allen_sauer.gwt.voices.client.ui.FlashMovie;
 import com.google.gwt.dom.client.Element;
 
@@ -49,7 +49,7 @@ public class HtmlAudio implements Audio {
 
   @SuppressWarnings("deprecation")
   public void init() {
-    HtmlPlatform.log.debug("Preferred sound type(s): " + soundController.getPreferredSoundType());
+    HtmlPlatform.log.debug("Preferred sound type(s): " + soundController.getPreferredSoundTypes());
 
     // Attempt to create Web Audio API audio context
     audioContext = maybeCreateAudioContext();
@@ -69,8 +69,8 @@ public class HtmlAudio implements Audio {
     }
 
     // Is Flash one of the requested audio types?
-    for (Class<?> clzz : soundController.getPreferredSoundType()) {
-      if (clzz == FlashSound.class) {
+    for (SoundType type : soundController.getPreferredSoundTypes()) {
+      if (type == SoundType.FLASH) {
         return isFlash9AudioPluginMissingImpl();
       }
     }
