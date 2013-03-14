@@ -491,10 +491,11 @@ class PointerMouseTouchTest extends Test {
     @Override
     public void render(Surface surface) {
       surface.setFillColor(0xff000000);
-      surface.drawLine(0, 0, layer.width(), 0, 1);
-      surface.drawLine(layer.width(), 0, layer.width(), layer.height(), 1);
-      surface.drawLine(layer.width(), layer.height() - 1, 0, layer.height() - 1, 1);
-      surface.drawLine(1, layer.height() - 1, 1, 0, 1);
+      float t = 0.5f, l = 0.5f, b = layer.height() - 0.5f, r = layer.width() - 0.5f;
+      surface.drawLine(l, t, l, b, 1);
+      surface.drawLine(r, t, r, b, 1);
+      surface.drawLine(l, b, r, b, 1);
+      surface.drawLine(l, t, r, t, 1);
     }
   }
 }
