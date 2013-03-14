@@ -77,8 +77,7 @@ public class TestsGame implements Game {
     touch().setListener(new Touch.Adapter() {
       @Override
       public void onTouchStart(Touch.Event[] touches) {
-        if (currentTest != null && currentTest.usesPositionalInputs())
-          return;
+        if (currentTest != null && currentTest.usesPositionalInputs()) return;
         // Android and iOS handle touch events rather differently, so we need to do this finagling
         // to determine whether there is an active two or three finger touch
         for (Touch.Event event : touches)
@@ -95,8 +94,6 @@ public class TestsGame implements Game {
         clearTouches(touches);
       }
       protected void clearTouches(Touch.Event[] touches) {
-        if (currentTest != null && currentTest.usesPositionalInputs())
-          return;
         for (Touch.Event event : touches)
           _active.remove(event.id());
       }
