@@ -16,7 +16,6 @@
 package playn.tests.core;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import static playn.core.PlayN.*;
@@ -31,7 +30,7 @@ import playn.core.TextLayout;
 public class PauseResumeTest extends Test {
 
   private final List<String> notifications = new ArrayList<String>();
-  private final ImageLayer layer = graphics().createImageLayer();
+  private ImageLayer layer;
 
   @Override
   public String getName() {
@@ -66,6 +65,7 @@ public class PauseResumeTest extends Test {
       public void onExit() {} // nada
     });
 
+    layer = graphics().createImageLayer();
     updateDisplay();
     graphics().rootLayer().addAt(layer, 15, 15);
   }
