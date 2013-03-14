@@ -195,6 +195,39 @@ public class CanvasTest extends Test {
         canvas.setFillColor(0xFF000000).fillText(capF, 0, 0);
       }
     });
+
+    addTestCanvas("round rect precision", 100, 100, new Drawer() {
+      float bwid = 4;
+      void outer (Canvas canvas, float y) {
+        canvas.setFillColor(0xFF000000);
+        canvas.fillRect(2, y, 94, 30);
+      }
+      void inner (Canvas canvas, float y) {
+        canvas.setFillColor(0xFF555555);
+        canvas.fillRect(2 + bwid, y + bwid, 94 - bwid * 2, 30 - bwid * 2);
+      }
+      void stroke (Canvas canvas, float y) {
+        canvas.setStrokeColor(0xFF99CCFF);
+        canvas.setStrokeWidth(bwid);
+        canvas.strokeRoundRect(2 + bwid / 2, y + bwid / 2, 94 - bwid, 30 - bwid, 10);
+      }
+      public void draw(Canvas canvas) {
+        float y = 1;
+        outer(canvas, y);
+        inner(canvas, y);
+        stroke(canvas, y);
+
+        y += 34;
+        outer(canvas, y);
+        stroke(canvas, y);
+        inner(canvas, y);
+
+        y += 34;
+        stroke(canvas, y);
+        outer(canvas, y);
+        inner(canvas, y);
+      }
+    });
   }
 
   @Override
