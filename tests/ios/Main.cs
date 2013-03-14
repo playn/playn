@@ -11,7 +11,9 @@ namespace playn.tests.ios
   [Register ("AppDelegate")]
   public partial class AppDelegate : IOSApplicationDelegate {
     public override bool FinishedLaunching (UIApplication app, NSDictionary options) {
-      var platform = IOSPlatform.register(app, IOSPlatform.SupportedOrients.LANDSCAPES);
+      IOSPlatform.Config config = new IOSPlatform.Config();
+      config.orients = IOSPlatform.SupportedOrients.LANDSCAPES;
+      IOSPlatform.register(app, config);
       PlayN.run(new TestsGame());
       return true;
     }
