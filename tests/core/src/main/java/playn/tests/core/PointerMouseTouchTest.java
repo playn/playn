@@ -305,21 +305,21 @@ class PointerMouseTouchTest extends Test {
   }
 
   protected ImageLayer createLabel(String text, int bg, float x, float y) {
-    return createLabel(text, graphics().rootLayer(), 0xFF6699CC, bg, x, y);
+    return createLabel(text, graphics().rootLayer(), 0xFF6699CC, bg, x, y, 0);
   }
 
   protected ImageLayer createLabel(String text, GroupLayer parent,
-                                   int fg, int bg, float x, float y) {
+                                   int fg, int bg, float x, float y, float padding) {
     TextLayout layout = graphics().layoutText(text, baseFormat);
-    float twidth = layout.width();
-    float theight = layout.height();
+    float twidth = layout.width() + padding * 2;
+    float theight = layout.height() + padding * 2;
     CanvasImage image = graphics().createImage(twidth, theight);
     if (bg != 0) {
       image.canvas().setFillColor(bg);
       image.canvas().fillRect(0, 0, twidth, theight);
     }
     image.canvas().setFillColor(fg);
-    image.canvas().fillText(layout, 0, 0);
+    image.canvas().fillText(layout, padding, padding);
     ImageLayer imageLayer = graphics().createImageLayer(image);
     imageLayer.setTranslation(x, y);
     parent.add(imageLayer);
@@ -475,7 +475,7 @@ class PointerMouseTouchTest extends Test {
     Box (String text, int color, float wid, float hei) {
       layer = graphics().createGroupLayer(wid, hei);
       layer.add(graphics().createImmediateLayer(this));
-      label = createLabel(text, layer, 0xff000000, color, 0, 0);
+      label = createLabel(text, layer, 0xff000000, color, 0, 0, 40);
       layer.addAt(label, (wid - label.image().width()) / 2, (hei - label.image().height()) / 2);
       layer.setHitTester(this);
     }
