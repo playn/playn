@@ -176,11 +176,23 @@ public class TestsGame implements Game {
 
     // setup root layer for next test
     clearRoot();
-    graphics().rootLayer().add(createWhiteBackground());
+
+    GroupLayer root = graphics().rootLayer();
+    root.add(createWhiteBackground());
 
     log().info("Starting " + currentTest.getName());
     log().info(" Description: " + currentTest.getDescription());
     currentTest.init();
+
+    if (currentTest.usesPositionalInputs()) {
+      // slap on a Back button if the test is testing the usual means of backing out
+      ImageLayer back = Test.createButton("Back", new Runnable() {
+        public void run () {
+          displayMenuLater();
+        }
+      });
+      root.addAt(back, graphics().width() - back.width(), 0);
+    }
   }
 
   @Override
