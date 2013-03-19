@@ -178,13 +178,14 @@ public interface Layer {
   Layer setOrigin(float x, float y);
 
   /**
-   * Sets the depth of this layer. Within a single {@link GroupLayer}, layers are rendered from
-   * lowest depth to highest depth.
+   * Returns this layer's current depth.
    */
   float depth();
 
   /**
-   * Updates this layer's depth.
+   * Sets the depth of this layer.
+   * <p>
+   * Within a single {@link GroupLayer}, layers are rendered from lowest depth to highest depth.
    *
    * @return a reference to this layer for call chaining.
    */
