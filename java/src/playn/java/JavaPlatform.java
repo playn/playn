@@ -89,16 +89,8 @@ public class JavaPlatform extends AbstractPlatform {
     return instance;
   }
 
-  // Maximum delta time to consider between update() calls (in milliseconds). If the delta between
-  // two update()s is greater than MAX_DELTA, we clamp to MAX_DELTA.
+  // If updateRate is 0, we will cap updateDelta at this value.
   private static final float MAX_DELTA = 100;
-
-  // Minimum time between any two paint() calls (in milliseconds). We will paint every
-  // FRAME_TIME ms, which is equivalent to (1000 * 1 / FRAME_TIME) frames per second.
-  // TODO(pdr): this is set ridiculously low because we're using Java's software renderer which
-  // causes the paint loop to be quite slow. Setting this to 10 prevents hitching that occurs when
-  // we try to squeeze a paint() near max bound of FRAME_TIME.
-  private static final float FRAME_TIME = 10;
 
   private static JavaPlatform testInstance;
 
@@ -126,11 +118,6 @@ public class JavaPlatform extends AbstractPlatform {
   private final JavaAssets assets = new JavaAssets(this);
 
   private final ExecutorService _exec = Executors.newFixedThreadPool(4);
-
-  private int updateRate = 0;
-  private float accum = updateRate;
-  private double lastUpdateTime;
-  private double lastPaintTime;
 
   public JavaPlatform(Config config) {
     super(new JavaLog());
@@ -253,8 +240,6 @@ public class JavaPlatform extends AbstractPlatform {
 
   @Override
   public void run(final Game game) {
-    this.updateRate = game.updateRate();
-
     try {
       // initialize LWJGL (and show the display) now that the game has been initialized
       graphics.init();
@@ -264,9 +249,10 @@ public class JavaPlatform extends AbstractPlatform {
     } catch (LWJGLException e) {
       throw new RuntimeException("Unrecoverable initialization error", e);
     }
-
     game.init();
 
+    final int updateRate = game.updateRate();
+    long updateTime = now();
     boolean wasActive = Display.isActive();
     while (!Display.isCloseRequested()) {
       // Event handling.
@@ -287,33 +273,29 @@ public class JavaPlatform extends AbstractPlatform {
       // Execute any pending runnables.
       runQueue.execute();
 
-      // Game loop.
-      double now = time();
-      float updateDelta = (float) (now - lastUpdateTime);
-      if (updateDelta > 1) {
-        updateDelta = updateDelta > MAX_DELTA ? MAX_DELTA : updateDelta;
-        lastUpdateTime = now;
+      // Run the game loop.
+      long now = now();
+      if (updateRate <= 0) {
+        game.update(Math.min(MAX_DELTA, now - updateTime));
+        updateTime = now;
+        graphics.paint(game, 0);
 
-        if (updateRate == 0) {
-          game.update(updateDelta);
-          accum = 0;
-        } else {
-          accum += updateDelta;
-          while (accum > updateRate) {
-            game.update(updateRate);
-            accum -= updateRate;
-          }
+      } else {
+        int updates = 0;
+        while (now >= updateTime) {
+          game.update(updateRate);
+          updateTime += updateRate;
+          updates++;
         }
+        // calling update() may have taken > 1ms, so we need to re-read the clock to determine how
+        // far along we really are in this particular frame
+        long pnow = (updates == 0) ? now : now();
+        float alpha = 1 - (updateTime - pnow) / (float)updateRate;
+        graphics.paint(game, alpha);
       }
 
-      float paintDelta = (float) (now - lastPaintTime);
-      if (paintDelta > FRAME_TIME) {
-        graphics.paint(game, updateRate == 0 ? 0 : accum / updateRate);
-        lastPaintTime = now;
-      }
-
-      Display.sync(60);
       Display.update();
+      Display.sync(60);
     }
 
     // let the game run any of its exit hooks
@@ -329,5 +311,9 @@ public class JavaPlatform extends AbstractPlatform {
 
     // and finally stick a fork in the JVM
     System.exit(0);
+  }
+
+  private static long now () {
+    return System.nanoTime() / 1000000L;
   }
 }
