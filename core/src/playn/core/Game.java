@@ -18,8 +18,6 @@ package playn.core;
 /**
  * Main game interface. To start a new game, implement this interface and call {@link PlayN#run}.
  *
- * TODO(jgw): Callbacks for resize, background, foreground, shutdown.
- *
  * @see <a href="http://code.google.com/p/playn/wiki/GameLoop">Understanding the Game Loop</a>
  */
 public interface Game {
@@ -37,7 +35,7 @@ public interface Game {
    * actions should be taken in {@link #paint}.
    *
    * @param delta time, in ms, passed since the previous {@link #update} (if {@link #updateRate} is
-   * zero, this will be wall time, otherwise it will always be {@link #updateRate}).
+   * zero, this will be real time, otherwise it will always be {@link #updateRate}).
    */
   void update(float delta);
 
@@ -49,8 +47,12 @@ public interface Game {
    * <p> You should not run game logic in this method, as it's not always guaranteed to be called
    * frequently (for example, when the game is not visible this method may not be called). </p>
    *
-   * @param alpha a value between 0 and 1, representing the proportion of time passed between the
-   * last two update ticks (if {@link #updateRate()} is zero, this value will always be zero.
+   * @param alpha a value between 0 and 1, this represents how far we have elapsed along the time
+   * line between the previous update tick and the next. For example if the previous update was
+   * scheduled to happen at T=500ms and the next update at T=530ms (i.e. {@link #updateRate}
+   * returns 30) and the actual time at which we are being rendered is T=517ms then alpha will be
+   * (517-500)/(530-500) or 17/30. Note: if {@link #updateRate} is zero, this value will always be
+   * zero.
    */
   void paint(float alpha);
 
