@@ -253,7 +253,7 @@ public abstract class HtmlGraphics implements Graphics {
 
   abstract Element rootElement();
 
-  abstract void paint(Game game, float paintAlpha);
+  abstract void paint();
 
   private native int fullScreenWidth() /*-{
      return $wnd.screen.width;

@@ -118,6 +118,7 @@ public class JavaPlatform extends AbstractPlatform {
   private final JavaAssets assets = new JavaAssets(this);
 
   private final ExecutorService _exec = Executors.newFixedThreadPool(4);
+  private final long start = System.nanoTime();
 
   public JavaPlatform(Config config) {
     super(new JavaLog());
@@ -223,6 +224,11 @@ public class JavaPlatform extends AbstractPlatform {
   }
 
   @Override
+  public int tick() {
+    return (int)((System.nanoTime() - start) / 1000000L);
+  }
+
+  @Override
   public void openURL(String url) {
     try {
       Desktop.getDesktop().browse(URI.create(url));
@@ -251,8 +257,6 @@ public class JavaPlatform extends AbstractPlatform {
     }
     game.init();
 
-    final int updateRate = game.updateRate();
-    long updateTime = now();
     boolean wasActive = Display.isActive();
     while (!Display.isCloseRequested()) {
       // Event handling.
@@ -273,28 +277,12 @@ public class JavaPlatform extends AbstractPlatform {
       // Execute any pending runnables.
       runQueue.execute();
 
-      // Run the game loop.
-      long now = now();
-      if (updateRate <= 0) {
-        game.update(Math.min(MAX_DELTA, now - updateTime));
-        updateTime = now;
-        graphics.paint(game, 0);
-
-      } else {
-        int updates = 0;
-        while (now >= updateTime) {
-          game.update(updateRate);
-          updateTime += updateRate;
-          updates++;
-        }
-        // calling update() may have taken > 1ms, so we need to re-read the clock to determine how
-        // far along we really are in this particular frame
-        long pnow = (updates == 0) ? now : now();
-        float alpha = 1 - (updateTime - pnow) / (float)updateRate;
-        graphics.paint(game, alpha);
-      }
-
+      // Run the game loop, render the scene graph, and update the display.
+      game.tick(tick());
+      graphics.paint();
       Display.update();
+
+      // Sleep until it's time for the next frame.
       Display.sync(60);
     }
 

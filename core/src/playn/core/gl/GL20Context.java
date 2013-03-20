@@ -62,19 +62,14 @@ public class GL20Context extends GLContext {
     checkGLError("initGL");
   }
 
-  public void preparePaint(GroupLayerGL rootLayer) {
-    checkGLError("preparePaint");
+  public void paint(GroupLayerGL rootLayer) {
     if (rootLayer.size() > 0) {
+      checkGLError("paint");
       bindFramebuffer();
       gl.glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear to transparent
+      rootLayer.paint(rootXform, Tint.NOOP_TINT, null); // paint all the layers
+      useShader(null, false); // flush any pending shader
     }
-  }
-
-  public void paintLayers(GroupLayerGL rootLayer) {
-    checkGLError("paintLayers");
-    bindFramebuffer();
-    rootLayer.paint(rootXform, Tint.NOOP_TINT, null); // paint all the layers
-    useShader(null, false); // flush any pending shader
     if (STATS_ENABLED) stats.frames++;
   }
 

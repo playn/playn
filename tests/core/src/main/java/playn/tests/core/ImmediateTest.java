@@ -105,8 +105,8 @@ public class ImmediateTest extends Test {
   }
 
   @Override
-  public void update(float delta) {
-    elapsed += delta/1000;
+  public void update(int delta) {
+    elapsed += delta/1000f;
     rotation = elapsed * FloatMath.PI/2;
   }
 }

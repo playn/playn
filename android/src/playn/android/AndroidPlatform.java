@@ -47,6 +47,7 @@ public class AndroidPlatform extends AbstractPlatform {
   private final AndroidStorage storage;
   private final TouchImpl touch;
   private final Json json;
+  private final long start = System.nanoTime();
 
   protected AndroidPlatform(GameActivity activity, AndroidGL20 gl20) {
     super(new AndroidLog(activity));
@@ -181,6 +182,11 @@ public class AndroidPlatform extends AbstractPlatform {
   }
 
   @Override
+  public int tick() {
+    return (int)((System.nanoTime() - start) / 1000000L);
+  }
+
+  @Override
   public void setPropagateEvents(boolean propagate) {
     touch.setPropagateEvents(propagate);
     pointer.setPropagateEvents(propagate);
@@ -208,10 +214,10 @@ public class AndroidPlatform extends AbstractPlatform {
     super.onExit();
   }
 
-  void update(float delta) {
+  void update() {
     runQueue.execute();
     if (game != null) {
-      game.update(delta);
+      game.tick(tick());
     }
   }
 }

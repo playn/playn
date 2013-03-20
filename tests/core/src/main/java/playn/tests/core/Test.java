@@ -18,34 +18,31 @@ package playn.tests.core;
 
 import playn.core.CanvasImage;
 import playn.core.Font;
-import playn.core.Game;
 import playn.core.ImageLayer;
-import playn.core.TextFormat;
 import playn.core.Layer;
 import playn.core.Pointer;
+import playn.core.TextFormat;
 import playn.core.TextLayout;
 import static playn.core.PlayN.graphics;
 
-public abstract class Test implements Game {
+public abstract class Test {
+
+  public static final int UPDATE_RATE = 25;
 
   public abstract String getName();
 
   public abstract String getDescription();
 
-  @Override
-  public void update(float delta) {
+  public void init() {
   }
 
-  @Override
+  public void update(int delta) {
+  }
+
   public void paint(float alpha) {
   }
 
   public void dispose() {
-  }
-
-  @Override
-  public int updateRate() {
-    return 25;
   }
 
   public boolean usesPositionalInputs () {

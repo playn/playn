@@ -23,7 +23,7 @@ public class SurfaceTest extends Test {
   private List<SurfaceLayer> dots = new ArrayList<SurfaceLayer>();
   private SurfaceLayer paintUpped;
   private Rectangle dotBox;
-  private float elapsed;
+  private int elapsed;
 
   @Override
   public String getName() {
@@ -169,15 +169,12 @@ public class SurfaceTest extends Test {
   }
 
   @Override
-  public void update(float delta) {
-    super.update(delta);
+  public void update(int delta) {
     elapsed += delta;
   }
 
   @Override
   public void paint(float alpha) {
-    super.paint(alpha);
-
     for (SurfaceLayer dot : dots) {
       if (random() > 0.95) {
         dot.setTranslation(dotBox.x + random()*(dotBox.width-10),
@@ -186,7 +183,8 @@ public class SurfaceTest extends Test {
     }
 
     if (paintUpped != null) {
-      float sin = Math.abs(FloatMath.sin(elapsed)), cos = Math.abs(FloatMath.cos(elapsed));
+      float now = (elapsed + UPDATE_RATE*alpha)/1000;
+      float sin = Math.abs(FloatMath.sin(now)), cos = Math.abs(FloatMath.cos(now));
       int sinColor = (int)(sin * 255), cosColor = (int)(cos * 255);
       int c1 = (0xFF << 24) | (sinColor << 16) | (cosColor << 8);
       int c2 = (0xFF << 24) | (cosColor << 16) | (sinColor << 8);

@@ -115,9 +115,8 @@ class HtmlGraphicsCanvas extends HtmlGraphics {
   }
 
   @Override
-  void paint(Game game, float paintAlpha) {
+  void paint() {
     ctx.clearRect(0, 0, width(), height());
-    game.paint(paintAlpha);
     rootLayer.paint(ctx, 1);
     ctx.setGlobalAlpha(1);
   }

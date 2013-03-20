@@ -18,7 +18,7 @@ import playn.core.util.Callback;
 
 public class SubImageTest extends Test {
 
-  private float elapsed;
+  private int elapsed;
   private Image.Region osci;
 
   @Override
@@ -95,10 +95,10 @@ public class SubImageTest extends Test {
   }
 
   @Override
-  public void update(float delta) {
+  public void update(int delta) {
     elapsed += delta;
     if (osci != null) {
-      float osciCurWidth = Math.abs(FloatMath.sin(elapsed/1000)) * osci.parent().width();
+      float osciCurWidth = Math.abs(FloatMath.sin(elapsed/1000f)) * osci.parent().width();
       osci.setBounds(0, 0, osciCurWidth, osci.parent().height());
     }
   }

@@ -159,6 +159,9 @@ public class HtmlPlatform extends AbstractPlatform {
   private final HtmlStorage storage = new HtmlStorage();
   private final HtmlAnalytics analytics = new HtmlAnalytics();
 
+  // installs backwards compat Date.now() if needed and calls it
+  private final double start = initNow();
+
   private Game game;
   private TimerCallback paintCallback;
   private TimerCallback updateCallback;
@@ -264,42 +267,17 @@ public class HtmlPlatform extends AbstractPlatform {
 
   @Override
   public void run(final Game game) {
-    final int updateRate = game.updateRate();
-
     this.game = game;
     game.init();
 
     // Game loop.
     paintCallback = new TimerCallback() {
-      private float accum = updateRate;
-      private double lastTime;
-
       @Override
       public void fire() {
         requestAnimationFrame(paintCallback);
-
-        // process pending actions
-        runQueue.execute();
-
-        double now = time();
-        float delta = (float) (now - lastTime);
-        if (delta > MAX_DELTA) {
-          delta = MAX_DELTA;
-        }
-        lastTime = now;
-
-        if (updateRate == 0) {
-          game.update(delta);
-          accum = 0;
-        } else {
-          accum += delta;
-          while (accum > updateRate) {
-            game.update(updateRate);
-            accum -= updateRate;
-          }
-        }
-
-        graphics.paint(game, updateRate == 0 ? 0 : accum / updateRate);
+        runQueue.execute(); // process pending actions
+        game.tick(tick());  // update the game
+        graphics.paint();   // draw the scene graph
       }
     };
     requestAnimationFrame(paintCallback);
@@ -307,7 +285,12 @@ public class HtmlPlatform extends AbstractPlatform {
 
   @Override
   public double time() {
-    return Duration.currentTimeMillis();
+    return now();
+  }
+
+  @Override
+  public int tick() {
+    return (int)(now() - start);
   }
 
   /**
@@ -423,5 +406,18 @@ public class HtmlPlatform extends AbstractPlatform {
     target.oncontextmenu = function() {
       return false;
     };
+  }-*/;
+
+  private static native double initNow () /*-{
+    if (!Date.now) {
+      Date.now = function now() {
+        return +(new Date);
+      };
+    }
+    return Date.now();
+  }-*/;
+
+  private static native double now () /*-{
+    return Date.now();
   }-*/;
 }

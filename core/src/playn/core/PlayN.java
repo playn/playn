@@ -75,6 +75,13 @@ public class PlayN {
   }
 
   /**
+   * Returns the number of milliseconds that have elapsed since the game started.
+   */
+  public static int tick() {
+    return platform.tick();
+  }
+
+  /**
    * Gets a random floating-point value in the range [0, 1).
    */
   public static float random() {

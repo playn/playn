@@ -326,20 +326,15 @@ public class IOSGLContext extends GLContext {
                   PixelFormat.wrap(PixelFormat.Rgba), PixelType.wrap(PixelType.UnsignedByte), data);
   }
 
-  void preparePaint() {
-    checkGLError("preparePaint start");
-    bindFramebuffer();
-    GL.Clear(ClearBufferMask.wrap(ClearBufferMask.ColorBufferBit | // clear to transparent
-                                  ClearBufferMask.DepthBufferBit));
-    checkGLError("preparePaint end");
-  }
-
-  void paintLayers(GroupLayerGL rootLayer) {
-    checkGLError("updateLayers start");
-    bindFramebuffer();
-    rootLayer.paint(rootTransform, Tint.NOOP_TINT, null); // paint all the layers
-    checkGLError("updateLayers end");
-    useShader(null, false); // guarantee a flush
+  void paint(GroupLayerGL rootLayer) {
+    if (rootLayer.size() > 0) {
+      checkGLError("paint");
+      bindFramebuffer();
+      GL.Clear(ClearBufferMask.wrap(ClearBufferMask.ColorBufferBit | // clear to transparent
+                                    ClearBufferMask.DepthBufferBit));
+      rootLayer.paint(rootTransform, Tint.NOOP_TINT, null); // paint all the layers
+      useShader(null, false); // guarantee a shader flush
+    }
     if (STATS_ENABLED) stats.frames++;
   }
 

@@ -25,7 +25,7 @@ import static playn.core.PlayN.*;
 
 public class ImageScalingTest extends Test {
 
-  private float elapsed;
+  private int elapsed;
   private boolean pointerPressed;
   private ImageLayer player1, player2;
   private ImageLayer slayer1, slayer2;
@@ -80,7 +80,7 @@ public class ImageScalingTest extends Test {
   }
 
   @Override
-  public void update(float delta) {
+  public void update(int delta) {
     super.update(delta);
     if (!pointerPressed) elapsed += delta;
   }
@@ -89,7 +89,8 @@ public class ImageScalingTest extends Test {
   public void paint(float alpha) {
     super.paint(alpha);
 
-    float scale = Math.max(Math.abs(FloatMath.sin(elapsed/1000)), FloatMath.EPSILON);
+    float now = elapsed + alpha*UPDATE_RATE;
+    float scale = Math.max(Math.abs(FloatMath.sin(now/1000)), FloatMath.EPSILON);
     player1.setScale(scale);
     player2.setScale(scale);
     slayer1.setScale(scale);

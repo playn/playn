@@ -118,8 +118,8 @@ public class ClippedGroupTest extends Test {
   }
 
   @Override
-  public void update(float delta) {
-    elapsed += delta/1000;
+  public void update(int delta) {
+    elapsed += delta/1000f;
     i1.setRotation(elapsed * FloatMath.PI/2);
     s1.setRotation(elapsed * FloatMath.PI/2);
     g2.setWidth(Math.max(1f, Math.abs(100 * FloatMath.sin(elapsed))));

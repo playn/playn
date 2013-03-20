@@ -206,10 +206,8 @@ public class AndroidGraphics extends GraphicsGL {
     return new AndroidSurfaceGL(platform.activity.getCacheDir(), ctx, width, height);
   }
 
-  void paint(Game game, float paintAlpha) {
-    ctx.preparePaint(rootLayer);
-    game.paint(paintAlpha);     // run the game's custom painting code
-    ctx.paintLayers(rootLayer); // paint the scene graph
+  void paint() {
+    ctx.paint(rootLayer);
   }
 
   IPoint transformTouch(float x, float y) {

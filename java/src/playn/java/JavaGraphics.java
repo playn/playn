@@ -129,7 +129,7 @@ public class JavaGraphics extends GraphicsGL {
   }
 
   @Override
-  public GLContext ctx() {
+  public GL20Context ctx() {
     return ctx;
   }
 
@@ -150,10 +150,8 @@ public class JavaGraphics extends GraphicsGL {
     point.y /= ctx.scale.factor;
   }
 
-  void paint(Game game, float paintAlpha) {
-    ctx.preparePaint(rootLayer);
-    game.paint(paintAlpha);
-    ctx.paintLayers(rootLayer);
+  void paint() {
+    ctx.paint(rootLayer);
   }
 
   protected Map<String,java.awt.Font> _fonts = new HashMap<String,java.awt.Font>();

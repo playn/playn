@@ -72,6 +72,7 @@ public class FlashPlatform extends AbstractPlatform {
   private final FlashNet net;
   private final FlashPointer pointer;
   private final FlashMouse mouse;
+  private final double start = Duration.currentTimeMillis();
 
   private Game game;
   private TimerCallback paintCallback;
@@ -172,13 +173,10 @@ public class FlashPlatform extends AbstractPlatform {
 
   @Override
   public void run(final Game game) {
-    final int updateRate = game.updateRate();
     this.game = game;
 
     // Game loop.
     paintCallback = new TimerCallback() {
-      private float accum = updateRate;
-      private double lastTime;
       int frameCounter = 0;
       private double frameCounterStart = 0;
 
@@ -186,31 +184,9 @@ public class FlashPlatform extends AbstractPlatform {
       public void fire() {
         // process pending actions
         runQueue.execute();
-
-        double now = time();
-        if (frameCounter == 0) {
-          frameCounterStart = now;
-        }
-
-        float delta = (float)(now - lastTime);
-        if (delta > MAX_DELTA) {
-          delta = MAX_DELTA;
-        }
-        lastTime = now;
-
-        if (updateRate == 0) {
-          game.update(delta);
-          accum = 0;
-        } else {
-          accum += delta;
-          while (accum > updateRate) {
-            game.update(updateRate);
-            accum -= updateRate;
-          }
-        }
-
-        game.paint(accum / updateRate);
-
+        // tick the game
+        game.tick(tick());
+        // render the scene graph
         graphics.updateLayers();
         frameCounter++;
         if (frameCounter == FPS_COUNTER_MAX) {
@@ -228,6 +204,11 @@ public class FlashPlatform extends AbstractPlatform {
   @Override
   public double time() {
     return Duration.currentTimeMillis();
+  }
+
+  @Override
+  public int tick() {
+    return (int)(Duration.currentTimeMillis() - start);
   }
 
   @Override

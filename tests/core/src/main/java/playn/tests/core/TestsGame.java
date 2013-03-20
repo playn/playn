@@ -21,7 +21,7 @@ import java.util.Set;
 import playn.core.*;
 import static playn.core.PlayN.*;
 
-public class TestsGame implements Game {
+public class TestsGame extends Game.Default {
 
   public static Image makeButtonImage(String label) {
     TextLayout layout = graphics().layoutText(label, BUTTON_FMT);
@@ -58,6 +58,10 @@ public class TestsGame implements Game {
     /*new YourTest(),*/
   };
   private Test currentTest;
+
+  public TestsGame () {
+    super(Test.UPDATE_RATE);
+  }
 
   @Override
   public void init() {
@@ -202,14 +206,9 @@ public class TestsGame implements Game {
   }
 
   @Override
-  public void update(float delta) {
+  public void update(int delta) {
     if (currentTest != null)
       currentTest.update(delta);
-  }
-
-  @Override
-  public int updateRate() {
-    return (currentTest == null) ? 25 : currentTest.updateRate();
   }
 
   protected void clearRoot() {

@@ -139,9 +139,7 @@ public class IOSGraphics extends GraphicsGL {
                          y*touchScale/ctx.scale.factor);
   }
 
-  void paint(Game game, float alpha) {
-    ctx.preparePaint();
-    game.paint(alpha); // run the game's custom painting code
-    ctx.paintLayers(rootLayer);
+  void paint() {
+    ctx.paint(rootLayer);
   }
 }

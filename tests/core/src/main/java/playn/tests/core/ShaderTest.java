@@ -186,7 +186,7 @@ public class ShaderTest extends Test {
   }
 
   @Override
-  public void update(float delta) {
-    elapsed += delta/1000;
+  public void update(int delta) {
+    elapsed += delta/1000f;
   }
 }

@@ -98,6 +98,7 @@ public class StubPlatform implements Platform {
   private Mouse mouse = new MouseStub();
   private Json json = new JsonImpl();
   private Pointer pointer = new PointerImpl() {};
+  private final long start = System.currentTimeMillis();
 
   protected PlayN.LifecycleListener _lifecycleListener;
 
@@ -114,6 +115,11 @@ public class StubPlatform implements Platform {
   @Override
   public double time() {
     return (double) System.currentTimeMillis();
+  }
+
+  @Override
+  public int tick() {
+    return (int)(System.currentTimeMillis() - start);
   }
 
   @Override

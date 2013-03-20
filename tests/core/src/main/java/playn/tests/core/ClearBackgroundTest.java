@@ -24,7 +24,7 @@ import static playn.core.PlayN.*;
 
 public class ClearBackgroundTest extends Test {
 
-  private float time;
+  private int time;
   private SurfaceLayer square;
   static int width = 100;
   static int height = 100;
@@ -53,13 +53,13 @@ public class ClearBackgroundTest extends Test {
   }
 
   @Override
-  public void update(float delta) {
+  public void update(int delta) {
     time += delta;
   }
 
   @Override
   public void paint(float alpha) {
-    float t = (time + alpha) / 1000;
+    float t = (time + alpha*UPDATE_RATE) / 1000;
     square.setTranslation((FloatMath.cos(t) + 1) * (graphics().width() - width) / 2,
                           (FloatMath.sin(t) + 1) * (graphics().height() - height) / 2);
   }

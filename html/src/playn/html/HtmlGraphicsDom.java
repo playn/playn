@@ -103,8 +103,7 @@ class HtmlGraphicsDom extends HtmlGraphics {
   }
 
   @Override
-  void paint(Game game, float paintAlpha) {
-    game.paint(paintAlpha);
+  void paint() {
     rootLayer.update();
   }
 

@@ -15,7 +15,6 @@
  */
 package playn.ios;
 
-import cli.System.DateTime;
 import cli.System.Drawing.RectangleF;
 import cli.System.EventArgs;
 
@@ -41,7 +40,6 @@ public class IOSGameView extends iPhoneOSGameView {
   private static final float MAX_DELTA = 100;
 
   private final IOSPlatform platform;
-  private DateTime lastUpdate = DateTime.get_Now();
   private boolean paused;
   private boolean createdCtx;
 
@@ -122,7 +120,7 @@ public class IOSGameView extends iPhoneOSGameView {
 
     // run a single frame so that we have something in our framebuffer when iOS stops displaying
     // our splash screen and starts displaying our app
-    platform.update(0);
+    platform.update();
     GL.BindFramebuffer(FramebufferTarget.wrap(FramebufferTarget.Framebuffer), get_Framebuffer());
     MakeCurrent();
     platform.paint();
@@ -133,17 +131,6 @@ public class IOSGameView extends iPhoneOSGameView {
   protected void OnUnload(EventArgs e) {
     super.OnUnload(e);
     UIDevice.get_CurrentDevice().EndGeneratingDeviceOrientationNotifications();
-  }
-
-  @Override
-  protected void OnRenderFrame(FrameEventArgs e) {
-    super.OnRenderFrame(e);
-
-    if (!paused) {
-      MakeCurrent();
-      platform.paint();
-      SwapBuffers();
-    }
   }
 
   @Override
@@ -159,11 +146,18 @@ public class IOSGameView extends iPhoneOSGameView {
   @Override
   protected void OnUpdateFrame(FrameEventArgs e) {
     super.OnUpdateFrame(e);
+    platform.update();
+  }
 
-    DateTime now = DateTime.get_Now();
-    float delta = Math.min(MAX_DELTA, (now.get_Ticks() - lastUpdate.get_Ticks())/10000f);
-    lastUpdate = now;
-    platform.update(delta);
+  @Override
+  protected void OnRenderFrame(FrameEventArgs e) {
+    super.OnRenderFrame(e);
+
+    if (!paused) {
+      MakeCurrent();
+      platform.paint();
+      SwapBuffers();
+    }
   }
 
   @ExportAttribute.Annotation("layerClass")

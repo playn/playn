@@ -28,6 +28,8 @@ public interface Platform {
 
   double time();
 
+  int tick();
+
   float random();
 
   void openURL(String url);

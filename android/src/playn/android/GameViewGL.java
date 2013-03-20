@@ -15,6 +15,7 @@
  */
 package playn.android;
 
+import java.util.concurrent.atomic.AtomicBoolean;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
@@ -25,11 +26,12 @@ public class GameViewGL extends GLSurfaceView {
 
   private final AndroidPlatform platform;
   private final AndroidGL20 gl20;
-  private GameLoop loop;
+  private AtomicBoolean started = new AtomicBoolean(false);
+  private AtomicBoolean paused = new AtomicBoolean(true);
 
-  public GameViewGL(Context context, AndroidPlatform platform, AndroidGL20 gl20) {
+  public GameViewGL(Context context, AndroidPlatform plat, AndroidGL20 gl20) {
     super(context);
-    this.platform = platform;
+    this.platform = plat;
     this.gl20 = gl20;
 
     setFocusable(true);
@@ -48,14 +50,16 @@ public class GameViewGL extends GLSurfaceView {
       @Override
       public void onSurfaceChanged(GL10 gl, int width, int height) {
         GameViewGL.this.platform.graphics().onSizeChanged(width, height);
-        // we defer the start of the game until we've received our initial surface size; thus we
-        // create our game loop lazily, then initialize the game and start the loop
-        if (loop == null)
+        // we defer the start of the game until we've received our initial surface size
+        if (!started.get())
           startGame();
       }
       @Override
       public void onDrawFrame(GL10 gl) {
-        loop.run();
+        if (!paused.get()) {
+          platform.update();
+          platform.graphics().paint();
+        }
       }
     });
     setRenderMode(RENDERMODE_CONTINUOUSLY);
@@ -63,10 +67,8 @@ public class GameViewGL extends GLSurfaceView {
 
   @Override
   public void onPause() {
-    // in theory loop should never be null, but I saw a crash in the field, so somehow someone
-    // managed to start and pause the app before the renderer was able to render a single frame
-    if (loop != null)
-      loop.pause();
+    // pause our game updates
+    paused.set(true);
     // this is a terribly unfortunate hack; we would like to override surfaceDestroyed and indicate
     // that our surface was lost only when that method was called, but surfaceDestroyed is not
     // called when the screen is locked while our game is running (even though we do in fact lose
@@ -83,19 +85,17 @@ public class GameViewGL extends GLSurfaceView {
   @Override
   public void onResume() {
     super.onResume();
-    // the very first time we're resumed, our loop will still be null because we wait to create it
-    // until after our UI has been laid out and we know the size of the game screen
-    if (loop != null)
-      loop.start();
+    // unpause our game updates
+    paused.set(false);
   }
 
   void startGame() {
-    loop = new GameLoop(platform);
+    started.set(true);
     queueEvent(new Runnable() {
       @Override
       public void run() {
         platform.activity.main();
-        loop.start();
+        paused.set(false);
       }
     });
   }

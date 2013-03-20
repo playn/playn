@@ -21,6 +21,7 @@ import java.io.PrintStream;
 import java.util.HashMap;
 import java.util.Map;
 
+import cli.System.DateTime;
 import cli.System.Drawing.RectangleF;
 import cli.System.Threading.ThreadPool;
 import cli.System.Threading.WaitCallback;
@@ -164,6 +165,7 @@ public class IOSPlatform extends AbstractPlatform {
   private final IOSRootViewController rootViewController;
   private final IOSGameView gameView;
   private final UIView uiOverlay;
+  private final long start = DateTime.get_Now().get_Ticks();
 
   /** Returns the top-level UIWindow. */
   public UIWindow window () {
@@ -318,6 +320,11 @@ public class IOSPlatform extends AbstractPlatform {
   }
 
   @Override
+  public int tick() {
+    return (int)((DateTime.get_Now().get_Ticks() - start) / 10000);
+  }
+
+  @Override
   public void openURL(String url) {
     if (!app.OpenUrl(new NSUrl(url))) {
       log().warn("Failed to open URL: " + url);
@@ -399,32 +406,15 @@ public class IOSPlatform extends AbstractPlatform {
     // TODO: notify the game of the orientation change
   }
 
-  void update(float delta) {
-    // log.debug("Update " + delta);
-
+  void update() {
     // process pending actions
     runQueue.execute();
-
     // perform the game updates
-    float updateRate = game.updateRate();
-    if (updateRate == 0) {
-      game.update(delta);
-      accum = 0;
-    } else {
-      accum += delta;
-      while (accum >= updateRate) {
-        game.update(updateRate);
-        accum -= updateRate;
-      }
-    }
-
-    // save the alpha, we'll get a call to paint later
-    alpha = (updateRate == 0) ? 0 : accum / updateRate;
+    game.tick(tick());
   }
 
   void paint() {
-    // log.debug("Paint " + alpha);
-    graphics.paint(game, alpha);
+    graphics.paint();
   }
 
   protected static final Map<UIDeviceOrientation,UIInterfaceOrientation> ORIENT_MAP =

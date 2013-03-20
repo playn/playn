@@ -20,7 +20,7 @@ import static playn.core.PlayN.*;
 import playn.core.Game;
 import playn.core.GroupLayer;
 
-public class Bench implements Game {
+public class Bench extends Game.Default {
 
   private static final TimeTest[] TESTS = new TimeTest[] {
     new SurfaceTimeTest(),
@@ -31,13 +31,17 @@ public class Bench implements Game {
   private int curTextIndex = -1;
   private TimeTest curTest;
 
+  public Bench () {
+    super(33);
+  }
+
   @Override
   public void init() {
     nextTest();
   }
 
   @Override
-  public void update(float delta) {
+  public void update(int delta) {
   }
 
   @Override
@@ -48,11 +52,6 @@ public class Bench implements Game {
         nextTest();
       }
     }
-  }
-
-  @Override
-  public int updateRate() {
-    return 33;
   }
 
   private void cleanup() {

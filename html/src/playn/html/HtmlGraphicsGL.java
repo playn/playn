@@ -144,14 +144,8 @@ class HtmlGraphicsGL extends HtmlGraphics {
   }
 
   @Override
-  void paint(Game game, float paintAlpha) {
-    if (rootLayer.size() > 0) {
-      ctx.preparePaint(rootLayer);
-      game.paint(paintAlpha);
-      ctx.paintLayers(rootLayer);
-    } else {
-      game.paint(paintAlpha);
-    }
+  void paint() {
+    ctx.paint(rootLayer);
   }
 
   @Override
