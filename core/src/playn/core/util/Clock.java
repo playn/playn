@@ -42,7 +42,7 @@ public interface Clock {
   public static class Source implements Clock {
     private final int updateRate;
     private int elapsed;
-    private float current;
+    private float current, paintDelta;
 
     public Source(int updateRate) {
       this.updateRate = updateRate;
@@ -53,6 +53,11 @@ public interface Clock {
       return current;
     }
 
+    @Override
+    public float dt() {
+      return paintDelta;
+    }
+
     /** Call this from {@link playn.core.Game.Default#update}. */
     public void update(int delta) {
       elapsed += delta;
@@ -61,10 +66,18 @@ public interface Clock {
 
     /** Call this from {@link playn.core.Game.Default#paint}. */
     public void paint(float alpha) {
-      current = elapsed + alpha * updateRate;
+      float newCurrent = elapsed + alpha * updateRate;
+      paintDelta = newCurrent - current;
+      current = newCurrent;
     }
   }
 
   /** Returns the current time, adjusted for the latest paint's alpha. */
   float time();
+
+  /** Returns the ms between the current alpha-adjusted paint time (aka {@link #time}) and the last
+   * alpha-adjusted paint time. Some animation APIs really just want to know how many ms have
+   * elapsed since they last did their interpolation, and this saves them the trouble of having to
+   * track it themselves. */
+  float dt();
 }
