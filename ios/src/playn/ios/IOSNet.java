@@ -15,11 +15,20 @@
  */
 package playn.ios;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import cli.System.Convert;
+import cli.System.Runtime.InteropServices.Marshal;
+
 import cli.MonoTouch.Foundation.NSData;
+import cli.MonoTouch.Foundation.NSDictionary;
 import cli.MonoTouch.Foundation.NSError;
 import cli.MonoTouch.Foundation.NSHttpUrlResponse;
 import cli.MonoTouch.Foundation.NSMutableData;
 import cli.MonoTouch.Foundation.NSMutableUrlRequest;
+import cli.MonoTouch.Foundation.NSObject;
 import cli.MonoTouch.Foundation.NSString;
 import cli.MonoTouch.Foundation.NSStringEncoding;
 import cli.MonoTouch.Foundation.NSUrl;
@@ -38,22 +47,29 @@ public class IOSNet extends NetImpl {
   }
 
   @Override
-  public void get(String url, Callback<String> callback) {
-    sendRequest(new NSUrlRequest(new NSUrl(url)), callback);
+  protected void execute(BuilderImpl req, Callback<Response> callback) {
+    NSMutableUrlRequest mreq = new NSMutableUrlRequest(new NSUrl(req.url));
+    for (Header header : req.headers) {
+      mreq.set_Item(header.name, header.value);
+    }
+    mreq.set_HttpMethod(req.method());
+    if (req.isPost()) {
+      mreq.set_Item("Content-type", req.contentType());
+      if (req.payloadString != null) {
+        mreq.set_Body(NSData.FromString(req.payloadString,
+                                        NSStringEncoding.wrap(NSStringEncoding.UTF8)));
+      } else {
+        mreq.set_Body(NSData.FromArray(req.payloadBytes));
+      }
+    }
+    sendRequest(mreq, callback);
   }
 
-  @Override
-  public void post(String url, String data, Callback<String> callback) {
-    NSMutableUrlRequest req = new NSMutableUrlRequest(new NSUrl(url));
-    req.set_HttpMethod("POST");
-    req.set_Body(NSData.FromString(data, NSStringEncoding.wrap(NSStringEncoding.UTF8)));
-    sendRequest(req, callback);
-  }
-
-  protected void sendRequest(NSUrlRequest req, final Callback<String> callback) {
+  protected void sendRequest(NSUrlRequest req, final Callback<Response> callback) {
     new NSUrlConnection(req, new NSUrlConnectionDelegate() {
       private NSMutableData data;
       private int rspCode = -1;
+      private NSDictionary headers;
 
       @Override
       public void ReceivedResponse(NSUrlConnection conn, NSUrlResponse rsp) {
@@ -62,7 +78,9 @@ public class IOSNet extends NetImpl {
         data = new NSMutableData();
         // note our most recent response code
         if (rsp instanceof NSHttpUrlResponse) {
-          rspCode = ((NSHttpUrlResponse)rsp).get_StatusCode();
+          NSHttpUrlResponse hrsp = (NSHttpUrlResponse)rsp;
+          rspCode = hrsp.get_StatusCode();
+          headers = hrsp.get_AllHeaderFields();
         }
       }
       @Override
@@ -77,13 +95,43 @@ public class IOSNet extends NetImpl {
       }
       @Override
       public void FinishedLoading (NSUrlConnection conn) {
-        NSString nsResult = NSString.FromData(data, NSStringEncoding.wrap(NSStringEncoding.UTF8));
-        String result = NSString.op_Implicit(nsResult);
-        if (rspCode == 200) {
-          platform.notifySuccess(callback, result);
-        } else {
-          platform.notifyFailure(callback, new HttpException(rspCode, result));
-        }
+        platform.notifySuccess(callback, new ResponseImpl(rspCode) {
+          @Override
+          public Iterable<String> headerNames() {
+            List<String> list = new ArrayList<String>();
+            if (headers != null) {
+              for (NSObject key : headers.get_Keys()) {
+                list.add(key.ToString());
+              }
+            }
+            return list;
+          }
+          @Override
+          public String header(String name) {
+            NSObject value = (headers == null) ? null : headers.get_Item(name);
+            return (value == null) ? null : value.ToString();
+          }
+          @Override
+          public List<String> headers(String name) {
+            String value = header(name);
+            // iOS concatenates all repeated headers into a single header separated by commas,
+            // which is known to be a fucking stupid thing to do, but hey, they're doing it!
+            return (value == null) ? Collections.<String>emptyList() :
+              Collections.singletonList(value);
+          }
+          @Override
+          public String payloadString() {
+            return NSString.op_Implicit(
+              NSString.FromData(data, NSStringEncoding.wrap(NSStringEncoding.UTF8)));
+          }
+          @Override
+          public byte[] payload() {
+            int length = Convert.ToInt32(data.get_Length());
+            byte[] bytes = new byte[length];
+            Marshal.Copy(data.get_Bytes(), bytes, 0, length);
+            return bytes;
+          }
+        });
       }
     }, true);
   }

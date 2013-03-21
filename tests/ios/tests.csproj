@@ -127,4 +127,7 @@
     <Content Include="assets\sounds\fanfare.caf" />
     <Content Include="touch-icon-57x57.png" />
   </ItemGroup>
+  <ItemGroup>
+    <BundleResource Include="assets\images\star.png" />
+  </ItemGroup>
 </Project>

@@ -116,7 +116,10 @@ public interface Net {
      * response headers with this name, one will be chosen using an undefined algorithm. */
     String header(String name);
 
-    /** Returns the value of all headers with the specified name, or the empty list. */
+    /** Returns the value of all headers with the specified name, or the empty list.
+     * <p><em>NOTE:</em> on the iOS backend, repeated headers will be coalesced into a single
+     * header separated by commas. This sucks but we can't "undo" the coalescing without breaking
+     * otherwise normal headers that happent to contain commas. Complain to Apple.</p> */
     List<String> headers(String name);
 
     /** Returns the response payload as a string, decoded using the character set specified in the

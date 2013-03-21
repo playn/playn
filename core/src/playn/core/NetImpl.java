@@ -28,6 +28,8 @@ import playn.core.util.Callback;
  */
 public abstract class NetImpl implements Net {
 
+  protected static final String UTF8 = "UTF-8";
+
   protected class Header {
     public final String name;
     public final String value;
@@ -57,6 +59,10 @@ public abstract class NetImpl implements Net {
 
     public String method() {
       return isPost() ? "POST" : "GET";
+    }
+
+    public String contentType() {
+      return contentType + (payloadString != null ? ("; charset=" + UTF8) : "");
     }
 
     @Override

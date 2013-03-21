@@ -36,7 +36,6 @@ import playn.core.util.Callback;
 public class JavaNet extends NetImpl {
 
   private static final int BUF_SIZE = 4096;
-  private static final String ENCODING = "UTF-8";
   private List<JavaWebSocket> sockets = new ArrayList<JavaWebSocket>();
 
   public JavaNet(JavaPlatform platform) {
@@ -67,12 +66,10 @@ public class JavaNet extends NetImpl {
             conn.setDoOutput(true);
             conn.setDoInput(true);
             conn.setAllowUserInteraction(false);
-            String encType = (req.payloadString == null) ? "" : ("; charset=" + ENCODING);
-            conn.setRequestProperty("Content-type", req.contentType + encType);
+            conn.setRequestProperty("Content-type", req.contentType());
             conn.connect();
-            byte[] payload = (req.payloadString == null) ? req.payloadBytes :
-              req.payloadString.getBytes(ENCODING);
-            conn.getOutputStream().write(payload);
+            conn.getOutputStream().write(
+              (req.payloadString == null) ? req.payloadBytes : req.payloadString.getBytes(UTF8));
             conn.getOutputStream().close();
           }
 
@@ -81,7 +78,7 @@ public class JavaNet extends NetImpl {
             int code = conn.getResponseCode();
             byte[] payload = ByteStreams.toByteArray(conn.getInputStream());
             String encoding = conn.getContentEncoding();
-            if (encoding == null) encoding = ENCODING;
+            if (encoding == null) encoding = UTF8;
             platform.notifySuccess(callback, new BinaryResponse(code, payload, encoding) {
               private Map<String,List<String>> headerFieldsCache;
               private Map<String,List<String>> headerFields() {
