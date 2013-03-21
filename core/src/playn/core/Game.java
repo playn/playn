@@ -15,6 +15,8 @@
  */
 package playn.core;
 
+import playn.core.Asserts;
+
 /**
  * Main game API. Most games will want to create an instance of {@link playn.core.Game.Default} and
  * pass it to {@link PlayN#run}.
@@ -40,6 +42,7 @@ public interface Game {
      * @param updateRate  the desired update rate of the main game loop, in ms.
      */
     public Default (int updateRate) {
+      Asserts.checkArgument(updateRate > 0, "updateRate must be greater than zero.");
       this.updateRate = updateRate;
     }
 
