@@ -27,6 +27,8 @@ public class TestsGameJava {
     if (args.length > 0) {
       config.scaleFactor = Float.parseFloat(args[0]);
     }
+    config.width = 800;
+    config.height = 600;
     JavaPlatform platform = JavaPlatform.register(config);
     platform.setTitle("Tests");
     PlayN.run(new TestsGame());
