@@ -15,11 +15,15 @@
  */
 package playn.flash;
 
-import playn.core.Net;
+import playn.core.NetImpl;
 import playn.core.PlayN;
 import playn.core.util.Callback;
 
-public class FlashNet implements Net {
+public class FlashNet extends NetImpl {
+
+  public FlashNet(FlashPlatform platform) {
+    super(platform);
+  }
 
   @Override
   public void get(String url, Callback<String> callback) {
@@ -39,9 +43,4 @@ public class FlashNet implements Net {
       });
       loader.load(request);
   }-*/;
-
-  @Override
-  public WebSocket createWebSocket(String url, WebSocket.Listener listener) {
-    throw new UnsupportedOperationException();
-  }
 }

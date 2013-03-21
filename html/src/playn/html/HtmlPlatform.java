@@ -149,7 +149,7 @@ public class HtmlPlatform extends AbstractPlatform {
   private final HtmlGraphics graphics;
   private final HtmlJson json = new HtmlJson();
   private final HtmlKeyboard keyboard = new HtmlKeyboard();
-  private final HtmlNet net = new HtmlNet();
+  private final HtmlNet net = new HtmlNet(this);
   private final HtmlPointer pointer;
   private final HtmlMouse mouse;
   private final HtmlTouch touch;

@@ -78,7 +78,7 @@ public class FlashPlatform extends AbstractPlatform {
   protected FlashPlatform() {
     super(new FlashLog());
     regularExpression = new HtmlRegularExpression();
-    net = new FlashNet();
+    net = new FlashNet(this);
     audio = new FlashAudio();
     keyboard = new FlashKeyboard();
     pointer = new FlashPointer();

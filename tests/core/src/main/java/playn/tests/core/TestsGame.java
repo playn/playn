@@ -55,6 +55,7 @@ public class TestsGame extends Game.Default {
     new MouseWheelTest(),
     new ShaderTest(),
     new SoundTest(),
+    new NetTest(),
     /*new YourTest(),*/
   };
   private Test currentTest;

@@ -16,14 +16,19 @@
 package playn.java;
 
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import com.google.common.io.ByteStreams;
 
 import playn.core.NetImpl;
 import playn.core.util.Callback;
@@ -46,17 +51,61 @@ public class JavaNet extends NetImpl {
   }
 
   @Override
-  public void get(final String urlStr, final Callback<String> callback) {
+  protected void execute(final BuilderImpl req, final Callback<Response> callback) {
     platform.invokeAsync(new Runnable() {
       @Override
       public void run() {
         try {
-          URL url = new URL(canonicalizeUrl(urlStr));
-          URLConnection conn = url.openConnection();
-          if (conn instanceof HttpURLConnection) {
-            processResponse((HttpURLConnection) conn, callback);
-          } else {
-            platform.notifySuccess(callback, readContent(conn));
+          // configure the request
+          URL url = new URL(canonicalizeUrl(req.url));
+          final HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+          for (Header header : req.headers) {
+            conn.setRequestProperty(header.name, header.value);
+          }
+          conn.setRequestMethod(req.method());
+          if (req.isPost()) {
+            conn.setDoOutput(true);
+            conn.setDoInput(true);
+            conn.setAllowUserInteraction(false);
+            String encType = (req.payloadString == null) ? "" : ("; charset=" + ENCODING);
+            conn.setRequestProperty("Content-type", req.contentType + encType);
+            conn.connect();
+            byte[] payload = (req.payloadString == null) ? req.payloadBytes :
+              req.payloadString.getBytes(ENCODING);
+            conn.getOutputStream().write(payload);
+            conn.getOutputStream().close();
+          }
+
+          // issue the request and process the response
+          try {
+            int code = conn.getResponseCode();
+            byte[] payload = ByteStreams.toByteArray(conn.getInputStream());
+            String encoding = conn.getContentEncoding();
+            if (encoding == null) encoding = ENCODING;
+            platform.notifySuccess(callback, new BinaryResponse(code, payload, encoding) {
+              private Map<String,List<String>> headerFieldsCache;
+              private Map<String,List<String>> headerFields() {
+                if (headerFieldsCache == null) {
+                  headerFieldsCache = conn.getHeaderFields();
+                }
+                return headerFieldsCache;
+              }
+              @Override
+              public Iterable<String> headerNames() {
+                return headerFields().keySet();
+              }
+              @Override
+              public String header(String name) {
+                List<String> values = headerFields().get(name);
+                return (values == null) ? null : values.get(0);
+              }
+              @Override public List<String> headers(String name) {
+                List<String> values = headerFields().get(name);
+                return values == null ? Collections.<String>emptyList() : values;
+              }
+            });
+          } finally {
+            conn.disconnect();
           }
 
         } catch (MalformedURLException e) {
@@ -67,39 +116,7 @@ public class JavaNet extends NetImpl {
       }
       @Override
       public String toString() {
-        return "JavaNet.get(" + urlStr + ")";
-      }
-    });
-  }
-
-  @Override
-  public void post(final String urlStr, final String data, final Callback<String> callback) {
-    platform.invokeAsync(new Runnable() {
-      @Override
-      public void run() {
-        try {
-          URL url = new URL(canonicalizeUrl(urlStr));
-          HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-          conn.setRequestMethod("POST");
-          conn.setDoOutput(true);
-          conn.setDoInput(true);
-          conn.setAllowUserInteraction(false);
-          conn.setRequestProperty("Content-type", "text/xml; charset=" + ENCODING);
-
-          conn.connect();
-          conn.getOutputStream().write(data.getBytes(ENCODING));
-          conn.getOutputStream().close();
-          processResponse(conn, callback);
-
-        } catch (MalformedURLException e) {
-          platform.notifyFailure(callback, e);
-        } catch (IOException e) {
-          platform.notifyFailure(callback, e);
-        }
-      }
-      @Override
-      public String toString() {
-        return "JavaNet.post(" + urlStr + ")";
+        return "JavaNet." + req.method().toLowerCase() + "(" + req.url + ")";
       }
     });
   }
@@ -110,20 +127,6 @@ public class JavaNet extends NetImpl {
       if (!s.update()) {
         it.remove();
       }
-    }
-  }
-
-  private void processResponse(HttpURLConnection conn, Callback<String> callback)
-      throws IOException {
-    try {
-      int code = conn.getResponseCode();
-      if (code != HttpURLConnection.HTTP_OK) {
-        throw new HttpException(code, conn.getResponseMessage());
-      } else {
-        platform.notifySuccess(callback, readContent(conn));
-      }
-    } finally {
-      conn.disconnect();
     }
   }
 
@@ -139,17 +142,5 @@ public class JavaNet extends NetImpl {
   // TODO: Make this specifyable somewhere.
   private String server() {
     return "127.0.0.1:8080";
-  }
-
-  private String readContent(URLConnection conn) throws IOException {
-    String encoding = conn.getContentEncoding() == null ? ENCODING : conn.getContentEncoding();
-    InputStreamReader reader = new InputStreamReader(conn.getInputStream(), encoding);
-    StringBuffer result = new StringBuffer();
-    char[] buf = new char[BUF_SIZE];
-    int len = 0;
-    while (-1 != (len = reader.read(buf))) {
-      result.append(buf, 0, len);
-    }
-    return result.toString();
   }
 }

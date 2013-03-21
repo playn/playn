@@ -15,10 +15,142 @@
  */
 package playn.core;
 
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import playn.core.util.Callback;
+
 /**
  * An abstract implementation of {@link Net} shared by multiple backends.
  */
 public abstract class NetImpl implements Net {
+
+  protected class Header {
+    public final String name;
+    public final String value;
+
+    public Header(String name, String value) {
+      this.name = name;
+      this.value = value;
+    }
+  }
+
+  protected class BuilderImpl implements Builder {
+    public final String url;
+    public final List<Header> headers = new ArrayList<Header>();
+    public String contentType = "text/plain";
+    public String payloadString;
+    public byte[] payloadBytes;
+
+    public BuilderImpl(String url) {
+      Asserts.checkArgument(url.startsWith("http:") || url.startsWith("https:"),
+                            "Only http and https URLs are supported");
+      this.url = url;
+    }
+
+    public boolean isPost() {
+      return payloadString != null || payloadBytes != null;
+    }
+
+    public String method() {
+      return isPost() ? "POST" : "GET";
+    }
+
+    @Override
+    public Builder setPayload(String payload) {
+      return setPayload(payload, "text/plain");
+    }
+
+    @Override
+    public Builder setPayload(String payload, String contentType) {
+      this.payloadString = payload;
+      this.contentType = contentType;
+      return this;
+    }
+
+    @Override
+    public Builder setPayload(byte[] payload) {
+      return setPayload(payload, "application/octet-stream");
+    }
+
+    @Override
+    public Builder setPayload(byte[] payload, String contentType) {
+      this.payloadBytes = payload;
+      this.contentType = contentType;
+      return this;
+    }
+
+    @Override
+    public Builder addHeader(String name, String value) {
+      headers.add(new Header(name, value));
+      return this;
+    }
+
+    @Override
+    public void execute (Callback<Response> callback) {
+      NetImpl.this.execute(this, callback);
+    }
+  }
+
+  protected abstract class ResponseImpl implements Response {
+    private int responseCode;
+
+    public ResponseImpl(int responseCode) {
+      this.responseCode = responseCode;
+    }
+
+    @Override
+    public int responseCode() {
+      return this.responseCode;
+    }
+  }
+
+  protected abstract class StringResponse extends ResponseImpl {
+    private final String payload;
+
+    public StringResponse(int responseCode, String payload) {
+      super(responseCode);
+      this.payload = payload;
+    }
+
+    @Override
+    public String payloadString() {
+      return payload;
+    }
+
+    @Override
+    public byte[] payload() {
+      throw new UnsupportedOperationException();
+    }
+  }
+
+  protected abstract class BinaryResponse extends ResponseImpl {
+    private final byte[] payload;
+    private final String encoding;
+
+    public BinaryResponse(int responseCode, byte[] payload, String encoding) {
+      super(responseCode);
+      this.payload = payload;
+      this.encoding = encoding;
+    }
+
+    @Override
+    public String payloadString() {
+      try {
+        return new String(payload, encoding);
+      } catch (UnsupportedEncodingException uee) {
+        return uee.toString();
+      }
+    }
+
+    @Override
+    public byte[] payload() {
+      return payload;
+    }
+  }
 
   protected final AbstractPlatform platform;
 
@@ -27,7 +159,38 @@ public abstract class NetImpl implements Net {
     throw new UnsupportedOperationException();
   }
 
+  @Override
+  public void get(String url, Callback<String> callback) {
+    req(url).execute(adapt(callback));
+  }
+
+  @Override
+  public void post(String url, String data, Callback<String> callback) {
+    req(url).setPayload(data).execute(adapt(callback));
+  }
+
+  @Override
+  public Builder req(String url) {
+    return new BuilderImpl(url);
+  }
+
   protected NetImpl(AbstractPlatform platform) {
     this.platform = platform;
+  }
+
+  protected void execute(BuilderImpl req, Callback<Response> callback) {
+    throw new UnsupportedOperationException();
+  }
+
+  private Callback<Response> adapt (final Callback<String> callback) {
+    return new Callback.Chain<Response>(callback) {
+      public void onSuccess(Response rsp) {
+        if (rsp.responseCode() == 200) {
+          callback.onSuccess(rsp.payloadString());
+        } else {
+          callback.onFailure(new HttpException(rsp.responseCode(), rsp.payloadString()));
+        }
+      }
+    };
   }
 }

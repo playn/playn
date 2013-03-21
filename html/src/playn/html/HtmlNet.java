@@ -18,10 +18,14 @@ package playn.html;
 import com.google.gwt.xhr.client.ReadyStateChangeHandler;
 import com.google.gwt.xhr.client.XMLHttpRequest;
 
-import playn.core.Net;
+import playn.core.NetImpl;
 import playn.core.util.Callback;
 
-public class HtmlNet implements Net {
+public class HtmlNet extends NetImpl {
+
+  public HtmlNet(HtmlPlatform platform) {
+    super(platform);
+  }
 
   @Override
   public WebSocket createWebSocket(String url, WebSocket.Listener listener) {
