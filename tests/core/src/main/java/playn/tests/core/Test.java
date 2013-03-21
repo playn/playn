@@ -84,7 +84,11 @@ public abstract class Test {
   }
 
   protected static CanvasImage formatText (String text, boolean border) {
-    TextLayout layout = graphics().layoutText(text, TEXT_FMT);
+    return formatText(TEXT_FMT, text, border);
+  }
+
+  protected static CanvasImage formatText (TextFormat format, String text, boolean border) {
+    TextLayout layout = graphics().layoutText(text, format);
     float margin = border ? 10 : 0;
     float width = layout.width()+2*margin, height = layout.height()+2*margin;
     CanvasImage image = graphics().createImage(width, height);
@@ -105,6 +109,12 @@ public abstract class Test {
       }
     });
     return button;
+  }
+
+  protected float addButton (String text, Runnable onClick, float x, float y) {
+    ImageLayer button = createButton(text, onClick);
+    graphics().rootLayer().addAt(button, x, y);
+    return x + button.width() + 10;
   }
 
   protected static final TextFormat TEXT_FMT = new TextFormat().withFont(

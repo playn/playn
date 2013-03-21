@@ -37,7 +37,7 @@ public class SoundTest extends Test {
         fanfare.play();
         addAction("Played Fanfare.");
       }
-    }, x);
+    }, x, 100);
 
     Sound lfanfare = assets().getSound("sounds/fanfare");
     lfanfare.setLooping(true);
@@ -58,21 +58,16 @@ public class SoundTest extends Test {
           addAction("Starting looping " + name + ".");
         }
       }
-    }, x);
-    return addButton("Stop Loop " + name, new Runnable() {
+    }, x, 100);
+    x = addButton("Stop Loop " + name, new Runnable() {
       public void run() {
         if (sound.isPlaying()) {
           sound.stop();
           addAction("Stopped looping " + name + ".");
         }
       }
-    }, x);
-  }
-
-  protected float addButton (String text, Runnable onClick, float x) {
-    ImageLayer button = createButton(text, onClick);
-    graphics().rootLayer().addAt(button, x, 100);
-    return x + button.width() + 10;
+    }, x, 100);
+    return x;
   }
 
   protected void addAction (String action) {
