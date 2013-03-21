@@ -42,7 +42,7 @@ public interface Clock {
   public static class Source implements Clock {
     private final int updateRate;
     private int elapsed;
-    private float current, paintDelta;
+    private float current, paintDelta, alpha;
 
     public Source(int updateRate) {
       this.updateRate = updateRate;
@@ -58,6 +58,11 @@ public interface Clock {
       return paintDelta;
     }
 
+    @Override
+    public float alpha() {
+      return alpha;
+    }
+
     /** Call this from {@link playn.core.Game.Default#update}. */
     public void update(int delta) {
       elapsed += delta;
@@ -69,6 +74,7 @@ public interface Clock {
       float newCurrent = elapsed + alpha * updateRate;
       paintDelta = newCurrent - current;
       current = newCurrent;
+      this.alpha = alpha;
     }
   }
 
@@ -80,4 +86,7 @@ public interface Clock {
    * elapsed since they last did their interpolation, and this saves them the trouble of having to
    * track it themselves. */
   float dt();
+
+  /** Returns the current paint call's {@code alpha}. */
+  float alpha();
 }
