@@ -45,9 +45,6 @@ public class FlashPlatform extends AbstractPlatform {
   static final int DEFAULT_WIDTH = 640;
   static final int DEFAULT_HEIGHT = 480;
 
-  private static final int FPS_COUNTER_MAX = 300;
-  private static final int LOG_FREQ = 2500;
-  private static final float MAX_DELTA = 100;
   private static FlashPlatform platform;
 
   public static FlashPlatform register() {
@@ -74,9 +71,7 @@ public class FlashPlatform extends AbstractPlatform {
   private final FlashMouse mouse;
   private final double start = Duration.currentTimeMillis();
 
-  private Game game;
   private TimerCallback paintCallback;
-  private TimerCallback updateCallback;
   private Storage storage;
   private Analytics analytics;
 
@@ -173,31 +168,16 @@ public class FlashPlatform extends AbstractPlatform {
 
   @Override
   public void run(final Game game) {
-    this.game = game;
-
+    game.init();
     // Game loop.
     paintCallback = new TimerCallback() {
-      int frameCounter = 0;
-      private double frameCounterStart = 0;
-
       @Override
       public void fire() {
-        // process pending actions
-        runQueue.execute();
-        // tick the game
-        game.tick(tick());
-        // render the scene graph
-        graphics.updateLayers();
-        frameCounter++;
-        if (frameCounter == FPS_COUNTER_MAX) {
-          double frameRate = frameCounter /
-            ((time() - frameCounterStart) / 1000.0);
-          log().info("FPS: " + frameRate);
-          frameCounter = 0;
-        }
+        runQueue.execute(); // process pending actions
+        game.tick(tick());  // tick the game
+        graphics.paint();   // "draw" the scene graph
       }
     };
-    game.init();
     requestAnimationFrame(paintCallback);
   }
 
@@ -226,14 +206,6 @@ public class FlashPlatform extends AbstractPlatform {
       }
     });
   }
-
-  private native int setInterval(TimerCallback callback, int ms) /*-{
-    return $wnd.setInterval(function() { callback.@playn.flash.TimerCallback::fire()(); }, ms);
-  }-*/;
-
-  private native int setTimeout(TimerCallback callback, int ms) /*-{
-    return $wnd.setTimeout(function() { callback.@playn.flash.TimerCallback::fire()(); }, ms);
-  }-*/;
 
   public static native void captureEvent(EventType eventType, EventHandler<?> eventHandler) /*-{
     $root.stage.addEventListener(eventType, function(arg) {

@@ -206,7 +206,7 @@ class FlashGraphics implements Graphics {
     return null;
   }
 
-  public void updateLayers() {
+  public void paint() {
     rootLayer.update();
   }
 

@@ -68,9 +68,6 @@ public class HtmlPlatform extends AbstractPlatform {
   /** Indicates whether this browser supports JavaScript typed arrays. */
   static final boolean hasTypedArraySupport = hasTypedArraySupport();
 
-  private static final int LOG_FREQ = 2500;
-  private static final float MAX_DELTA = 100;
-
   /**
    * Prepares the HTML platform for operation.
    */
@@ -162,9 +159,7 @@ public class HtmlPlatform extends AbstractPlatform {
   // installs backwards compat Date.now() if needed and calls it
   private final double start = initNow();
 
-  private Game game;
   private TimerCallback paintCallback;
-  private TimerCallback updateCallback;
 
   private static AgentInfo agentInfo = computeAgentInfo();
 
@@ -267,9 +262,7 @@ public class HtmlPlatform extends AbstractPlatform {
 
   @Override
   public void run(final Game game) {
-    this.game = game;
     game.init();
-
     // Game loop.
     paintCallback = new TimerCallback() {
       @Override
@@ -355,18 +348,6 @@ public class HtmlPlatform extends AbstractPlatform {
       // 20ms => 50fps
       $wnd.setTimeout(fn, 20);
     }
-  }-*/;
-
-  private native int setInterval(TimerCallback callback, int ms) /*-{
-    return $wnd.setInterval(function() {
-      callback.@playn.html.TimerCallback::fire()();
-    }, ms);
-  }-*/;
-
-  private native int setTimeout(TimerCallback callback, int ms) /*-{
-    return $wnd.setTimeout(function() {
-      callback.@playn.html.TimerCallback::fire()();
-    }, ms);
   }-*/;
 
   private static native AgentInfo computeAgentInfo() /*-{
