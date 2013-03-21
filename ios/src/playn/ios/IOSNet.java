@@ -17,7 +17,9 @@ package playn.ios;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import cli.System.Convert;
 import cli.System.Runtime.InteropServices.Marshal;
@@ -97,27 +99,15 @@ public class IOSNet extends NetImpl {
       public void FinishedLoading (NSUrlConnection conn) {
         platform.notifySuccess(callback, new ResponseImpl(rspCode) {
           @Override
-          public Iterable<String> headerNames() {
-            List<String> list = new ArrayList<String>();
-            if (headers != null) {
-              for (NSObject key : headers.get_Keys()) {
-                list.add(key.ToString());
-              }
+          protected Map<String,List<String>> extractHeaders() {
+            Map<String,List<String>> headerMap = new HashMap<String,List<String>>();
+            for (NSObject key : headers.get_Keys()) {
+              // iOS concatenates all repeated headers into a single header separated by commas,
+              // which is known to be a fucking stupid thing to do, but hey, they're doing it!
+              headerMap.put(key.ToString(),
+                            Collections.singletonList(headers.get_Item(key).ToString()));
             }
-            return list;
-          }
-          @Override
-          public String header(String name) {
-            NSObject value = (headers == null) ? null : headers.get_Item(name);
-            return (value == null) ? null : value.ToString();
-          }
-          @Override
-          public List<String> headers(String name) {
-            String value = header(name);
-            // iOS concatenates all repeated headers into a single header separated by commas,
-            // which is known to be a fucking stupid thing to do, but hey, they're doing it!
-            return (value == null) ? Collections.<String>emptyList() :
-              Collections.singletonList(value);
+            return headerMap;
           }
           @Override
           public String payloadString() {

@@ -16,7 +16,13 @@
 package playn.android;
 
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
+import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.StatusLine;
@@ -24,6 +30,7 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.BasicHttpParams;
@@ -37,22 +44,12 @@ import playn.core.util.Callback;
 
 class AndroidNet extends NetImpl {
 
-  @Override
-  public void get(String url, Callback<String> callback) {
-    doHttp(false, url, null, callback);
-  }
-
-  @Override
-  public void post(String url, String data, Callback<String> callback) {
-    doHttp(true, url, data, callback);
-  }
-
   AndroidNet(AndroidPlatform platform) {
     super(platform);
   }
 
-  private void doHttp(final boolean isPost, final String url, final String data,
-                      final Callback<String> callback) {
+  @Override
+  protected void execute(final BuilderImpl req, final Callback<Response> callback) {
     platform.invokeAsync(new Runnable() {
       @Override
       public void run() {
@@ -60,37 +57,51 @@ class AndroidNet extends NetImpl {
         HttpProtocolParams.setContentCharset(params, HTTP.UTF_8);
         HttpProtocolParams.setHttpElementCharset(params, HTTP.UTF_8);
         HttpClient httpclient = new DefaultHttpClient(params);
-        HttpRequestBase req = null;
-        if (isPost) {
-          HttpPost httppost = new HttpPost(url);
-          if (data != null) {
-            try {
-              httppost.setEntity(new StringEntity(data, HTTP.UTF_8));
-            } catch (UnsupportedEncodingException e) {
-              platform.notifyFailure(callback, e);
-            }
-          }
-          req = httppost;
-        } else {
-          req = new HttpGet(url);
-        }
+
+        // prepare the request
+        HttpRequestBase hreq = null;
         try {
-          HttpResponse response = httpclient.execute(req);
-          StatusLine status = response.getStatusLine();
-          int code = status.getStatusCode();
-          String body = EntityUtils.toString(response.getEntity());
-          if (code == HttpStatus.SC_OK) {
-            platform.notifySuccess(callback, body);
+          if (req.isPost()) {
+            HttpPost httppost = new HttpPost(req.url);
+            if (req.payloadString != null) {
+              httppost.setEntity(new StringEntity(req.payloadString, HTTP.UTF_8));
+            } else if (req.payloadBytes != null) {
+              httppost.setEntity(new ByteArrayEntity(req.payloadBytes));
+            }
+            hreq = httppost;
           } else {
-            platform.notifyFailure(callback, new HttpException(code, body));
+            hreq = new HttpGet(req.url);
           }
+          for (Header header : req.headers) {
+            hreq.addHeader(header.name, header.value);
+          }
+
+          // execute the request and process the response
+          final HttpResponse response = httpclient.execute(hreq);
+          int code = response.getStatusLine().getStatusCode();
+          HttpEntity entity = response.getEntity();
+          byte[] data = EntityUtils.toByteArray(entity);
+          String encoding = EntityUtils.getContentCharSet(entity);
+          if (encoding == null) encoding = HTTP.UTF_8;
+          platform.notifySuccess(callback, new BinaryResponse(code, data, encoding) {
+            protected Map<String,List<String>> extractHeaders() {
+              Map<String,List<String>> hmap = new HashMap<String,List<String>>();
+              for (org.apache.http.Header header : response.getAllHeaders()) {
+                String name = header.getName();
+                List<String> values = hmap.get(name);
+                if (values == null) hmap.put(name, values = new ArrayList<String>());
+                values.add(header.getValue());
+              }
+              return hmap;
+            }
+          });
         } catch (Exception e) {
           platform.notifyFailure(callback, e);
         }
       }
       @Override
       public String toString() {
-        return "AndroidNet.doHttp(" + isPost + ", " + url + ")";
+        return "AndroidNet.exec(" + req.method() + ", " + req.url + ")";
       }
     });
   }

@@ -17,6 +17,7 @@ package playn.core;
 
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -103,6 +104,7 @@ public abstract class NetImpl implements Net {
 
   protected abstract class ResponseImpl implements Response {
     private int responseCode;
+    private Map<String,List<String>> headersMap;
 
     public ResponseImpl(int responseCode) {
       this.responseCode = responseCode;
@@ -112,6 +114,31 @@ public abstract class NetImpl implements Net {
     public int responseCode() {
       return this.responseCode;
     }
+
+    @Override
+    public Iterable<String> headerNames() {
+      return headers().keySet();
+    }
+
+    @Override
+    public String header(String name) {
+      List<String> values = headers().get(name);
+      return (values == null) ? null : values.get(0);
+    }
+
+    @Override public List<String> headers(String name) {
+      List<String> values = headers().get(name);
+      return values == null ? Collections.<String>emptyList() : values;
+    }
+
+    private Map<String,List<String>> headers() {
+      if (headersMap == null) {
+        headersMap = extractHeaders();
+      }
+      return headersMap;
+    }
+
+    protected abstract Map<String,List<String>> extractHeaders();
   }
 
   protected abstract class StringResponse extends ResponseImpl {

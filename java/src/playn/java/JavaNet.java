@@ -80,25 +80,8 @@ public class JavaNet extends NetImpl {
             String encoding = conn.getContentEncoding();
             if (encoding == null) encoding = UTF8;
             platform.notifySuccess(callback, new BinaryResponse(code, payload, encoding) {
-              private Map<String,List<String>> headerFieldsCache;
-              private Map<String,List<String>> headerFields() {
-                if (headerFieldsCache == null) {
-                  headerFieldsCache = conn.getHeaderFields();
-                }
-                return headerFieldsCache;
-              }
-              @Override
-              public Iterable<String> headerNames() {
-                return headerFields().keySet();
-              }
-              @Override
-              public String header(String name) {
-                List<String> values = headerFields().get(name);
-                return (values == null) ? null : values.get(0);
-              }
-              @Override public List<String> headers(String name) {
-                List<String> values = headerFields().get(name);
-                return values == null ? Collections.<String>emptyList() : values;
+              protected Map<String,List<String>> extractHeaders() {
+                return conn.getHeaderFields();
               }
             });
           } finally {
