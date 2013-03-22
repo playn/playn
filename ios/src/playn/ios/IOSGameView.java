@@ -19,7 +19,6 @@ import cli.System.Drawing.RectangleF;
 import cli.System.EventArgs;
 
 import cli.OpenTK.FrameEventArgs;
-import cli.OpenTK.Graphics.ES20.All;
 import cli.OpenTK.Graphics.ES20.GL;
 import cli.OpenTK.Graphics.ES20.FramebufferTarget;
 import cli.OpenTK.Platform.iPhoneOS.iPhoneOSGameView;
@@ -28,11 +27,9 @@ import cli.MonoTouch.CoreAnimation.CAEAGLLayer;
 import cli.MonoTouch.Foundation.ExportAttribute;
 import cli.MonoTouch.Foundation.NSNotification;
 import cli.MonoTouch.Foundation.NSNotificationCenter;
-import cli.MonoTouch.Foundation.NSSet;
 import cli.MonoTouch.OpenGLES.EAGLColorFormat;
 import cli.MonoTouch.OpenGLES.EAGLRenderingAPI;
 import cli.MonoTouch.UIKit.UIDevice;
-import cli.MonoTouch.UIKit.UIEvent;
 import cli.MonoTouch.UIKit.UIWindow;
 
 public class IOSGameView extends iPhoneOSGameView {

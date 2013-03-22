@@ -59,7 +59,6 @@ public class SharedObject extends EventDispatcher {
     return this.size;
   }-*/;
 
-
   /**
    * For local shared objects, purges all of the data and deletes the shared object from the disk.
    */

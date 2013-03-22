@@ -27,7 +27,6 @@ import pythagoras.f.Point;
 
 import playn.core.CanvasImage;
 import playn.core.Font;
-import playn.core.Game;
 import playn.core.Gradient;
 import playn.core.GroupLayer;
 import playn.core.TextFormat;

@@ -16,14 +16,10 @@
 package playn.android;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
-import java.security.MessageDigest;
 
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
@@ -37,14 +33,11 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
 
-import pythagoras.f.MathUtil;
-
 import playn.core.AbstractAssets;
 import playn.core.Image;
 import playn.core.AsyncImage;
 import playn.core.Sound;
 import playn.core.gl.Scale;
-import playn.core.util.Callback;
 import static playn.core.PlayN.log;
 
 public class AndroidAssets extends AbstractAssets<Bitmap> {

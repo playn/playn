@@ -25,7 +25,6 @@ import flash.geom.Point;
 import flash.geom.Rectangle;
 import flash.gwt.FlashImport;
 
-
 /**
  * @see <a href="http://livedocs.adobe.com/flash/8/main/00001942.html#wp137587">ActionScript 2.0 Language Reference</a>
  */

@@ -25,8 +25,6 @@ import android.graphics.RadialGradient;
 import android.graphics.Shader.TileMode;
 import android.graphics.Typeface;
 import android.util.Pair;
-import android.view.Display;
-import android.view.View;
 
 import pythagoras.f.IPoint;
 import pythagoras.f.MathUtil;
@@ -35,7 +33,6 @@ import pythagoras.f.Point;
 import playn.core.Asserts;
 import playn.core.CanvasImage;
 import playn.core.Font;
-import playn.core.Game;
 import playn.core.Gradient;
 import playn.core.GroupLayer;
 import playn.core.TextFormat;

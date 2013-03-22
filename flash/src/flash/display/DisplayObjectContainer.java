@@ -60,7 +60,6 @@ public class DisplayObjectContainer extends InteractiveObject {
     return this.tabChildren;
   }-*/;
 
-
   /**
    * Adds a child DisplayObject instance to this DisplayObjectContainer instance.
    */

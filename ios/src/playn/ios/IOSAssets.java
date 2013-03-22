@@ -18,12 +18,7 @@ package playn.ios;
 import java.io.FileNotFoundException;
 
 import cli.System.IO.File;
-import cli.System.IO.FileAccess;
-import cli.System.IO.FileMode;
-import cli.System.IO.FileShare;
-import cli.System.IO.FileStream;
 import cli.System.IO.Path;
-import cli.System.IO.Stream;
 import cli.System.IO.StreamReader;
 
 import cli.MonoTouch.Foundation.NSData;
@@ -41,7 +36,6 @@ import playn.core.AsyncImage;
 import playn.core.Image;
 import playn.core.Sound;
 import playn.core.gl.Scale;
-import playn.core.util.Callback;
 
 public class IOSAssets extends AbstractAssets<UIImage> {
 

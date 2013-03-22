@@ -74,7 +74,6 @@ final public class Sprite extends DisplayObjectContainer {
      this.hitArea = hitArea;
    }-*/;
 
-
 //   /**
 //    * Controls sound within this sprite.
 //    */

@@ -26,7 +26,6 @@ import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.dom.client.Style;
 import com.google.gwt.event.logical.shared.ResizeEvent;
 import com.google.gwt.event.logical.shared.ResizeHandler;
-import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Window;
 
 import pythagoras.f.Point;
@@ -34,7 +33,6 @@ import pythagoras.f.Point;
 import playn.core.Asserts;
 import playn.core.CanvasImage;
 import playn.core.Font;
-import playn.core.Game;
 import playn.core.Gradient;
 import playn.core.Graphics;
 import playn.core.TextFormat;

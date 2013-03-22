@@ -37,7 +37,6 @@ public class InteractiveObject extends DisplayObject {
     return this.doubleClickEnabled;
   }-*/;
 
-
   /*       focusRect : Object
   Specifies whether this object displays a focus rectangle.
   InteractiveObject*/

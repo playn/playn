@@ -20,7 +20,6 @@ import pythagoras.f.FloatMath;
 import playn.core.Image;
 import playn.core.ImageLayer;
 import playn.core.Pointer;
-import playn.core.gl.ImageGL;
 import static playn.core.PlayN.*;
 
 public class ImageScalingTest extends Test {

@@ -55,7 +55,6 @@ public class DisplayObject extends EventDispatcher {
     return BlendMode.valueOfNative(getBlendMode0());
   }
 
-
   final public void setBlendMode(BlendMode blendMode) {
     setBlendMode0(blendMode.nativeEnum());
   }

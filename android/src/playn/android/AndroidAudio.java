@@ -15,8 +15,6 @@
  */
 package playn.android;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;

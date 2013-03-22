@@ -511,7 +511,6 @@ public final class ByteBuffer extends Buffer implements Comparable<ByteBuffer>, 
       return result;
     }
 
-
     /** Returns the short at the specified index.
      * <p> The 2 bytes starting at the specified index are composed into a short according to the
      * current byte order and returned. The position is not changed. </p>

@@ -20,8 +20,6 @@ import com.allen_sauer.gwt.voices.client.handler.SoundHandler;
 import com.allen_sauer.gwt.voices.client.handler.SoundLoadStateChangeEvent;
 import com.allen_sauer.gwt.voices.client.Sound.LoadState;
 
-import pythagoras.f.MathUtil;
-
 import com.allen_sauer.gwt.voices.client.Sound;
 
 import playn.core.AbstractSound;

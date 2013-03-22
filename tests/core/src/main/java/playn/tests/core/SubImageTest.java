@@ -12,7 +12,6 @@ import playn.core.Image;
 import playn.core.ImageLayer;
 import playn.core.ImmediateLayer;
 import playn.core.Surface;
-import playn.core.Layer;
 import static playn.core.PlayN.*;
 import playn.core.util.Callback;
 

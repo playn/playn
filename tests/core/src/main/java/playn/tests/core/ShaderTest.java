@@ -22,8 +22,6 @@ import playn.core.Image;
 import playn.core.ImageLayer;
 import playn.core.ImmediateLayer;
 import playn.core.Surface;
-import playn.core.gl.GLContext;
-import playn.core.gl.GLShader;
 import playn.core.gl.IndexedTrisShader;
 import playn.core.util.Callback;
 import static playn.core.PlayN.*;

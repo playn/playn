@@ -231,7 +231,6 @@ class FlashCanvas implements Canvas {
       this.font = font;
     }-*/;
 
-
     final static class Measure extends JavaScriptObject {
       protected Measure(){}
 

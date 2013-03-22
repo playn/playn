@@ -8,7 +8,6 @@ import java.util.List;
 
 import playn.core.Sound;
 import playn.core.CanvasImage;
-import playn.core.ImageLayer;
 import static playn.core.PlayN.*;
 import playn.core.TextFormat;
 

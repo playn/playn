@@ -15,12 +15,8 @@
  */
 package playn.tests.core;
 
-import playn.core.CanvasImage;
 import playn.core.ImageLayer;
 import playn.core.Keyboard;
-import playn.core.Pointer;
-import playn.core.TextFormat;
-import playn.core.TextLayout;
 import playn.core.util.Callback;
 import static playn.core.PlayN.*;
 

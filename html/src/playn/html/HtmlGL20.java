@@ -26,12 +26,8 @@ import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayInteger;
 import com.google.gwt.typedarrays.shared.ArrayBufferView;
 import com.google.gwt.typedarrays.shared.Float32Array;
-import com.google.gwt.typedarrays.shared.Int16Array;
 import com.google.gwt.typedarrays.shared.Int32Array;
-import com.google.gwt.typedarrays.shared.Int8Array;
 import com.google.gwt.typedarrays.shared.TypedArrays;
-import com.google.gwt.typedarrays.shared.Uint16Array;
-import com.google.gwt.typedarrays.shared.Uint8Array;
 import com.google.gwt.webgl.client.WebGLBuffer;
 import com.google.gwt.webgl.client.WebGLFramebuffer;
 import com.google.gwt.webgl.client.WebGLObject;
@@ -1155,7 +1151,6 @@ public final class HtmlGL20 implements playn.core.gl.GL20 {
   public void glDisable(int cap) {
     gl.disable(cap);
   }
-
 
   @Override
   public void glEnable(int cap) {

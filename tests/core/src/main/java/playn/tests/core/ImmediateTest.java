@@ -16,7 +16,6 @@
 package playn.tests.core;
 
 import playn.core.GroupLayer;
-import playn.core.Canvas;
 import playn.core.CanvasImage;
 import playn.core.ImmediateLayer;
 import playn.core.Surface;

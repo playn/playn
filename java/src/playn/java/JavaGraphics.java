@@ -25,13 +25,11 @@ import pythagoras.f.Point;
 
 import playn.core.CanvasImage;
 import playn.core.Font;
-import playn.core.Game;
 import playn.core.Gradient;
 import playn.core.TextFormat;
 import playn.core.TextLayout;
 import playn.core.gl.GL20;
 import playn.core.gl.GL20Context;
-import playn.core.gl.GLContext;
 import playn.core.gl.GraphicsGL;
 import playn.core.gl.GroupLayerGL;
 import playn.core.gl.Scale;

@@ -37,6 +37,5 @@ public abstract class FlashGame implements EntryPoint {
     flash.external.ExternalInterface.call("alert", msg);
   }-*/;
 
-
   public abstract void start();
 }

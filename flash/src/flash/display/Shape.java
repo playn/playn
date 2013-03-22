@@ -22,7 +22,6 @@ import flash.gwt.FlashImport;
 final public class Shape extends DisplayObject {
    protected Shape() {}
 
-
    public static native Shape create(int w, int h) /*-{
       var shape =  new flash.display.Shape();
       shape.width = w;

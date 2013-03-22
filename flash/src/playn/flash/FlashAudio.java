@@ -15,7 +15,6 @@
  */
 package playn.flash;
 
-
 import playn.core.Audio;
 
 class FlashAudio implements Audio {

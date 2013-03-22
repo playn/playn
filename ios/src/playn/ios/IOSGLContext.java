@@ -39,7 +39,6 @@ import playn.core.gl.GLProgram;
 import playn.core.gl.GLShader;
 import playn.core.gl.GroupLayerGL;
 import playn.core.gl.IndexedTrisShader;
-import playn.core.gl.QuadShader;
 
 public class IOSGLContext extends GLContext {
 

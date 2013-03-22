@@ -19,7 +19,6 @@ import com.google.gwt.dom.client.Element;
 import com.google.gwt.webgl.client.WebGLContextAttributes;
 import com.google.gwt.webgl.client.WebGLRenderingContext;
 
-import playn.core.Game;
 import playn.core.GroupLayer;
 import playn.core.Image;
 import playn.core.ImageLayer;

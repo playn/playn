@@ -30,7 +30,6 @@ import cli.MonoTouch.CoreGraphics.CGAffineTransform;
 import cli.MonoTouch.Foundation.NSUrl;
 import cli.MonoTouch.UIKit.UIApplication;
 import cli.MonoTouch.UIKit.UIDeviceOrientation;
-import cli.MonoTouch.UIKit.UIEvent;
 import cli.MonoTouch.UIKit.UIInterfaceOrientation;
 import cli.MonoTouch.UIKit.UIScreen;
 import cli.MonoTouch.UIKit.UIView;

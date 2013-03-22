@@ -17,10 +17,8 @@ package playn.android;
 
 import android.graphics.Typeface;
 
-import java.util.Collections;
 import java.util.EnumMap;
 import java.util.Map;
-import java.util.Set;
 
 import playn.core.AbstractFont;
 

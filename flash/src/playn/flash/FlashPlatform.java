@@ -24,7 +24,6 @@ import flash.events.EventType;
 
 import playn.core.AbstractPlatform;
 import playn.core.Analytics;
-import playn.core.Audio;
 import playn.core.Game;
 import playn.core.Graphics;
 import playn.core.Json;

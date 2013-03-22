@@ -44,7 +44,6 @@ public class FlashSurface implements Surface {
     return this;
   }
 
-
   @Override
   public Surface drawImage(Image img, float x, float y) {
     Asserts.checkArgument(img instanceof FlashImage);

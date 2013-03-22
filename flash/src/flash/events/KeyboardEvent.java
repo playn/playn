@@ -14,7 +14,6 @@
  * the License.
  */
 
-
 package flash.events;
 
 /**

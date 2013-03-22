@@ -19,7 +19,6 @@ import cli.System.IntPtr;
 import cli.System.Runtime.InteropServices.GCHandle;
 import cli.System.Runtime.InteropServices.GCHandleType;
 
-import cli.OpenTK.Graphics.ES20.All;
 import cli.OpenTK.Graphics.ES20.BeginMode;
 import cli.OpenTK.Graphics.ES20.BufferTarget;
 import cli.OpenTK.Graphics.ES20.BufferUsage;
