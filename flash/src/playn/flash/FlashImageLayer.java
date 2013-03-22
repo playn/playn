@@ -77,7 +77,7 @@ public class FlashImageLayer extends FlashLayer implements ImageLayer {
   }
 
   @Override
-  public void setImage(Image image) {
+  public ImageLayer setImage(Image image) {
     this.image = (FlashImage) image;
     image.addCallback(new Callback<Image>() {
       @Override
@@ -90,6 +90,7 @@ public class FlashImageLayer extends FlashLayer implements ImageLayer {
         dirty = true;
       }
     });
+    return this;
   }
 
   @Override

@@ -75,31 +75,29 @@ class HtmlImageLayerDom extends HtmlLayerDom implements ImageLayer {
   }
 
   @Override
-  public void setImage(final Image img) {
+  public ImageLayer setImage(final Image img) {
     Asserts.checkArgument(img instanceof HtmlImage);
-
     // Make sure redundant setImage() calls don't cost much.
-    if (htmlImage == img) {
-      return;
+    if (htmlImage != img) {
+      htmlImage = (HtmlImage) img;
+      ImageElement imgElem = htmlImage.img.cast();
+      element().getStyle().setBackgroundImage("url(" + imgElem.getSrc() + ")");
+      element().getStyle().setOverflow(Overflow.HIDDEN);
+
+      img.addCallback(new Callback<Image>() {
+        @Override
+        public void onSuccess(Image resource) {
+          applySize();
+          applyBackgroundSize();
+        }
+
+        @Override
+        public void onFailure(Throwable err) {
+          // Nothing to be done about errors.
+        }
+      });
     }
-
-    htmlImage = (HtmlImage) img;
-    ImageElement imgElem = htmlImage.img.cast();
-    element().getStyle().setBackgroundImage("url(" + imgElem.getSrc() + ")");
-    element().getStyle().setOverflow(Overflow.HIDDEN);
-
-    img.addCallback(new Callback<Image>() {
-      @Override
-      public void onSuccess(Image resource) {
-        applySize();
-        applyBackgroundSize();
-      }
-
-      @Override
-      public void onFailure(Throwable err) {
-        // Nothing to be done about errors.
-      }
-    });
+    return this;
   }
 
   @Override

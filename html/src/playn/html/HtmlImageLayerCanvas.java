@@ -64,9 +64,10 @@ class HtmlImageLayerCanvas extends HtmlLayerCanvas implements ImageLayer {
   }
 
   @Override
-  public void setImage(Image img) {
+  public ImageLayer setImage(Image img) {
     Asserts.checkArgument(img instanceof HtmlCanvas.Drawable);
     this.img = img;
+    return this;
   }
 
   @Override

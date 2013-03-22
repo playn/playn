@@ -65,16 +65,17 @@ public class ImageLayerGL extends LayerGL implements ImageLayer {
   }
 
   @Override
-  public void setImage(Image img) {
+  public ImageLayer setImage(Image img) {
     Asserts.checkArgument(img == null || img instanceof ImageGL);
     // avoid releasing and rereferencing image if nothing changes
-    if (this.img == img)
-      return;
-    if (this.img != null)
-      this.img.release();
-    this.img = (ImageGL) img;
-    if (this.img != null)
-      this.img.reference();
+    if (this.img != img) {
+      if (this.img != null)
+        this.img.release();
+      this.img = (ImageGL) img;
+      if (this.img != null)
+        this.img.reference();
+    }
+    return this;
   }
 
   @Override

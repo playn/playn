@@ -16,56 +16,61 @@
 package playn.core;
 
 /**
- * TODO
+ * A layer that displays a bitmapped image. By default, the layer is the same size as its
+ * underlying image, but its size can be changed from that default and the layer will either scale
+ * or repeat the image to cause it to fill its bounds. See {@link #setSize}, {@link #setRepeatX},
+ * etc.
  */
 public interface ImageLayer extends Layer.HasSize {
 
   /**
-   * TODO
+   * Returns the image contained by this layer.
    */
   Image image();
 
   /**
-   * TODO
+   * Sets the image contained by this layer.
    */
-  void setImage(Image image);
+  ImageLayer setImage(Image image);
 
   /**
-   * TODO
-   *
-   * The default is <code>false</code>.
+   * Configures this layer to repeat its underlying image (instead of scaling it) when this layer's
+   * width differs from that of its underlying image. The default is {@code false}.
    */
   void setRepeatX(boolean repeat);
 
   /**
-   * TODO
-   *
-   * The default is <code>false</code>.
+   * Configures this layer to repeat its underlying image (instead of scaling it) when this layer's
+   * height differs from that of its underlying image. The default is {@code false}.
    */
   void setRepeatY(boolean repeat);
 
   /**
-   * TODO
+   * Configures the size of this layer. The size defaults to the size of the image contained by the
+   * layer, but if it is set manually then the image will be scaled or repeated to fill the
+   * specified size.
    */
   void setSize(float width, float height);
 
   /**
-   * TODO
+   * Configures the width of this layer. See {@link #setSize}.
    */
   void setWidth(float width);
 
   /**
-   * TODO
+   * Configures the height of this layer. See {@link #setSize}.
    */
   void setHeight(float height);
 
   /**
-   * TODO
-   */
-  void clearHeight();
-
-  /**
-   * TODO
+   * Clears out the configured width for this layer, causing it to return to using the height of
+   * its contained image.
    */
   void clearWidth();
+
+  /**
+   * Clears out the configured height for this layer, causing it to return to using the height of
+   * its contained image.
+   */
+  void clearHeight();
 }
