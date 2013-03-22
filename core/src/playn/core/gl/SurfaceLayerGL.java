@@ -21,7 +21,7 @@ import playn.core.Tint;
 
 public class SurfaceLayerGL extends LayerGL implements SurfaceLayer {
 
-  private SurfaceGL surface;
+  private final SurfaceGL surface;
 
   public SurfaceLayerGL(GLContext ctx, float width, float height) {
     this(ctx, new SurfaceGL(ctx, width, height));
@@ -36,7 +36,6 @@ public class SurfaceLayerGL extends LayerGL implements SurfaceLayer {
   public void destroy() {
     super.destroy();
     surface.destroy();
-    surface = null;
   }
 
   @Override
@@ -54,13 +53,11 @@ public class SurfaceLayerGL extends LayerGL implements SurfaceLayer {
 
   @Override
   public float width() {
-    Asserts.checkNotNull(surface, "Surface must not be null");
     return surface.width();
   }
 
   @Override
   public float height() {
-    Asserts.checkNotNull(surface, "Surface must not be null");
     return surface.height();
   }
 
