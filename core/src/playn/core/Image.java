@@ -97,8 +97,6 @@ public interface Image {
    * alpha, red, green and blue are the corresponding channel values, ranging from 0 to 255
    * inclusive.
    *
-   * Currently not implemented for iOS.
-   *
    * @param startX x-coordinate of the upper left corner of the area.
    * @param startY y-coordinate of the upper left corner of the area.
    * @param width width of the area.
