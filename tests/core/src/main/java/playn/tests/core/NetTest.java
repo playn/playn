@@ -19,6 +19,7 @@ import playn.core.ImageLayer;
 import playn.core.Keyboard;
 import playn.core.Net;
 import playn.core.util.Callback;
+import playn.core.Platform;
 import static playn.core.PlayN.*;
 
 public class NetTest extends Test {
@@ -67,25 +68,28 @@ public class NetTest extends Test {
         getText("Enter POST body:", new Callback<String>() {
           public void onSuccess (String data) {
             if (data == null || data.length() == 0) return;
-            net().req("http://www.posttestserver.com/post.php").setPayload(data).
-              addHeader("playn-test", "we love to test!").
-              execute(new Callback<Net.Response>() {
-                public void onSuccess (Net.Response rsp) {
-                  String[] lines = rsp.payloadString().split("[\r\n]+");
-                  String urlPre = "View it at ";
-                  for (String line : lines) {
-                    System.err.println(line + " " + line.startsWith(urlPre) + " " + urlPre);
-                    if (line.startsWith(urlPre)) {
-                      lastPostURL = line.substring(urlPre.length());
-                      break;
-                    }
+            Net.Builder b = net().req("http://www.posttestserver.com/post.php").setPayload(data);
+            // don't add the header on HTML because it causes CORS freakoutery
+            if (platformType() != Platform.Type.HTML) {
+              b.addHeader("playn-test", "we love to test!");
+            }
+            b.execute(new Callback<Net.Response>() {
+              public void onSuccess (Net.Response rsp) {
+                String[] lines = rsp.payloadString().split("[\r\n]+");
+                String urlPre = "View it at ";
+                for (String line : lines) {
+                  System.err.println(line + " " + line.startsWith(urlPre) + " " + urlPre);
+                  if (line.startsWith(urlPre)) {
+                    lastPostURL = line.substring(urlPre.length());
+                    break;
                   }
-                  displayResult(rsp);
                 }
-                public void onFailure (Throwable cause) {
-                  displayText(cause.toString());
-                }
-              });
+                displayResult(rsp);
+              }
+              public void onFailure (Throwable cause) {
+                displayText(cause.toString());
+              }
+            });
           }
           public void onFailure (Throwable cause) {
             displayText(cause.toString());
