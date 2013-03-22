@@ -15,6 +15,12 @@
  */
 package playn.html;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import com.google.gwt.xhr.client.ReadyStateChangeHandler;
 import com.google.gwt.xhr.client.XMLHttpRequest;
 
@@ -32,46 +38,62 @@ public class HtmlNet extends NetImpl {
     return new HtmlWebSocket(url, listener);
   }
 
-  public void get(String url, final Callback<String> callback) {
-    try {
-      XMLHttpRequest xhr = XMLHttpRequest.create();
-      xhr.open("GET", url);
-      xhr.setOnReadyStateChange(new ReadyStateChangeHandler() {
-        @Override
-        public void onReadyStateChange(XMLHttpRequest xhr) {
-          if (xhr.getReadyState() == XMLHttpRequest.DONE) {
-            if (xhr.getStatus() == 200) {
-              callback.onSuccess(xhr.getResponseText());
-            } else {
-              callback.onFailure(new HttpException(xhr.getStatus(), xhr.getStatusText()));
-            }
-          }
-        }
-      });
-      xhr.send();
-    } catch (Exception e) {
-      callback.onFailure(e);
-    }
-  }
-
   @Override
-  public void post(String url, String data, final Callback<String> callback) {
+  protected void execute(final BuilderImpl req, final Callback<Response> callback) {
     try {
       XMLHttpRequest xhr = XMLHttpRequest.create();
-      xhr.open("POST", url);
+      xhr.open(req.method(), req.url);
+      for (Header header : req.headers) {
+        xhr.setRequestHeader(header.name, header.value);
+      }
       xhr.setOnReadyStateChange(new ReadyStateChangeHandler() {
         @Override
-        public void onReadyStateChange(XMLHttpRequest xhr) {
+        public void onReadyStateChange(final XMLHttpRequest xhr) {
           if (xhr.getReadyState() == XMLHttpRequest.DONE) {
-            if (xhr.getStatus() == 200) {
-              callback.onSuccess(xhr.getResponseText());
-            } else {
-              callback.onFailure(new HttpException(xhr.getStatus(), xhr.getStatusText()));
-            }
+            callback.onSuccess(new StringResponse(xhr.getStatus(), xhr.getResponseText()) {
+              protected Map<String,List<String>> extractHeaders() {
+                Map<String,List<String>> headers = new HashMap<String,List<String>>();
+                String block = xhr.getAllResponseHeaders();
+                for (String line : block.split("\r\n")) {
+                  int cidx = line.indexOf(":");
+                  if (cidx > 0) {
+                    String name = line.substring(0, cidx);
+                    List<String> values = headers.get(name);
+                    if (values == null) headers.put(name, values = new ArrayList<String>());
+                    values.add(line.substring(cidx+1).trim());
+                  }
+                }
+                return headers;
+              }
+              @Override
+              public String header(String name) {
+                // some browsers have buggy implementation of getAllResponseHeaders, so calling
+                // this directly instead of relying on our parsed map helps things to mostly work
+                // in those cases; yay web!
+                return xhr.getResponseHeader(name);
+              }
+              @Override
+              public List<String> headers(String name) {
+                // if we were able to parse the headers ourselves, use those, but if not (due
+                // perhaps to bugs, etc.) then fall back to using getResponseHeader
+                List<String> values = super.headers(name);
+                if (!values.isEmpty()) return values;
+                String value = xhr.getResponseHeader(name);
+                return (value == null) ? values : Collections.singletonList(value);
+              }
+            });
           }
         }
       });
-      xhr.send(data);
+      if (req.isPost()) {
+        if (req.payloadBytes != null) {
+          throw new UnsupportedOperationException("Raw bytes not currently supported in HTML5.");
+        }
+        xhr.setRequestHeader("Content-Type", req.contentType());
+        xhr.send(req.payloadString);
+      } else {
+        xhr.send();
+      }
     } catch (Exception e) {
       callback.onFailure(e);
     }
