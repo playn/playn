@@ -40,8 +40,6 @@ public class FlashImageLayer extends FlashLayer implements ImageLayer {
   float height = NOT_SET;
 
   private boolean dirty = true;
-  private boolean repeatX;
-  private boolean repeatY;
 
   public FlashImageLayer(Image image) {
     super((Sprite) (Bitmap.create(null).cast()));
@@ -94,18 +92,6 @@ public class FlashImageLayer extends FlashLayer implements ImageLayer {
   }
 
   @Override
-  public void setRepeatX(boolean repeat) {
-    repeatX = repeat;
-    dirty = true;
-  }
-
-  @Override
-  public void setRepeatY(boolean repeat) {
-    repeatY = repeat;
-    dirty = true;
-  }
-
-  @Override
   public void setWidth(float width) {
     this.width = width;
     dirty = true;
@@ -145,9 +131,9 @@ public class FlashImageLayer extends FlashLayer implements ImageLayer {
       float dw = width();
       float dh = height();
 
-      if (repeatX || repeatY) {
-        float anchorWidth = repeatX ? dw : image.width();
-        float anchorHeight = repeatY ? dh : image.height();
+      if (image.repeatX() || image.repeatY()) {
+        float anchorWidth = image.repeatX() ? dw : image.width();
+        float anchorHeight = image.repeatY() ? dh : image.height();
 
         Shape shape = Shape.create((int) anchorWidth, (int) anchorHeight);
         Graphics g = shape.getGraphics();

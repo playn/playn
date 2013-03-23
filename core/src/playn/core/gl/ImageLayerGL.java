@@ -23,7 +23,6 @@ public class ImageLayerGL extends LayerGL implements ImageLayer {
 
   private float width, height;
   private boolean widthSet, heightSet;
-  private boolean repeatX, repeatY;
   private ImageGL img;
 
   public ImageLayerGL(GLContext ctx) {
@@ -79,16 +78,6 @@ public class ImageLayerGL extends LayerGL implements ImageLayer {
   }
 
   @Override
-  public void setRepeatX(boolean repeat) {
-    repeatX = repeat;
-  }
-
-  @Override
-  public void setRepeatY(boolean repeat) {
-    repeatY = repeat;
-  }
-
-  @Override
   public void setWidth(float width) {
     Asserts.checkArgument(width > 0, "Width must be > 0");
 
@@ -114,7 +103,7 @@ public class ImageLayerGL extends LayerGL implements ImageLayer {
     if (tint != Tint.NOOP_TINT)
       curTint = Tint.combine(curTint, tint);
     img.draw((shader == null) ? curShader : shader, localTransform(curTransform),
-             0, 0, width(), height(), repeatX, repeatY, curTint);
+             0, 0, width(), height(), curTint);
   }
 
   @Override

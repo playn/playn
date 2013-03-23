@@ -47,18 +47,17 @@ public class SubImageTest extends Test {
         fragment("Image", orange, 250, 10);
 
         float pw = orange.width(), ph = orange.height(), phw = pw/2, phh = ph/2;
-        final Image.Region orangemid = orange.subImage(0, phh/2, pw, phh);
+        final Image.Region orangerep = orange.subImage(0, phh/2, pw, phh);
+        orangerep.setRepeat(true, true);
 
         // tile a sub-image, oh my!
-        ImageLayer tiled = graphics().createImageLayer(orangemid);
-        tiled.setRepeatX(true);
-        tiled.setRepeatY(true);
+        ImageLayer tiled = graphics().createImageLayer(orangerep);
         tiled.setSize(100, 100);
         addTest(10, 10, tiled, "ImageLayer tiled with subimage");
 
         // use a subimage as a fill pattern
         CanvasImage pat = graphics().createImage(100, 100);
-        pat.canvas().setFillPattern(orangemid.toPattern());
+        pat.canvas().setFillPattern(orangerep.toPattern());
         pat.canvas().fillRect(0, 0, 100, 100);
         addTest(10, 150, graphics().createImageLayer(pat), "Canvas filled with subimage");
 
@@ -71,6 +70,7 @@ public class SubImageTest extends Test {
         addTest(140, 10, graphics().createImageLayer(split), "draw subimg into Canvas", 80);
 
         // draw a subimage in an immediate layer
+        final Image.Region orangemid = orange.subImage(0, phh/2, pw, phh);
         ImmediateLayer imm = graphics().createImmediateLayer(new ImmediateLayer.Renderer() {
           public void render(Surface surf) {
             surf.drawImage(orangemid, 0, 0);

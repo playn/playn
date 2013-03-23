@@ -126,7 +126,7 @@ public interface Surface {
   Surface drawImage(Image image, float dx, float dy);
 
   /**
-   * Draws a scaled image at the specified location.
+   * Draws a scaled or repeated image at the specified location.
    *
    * @param dx the destination x
    * @param dy the destination y

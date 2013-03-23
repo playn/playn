@@ -49,6 +49,23 @@ public interface Image {
   void addCallback(Callback<? super Image> callback);
 
   /**
+   * Returns whether this image repeats in the x direction. See {@link #setRepeatX}.
+   */
+  boolean repeatX();
+
+  /**
+   * Returns whether this image repeats in the y direction. See {@link #setRepeatX}.
+   */
+  boolean repeatY();
+
+  /**
+   * Configures whether this image repeats in the x or y direction (rather than scaling) when used
+   * in a layer whose width or height is larger or smaller than the image. Both axes default to
+   * {@code false}.
+   */
+  void setRepeat(boolean repeatX, boolean repeatY);
+
+  /**
    * A subregion of an image. See {@link Image#subImage}.
    */
   public interface Region extends Image {
@@ -117,29 +134,27 @@ public interface Image {
 
   /**
    * Configures the use of mipmaps when rendering this image at scales less than 1. This only
-   * applies to GL-based backends (it is a NOOP on other backends). It must also be called before
-   * the image is rendered by any layer or by being drawn to a surface.
+   * applies to GL-based backends (it is a NOOP on other backends).
    */
   void setMipmapped (boolean mipmapped);
 
   /**
    * Creates a texture for this image (if one does not already exist) and returns its OpenGL
    * texture id. Returns 0 if the underlying image data is not yet ready or if this platform does
-   * not use OpenGL. If either {@code repeatX} or {@code repeatY} are true, the underlying image
-   * data will be scaled up into a power of two texture. The image will maintain one or both of an
-   * unscaled and scaled texture until a call to {@link #clearTexture} is made or until this image
-   * is garbage collected (at which time the textures are cleared).
+   * not use OpenGL. The texture will remain in GPU memory until {@link #clearTexture} is called or
+   * this image is garbage collected.
    *
-   * @param repeatX controls S texture wrapping parameter (repeat or clamp to edge).
-   * @param repeatY controls T texture wrapping parameter (repeat or clamp to edge).
+   * <p><em>Note:</em> this texture handle should not be held for longer than the scope of the
+   * enclosing function call. It is not safe to hang onto an image's texture handle as the image
+   * may delete its texture and recreate it under any number of circumstances.</p>
    */
-  int ensureTexture(boolean repeatX, boolean repeatY);
+  int ensureTexture();
 
   /**
-   * Clears the GPU texture(s) associated with this image, on platforms implemented via OpenGL.
-   * Does nothing on non-OpenGL platforms. In general it is not necessary to call this method.
-   * Images added to {@link ImageLayer} instances automatically clear their texture when the image
-   * layer is removed from the scene graph. Textures are also cleared when the image is garbage
+   * Clears the GPU texture associated with this image, on platforms implemented via OpenGL. Does
+   * nothing on non-OpenGL platforms. In general it is not necessary to call this method. Images
+   * added to {@link ImageLayer} instances automatically clear their texture when the image layer
+   * is removed from the scene graph. Textures are also cleared when the image is garbage
    * collected. However, if you manually call {@link #ensureTexture}, or if you draw images to a
    * {@link Surface}, you may wish to clear textures manually to avoid running out of GPU memory
    * before garbage collection has a chance to run and clear the textures for you.

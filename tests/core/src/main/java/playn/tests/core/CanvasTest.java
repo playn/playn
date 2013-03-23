@@ -111,16 +111,16 @@ public class CanvasTest extends Test {
       }
     });
 
-    ImageLayer layer = graphics().createImageLayer(createCanvasImage(30, 30, new Drawer() {
+    CanvasImage repimg = createCanvasImage(30, 30, new Drawer() {
       public void draw(Canvas canvas) {
         canvas.setFillColor(0xFF99CCFF);
         canvas.fillCircle(15, 15, 15);
         canvas.setStrokeColor(0xFF000000);
         canvas.strokeRect(0, 0, 30, 30);
       }
-    }));
-    layer.setRepeatX(true);
-    layer.setRepeatY(true);
+    });
+    repimg.setRepeat(true, true);
+    ImageLayer layer = graphics().createImageLayer(repimg);
     layer.setSize(100, 100);
     addTestLayer("ImageLayer repeat x/y", 100, 100, layer);
 

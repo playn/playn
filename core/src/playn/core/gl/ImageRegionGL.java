@@ -36,24 +36,21 @@ public abstract class ImageRegionGL extends ImageGL implements Image.Region {
   }
 
   @Override
-  public int ensureTexture(boolean repeatX, boolean repeatY) {
+  public int ensureTexture() {
     if (!isReady()) {
       return 0;
     } else if (repeatX || repeatY) {
-      scaleTexture(repeatX, repeatY);
-      return reptex;
+      return (tex > 0) ? tex : (tex = scaleTexture());
     } else {
-      return parent.ensureTexture(repeatX, repeatY);
+      return parent.ensureTexture();
     }
   }
 
   @Override
   public void clearTexture() {
-    parent.clearTexture();
-    Asserts.checkState(tex == 0, "ImageRegionGL somehow got non-zero 'tex'!");
-    if (reptex > 0) {
-      ctx.destroyTexture(reptex);
-      reptex = 0;
+    if (tex > 0) {
+      ctx.destroyTexture(tex);
+      tex = 0;
     }
   }
 
@@ -130,13 +127,13 @@ public abstract class ImageRegionGL extends ImageGL implements Image.Region {
   }
 
   @Override
-  protected float texWidth(boolean repeatX) {
-    return repeatX ? width : parent.texWidth(repeatX);
+  protected float texWidth() {
+    return (tex > 0) ? width : parent.texWidth();
   }
 
   @Override
-  protected float texHeight(boolean repeatY) {
-    return repeatY ? height : parent.texHeight(repeatY);
+  protected float texHeight() {
+    return (tex > 0) ? height : parent.texHeight();
   }
 
   @Override
@@ -144,10 +141,7 @@ public abstract class ImageRegionGL extends ImageGL implements Image.Region {
     throw new AssertionError("Region.updateTexture should never be called.");
   }
 
-  private void scaleTexture(boolean repeatX, boolean repeatY) {
-    if (reptex > 0)
-      return;
-
+  private int scaleTexture() {
     int scaledWidth = scale.scaledCeil(this.width);
     int scaledHeight = scale.scaledCeil(this.height);
 
@@ -161,16 +155,16 @@ public abstract class ImageRegionGL extends ImageGL implements Image.Region {
       height = scaledHeight;
 
     // our source image is our parent's texture
-    int tex = parent.ensureTexture(false, false);
+    int tex = parent.ensureTexture();
 
     // create our texture and point a new framebuffer at it
-    reptex = ctx.createTexture(width, height, repeatX, repeatY, mipmapped);
+    int reptex = ctx.createTexture(width, height, repeatX, repeatY, mipmapped);
     int fbuf = ctx.createFramebuffer(reptex);
     ctx.pushFramebuffer(fbuf, width, height);
     try {
       // render the parent texture into the framebuffer properly scaled
       ctx.clear(0, 0, 0, 0);
-      float tw = texWidth(false), th = texHeight(false);
+      float tw = parent.texWidth(), th = parent.texHeight();
       float sl = this.x, st = this.y, sr = sl + this.width, sb = st + this.height;
       GLShader shader = ctx.quadShader(null).prepareTexture(tex, Tint.NOOP_TINT);
       shader.addQuad(ctx.createTransform(), 0, height, width, 0,
@@ -178,6 +172,8 @@ public abstract class ImageRegionGL extends ImageGL implements Image.Region {
       shader.flush();
       // if we're mipmapped, we can now generate our mipmaps
       if (mipmapped) ctx.generateMipmap(reptex);
+      return reptex;
+
     } finally {
       // we no longer need this framebuffer; rebind the previous framebuffer and delete ours
       ctx.popFramebuffer();

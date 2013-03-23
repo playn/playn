@@ -64,8 +64,7 @@ abstract class AbstractSurfaceGL implements Surface {
   @Override
   public Surface drawImage(Image image, float x, float y, float dw, float dh) {
     bindFramebuffer();
-    ((ImageGL) image).draw(shader, topTransform(), x, y, dw, dh,
-                           0, 0, image.width(), image.height(), tint);
+    ((ImageGL) image).draw(shader, topTransform(), x, y, dw, dh, tint);
     return this;
   }
 
@@ -108,7 +107,7 @@ abstract class AbstractSurfaceGL implements Surface {
 
     GLShader shader = ctx.quadShader(this.shader);
     if (fillPattern != null) {
-      int tex = fillPattern.ensureTexture(true, true);
+      int tex = fillPattern.ensureTexture();
       if (tex > 0) {
         shader.prepareTexture(tex, tint);
         shader.addQuad(l, 0, 0, length, width,
@@ -127,7 +126,7 @@ abstract class AbstractSurfaceGL implements Surface {
 
     GLShader shader = ctx.quadShader(this.shader);
     if (fillPattern != null) {
-      int tex = fillPattern.ensureTexture(true, true);
+      int tex = fillPattern.ensureTexture();
       if (tex > 0) {
         shader.prepareTexture(tex, tint);
         float tw = fillPattern.width(), th = fillPattern.height(), r = x+width, b = y+height;
@@ -146,7 +145,7 @@ abstract class AbstractSurfaceGL implements Surface {
 
     GLShader shader = ctx.trisShader(this.shader);
     if (fillPattern != null) {
-      int tex = fillPattern.ensureTexture(true, true);
+      int tex = fillPattern.ensureTexture();
       if (tex > 0) {
         shader.prepareTexture(tex, tint);
         shader.addTriangles(topTransform(), xys, fillPattern.width(), fillPattern.height(), indices);
@@ -164,7 +163,7 @@ abstract class AbstractSurfaceGL implements Surface {
 
     if (fillPattern == null)
       throw new IllegalStateException("No fill pattern currently set");
-    int tex = fillPattern.ensureTexture(true, true);
+    int tex = fillPattern.ensureTexture();
     if (tex > 0) {
       GLShader shader = ctx.trisShader(this.shader).prepareTexture(tex, tint);
       shader.addTriangles(topTransform(), xys, sxys, indices);
@@ -231,6 +230,7 @@ abstract class AbstractSurfaceGL implements Surface {
     // TODO: Add it to the state stack.
     Asserts.checkArgument(pattern instanceof GLPattern);
     this.fillPattern = ((GLPattern) pattern).image();
+    this.fillPattern.setRepeat(true, true);
     return this;
   }
 

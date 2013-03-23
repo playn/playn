@@ -34,18 +34,6 @@ public interface ImageLayer extends Layer.HasSize {
   ImageLayer setImage(Image image);
 
   /**
-   * Configures this layer to repeat its underlying image (instead of scaling it) when this layer's
-   * width differs from that of its underlying image. The default is {@code false}.
-   */
-  void setRepeatX(boolean repeat);
-
-  /**
-   * Configures this layer to repeat its underlying image (instead of scaling it) when this layer's
-   * height differs from that of its underlying image. The default is {@code false}.
-   */
-  void setRepeatY(boolean repeat);
-
-  /**
    * Configures the size of this layer. The size defaults to the size of the image contained by the
    * layer, but if it is set manually then the image will be scaled or repeated to fill the
    * specified size.
