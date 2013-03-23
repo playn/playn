@@ -55,7 +55,6 @@ public interface HtmlUrlParameters {
 
   public static class Renderer {
     static final String CANVAS = "canvas";
-    static final String DOM = "dom";
     static final String GL = "gl";
     static final String PARAM_NAME = "renderer";
 
@@ -65,8 +64,6 @@ public interface HtmlUrlParameters {
         return Mode.CANVAS;
       } else if (GL.equals(renderer)) {
         return Mode.WEBGL;
-      } else if (DOM.equals(renderer)) {
-        return Mode.DOM;
       }
       return Mode.AUTODETECT;
     }

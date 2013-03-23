@@ -48,7 +48,7 @@ public class HtmlPlatform extends AbstractPlatform {
 
   /** Used by {@link #register(Mode)}. */
   public static enum Mode {
-    WEBGL, CANVAS, DOM, AUTODETECT;
+    WEBGL, CANVAS, AUTODETECT;
   }
 
   /** Returned by {@link #agentInfo}. */
@@ -310,8 +310,6 @@ public class HtmlPlatform extends AbstractPlatform {
       switch (config.mode) {
       case CANVAS:
         return new HtmlGraphicsCanvas(config);
-      case DOM:
-        return new HtmlGraphicsDom(config);
       case WEBGL:
         return new HtmlGraphicsGL(this, config);
       default:
