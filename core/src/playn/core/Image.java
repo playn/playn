@@ -136,7 +136,7 @@ public interface Image {
    * Configures the use of mipmaps when rendering this image at scales less than 1. This only
    * applies to GL-based backends (it is a NOOP on other backends).
    */
-  void setMipmapped (boolean mipmapped);
+  void setMipmapped(boolean mipmapped);
 
   /**
    * Creates a texture for this image (if one does not already exist) and returns its OpenGL
