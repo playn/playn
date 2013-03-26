@@ -38,14 +38,6 @@ License, Version 2.0:
 
 ### Additional license info
 
-Code under `gwtbox2d`:
-
-* URL: http://www.jbox2d.org/
-* License: zlib
-* Description: GWT-friendly adaptation of JBox2D.
-* Local modifications: Various modifications to support cross-compilation to
-  supported platforms.
-
 Image resources under `sample/(cute|peas)`:
 
 * URL: http://www.lostgarden.com/2007/03/lost-garden-license.html

@@ -1,20 +1,22 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-
   <parent>
     <groupId>com.googlecode.playn</groupId>
     <artifactId>playn-project</artifactId>
     <version>1.7-SNAPSHOT</version>
-    <relativePath>../pom.xml</relativePath>
   </parent>
 
   <artifactId>playn-jbox2d</artifactId>
   <packaging>jar</packaging>
   <name>PlayN JBox2D</name>
-  <description>A GWT-compatible port of JBox2D, for use with PlayN games.</description>
+  <description>A DebugDraw implementation for JBox2D.</description>
 
   <dependencies>
-    <!-- this is needed for src/playn/core/DebugDrawBox2D -->
+    <dependency>
+      <groupId>org.jbox2d</groupId>
+      <artifactId>jbox2d-library</artifactId>
+      <version>${jbox2d.version}</version>
+    </dependency>
     <dependency>
       <groupId>com.googlecode.playn</groupId>
       <artifactId>playn-core</artifactId>
@@ -37,16 +39,6 @@
             </goals>
           </execution>
         </executions>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <configuration>
-          <excludes>
-            <exclude>**/emul/**</exclude>
-            <exclude>**/generator/**</exclude>
-          </excludes>
-        </configuration>
       </plugin>
     </plugins>
   </build>

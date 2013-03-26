@@ -144,26 +144,23 @@ public class DebugDrawBox2D extends DebugDraw {
       return;
     }
 
-    getWorldToScreenToOut(xf.position, tempVec1);
+    getWorldToScreenToOut(xf.p, tempVec1);
     tempVec2.setZero();
     float k_axisScale = 0.4f;
 
-    canvas.setStrokeColor(Color.rgb(1, 0, 0)); // note: violates
-                                                        // strokeAlpha
-    tempVec2.x = xf.position.x + k_axisScale * xf.R.m11;
-    tempVec2.y = xf.position.y + k_axisScale * xf.R.m12;
+    canvas.setStrokeColor(Color.rgb(1, 0, 0)); // note: violates strokeAlpha
+    tempVec2.x = xf.p.x; // + k_axisScale * xf.R.m11; // Transform no longer scales
+    tempVec2.y = xf.p.y; // + k_axisScale * xf.R.m12;
     getWorldToScreenToOut(tempVec2, tempVec2);
     canvas.drawLine(tempVec1.x, tempVec1.y, tempVec2.x, tempVec2.y);
 
-    canvas.setStrokeColor(Color.rgb(0, 1, 0)); // note: violates
-                                                        // strokeAlpha
-    tempVec2.x = xf.position.x + k_axisScale * xf.R.m21;
-    tempVec2.y = xf.position.y + k_axisScale * xf.R.m22;
+    canvas.setStrokeColor(Color.rgb(0, 1, 0)); // note: violates strokeAlpha
+    tempVec2.x = xf.p.x; // + k_axisScale * xf.R.m21; // Transform no longer scales
+    tempVec2.y = xf.p.y; // + k_axisScale * xf.R.m22;
     getWorldToScreenToOut(tempVec2, tempVec2);
     canvas.drawLine(tempVec1.x, tempVec1.y, tempVec2.x, tempVec2.y);
 
-    canvas.setStrokeColor(Color.argb(strokeAlpha, 1, 0, 0)); // restores
-                                                                      // strokeAlpha
+    canvas.setStrokeColor(Color.argb(strokeAlpha, 1, 0, 0)); // restores strokeAlpha
   }
 
   public Canvas getCanvas() {
@@ -231,7 +228,7 @@ public class DebugDrawBox2D extends DebugDraw {
 
   /**
    * Sets the fill color from a Color3f
-   * 
+   *
    * @param color color where (r,g,b) = (x,y,z)
    */
   private void setFillColor(Color3f color) {
@@ -250,7 +247,7 @@ public class DebugDrawBox2D extends DebugDraw {
 
   /**
    * Sets the stroke color from a Color3f
-   * 
+   *
    * @param color color where (r,g,b) = (x,y,z)
    */
   private void setStrokeColor(Color3f color) {
@@ -270,8 +267,8 @@ public class DebugDrawBox2D extends DebugDraw {
     super.setCamera(cameraX, cameraY, cameraScale);
   }
 
-  @Override
-  public void clear() {
-    canvas.clear();
-  }
+  // @Override
+  // public void clear() {
+  //   canvas.clear();
+  // }
 }

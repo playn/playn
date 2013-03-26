@@ -10,10 +10,6 @@
        enabled in your JVM already, pass -Djunit.fork=false to ant to speed things up a bit. -->
   <property name="junit.fork"   value="true"/>
 
-  <!-- used to include additional source code in our jar file; -->
-  <!-- pesky hack needed by gwtbox2d -->
-  <property name="aux.src.dir"  value="notused"/>
-
   <import file="build-maven.xml"/>
 
   <target name="-prepare" depends="-init-maven-ant">
@@ -88,7 +84,6 @@
       <fileset dir="${classes.dir}" includes="**/*"/>
       <!-- we include the source in the main jar for use by GWT (.java, .xml, etc.) -->
       <fileset dir="${src.dir}" includes="**/*"/>
-      <fileset erroronmissingdir="false" dir="${aux.src.dir}" includes="**/*"/>
     </jar>
     <jar destfile="${target.dir}/${pom.artifactId}-${pom.version}-sources.jar">
       <fileset dir="${src.dir}" includes="**/*.java"/>

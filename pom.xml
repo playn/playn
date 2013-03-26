@@ -32,7 +32,7 @@
     <module>benchmark</module>
     <module>core</module>
     <module>flash</module>
-    <module>gwtbox2d</module>
+    <module>jbox2d</module>
     <module>html</module>
     <module>ios</module>
     <module>java</module>
@@ -48,6 +48,7 @@
     <android.maven.version>3.5.0</android.maven.version>
     <monotouch.version>6.0.6</monotouch.version>
     <gwt.version>2.5.0</gwt.version>
+    <jbox2d.version>2.2.1.1</jbox2d.version>
     <lwjgl.version>2.8.5</lwjgl.version>
     <!--
       GWT log levels:

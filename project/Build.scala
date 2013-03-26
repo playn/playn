@@ -47,7 +47,7 @@ object PlayNBuild extends Build {
  	        "com.novocode" % "junit-interface" % "0.7" % "test->default"
         )
       )
-      case "gwtbox2d" => srcDirSettings ++ seq(
+      case "jbox2d" => srcDirSettings ++ seq(
         // exclude GWT generator and supersource code
         excludeFilter in unmanagedSources ~= {
           _ || "PoolingStackGenerator.java" || excludePath("org/jbox2d/emul")
@@ -74,7 +74,7 @@ object PlayNBuild extends Build {
   }
 
   lazy val core = builder("core")
-  lazy val gwtbox2d = builder("gwtbox2d")
+  lazy val jbox2d = builder("jbox2d")
   lazy val webgl = builder("webgl")
   lazy val java = builder("java")
   lazy val html = builder("html")
@@ -91,5 +91,5 @@ object PlayNBuild extends Build {
 
   // one giant fruit roll-up to bring them all together
   lazy val playn = Project("playn", file(".")) aggregate(
-    core, gwtbox2d, webgl, java, html, flash, android, ios, tests)
+    core, jbox2d, webgl, java, html, flash, android, ios, tests)
 }
