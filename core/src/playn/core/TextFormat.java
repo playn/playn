@@ -101,4 +101,22 @@ public class TextFormat {
     String wrapStr = shouldWrap() ? ""+wrapWidth : "n/a";
     return "[font=" + font + ", wrapWidth=" + wrapStr + ", align=" + align + "]";
   }
+
+  @Override
+  public boolean equals(Object other) {
+    if (other instanceof TextFormat) {
+      TextFormat ofmt = (TextFormat)other;
+      return (font == ofmt.font || (font != null && font.equals(ofmt.font))) &&
+        wrapWidth == ofmt.wrapWidth && align == ofmt.align;
+    } else {
+      return false;
+    }
+  }
+
+  @Override
+  public int hashCode() {
+    int hash = align.hashCode() ^ (int)wrapWidth;
+    if (font != null) hash ^= font.hashCode();
+    return hash;
+  }
 }
