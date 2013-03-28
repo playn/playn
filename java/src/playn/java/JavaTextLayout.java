@@ -36,6 +36,7 @@ class JavaTextLayout extends AbstractTextLayout {
   private static FontRenderContext dummyFontContext = createDummyFRC();
 
   private List<TextLayout> layouts = new ArrayList<TextLayout>();
+  private final float xAdjust;
 
   public JavaTextLayout(JavaGraphics gfx, String text, TextFormat format) {
     super(gfx, text, format);
@@ -68,10 +69,16 @@ class JavaTextLayout extends AbstractTextLayout {
       layouts.add(new TextLayout(astring.getIterator(), dummyFontContext));
     }
 
-    // compute our width and height
+    // some font glyphs start rendering at a negative inset, blowing outside their bounding box
+    // (naughty!); in such cases, we shift everything to the right to ensure that we don't paint
+    // outside our reported bounding box (so that someone can create a single canvas of bounding
+    // box size and render this text layout into it at (0,0) and nothing will get cut off)
+    float maxXAdjust = 0;
+    // compute our total width and height
     float twidth = 0, theight = 0;
     for (TextLayout layout : layouts) {
       Rectangle2D bounds = layout.getBounds();
+      maxXAdjust = Math.max(maxXAdjust, -Math.min(0, (float)bounds.getX()));
       twidth = Math.max(twidth, getWidth(bounds));
       if (layout != layouts.get(0)) {
         theight += layout.getLeading(); // leading only applied to lines after 0
@@ -80,6 +87,12 @@ class JavaTextLayout extends AbstractTextLayout {
     }
     width = isEmptyString ? 0 : twidth;
     height = theight;
+    xAdjust = maxXAdjust;
+  }
+
+  @Override
+  public float width() {
+    return super.width() + xAdjust;
   }
 
   @Override
@@ -91,7 +104,7 @@ class JavaTextLayout extends AbstractTextLayout {
   public Rectangle lineBounds(int line) {
     Rectangle2D bounds = layouts.get(line).getBounds();
     float lineWidth = getWidth(bounds);
-    float x = (float)-bounds.getX() + format.align.getX(lineWidth, width);
+    float x = xAdjust + format.align.getX(lineWidth, width);
     float y = line == 0 ? 0 : line * (ascent() + descent() + leading());
     return new Rectangle(x+pad, y+pad, lineWidth, ascent()+descent());
   }
@@ -123,12 +136,7 @@ class JavaTextLayout extends AbstractTextLayout {
     float yoff = y;
     for (TextLayout layout : layouts) {
       Rectangle2D bounds = layout.getBounds();
-      // some fonts starting rendering inset to the right, and others start rendering at a negative
-      // inset, blowing outside their bounding box (naughty!); for the former, we trim off that
-      // inset and for the latter we shift everything to the right to ensure that we don't paint
-      // outside our reported bounding box (so that someone can create a single canvas of bounding
-      // box size and render this text layout into it at (0,0) and nothing will get cut off)
-      float sx = x + (float)-bounds.getX() + format.align.getX(getWidth(bounds), width);
+      float sx = x + xAdjust + format.align.getX(getWidth(bounds), width);
       yoff += layout.getAscent();
       if (stroke) {
         gfx.translate(sx, yoff);
@@ -142,11 +150,13 @@ class JavaTextLayout extends AbstractTextLayout {
   }
 
   private static float getWidth(Rectangle2D bounds) {
-    // if our text includes a negative inset, that needs to be tacked onto the width
-    return (float)(Math.max(-bounds.getX(), 0) + bounds.getWidth());
+    // if the x position is positive, we need to account for the fact that getWidth doesn't include
+    // this leading whitespace, but we need to include it in our bounds; we don't need to worry
+    // about xAdjust here because that's accounted elsewhere
+    return (float)(Math.max(0, bounds.getX()) + bounds.getWidth());
   }
 
-  private static FontRenderContext createDummyFRC () {
+  private static FontRenderContext createDummyFRC() {
     Graphics2D gfx = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB).createGraphics();
     gfx.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
     return gfx.getFontRenderContext();
