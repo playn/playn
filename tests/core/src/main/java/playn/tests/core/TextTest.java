@@ -19,7 +19,6 @@ import playn.core.Image;
 import playn.core.Keyboard.TextType;
 import playn.core.Pointer;
 import playn.core.Pointer.Event;
-import playn.core.PlayN;
 import playn.core.TextFormat;
 import playn.core.Canvas;
 import playn.core.CanvasImage;
@@ -33,8 +32,6 @@ import static playn.core.PlayN.keyboard;
 
 public class TextTest extends Test {
 
-  private TextFormat baseFormat = new TextFormat().
-    withFont(graphics().createFont("Times New Roman", Font.Style.PLAIN, 24));
   private final float COL_WIDTH = 120;
 
   @Override
@@ -51,10 +48,13 @@ public class TextTest extends Test {
   public void init() {
     float x = 0;
     x += addExamples("Filled", FILL, x);
+    x += addExamples("Bold", BOLD, x);
     x += addExamples("Stroked", STROKE, x);
     x += addExamples("Vector otln", OUTLINE_VEC, x);
     x += addExamples("Shadow UL", SHADOW_UL, x);
     x += addExamples("Shadow LR", SHADOW_LR, x);
+
+    final TextFormat baseFormat = STROKE.format();
 
     // test laying out the empty string
     TextLayout layout = graphics().layoutText("", new TextFormat());
@@ -83,6 +83,7 @@ public class TextTest extends Test {
 
   protected float addExamples(String name, TextRenderer renderer, float x) {
     GroupLayer root = graphics().rootLayer();
+    TextFormat baseFormat = renderer.format();
     ImageLayer[] layers = {
       makeTextLayer(name, renderer, baseFormat),
       makeTextLayer("The quick brown fox", renderer,
@@ -117,6 +118,10 @@ public class TextTest extends Test {
   }
 
   protected static abstract class TextRenderer {
+    public Font.Style style () { return Font.Style.PLAIN; }
+    public TextFormat format () {
+      return new TextFormat().withFont(graphics().createFont("Times New Roman", style(), 24));
+    }
     public float adjustWidth(float width) { return width; }
     public float adjustHeight(float height) { return height; }
     public abstract void render(Canvas canvas, TextLayout text);
@@ -129,6 +134,15 @@ public class TextTest extends Test {
     }
   };
   protected static TextRenderer FILL = new TextRenderer() {
+    public void render(Canvas canvas, TextLayout text) {
+      canvas.setFillColor(0xFF6699CC);
+      canvas.fillText(text, 0, 0);
+    }
+  };
+  protected static TextRenderer BOLD = new TextRenderer() {
+    public Font.Style style () {
+      return Font.Style.BOLD;
+    }
     public void render(Canvas canvas, TextLayout text) {
       canvas.setFillColor(0xFF6699CC);
       canvas.fillText(text, 0, 0);
