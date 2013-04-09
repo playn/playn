@@ -34,7 +34,7 @@ import playn.core.util.Callback;
 /**
  * Provides some shared bits for {@link IOSImage} and {@link IOSCanvasImage}.
  */
-public abstract class IOSAbstractImage extends ImageGL implements Image, IOSCanvas.Drawable {
+public abstract class IOSAbstractImage extends ImageGL<CGBitmapContext> implements Image {
 
   /**
    * Creates a {@code UIImage} based on our underlying image data. This is useful when you need to
@@ -57,11 +57,6 @@ public abstract class IOSAbstractImage extends ImageGL implements Image, IOSCanv
   @Override
   public void addCallback(Callback<? super Image> callback) {
     callback.onSuccess(this); // we're always ready
-  }
-
-  @Override
-  public Region subImage(float x, float y, float width, float height) {
-    return new IOSImageRegion(this, x, y, width, height);
   }
 
   @Override
@@ -98,6 +93,12 @@ public abstract class IOSAbstractImage extends ImageGL implements Image, IOSCanv
   }
 
   @Override
+  public Image transform(BitmapTransformer xform) {
+    UIImage ximage = new UIImage(((IOSBitmapTransformer) xform).transform(cgImage()));
+    return new IOSImage(ctx, ximage.get_CGImage(), scale);
+  }
+
+  @Override
   public void draw(CGBitmapContext bctx, float x, float y, float width, float height) {
     CGImage cgImage = cgImage();
     // pesky fiddling to cope with the fact that UIImages are flipped; TODO: make sure drawing a
@@ -131,12 +132,6 @@ public abstract class IOSAbstractImage extends ImageGL implements Image, IOSCanv
     bctx.TranslateCTM(-sx*scaleX, -(ih-(sy+sh))*scaleY);
     bctx.DrawImage(new RectangleF(0, 0, iw*scaleX, ih*scaleY), cgImage);
     bctx.RestoreState();
-  }
-
-  @Override
-  public Image transform(BitmapTransformer xform) {
-    UIImage ximage = new UIImage(((IOSBitmapTransformer) xform).transform(cgImage()));
-    return new IOSImage(ctx, ximage.get_CGImage(), scale);
   }
 
   @Override

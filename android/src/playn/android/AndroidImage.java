@@ -29,7 +29,7 @@ import playn.core.gl.ImageGL;
 import playn.core.gl.Scale;
 import playn.core.util.Callback;
 
-class AndroidImage extends ImageGL implements AndroidGLContext.Refreshable, AndroidCanvas.Drawable {
+class AndroidImage extends ImageGL<AndroidCanvas> implements AndroidGLContext.Refreshable {
 
   protected Bitmap bitmap; // only mutated in AndroidAsyncImage
 
@@ -37,6 +37,10 @@ class AndroidImage extends ImageGL implements AndroidGLContext.Refreshable, Andr
     super(ctx, scale);
     this.bitmap = bitmap;
     ((AndroidGLContext) ctx).addRefreshable(this);
+  }
+
+  Bitmap bitmap() {
+    return bitmap;
   }
 
   @Override
@@ -75,11 +79,6 @@ class AndroidImage extends ImageGL implements AndroidGLContext.Refreshable, Andr
   }
 
   @Override
-  public Region subImage(float x, float y, float width, float height) {
-    return new AndroidImageRegion(this, x, y, width, height);
-  }
-
-  @Override
   public Pattern toPattern() {
     return new AndroidPattern(this);
   }
@@ -96,21 +95,19 @@ class AndroidImage extends ImageGL implements AndroidGLContext.Refreshable, Andr
   }
 
   @Override
-  public Bitmap bitmap() {
-    return bitmap;
+  public void draw(AndroidCanvas ac, float dx, float dy, float dw, float dh) {
+    draw(ac, dx, dy, dw, dh, 0, 0, width(), height());
   }
 
   @Override
-  public void prepDraw(Rect rect, RectF rectf, float dx, float dy, float dw, float dh,
-                       float sx, float sy, float sw, float sh) {
+  public void draw(AndroidCanvas ac, float dx, float dy, float dw, float dh,
+                   float sx, float sy, float sw, float sh) {
     // adjust our source rect to account for the scale factor
     sx *= scale.factor;
     sy *= scale.factor;
     sw *= scale.factor;
     sh *= scale.factor;
-
-    rect.set((int) sx, (int) sy, (int) (sx + sw), (int) (sy + sh));
-    rectf.set(dx, dy, dx + dw, dy + dh);
+    ac.draw(bitmap, dx, dy, dw, dh, sx, sy, sw, sh);
   }
 
   @Override
@@ -118,7 +115,7 @@ class AndroidImage extends ImageGL implements AndroidGLContext.Refreshable, Andr
                                  float x, float y, float width, float height) {
     int ix = MathUtil.ifloor(x), iy = MathUtil.ifloor(y);
     int iw = MathUtil.iceil(width), ih = MathUtil.iceil(height);
-    return new AndroidPattern(image, Bitmap.createBitmap(bitmap(), ix, iy, iw, ih));
+    return new AndroidPattern(image, Bitmap.createBitmap(bitmap, ix, iy, iw, ih));
   }
 
   @Override

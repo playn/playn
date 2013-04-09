@@ -17,33 +17,27 @@ package playn.android;
 
 import java.util.LinkedList;
 
-import playn.core.Asserts;
-import playn.core.Canvas;
-import playn.core.Gradient;
-import playn.core.Image;
-import playn.core.Path;
-import playn.core.Pattern;
-import playn.core.TextLayout;
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
 import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.graphics.RectF;
 
-class AndroidCanvas implements Canvas {
+import playn.core.Asserts;
+import playn.core.Canvas;
+import playn.core.Gradient;
+import playn.core.Path;
+import playn.core.Pattern;
+import playn.core.TextLayout;
+import playn.core.gl.AbstractCanvasGL;
 
-  interface Drawable {
-    Bitmap bitmap();
-    void prepDraw(Rect rect, RectF rectf, float dx, float dy, float dw, float dh,
-                  float sx, float sy, float sw, float sh);
-  }
+class AndroidCanvas extends AbstractCanvasGL<AndroidCanvas> {
 
   private static Matrix m = new Matrix();
   private static Rect rect = new Rect();
   private static RectF rectf = new RectF();
 
   private final android.graphics.Canvas canvas;
-  private boolean dirty = true;
 
   private LinkedList<AndroidCanvasState> paintStack = new LinkedList<AndroidCanvasState>();
 
@@ -52,10 +46,18 @@ class AndroidCanvas implements Canvas {
     paintStack.addFirst(new AndroidCanvasState());
   }
 
+  void draw(Bitmap bitmap, float dx, float dy, float dw, float dh,
+            float sx, float sy, float sw, float sh) {
+    rect.set((int) sx, (int) sy, (int) (sx + sw), (int) (sy + sh));
+    rectf.set(dx, dy, dx + dw, dy + dh);
+    canvas.drawBitmap(bitmap, rect, rectf, currentState().prepareImage());
+    isDirty = true;
+  }
+
   @Override
   public Canvas clear() {
     canvas.drawColor(0, PorterDuff.Mode.SRC);
-    dirty = true;
+    isDirty = true;
     return this;
   }
 
@@ -67,7 +69,7 @@ class AndroidCanvas implements Canvas {
     // specified color and porter-duff xfermode."
     canvas.drawColor(0, PorterDuff.Mode.SRC);
     canvas.restore();
-    dirty = true;
+    isDirty = true;
     return this;
   }
 
@@ -84,59 +86,30 @@ class AndroidCanvas implements Canvas {
   }
 
   @Override
-  public Canvas drawImage(Image img, float x, float y) {
-    drawImage(img, x, y, img.width(), img.height());
-    return this;
-  }
-
-  @Override
-  public Canvas drawImage(Image img, float x, float y, float w, float h) {
-    drawImage(img, x, y, w, h, 0, 0, img.width(), img.height());
-    return this;
-  }
-
-  @Override
-  public Canvas drawImage(Image img, float dx, float dy, float dw, float dh,
-                          float sx, float sy, float sw, float sh) {
-    Asserts.checkArgument(img instanceof Drawable);
-    ((Drawable) img).prepDraw(rect, rectf, dx, dy, dw, dh, sx, sy, sw, sh);
-    canvas.drawBitmap(((Drawable) img).bitmap(), rect, rectf, currentState().prepareImage());
-    dirty = true;
-    return this;
-  }
-
-  @Override
-  public Canvas drawImageCentered(Image image, float dx, float dy) {
-    drawImage(image, dx - image.width() / 2, dy - image.height() / 2);
-    dirty = true;
-    return this;
-  }
-
-  @Override
   public Canvas drawLine(float x0, float y0, float x1, float y1) {
     canvas.drawLine(x0, y0, x1, y1, currentState().prepareStroke());
-    dirty = true;
+    isDirty = true;
     return this;
   }
 
   @Override
   public Canvas drawPoint(float x, float y) {
     canvas.drawPoint(x, y, currentState().prepareStroke());
-    dirty = true;
+    isDirty = true;
     return this;
   }
 
   @Override
   public Canvas drawText(String text, float x, float y) {
     canvas.drawText(text, x, y, currentState().prepareFill());
-    dirty = true;
+    isDirty = true;
     return this;
   }
 
   @Override
   public Canvas fillCircle(float x, float y, float radius) {
     canvas.drawCircle(x, y, radius, currentState().prepareFill());
-    dirty = true;
+    isDirty = true;
     return this;
   }
 
@@ -144,7 +117,7 @@ class AndroidCanvas implements Canvas {
   public Canvas fillPath(Path path) {
     Asserts.checkArgument(path instanceof AndroidPath);
     canvas.drawPath(((AndroidPath) path).path, currentState().prepareFill());
-    dirty = true;
+    isDirty = true;
     return this;
   }
 
@@ -155,7 +128,7 @@ class AndroidCanvas implements Canvas {
     float right = left + width;
     float bottom = top + height;
     canvas.drawRect(left, top, right, bottom, currentState().prepareFill());
-    dirty = true;
+    isDirty = true;
     return this;
   }
 
@@ -166,14 +139,14 @@ class AndroidCanvas implements Canvas {
     rectf.set(0, 0, width, height);
     canvas.drawRoundRect(rectf, radius, radius, currentState().prepareFill());
     canvas.translate(-x, -y);
-    dirty = true;
+    isDirty = true;
     return this;
   }
 
   @Override
   public Canvas fillText(TextLayout layout, float x, float y) {
     ((AndroidTextLayout)layout).draw(canvas, x, y, currentState().prepareFill());
-    dirty = true;
+    isDirty = true;
     return this;
   }
 
@@ -279,7 +252,7 @@ class AndroidCanvas implements Canvas {
   @Override
   public Canvas strokeCircle(float x, float y, float radius) {
     canvas.drawCircle(x, y, radius, currentState().prepareStroke());
-    dirty = true;
+    isDirty = true;
     return this;
   }
 
@@ -287,7 +260,7 @@ class AndroidCanvas implements Canvas {
   public Canvas strokePath(Path path) {
     Asserts.checkArgument(path instanceof AndroidPath);
     canvas.drawPath(((AndroidPath) path).path, currentState().prepareStroke());
-    dirty = true;
+    isDirty = true;
     return this;
   }
 
@@ -298,7 +271,7 @@ class AndroidCanvas implements Canvas {
     float right = left + width;
     float bottom = top + height;
     canvas.drawRect(left, top, right, bottom, currentState().prepareStroke());
-    dirty = true;
+    isDirty = true;
     return this;
   }
 
@@ -309,14 +282,14 @@ class AndroidCanvas implements Canvas {
     rectf.set(0, 0, width, height);
     canvas.drawRoundRect(rectf, radius, radius, currentState().prepareStroke());
     canvas.translate(-x, -y);
-    dirty = true;
+    isDirty = true;
     return this;
   }
 
   @Override
   public Canvas strokeText(TextLayout layout, float x, float y) {
     ((AndroidTextLayout)layout).draw(canvas, x, y, currentState().prepareStroke());
-    dirty = true;
+    isDirty = true;
     return this;
   }
 
@@ -338,12 +311,9 @@ class AndroidCanvas implements Canvas {
     return canvas.getWidth();
   }
 
-  void clearDirty() {
-    dirty = false;
-  }
-
-  boolean dirty() {
-    return dirty;
+  @Override
+  protected AndroidCanvas gc() {
+    return this;
   }
 
   private AndroidCanvasState currentState() {

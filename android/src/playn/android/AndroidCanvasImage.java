@@ -29,7 +29,7 @@ class AndroidCanvasImage extends AndroidImage implements CanvasImage {
   AndroidCanvasImage(AndroidGraphics gfx, float width, float height, Scale scale) {
     super(gfx.ctx, Bitmap.createBitmap(scale.scaledCeil(width), scale.scaledCeil(height),
                                        gfx.preferredBitmapConfig), scale);
-    this.canvas = new AndroidCanvas(bitmap());
+    this.canvas = new AndroidCanvas(bitmap);
     this.canvas.scale(scale.factor, scale.factor);
   }
 
@@ -40,7 +40,7 @@ class AndroidCanvasImage extends AndroidImage implements CanvasImage {
 
   @Override
   public Image snapshot() {
-    return new AndroidImage(ctx, bitmap().copy(bitmap().getConfig(), false), scale);
+    return new AndroidImage(ctx, bitmap.copy(bitmap.getConfig(), false), scale);
   }
 
   @Override
@@ -57,6 +57,6 @@ class AndroidCanvasImage extends AndroidImage implements CanvasImage {
   @Override
   public void setRgb(int startX, int startY, int width, int height, int[] rgbArray, int offset,
                      int scanSize) {
-    bitmap().setPixels(rgbArray, offset, scanSize, startX, startY, width, height);
+    bitmap.setPixels(rgbArray, offset, scanSize, startX, startY, width, height);
   }
 }

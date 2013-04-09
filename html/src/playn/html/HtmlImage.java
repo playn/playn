@@ -34,7 +34,7 @@ import playn.core.gl.ImageGL;
 import playn.core.gl.Scale;
 import playn.core.util.Callback;
 
-class HtmlImage extends ImageGL implements HtmlCanvas.Drawable {
+class HtmlImage extends ImageGL<Context2d> {
 
   private static native boolean isComplete(ImageElement img) /*-{
     return img.complete;
@@ -131,27 +131,6 @@ class HtmlImage extends ImageGL implements HtmlCanvas.Drawable {
   }
 
   @Override
-  public Region subImage(float x, float y, float width, float height) {
-    return new HtmlImageRegion(this, x, y, width, height);
-  }
-
-  @Override
-  public void draw(Context2d ctx, float x, float y, float width, float height) {
-    draw(ctx, 0, 0, width(), height(), x, y, width, height);
-  }
-
-  @Override
-  public void draw(Context2d ctx, float sx, float sy, float sw, float sh,
-            float dx, float dy, float dw, float dh) {
-    // adjust our source rect to account for the scale factor
-    sx *= scale.factor;
-    sy *= scale.factor;
-    sw *= scale.factor;
-    sh *= scale.factor;
-    ctx.drawImage(img, sx, sy, sw, sh, dx, dy, dw, dh);
-  }
-
-  @Override
   public Image transform(BitmapTransformer xform) {
     return new HtmlImage(ctx, scale, ((HtmlBitmapTransformer) xform).transform(img));
   }
@@ -161,6 +140,22 @@ class HtmlImage extends ImageGL implements HtmlCanvas.Drawable {
     // we may be in use on a non-WebGL platform, in which case we should NOOP
     if (ctx != null)
       super.clearTexture();
+  }
+
+  @Override
+  public void draw(Context2d ctx, float x, float y, float width, float height) {
+    draw(ctx, 0, 0, width(), height(), x, y, width, height);
+  }
+
+  @Override
+  public void draw(Context2d ctx, float dx, float dy, float dw, float dh,
+                   float sx, float sy, float sw, float sh) {
+    // adjust our source rect to account for the scale factor
+    sx *= scale.factor;
+    sy *= scale.factor;
+    sw *= scale.factor;
+    sh *= scale.factor;
+    ctx.drawImage(img, sx, sy, sw, sh, dx, dy, dw, dh);
   }
 
   @Override

@@ -20,7 +20,7 @@ import playn.core.Image;
 import playn.core.InternalTransform;
 import playn.core.Pattern;
 
-public abstract class AbstractImageGL implements Image {
+public abstract class AbstractImageGL<GC> implements Image {
 
   protected final GLContext ctx;
 
@@ -54,6 +54,13 @@ public abstract class AbstractImageGL implements Image {
       clearTexture();
     }
   }
+
+  /** Draws this image into the platform-specific (canvas) graphics context. */
+  public abstract void draw(GC gc, float dx, float dy, float dw, float dh);
+
+  /** Draws this image into the platform-specific (canvas) graphics context. */
+  public abstract void draw(GC gc, float dx, float dy, float dw, float dh,
+                            float sx, float sy, float sw, float sh);
 
   /**
    * Draws this image with the supplied transform in the specified target dimensions.
@@ -111,10 +118,15 @@ public abstract class AbstractImageGL implements Image {
   }
 
   @Override
+  public Region subImage(float sx, float sy, float swidth, float sheight) {
+    return new ImageRegionGL<GC>(this, sx, sy, swidth, sheight);
+  }
+
+  @Override
   public Pattern toPattern() {
     // TODO: this will cause freakoutery when used in a canvas
     return new GLPattern() {
-      public AbstractImageGL image() {
+      public AbstractImageGL<?> image() {
         return AbstractImageGL.this;
       }
     };
@@ -132,7 +144,7 @@ public abstract class AbstractImageGL implements Image {
   }
 
   protected abstract Pattern toSubPattern(
-    AbstractImageGL image, float x, float y, float width, float height);
+    AbstractImageGL<GC> image, float x, float y, float width, float height);
 
   protected AbstractImageGL(GLContext ctx) {
     this.ctx = ctx;

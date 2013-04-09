@@ -22,5 +22,5 @@ import playn.core.Pattern;
  */
 public interface GLPattern extends Pattern {
 
-  AbstractImageGL image();
+  AbstractImageGL<?> image();
 }

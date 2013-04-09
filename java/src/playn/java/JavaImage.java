@@ -32,7 +32,7 @@ import playn.core.gl.GLContext;
 import playn.core.gl.ImageGL;
 import playn.core.gl.Scale;
 
-abstract class JavaImage extends ImageGL implements JavaCanvas.Drawable {
+abstract class JavaImage extends ImageGL<Graphics2D> {
 
   protected BufferedImage img;
 
@@ -54,11 +54,6 @@ abstract class JavaImage extends ImageGL implements JavaCanvas.Drawable {
   @Override
   public boolean isReady() {
     return (img != null);
-  }
-
-  @Override
-  public Region subImage(float sx, float sy, float swidth, float sheight) {
-    return new JavaImageRegion(this, sx, sy, swidth, sheight);
   }
 
   @Override

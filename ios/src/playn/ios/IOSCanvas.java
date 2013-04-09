@@ -19,36 +19,28 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 
+import cli.MonoTouch.CoreGraphics.*;
 import cli.System.Drawing.RectangleF;
 import cli.System.IntPtr;
 import cli.System.Runtime.InteropServices.Marshal;
 
-import cli.MonoTouch.CoreGraphics.*;
-
 import playn.core.Canvas;
 import playn.core.Gradient;
-import playn.core.Image;
 import playn.core.Path;
 import playn.core.Pattern;
 import playn.core.TextLayout;
+import playn.core.gl.AbstractCanvasGL;
 
 /**
  * Implements {@link Canvas}.
  */
-public class IOSCanvas implements Canvas {
-
-  interface Drawable {
-    void draw(CGBitmapContext bctx, float dx, float dy, float dw, float dh);
-    void draw(CGBitmapContext bctx, float dx, float dy, float dw, float dh,
-              float sx, float sy, float sw, float sh);
-  }
+public class IOSCanvas extends AbstractCanvasGL<CGBitmapContext> {
 
   private final float width, height;
   private final int texWidth, texHeight;
 
   private float strokeWidth = 1;
   private int strokeColor = 0xFF000000;
-  private boolean isDirty;
   private IntPtr data;
   private CGBitmapContext bctx;
 
@@ -98,14 +90,6 @@ public class IOSCanvas implements Canvas {
     return bctx.ToImage();
   }
 
-  public boolean dirty() {
-    return isDirty;
-  }
-
-  public void clearDirty() {
-    isDirty = false;
-  }
-
   public void dispose() {
     if (bctx != null) {
       bctx.Dispose();
@@ -151,31 +135,6 @@ public class IOSCanvas implements Canvas {
   @Override
   public Path createPath() {
     return new IOSPath();
-  }
-
-  @Override
-  public Canvas drawImage(Image image, float dx, float dy) {
-    return drawImage(image, dx, dy, image.width(), image.height());
-  }
-
-  @Override
-  public Canvas drawImageCentered(Image image, float dx, float dy) {
-    return drawImage(image, dx - image.width()/2, dy - image.height()/2);
-  }
-
-  @Override
-  public Canvas drawImage(Image image, float dx, float dy, float dw, float dh) {
-    ((Drawable) image).draw(bctx, dx, dy, dw, dh);
-    isDirty = true;
-    return this;
-  }
-
-  @Override
-  public Canvas drawImage(Image image, float dx, float dy, float dw, float dh,
-                          float sx, float sy, float sw, float sh) {
-    ((Drawable) image).draw(bctx, dx, dy, dw, dh, sx, sy, sw, sh);
-    isDirty = true;
-    return this;
   }
 
   @Override
@@ -411,6 +370,11 @@ public class IOSCanvas implements Canvas {
 
   protected void finalize() {
     dispose(); // meh
+  }
+
+  @Override
+  protected CGBitmapContext gc() {
+    return bctx;
   }
 
   private void addRoundRectPath(float x, float y, float width, float height, float radius) {

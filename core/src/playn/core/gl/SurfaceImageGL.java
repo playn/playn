@@ -23,7 +23,7 @@ import playn.core.SurfaceImage;
 import playn.core.Tint;
 import playn.core.util.Callback;
 
-public class SurfaceImageGL extends AbstractImageGL implements SurfaceImage {
+public class SurfaceImageGL extends AbstractImageGL<Object> implements SurfaceImage {
 
   private final SurfaceGL surface;
 
@@ -69,7 +69,7 @@ public class SurfaceImageGL extends AbstractImageGL implements SurfaceImage {
 
   @Override
   public Region subImage(float sx, float sy, float swidth, float sheight) {
-    return new ImageRegionGL(this, sx, sy, swidth, sheight);
+    return new ImageRegionGL<Object>(this, sx, sy, swidth, sheight);
   }
 
   @Override
@@ -84,6 +84,18 @@ public class SurfaceImageGL extends AbstractImageGL implements SurfaceImage {
   }
 
   @Override
+  public void draw(Object gc, float dx, float dy, float dw, float dh) {
+    draw(gc, dx, dy, dw, dh, 0, 0, width(), height());
+  }
+
+  @Override
+  public void draw(Object gc, float sx, float sy, float sw, float sh,
+                   float dx, float dy, float dw, float dh) {
+    throw new UnsupportedOperationException(
+      "SurfaceImage cannot currently be drawn into a Canvas.");
+  }
+
+  @Override
   void drawImpl(GLShader shader, InternalTransform xform, int tex, int tint,
                 float dx, float dy, float dw, float dh,
                 float sl, float st, float sr, float sb) {
@@ -95,11 +107,11 @@ public class SurfaceImageGL extends AbstractImageGL implements SurfaceImage {
   }
 
   @Override
-  protected Pattern toSubPattern(final AbstractImageGL image,
+  protected Pattern toSubPattern(final AbstractImageGL<Object> image,
                                  float x, float y, float width, float height) {
     // TODO: this will cause freakoutery when used in a canvas
     return new GLPattern() {
-      public AbstractImageGL image() {
+      public AbstractImageGL<?> image() {
         return image;
       }
     };

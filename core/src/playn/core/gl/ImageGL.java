@@ -20,7 +20,7 @@ import playn.core.InternalTransform;
 import playn.core.Pattern;
 import playn.core.Tint;
 
-public abstract class ImageGL extends AbstractImageGL {
+public abstract class ImageGL<GC> extends AbstractImageGL<GC> {
 
   /** This image's scale factor. This is effectively final, but can't be marked final because it
    * can be updated post-construction due to asynchronous image loading. */

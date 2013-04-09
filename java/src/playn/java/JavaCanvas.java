@@ -20,10 +20,10 @@ import pythagoras.f.MathUtil;
 import playn.core.Asserts;
 import playn.core.Canvas;
 import playn.core.Gradient;
-import playn.core.Image;
 import playn.core.Path;
 import playn.core.Pattern;
 import playn.core.TextLayout;
+import playn.core.gl.AbstractCanvasGL;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -35,16 +35,9 @@ import java.awt.geom.RoundRectangle2D;
 import java.util.Deque;
 import java.util.LinkedList;
 
-class JavaCanvas implements Canvas {
-
-  interface Drawable {
-    void draw(Graphics2D gfx, float dx, float dy, float dw, float dh);
-    void draw(Graphics2D gfx, float sx, float sy, float sw, float sh,
-              float dx, float dy, float dw, float dh);
-  }
+class JavaCanvas extends AbstractCanvasGL<Graphics2D> {
 
   final Graphics2D gfx;
-  private boolean isDirty;
   private final float width, height;
   private Deque<JavaCanvasState> stateStack = new LinkedList<JavaCanvasState>();
 
@@ -63,14 +56,6 @@ class JavaCanvas implements Canvas {
 
     // All clears go to rgba(0,0,0,0).
     gfx.setBackground(new Color(0, true));
-  }
-
-  public boolean dirty() {
-    return isDirty;
-  }
-
-  public void clearDirty() {
-    isDirty = false;
   }
 
   public float alpha() {
@@ -106,37 +91,6 @@ class JavaCanvas implements Canvas {
   @Override
   public Path createPath() {
     return new JavaPath();
-  }
-
-  @Override
-  public Canvas drawImage(Image img, float x, float y) {
-    return drawImage(img, x, y, img.width(), img.height());
-  }
-
-  @Override
-  public Canvas drawImageCentered(Image img, float x, float y) {
-    return drawImage(img, x - img.width()/2, y - img.height()/2);
-  }
-
-  @Override
-  public Canvas drawImage(Image img, float x, float y, float w, float h) {
-    Asserts.checkArgument(img instanceof Drawable);
-    Drawable d = (Drawable) img;
-    currentState().prepareFill(gfx);
-    d.draw(gfx, x, y, w, h);
-    isDirty = true;
-    return this;
-  }
-
-  @Override
-  public Canvas drawImage(Image img, float dx, float dy, float dw, float dh,
-                          float sx, float sy, float sw, float sh) {
-    Asserts.checkArgument(img instanceof Drawable);
-    Drawable d = (Drawable) img;
-    currentState().prepareFill(gfx);
-    d.draw(gfx, dx, dy, dw, dh, sx, sy, sw, sh);
-    isDirty = true;
-    return this;
   }
 
   @Override
@@ -371,6 +325,12 @@ class JavaCanvas implements Canvas {
   @Override
   public float width() {
     return width;
+  }
+
+  @Override
+  protected Graphics2D gc() {
+    currentState().prepareFill(gfx);
+    return gfx;
   }
 
   private JavaCanvasState currentState() {

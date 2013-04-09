@@ -23,7 +23,7 @@ public class ImageLayerGL extends LayerGL implements ImageLayer {
 
   private float width, height;
   private boolean widthSet, heightSet;
-  private AbstractImageGL img;
+  private AbstractImageGL<?> img;
 
   public ImageLayerGL(GLContext ctx) {
     super(ctx);
@@ -52,12 +52,12 @@ public class ImageLayerGL extends LayerGL implements ImageLayer {
 
   @Override
   public ImageLayer setImage(Image img) {
-    Asserts.checkArgument(img == null || img instanceof AbstractImageGL);
+    Asserts.checkArgument(img == null || img instanceof AbstractImageGL<?>);
     // avoid releasing and rereferencing image if nothing changes
     if (this.img != img) {
       if (this.img != null)
         this.img.release();
-      this.img = (AbstractImageGL) img;
+      this.img = (AbstractImageGL<?>) img;
       if (this.img != null)
         this.img.reference();
     }

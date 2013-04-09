@@ -19,29 +19,22 @@ import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.dom.client.CanvasElement;
 import com.google.gwt.dom.client.Document;
 
+import pythagoras.f.MathUtil;
+
 import playn.core.Asserts;
 import playn.core.Canvas;
 import playn.core.Gradient;
-import playn.core.Image;
 import playn.core.Path;
 import playn.core.Pattern;
 import playn.core.TextLayout;
+import playn.core.gl.AbstractCanvasGL;
 import playn.core.gl.Scale;
 
-import pythagoras.f.MathUtil;
-
-class HtmlCanvas implements Canvas {
-
-  interface Drawable {
-    void draw(Context2d ctx, float x, float y, float width, float height);
-    void draw(Context2d ctx, float sx, float sy, float sw, float sh,
-              float dx, float dy, float dw, float dh);
-  }
+class HtmlCanvas extends AbstractCanvasGL<Context2d> {
 
   private final CanvasElement canvas;
   private final Context2d ctx;
   private final float width, height;
-  private boolean dirty = true;
 
   public static HtmlCanvas create(Scale scale, float width, float height) {
     float sw = scale.scaledCeil(width), sh = scale.scaledCeil(height);
@@ -52,6 +45,10 @@ class HtmlCanvas implements Canvas {
 
   HtmlCanvas(Context2d ctx, float width, float height) {
     this(null, ctx, width, height);
+  }
+
+  CanvasElement canvas() {
+    return canvas;
   }
 
   private HtmlCanvas(float width, float height) {
@@ -66,22 +63,22 @@ class HtmlCanvas implements Canvas {
 
   private HtmlCanvas(CanvasElement canvas, Context2d ctx, float width, float height) {
     this.canvas = canvas;
+    this.ctx = ctx;
     this.width = width;
     this.height = height;
-    this.ctx = ctx;
   }
 
   @Override
   public Canvas clear() {
     ctx.clearRect(0, 0, width, height);
-    dirty = true;
+    isDirty = true;
     return this;
   }
 
   @Override
   public Canvas clearRect(float x, float y, float width, float height) {
     ctx.clearRect(x, y, width, height);
-    dirty = true;
+    isDirty = true;
     return this;
   }
 
@@ -99,41 +96,12 @@ class HtmlCanvas implements Canvas {
   }
 
   @Override
-  public Canvas drawImage(Image img, float x, float y) {
-    return drawImage(img, x, y, img.width(), img.height());
-  }
-
-  @Override
-  public Canvas drawImage(Image img, float x, float y, float w, float h) {
-    Asserts.checkArgument(img instanceof Drawable);
-    ((Drawable) img).draw(ctx, x, y, w, h);
-    dirty = true;
-    return this;
-  }
-
-  @Override
-  public Canvas drawImage(Image img, float dx, float dy, float dw, float dh,
-      float sx, float sy, float sw, float sh) {
-    Asserts.checkArgument(img instanceof Drawable);
-    ((Drawable) img).draw(ctx, sx, sy, sw, sh, dx, dy, dw, dh);
-    dirty = true;
-    return this;
-  }
-
-  @Override
-  public Canvas drawImageCentered(Image img, float x, float y) {
-    drawImage(img, x - img.width()/2, y - img.height()/2);
-    dirty = true;
-    return this;
-  }
-
-  @Override
   public Canvas drawLine(float x0, float y0, float x1, float y1) {
     ctx.beginPath();
     ctx.moveTo(x0, y0);
     ctx.lineTo(x1, y1);
     ctx.stroke();
-    dirty = true;
+    isDirty = true;
     return this;
   }
 
@@ -143,14 +111,14 @@ class HtmlCanvas implements Canvas {
     ctx.moveTo(x, y);
     ctx.lineTo(x, y);
     ctx.stroke();
-    dirty = true;
+    isDirty = true;
     return this;
   }
 
   @Override
   public Canvas drawText(String text, float x, float y) {
     ctx.fillText(text, x, y);
-    dirty = true;
+    isDirty = true;
     return this;
   }
 
@@ -159,7 +127,7 @@ class HtmlCanvas implements Canvas {
     ctx.beginPath();
     ctx.arc(x, y, radius, 0, 2 * Math.PI);
     ctx.fill();
-    dirty = true;
+    isDirty = true;
     return this;
   }
 
@@ -168,14 +136,14 @@ class HtmlCanvas implements Canvas {
     Asserts.checkArgument(path instanceof HtmlPath);
     ((HtmlPath) path).replay(ctx);
     ctx.fill();
-    dirty = true;
+    isDirty = true;
     return this;
   }
 
   @Override
   public Canvas fillRect(float x, float y, float w, float h) {
     ctx.fillRect(x, y, w, h);
-    dirty = true;
+    isDirty = true;
     return this;
   }
 
@@ -183,14 +151,14 @@ class HtmlCanvas implements Canvas {
   public Canvas fillRoundRect(float x, float y, float w, float h, float radius) {
     addRoundRectPath(x, y, w, h, radius);
     ctx.fill();
-    dirty = true;
+    isDirty = true;
     return this;
   }
 
   @Override
   public Canvas fillText(TextLayout layout, float x, float y) {
     ((HtmlTextLayout)layout).fill(ctx, x, y);
-    dirty = true;
+    isDirty = true;
     return this;
   }
 
@@ -290,7 +258,7 @@ class HtmlCanvas implements Canvas {
     ctx.beginPath();
     ctx.arc(x, y, radius, 0, 2 * Math.PI);
     ctx.stroke();
-    dirty = true;
+    isDirty = true;
     return this;
   }
 
@@ -299,14 +267,14 @@ class HtmlCanvas implements Canvas {
     Asserts.checkArgument(path instanceof HtmlPath);
     ((HtmlPath) path).replay(ctx);
     ctx.stroke();
-    dirty = true;
+    isDirty = true;
     return this;
   }
 
   @Override
   public Canvas strokeRect(float x, float y, float w, float h) {
     ctx.strokeRect(x, y, w, h);
-    dirty = true;
+    isDirty = true;
     return this;
   }
 
@@ -314,14 +282,14 @@ class HtmlCanvas implements Canvas {
   public Canvas strokeRoundRect(float x, float y, float w, float h, float radius) {
     addRoundRectPath(x, y, w, h, radius);
     ctx.stroke();
-    dirty = true;
+    isDirty = true;
     return this;
   }
 
   @Override
   public Canvas strokeText(TextLayout layout, float x, float y) {
     ((HtmlTextLayout)layout).stroke(ctx, x, y);
-    dirty = true;
+    isDirty = true;
     return this;
   }
 
@@ -343,16 +311,9 @@ class HtmlCanvas implements Canvas {
     return width;
   }
 
-  CanvasElement canvas() {
-    return canvas;
-  }
-
-  void clearDirty() {
-    dirty = false;
-  }
-
-  boolean dirty() {
-    return dirty;
+  @Override
+  protected Context2d gc() {
+    return ctx;
   }
 
   private void addRoundRectPath(float x, float y, float width, float height, float radius) {

@@ -21,6 +21,7 @@ import com.google.gwt.canvas.dom.client.Context2d;
 import playn.core.Asserts;
 import playn.core.Image;
 import playn.core.ImageLayer;
+import playn.core.gl.AbstractImageGL;
 
 class HtmlImageLayerCanvas extends HtmlLayerCanvas implements ImageLayer {
 
@@ -64,7 +65,6 @@ class HtmlImageLayerCanvas extends HtmlLayerCanvas implements ImageLayer {
 
   @Override
   public ImageLayer setImage(Image img) {
-    Asserts.checkArgument(img instanceof HtmlCanvas.Drawable);
     this.img = img;
     return this;
   }
@@ -106,7 +106,8 @@ class HtmlImageLayerCanvas extends HtmlLayerCanvas implements ImageLayer {
       ctx.scale(img.repeatX() ? 1 : width / img.width(), img.repeatY() ? 1 : height / img.height());
       ctx.fill();
     } else {
-      ((HtmlCanvas.Drawable) img).draw(ctx, 0, 0, width, height);
+      @SuppressWarnings("unchecked") AbstractImageGL<Context2d> d = (AbstractImageGL<Context2d>) img;
+      d.draw(ctx, 0, 0, width, height);
     }
 
     ctx.restore();

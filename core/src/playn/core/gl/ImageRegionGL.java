@@ -22,14 +22,14 @@ import playn.core.Pattern;
 import playn.core.Tint;
 import playn.core.util.Callback;
 
-public class ImageRegionGL extends AbstractImageGL implements Image.Region {
+public class ImageRegionGL<GC> extends AbstractImageGL<GC> implements Image.Region {
 
-  protected final AbstractImageGL parent;
+  protected final AbstractImageGL<GC> parent;
   protected float x, y;
   protected float width, height;
   protected int tex;
 
-  public ImageRegionGL(AbstractImageGL parent, float x, float y, float width, float height) {
+  public ImageRegionGL(AbstractImageGL<GC> parent, float x, float y, float width, float height) {
     super(parent.ctx);
     this.parent = parent;
     this.x = x;
@@ -146,6 +146,17 @@ public class ImageRegionGL extends AbstractImageGL implements Image.Region {
   }
 
   @Override
+  public void draw(GC gc, float dx, float dy, float dw, float dh) {
+    draw(gc, dx, dy, dw, dh, 0, 0, width, height);
+  }
+
+  @Override
+  public void draw(GC gc, float dx, float dy, float dw, float dh,
+                   float sx, float sy, float sw, float sh) {
+    parent.draw(gc, dx, dy, dw, dh, x+sx, y+sy, sw, sh);
+  }
+
+  @Override
   void draw(GLShader shader, InternalTransform xform, int tint,
             float dx, float dy, float dw, float dh, float sx, float sy, float sw, float sh) {
     float texWidth = (tex > 0) ? width : parent.width();
@@ -157,7 +168,7 @@ public class ImageRegionGL extends AbstractImageGL implements Image.Region {
   }
 
   @Override
-  protected Pattern toSubPattern(AbstractImageGL image,
+  protected Pattern toSubPattern(AbstractImageGL<GC> image,
                                  float x, float y, float width, float height) {
     throw new AssertionError(); // this should never be called
   }
