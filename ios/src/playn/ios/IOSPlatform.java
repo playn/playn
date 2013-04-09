@@ -21,7 +21,9 @@ import java.io.PrintStream;
 import java.util.HashMap;
 import java.util.Map;
 
+import cli.MonoTouch.UIKit.UIEvent;
 import cli.System.DateTime;
+import cli.System.Drawing.PointF;
 import cli.System.Drawing.RectangleF;
 import cli.System.Threading.ThreadPool;
 import cli.System.Threading.WaitCallback;
@@ -217,7 +219,16 @@ public class IOSPlatform extends AbstractPlatform {
     rootViewController = new IOSRootViewController(this, gameView);
     mainWindow.set_RootViewController(rootViewController);
 
-    uiOverlay = new UIView(bounds);
+    uiOverlay = new UIView(bounds) {
+      @Override public boolean PointInside (PointF pointF, UIEvent uiEvent) {
+        // only accept the touch if it is hitting one of our native widgets
+        PointF screen = ConvertPointFromView(pointF, this);
+        for (UIView view : get_Subviews()) {
+          if (view.PointInside(ConvertPointToView(screen, view), uiEvent)) return true;
+        }
+        return false;
+      }
+    };
     uiOverlay.set_MultipleTouchEnabled(true);
     gameView.Add(uiOverlay);
 
