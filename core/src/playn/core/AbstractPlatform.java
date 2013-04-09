@@ -43,6 +43,11 @@ public abstract class AbstractPlatform implements Platform {
     return log;
   }
 
+  @Override
+  public UIOverlay uiOverlay() {
+    return new UIOverlayStub();
+  }
+
   /**
    * Delivers {@code result} to {@code callback} on the next game tick (on the PlayN thread).
    */

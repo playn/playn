@@ -165,7 +165,7 @@ public class IOSPlatform extends AbstractPlatform {
   private final UIWindow mainWindow;
   private final IOSRootViewController rootViewController;
   private final IOSGameView gameView;
-  private final UIView uiOverlay;
+  private final IOSUIOverlay uiOverlay;
   private final long start = DateTime.get_Now().get_Ticks();
 
   /** Returns the top-level UIWindow. */
@@ -183,7 +183,8 @@ public class IOSPlatform extends AbstractPlatform {
    * the device orientation changes, so views added to it will also be correctly oriented without
    * additional effort on the part of the caller.
    */
-  public UIView uiOverlay() {
+  @Override
+  public IOSUIOverlay uiOverlay() {
     return uiOverlay;
   }
 
@@ -219,17 +220,7 @@ public class IOSPlatform extends AbstractPlatform {
     rootViewController = new IOSRootViewController(this, gameView);
     mainWindow.set_RootViewController(rootViewController);
 
-    uiOverlay = new UIView(bounds) {
-      @Override public boolean PointInside (PointF pointF, UIEvent uiEvent) {
-        // only accept the touch if it is hitting one of our native widgets
-        PointF screen = ConvertPointFromView(pointF, this);
-        for (UIView view : get_Subviews()) {
-          if (view.PointInside(ConvertPointToView(screen, view), uiEvent)) return true;
-        }
-        return false;
-      }
-    };
-    uiOverlay.set_MultipleTouchEnabled(true);
+    uiOverlay = new IOSUIOverlay(bounds);
     gameView.Add(uiOverlay);
 
     // if the game supplied a proper delegate, configure it (for lifecycle notifications)
@@ -409,6 +400,8 @@ public class IOSPlatform extends AbstractPlatform {
       overlayBounds.set_Height(width);
       uiOverlay().set_Bounds(overlayBounds);
     }
+    // update the overlay's hidden area, if any
+    uiOverlay.updateHidden();
 
     if (!sorient.equals(app.get_StatusBarOrientation())) {
       app.SetStatusBarOrientation(sorient, !app.get_StatusBarHidden());
