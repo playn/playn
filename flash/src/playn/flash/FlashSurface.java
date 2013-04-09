@@ -19,9 +19,10 @@ package playn.flash;
 import pythagoras.f.MathUtil;
 
 import playn.core.Asserts;
-import playn.core.Surface;
 import playn.core.Image;
+import playn.core.Layer;
 import playn.core.Pattern;
+import playn.core.Surface;
 import playn.core.gl.GLShader;
 import playn.flash.FlashCanvas.Context2d;
 
@@ -76,6 +77,10 @@ public class FlashSurface implements Surface {
     return this;
   }
 
+  @Override
+  public Surface drawLayer(Layer layer) {
+    throw new UnsupportedOperationException("TODO");
+  }
 
   @Override
   public Surface fillRect(float x, float y, float w, float h) {

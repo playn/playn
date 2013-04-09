@@ -38,6 +38,7 @@ public class TestsGame extends Game.Default {
   private Test[] tests = new Test[] {
     new CanvasTest(),
     new SurfaceTest(),
+    new SurfaceDrawLayerTest(),
     new SubImageTest(),
     new ClippedGroupTest(),
     new PauseResumeTest(),

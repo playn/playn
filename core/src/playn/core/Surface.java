@@ -169,6 +169,15 @@ public interface Surface {
   Surface drawLine(float x0, float y0, float x1, float y1, float width);
 
   /**
+   * Renders the supplied scene graph into this surface. This renders the scene graph into the
+   * surface's texture using the main render pipeline, so custom shaders (on platforms that support
+   * them) are handled properly. <em>NOTE:</em> if there is a loop in the scene graph (like you add
+   * an ImmediateLayer that calls {@code surf.drawLayer(graphics().rootLayer())}) you will get the
+   * infinite loop that you deserve. Caveat renderer.
+   */
+  Surface drawLayer(Layer layer);
+
+  /**
    * Fills the specified rectangle.
    */
   Surface fillRect(float x, float y, float width, float height);

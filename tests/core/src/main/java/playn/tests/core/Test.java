@@ -23,6 +23,8 @@ import playn.core.Layer;
 import playn.core.Pointer;
 import playn.core.TextFormat;
 import playn.core.TextLayout;
+import playn.core.gl.GLShader;
+import playn.core.gl.IndexedTrisShader;
 import static playn.core.PlayN.graphics;
 
 public abstract class Test {
@@ -115,6 +117,27 @@ public abstract class Test {
     ImageLayer button = createButton(text, onClick);
     graphics().rootLayer().addAt(button, x, y);
     return x + button.width() + 10;
+  }
+
+  protected GLShader createSepiaShader() {
+    return (graphics().ctx() == null) ? null : new IndexedTrisShader(graphics().ctx()) {
+      @Override protected String textureFragmentShader() {
+        return "#ifdef GL_ES\n" +
+          "precision highp float;\n" +
+          "#endif\n" +
+
+          "uniform sampler2D u_Texture;\n" +
+          "varying vec2 v_TexCoord;\n" +
+          "varying vec4 v_Color;\n" +
+
+          "void main(void) {\n" +
+          "  vec4 textureColor = texture2D(u_Texture, v_TexCoord);\n" +
+          "  textureColor.rgb *= v_Color.rgb;\n" +
+          "  float grey = dot(textureColor.rgb, vec3(0.299, 0.587, 0.114));\n" +
+          "  gl_FragColor = vec4(grey * vec3(1.2, 1.0, 0.8), textureColor.a) * v_Color.a;\n" +
+          "}";
+      }
+    };
   }
 
   protected static final TextFormat TEXT_FMT = new TextFormat().withFont(

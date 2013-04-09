@@ -66,24 +66,7 @@ public class ShaderTest extends Test {
 
     // add a sepia toned orange
     ImageLayer olayer = graphics().createImageLayer(orange);
-    olayer.setShader(new IndexedTrisShader(graphics().ctx()) {
-      @Override protected String textureFragmentShader() {
-        return "#ifdef GL_ES\n" +
-          "precision highp float;\n" +
-          "#endif\n" +
-
-          "uniform sampler2D u_Texture;\n" +
-          "varying vec2 v_TexCoord;\n" +
-          "varying vec4 v_Color;\n" +
-
-          "void main(void) {\n" +
-          "  vec4 textureColor = texture2D(u_Texture, v_TexCoord);\n" +
-          "  textureColor.rgb *= v_Color.rgb;\n" +
-          "  float grey = dot(textureColor.rgb, vec3(0.299, 0.587, 0.114));\n" +
-          "  gl_FragColor = vec4(grey * vec3(1.2, 1.0, 0.8), textureColor.a) * v_Color.a;\n" +
-          "}";
-      }
-    });
+    olayer.setShader(createSepiaShader());
     graphics().rootLayer().addAt(olayer, 25+dx, 25);
 
     // create a shader that rotates things around the (3D) y axis

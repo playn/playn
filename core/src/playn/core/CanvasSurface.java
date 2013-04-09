@@ -61,6 +61,11 @@ public class CanvasSurface implements Surface {
   }
 
   @Override
+  public Surface drawLayer(Layer layer) {
+    throw new UnsupportedOperationException("TODO");
+  }
+
+  @Override
   public Surface drawLine(float x0, float y0, float x1, float y1, float width) {
     canvas.save();
     canvas.setStrokeWidth(width);

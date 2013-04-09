@@ -24,6 +24,7 @@ import pythagoras.f.MathUtil;
 import playn.core.Asserts;
 import playn.core.Image;
 import playn.core.InternalTransform;
+import playn.core.Layer;
 import playn.core.Pattern;
 import playn.core.Surface;
 import playn.core.Tint;
@@ -39,7 +40,7 @@ abstract class AbstractSurfaceGL implements Surface {
 
   protected int fillColor;
   protected int tint = Tint.NOOP_TINT;
-  protected AbstractImageGL fillPattern;
+  protected AbstractImageGL<?> fillPattern;
   protected GLShader shader;
 
   protected AbstractSurfaceGL(GLContext ctx) {
@@ -79,6 +80,13 @@ abstract class AbstractSurfaceGL implements Surface {
   @Override
   public Surface drawImageCentered(Image img, float x, float y) {
     return drawImage(img, x - img.width()/2, y - img.height()/2);
+  }
+
+  @Override
+  public Surface drawLayer(Layer layer) {
+    bindFramebuffer();
+    ((LayerGL) layer).paint(topTransform(), tint, shader);
+    return this;
   }
 
   @Override
