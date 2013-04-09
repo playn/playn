@@ -17,6 +17,7 @@ package playn.core.gl;
 
 import playn.core.Asserts;
 import playn.core.Image;
+import playn.core.InternalTransform;
 import playn.core.Tint;
 import playn.core.util.Callback;
 
@@ -133,13 +134,14 @@ public class ImageRegionGL extends AbstractImageGL implements Image.Region {
   }
 
   @Override
-  protected float texWidth() {
-    return (tex > 0) ? width : parent.texWidth();
-  }
-
-  @Override
-  protected float texHeight() {
-    return (tex > 0) ? height : parent.texHeight();
+  void draw(GLShader shader, InternalTransform xform, int tint,
+            float dx, float dy, float dw, float dh, float sx, float sy, float sw, float sh) {
+    float texWidth = (tex > 0) ? width : parent.width();
+    float texHeight = (tex > 0) ? height : parent.height();
+    sx += x();
+    sy += y();
+    parent.drawImpl(shader, xform, ensureTexture(), tint, dx, dy, dw, dh,
+                    sx / texWidth, sy / texHeight, (sx + sw) / texWidth, (sy + sh) / texHeight);
   }
 
   private int scaleTexture() {
@@ -165,7 +167,7 @@ public class ImageRegionGL extends AbstractImageGL implements Image.Region {
     try {
       // render the parent texture into the framebuffer properly scaled
       ctx.clear(0, 0, 0, 0);
-      float tw = parent.texWidth(), th = parent.texHeight();
+      float tw = parent.width(), th = parent.height();
       float sl = this.x, st = this.y, sr = sl + this.width, sb = st + this.height;
       GLShader shader = ctx.quadShader(null).prepareTexture(tex, Tint.NOOP_TINT);
       shader.addQuad(ctx.createTransform(), 0, height, width, 0,

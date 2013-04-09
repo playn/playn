@@ -64,7 +64,7 @@ abstract class AbstractSurfaceGL implements Surface {
   @Override
   public Surface drawImage(Image image, float x, float y, float dw, float dh) {
     bindFramebuffer();
-    ((AbstractImageGL) image).draw(shader, topTransform(), x, y, dw, dh, tint);
+    ((AbstractImageGL) image).draw(shader, topTransform(), tint, x, y, dw, dh);
     return this;
   }
 
@@ -72,7 +72,7 @@ abstract class AbstractSurfaceGL implements Surface {
   public Surface drawImage(Image image, float dx, float dy, float dw, float dh,
                            float sx, float sy, float sw, float sh) {
     bindFramebuffer();
-    ((AbstractImageGL) image).draw(shader, topTransform(), dx, dy, dw, dh, sx, sy, sw, sh, tint);
+    ((AbstractImageGL) image).draw(shader, topTransform(), tint, dx, dy, dw, dh, sx, sy, sw, sh);
     return this;
   }
 

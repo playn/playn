@@ -13,6 +13,7 @@ import playn.core.ImageLayer;
 import playn.core.ImmediateLayer;
 import playn.core.Surface;
 import static playn.core.PlayN.*;
+import playn.core.SurfaceImage;
 import playn.core.util.Callback;
 
 public class SubImageTest extends Test {
@@ -53,13 +54,22 @@ public class SubImageTest extends Test {
         // tile a sub-image, oh my!
         ImageLayer tiled = graphics().createImageLayer(orangerep);
         tiled.setSize(100, 100);
-        addTest(10, 10, tiled, "ImageLayer tiled with subimage");
+        addTest(10, 10, tiled, "ImageLayer tiled with subimage of Image");
 
         // use a subimage as a fill pattern
         CanvasImage pat = graphics().createImage(100, 100);
         pat.canvas().setFillPattern(orangerep.toPattern());
         pat.canvas().fillRect(0, 0, 100, 100);
-        addTest(10, 150, graphics().createImageLayer(pat), "Canvas filled with subimage");
+        addTest(10, 160, graphics().createImageLayer(pat), "Canvas filled with subimage");
+
+        // tile a sub-image of a surface image, oh my!
+        SurfaceImage surf = graphics().createSurface(orange.width(), orange.height());
+        surf.surface().drawImage(orange, 0, 0);
+        Image.Region surfrep = surf.subImage(0, phh/2, pw, phh);
+        surfrep.setRepeat(true, true);
+        ImageLayer surftiled = graphics().createImageLayer(surfrep);
+        surftiled.setSize(100, 100);
+        addTest(10, 300, surftiled, "ImageLayer tiled with subimage of SurfaceImage");
 
         // draw a subimage to a canvas
         CanvasImage split = graphics().createImage(orange.width(), orange.height());

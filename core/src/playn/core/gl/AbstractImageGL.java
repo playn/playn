@@ -58,35 +58,29 @@ public abstract class AbstractImageGL implements Image {
   /**
    * Draws this image with the supplied transform in the specified target dimensions.
    */
-  void draw(GLShader shader, InternalTransform xform, float dx, float dy, float dw, float dh,
-            int tint) {
-    int tex = ensureTexture();
-    if (tex > 0) {
-      float sl = x(), st = y();
-      float sr = sl + (repeatX ? dw : width()), sb = st + (repeatY ? dh : height());
-      float texWidth = texWidth(), texHeight = texHeight();
-      addQuad(ctx.quadShader(shader).prepareTexture(tex, tint), xform, dx, dy, dx + dw, dy + dh,
-              sl / texWidth, st / texHeight, sr / texWidth, sb / texHeight);
-    }
+  void draw(GLShader shader, InternalTransform xform, int tint,
+            float dx, float dy, float dw, float dh) {
+    draw(shader, xform, tint, dx, dy, dw, dh,
+         0, 0, (repeatX ? dw : width()), (repeatY ? dh : height()));
   }
 
   /**
    * Draws this image with the supplied transform, and source and target dimensions.
    */
-  void draw(GLShader shader, InternalTransform xform, float dx, float dy, float dw, float dh,
-            float sx, float sy, float sw, float sh, int tint) {
-    int tex = ensureTexture();
-    if (tex > 0) {
-      sx += x(); sy += y();
-      float texWidth = texWidth(), texHeight = texHeight();
-      addQuad(ctx.quadShader(shader).prepareTexture(tex, tint), xform, dx, dy, dx + dw, dy + dh,
-              sx / texWidth, sy / texHeight, (sx + sw) / texWidth, (sy + sh) / texHeight);
-    }
+  void draw(GLShader shader, InternalTransform xform, int tint,
+            float dx, float dy, float dw, float dh, float sx, float sy, float sw, float sh) {
+    float texWidth = width(), texHeight = height();
+    drawImpl(shader, xform, ensureTexture(), tint, dx, dy, dw, dh,
+             sx / texWidth, sy / texHeight, (sx + sw) / texWidth, (sy + sh) / texHeight);
   }
 
-  void addQuad(GLShader shader, InternalTransform xform, float dx, float dy, float dw, float dh,
-               float sl, float st, float sr, float sb) {
-    shader.addQuad(xform, dx, dy, dw, dh, sl, st, sr, sb);
+  void drawImpl(GLShader shader, InternalTransform xform, int tex, int tint,
+                float dx, float dy, float dw, float dh,
+                float sl, float st, float sr, float sb) {
+    if (tex > 0) {
+      ctx.quadShader(shader).prepareTexture(tex, tint).addQuad(
+        xform, dx, dy, dx + dw, dy + dh, sl, st, sr, sb);
+    }
   }
 
   @Override
@@ -139,33 +133,5 @@ public abstract class AbstractImageGL implements Image {
 
   protected AbstractImageGL(GLContext ctx) {
     this.ctx = ctx;
-  }
-
-  /**
-   * The x offset into our source image at which this image's region starts.
-   */
-  protected float x() {
-    return 0;
-  }
-
-  /**
-   * The y offset into our source image at which this image's region starts.
-   */
-  protected float y() {
-    return 0;
-  }
-
-  /**
-   * Returns the width of our underlying texture image.
-   */
-  protected float texWidth() {
-    return width();
-  }
-
-  /**
-   * Returns the height of our underlying texture image.
-   */
-  protected float texHeight() {
-    return height();
   }
 }

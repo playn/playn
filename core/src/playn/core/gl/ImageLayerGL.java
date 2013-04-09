@@ -93,8 +93,8 @@ public class ImageLayerGL extends LayerGL implements ImageLayer {
     if (visible() && img != null) {
       if (tint != Tint.NOOP_TINT)
         curTint = Tint.combine(curTint, tint);
-      img.draw((shader == null) ? curShader : shader, localTransform(curTransform),
-               0, 0, width(), height(), curTint);
+      img.draw((shader == null) ? curShader : shader, localTransform(curTransform), curTint,
+               0, 0, width(), height());
     }
   }
 

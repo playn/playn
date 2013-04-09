@@ -83,8 +83,14 @@ public class SurfaceImageGL extends AbstractImageGL implements SurfaceImage {
     // collected or manually destroy()ed
   }
 
-  void addQuad(GLShader shader, InternalTransform xform, float dx, float dy, float dw, float dh,
-               float sl, float st, float sr, float sb) {
-    shader.addQuad(xform, dx, dy, dw, dh, sl, 1-st, sr, 1-sb);
+  @Override
+  void drawImpl(GLShader shader, InternalTransform xform, int tex, int tint,
+                float dx, float dy, float dw, float dh,
+                float sl, float st, float sr, float sb) {
+    if (tex > 0) {
+      // we have to invert y here due to GL origin shenanigans
+      ctx.quadShader(shader).prepareTexture(tex, tint).addQuad(
+        xform, dx, dy, dx + dw, dy + dh, sl, 1-st, sr, 1-sb);
+    }
   }
 }
