@@ -109,11 +109,11 @@ public abstract class IOSAbstractImage extends ImageGL<CGBitmapContext> implemen
     // pesky fiddling to cope with the fact that UIImages are flipped; TODO: make sure drawing a
     // canvas image on a canvas image does the right thing
     y += height;
+    bctx.SaveState();
     bctx.TranslateCTM(x, y);
     bctx.ScaleCTM(1, -1);
     bctx.DrawImage(new RectangleF(0, 0, width, height), cgImage);
-    bctx.ScaleCTM(1, -1);
-    bctx.TranslateCTM(-x, -y);
+    bctx.RestoreState();
   }
 
   @Override
