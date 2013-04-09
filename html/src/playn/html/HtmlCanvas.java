@@ -26,6 +26,7 @@ import playn.core.Image;
 import playn.core.Path;
 import playn.core.Pattern;
 import playn.core.TextLayout;
+import playn.core.gl.Scale;
 
 import pythagoras.f.MathUtil;
 
@@ -42,18 +43,25 @@ class HtmlCanvas implements Canvas {
   private final float width, height;
   private boolean dirty = true;
 
-  HtmlCanvas(float width, float height) {
-    this(Document.get().createCanvasElement(), width, height);
-  }
-
-  HtmlCanvas(CanvasElement canvas, float width, float height) {
-    this(canvas, canvas.getContext2d(), width, height);
-    canvas.setWidth(MathUtil.iceil(width));
-    canvas.setHeight(MathUtil.iceil(height));
+  public static HtmlCanvas create(Scale scale, float width, float height) {
+    float sw = scale.scaledCeil(width), sh = scale.scaledCeil(height);
+    HtmlCanvas canvas = new HtmlCanvas(sw, sh);
+    canvas.scale(scale.factor, scale.factor);
+    return canvas;
   }
 
   HtmlCanvas(Context2d ctx, float width, float height) {
     this(null, ctx, width, height);
+  }
+
+  private HtmlCanvas(float width, float height) {
+    this(Document.get().createCanvasElement(), width, height);
+  }
+
+  private HtmlCanvas(CanvasElement canvas, float width, float height) {
+    this(canvas, canvas.getContext2d(), width, height);
+    canvas.setWidth(MathUtil.iceil(width));
+    canvas.setHeight(MathUtil.iceil(height));
   }
 
   private HtmlCanvas(CanvasElement canvas, Context2d ctx, float width, float height) {

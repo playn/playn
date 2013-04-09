@@ -23,12 +23,15 @@ import playn.core.GroupLayer;
 import playn.core.Image;
 import playn.core.ImageLayer;
 import playn.core.ImmediateLayer;
+import playn.core.SurfaceImage;
 import playn.core.SurfaceLayer;
 import playn.core.gl.GL20;
 import playn.core.gl.GroupLayerGL;
 import playn.core.gl.ImageLayerGL;
 import playn.core.gl.ImmediateLayerGL;
 import playn.core.gl.Scale;
+import playn.core.gl.SurfaceGL;
+import playn.core.gl.SurfaceImageGL;
 import playn.core.gl.SurfaceLayerGL;
 
 class HtmlGraphicsGL extends HtmlGraphics {
@@ -93,10 +96,10 @@ class HtmlGraphicsGL extends HtmlGraphics {
 
   @Override
   public ImageLayer createImageLayer(Image img) {
-    return new ImageLayerGL(ctx, img);
+    return new ImageLayerGL(ctx).setImage(img);
   }
 
-  @Override
+  @Override @Deprecated
   public SurfaceLayer createSurfaceLayer(float width, float height) {
     return new SurfaceLayerGL(ctx, width, height);
   }
@@ -110,6 +113,11 @@ class HtmlGraphicsGL extends HtmlGraphics {
   @Override
   public ImmediateLayer createImmediateLayer(ImmediateLayer.Renderer renderer) {
     return new ImmediateLayerGL(ctx, renderer);
+  }
+
+  @Override
+  public SurfaceImage createSurface(float width, float height) {
+    return new SurfaceImageGL(ctx(), new SurfaceGL(ctx(), width, height));
   }
 
   @Override

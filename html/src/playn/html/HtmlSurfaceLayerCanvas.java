@@ -21,14 +21,15 @@ import playn.core.Asserts;
 import playn.core.CanvasSurface;
 import playn.core.Surface;
 import playn.core.SurfaceLayer;
+import playn.core.gl.Scale;
 
 class HtmlSurfaceLayerCanvas extends HtmlLayerCanvas implements SurfaceLayer {
 
   private HtmlCanvas canvas;
   private CanvasSurface surface;
 
-  HtmlSurfaceLayerCanvas(float width, float height) {
-    surface = new CanvasSurface(canvas = new HtmlCanvas(width, height));
+  HtmlSurfaceLayerCanvas(Scale scale, float width, float height) {
+    surface = new CanvasSurface(HtmlCanvas.create(scale, width, height));
   }
 
   @Override

@@ -39,7 +39,7 @@ abstract class AbstractSurfaceGL implements Surface {
 
   protected int fillColor;
   protected int tint = Tint.NOOP_TINT;
-  protected ImageGL fillPattern;
+  protected AbstractImageGL fillPattern;
   protected GLShader shader;
 
   protected AbstractSurfaceGL(GLContext ctx) {
@@ -64,7 +64,7 @@ abstract class AbstractSurfaceGL implements Surface {
   @Override
   public Surface drawImage(Image image, float x, float y, float dw, float dh) {
     bindFramebuffer();
-    ((ImageGL) image).draw(shader, topTransform(), x, y, dw, dh, tint);
+    ((AbstractImageGL) image).draw(shader, topTransform(), x, y, dw, dh, tint);
     return this;
   }
 
@@ -72,7 +72,7 @@ abstract class AbstractSurfaceGL implements Surface {
   public Surface drawImage(Image image, float dx, float dy, float dw, float dh,
                            float sx, float sy, float sw, float sh) {
     bindFramebuffer();
-    ((ImageGL) image).draw(shader, topTransform(), dx, dy, dw, dh, sx, sy, sw, sh, tint);
+    ((AbstractImageGL) image).draw(shader, topTransform(), dx, dy, dw, dh, sx, sy, sw, sh, tint);
     return this;
   }
 

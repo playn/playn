@@ -20,6 +20,7 @@ import playn.core.GroupLayer;
 import playn.core.Image;
 import playn.core.ImageLayer;
 import playn.core.ImmediateLayer;
+import playn.core.SurfaceImage;
 import playn.core.SurfaceLayer;
 
 /**
@@ -59,12 +60,12 @@ public abstract class GraphicsGL implements Graphics {
 
   @Override
   public ImageLayer createImageLayer(Image image) {
-    return new ImageLayerGL(ctx(), image);
+    return new ImageLayerGL(ctx()).setImage(image);
   }
 
-  @Override
+  @Deprecated @Override
   public SurfaceLayer createSurfaceLayer(float width, float height) {
-    return new SurfaceLayerGL(ctx(), createSurface(width, height));
+    return new SurfaceLayerGL(ctx(), createSurfaceGL(width, height));
   }
 
   @Override
@@ -78,7 +79,12 @@ public abstract class GraphicsGL implements Graphics {
     return new ImmediateLayerGL(ctx(), renderer);
   }
 
-  protected SurfaceGL createSurface(float width, float height) {
+  @Override
+  public SurfaceImage createSurface(float width, float height) {
+    return new SurfaceImageGL(ctx(), createSurfaceGL(width, height));
+  }
+
+  protected SurfaceGL createSurfaceGL(float width, float height) {
     return new SurfaceGL(ctx(), width, height);
   }
 }

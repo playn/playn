@@ -15,16 +15,14 @@
  */
 package playn.core;
 
+import playn.core.gl.Scale;
 import playn.core.util.Callback;
 
 /**
- * An image.
+ * The base image interface. See {@link CanvasImage} and {@link SurfaceImage} for specialized
+ * variants.
  */
 public interface Image {
-
-  /** Used with {@link #transform}. */
-  public interface BitmapTransformer {
-  }
 
   /**
    * This image's width in pixels.
@@ -35,6 +33,12 @@ public interface Image {
    * This image's height in pixels.
    */
   float height();
+
+  /**
+   * Returns the pixel-scale of this image. This will be {@link Scale#ONE} unless HiDPI images are
+   * being used.
+   */
+  Scale scale();
 
   /**
    * Whether or not this image is ready to be used.
@@ -125,10 +129,14 @@ public interface Image {
   void getRgb(int startX, int startY, int width, int height, int[] rgbArray,
               int offset, int scanSize);
 
+  /** Used with {@link #transform}. */
+  public interface BitmapTransformer {
+  }
+
   /**
    * Generates a new image from this image's bitmap, using a bitmap transformer created for the
    * platform in use. See {@code JavaBitmapTransformer} and {@code IOSBitmapTransformer}. This does
-   * not work on sub-images.
+   * not work on sub-images nor {@link SurfaceImage}s.
    */
   Image transform(BitmapTransformer xform);
 

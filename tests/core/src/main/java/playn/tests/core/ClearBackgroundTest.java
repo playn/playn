@@ -19,13 +19,14 @@ package playn.tests.core;
 import pythagoras.f.FloatMath;
 
 import playn.core.Color;
-import playn.core.SurfaceLayer;
+import playn.core.ImageLayer;
+import playn.core.SurfaceImage;
 import static playn.core.PlayN.*;
 
 public class ClearBackgroundTest extends Test {
 
   private int time;
-  private SurfaceLayer square;
+  private ImageLayer square;
   static int width = 100;
   static int height = 100;
 
@@ -46,9 +47,10 @@ public class ClearBackgroundTest extends Test {
     graphics().rootLayer().clear();
 
     // add a grey square
-    square = graphics().createSurfaceLayer(width, height);
-    square.surface().setFillColor(Color.rgb(200, 200, 200));
-    square.surface().fillRect(0, 0, square.surface().width(), square.surface().height());
+    SurfaceImage surf = graphics().createSurface(width, height);
+    surf.surface().setFillColor(Color.rgb(200, 200, 200));
+    surf.surface().fillRect(0, 0, width, height);
+    square = graphics().createImageLayer(surf);
     graphics().rootLayer().add(square);
   }
 

@@ -32,7 +32,6 @@ class HtmlCanvasImage extends HtmlImage implements CanvasImage {
   public HtmlCanvasImage(GLContext ctx, Scale scale, HtmlCanvas canvas) {
     super(ctx, scale, canvas.canvas());
     this.canvas = canvas;
-    canvas.scale(scale.factor, scale.factor);
   }
 
   @Override

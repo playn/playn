@@ -32,6 +32,7 @@ import playn.core.Image;
 import playn.core.ImageLayer;
 import playn.core.ImmediateLayer;
 import playn.core.PlayN;
+import playn.core.SurfaceImage;
 import playn.core.SurfaceLayer;
 import playn.core.TextFormat;
 import playn.core.TextLayout;
@@ -117,7 +118,7 @@ class FlashGraphics implements Graphics {
     throw new UnsupportedOperationException("Clipped group layer not supported by Flash");
   }
 
-  @Override
+  @Override @Deprecated
   public SurfaceLayer createSurfaceLayer(float width, float height) {
     return new FlashSurfaceLayer(width, height);
   }
@@ -134,16 +135,23 @@ class FlashGraphics implements Graphics {
   }
 
   @Override
+  public ImageLayer createImageLayer() {
+    return new FlashImageLayer();
+  }
+
+  @Override
   public ImageLayer createImageLayer(Image image) {
     return new FlashImageLayer(image);
   }
 
   @Override
   public CanvasImage createImage(float width, float height) {
-    FlashCanvas surface = new FlashCanvas(
-      width, height, FlashCanvas.CanvasElement.create(
-        MathUtil.iceil(width), MathUtil.iceil(height)).getContext());
-    return new FlashCanvasImage(surface);
+    return new FlashCanvasImage(createCanvas(width, height));
+  }
+
+  @Override
+  public SurfaceImage createSurface(float width, float height) {
+    return new FlashSurfaceImageCanvas(createCanvas(width, height));
   }
 
   @Override
@@ -210,11 +218,8 @@ class FlashGraphics implements Graphics {
     rootLayer.update();
   }
 
-  /* (non-Javadoc)
-   * @see playn.core.Graphics#createImageLayer()
-   */
-  @Override
-  public ImageLayer createImageLayer() {
-    return new FlashImageLayer();
+  private FlashCanvas createCanvas(float width, float height) {
+    return new FlashCanvas(width, height, FlashCanvas.CanvasElement.create(
+                             MathUtil.iceil(width), MathUtil.iceil(height)).getContext());
   }
 }

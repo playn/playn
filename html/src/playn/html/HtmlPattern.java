@@ -19,19 +19,19 @@ import com.google.gwt.canvas.dom.client.CanvasPattern;
 import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.dom.client.ImageElement;
 
+import playn.core.gl.AbstractImageGL;
 import playn.core.gl.GLPattern;
-import playn.core.gl.ImageGL;
 
 class HtmlPattern implements GLPattern {
 
-  private final ImageGL image;
+  private final AbstractImageGL image;
   private final ImageElement patimg;
 
   HtmlPattern(HtmlImage image) {
     this(image, image.img);
   }
 
-  HtmlPattern(ImageGL image, ImageElement patimg) {
+  HtmlPattern(AbstractImageGL image, ImageElement patimg) {
     this.image = image;
     this.patimg = patimg;
   }
@@ -57,7 +57,7 @@ class HtmlPattern implements GLPattern {
   }
 
   @Override
-  public ImageGL image() {
+  public AbstractImageGL image() {
     return image;
   }
 }

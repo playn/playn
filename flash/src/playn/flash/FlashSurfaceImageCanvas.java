@@ -13,25 +13,29 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package playn.ios;
+package playn.flash;
 
-import cli.MonoTouch.CoreGraphics.CGColor;
+import playn.core.CanvasSurface;
+import playn.core.Surface;
+import playn.core.SurfaceImage;
+import playn.core.gl.GLContext;
 
-import playn.core.gl.AbstractImageGL;
-import playn.core.gl.GLPattern;
+public class FlashSurfaceImageCanvas extends FlashCanvasImage implements SurfaceImage {
 
-public class IOSPattern implements GLPattern {
+  private final CanvasSurface surface;
 
-  CGColor colorWithPattern;
-  private AbstractImageGL image;
-
-  public IOSPattern(AbstractImageGL image, CGColor colorWithPattern) {
-    this.image = image;
-    this.colorWithPattern = colorWithPattern;
+  public FlashSurfaceImageCanvas(FlashCanvas canvas) {
+    super(canvas);
+    surface = new CanvasSurface(canvas);
   }
 
   @Override
-  public AbstractImageGL image() {
-    return image;
+  public Surface surface() {
+    return surface;
+  }
+
+  @Override
+  public void destroy() {
+    // nothing to see here, move it along
   }
 }

@@ -9,19 +9,20 @@ import java.util.List;
 import pythagoras.f.FloatMath;
 import pythagoras.f.Rectangle;
 
-import playn.core.ImmediateLayer;
 import playn.core.AssetWatcher;
 import playn.core.GroupLayer;
 import playn.core.Image;
+import playn.core.ImageLayer;
+import playn.core.ImmediateLayer;
 import playn.core.Pattern;
 import playn.core.Surface;
-import playn.core.SurfaceLayer;
+import playn.core.SurfaceImage;
 import static playn.core.PlayN.*;
 
 public class SurfaceTest extends Test {
 
-  private List<SurfaceLayer> dots = new ArrayList<SurfaceLayer>();
-  private SurfaceLayer paintUpped;
+  private List<ImageLayer> dots = new ArrayList<ImageLayer>();
+  private SurfaceImage paintUpped;
   private Rectangle dotBox;
   private int elapsed;
 
@@ -113,9 +114,10 @@ public class SurfaceTest extends Test {
       }
     }, 120, 210, "ImmediateLayer patterned fillRect, fillTriangles");
 
-    SurfaceLayer slayer = graphics().createSurfaceLayer(100, 100);
-    slayer.surface().setFillPattern(pattern).fillRect(0, 0, 100, 100);
-    ypos = ygap + addTest(170, ypos, slayer, "SurfaceLayer patterned fillRect");
+    SurfaceImage patted = graphics().createSurface(100, 100);
+    patted.surface().setFillPattern(pattern).fillRect(0, 0, 100, 100);
+    ypos = ygap + addTest(170, ypos, graphics().createImageLayer(patted),
+                          "SurfaceImage patterned fillRect");
 
     ypos = 10;
 
@@ -141,26 +143,29 @@ public class SurfaceTest extends Test {
       public void render (Surface surf) {
         surf.setFillColor(0xFFCCCCCC).fillRect(0, 0, dotBox.width, dotBox.height);
       }
-    }, dotBox.width, dotBox.height, "Randomly positioned SurfaceLayers");
+    }, dotBox.width, dotBox.height, "Randomly positioned SurfaceImages");
     for (int ii = 0; ii < 10; ii++) {
-      SurfaceLayer dot = graphics().createSurfaceLayer(10, 10);
+      SurfaceImage dot = graphics().createSurface(10, 10);
       dot.surface().setFillColor(0xFFFF0000);
       dot.surface().fillRect(0, 0, 5, 5);
       dot.surface().fillRect(5, 5, 5, 5);
       dot.surface().setFillColor(0xFF0000FF);
       dot.surface().fillRect(5, 0, 5, 5);
       dot.surface().fillRect(0, 5, 5, 5);
-      dot.setTranslation(dotBox.x + random()*(dotBox.width-10),
-                         dotBox.y + random()*(dotBox.height-10));
-      dots.add(dot);
-      // System.err.println("Created dot at " + dot.transform());
-      graphics().rootLayer().add(dot);
+      ImageLayer dotl = graphics().createImageLayer(dot);
+      dotl.setTranslation(dotBox.x + random()*(dotBox.width-10),
+                          dotBox.y + random()*(dotBox.height-10));
+      dots.add(dotl);
+
+      // System.err.println("Created dot at " + dotl.transform());
+      graphics().rootLayer().add(dotl);
     }
 
     // add a surface layer that is updated on every call to paint (a bad practice, but one that
     // should actually work)
-    paintUpped = graphics().createSurfaceLayer(100, 100);
-    ypos = ygap + addTest(315, ypos, paintUpped, "SurfaceLayer updated in paint()");
+    paintUpped = graphics().createSurface(100, 100);
+    ypos = ygap + addTest(315, ypos, graphics().createImageLayer(paintUpped),
+                          "SurfaceImage updated in paint()");
   }
 
   protected float addTest(float lx, float ly, ImmediateLayer.Renderer renderer,
@@ -175,7 +180,7 @@ public class SurfaceTest extends Test {
 
   @Override
   public void paint(float alpha) {
-    for (SurfaceLayer dot : dots) {
+    for (ImageLayer dot : dots) {
       if (random() > 0.95) {
         dot.setTranslation(dotBox.x + random()*(dotBox.width-10),
                            dotBox.y + random()*(dotBox.height-10));

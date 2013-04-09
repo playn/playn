@@ -199,7 +199,7 @@ public class AndroidGraphics extends GraphicsGL {
   }
 
   @Override
-  protected SurfaceGL createSurface(float width, float height) {
+  protected SurfaceGL createSurfaceGL(float width, float height) {
     return new AndroidSurfaceGL(platform.activity.getCacheDir(), ctx, width, height);
   }
 

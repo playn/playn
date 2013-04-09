@@ -22,6 +22,7 @@ import playn.core.GroupLayer;
 import playn.core.Image;
 import playn.core.ImageLayer;
 import playn.core.ImmediateLayer;
+import playn.core.SurfaceImage;
 import playn.core.SurfaceLayer;
 import playn.core.gl.Scale;
 
@@ -72,9 +73,9 @@ class HtmlGraphicsCanvas extends HtmlGraphics {
     return new HtmlImageLayerCanvas(img);
   }
 
-  @Override
+  @Override @Deprecated
   public SurfaceLayer createSurfaceLayer(float width, float height) {
-    return new HtmlSurfaceLayerCanvas(width, height);
+    return new HtmlSurfaceLayerCanvas(scale, width, height);
   }
 
   @Override
@@ -86,6 +87,11 @@ class HtmlGraphicsCanvas extends HtmlGraphics {
   @Override
   public ImmediateLayer createImmediateLayer(ImmediateLayer.Renderer renderer) {
     return new HtmlImmediateLayerCanvas(ctx, renderer);
+  }
+
+  @Override
+  public SurfaceImage createSurface(float width, float height) {
+    return new HtmlSurfaceImageCanvas(ctx(), scale, HtmlCanvas.create(scale, width, height));
   }
 
   @Override

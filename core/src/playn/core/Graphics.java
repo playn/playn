@@ -25,10 +25,50 @@ import playn.core.gl.GLContext;
 public interface Graphics {
 
   /**
+   * Gets the width of the drawable surface, in pixels.
+   */
+  int width();
+
+  /**
+   * Gets the height of the drawable surface, in pixels.
+   */
+  int height();
+
+  /**
+   * Gets the height of the available screen real-estate, in pixels.
+   */
+  int screenHeight();
+
+  /**
+   * Gets the width of the available screen real-estate, in pixels.
+   */
+  int screenWidth();
+
+  /**
+   * Returns the display scale factor. This will be 1 except on HiDPI devices that have been
+   * configured to use HiDPI mode, where it will probably be 2, but could be some other scale
+   * depending on how things were configured when initializing the platform.
+   */
+  float scaleFactor();
+
+  /**
    * Returns the root of the scene graph. When layers are added to this layer, they become visible
    * on the screen.
    */
   GroupLayer rootLayer();
+
+  /**
+   * Returns the GL context on platforms that use GL, null otherwise. This is used for creating
+   * custom shaders.
+   */
+  GLContext ctx();
+
+  /**
+   * Returns a reference to the GL context. <b>WARNING</b>: this is an experimental, not well
+   * tested feature. It works on the Java, HTML and Android backends. It may change completely.
+   * Consider yourself warned.
+   */
+  GL20 gl20();
 
   /**
    * Creates a group layer.
@@ -36,7 +76,7 @@ public interface Graphics {
   GroupLayer createGroupLayer();
 
   /**
-   * Creates a clipped group layer, with the initial specified size.
+   * Creates a clipped group layer, with the initial clipping size.
    */
   GroupLayer.Clipped createGroupLayer(float width, float height);
 
@@ -57,24 +97,31 @@ public interface Graphics {
   ImmediateLayer createImmediateLayer(ImmediateLayer.Renderer renderer);
 
   /**
-   * TODO
-   */
-  SurfaceLayer createSurfaceLayer(float width, float height);
-
-  /**
-   * TODO
+   * Creates an image layer with no configured image. Configure the image like so:
+   * {@code createImageLayer().setImage(image)}.
    */
   ImageLayer createImageLayer();
 
   /**
-   * TODO
+   * Creates an image layer with the supplied image.
    */
   ImageLayer createImageLayer(Image image);
+
+  /**
+   * @deprecated Use {@link #createSurface} and {@link #createImageLayer}.
+   */
+  @Deprecated
+  SurfaceLayer createSurfaceLayer(float width, float height);
 
   /**
    * Creates an image that can be painted using the {@link Canvas} interface.
    */
   CanvasImage createImage(float width, float height);
+
+  /**
+   * Creates an image that can be rendered into using the {@link Surface} interface.
+   */
+  SurfaceImage createSurface(float width, float height);
 
   /**
    * Creates a linear gradient fill pattern. (x0, y0) and (x1, y1) specify the
@@ -102,45 +149,4 @@ public interface Graphics {
    * on a canvas via {@link Canvas#fillText(TextLayout,float,float)}.
    */
   TextLayout layoutText(String text, TextFormat format);
-
-  /**
-   * Gets the height of the available screen real-estate, in pixels.
-   */
-  int screenHeight();
-
-  /**
-   * Gets the width of the available screen real-estate, in pixels.
-   */
-  int screenWidth();
-
-  /**
-   * Gets the width of the drawable surface, in pixels.
-   */
-  int width();
-
-  /**
-   * Gets the height of the drawable surface, in pixels.
-   */
-  int height();
-
-  /**
-   * Returns the display scale factor. This will be 1 except on HiDPI devices that have been
-   * configured to use HiDPI mode, where it will probably be 2, but could be some other scale
-   * depending on how things were configured when initializing the platform.
-   */
-  float scaleFactor();
-
-  /**
-   * <b>WARNING</b>: this is a totally experimental, untested feature. It only works on Android. It
-   * may change completely. Consider yourself warned.
-   *
-   * <p> Returns a reference to the GL context. </p>
-   */
-  GL20 gl20();
-
-  /**
-   * Returns the GL context on platforms that use GL, null otherwise. This is used for creating
-   * custom shaders.
-   */
-  GLContext ctx();
 }

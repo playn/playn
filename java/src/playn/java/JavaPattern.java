@@ -17,21 +17,21 @@ package playn.java;
 
 import java.awt.TexturePaint;
 
+import playn.core.gl.AbstractImageGL;
 import playn.core.gl.GLPattern;
-import playn.core.gl.ImageGL;
 
 class JavaPattern implements GLPattern {
 
-  private final ImageGL image;
+  private final AbstractImageGL image;
   final TexturePaint paint;
 
-  JavaPattern(ImageGL image, TexturePaint paint) {
+  JavaPattern(AbstractImageGL image, TexturePaint paint) {
     this.image = image;
     this.paint = paint;
   }
 
   @Override
-  public ImageGL image() {
+  public AbstractImageGL image() {
     return image;
   }
 }

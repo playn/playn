@@ -23,7 +23,7 @@ import playn.core.ImageLayer;
 import playn.core.ImmediateLayer;
 import playn.core.Layer;
 import playn.core.Surface;
-import playn.core.SurfaceLayer;
+import playn.core.SurfaceImage;
 import static playn.core.PlayN.graphics;
 
 public class ClippedGroupTest extends Test {
@@ -32,7 +32,7 @@ public class ClippedGroupTest extends Test {
   private GroupLayer.Clipped g1, g2, g3, g4, g5;
   private ImageLayer i1;
   private GroupLayer inner, g5Inner;
-  private SurfaceLayer s1;
+  private ImageLayer s1;
 
   @Override
   public String getName() {
@@ -98,10 +98,11 @@ public class ClippedGroupTest extends Test {
     g3.add(inner);
     rootLayer.addAt(g3, 275, 25);
 
-    // create a group layer with a static clip, and a rotating surface layer inside
+    // create a group layer with a static clip, and a rotating surface image inside
     g4 = graphics().createGroupLayer(100, 100);
-    s1 = graphics().createSurfaceLayer(100, 50);
-    s1.surface().setFillColor(0xFF99CCFF).fillRect(0, 0, 100, 50);
+    SurfaceImage si = graphics().createSurface(100, 50);
+    si.surface().setFillColor(0xFF99CCFF).fillRect(0, 0, 100, 50);
+    s1 = graphics().createImageLayer(si);
     s1.setOrigin(s1.width()/2, s1.height()/2);
     g4.addAt(s1, 50, 50);
     rootLayer.addAt(g4, 400, 25);

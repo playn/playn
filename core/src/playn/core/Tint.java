@@ -18,8 +18,8 @@ package playn.core;
 /**
  * Tinting related utility methods.
  */
-public class Tint
-{
+public class Tint {
+
   /** A tint that does not change the underlying color. */
   public static final int NOOP_TINT = 0xFFFFFFFF;
 

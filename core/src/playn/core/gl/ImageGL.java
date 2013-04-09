@@ -16,78 +16,22 @@
 package playn.core.gl;
 
 import playn.core.Asserts;
-import playn.core.Image;
 import playn.core.InternalTransform;
 import playn.core.Pattern;
 import playn.core.Tint;
 
-public abstract class ImageGL implements Image {
-
-  protected final GLContext ctx;
+public abstract class ImageGL extends AbstractImageGL {
 
   /** This image's scale factor. This is effectively final, but can't be marked final because it
    * can be updated post-construction due to asynchronous image loading. */
   protected Scale scale;
 
-  /** The current count of references to this image. */
-  protected int refs;
-
   /** Our texture handle. */
   protected int tex;
 
-  /** Whether this image repeats in the x/y direction. */
-  protected boolean repeatX, repeatY;
-
-  /** Whether to generate mipmaps for this image. */
-  protected boolean mipmapped;
-
-  /**
-   * Increments this image's reference count. Called by {@link ImageLayerGL} to let the image know
-   * that it's part of the scene graph. Note that this reference counting mechanism only exists to
-   * make more efficient use of texture memory. Images are also used by things like {@link Pattern}
-   * which does not support reference counting, thus images must also provide some fallback
-   * mechanism for releasing their texture when no longer needed (like in their finalizer).
-   */
-  public void reference() {
-    refs++; // we still create our texture on demand
-  }
-
-  /**
-   * Decrements this image's reference count. Called by {@link ImageLayerGL} to let the image know
-   * that may no longer be part of the scene graph.
-   */
-  public void release() {
-    Asserts.checkState(refs > 0, "Released an image with no references!");
-    if (--refs == 0) {
-      clearTexture();
-    }
-  }
-
   @Override
-  public boolean repeatX() {
-    return repeatX;
-  }
-
-  @Override
-  public boolean repeatY() {
-    return repeatY;
-  }
-
-  @Override
-  public void setRepeat(boolean repeatX, boolean repeatY) {
-    if (repeatX != this.repeatX || repeatY != this.repeatY) {
-      this.repeatX = repeatX;
-      this.repeatY = repeatY;
-      clearTexture();
-    }
-  }
-
-  @Override
-  public void setMipmapped (boolean mipmapped) {
-    if (this.mipmapped != mipmapped) {
-      this.mipmapped = mipmapped;
-      clearTexture();
-    }
+  public Scale scale() {
+    return scale;
   }
 
   @Override
@@ -99,7 +43,7 @@ public abstract class ImageGL implements Image {
     } else if (repeatX || repeatY || mipmapped) {
       return (tex = scaleTexture());
     } else {
-      return (tex = loadTexture());
+      return (tex = createMainTex());
     }
   }
 
@@ -111,68 +55,9 @@ public abstract class ImageGL implements Image {
     }
   }
 
-  /**
-   * Draws this image with the supplied transform in the specified target dimensions.
-   */
-  void draw(GLShader shader, InternalTransform xform, float dx, float dy, float dw, float dh,
-            int tint) {
-    int tex = ensureTexture();
-    if (tex > 0) {
-      float sl = x(), st = y();
-      float sr = sl + (repeatX ? dw : width()), sb = st + (repeatY ? dh : height());
-      float texWidth = texWidth(), texHeight = texHeight();
-      ctx.quadShader(shader).prepareTexture(tex, tint).addQuad(
-        xform, dx, dy, dx + dw, dy + dh,
-        sl / texWidth, st / texHeight, sr / texWidth, sb / texHeight);
-    }
-  }
-
-  /**
-   * Draws this image with the supplied transform, and source and target dimensions.
-   */
-  void draw(GLShader shader, InternalTransform xform, float dx, float dy, float dw, float dh,
-            float sx, float sy, float sw, float sh, int tint) {
-    int tex = ensureTexture();
-    if (tex > 0) {
-      sx += x(); sy += y();
-      float texWidth = texWidth(), texHeight = texHeight();
-      ctx.quadShader(shader).prepareTexture(tex, tint).addQuad(
-        xform, dx, dy, dx + dw, dy + dh,
-        sx / texWidth, sy / texHeight, (sx + sw) / texWidth, (sy + sh) / texHeight);
-    }
-  }
-
   protected ImageGL(GLContext ctx, Scale scale) {
-    this.ctx = ctx;
+    super(ctx);
     this.scale = scale;
-  }
-
-  /**
-   * The x offset into our source image at which this image's region starts.
-   */
-  protected float x() {
-    return 0;
-  }
-
-  /**
-   * The y offset into our source image at which this image's region starts.
-   */
-  protected float y() {
-    return 0;
-  }
-
-  /**
-   * Returns the width of our underlying texture image.
-   */
-  protected float texWidth() {
-    return width();
-  }
-
-  /**
-   * Returns the height of our underlying texture image.
-   */
-  protected float texHeight() {
-    return height();
   }
 
   /**
@@ -186,13 +71,27 @@ public abstract class ImageGL implements Image {
       ctx.queueDestroyTexture(tex);
   }
 
-  private int loadTexture() {
+  /**
+   * Creates and populates a (not necessarily power of two) texture for use as our main texture.
+   */
+  protected int createMainTex() {
     // the mipmaps flag is always false here because we only ever generate mipmaps for our
     // power-of-two textures; scaleTexture will use tex to create the POT texture, so tex should
     // not have mipmaps enabled, or it will hose up that process
     int tex = ctx.createTexture(false, false, false);
     updateTexture(tex);
     return tex;
+  }
+
+  /**
+   * Creates and populates a texture for use as our power-of-two texture. This is used when our
+   * main image data is already power-of-two-sized.
+   */
+  protected int createPow2RepTex(int width, int height, boolean repeatX, boolean repeatY,
+                                 boolean mipmapped) {
+    int powtex = ctx.createTexture(width, height, repeatX, repeatY, mipmapped);
+    updateTexture(powtex);
+    return powtex;
   }
 
   private int scaleTexture() {
@@ -207,14 +106,13 @@ public abstract class ImageGL implements Image {
 
     // no need to scale if our source data is already a power of two
     if ((width == 0) && (height == 0)) {
-      int reptex = ctx.createTexture(scaledWidth, scaledHeight, repeatX, repeatY, mipmapped);
-      updateTexture(reptex);
+      int reptex = createPow2RepTex(scaledWidth, scaledHeight, repeatX, repeatY, mipmapped);
       if (mipmapped) ctx.generateMipmap(reptex);
       return reptex;
     }
 
     // otherwise we need to scale our non-repeated texture, so load that normally
-    int tex = loadTexture();
+    int tex = createMainTex();
 
     // width/height == 0 => already a power of two.
     if (width == 0)
@@ -223,6 +121,16 @@ public abstract class ImageGL implements Image {
       height = scaledHeight;
 
     // create our texture and point a new framebuffer at it
+    try {
+      return convertToRepTex(ctx, tex, width, height, repeatX, repeatY, mipmapped);
+    } finally {
+      // delete the non-repeated texture
+      ctx.destroyTexture(tex);
+    }
+  }
+
+  protected static int convertToRepTex(GLContext ctx, int tex, int width, int height,
+                                       boolean repeatX, boolean repeatY, boolean mipmapped) {
     int reptex = ctx.createTexture(width, height, repeatX, repeatY, mipmapped);
     int fbuf = ctx.createFramebuffer(reptex);
     ctx.pushFramebuffer(fbuf, width, height);
@@ -237,8 +145,6 @@ public abstract class ImageGL implements Image {
       return reptex;
 
     } finally {
-      // delete the non-repeated texture
-      ctx.destroyTexture(tex);
       // we no longer need this framebuffer; rebind the previous framebuffer and delete ours
       ctx.popFramebuffer();
       ctx.deleteFramebuffer(fbuf);

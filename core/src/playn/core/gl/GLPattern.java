@@ -20,7 +20,7 @@ import playn.core.Pattern;
 /**
  * Provide access to the texture that implements a pattern in GL.
  */
-public interface GLPattern extends Pattern
-{
-  ImageGL image();
+public interface GLPattern extends Pattern {
+
+  AbstractImageGL image();
 }

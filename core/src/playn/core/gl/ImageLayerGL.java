@@ -23,15 +23,10 @@ public class ImageLayerGL extends LayerGL implements ImageLayer {
 
   private float width, height;
   private boolean widthSet, heightSet;
-  private ImageGL img;
+  private AbstractImageGL img;
 
   public ImageLayerGL(GLContext ctx) {
     super(ctx);
-  }
-
-  public ImageLayerGL(GLContext ctx, Image img) {
-    this(ctx);
-    setImage(img);
   }
 
   @Override
@@ -56,21 +51,13 @@ public class ImageLayerGL extends LayerGL implements ImageLayer {
   }
 
   @Override
-  public void setHeight(float height) {
-    Asserts.checkArgument(height > 0, "Height must be > 0");
-
-    heightSet = true;
-    this.height = height;
-  }
-
-  @Override
   public ImageLayer setImage(Image img) {
-    Asserts.checkArgument(img == null || img instanceof ImageGL);
+    Asserts.checkArgument(img == null || img instanceof AbstractImageGL);
     // avoid releasing and rereferencing image if nothing changes
     if (this.img != img) {
       if (this.img != null)
         this.img.release();
-      this.img = (ImageGL) img;
+      this.img = (AbstractImageGL) img;
       if (this.img != null)
         this.img.reference();
     }
@@ -80,16 +67,21 @@ public class ImageLayerGL extends LayerGL implements ImageLayer {
   @Override
   public void setWidth(float width) {
     Asserts.checkArgument(width > 0, "Width must be > 0");
-
     widthSet = true;
     this.width = width;
+  }
+
+  @Override
+  public void setHeight(float height) {
+    Asserts.checkArgument(height > 0, "Height must be > 0");
+    heightSet = true;
+    this.height = height;
   }
 
   @Override
   public void setSize(float width, float height) {
     Asserts.checkArgument(width > 0 && height > 0,
                           "Width and height must be > 0 (got %dx%d)", width, height);
-
     widthSet = true;
     this.width = width;
     heightSet = true;
@@ -98,12 +90,12 @@ public class ImageLayerGL extends LayerGL implements ImageLayer {
 
   @Override
   public void paint(InternalTransform curTransform, int curTint, GLShader curShader) {
-    if (!visible() || img == null) return;
-
-    if (tint != Tint.NOOP_TINT)
-      curTint = Tint.combine(curTint, tint);
-    img.draw((shader == null) ? curShader : shader, localTransform(curTransform),
-             0, 0, width(), height(), curTint);
+    if (visible() && img != null) {
+      if (tint != Tint.NOOP_TINT)
+        curTint = Tint.combine(curTint, tint);
+      img.draw((shader == null) ? curShader : shader, localTransform(curTransform),
+               0, 0, width(), height(), curTint);
+    }
   }
 
   @Override

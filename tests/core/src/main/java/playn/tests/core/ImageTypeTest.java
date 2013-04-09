@@ -21,8 +21,8 @@ import playn.core.Color;
 import playn.core.GroupLayer;
 import playn.core.Image;
 import playn.core.ImageLayer;
-import playn.core.SurfaceLayer;
 import playn.core.util.Callback;
+import playn.core.SurfaceImage;
 import static playn.core.PlayN.*;
 
 public class ImageTypeTest extends Test {
@@ -37,11 +37,11 @@ public class ImageTypeTest extends Test {
   Image image1;
 
   ImageLayer imageLayer1;
-  SurfaceLayer surfaceLayer1;
+  ImageLayer surfaceLayer1;
   ImageLayer canvasLayer1;
 
   ImageLayer imageLayer2;
-  SurfaceLayer surfaceLayer2;
+  ImageLayer surfaceLayer2;
   ImageLayer canvasLayer2;
 
   Image imageGroundTruth;
@@ -54,7 +54,7 @@ public class ImageTypeTest extends Test {
 
   @Override
   public String getDescription() {
-    return "Test that image types display the same. Left-to-right: ImageLayer, SurfaceLayer, CanvasImage, ground truth (expected).";
+    return "Test that image types display the same. Left-to-right: ImageLayer, SurfaceImage, CanvasImage, ground truth (expected).";
   }
 
   @Override
@@ -62,13 +62,13 @@ public class ImageTypeTest extends Test {
     rootLayer = graphics().rootLayer();
 
     // add a half white, half blue background
-    SurfaceLayer bg = graphics().createSurfaceLayer((int) (4 * width), (int) (4 * height));
+    SurfaceImage bg = graphics().createSurface((int) (4 * width), (int) (4 * height));
     bg.surface().setFillColor(Color.rgb(255, 255, 255));
     bg.surface().fillRect(0, 0, bg.surface().width(), bg.surface().height());
     bg.surface().setFillColor(Color.rgb(0, 0, 255));
-    bg.surface().fillRect(0, bg.surface().width() / 2, bg.surface().width(),
-        bg.surface().height() / 2);
-    rootLayer.add(bg);
+    bg.surface().fillRect(0, bg.surface().width() / 2,
+                          bg.surface().width(), bg.surface().height() / 2);
+    rootLayer.add(graphics().createImageLayer(bg));
 
     image1 = assets().getImage(imageSrc);
     image1.addCallback(new Callback<Image>() {
@@ -76,14 +76,16 @@ public class ImageTypeTest extends Test {
       public void onSuccess(Image image) {
         // once the image loads, create our layers
         imageLayer1 = graphics().createImageLayer(image);
-        surfaceLayer1 = graphics().createSurfaceLayer(image.width(), image.height());
-        surfaceLayer1.surface().drawImage(image, 0, 0);
+        SurfaceImage surface1 = graphics().createSurface(image.width(), image.height());
+        surface1.surface().drawImage(image, 0, 0);
+        surfaceLayer1 = graphics().createImageLayer(surface1);
         CanvasImage canvas1 = graphics().createImage(image.width(), image.height());
         canvas1.canvas().drawImage(image, 0, 0);
         canvasLayer1 = graphics().createImageLayer(canvas1);
         imageLayer2 = graphics().createImageLayer(image);
-        surfaceLayer2 = graphics().createSurfaceLayer(image.width(), image.height());
-        surfaceLayer2.surface().drawImage(image, 0, 0);
+        SurfaceImage surface2 = graphics().createSurface(image.width(), image.height());
+        surface2.surface().drawImage(image, 0, 0);
+        surfaceLayer2 = graphics().createImageLayer(surface2);
         CanvasImage canvas2 = graphics().createImage(image.width(), image.height());
         canvas2.canvas().drawImage(image, 0, 0);
         canvasLayer2 = graphics().createImageLayer(canvas2);

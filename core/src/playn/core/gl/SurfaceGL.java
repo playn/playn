@@ -25,7 +25,7 @@ public class SurfaceGL extends AbstractSurfaceGL {
   protected final int texWidth, texHeight;
   protected int tex, fbuf;
 
-  protected SurfaceGL(GLContext ctx, float width, float height) {
+  public SurfaceGL(GLContext ctx, float width, float height) {
     super(ctx);
     this.width = width;
     this.height = height;
@@ -45,7 +45,7 @@ public class SurfaceGL extends AbstractSurfaceGL {
     return height;
   }
 
-  protected void paint(InternalTransform xform, int curTint, GLShader shader) {
+  void draw(GLShader shader, InternalTransform xform, int curTint) {
     if (tint != Tint.NOOP_TINT)
       curTint = Tint.combine(curTint, tint);
     // Draw this layer to the screen upside-down, because its contents are flipped (This happens

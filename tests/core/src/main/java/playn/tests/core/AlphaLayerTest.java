@@ -21,7 +21,7 @@ import playn.core.Color;
 import playn.core.GroupLayer;
 import playn.core.Image;
 import playn.core.ImageLayer;
-import playn.core.SurfaceLayer;
+import playn.core.SurfaceImage;
 import playn.core.util.Callback;
 import static playn.core.PlayN.*;
 
@@ -37,7 +37,7 @@ public class AlphaLayerTest extends Test {
 
   @Override
   public String getDescription() {
-    return "Test that the alpha value on layers works the same on all layer types and that alpha is 'additive'. Left-to-right: ImageLayer, SurfaceLayer, CanvasImage (layer alpha), CanvasImage (canvas alpha), ground truth (expected). The first three layers all have alpha 50% and are in a grouplayer with alpha 50% (should result in a 25% opaque image).";
+    return "Test that alpha works the same on all layer types and that alpha is 'additive'.";
   }
 
   @Override
@@ -46,12 +46,12 @@ public class AlphaLayerTest extends Test {
     final float fullWidth = 6*width, fullHeight = 3*height;
 
     // add a half white, half blue background
-    SurfaceLayer bg = graphics().createSurfaceLayer((int) fullWidth, (int) fullHeight);
+    SurfaceImage bg = graphics().createSurface(fullWidth, fullHeight);
     bg.surface().setFillColor(Color.rgb(255, 255, 255));
-    bg.surface().fillRect(0, 0, bg.surface().width(), bg.surface().height());
+    bg.surface().fillRect(0, 0, fullWidth, fullHeight);
     bg.surface().setFillColor(Color.rgb(0, 0, 255));
-    bg.surface().fillRect(0, 2*height, bg.surface().width(), height);
-    rootLayer.add(bg);
+    bg.surface().fillRect(0, 2*height, fullWidth, height);
+    rootLayer.add(graphics().createImageLayer(bg));
 
     addDescrip("all layers contained in group layer with a=0.5\n" +
                "thus, fully composited a=0.25", offset, fullHeight+5, fullWidth);
@@ -71,16 +71,16 @@ public class AlphaLayerTest extends Test {
         addDescrip("image\nimg layer a=0.5", x, offset + height, width);
         x += width;
 
-        SurfaceLayer surf1 = graphics().createSurfaceLayer(image.width(), image.height());
+        SurfaceImage surf1 = graphics().createSurface(image.width(), image.height());
         surf1.surface().setAlpha(0.5f).drawImage(image, 0, 0);
-        groupLayer.addAt(surf1, x, offset);
-        addDescrip("image a=0.5\nsurf layer a=1", x, offset + height, width);
+        groupLayer.addAt(graphics().createImageLayer(surf1), x, offset);
+        addDescrip("surface a=0.5\nimg layer a=1", x, offset + height, width);
         x += width;
 
-        SurfaceLayer surf2 = graphics().createSurfaceLayer(image.width(), image.height());
+        SurfaceImage surf2 = graphics().createSurface(image.width(), image.height());
         surf2.surface().drawImage(image, 0, 0);
-        groupLayer.addAt(surf2.setAlpha(0.5f), x, offset);
-        addDescrip("image a=1\nsurf layer a=0.5", x, offset + height, width);
+        groupLayer.addAt(graphics().createImageLayer(surf2).setAlpha(0.5f), x, offset);
+        addDescrip("surface a=1\nimg layer a=0.5", x, offset + height, width);
         x += width;
 
         CanvasImage canvas1 = graphics().createImage(image.width(), image.height());
@@ -101,14 +101,14 @@ public class AlphaLayerTest extends Test {
         groupLayer.addAt(graphics().createImageLayer(image).setAlpha(0.5f), x, offset + 2 * height);
         x += width;
 
-        SurfaceLayer surf1b = graphics().createSurfaceLayer(image.width(), image.height());
+        SurfaceImage surf1b = graphics().createSurface(image.width(), image.height());
         surf1b.surface().setAlpha(0.5f).drawImage(image, 0, 0);
-        groupLayer.addAt(surf1b, x, offset + 2 * height);
+        groupLayer.addAt(graphics().createImageLayer(surf1b), x, offset + 2 * height);
         x += width;
 
-        SurfaceLayer surf2b = graphics().createSurfaceLayer(image.width(), image.height());
+        SurfaceImage surf2b = graphics().createSurface(image.width(), image.height());
         surf2b.surface().drawImage(image, 0, 0);
-        groupLayer.addAt(surf2b.setAlpha(0.5f), x, offset + 2 * height);
+        groupLayer.addAt(graphics().createImageLayer(surf2b).setAlpha(0.5f), x, offset + 2 * height);
         x += width;
 
         CanvasImage canvas1b = graphics().createImage(image.width(), image.height());

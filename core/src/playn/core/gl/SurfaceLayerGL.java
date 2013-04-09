@@ -48,7 +48,7 @@ public class SurfaceLayerGL extends LayerGL implements SurfaceLayer {
     if (!visible()) return;
     if (tint != Tint.NOOP_TINT)
       curTint = Tint.combine(curTint, tint);
-    surface.paint(localTransform(parentTransform), curTint, (shader == null) ? curShader : shader);
+    surface.draw((shader == null) ? curShader : shader, localTransform(parentTransform), curTint);
   }
 
   @Override

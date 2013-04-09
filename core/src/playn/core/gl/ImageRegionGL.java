@@ -20,19 +20,25 @@ import playn.core.Image;
 import playn.core.Tint;
 import playn.core.util.Callback;
 
-public abstract class ImageRegionGL extends ImageGL implements Image.Region {
+public class ImageRegionGL extends AbstractImageGL implements Image.Region {
 
-  protected final ImageGL parent;
+  protected final AbstractImageGL parent;
   protected float x, y;
   protected float width, height;
+  protected int tex;
 
-  public ImageRegionGL(ImageGL parent, float x, float y, float width, float height) {
-    super(parent.ctx, parent.scale);
+  public ImageRegionGL(AbstractImageGL parent, float x, float y, float width, float height) {
+    super(parent.ctx);
     this.parent = parent;
     this.x = x;
     this.y = y;
     this.width = width;
     this.height = height;
+  }
+
+  @Override
+  public Scale scale() {
+    return parent.scale();
   }
 
   @Override
@@ -136,14 +142,9 @@ public abstract class ImageRegionGL extends ImageGL implements Image.Region {
     return (tex > 0) ? height : parent.texHeight();
   }
 
-  @Override
-  protected void updateTexture(int tex) {
-    throw new AssertionError("Region.updateTexture should never be called.");
-  }
-
   private int scaleTexture() {
-    int scaledWidth = scale.scaledCeil(this.width);
-    int scaledHeight = scale.scaledCeil(this.height);
+    int scaledWidth = scale().scaledCeil(this.width);
+    int scaledHeight = scale().scaledCeil(this.height);
 
     // GL requires pow2 on axes that repeat
     int width = GLUtil.nextPowerOfTwo(scaledWidth), height = GLUtil.nextPowerOfTwo(scaledHeight);
