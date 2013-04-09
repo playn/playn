@@ -27,6 +27,7 @@ import pythagoras.f.MathUtil;
 import playn.core.Asserts;
 import playn.core.Image;
 import playn.core.Pattern;
+import playn.core.gl.AbstractImageGL;
 import playn.core.gl.GLContext;
 import playn.core.gl.ImageGL;
 import playn.core.gl.Scale;
@@ -102,6 +103,18 @@ abstract class JavaImage extends ImageGL implements JavaCanvas.Drawable {
     gfx.drawImage(img, new AffineTransform(scaleX, 0f, 0f, scaleY,
                                            dx-sx*scaleX, dy-sy*scaleY), null);
     gfx.setClip(oclip);
+  }
+
+  @Override
+  protected Pattern toSubPattern(AbstractImageGL image,
+                                 float x, float y, float width, float height) {
+    Asserts.checkState(isReady(), "Cannot generate a pattern from unready image.");
+    // we have to account for the scale factor when extracting our subimage
+    BufferedImage subImage = img.getSubimage(
+      scale.scaledFloor(x), scale.scaledFloor(y),
+      scale.scaledCeil(width), scale.scaledCeil(height));
+    Rectangle2D rect = new Rectangle2D.Float(0, 0, width, height);
+    return new JavaPattern(image, new TexturePaint(subImage, rect));
   }
 
   @Override

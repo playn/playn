@@ -93,4 +93,15 @@ public class SurfaceImageGL extends AbstractImageGL implements SurfaceImage {
         xform, dx, dy, dx + dw, dy + dh, sl, 1-st, sr, 1-sb);
     }
   }
+
+  @Override
+  protected Pattern toSubPattern(final AbstractImageGL image,
+                                 float x, float y, float width, float height) {
+    // TODO: this will cause freakoutery when used in a canvas
+    return new GLPattern() {
+      public AbstractImageGL image() {
+        return image;
+      }
+    };
+  }
 }

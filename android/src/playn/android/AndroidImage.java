@@ -19,8 +19,11 @@ import android.graphics.Bitmap;
 import android.graphics.Rect;
 import android.graphics.RectF;
 
+import pythagoras.f.MathUtil;
+
 import playn.core.Image;
 import playn.core.Pattern;
+import playn.core.gl.AbstractImageGL;
 import playn.core.gl.GLContext;
 import playn.core.gl.ImageGL;
 import playn.core.gl.Scale;
@@ -108,6 +111,14 @@ class AndroidImage extends ImageGL implements AndroidGLContext.Refreshable, Andr
 
     rect.set((int) sx, (int) sy, (int) (sx + sw), (int) (sy + sh));
     rectf.set(dx, dy, dx + dw, dy + dh);
+  }
+
+  @Override
+  protected Pattern toSubPattern(AbstractImageGL image,
+                                 float x, float y, float width, float height) {
+    int ix = MathUtil.ifloor(x), iy = MathUtil.ifloor(y);
+    int iw = MathUtil.iceil(width), ih = MathUtil.iceil(height);
+    return new AndroidPattern(image, Bitmap.createBitmap(bitmap(), ix, iy, iw, ih));
   }
 
   @Override

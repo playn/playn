@@ -25,6 +25,7 @@ import cli.System.Drawing.RectangleF;
 
 import playn.core.Image;
 import playn.core.Pattern;
+import playn.core.gl.AbstractImageGL;
 import playn.core.gl.GLContext;
 import playn.core.gl.ImageGL;
 import playn.core.gl.Scale;
@@ -136,6 +137,14 @@ public abstract class IOSAbstractImage extends ImageGL implements Image, IOSCanv
   public Image transform(BitmapTransformer xform) {
     UIImage ximage = new UIImage(((IOSBitmapTransformer) xform).transform(cgImage()));
     return new IOSImage(ctx, ximage.get_CGImage(), scale);
+  }
+
+  @Override
+  protected Pattern toSubPattern(AbstractImageGL image,
+                                 float x, float y, float width, float height) {
+    // this is a circuitous route, but I'm not savvy enough to find a more direct one
+    CGImage subImage = cgImage().WithImageInRect(new RectangleF(x, y, width, height));
+    return new IOSPattern(image, UIColor.FromPatternImage(new UIImage(subImage)).get_CGColor());
   }
 
   protected IOSAbstractImage(GLContext ctx, Scale scale) {

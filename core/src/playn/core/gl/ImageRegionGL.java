@@ -18,6 +18,7 @@ package playn.core.gl;
 import playn.core.Asserts;
 import playn.core.Image;
 import playn.core.InternalTransform;
+import playn.core.Pattern;
 import playn.core.Tint;
 import playn.core.util.Callback;
 
@@ -128,6 +129,17 @@ public class ImageRegionGL extends AbstractImageGL implements Image.Region {
   }
 
   @Override
+  public Pattern toPattern() {
+    return parent.toSubPattern(this, x, y, width, height);
+  }
+
+  @Override
+  public void getRgb(int startX, int startY, int width, int height, int[] rgbArray, int offset,
+                     int scanSize) {
+    parent.getRgb(startX + (int) x, startY + (int) y, width, height, rgbArray, offset, scanSize);
+  }
+
+  @Override
   public Image transform(BitmapTransformer xform) {
     throw new UnsupportedOperationException(
       "Cannot transform subimages. Transform the parent and then obtain a subimage of that.");
@@ -142,6 +154,12 @@ public class ImageRegionGL extends AbstractImageGL implements Image.Region {
     sy += y();
     parent.drawImpl(shader, xform, ensureTexture(), tint, dx, dy, dw, dh,
                     sx / texWidth, sy / texHeight, (sx + sw) / texWidth, (sy + sh) / texHeight);
+  }
+
+  @Override
+  protected Pattern toSubPattern(AbstractImageGL image,
+                                 float x, float y, float width, float height) {
+    throw new AssertionError(); // this should never be called
   }
 
   private int scaleTexture() {

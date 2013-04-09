@@ -31,19 +31,6 @@ class AndroidImageRegion extends ImageRegionGL implements AndroidCanvas.Drawable
   }
 
   @Override
-  public void getRgb(int startX, int startY, int width, int height, int[] rgbArray, int offset,
-                     int scanSize) {
-    bitmap().getPixels(rgbArray, offset, scanSize, startX + (int)x, startY + (int)y, width, height);
-  }
-
-  @Override
-  public Pattern toPattern() {
-    int ix = MathUtil.ifloor(x), iy = MathUtil.ifloor(y);
-    int iw = MathUtil.iceil(width), ih = MathUtil.iceil(height);
-    return new AndroidPattern(this, Bitmap.createBitmap(bitmap(), ix, iy, iw, ih));
-  }
-
-  @Override
   public Bitmap bitmap() {
     return ((AndroidImage) parent).bitmap();
   }

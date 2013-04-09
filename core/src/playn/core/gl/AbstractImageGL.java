@@ -131,6 +131,9 @@ public abstract class AbstractImageGL implements Image {
     throw new UnsupportedOperationException("Cannot transform " + getClass().getName());
   }
 
+  protected abstract Pattern toSubPattern(
+    AbstractImageGL image, float x, float y, float width, float height);
+
   protected AbstractImageGL(GLContext ctx) {
     this.ctx = ctx;
   }

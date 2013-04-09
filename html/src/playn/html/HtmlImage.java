@@ -28,6 +28,7 @@ import pythagoras.f.MathUtil;
 import playn.core.Asserts;
 import playn.core.Image;
 import playn.core.Pattern;
+import playn.core.gl.AbstractImageGL;
 import playn.core.gl.GLContext;
 import playn.core.gl.ImageGL;
 import playn.core.gl.Scale;
@@ -163,15 +164,18 @@ class HtmlImage extends ImageGL implements HtmlCanvas.Drawable {
   }
 
   @Override
-  protected void updateTexture(int tex) {
-    ((HtmlGLContext) ctx).updateTexture(tex, img);
-  }
-
-  ImageElement subImageElement(float x, float y, float width, float height) {
+  protected Pattern toSubPattern(AbstractImageGL image,
+                                 float x, float y, float width, float height) {
     CanvasElement canvas = Document.get().createElement("canvas").<CanvasElement>cast();
     canvas.setWidth(MathUtil.iceil(width));
     canvas.setHeight(MathUtil.iceil(height));
     canvas.getContext2d().drawImage(img, x, y, width, height, 0, 0, width, height);
-    return canvas.cast();
+    ImageElement subelem = canvas.cast();
+    return new HtmlPattern(image, subelem);
+  }
+
+  @Override
+  protected void updateTexture(int tex) {
+    ((HtmlGLContext) ctx).updateTexture(tex, img);
   }
 }

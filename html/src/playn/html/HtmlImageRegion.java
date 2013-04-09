@@ -27,11 +27,6 @@ class HtmlImageRegion extends ImageRegionGL implements HtmlCanvas.Drawable {
   }
 
   @Override
-  public Pattern toPattern() {
-    return new HtmlPattern(this, ((HtmlImage) parent).subImageElement(x, y, width, height));
-  }
-
-  @Override
   public void getRgb(int startX, int startY, int width, int height, int[] rgbArray, int offset,
                      int scanSize) {
     parent.getRgb(startX + (int) this.x, startY + (int) this.y, width, height, rgbArray, offset,
