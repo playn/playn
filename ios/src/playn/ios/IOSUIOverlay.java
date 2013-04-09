@@ -34,7 +34,10 @@ public class IOSUIOverlay extends UIView implements UIOverlay {
 
   @Override
   public void hideOverlay(IRectangle area) {
-    hidden = area == null ? null : new RectangleF(area.x(), area.y(), area.width(), area.height());
+    RectangleF updated =
+      area == null ? null : new RectangleF(area.x(), area.y(), area.width(), area.height());
+    if (updated != null && updated.equals(hidden)) return; // NOOP
+    hidden = updated;
     updateHidden();
   }
 
