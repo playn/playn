@@ -35,6 +35,10 @@ public class SurfaceGL extends AbstractSurfaceGL {
     scale(ctx.scale.factor, ctx.scale.factor);
   }
 
+  public void destroy() {
+    clearTexture();
+  }
+
   @Override
   public float width() {
     return width;
@@ -53,10 +57,6 @@ public class SurfaceGL extends AbstractSurfaceGL {
     // the origin at the top-left).
     ctx.quadShader(shader).prepareTexture(tex, curTint).addQuad(
       xform, 0, height, width, 0, 0, 0, 1, 1);
-  }
-
-  protected void destroy() {
-    clearTexture();
   }
 
   protected void createTexture() {

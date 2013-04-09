@@ -39,7 +39,7 @@ public class SurfaceImageGL extends AbstractImageGL<Object> implements SurfaceIm
 
   @Override
   public void destroy() {
-    surface.clearTexture();
+    surface.destroy();
   }
 
   @Override

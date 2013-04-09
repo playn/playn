@@ -44,7 +44,7 @@ public class AndroidSurfaceGL extends SurfaceGL
   }
 
   @Override
-  protected void destroy() {
+  public void destroy() {
     ((AndroidGLContext) ctx).removeRefreshable(this);
     super.destroy();
   }

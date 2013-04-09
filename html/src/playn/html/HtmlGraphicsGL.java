@@ -101,7 +101,7 @@ class HtmlGraphicsGL extends HtmlGraphics {
 
   @Override @Deprecated
   public SurfaceLayer createSurfaceLayer(float width, float height) {
-    return new SurfaceLayerGL(ctx, width, height);
+    return new SurfaceLayerGL(ctx, new SurfaceGL(ctx(), width, height));
   }
 
   @Override
