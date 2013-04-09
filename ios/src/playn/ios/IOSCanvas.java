@@ -149,7 +149,11 @@ public class IOSCanvas extends AbstractCanvasGL<CGBitmapContext> {
 
   @Override
   public Canvas drawPoint(float x, float y) {
-    return strokeRect(x, y, 1, 1);
+    save();
+    setStrokeWidth(0.5f);
+    strokeRect(x + 0.25f, y + 0.25f, 0.5f, 0.5f);
+    restore();
+    return this;
   }
 
   @Override
