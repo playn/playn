@@ -212,7 +212,8 @@ public class StubPlatform implements Platform {
     throw new UnsupportedOperationException();
   }
 
-  @Override public UIOverlay uiOverlay() {
+  @Override
+  public UIOverlay uiOverlay() {
     return new UIOverlayStub();
   }
 }

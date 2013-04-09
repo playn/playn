@@ -135,7 +135,7 @@ public class IOSGraphics extends GraphicsGL {
 
   IPoint transformTouch(float x, float y) {
     return ctx.rootTransform().inverseTransform(
-      touchTemp.set(x*touchScale,y*touchScale), touchTemp);
+      touchTemp.set(x*touchScale, y*touchScale), touchTemp);
   }
 
   void paint() {
