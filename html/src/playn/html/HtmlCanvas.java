@@ -294,8 +294,7 @@ class HtmlCanvas extends AbstractCanvasGL<Context2d> {
   }
 
   @Override
-  public Canvas transform(float m11, float m12, float m21, float m22, float dx,
-      float dy) {
+  public Canvas transform(float m11, float m12, float m21, float m22, float dx, float dy) {
     ctx.transform(m11, m12, m21, m22, dx, dy);
     return this;
   }

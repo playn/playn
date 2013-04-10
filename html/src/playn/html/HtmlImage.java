@@ -144,7 +144,7 @@ class HtmlImage extends ImageGL<Context2d> {
 
   @Override
   public void draw(Context2d ctx, float x, float y, float width, float height) {
-    draw(ctx, 0, 0, width(), height(), x, y, width, height);
+    ctx.drawImage(img, x, y, width, height);
   }
 
   @Override

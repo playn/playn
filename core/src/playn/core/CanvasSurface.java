@@ -62,7 +62,25 @@ public class CanvasSurface implements Surface {
 
   @Override
   public Surface drawLayer(Layer layer) {
-    throw new UnsupportedOperationException("TODO");
+    canvas.save();
+    InternalTransform at = (InternalTransform) layer.transform();
+    canvas.transform(at.m00(), at.m01(), at.m10(), at.m11(), at.tx(), at.ty());
+    canvas.translate(-layer.originX(), -layer.originY());
+    // TODO: clipping
+    if (layer instanceof GroupLayer) {
+      GroupLayer gl = (GroupLayer)layer;
+      for (int ii = 0, ll = gl.size(); ii < ll; ii++) {
+        drawLayer(gl.get(ii));
+      }
+    } else if (layer instanceof ImageLayer) {
+      ImageLayer il = (ImageLayer)layer;
+      canvas.drawImage(il.image(), 0, 0);
+    } else if (layer instanceof ImmediateLayer) {
+      ImmediateLayer il = (ImmediateLayer)layer;
+      il.renderer().render(this);
+    }
+    canvas.restore();
+    return this;
   }
 
   @Override
