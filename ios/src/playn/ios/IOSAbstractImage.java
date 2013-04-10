@@ -19,6 +19,7 @@ import cli.MonoTouch.CoreGraphics.CGBitmapContext;
 import cli.MonoTouch.CoreGraphics.CGColorSpace;
 import cli.MonoTouch.CoreGraphics.CGImage;
 import cli.MonoTouch.CoreGraphics.CGImageAlphaInfo;
+import cli.MonoTouch.CoreGraphics.CGInterpolationQuality;
 import cli.MonoTouch.UIKit.UIColor;
 import cli.MonoTouch.UIKit.UIImage;
 import cli.System.Drawing.RectangleF;
@@ -73,6 +74,9 @@ public abstract class IOSAbstractImage extends ImageGL<CGBitmapContext> implemen
     CGBitmapContext context = new CGBitmapContext(regionBytes, width, height, 8, bytesPerRow,
       // PremultipliedFirst for ARGB, same as BufferedImage in Java.
       CGColorSpace.CreateDeviceRGB(), CGImageAlphaInfo.wrap(CGImageAlphaInfo.PremultipliedFirst));
+    // since we're fishing for authentic RGB data, never allow interpolation or antialiasing.
+    context.SetAllowsAntialiasing(false);
+    context.set_InterpolationQuality(CGInterpolationQuality.wrap(CGInterpolationQuality.None));
     draw(context, 0, 0, width, height, startX, startY, width, height);
 
     int x = 0;
