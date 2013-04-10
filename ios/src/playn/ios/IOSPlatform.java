@@ -21,9 +21,7 @@ import java.io.PrintStream;
 import java.util.HashMap;
 import java.util.Map;
 
-import cli.MonoTouch.UIKit.UIEvent;
 import cli.System.DateTime;
-import cli.System.Drawing.PointF;
 import cli.System.Drawing.RectangleF;
 import cli.System.Threading.ThreadPool;
 import cli.System.Threading.WaitCallback;
@@ -34,7 +32,6 @@ import cli.MonoTouch.UIKit.UIApplication;
 import cli.MonoTouch.UIKit.UIDeviceOrientation;
 import cli.MonoTouch.UIKit.UIInterfaceOrientation;
 import cli.MonoTouch.UIKit.UIScreen;
-import cli.MonoTouch.UIKit.UIView;
 import cli.MonoTouch.UIKit.UIViewController;
 import cli.MonoTouch.UIKit.UIWindow;
 

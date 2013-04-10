@@ -20,7 +20,6 @@ import playn.core.InternalTransform;
 import playn.core.Pattern;
 import playn.core.Surface;
 import playn.core.SurfaceImage;
-import playn.core.Tint;
 import playn.core.util.Callback;
 
 public class SurfaceImageGL extends AbstractImageGL<Object> implements SurfaceImage {

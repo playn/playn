@@ -15,9 +15,6 @@
  */
 package playn.core.gl;
 
-import playn.core.Asserts;
-import playn.core.InternalTransform;
-import playn.core.Pattern;
 import playn.core.Tint;
 
 public abstract class ImageGL<GC> extends AbstractImageGL<GC> {

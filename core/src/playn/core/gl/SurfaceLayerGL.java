@@ -13,7 +13,6 @@
  */
 package playn.core.gl;
 
-import playn.core.Asserts;
 import playn.core.InternalTransform;
 import playn.core.Surface;
 import playn.core.SurfaceLayer;

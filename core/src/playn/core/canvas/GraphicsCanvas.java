@@ -22,7 +22,6 @@ import playn.core.Image;
 import playn.core.ImageLayer;
 import playn.core.ImmediateLayer;
 import playn.core.InternalTransform;
-import playn.core.Layer;
 import playn.core.SurfaceLayer;
 import playn.core.gl.Scale;
 
