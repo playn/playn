@@ -34,8 +34,6 @@ import cli.MonoTouch.UIKit.UIWindow;
 
 public class IOSGameView extends iPhoneOSGameView {
 
-  private static final float MAX_DELTA = 100;
-
   private final IOSPlatform platform;
   private boolean paused;
   private boolean createdCtx;

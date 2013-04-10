@@ -29,8 +29,6 @@ import playn.core.util.Callback;
 
 public class JavaNet extends NetImpl {
 
-  private static final int BUF_SIZE = 4096;
-
   public JavaNet(JavaPlatform platform) {
     super(platform);
   }

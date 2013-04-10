@@ -89,9 +89,6 @@ public class JavaPlatform extends AbstractPlatform {
     return instance;
   }
 
-  // If updateRate is 0, we will cap updateDelta at this value.
-  private static final float MAX_DELTA = 100;
-
   private static JavaPlatform testInstance;
 
   private static float getDefaultScaleFactor() {
@@ -298,9 +295,5 @@ public class JavaPlatform extends AbstractPlatform {
 
     // and finally stick a fork in the JVM
     System.exit(0);
-  }
-
-  private static long now () {
-    return System.nanoTime() / 1000000L;
   }
 }

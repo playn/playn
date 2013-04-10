@@ -161,7 +161,6 @@ public class IOSPlatform extends AbstractPlatform {
   private final IOSAnalytics analytics;
 
   private Game game;
-  private float accum, alpha;
 
   private final SupportedOrients orients;
   private final int frameInterval;

@@ -214,14 +214,12 @@ class BigClip
     InputStream is2 = is1;
 
     byte[] buf = new byte[1 << 16];
-    int totalRead = 0;
     int numRead = 0;
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
     numRead = is2.read(buf);
     while (numRead > -1) {
       baos.write(buf, 0, numRead);
       numRead = is2.read(buf, 0, buf.length);
-      totalRead += numRead;
     }
     is2.close();
     audioData = baos.toByteArray();
@@ -353,7 +351,6 @@ class BigClip
         boolean startOrMove = true;
         byte[] data = new byte[bufSize];
         int offset = framePosition * frameSize;
-        int totalBytes = offset;
         bytesRead = inputStream.read(new byte[offset], 0, offset);
         // PlayN.log().debug("bytesRead " + bytesRead);
         bytesRead = inputStream.read(data, 0, data.length);
@@ -365,7 +362,6 @@ class BigClip
         while (bytesRead != -1 && (loopCount == Clip.LOOP_CONTINUOUSLY || countDown > 0)
           && active) {
           // PlayN.log().debug("BigClip.start() loop " + framePosition);
-          totalBytes += bytesRead;
           int framesRead;
           byte[] tempData;
           if (format.getChannels() < 2) {
