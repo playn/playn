@@ -48,6 +48,7 @@ public class SurfaceDrawLayerTest extends Test {
         addTests(orange);
       }
       public void onFailure(Throwable cause) {
+        log().warn("Failed to load image", cause);
       }
     });
   }
