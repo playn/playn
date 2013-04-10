@@ -50,6 +50,7 @@ public class IOSGraphics extends GraphicsGL {
   private final float touchScale;
   private final Point touchTemp = new Point();
   private boolean invertSizes;
+  private boolean interpolateCanvasDrawing;
 
   // a scratch bitmap context used for measuring text
   private static final int S_SIZE = 10;
@@ -60,17 +61,18 @@ public class IOSGraphics extends GraphicsGL {
   final IOSGLContext ctx;
 
   public IOSGraphics(IOSPlatform platform, int screenWidth, int screenHeight,
-                     float viewScale, float touchScale) {
+                     float viewScale, float touchScale, boolean interpolateCanvasDrawing) {
     this.screenWidth = screenWidth;
     this.screenHeight = screenHeight;
     this.touchScale = touchScale;
+    this.interpolateCanvasDrawing = interpolateCanvasDrawing;
     ctx = new IOSGLContext(platform, new IOSGL20(), viewScale, screenWidth, screenHeight);
     rootLayer = new GroupLayerGL(ctx);
   }
 
   @Override
   public CanvasImage createImage(float width, float height) {
-    return new IOSCanvasImage(ctx, width, height);
+    return new IOSCanvasImage(ctx, width, height, interpolateCanvasDrawing);
   }
 
   @Override

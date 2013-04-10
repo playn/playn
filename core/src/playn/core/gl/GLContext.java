@@ -84,7 +84,7 @@ public abstract class GLContext {
    * Sets the view width to the specified width and height (in pixels). The framebuffer will
    * potentially be larger than this size if a HiDPI scale factor is in effect.
    */
-  public void setSize (int width, int height) {
+  public void setSize(int width, int height) {
     viewWidth = width;
     viewHeight = height;
     curFbufWidth = defaultFbufWidth = scale.scaledCeil(width);
@@ -98,7 +98,7 @@ public abstract class GLContext {
    * @param minFilter the scaling to use when rendering textures that are scaled down.
    * @param magFilter the scaling to use when rendering textures that are scaled up.
    */
-  public abstract void setTextureFilter (Filter minFilter, Filter magFilter);
+  public abstract void setTextureFilter(Filter minFilter, Filter magFilter);
 
   /** Returns the specified GL integer parameter. */
   public abstract int getInteger(int param);

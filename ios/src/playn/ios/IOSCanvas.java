@@ -46,7 +46,7 @@ public class IOSCanvas extends AbstractCanvasGL<CGBitmapContext> {
 
   private LinkedList<IOSCanvasState> states = new LinkedList<IOSCanvasState>();
 
-  public IOSCanvas(IOSGLContext ctx, float width, float height) {
+  public IOSCanvas(IOSGLContext ctx, float width, float height, boolean interpolate) {
     // if our size is invalid, we'll fail below at CGBitmapContext, so fail here more usefully
     if (width <= 0 || height <= 0) throw new IllegalArgumentException(
       "Invalid size " + width + "x" + height);
@@ -63,6 +63,10 @@ public class IOSCanvas extends AbstractCanvasGL<CGBitmapContext> {
     bctx = new CGBitmapContext(
       data, texWidth, texHeight, 8, 4 * texWidth, IOSGraphics.colorSpace,
       CGImageAlphaInfo.wrap(CGImageAlphaInfo.PremultipliedLast));
+    if (!interpolate) {
+      bctx.SetAllowsAntialiasing(false);
+      bctx.set_InterpolationQuality(CGInterpolationQuality.wrap(CGInterpolationQuality.None));
+    }
 
     // CG coordinate system is OpenGL-style (0,0 in lower left); so we flip it
     bctx.TranslateCTM(0, ctx.scale.scaled(height));

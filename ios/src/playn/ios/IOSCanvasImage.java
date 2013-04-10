@@ -28,9 +28,9 @@ public class IOSCanvasImage extends IOSAbstractImage implements CanvasImage {
 
   private final IOSCanvas canvas;
 
-  public IOSCanvasImage(IOSGLContext ctx, float width, float height) {
+  public IOSCanvasImage(IOSGLContext ctx, float width, float height, boolean interpolate) {
     super(ctx, ctx.scale);
-    canvas = new IOSCanvas(ctx, width, height);
+    canvas = new IOSCanvas(ctx, width, height, interpolate);
   }
 
   @Override

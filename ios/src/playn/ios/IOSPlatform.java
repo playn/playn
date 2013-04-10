@@ -114,6 +114,13 @@ public class IOSPlatform extends AbstractPlatform {
      * FPS. As the iOS docs say: a game that runs at a consistent but slow frame rate is better
      * than a game that runs at an erratic frame rate. */
     public int frameInterval = 1;
+
+    /** If true, calls to CanvasImage.draw() on a retina device using a non-retina image as the
+     * source will use the default interpolation defined for CGBitmapContext. This will potentially
+     * make scaled non-retina images look better, but has performance and pixel accuracy
+     * implications.
+     */
+    public boolean interpolateCanvasDrawing = true;
   }
 
   /**
@@ -205,7 +212,8 @@ public class IOSPlatform extends AbstractPlatform {
     }
 
     audio = new IOSAudio(this);
-    graphics = new IOSGraphics(this, screenWidth, screenHeight, viewScale, deviceScale);
+    graphics = new IOSGraphics(this, screenWidth, screenHeight, viewScale, deviceScale,
+      config.interpolateCanvasDrawing);
     json = new JsonImpl();
     keyboard = new IOSKeyboard();
     net = new IOSNet(this);
