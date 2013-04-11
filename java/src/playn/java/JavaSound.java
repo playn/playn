@@ -51,8 +51,10 @@ class JavaSound extends AbstractSound<Clip> {
 
   @Override
   protected void setVolumeImpl(float volume) {
-    FloatControl volctrl = (FloatControl) impl.getControl(FloatControl.Type.MASTER_GAIN);
-    volctrl.setValue(toGain(volume, volctrl.getMinimum(), volctrl.getMaximum()));
+    if (impl.isControlSupported(FloatControl.Type.MASTER_GAIN)) {
+      FloatControl volctrl = (FloatControl) impl.getControl(FloatControl.Type.MASTER_GAIN);
+      volctrl.setValue(toGain(volume, volctrl.getMinimum(), volctrl.getMaximum()));
+    }
   }
 
   @Override
