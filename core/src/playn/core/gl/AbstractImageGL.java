@@ -126,6 +126,12 @@ public abstract class AbstractImageGL<GC> implements Image {
   public Pattern toPattern() {
     // TODO: this will cause freakoutery when used in a canvas
     return new GLPattern() {
+      public boolean repeatX() {
+        return repeatX;
+      }
+      public boolean repeatY() {
+        return repeatY;
+      }
       public AbstractImageGL<?> image() {
         return AbstractImageGL.this;
       }
@@ -143,8 +149,9 @@ public abstract class AbstractImageGL<GC> implements Image {
     throw new UnsupportedOperationException("Cannot transform " + getClass().getName());
   }
 
-  protected abstract Pattern toSubPattern(
-    AbstractImageGL<GC> image, float x, float y, float width, float height);
+  protected abstract Pattern toSubPattern(AbstractImageGL<?> image,
+                                          boolean repeatX, boolean repeatY,
+                                          float x, float y, float width, float height);
 
   protected AbstractImageGL(GLContext ctx) {
     this.ctx = ctx;

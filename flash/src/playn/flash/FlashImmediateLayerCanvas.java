@@ -19,9 +19,9 @@ import flash.display.Sprite;
 
 import pythagoras.f.MathUtil;
 
-import playn.core.CanvasSurface;
 import playn.core.ImmediateLayer;
 import playn.core.InternalTransform;
+import playn.core.canvas.CanvasSurface;
 
 import static playn.core.PlayN.graphics;
 

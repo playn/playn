@@ -24,7 +24,7 @@ import playn.core.SurfaceImage;
 import playn.core.SurfaceLayer;
 
 /**
- * Handles the common implementation of {@link Graphics} for GL backends.
+ * Handles the common implementation of {@link Graphics} for GL-based backends.
  */
 public abstract class GraphicsGL implements Graphics {
 

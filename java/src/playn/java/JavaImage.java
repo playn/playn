@@ -60,7 +60,7 @@ abstract class JavaImage extends ImageGL<Graphics2D> {
   public Pattern toPattern() {
     Asserts.checkState(isReady(), "Cannot generate a pattern from unready image.");
     Rectangle2D rect = new Rectangle2D.Float(0, 0, width(), height());
-    return new JavaPattern(this, new TexturePaint(img, rect));
+    return new JavaPattern(this, repeatX, repeatY, new TexturePaint(img, rect));
   }
 
   @Override
@@ -101,7 +101,7 @@ abstract class JavaImage extends ImageGL<Graphics2D> {
   }
 
   @Override
-  protected Pattern toSubPattern(AbstractImageGL image,
+  protected Pattern toSubPattern(AbstractImageGL<?> image, boolean repeatX, boolean repeatY,
                                  float x, float y, float width, float height) {
     Asserts.checkState(isReady(), "Cannot generate a pattern from unready image.");
     // we have to account for the scale factor when extracting our subimage
@@ -109,7 +109,7 @@ abstract class JavaImage extends ImageGL<Graphics2D> {
       scale.scaledFloor(x), scale.scaledFloor(y),
       scale.scaledCeil(width), scale.scaledCeil(height));
     Rectangle2D rect = new Rectangle2D.Float(0, 0, width, height);
-    return new JavaPattern(image, new TexturePaint(subImage, rect));
+    return new JavaPattern(image, repeatX, repeatY, new TexturePaint(subImage, rect));
   }
 
   @Override

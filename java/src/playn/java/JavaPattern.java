@@ -22,16 +22,29 @@ import playn.core.gl.GLPattern;
 
 class JavaPattern implements GLPattern {
 
-  private final AbstractImageGL image;
+  private final AbstractImageGL<?> image;
+  private final boolean repeatX, repeatY;
   final TexturePaint paint;
 
-  JavaPattern(AbstractImageGL image, TexturePaint paint) {
+  JavaPattern(AbstractImageGL<?> image, boolean repeatX, boolean repeatY, TexturePaint paint) {
     this.image = image;
+    this.repeatX = repeatX;
+    this.repeatY = repeatY;
     this.paint = paint;
   }
 
   @Override
-  public AbstractImageGL image() {
+  public boolean repeatX() {
+    return repeatX;
+  }
+
+  @Override
+  public boolean repeatY() {
+    return repeatY;
+  }
+
+  @Override
+  public AbstractImageGL<?> image() {
     return image;
   }
 }

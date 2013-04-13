@@ -117,7 +117,7 @@ class FlashImage implements Image {
 
   @Override
   public Pattern toPattern() {
-    return new FlashPattern(this);
+    return new FlashPattern(this, repeatX, repeatY);
   }
 
   @Override

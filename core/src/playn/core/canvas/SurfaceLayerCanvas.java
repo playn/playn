@@ -1,5 +1,5 @@
 /**
- * Copyright 2010 The PlayN Authors
+ * Copyright 2013 The PlayN Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
@@ -13,30 +13,24 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package playn.html;
-
-import com.google.gwt.canvas.dom.client.Context2d;
+package playn.core.canvas;
 
 import playn.core.Asserts;
-import playn.core.CanvasSurface;
+import playn.core.Canvas;
+import playn.core.CanvasImage;
+import playn.core.InternalTransform;
 import playn.core.Surface;
 import playn.core.SurfaceLayer;
-import playn.core.gl.Scale;
 
-class HtmlSurfaceLayerCanvas extends HtmlLayerCanvas implements SurfaceLayer {
+public class SurfaceLayerCanvas extends LayerCanvas implements SurfaceLayer {
 
-  private HtmlCanvas canvas;
+  private CanvasImage image;
   private CanvasSurface surface;
 
-  HtmlSurfaceLayerCanvas(Scale scale, float width, float height) {
-    surface = new CanvasSurface(HtmlCanvas.create(scale, width, height));
-  }
-
-  @Override
-  public void destroy() {
-    super.destroy();
-    canvas = null;
-    surface = null;
+  public SurfaceLayerCanvas(InternalTransform xform, CanvasImage image) {
+    super(xform);
+    this.image = image;
+    this.surface = new CanvasSurface(image.canvas());
   }
 
   @Override
@@ -67,13 +61,20 @@ class HtmlSurfaceLayerCanvas extends HtmlLayerCanvas implements SurfaceLayer {
   }
 
   @Override
-  void paint(Context2d ctx, float parentAlpha) {
+  public void destroy() {
+    super.destroy();
+    image = null;
+    surface = null;
+  }
+
+  @Override
+  public void paint(Canvas canvas, float parentAlpha) {
     if (!visible()) return;
 
-    ctx.save();
-    transform(ctx);
-    ctx.setGlobalAlpha(parentAlpha * alpha());
-    ctx.drawImage(canvas.canvas(), 0, 0);
-    ctx.restore();
+    canvas.save();
+    transform(canvas);
+    canvas.setAlpha(parentAlpha * alpha());
+    canvas.drawImage(image, 0, 0);
+    canvas.restore();
   }
 }

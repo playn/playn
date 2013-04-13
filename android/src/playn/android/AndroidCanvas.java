@@ -81,6 +81,12 @@ class AndroidCanvas extends AbstractCanvasGL<AndroidCanvas> {
   }
 
   @Override
+  public Canvas clipRect(float x, float y, float width, float height) {
+    canvas.clipRect(x, y, x + width, y + height);
+    return this;
+  }
+
+  @Override
   public Path createPath() {
     return new AndroidPath();
   }

@@ -164,6 +164,11 @@ public interface Canvas {
   Canvas clip(Path clipPath);
 
   /**
+   * Intersects the current clip with the supplied rectangle.
+   */
+  Canvas clipRect(float x, float y, float width, float height);
+
+  /**
    * Creates a path object.
    */
   Path createPath();

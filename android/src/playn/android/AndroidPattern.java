@@ -25,20 +25,33 @@ import playn.core.gl.GLPattern;
 
 class AndroidPattern implements Pattern, GLPattern {
 
-  private final AbstractImageGL image;
+  private final AbstractImageGL<?> image;
+  private final boolean repeatX, repeatY;
   final BitmapShader shader;
 
-  AndroidPattern(AndroidImage image) {
-    this(image, image.bitmap());
+  AndroidPattern(AndroidImage image, boolean repeatX, boolean repeatY) {
+    this(image, repeatX, repeatY, image.bitmap());
   }
 
-  AndroidPattern(AbstractImageGL image, Bitmap bitmap) {
+  AndroidPattern(AbstractImageGL<?> image, boolean repeatX, boolean repeatY, Bitmap bitmap) {
     this.image = image;
+    this.repeatX = repeatX;
+    this.repeatY = repeatY;
     this.shader = new BitmapShader(bitmap, Shader.TileMode.REPEAT, Shader.TileMode.REPEAT);
   }
 
   @Override
-  public AbstractImageGL image() {
+  public boolean repeatX() {
+    return repeatX;
+  }
+
+  @Override
+  public boolean repeatY() {
+    return repeatY;
+  }
+
+  @Override
+  public AbstractImageGL<?> image() {
     return image;
   }
 }

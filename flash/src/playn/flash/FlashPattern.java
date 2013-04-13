@@ -23,6 +23,20 @@ import playn.core.Pattern;
  */
 public class FlashPattern implements Pattern {
 
-  public FlashPattern(Image img) {
+  private final boolean repeatX, repeatY;
+
+  public FlashPattern(Image img, boolean repeatX, boolean repeatY) {
+    this.repeatX = repeatX;
+    this.repeatY = repeatY;
+  }
+
+  @Override
+  public boolean repeatX() {
+    return repeatX;
+  }
+
+  @Override
+  public boolean repeatY() {
+    return repeatY;
   }
 }

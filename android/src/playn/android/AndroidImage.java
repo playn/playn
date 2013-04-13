@@ -80,7 +80,7 @@ class AndroidImage extends ImageGL<AndroidCanvas> implements AndroidGLContext.Re
 
   @Override
   public Pattern toPattern() {
-    return new AndroidPattern(this);
+    return new AndroidPattern(this, repeatX, repeatY);
   }
 
   @Override
@@ -111,11 +111,11 @@ class AndroidImage extends ImageGL<AndroidCanvas> implements AndroidGLContext.Re
   }
 
   @Override
-  protected Pattern toSubPattern(AbstractImageGL image,
+  protected Pattern toSubPattern(AbstractImageGL<?> image, boolean repeatX, boolean repeatY,
                                  float x, float y, float width, float height) {
     int ix = MathUtil.ifloor(x), iy = MathUtil.ifloor(y);
     int iw = MathUtil.iceil(width), ih = MathUtil.iceil(height);
-    return new AndroidPattern(image, Bitmap.createBitmap(bitmap, ix, iy, iw, ih));
+    return new AndroidPattern(image, repeatX, repeatY, Bitmap.createBitmap(bitmap, ix, iy, iw, ih));
   }
 
   @Override

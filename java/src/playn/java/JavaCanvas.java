@@ -84,8 +84,16 @@ class JavaCanvas extends AbstractCanvasGL<Graphics2D> {
     return this;
   }
 
-  void clip(JavaCanvasState.Clipper clipper) {
-    currentState().clipper = clipper;
+  @Override
+  public Canvas clipRect(float x, float y, float width, final float height) {
+    final int cx = MathUtil.ifloor(x), cy = MathUtil.ifloor(y);
+    final int cwidth = MathUtil.iceil(width), cheight = MathUtil.iceil(height);
+    currentState().clipper = new JavaCanvasState.Clipper() {
+      public void setClip(Graphics2D gfx) {
+        gfx.clipRect(cx, cy, cwidth, cheight);
+      }
+    };
+    return this;
   }
 
   @Override

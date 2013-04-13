@@ -97,7 +97,7 @@ class HtmlImage extends ImageGL<Context2d> {
   @Override
   public Pattern toPattern() {
     Asserts.checkState(isReady(), "Cannot toPattern() a non-ready image");
-    return new HtmlPattern(this);
+    return new HtmlPattern(this, repeatX, repeatY);
   }
 
   @Override
@@ -159,14 +159,14 @@ class HtmlImage extends ImageGL<Context2d> {
   }
 
   @Override
-  protected Pattern toSubPattern(AbstractImageGL image,
+  protected Pattern toSubPattern(AbstractImageGL<?> image, boolean repeatX, boolean repeatY,
                                  float x, float y, float width, float height) {
     CanvasElement canvas = Document.get().createElement("canvas").<CanvasElement>cast();
     canvas.setWidth(MathUtil.iceil(width));
     canvas.setHeight(MathUtil.iceil(height));
     canvas.getContext2d().drawImage(img, x, y, width, height, 0, 0, width, height);
     ImageElement subelem = canvas.cast();
-    return new HtmlPattern(image, subelem);
+    return new HtmlPattern(image, subelem, repeatX, repeatY);
   }
 
   @Override

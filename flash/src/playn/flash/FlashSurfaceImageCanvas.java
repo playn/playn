@@ -15,9 +15,9 @@
  */
 package playn.flash;
 
-import playn.core.CanvasSurface;
 import playn.core.Surface;
 import playn.core.SurfaceImage;
+import playn.core.canvas.CanvasSurface;
 import playn.core.gl.GLContext;
 
 public class FlashSurfaceImageCanvas extends FlashCanvasImage implements SurfaceImage {

@@ -24,23 +24,23 @@ import playn.core.gl.GLPattern;
 
 class HtmlPattern implements GLPattern {
 
-  private final AbstractImageGL image;
+  private final AbstractImageGL<?> image;
   private final ImageElement patimg;
+  private final boolean repeatX, repeatY;
 
-  HtmlPattern(HtmlImage image) {
-    this(image, image.img);
+  HtmlPattern(HtmlImage image, boolean repeatX, boolean repeatY) {
+    this(image, image.img, repeatX, repeatY);
   }
 
-  HtmlPattern(AbstractImageGL image, ImageElement patimg) {
+  HtmlPattern(AbstractImageGL<?> image, ImageElement patimg,
+              boolean repeatX, boolean repeatY) {
     this.image = image;
     this.patimg = patimg;
+    this.repeatX = repeatX;
+    this.repeatY = repeatY;
   }
 
   public CanvasPattern pattern(Context2d ctx) {
-    return pattern(ctx, true, true);
-  }
-
-  public CanvasPattern pattern(Context2d ctx, boolean repeatX, boolean repeatY) {
     Context2d.Repetition repeat;
     if (repeatX) {
       if (repeatY) {
@@ -57,7 +57,17 @@ class HtmlPattern implements GLPattern {
   }
 
   @Override
-  public AbstractImageGL image() {
+  public boolean repeatX() {
+    return repeatX;
+  }
+
+  @Override
+  public boolean repeatY() {
+    return repeatY;
+  }
+
+  @Override
+  public AbstractImageGL<?> image() {
     return image;
   }
 }

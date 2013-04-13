@@ -13,8 +13,14 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package playn.core;
+package playn.core.canvas;
 
+import playn.core.Canvas;
+import playn.core.Image;
+import playn.core.Layer;
+import playn.core.Path;
+import playn.core.Pattern;
+import playn.core.Surface;
 import playn.core.gl.GLShader;
 
 /**
@@ -23,7 +29,8 @@ import playn.core.gl.GLShader;
  */
 public class CanvasSurface implements Surface {
 
-  private final Canvas canvas;
+  // usually not modified, but ImmediateLayer does some tweaking
+  Canvas canvas;
 
   public CanvasSurface(Canvas canvas) {
     this.canvas = canvas;
@@ -62,24 +69,7 @@ public class CanvasSurface implements Surface {
 
   @Override
   public Surface drawLayer(Layer layer) {
-    canvas.save();
-    InternalTransform at = (InternalTransform) layer.transform();
-    canvas.transform(at.m00(), at.m01(), at.m10(), at.m11(), at.tx(), at.ty());
-    canvas.translate(-layer.originX(), -layer.originY());
-    // TODO: clipping
-    if (layer instanceof GroupLayer) {
-      GroupLayer gl = (GroupLayer)layer;
-      for (int ii = 0, ll = gl.size(); ii < ll; ii++) {
-        drawLayer(gl.get(ii));
-      }
-    } else if (layer instanceof ImageLayer) {
-      ImageLayer il = (ImageLayer)layer;
-      canvas.drawImage(il.image(), 0, 0);
-    } else if (layer instanceof ImmediateLayer) {
-      ImmediateLayer il = (ImmediateLayer)layer;
-      il.renderer().render(this);
-    }
-    canvas.restore();
+    ((LayerCanvas) layer).paint(canvas, 1);
     return this;
   }
 

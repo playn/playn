@@ -130,7 +130,7 @@ public class ImageRegionGL<GC> extends AbstractImageGL<GC> implements Image.Regi
 
   @Override
   public Pattern toPattern() {
-    return parent.toSubPattern(this, x, y, width, height);
+    return parent.toSubPattern(this, repeatX, repeatY, x, y, width, height);
   }
 
   @Override
@@ -168,7 +168,7 @@ public class ImageRegionGL<GC> extends AbstractImageGL<GC> implements Image.Regi
   }
 
   @Override
-  protected Pattern toSubPattern(AbstractImageGL<GC> image,
+  protected Pattern toSubPattern(AbstractImageGL<?> image, boolean repeatX, boolean repeatY,
                                  float x, float y, float width, float height) {
     throw new AssertionError(); // this should never be called
   }

@@ -23,15 +23,29 @@ import playn.core.gl.GLPattern;
 public class IOSPattern implements GLPattern {
 
   CGColor colorWithPattern;
-  private AbstractImageGL image;
+  private final AbstractImageGL<?> image;
+  private final boolean repeatX, repeatY;
 
-  public IOSPattern(AbstractImageGL image, CGColor colorWithPattern) {
+  public IOSPattern(AbstractImageGL<?> image, CGColor colorWithPattern,
+                    boolean repeatX, boolean repeatY) {
     this.image = image;
     this.colorWithPattern = colorWithPattern;
+    this.repeatX = repeatX;
+    this.repeatY = repeatY;
   }
 
   @Override
-  public AbstractImageGL image() {
+  public boolean repeatX() {
+    return repeatX;
+  }
+
+  @Override
+  public boolean repeatY() {
+    return repeatY;
+  }
+
+  @Override
+  public AbstractImageGL<?> image() {
     return image;
   }
 }

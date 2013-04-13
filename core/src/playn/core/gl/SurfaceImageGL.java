@@ -107,10 +107,17 @@ public class SurfaceImageGL extends AbstractImageGL<Object> implements SurfaceIm
   }
 
   @Override
-  protected Pattern toSubPattern(final AbstractImageGL<Object> image,
+  protected Pattern toSubPattern(final AbstractImageGL<?> image,
+                                 final boolean repeatX, final boolean repeatY,
                                  float x, float y, float width, float height) {
     // TODO: this will cause freakoutery when used in a canvas
     return new GLPattern() {
+      public boolean repeatX() {
+        return repeatX;
+      }
+      public boolean repeatY() {
+        return repeatY;
+      }
       public AbstractImageGL<?> image() {
         return image;
       }

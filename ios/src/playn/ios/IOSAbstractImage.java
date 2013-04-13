@@ -63,7 +63,8 @@ public abstract class IOSAbstractImage extends ImageGL<CGBitmapContext> implemen
   @Override
   public Pattern toPattern() {
     // this is a circuitous route, but I'm not savvy enough to find a more direct one
-    return new IOSPattern(this, UIColor.FromPatternImage(new UIImage(cgImage())).get_CGColor());
+    return new IOSPattern(this, UIColor.FromPatternImage(new UIImage(cgImage())).get_CGColor(),
+                          repeatX, repeatY);
   }
 
   @Override
@@ -139,11 +140,12 @@ public abstract class IOSAbstractImage extends ImageGL<CGBitmapContext> implemen
   }
 
   @Override
-  protected Pattern toSubPattern(AbstractImageGL image,
+  protected Pattern toSubPattern(AbstractImageGL<?> image, boolean repeatX, boolean repeatY,
                                  float x, float y, float width, float height) {
     // this is a circuitous route, but I'm not savvy enough to find a more direct one
     CGImage subImage = cgImage().WithImageInRect(new RectangleF(x, y, width, height));
-    return new IOSPattern(image, UIColor.FromPatternImage(new UIImage(subImage)).get_CGColor());
+    return new IOSPattern(image, UIColor.FromPatternImage(new UIImage(subImage)).get_CGColor(),
+                          repeatX, repeatY);
   }
 
   protected IOSAbstractImage(GLContext ctx, Scale scale) {

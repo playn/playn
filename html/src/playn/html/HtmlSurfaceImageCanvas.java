@@ -15,9 +15,9 @@
  */
 package playn.html;
 
-import playn.core.CanvasSurface;
 import playn.core.Surface;
 import playn.core.SurfaceImage;
+import playn.core.canvas.CanvasSurface;
 import playn.core.gl.GLContext;
 import playn.core.gl.Scale;
 

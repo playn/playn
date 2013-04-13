@@ -22,91 +22,106 @@ import playn.core.GroupLayer;
 import playn.core.Image;
 import playn.core.ImageLayer;
 import playn.core.ImmediateLayer;
+import playn.core.InternalTransform;
+import playn.core.StockInternalTransform;
 import playn.core.SurfaceImage;
 import playn.core.SurfaceLayer;
+import playn.core.canvas.GroupLayerCanvas;
+import playn.core.canvas.ImageLayerCanvas;
+import playn.core.canvas.ImmediateLayerCanvas;
+import playn.core.canvas.SurfaceLayerCanvas;
 import playn.core.gl.Scale;
 
 class HtmlGraphicsCanvas extends HtmlGraphics {
 
   private final Scale scale;
-  private final HtmlGroupLayerCanvas rootLayer;
-  private final CanvasElement canvas;
+  private final GroupLayerCanvas rootLayer;
+  private final CanvasElement elem;
   private final Context2d ctx;
+  private final AbstractHtmlCanvas canvas;
 
   public HtmlGraphicsCanvas(HtmlPlatform.Config config) {
     super(config);
     scale = new Scale(config.scaleFactor);
-    rootLayer = new HtmlGroupLayerCanvas();
-    canvas = Document.get().createCanvasElement();
-    canvas.setWidth(rootElement.getOffsetWidth());
-    canvas.setHeight(rootElement.getOffsetHeight());
-    rootElement.appendChild(canvas);
-    ctx = canvas.getContext2d();
+    rootLayer = new GroupLayerCanvas(createXform());
+    elem = Document.get().createCanvasElement();
+    elem.setWidth(rootElement.getOffsetWidth());
+    elem.setHeight(rootElement.getOffsetHeight());
+    rootElement.appendChild(elem);
+    ctx = elem.getContext2d();
     ctx.scale(config.scaleFactor, config.scaleFactor);
+    canvas = new AbstractHtmlCanvas(ctx) {
+      public float width() {
+        return HtmlGraphicsCanvas.this.width();
+      }
+      public float height() {
+        return HtmlGraphicsCanvas.this.height();
+      }
+    };
+  }
+
+  @Override
+  public int width() {
+    return (int)scale.invScaled(elem.getOffsetWidth());
+  }
+
+  @Override
+  public int height() {
+    return (int)scale.invScaled(elem.getOffsetHeight());
+  }
+
+  @Override
+  public GroupLayerCanvas rootLayer() {
+    return rootLayer;
   }
 
   @Override
   public void setSize(int width, int height) {
     int swidth = scale.scaledCeil(width), sheight = scale.scaledCeil(height);
     super.setSize(swidth, sheight);
-    canvas.setWidth(swidth);
-    canvas.setHeight(sheight);
+    elem.setWidth(swidth);
+    elem.setHeight(sheight);
   }
 
   @Override
   public GroupLayer createGroupLayer() {
-    return new HtmlGroupLayerCanvas();
+    return new GroupLayerCanvas(createXform());
   }
 
   @Override
   public GroupLayer.Clipped createGroupLayer(float width, float height) {
-    return new HtmlGroupLayerCanvas.Clipped(width, height);
+    return new GroupLayerCanvas.Clipped(createXform(), width, height);
   }
 
   @Override
   public ImageLayer createImageLayer() {
-    return new HtmlImageLayerCanvas();
+    return new ImageLayerCanvas(createXform());
   }
 
   @Override
   public ImageLayer createImageLayer(Image img) {
-    return new HtmlImageLayerCanvas(img);
+    return createImageLayer().setImage(img);
   }
 
   @Override @Deprecated
   public SurfaceLayer createSurfaceLayer(float width, float height) {
-    return new HtmlSurfaceLayerCanvas(scale, width, height);
+    return new SurfaceLayerCanvas(createXform(), createImage(width, height));
   }
 
   @Override
   public ImmediateLayer.Clipped createImmediateLayer(
       int width, int height, ImmediateLayer.Renderer renderer) {
-    return new HtmlImmediateLayerCanvas.Clipped(ctx, width, height, renderer);
+    return new ImmediateLayerCanvas.Clipped(createXform(), width, height, renderer);
   }
 
   @Override
   public ImmediateLayer createImmediateLayer(ImmediateLayer.Renderer renderer) {
-    return new HtmlImmediateLayerCanvas(ctx, renderer);
+    return new ImmediateLayerCanvas(createXform(), renderer);
   }
 
   @Override
   public SurfaceImage createSurface(float width, float height) {
     return new HtmlSurfaceImageCanvas(ctx(), scale, HtmlCanvas.create(scale, width, height));
-  }
-
-  @Override
-  public HtmlGroupLayerCanvas rootLayer() {
-    return rootLayer;
-  }
-
-  @Override
-  public int width() {
-    return (int)scale.invScaled(canvas.getOffsetWidth());
-  }
-
-  @Override
-  public int height() {
-    return (int)scale.invScaled(canvas.getOffsetHeight());
   }
 
   @Override
@@ -116,13 +131,18 @@ class HtmlGraphicsCanvas extends HtmlGraphics {
 
   @Override
   Element rootElement() {
-    return canvas;
+    return elem;
   }
 
   @Override
   void paint() {
-    ctx.clearRect(0, 0, width(), height());
-    rootLayer.paint(ctx, 1);
-    ctx.setGlobalAlpha(1);
+    canvas.clear();
+    rootLayer.paint(canvas, 1);
+    canvas.setAlpha(1);
+  }
+
+  protected InternalTransform createXform() {
+    return HtmlPlatform.hasTypedArraySupport ?
+      new HtmlInternalTransform() : new StockInternalTransform();
   }
 }

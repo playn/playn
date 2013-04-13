@@ -1,5 +1,5 @@
 /**
- * Copyright 2010 The PlayN Authors
+ * Copyright 2013 The PlayN Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
@@ -13,24 +13,25 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package playn.html;
-
-import com.google.gwt.canvas.dom.client.Context2d;
+package playn.core.canvas;
 
 import pythagoras.f.Point;
 
 import playn.core.Asserts;
+import playn.core.Canvas;
 import playn.core.GroupLayer;
 import playn.core.GroupLayerImpl;
+import playn.core.InternalTransform;
 import playn.core.Layer;
 import playn.core.ParentLayer;
 
-class HtmlGroupLayerCanvas extends HtmlLayerCanvas implements GroupLayer, ParentLayer {
+public class GroupLayerCanvas extends LayerCanvas implements GroupLayer, ParentLayer {
 
-  public static class Clipped extends HtmlGroupLayerCanvas implements GroupLayer.Clipped, HasSize {
+  public static class Clipped extends GroupLayerCanvas implements GroupLayer.Clipped, HasSize {
     private float width, height;
 
-    public Clipped (float width, float height) {
+    public Clipped(InternalTransform xform, float width, float height) {
+      super(xform);
       this.width = width;
       this.height = height;
     }
@@ -72,15 +73,17 @@ class HtmlGroupLayerCanvas extends HtmlLayerCanvas implements GroupLayer, Parent
     }
 
     @Override
-    protected void render(Context2d ctx, float alpha) {
-      ctx.beginPath();
-      ctx.rect(0, 0, width, height);
-      ctx.clip();
-      super.render(ctx, alpha);
+    protected void paintChildren(Canvas canvas, float alpha) {
+      canvas.clipRect(0, 0, width, height);
+      super.paintChildren(canvas, alpha);
     }
   }
 
-  private GroupLayerImpl<HtmlLayerCanvas> impl = new GroupLayerImpl<HtmlLayerCanvas>();
+  private GroupLayerImpl<LayerCanvas> impl = new GroupLayerImpl<LayerCanvas>();
+
+  public GroupLayerCanvas(InternalTransform xform) {
+    super(xform);
+  }
 
   @Override
   public Layer get(int index) {
@@ -89,8 +92,8 @@ class HtmlGroupLayerCanvas extends HtmlLayerCanvas implements GroupLayer, Parent
 
   @Override
   public void add(Layer layer) {
-    Asserts.checkArgument(layer instanceof HtmlLayerCanvas);
-    impl.add(this, (HtmlLayerCanvas) layer);
+    Asserts.checkArgument(layer instanceof LayerCanvas);
+    impl.add(this, (LayerCanvas) layer);
   }
 
   @Override
@@ -100,8 +103,8 @@ class HtmlGroupLayerCanvas extends HtmlLayerCanvas implements GroupLayer, Parent
 
   @Override
   public void remove(Layer layer) {
-    Asserts.checkArgument(layer instanceof HtmlLayerCanvas);
-    impl.remove(this, (HtmlLayerCanvas) layer);
+    Asserts.checkArgument(layer instanceof LayerCanvas);
+    impl.remove(this, (LayerCanvas) layer);
   }
 
   @Override
@@ -139,23 +142,23 @@ class HtmlGroupLayerCanvas extends HtmlLayerCanvas implements GroupLayer, Parent
 
   @Override
   public void depthChanged(Layer layer, float oldDepth) {
-    Asserts.checkArgument(layer instanceof HtmlLayerCanvas);
+    Asserts.checkArgument(layer instanceof LayerCanvas);
     impl.depthChanged(this, layer, oldDepth);
   }
 
   @Override
-  public void paint(Context2d ctx, float parentAlpha) {
+  public void paint(Canvas canvas, float parentAlpha) {
     if (!visible()) return;
 
-    ctx.save();
-    transform(ctx);
-    render(ctx, parentAlpha * alpha());
-    ctx.restore();
+    canvas.save();
+    transform(canvas);
+    paintChildren(canvas, parentAlpha * alpha());
+    canvas.restore();
   }
 
-  protected void render(Context2d ctx, float alpha) {
-    for (HtmlLayerCanvas child : impl.children) {
-      child.paint(ctx, alpha);
+  protected void paintChildren(Canvas canvas, float alpha) {
+    for (LayerCanvas child : impl.children) {
+      child.paint(canvas, alpha);
     }
   }
 }

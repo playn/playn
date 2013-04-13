@@ -292,6 +292,13 @@ class FlashCanvas implements Canvas {
 
   @Override
   public Canvas clip(Path path) {
+    // TODO!
+    return this;
+  }
+
+  @Override
+  public Canvas clipRect(float x, float y, float width, float height) {
+    // TODO!
     return this;
   }
 

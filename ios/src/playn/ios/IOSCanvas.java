@@ -137,6 +137,12 @@ public class IOSCanvas extends AbstractCanvasGL<CGBitmapContext> {
   }
 
   @Override
+  public Canvas clipRect(float x, float y, float width, float height) {
+    bctx.ClipToRect(new RectangleF(x, y, width, height));
+    return this;
+  }
+
+  @Override
   public Path createPath() {
     return new IOSPath();
   }
