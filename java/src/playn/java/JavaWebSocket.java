@@ -19,7 +19,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.ByteBuffer;
 
-import org.java_websocket.WebSocketClient;
+import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
 
 import playn.core.Net;
@@ -94,7 +94,7 @@ public class JavaWebSocket implements Net.WebSocket {
   @Override
   public void send(String data) {
     try {
-      socket.send(data);
+      socket.getConnection().send(data);
     } catch (Throwable e) {
       throw new RuntimeException(e);
     }
@@ -103,10 +103,7 @@ public class JavaWebSocket implements Net.WebSocket {
   @Override
   public void send(ByteBuffer data) {
     try {
-      // TODO(haustein) check for underlying array or send in chunks?
-      byte[] bytes = new byte[data.remaining()];
-      data.get(bytes);
-      socket.send(bytes);
+      socket.getConnection().send(data);
     } catch (Throwable e) {
       throw new RuntimeException(e);
     }

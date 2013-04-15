@@ -29,9 +29,9 @@
     </dependency>
 
     <dependency>
-      <groupId>org.java_websocket</groupId>
-      <artifactId>websocket</artifactId>
-      <version>20120606</version>
+      <groupId>org.java-websocket</groupId>
+      <artifactId>Java-WebSocket</artifactId>
+      <version>1.3.0</version>
     </dependency>
   </dependencies>
 
