@@ -30,10 +30,6 @@ public class HtmlWebSocket implements Net.WebSocket {
 
   private WebSocket ws;
 
-  native byte[] toByteArray(Uint8Array bytes) /*-{
-    return bytes;
-  }-*/;
-
   HtmlWebSocket(String url, final Listener listener) {
     ws = WebSocket.create(url);
     ws.setListener(new WebSocket.Listener() {
@@ -44,10 +40,11 @@ public class HtmlWebSocket implements Net.WebSocket {
 
       @Override
       public void onMessage(WebSocket socket, MessageEvent event) {
-        // TODO(jgw): Differentiate binary and text messages.
-        ArrayBuffer buf = event.getData();
-        ByteBuffer bb = TypedArrayHelper.wrap(buf);
-        listener.onDataMessage(bb);
+        if (event.dataIsText()) {
+          listener.onTextMessage(event.stringData());
+        } else {
+          listener.onDataMessage(TypedArrayHelper.wrap(event.bufferData()));
+        }
       }
 
       @Override
