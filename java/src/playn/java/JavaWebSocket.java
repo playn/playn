@@ -18,80 +18,18 @@ package playn.java;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.ByteBuffer;
-import java.util.LinkedList;
-import java.util.Queue;
 
 import org.java_websocket.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
 
 import playn.core.Net;
+import playn.core.Platform;
 
 public class JavaWebSocket implements Net.WebSocket {
 
-  private abstract class Event {
-    abstract boolean handle();
-  }
-
-  private class OpenEvent extends Event {
-    boolean handle() {
-      listener.onOpen();
-      return true;
-    }
-  }
-
-  private class CloseEvent extends Event {
-    boolean handle() {
-      listener.onClose();
-      return false;
-    }
-  }
-
-  private class DataMessageEvent extends Event {
-    ByteBuffer dataMessage;
-
-    DataMessageEvent(ByteBuffer buffer) {
-      dataMessage = buffer;
-    }
-
-    boolean handle() {
-      listener.onDataMessage(dataMessage);
-      return true;
-    }
-  }
-
-  private class TextMessageEvent extends Event {
-    final String textMessage;
-
-    TextMessageEvent(String message) {
-      textMessage = message;
-    }
-
-    boolean handle() {
-      listener.onTextMessage(textMessage);
-      return true;
-    }
-  }
-
-  private class ErrorEvent extends Event {
-    final String reason;
-
-    ErrorEvent(String reason) {
-      this.reason = reason;
-    }
-
-    boolean handle() {
-      listener.onError(reason);
-      return true;
-    }
-  }
-
   private final WebSocketClient socket;
-  private final Net.WebSocket.Listener listener;
-  private final Queue<Event> pendingEvents = new LinkedList<Event>();
 
-  JavaWebSocket(String uri, Listener listener) {
-    this.listener = listener;
-
+  public JavaWebSocket(final Platform platform, String uri, final Listener listener) {
     URI juri = null;
     try {
       juri = new URI(uri);
@@ -101,28 +39,48 @@ public class JavaWebSocket implements Net.WebSocket {
 
     socket = new WebSocketClient(juri) {
       @Override
-      public void onMessage(ByteBuffer buffer) {
-        addEvent(new DataMessageEvent(buffer));
+      public void onMessage(final ByteBuffer buffer) {
+        platform.invokeLater(new Runnable() {
+          public void run() {
+            listener.onDataMessage(buffer);
+          }
+        });
       }
 
       @Override
-      public void onMessage(String msg) {
-        addEvent(new TextMessageEvent(msg));
+      public void onMessage(final String msg) {
+        platform.invokeLater(new Runnable() {
+          public void run() {
+            listener.onTextMessage(msg);
+          }
+        });
       }
 
       @Override
-      public void onError(Exception e) {
-        addEvent(new ErrorEvent(e.getMessage()));
+      public void onError(final Exception e) {
+        platform.invokeLater(new Runnable() {
+          public void run() {
+            listener.onError(e.getMessage());
+          }
+        });
       }
 
       @Override
       public void onClose(int arg0, String arg1, boolean arg2) {
-        addEvent(new CloseEvent());
+        platform.invokeLater(new Runnable() {
+          public void run() {
+            listener.onClose();
+          }
+        });
       }
 
       @Override
       public void onOpen(ServerHandshake handshake) {
-        addEvent(new OpenEvent());
+        platform.invokeLater(new Runnable() {
+          public void run() {
+            listener.onOpen();
+          }
+        });
       }
     };
     socket.connect();
@@ -152,18 +110,5 @@ public class JavaWebSocket implements Net.WebSocket {
     } catch (Throwable e) {
       throw new RuntimeException(e);
     }
-  }
-
-  synchronized boolean update() {
-    Event e;
-    boolean ret = true;
-    while (null != (e = pendingEvents.poll())) {
-      ret = e.handle();
-    }
-    return ret;
-  }
-
-  private synchronized void addEvent(Event e) {
-    pendingEvents.add(e);
   }
 }

@@ -19,8 +19,6 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -32,7 +30,6 @@ import playn.core.util.Callback;
 public class JavaNet extends NetImpl {
 
   private static final int BUF_SIZE = 4096;
-  private List<JavaWebSocket> sockets = new ArrayList<JavaWebSocket>();
 
   public JavaNet(JavaPlatform platform) {
     super(platform);
@@ -40,9 +37,7 @@ public class JavaNet extends NetImpl {
 
   @Override
   public WebSocket createWebSocket(String url, WebSocket.Listener listener) {
-    JavaWebSocket socket = new JavaWebSocket(url, listener);
-    sockets.add(socket);
-    return socket;
+    return new JavaWebSocket(platform, url, listener);
   }
 
   @Override
@@ -95,15 +90,6 @@ public class JavaNet extends NetImpl {
         return "JavaNet." + req.method().toLowerCase() + "(" + req.url + ")";
       }
     });
-  }
-
-  void update() {
-    for (Iterator<JavaWebSocket> it = sockets.iterator(); it.hasNext(); ) {
-      JavaWebSocket s = it.next();
-      if (!s.update()) {
-        it.remove();
-      }
-    }
   }
 
   // Super-simple url-cleanup: assumes it either starts with "http", or that

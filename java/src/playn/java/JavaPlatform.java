@@ -263,7 +263,6 @@ public class JavaPlatform extends AbstractPlatform {
       mouse.update();
       keyboard.update();
       pointer.update();
-      net.update();
 
       // Notify the app if lose or regain focus (treat said as pause/resume).
       if (wasActive != Display.isActive()) {
