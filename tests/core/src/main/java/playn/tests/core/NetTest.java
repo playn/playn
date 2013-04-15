@@ -15,17 +15,20 @@
  */
 package playn.tests.core;
 
+import java.nio.ByteBuffer;
+
 import playn.core.ImageLayer;
 import playn.core.Keyboard;
 import playn.core.Net;
-import playn.core.util.Callback;
 import playn.core.Platform;
+import playn.core.util.Callback;
 import static playn.core.PlayN.*;
 
 public class NetTest extends Test {
 
   private ImageLayer output;
   private String lastPostURL;
+  private Net.WebSocket _websock;
 
   @Override
   public String getName() {
@@ -52,12 +55,9 @@ public class NetTest extends Test {
 
     x = addButton("Enter URL", new Runnable() {
       public void run () {
-        getText("Enter URL:", new Callback<String>() {
-          public void onSuccess (String url) {
-            if (url != null && url.length() > 0) loadURL(url);
-          }
-          public void onFailure (Throwable cause) {
-            displayText(cause.toString());
+        getText("Enter URL:", new TextCB() {
+          protected void gotText (String url) {
+            loadURL(url);
           }
         });
       }
@@ -65,9 +65,8 @@ public class NetTest extends Test {
 
     x = addButton("Post Test", new Runnable() {
       public void run () {
-        getText("Enter POST body:", new Callback<String>() {
-          public void onSuccess (String data) {
-            if (data == null || data.length() == 0) return;
+        getText("Enter POST body:", new TextCB() {
+          protected void gotText(String data) {
             Net.Builder b = net().req("http://www.posttestserver.com/post.php").setPayload(data);
             // don't add the header on HTML because it causes CORS freakoutery
             if (platformType() != Platform.Type.HTML) {
@@ -91,9 +90,6 @@ public class NetTest extends Test {
               }
             });
           }
-          public void onFailure (Throwable cause) {
-            displayText(cause.toString());
-          }
         });
       }
     }, x, 10);
@@ -104,9 +100,57 @@ public class NetTest extends Test {
         else net().req(lastPostURL).execute(displayer);
       }
     }, x, 10);
+
+    x = addButton("WS Connect", new Runnable() {
+      public void run () {
+        if (_websock != null) displayText("Already connected.");
+        _websock = net().createWebSocket("ws://echo.websocket.org", new Net.WebSocket.Listener() {
+          public void onOpen() {
+            displayText("WebSocket connected.");
+          }
+          public void onTextMessage(String msg) {
+            displayText("Got WebSocket message: " + msg);
+          }
+          public void onDataMessage(ByteBuffer msg) {
+            displayText("Got WebSocket data message: " + msg.limit());
+          }
+          public void onClose() {
+            displayText("WebSocket closed.");
+            _websock = null;
+          }
+          public void onError(String reason) {
+            displayText("Got WebSocket error: " + reason);
+            _websock = null;
+          }
+        });
+        displayText("WebSocket connection started.");
+      }
+    }, x, 10);
+
+    x = addButton("WS Send", new Runnable() {
+      public void run () {
+        if (_websock == null) displayText("WebSocket not open.");
+        else getText("Enter message:", new TextCB() {
+          protected void gotText(String msg) {
+            if (_websock == null) displayText("WebSocket disappeared.");
+            else {
+              _websock.send(msg);
+              displayText("WebSocket sent: " + msg);
+            }
+          }
+        });
+      }
+    }, x, 10);
+
+    x = addButton("WS Close", new Runnable() {
+      public void run () {
+        if (_websock == null) displayText("WebSocket not open.");
+        else _websock.close();
+      }
+    }, x, 10);
   }
 
-  protected void getText (String label, Callback<String> callback) {
+  protected void getText (String label, TextCB callback) {
     keyboard().getText(Keyboard.TextType.DEFAULT, label, "", callback);
   }
 
@@ -151,4 +195,14 @@ public class NetTest extends Test {
     displayText(cause.toString());
     }
   };
+
+  private abstract class TextCB implements Callback<String> {
+    public void onSuccess(String text) {
+      if (text != null && text.length() > 0) gotText(text);
+    }
+    public void onFailure (Throwable cause) {
+      displayText(cause.toString());
+    }
+    protected abstract void gotText(String text);
+  }
 }
