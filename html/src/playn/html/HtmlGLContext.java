@@ -24,11 +24,11 @@ import com.google.gwt.typedarrays.shared.Uint16Array;
 import com.google.gwt.typedarrays.shared.Uint8Array;
 import com.google.gwt.webgl.client.ArrayUtils;
 import com.google.gwt.webgl.client.WebGLRenderingContext;
-
 import static com.google.gwt.webgl.client.WebGLRenderingContext.*;
 
 import pythagoras.f.MathUtil;
 
+import playn.core.Image;
 import playn.core.InternalTransform;
 import playn.core.gl.GL20Context;
 import playn.core.gl.GLContext;
@@ -60,6 +60,20 @@ public class HtmlGLContext extends GL20Context {
   @Override
   public InternalTransform createTransform() {
     return new HtmlInternalTransform();
+  }
+
+  @Override
+  public void texImage2D(Image image, int target, int level, int internalformat, int format,
+                         int type) {
+    // we can do this more efficiently by passing the image element right to WebGL
+    glc.texImage2D(target, level, internalformat, format, type, ((HtmlImage) image).img);
+  }
+
+  @Override
+  public void texSubImage2D(Image image, int target, int level, int xOffset, int yOffset, int format,
+                            int type) {
+    // we can do this more efficiently by passing the image element right to WebGL
+    glc.texSubImage2D(target, level, xOffset, yOffset, format, type, ((HtmlImage) image).img);
   }
 
   private void tryBasicGLCalls() throws RuntimeException {

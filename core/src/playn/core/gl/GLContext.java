@@ -13,14 +13,19 @@
  */
 package playn.core.gl;
 
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
+import pythagoras.i.Rectangle;
+
 import playn.core.Asserts;
+import playn.core.Image;
 import playn.core.InternalTransform;
 import playn.core.Platform;
 import playn.core.StockInternalTransform;
-import pythagoras.i.Rectangle;
 
 public abstract class GLContext {
 
@@ -108,6 +113,32 @@ public abstract class GLContext {
 
   /** Returns the specified GL boolean parameter. */
   public abstract boolean getBoolean(int param);
+
+  /**
+   * See http://www.khronos.org/opengles/sdk/docs/man/xhtml/glTexImage2D.xml
+   *
+   * <p>The default implementation is based on {@link Image#getRgb} and will hand over an RGBA byte
+   * array. Please set the (internal)format and type parameters accordingly; they are mainly
+   * present for future support of different formats. The WebGL implementation will pass through
+   * all parameters.</p>
+   */
+  public void texImage2D(Image image, int target, int level, int internalformat, int format,
+                         int type) {
+    throw new UnsupportedOperationException();
+  }
+
+  /**
+   * See http://www.khronos.org/opengles/sdk/docs/man/xhtml/glTexSubImage2D.xml
+   *
+   * <p>The default implementation is based on {@link Image#getRgb} and will hand over a RGBA byte
+   * array. Please set the (internal)format and type parameters accordingly; they are mainly
+   * present for future support of different formats. The WebGL implementation will pass through
+   * all parameters.</p>
+   */
+  public void texSubImage2D(Image image, int target, int level, int xOffset, int yOffset, int format,
+                            int type) {
+    throw new UnsupportedOperationException();
+  }
 
   /**
    * Creates a shader program, for use by a single {@link GLShader}.
@@ -384,6 +415,23 @@ public abstract class GLContext {
       }
     }
     return new IndexedTrisShader(this);
+  }
+
+  // used by GLContext.tex(Sub)Image2D impls
+  protected static ByteBuffer getRgba(Image image) {
+    int w = (int) image.width(), h = (int) image.height(), size = w * h;
+    int[] rawPixels = new int[size];
+    ByteBuffer pixels = ByteBuffer.allocateDirect(size * 4);
+    pixels.order(ByteOrder.nativeOrder());
+    IntBuffer rgba = pixels.asIntBuffer();
+    image.getRgb(0, 0, w, h, rawPixels, 0, w);
+
+    for (int i = 0; i < size; i++) {
+      int argb = rawPixels[i];
+      // Order is inverted because this is read as a byte array, and we store intel ints.
+      rgba.put(i, ((argb >> 16) & 0x0ff) | (argb & 0x0ff00ff00) | ((argb & 0xff) << 16));
+    }
+    return pixels;
   }
 
   protected abstract GLShader quadShader();

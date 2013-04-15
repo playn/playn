@@ -19,6 +19,7 @@ import java.nio.ByteBuffer;
 
 import pythagoras.i.Rectangle;
 
+import playn.core.Image;
 import playn.core.InternalTransform;
 import playn.core.Platform;
 import playn.core.Tint;
@@ -97,6 +98,20 @@ public class GL20Context extends GLContext {
   @Override
   public boolean getBoolean(int param) {
     return gl.glGetBoolean(param);
+  }
+
+  @Override
+  public void texImage2D(Image image, int target, int level, int internalformat, int format,
+                         int type) {
+    gl.glTexImage2D(target, level, internalformat, (int) image.width(),  (int) image.height(), 0,
+                    format, type, getRgba(image));
+  }
+
+  @Override
+  public void texSubImage2D(Image image, int target, int level, int xOffset, int yOffset, int format,
+                            int type) {
+    gl.glTexSubImage2D(target, level, xOffset, yOffset, (int) image.width(),  (int) image.height(),
+                       format, type, getRgba(image));
   }
 
   @Override

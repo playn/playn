@@ -68,7 +68,7 @@ public final class HtmlGL20 implements playn.core.gl.GL20 {
   private int enabledArrays = 0;
   private int useNioBuffer = 0;
 
-  final WebGLRenderingContext gl;
+  private final WebGLRenderingContext gl;
   private VertexAttribArrayState[] vertexAttribArrayState =
     new VertexAttribArrayState[VERTEX_ATTRIB_ARRAY_COUNT];
 

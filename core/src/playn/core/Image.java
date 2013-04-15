@@ -15,7 +15,6 @@
  */
 package playn.core;
 
-import playn.core.gl.GL20;
 import playn.core.gl.Scale;
 import playn.core.util.Callback;
 
@@ -170,22 +169,4 @@ public interface Image {
    * before garbage collection has a chance to run and clear the textures for you.
    */
   void clearTexture();
-  
-  /**
-   * See http://www.khronos.org/opengles/sdk/docs/man/xhtml/glTexImage2D.xml
-   * The default implementation is based on getRgb and will hand over a RGBA byte 
-   * array -- please set the (internal)format and type parameters accordingly -- they are mainly present 
-   * for future support of different formats. The WebGL implementation will pass through
-   * all parameters.
-   */
-  void glTexImage2D(GL20 gl, int target, int level, int internalformat, int format, int type);
-  
-  /**
-   * See http://www.khronos.org/opengles/sdk/docs/man/xhtml/glTexSubImage2D.xml
-   * The default implementation is based on getRgb and will hand over a RGBA byte 
-   * array -- please set the (internal)format and type parameters accordingly -- they are mainly present 
-   * for future support of different formats. The WebGL implementation will pass through
-   * all parameters.
-   */
-  void glTexSubImage2D(GL20 gl, int target, int level, int xOffset, int yOffset, int format, int type);
 }
