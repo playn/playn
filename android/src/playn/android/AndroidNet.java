@@ -45,6 +45,11 @@ class AndroidNet extends NetImpl {
   }
 
   @Override
+  public WebSocket createWebSocket(String url, WebSocket.Listener listener) {
+    return new AndroidWebSocket(platform, url, listener);
+  }
+
+  @Override
   protected void execute(final BuilderImpl req, final Callback<Response> callback) {
     platform.invokeAsync(new Runnable() {
       @Override
