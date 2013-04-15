@@ -9,7 +9,12 @@ import playn.core.Game;
 import playn.core.Image;
 import playn.core.ImageLayer;
 
-public class ${JavaGameClassName} implements Game {
+public class ${JavaGameClassName} extends Game.Default {
+
+  public ${JavaGameClassName}() {
+    super(33); // call update every 33ms (30 times per second)
+  }
+
   @Override
   public void init() {
     // create and add background image layer
@@ -19,16 +24,11 @@ public class ${JavaGameClassName} implements Game {
   }
 
   @Override
+  public void update(int delta) {
+  }
+
+  @Override
   public void paint(float alpha) {
     // the background automatically paints itself, so no need to do anything here!
-  }
-
-  @Override
-  public void update(float delta) {
-  }
-
-  @Override
-  public int updateRate() {
-    return 25;
   }
 }
