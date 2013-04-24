@@ -64,7 +64,6 @@ public class IOSCanvas extends AbstractCanvasGL<CGBitmapContext> {
       data, texWidth, texHeight, 8, 4 * texWidth, IOSGraphics.colorSpace,
       CGImageAlphaInfo.wrap(CGImageAlphaInfo.PremultipliedLast));
     if (!interpolate) {
-      bctx.SetAllowsAntialiasing(false);
       bctx.set_InterpolationQuality(CGInterpolationQuality.wrap(CGInterpolationQuality.None));
     }
 
@@ -169,9 +168,6 @@ public class IOSCanvas extends AbstractCanvasGL<CGBitmapContext> {
   @Override
   public Canvas drawText(String text, float x, float y) {
     bctx.SaveState();
-    // always allow antialiasing for text drawing.
-    bctx.SetAllowsAntialiasing(true);
-    bctx.set_InterpolationQuality(CGInterpolationQuality.wrap(CGInterpolationQuality.Default));
     bctx.TranslateCTM(x, y + IOSGraphics.defaultFont.ctFont.get_DescentMetric());
     bctx.ScaleCTM(1, -1);
     bctx.SelectFont(IOSGraphics.defaultFont.iosName(), IOSGraphics.defaultFont.size(),

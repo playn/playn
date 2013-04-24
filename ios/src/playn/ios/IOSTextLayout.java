@@ -16,7 +16,6 @@
 package playn.ios;
 
 import cli.MonoTouch.CoreGraphics.CGBitmapContext;
-import cli.MonoTouch.CoreGraphics.CGInterpolationQuality;
 import cli.MonoTouch.CoreGraphics.CGPath;
 import cli.MonoTouch.CoreText.CTFrame;
 import cli.MonoTouch.CoreText.CTFramesetter;
@@ -139,8 +138,6 @@ class IOSTextLayout extends AbstractTextLayout {
     public void paint(CGBitmapContext bctx, float x, float y) {
       float dx = x + adjustX, dy = y + ascent;
       bctx.SaveState();
-      bctx.SetAllowsAntialiasing(true);
-      bctx.set_InterpolationQuality(CGInterpolationQuality.wrap(CGInterpolationQuality.Default));
       bctx.TranslateCTM(dx, dy);
       bctx.ScaleCTM(1, -1);
       PointF origin = new PointF(0, 0);
@@ -182,8 +179,6 @@ class IOSTextLayout extends AbstractTextLayout {
     public void paint(CGBitmapContext bctx, float x, float y) {
       float dy = y + ascent;
       bctx.SaveState();
-      bctx.SetAllowsAntialiasing(true);
-      bctx.set_InterpolationQuality(CGInterpolationQuality.wrap(CGInterpolationQuality.Default));
       bctx.TranslateCTM(x, dy);
       bctx.ScaleCTM(1, -1);
       bctx.set_TextPosition(new PointF(0, 0));
