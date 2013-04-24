@@ -169,6 +169,9 @@ public class IOSCanvas extends AbstractCanvasGL<CGBitmapContext> {
   @Override
   public Canvas drawText(String text, float x, float y) {
     bctx.SaveState();
+    // always allow antialiasing for text drawing.
+    bctx.SetAllowsAntialiasing(true);
+    bctx.set_InterpolationQuality(CGInterpolationQuality.wrap(CGInterpolationQuality.Default));
     bctx.TranslateCTM(x, y + IOSGraphics.defaultFont.ctFont.get_DescentMetric());
     bctx.ScaleCTM(1, -1);
     bctx.SelectFont(IOSGraphics.defaultFont.iosName(), IOSGraphics.defaultFont.size(),
