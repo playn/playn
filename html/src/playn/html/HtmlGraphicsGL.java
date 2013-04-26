@@ -54,16 +54,19 @@ class HtmlGraphicsGL extends HtmlGraphics {
 
       // if this returns null, the browser doesn't support WebGL on this machine
       WebGLRenderingContext gl = WebGLRenderingContext.getContext(canvas, attrs);
-      // Some systems seem to have a problem where they return a valid context, but it's in an
+      if (gl == null)
+        throw new RuntimeException("Unable to create GL context");
+
+      // Some systems seem to have a problem where they return a non-null context, but it's in an
       // error state initially. We give up and fall back to Canvas in this case, because nothing
       // seems to work properly.
-      if (gl == null || gl.getError() != WebGLRenderingContext.NO_ERROR) {
-        throw new RuntimeException("GL context not created [err=" +
-                                   (gl == null ? "null" : gl.getError()) + "]");
-      }
+      int error = gl.getError();
+      if (error != WebGLRenderingContext.NO_ERROR)
+        throw new RuntimeException("GL context started with errors [err=" + error + "]");
 
       ctx = new HtmlGLContext(platform, config.scaleFactor, gl, canvas);
       rootLayer = new GroupLayerGL(ctx);
+
     } catch (RuntimeException re) {
       // Give up. HtmlPlatform will catch the exception and fall back to dom/canvas.
       rootElement.removeChild(canvas);
