@@ -15,13 +15,64 @@
  */
 package playn.tests.core;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
+import static playn.core.PlayN.graphics;
+
 import playn.core.*;
+import playn.core.Pointer.Event;
 import static playn.core.PlayN.*;
 
 public class TestsGame extends Game.Default {
+
+  /** Helpful class for allowing selection of an one of a set of values for a test. */
+  public static class NToggle<T> {
+    public final ImageLayer layer = graphics().createImageLayer();
+    public final String prefix;
+    public final List<T> values = new ArrayList<T>();
+    private int valueIdx;
+
+    public NToggle(String name, T...values) {
+      for (T value : values) {
+        this.values.add(value);
+      }
+      this.prefix = name + ": ";
+      layer.addListener(new Pointer.Adapter() {
+        @Override
+        public void onPointerStart(Event event) {
+          set((valueIdx + 1) % NToggle.this.values.size());
+        }
+      });
+
+      set(0);
+    }
+
+    public String toString(T value) {
+      return value.toString();
+    }
+
+    public void set(int idx) {
+      this.valueIdx = idx;
+      layer.setImage(makeButtonImage(prefix + toString(values.get(idx))));
+    }
+
+    public T value() {
+      return values.get(valueIdx);
+    }
+
+    public int valueIdx() {
+      return valueIdx;
+    }
+  }
+
+  public static class Toggle extends NToggle<Boolean> {
+    public Toggle (String name) {
+      super(name, Boolean.FALSE, Boolean.TRUE);
+    }
+  }
 
   public static Image makeButtonImage(String label) {
     TextLayout layout = graphics().layoutText(label, BUTTON_FMT);
