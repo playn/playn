@@ -30,7 +30,6 @@ import cli.System.Drawing.PointF;
 import cli.System.Drawing.RectangleF;
 
 import playn.core.AbstractTextLayout;
-import playn.core.PlayN;
 import playn.core.TextFormat;
 import pythagoras.f.Rectangle;
 
@@ -131,8 +130,8 @@ class IOSTextLayout extends AbstractTextLayout {
     public Rectangle lineBounds (int line) {
       // TODO: maybe cache bounds for lines?
       RectangleF bounds = lines[line].GetImageBounds(gfx.scratchCtx);
-      return new Rectangle(origins[line].get_X()+pad+adjustX,
-        line*lineHeight+pad, bounds.get_Width(), bounds.get_Height()+leading);
+      return new Rectangle(origins[line].get_X()+pad, line*lineHeight+pad, bounds.get_Width(),
+        bounds.get_Height());
     }
 
     @Override
