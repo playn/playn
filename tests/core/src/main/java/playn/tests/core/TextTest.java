@@ -15,6 +15,7 @@
  */
 package playn.tests.core;
 
+import playn.core.Font.Style;
 import playn.core.Image;
 import playn.core.Keyboard.TextType;
 import playn.core.Pointer;
@@ -22,17 +23,35 @@ import playn.core.Pointer.Event;
 import playn.core.TextFormat;
 import playn.core.Canvas;
 import playn.core.CanvasImage;
-import playn.core.Font;
-import playn.core.GroupLayer;
 import playn.core.ImageLayer;
+import playn.core.TextFormat.Alignment;
 import playn.core.TextLayout;
 import playn.core.util.Callback;
+import pythagoras.f.Rectangle;
 import static playn.core.PlayN.graphics;
 import static playn.core.PlayN.keyboard;
 
 public class TextTest extends Test {
+  private class NToggle<T> extends TestsGame.NToggle<T> {
+    public NToggle(String name, T...values) {
+      super(name, values);
+    }
+    @Override public void set (int idx) {
+      super.set(idx);
+      update();
+    }
+  }
 
-  private final float COL_WIDTH = 120;
+  NToggle<Style> style;
+  NToggle<String> draw;
+  NToggle<String> effect;
+  NToggle<Alignment> align;
+  NToggle<String> font;
+  NToggle<Boolean> lineBounds;
+  final float outlineWidth = 2;
+  String sample = "The quick brown fox\njumped over the lazy dog.\nEvery good boy deserves fudge.";
+  ImageLayer text;
+  Rectangle row;
 
   @Override
   public String getName() {
@@ -46,140 +65,139 @@ public class TextTest extends Test {
 
   @Override
   public void init() {
-    float x = 0;
-    x += addExamples("Filled", FILL, x);
-    x += addExamples("Bold", BOLD, x);
-    x += addExamples("Stroked", STROKE, x);
-    x += addExamples("Vector otln", OUTLINE_VEC, x);
-    x += addExamples("Shadow UL", SHADOW_UL, x);
-    x += addExamples("Shadow LR", SHADOW_LR, x);
+    row = new Rectangle(5, 5, 0, 0);
+    addToRow((style = new NToggle<Style>(
+        "Style", Style.PLAIN, Style.BOLD, Style.ITALIC, Style.BOLD_ITALIC)).layer);
+    addToRow((draw = new NToggle<String>("Draw", "Fill", "Stroke")).layer);
+    addToRow((effect = new NToggle<String>(
+        "Effect", "None", "ShadowUL", "ShadowLR", "Outline")).layer);
+    newRow();
 
-    final TextFormat baseFormat = STROKE.format();
+    addToRow((align = new NToggle<Alignment>(
+        "Align", Alignment.LEFT, Alignment.CENTER, Alignment.RIGHT)).layer);
+    addToRow((font = new NToggle<String>("Font", "Times New Roman", "Helvetica")).layer);
 
-    // test laying out the empty string
-    TextLayout layout = graphics().layoutText("", new TextFormat());
-    ImageLayer layer = makeTextLayer(
-      "Empty string size " + layout.width() + "x" + layout.height(), FILL, baseFormat);
-    graphics().rootLayer().addAt(layer, 10, 330);
-
-    class Field extends Pointer.Adapter implements Callback<String> {
-      final StringBuilder value = new StringBuilder("Click here to change text");
-      final ImageLayer layer = makeTextLayer(value.toString(), FILL, baseFormat); {
+    class SetText extends Pointer.Adapter implements Callback<String> {
+      final ImageLayer layer = graphics().createImageLayer(TestsGame.makeButtonImage("Set Text"));{
         layer.addListener(this);
       }
       public void onPointerEnd(Event event) {
-        keyboard().getText(TextType.DEFAULT, "Test text", value.toString(), this);
+        keyboard().getText(TextType.DEFAULT, "Test text", sample.replace("\n", "\\n"), this);
       }
       public void onSuccess(String result) {
         if (result == null) return;
-        value.setLength(0);
-        value.append(result);
-        layer.setImage(makeTextImage(value.toString().replace("\\n", "\n"), FILL, baseFormat));
+        // parse \n to allow testing line breaks
+        sample = result.replace("\\n", "\n");
+        update();
       }
       public void onFailure(Throwable cause) {}
     }
-    graphics().rootLayer().addAt(new Field().layer, 10, 380);
+    addToRow(new SetText().layer);
+    newRow();
+
+    addToRow((lineBounds = new NToggle<Boolean>("Lines", Boolean.FALSE, Boolean.TRUE)).layer);
+
+    // test laying out the empty string
+    TextLayout layout = graphics().layoutText("", new TextFormat());
+    ImageLayer empty = graphics().createImageLayer(makeLabel(
+      "Empty string size " + layout.width() + "x" + layout.height()));
+    addToRow(empty);
+
+    newRow();
+
+    addToRow((text = graphics().createImageLayer(makeTextImage())));
   }
 
-  protected float addExamples(String name, TextRenderer renderer, float x) {
-    GroupLayer root = graphics().rootLayer();
-    TextFormat baseFormat = renderer.format();
-    ImageLayer[] layers = {
-      makeTextLayer(name, renderer, baseFormat),
-      makeTextLayer("The quick brown fox", renderer,
-                    baseFormat.withWrapping(COL_WIDTH, TextFormat.Alignment.LEFT)),
-      makeTextLayer("jumped over the lazy dog.", renderer,
-                    baseFormat.withWrapping(COL_WIDTH, TextFormat.Alignment.CENTER)),
-      makeTextLayer("Every good boy deserves fudge.", renderer,
-                    baseFormat.withWrapping(COL_WIDTH, TextFormat.Alignment.RIGHT)),
-    };
-    float y = 0, maxwid = 0;
-    for (ImageLayer layer : layers) {
-      root.addAt(layer, x, y);
-      maxwid = Math.max(layer.width(), maxwid);
-      y += layer.height() + 5;
-    }
-    return maxwid + 5;
+  protected void addToRow (ImageLayer layer) {
+    graphics().rootLayer().add(layer.setTranslation(row.x + row.width, row.y));
+    row.width += layer.width() + 5;
+    row.height = Math.max(row.height, layer.height());
   }
 
-  protected ImageLayer makeTextLayer(String text, TextRenderer renderer, TextFormat format) {
-    return graphics().createImageLayer(makeTextImage(text, renderer, format));
+  protected void newRow () {
+    row.x = 5;
+    row.y += row.height + 5;
+    row.width = row.height = 0;
   }
 
-  protected Image makeTextImage(String text, TextRenderer renderer, TextFormat format) {
-    TextLayout layout = graphics().layoutText(text, format);
-    float twidth = renderer.adjustWidth(layout.width());
-    float theight = renderer.adjustHeight(layout.height());
-    CanvasImage image = graphics().createImage(twidth, theight);
-    image.canvas().setStrokeColor(0xFFFFCCCC);
-    image.canvas().strokeRect(0, 0, twidth, theight);
-    renderer.render(image.canvas(), layout);
+  protected void update() {
+    if (text == null) return;
+    text.setImage(makeTextImage());
+  }
+
+  protected Image makeLabel(String label) {
+    TextLayout layout = graphics().layoutText(label, new TextFormat());
+    CanvasImage image = graphics().createImage(layout.width(), layout.height());
+    image.canvas().setFillColor(0xFF000000);
+    image.canvas().fillText(layout, 0, 0);
     return image;
   }
 
-  protected static abstract class TextRenderer {
-    public Font.Style style () { return Font.Style.PLAIN; }
-    public TextFormat format () {
-      return new TextFormat().withFont(graphics().createFont("Times New Roman", style(), 24));
+  protected Image makeTextImage() {
+    TextLayout layout = graphics().layoutText(sample, format());
+    float twidth = adjustWidth(layout.width());
+    float theight = adjustHeight(layout.height());
+    CanvasImage image = graphics().createImage(twidth, theight);
+    image.canvas().setStrokeColor(0xFFFFCCCC);
+    image.canvas().strokeRect(0, 0, twidth, theight);
+    render(image.canvas(), layout);
+    if (lineBounds.value()) {
+      for (int ll = 0; ll < layout.lineCount(); ll++) {
+        Rectangle bounds = layout.lineBounds(ll);
+        image.canvas().setStrokeColor(0xFFFFCCCC);
+        image.canvas().setStrokeWidth(1);
+        image.canvas().strokeRect(bounds.x, bounds.y, bounds.width, bounds.height);
+      }
     }
-    public float adjustWidth(float width) { return width; }
-    public float adjustHeight(float height) { return height; }
-    public abstract void render(Canvas canvas, TextLayout text);
+    return image;
   }
 
-  protected static TextRenderer STROKE = new TextRenderer() {
-    public void render(Canvas canvas, TextLayout text) {
-      canvas.setStrokeColor(0xFF6699CC);
-      canvas.strokeText(text, 0, 0);
+  protected TextFormat format () {
+    return new TextFormat().withFont(graphics().createFont(font.value(), style.value(), 24)).
+        withAlignment(align.value());
+  }
+
+  protected float adjustDim (float value) {
+    String effect = this.effect.value();
+    if (effect.startsWith("Shadow")) {
+      value+=2;
+    } else if (effect.equals("Outline")) {
+      value+=outlineWidth*2;
     }
-  };
-  protected static TextRenderer FILL = new TextRenderer() {
-    public void render(Canvas canvas, TextLayout text) {
-      canvas.setFillColor(0xFF6699CC);
-      canvas.fillText(text, 0, 0);
+    return value;
+  }
+  protected float adjustWidth(float width) {
+    return adjustDim(width);
+  }
+  protected float adjustHeight(float height) {
+    return adjustDim(height);
+  }
+  protected void render (Canvas canvas, TextLayout text, int color, float x, float y) {
+    if (draw.value().equals("Fill")) {
+      canvas.setFillColor(color);
+      canvas.fillText(text, x, y);
+    } else {
+      canvas.setStrokeColor(color);
+      canvas.strokeText(text, x, y);
     }
-  };
-  protected static TextRenderer BOLD = new TextRenderer() {
-    public Font.Style style () {
-      return Font.Style.BOLD;
-    }
-    public void render(Canvas canvas, TextLayout text) {
-      canvas.setFillColor(0xFF6699CC);
-      canvas.fillText(text, 0, 0);
-    }
-  };
-  protected static TextRenderer SHADOW_UL = new TextRenderer() {
-    public float adjustWidth(float width) { return width + 2; }
-    public float adjustHeight(float height) { return height + 2; }
-    public void render(Canvas canvas, TextLayout text) {
-      canvas.setFillColor(0xFFCCCCCC);
-      canvas.fillText(text, 0, 0);
-      canvas.setFillColor(0xFF6699CC);
-      canvas.fillText(text, 2, 2);
-    }
-  };
-  protected static TextRenderer SHADOW_LR = new TextRenderer() {
-    public float adjustWidth(float width) { return width + 2; }
-    public float adjustHeight(float height) { return height + 2; }
-    public void render(Canvas canvas, TextLayout text) {
-      canvas.setFillColor(0xFFCCCCCC);
-      canvas.fillText(text, 2, 2);
-      canvas.setFillColor(0xFF6699CC);
-      canvas.fillText(text, 0, 0);
-    }
-  };
-  protected static TextRenderer OUTLINE_VEC = new TextRenderer() {
-    public final float outlineWidth = 2;
-    public float adjustWidth(float width) { return width + 2*outlineWidth; }
-    public float adjustHeight(float height) { return height + 2*outlineWidth; }
-    public void render(Canvas canvas, TextLayout text) {
+  }
+  protected void render (Canvas canvas, TextLayout text) {
+    String effect = this.effect.value();
+    if (effect.equals("ShadowUL")) {
+      render(canvas, text, 0xFFCCCCCC, 0, 0);
+      render(canvas, text, 0xFF6699CC, 2, 2);
+    } else if (effect.equals("ShadowLR")) {
+      render(canvas, text, 0xFFCCCCCC, 2, 2);
+      render(canvas, text, 0xFF6699CC, 0, 0);
+    } else if (effect.equals("Outline")) {
       canvas.setStrokeWidth(2*outlineWidth);
       canvas.setStrokeColor(0xFF336699);
       canvas.setLineCap(Canvas.LineCap.ROUND);
       canvas.setLineJoin(Canvas.LineJoin.ROUND);
       canvas.strokeText(text, outlineWidth, outlineWidth);
-      canvas.setFillColor(0xFF6699CC);
-      canvas.fillText(text, outlineWidth, outlineWidth);
+      render(canvas, text, 0xFF6699CC, outlineWidth, outlineWidth);
+    } else {
+      render(canvas, text, 0xFF6699CC, 0, 0);
     }
-  };
+  }
 }
