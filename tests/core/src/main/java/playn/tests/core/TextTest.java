@@ -42,12 +42,19 @@ public class TextTest extends Test {
     }
   }
 
+  public class Toggle extends NToggle<Boolean> {
+    public Toggle(String name) {
+      super(name, Boolean.FALSE, Boolean.TRUE);
+    }
+  }
+
   NToggle<Style> style;
   NToggle<String> draw;
   NToggle<String> effect;
   NToggle<Alignment> align;
   NToggle<String> font;
-  NToggle<Boolean> lineBounds;
+  NToggle<Integer> wrap;
+  Toggle lineBounds;
   final float outlineWidth = 2;
   String sample = "The quick brown fox\njumped over the lazy dog.\nEvery good boy deserves fudge.";
   ImageLayer text;
@@ -71,8 +78,7 @@ public class TextTest extends Test {
     addToRow((draw = new NToggle<String>("Draw", "Fill", "Stroke")).layer);
     addToRow((effect = new NToggle<String>(
         "Effect", "None", "ShadowUL", "ShadowLR", "Outline")).layer);
-    newRow();
-
+    addToRow((wrap = new NToggle<Integer>("Wrap", 0, 20, 50, 100)).layer);
     addToRow((align = new NToggle<Alignment>(
         "Align", Alignment.LEFT, Alignment.CENTER, Alignment.RIGHT)).layer);
     addToRow((font = new NToggle<String>("Font", "Times New Roman", "Helvetica")).layer);
@@ -93,14 +99,13 @@ public class TextTest extends Test {
       public void onFailure(Throwable cause) {}
     }
     addToRow(new SetText().layer);
-    newRow();
-
-    addToRow((lineBounds = new NToggle<Boolean>("Lines", Boolean.FALSE, Boolean.TRUE)).layer);
+    addToRow((lineBounds = new Toggle("Lines")).layer);
 
     // test laying out the empty string
     TextLayout layout = graphics().layoutText("", new TextFormat());
     ImageLayer empty = graphics().createImageLayer(makeLabel(
       "Empty string size " + layout.width() + "x" + layout.height()));
+    newRow();
     addToRow(empty);
 
     newRow();
@@ -110,8 +115,9 @@ public class TextTest extends Test {
 
   protected void addToRow (ImageLayer layer) {
     graphics().rootLayer().add(layer.setTranslation(row.x + row.width, row.y));
-    row.width += layer.width() + 5;
+    row.width += layer.width() + 45;
     row.height = Math.max(row.height, layer.height());
+    if (row.width > graphics().width() * .6f) newRow();
   }
 
   protected void newRow () {
@@ -153,8 +159,9 @@ public class TextTest extends Test {
   }
 
   protected TextFormat format () {
-    return new TextFormat().withFont(graphics().createFont(font.value(), style.value(), 24)).
-        withAlignment(align.value());
+    TextFormat format = new TextFormat().withFont(
+      graphics().createFont(font.value(), style.value(), 24)).withAlignment(align.value());
+    return wrap.value() == 0 ? format : format.withWrapWidth(graphics().width()*wrap.value()/100);
   }
 
   protected float adjustDim (float value) {
