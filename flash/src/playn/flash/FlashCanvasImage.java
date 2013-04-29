@@ -31,6 +31,11 @@ public class FlashCanvasImage extends FlashImage implements CanvasImage {
   }
 
   @Override
+  public BitmapData bitmapData() {
+    return canvas.bitmapData();
+  }
+
+  @Override
   public Canvas canvas() {
     return canvas;
   }
@@ -69,10 +74,5 @@ public class FlashCanvasImage extends FlashImage implements CanvasImage {
       }
       offset += scanSize;
     }
-  }
-
-  @Override
-  BitmapData bitmapData() {
-    return canvas.bitmapData();
   }
 }

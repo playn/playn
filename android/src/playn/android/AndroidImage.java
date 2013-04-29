@@ -29,17 +29,21 @@ import playn.core.gl.ImageGL;
 import playn.core.gl.Scale;
 import playn.core.util.Callback;
 
-class AndroidImage extends ImageGL<AndroidCanvas> implements AndroidGLContext.Refreshable {
+public class AndroidImage extends ImageGL<AndroidCanvas> implements AndroidGLContext.Refreshable {
 
   protected Bitmap bitmap; // only mutated in AndroidAsyncImage
 
-  AndroidImage(GLContext ctx, Bitmap bitmap, Scale scale) {
+  public AndroidImage(GLContext ctx, Bitmap bitmap, Scale scale) {
     super(ctx, scale);
     this.bitmap = bitmap;
     ((AndroidGLContext) ctx).addRefreshable(this);
   }
 
-  Bitmap bitmap() {
+  /**
+   * Returns the {@link Bitmap} that underlies this image. This is for games that need to write
+   * custom backend code to do special stuff. No promises are made, caveat coder.
+   */
+  public Bitmap bitmap() {
     return bitmap;
   }
 

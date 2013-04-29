@@ -44,6 +44,11 @@ public class IOSCanvasImage extends IOSAbstractImage implements CanvasImage {
   }
 
   @Override
+  public CGImage cgImage() {
+    return canvas.cgImage();
+  }
+
+  @Override
   public float width() {
     return canvas.width();
   }
@@ -68,11 +73,6 @@ public class IOSCanvasImage extends IOSAbstractImage implements CanvasImage {
   public void setRgb(int startX, int startY, int width, int height, int[] rgbArray, int offset,
                      int scanSize) {
     throw new UnsupportedOperationException();
-  }
-
-  @Override
-  protected CGImage cgImage() {
-    return canvas.cgImage();
   }
 
   @Override

@@ -27,9 +27,14 @@ public class IOSImage extends IOSAbstractImage {
 
   protected CGImage image; // only mutated by IOSAsyncImage
 
-  public IOSImage (GLContext ctx, CGImage image, Scale scale) {
+  public IOSImage(GLContext ctx, CGImage image, Scale scale) {
     super(ctx, scale);
     this.image = image;
+  }
+
+  @Override
+  public CGImage cgImage() {
+    return image;
   }
 
   @Override
@@ -40,11 +45,6 @@ public class IOSImage extends IOSAbstractImage {
   @Override
   public float height() {
     return scale.invScaled(image.get_Height());
-  }
-
-  @Override
-  protected CGImage cgImage() {
-    return image;
   }
 
   @Override

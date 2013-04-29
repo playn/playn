@@ -32,13 +32,21 @@ import playn.core.gl.GLContext;
 import playn.core.gl.ImageGL;
 import playn.core.gl.Scale;
 
-abstract class JavaImage extends ImageGL<Graphics2D> {
+public abstract class JavaImage extends ImageGL<Graphics2D> {
 
   protected BufferedImage img;
 
-  JavaImage(GLContext ctx, BufferedImage img, Scale scale) {
+  public JavaImage(GLContext ctx, BufferedImage img, Scale scale) {
     super(ctx, scale);
     this.img = img;
+  }
+
+  /**
+   * Returns the {@link BufferedImage} that underlies this image. This is for games that need to
+   * write custom backend code to do special stuff. No promises are made, caveat coder.
+   */
+  public BufferedImage bufferedImage() {
+    return img;
   }
 
   @Override

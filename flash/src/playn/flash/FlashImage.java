@@ -29,7 +29,7 @@ import playn.core.util.Callbacks;
 @FlashImport({
   "flash.display.Loader", "flash.events.Event", "flash.net.URLRequest", "flash.system.LoaderContext"
 })
-class FlashImage implements Image {
+public class FlashImage implements Image {
 
   private List<Callback<? super Image>> callbacks;
 
@@ -42,9 +42,17 @@ class FlashImage implements Image {
     scheduleLoad(url);
   }
 
-  FlashImage(BitmapData data) {
+  public FlashImage(BitmapData data) {
     this.url = "<from bitmap>";
     this.imageData = data;
+  }
+
+  /**
+   * Returns the {@link BitmapData} that underlies this image. This is for games that need to write
+   * custom backend code to do special stuff. No promises are made, caveat coder.
+   */
+  public BitmapData bitmapData() {
+    return imageData;
   }
 
   private native void scheduleLoad(String url) /*-{
@@ -149,10 +157,6 @@ class FlashImage implements Image {
   @Override
   public void clearTexture() {
     // noop
-  }
-
-  BitmapData bitmapData() {
-    return imageData;
   }
 
   private void runCallbacks(boolean success) {

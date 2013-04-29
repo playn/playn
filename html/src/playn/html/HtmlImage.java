@@ -34,7 +34,7 @@ import playn.core.gl.ImageGL;
 import playn.core.gl.Scale;
 import playn.core.util.Callback;
 
-class HtmlImage extends ImageGL<Context2d> {
+public class HtmlImage extends ImageGL<Context2d> {
 
   private static native boolean isComplete(ImageElement img) /*-{
     return img.complete;
@@ -47,16 +47,24 @@ class HtmlImage extends ImageGL<Context2d> {
   ImageElement img;
   CanvasElement canvas; // Used internally for getRGB
 
-  HtmlImage(GLContext ctx, Scale scale, CanvasElement img) {
+  public HtmlImage(GLContext ctx, Scale scale, CanvasElement img) {
     super(ctx, scale);
     this.canvas = img;
     fakeComplete(img);
     this.img = img.cast();
   }
 
-  HtmlImage(GLContext ctx, Scale scale, ImageElement img) {
+  public HtmlImage(GLContext ctx, Scale scale, ImageElement img) {
     super(ctx, scale);
     this.img = img;
+  }
+
+  /**
+   * Returns the {@link ImageElement} that underlies this image. This is for games that need to
+   * write custom backend code to do special stuff. No promises are made, caveat coder.
+   */
+  public ImageElement imageElement() {
+    return img;
   }
 
   @Override

@@ -46,9 +46,11 @@ public abstract class IOSAbstractImage extends ImageGL<CGBitmapContext> implemen
   }
 
   /**
-   * Returns a core graphics image that can be used to paint this image into a canvas.
+   * Returns the {@link BufferedImage} that underlies this image. This is public so that games that
+   * need to write custom backend code to do special stuff can access it. No promises are made,
+   * caveat coder.
    */
-  protected abstract CGImage cgImage();
+  public abstract CGImage cgImage();
 
   @Override
   public boolean isReady() {
