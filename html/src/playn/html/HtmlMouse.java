@@ -156,18 +156,13 @@ class HtmlMouse extends MouseImpl {
   void handleRequestsInUserEventContext() {
     // hack to allow requesting mouse lock from non-mouse/key handler event
     if (isRequestingMouseLock && !isLocked()) {
-      requestMouseLock(rootElement);
+      requestMouseLockImpl(rootElement);
     }
   }
 
-  native void requestMouseLock(Element element) /*-{
-    var pointer = navigator.pointer || navigator.mozPointer || navigator.webkitPointer;
-    var self = this;
-    if(pointer) {
-      pointer.lock(element, function() {
-      }, function(e) {
-      });
-    }
+  native void requestMouseLockImpl(Element element) /*-{
+    element.requestPointerLock = element.requestPointerLock || element.webkitRequestPointerLock || element.mozRequestPointerLock;
+    if (element.requestPointerLock) element.requestPointerLock();
   }-*/;
 
   /**
@@ -245,18 +240,17 @@ class HtmlMouse extends MouseImpl {
   }
 
   private native void unlockImpl() /*-{
-    var pointer = navigator.webkitPointer || navigator.mozPointer || navigator.pointer;
-    pointer && pointer.unlock();
+    $doc.exitPointerLock = $doc.exitPointerLock || $doc.webkitExitPointerLock || $doc.mozExitPointerLock;
+    $doc.exitPointerLock && $doc.exitPointerLock();
   }-*/;
 
   @Override
   public native boolean isLocked() /*-{
-    var pointer = navigator.webkitPointer || navigator.mozPointer || navigator.pointer;
-    return pointer && pointer.isLocked || false;
+    return !!($doc.pointerLockElement || $doc.webkitPointerLockElement || $doc.mozPointerLockElement);
   }-*/;
 
   @Override
   public native boolean isLockSupported() /*-{
-    return !!(navigator.webkitPointer || navigator.mozPointer || navigator.pointer);
+    return !!($doc.body.requestPointerLock || $doc.body.webkitRequestPointerLock || $doc.body.mozRequestPointerLock);
   }-*/;
 }
