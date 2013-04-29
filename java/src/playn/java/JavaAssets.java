@@ -159,7 +159,7 @@ public class JavaAssets extends AbstractAssets<BufferedImage> {
     for (String suff : SUFFIXES) {
       final String soundPath = path + suff;
       try {
-        return platform.audio().createSound(soundPath, getAssetStream(soundPath), music);
+        return platform.audio().createSound(getAssetStream(soundPath), music);
       } catch (Exception e) {
         err = e; // note the error, and loop through and try the next format
       }

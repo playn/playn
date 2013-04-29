@@ -24,13 +24,21 @@ import playn.core.AudioImpl;
 
 import javax.sound.sampled.Clip;
 
-class JavaAudio extends AudioImpl {
+public class JavaAudio extends AudioImpl {
 
   public JavaAudio(JavaPlatform platform) {
     super(platform);
   }
 
-  JavaSound createSound(final String name, final InputStream in, final boolean music) {
+  /**
+   * Creates a sound instance from the audio data available via {@code in}.
+   *
+   * @param in an input stream via which the audio data can be read.
+   * @param music if true, a custom {@link Clip} implementation will be used which can handle long
+   * audio clips; if false, the default Java clip implementation is used which cannot handle long
+   * audio clips.
+   */
+  public JavaSound createSound(final InputStream in, final boolean music) {
     final JavaSound sound = new JavaSound();
     ((JavaPlatform) platform).invokeAsync(new Runnable() {
       public void run () {

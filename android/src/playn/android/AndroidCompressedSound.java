@@ -26,7 +26,7 @@ public class AndroidCompressedSound extends AndroidSound<MediaPlayer> {
   private final AndroidAudio.Resolver<MediaPlayer> resolver;
   private int position;
 
-  AndroidCompressedSound(AndroidAudio audio, AndroidAudio.Resolver<MediaPlayer> resolver) {
+  public AndroidCompressedSound(AndroidAudio audio, AndroidAudio.Resolver<MediaPlayer> resolver) {
     this.audio = audio;
     this.resolver = resolver;
     resolve();

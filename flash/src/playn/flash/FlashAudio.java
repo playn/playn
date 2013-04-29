@@ -17,10 +17,9 @@ package playn.flash;
 
 import playn.core.Audio;
 
-class FlashAudio implements Audio {
+public class FlashAudio implements Audio {
 
-  FlashSound createSound(String url) {
+  public FlashSound createSound(String url) {
     return new FlashSound(url);
   }
-
 }

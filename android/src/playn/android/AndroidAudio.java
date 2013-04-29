@@ -15,6 +15,8 @@
  */
 package playn.android;
 
+import java.io.FileDescriptor;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -29,7 +31,7 @@ import android.media.SoundPool;
 import playn.core.AbstractSound;
 import playn.core.AudioImpl;
 
-class AndroidAudio extends AudioImpl {
+public class AndroidAudio extends AudioImpl {
 
   interface Resolver<I> {
     void resolve(AndroidSound<I> sound);
@@ -111,16 +113,32 @@ class AndroidAudio extends AudioImpl {
     });
   }
 
-  AbstractSound<?> createSound(final String path) {
-    PooledSound sound;
-    try {
-      sound = new PooledSound(pool.load(platform.assets().openAssetFd(path), 1));
-      loadingSounds.put(sound.soundId, sound);
-    } catch (Exception e) {
-      sound = new PooledSound(0);
-      sound.onLoadError(e);
-    }
+  /**
+   * Creates a sound instance from the supplied asset file descriptor.
+   */
+  public AbstractSound<?> createSound(AssetFileDescriptor fd) {
+    PooledSound sound = new PooledSound(pool.load(fd, 1));
+    loadingSounds.put(sound.soundId, sound);
     return sound;
+  }
+
+  /**
+   * Creates a sound instance from the supplied file descriptor offset.
+   */
+  public AbstractSound<?> createSound(FileDescriptor fd, long offset, long length) {
+    PooledSound sound = new PooledSound(pool.load(fd, offset, length, 1));
+    loadingSounds.put(sound.soundId, sound);
+    return sound;
+  }
+
+  AbstractSound<?> createSound(final String path) {
+    try {
+      return createSound(platform.assets().openAssetFd(path));
+    } catch (IOException ioe) {
+      PooledSound sound = new PooledSound(0);
+      sound.onLoadError(ioe);
+      return sound;
+    }
   }
 
   AbstractSound<?> createMusic(final String path) {

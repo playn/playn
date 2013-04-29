@@ -31,6 +31,15 @@ public class HtmlAudio implements Audio {
   private SoundController soundController = new SoundController();
 
   /**
+   * Creates a sound instance from the supplied URL.
+   */
+  public HtmlSound createSound(String url) {
+    Sound sound = soundController.createSound("audio/mpeg", url);
+    // HtmlPlatform.log.debug(sound.getClass().getName() + " " + sound.getUrl());
+    return new HtmlSound(sound);
+  }
+
+  /**
    * Borrowed form com.allen_sauer.gwt.voices.client.WebAudioSound#createAudioContext()
    */
   private static native Element maybeCreateAudioContext() /*-{
@@ -48,21 +57,15 @@ public class HtmlAudio implements Audio {
   }-*/;
 
   @SuppressWarnings("deprecation")
-  public void init() {
+  void init() {
     HtmlPlatform.log.debug("Preferred sound type(s): " + soundController.getPreferredSoundTypes());
 
     // Attempt to create Web Audio API audio context
     audioContext = maybeCreateAudioContext();
   }
 
-  HtmlSound createSound(String url) {
-    Sound sound = soundController.createSound("audio/mpeg", url);
-    // HtmlPlatform.log.debug(sound.getClass().getName() + " " + sound.getUrl());
-    return new HtmlSound(sound);
-  }
-
   @SuppressWarnings("deprecation")
-  public boolean isFlash9AudioPluginMissing() {
+  boolean isFlash9AudioPluginMissing() {
     if (audioContext != null) {
       // Web Audio API is available; Flash not needed
       return false;
@@ -79,16 +82,12 @@ public class HtmlAudio implements Audio {
     return false;
   }
 
-  public boolean isFlash9AudioPluginMissingImpl() {
-    HtmlPlatform.log.debug(
-        "FlashMovie.isExternalInterfaceSupported: " + FlashMovie.isExternalInterfaceSupported());
-    HtmlPlatform.log.debug("FlashMovie.getMajorVersion: " + FlashMovie.getMajorVersion());
-    if (FlashMovie.isExternalInterfaceSupported() && FlashMovie.getMajorVersion() >= 9) {
-      // Flash plugin operational and is at least version 9
-      return false;
-    }
-
-    // Flash plugin not installed or disabled
-    return true;
+  boolean isFlash9AudioPluginMissingImpl() {
+    boolean supported = FlashMovie.isExternalInterfaceSupported();
+    int version = FlashMovie.getMajorVersion();
+    HtmlPlatform.log.debug("FlashMovie.isExternalInterfaceSupported: " + supported +
+                           ", getMajorVersion: " + version);
+    // if Flash plugin is operational and at least version 9, then it's not "missing"
+    return (supported && version < 9);
   }
 }

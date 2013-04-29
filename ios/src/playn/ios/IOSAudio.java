@@ -31,21 +31,25 @@ public class IOSAudio extends AudioImpl {
     super(platform);
   }
 
-  Sound createSound(String path) {
+  public Sound createSound(NSUrl url) {
     final IOSSound sound = new IOSSound();
     ThreadPool.QueueUserWorkItem(new WaitCallback(new WaitCallback.Method() {
       public void Invoke(Object arg) {
-        String path = (String) arg;
+        NSUrl url = (NSUrl) arg;
         NSError[] error = new NSError[1];
-        AVAudioPlayer player = AVAudioPlayer.FromUrl(NSUrl.FromFilename(path), error);
+        AVAudioPlayer player = AVAudioPlayer.FromUrl(url, error);
         if (error[0] == null) {
           dispatchLoaded(sound, player);
         } else {
-          platform.log().warn("Error loading sound [" + path + ", " + error[0] + "]");
+          platform.log().warn("Error loading sound [" + url + ", " + error[0] + "]");
           dispatchLoadError(sound, new Exception(error[0].ToString()));
         }
       }
-    }), path);
+    }), url);
     return sound;
+  }
+
+  Sound createSound(String path) {
+    return createSound(NSUrl.FromFilename(path));
   }
 }
