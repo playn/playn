@@ -32,7 +32,7 @@ class HtmlPath implements Path {
   private JsArrayNumber list = JsArrayNumber.createArray().cast();
 
   @Override
-  public void bezierTo(float c1x, float c1y, float c2x, float c2y, float x, float y) {
+  public Path bezierTo(float c1x, float c1y, float c2x, float c2y, float x, float y) {
     list.push(CMD_BEZIER);
     list.push(c1x);
     list.push(c1y);
@@ -40,39 +40,45 @@ class HtmlPath implements Path {
     list.push(c2y);
     list.push(x);
     list.push(y);
+    return this;
   }
 
   @Override
-  public void close() {
+  public Path close() {
     list.push(CMD_CLOSE);
+    return this;
   }
 
   @Override
-  public void lineTo(float x, float y) {
+  public Path lineTo(float x, float y) {
     list.push(CMD_LINE);
     list.push(x);
     list.push(y);
+    return this;
   }
 
   @Override
-  public void moveTo(float x, float y) {
+  public Path moveTo(float x, float y) {
     list.push(CMD_MOVE);
     list.push(x);
     list.push(y);
+    return this;
   }
 
   @Override
-  public void quadraticCurveTo(float cpx, float cpy, float x, float y) {
+  public Path quadraticCurveTo(float cpx, float cpy, float x, float y) {
     list.push(CMD_QUAD);
     list.push(cpx);
     list.push(cpy);
     list.push(x);
     list.push(y);
+    return this;
   }
 
   @Override
-  public void reset() {
+  public Path reset() {
     list.setLength(0);
+    return this;
   }
 
   void replay(Context2d ctx) {

@@ -24,34 +24,40 @@ public class IOSPath implements Path {
   CGPath cgPath = new CGPath();
 
   @Override
-  public void reset() {
+  public Path reset() {
     cgPath.Dispose();
     cgPath = new CGPath();
+    return this;
   }
 
   @Override
-  public void close() {
+  public Path close() {
     cgPath.CloseSubpath();
+    return this;
   }
 
   @Override
-  public void moveTo(float x, float y) {
+  public Path moveTo(float x, float y) {
     cgPath.MoveToPoint(x, y);
+    return this;
   }
 
   @Override
-  public void lineTo(float x, float y) {
+  public Path lineTo(float x, float y) {
     cgPath.AddLineToPoint(x, y);
+    return this;
   }
 
   @Override
-  public void quadraticCurveTo(float cpx, float cpy, float x, float y) {
+  public Path quadraticCurveTo(float cpx, float cpy, float x, float y) {
     cgPath.AddQuadCurveToPoint(cpx, cpy, x, y);
+    return this;
   }
 
   @Override
-  public void bezierTo(float c1x, float c1y, float c2x, float c2y, float x, float y) {
+  public Path bezierTo(float c1x, float c1y, float c2x, float c2y, float x, float y) {
     cgPath.AddCurveToPoint(c1x, c1y, c2x, c2y, x, y);
+    return this;
   }
 
   protected void finalize() {

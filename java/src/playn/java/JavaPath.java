@@ -26,33 +26,39 @@ class JavaPath implements Path, JavaCanvasState.Clipper {
   Path2D path = new GeneralPath();
 
   @Override
-  public void reset() {
+  public Path reset() {
     path.reset();
+    return this;
   }
 
   @Override
-  public void close() {
+  public Path close() {
     path.closePath();
+    return this;
   }
 
   @Override
-  public void moveTo(float x, float y) {
+  public Path moveTo(float x, float y) {
     path.moveTo(x, y);
+    return this;
   }
 
   @Override
-  public void lineTo(float x, float y) {
+  public Path lineTo(float x, float y) {
     path.lineTo(x, y);
+    return this;
   }
 
   @Override
-  public void quadraticCurveTo(float cpx, float cpy, float x, float y) {
+  public Path quadraticCurveTo(float cpx, float cpy, float x, float y) {
     path.quadTo(cpx, cpy, x, y);
+    return this;
   }
 
   @Override
-  public void bezierTo(float c1x, float c1y, float c2x, float c2y, float x, float y) {
+  public Path bezierTo(float c1x, float c1y, float c2x, float c2y, float x, float y) {
     path.curveTo(c1x, c1y, c2x, c2y, x, y);
+    return this;
   }
 
   @Override

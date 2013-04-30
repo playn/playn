@@ -21,38 +21,48 @@ package playn.core;
 public interface Path {
 
   /**
-   * Resets the current path, removing all strokes and moving the position to
-   * (0, 0).
+   * Resets the current path, removing all strokes and moving the position to (0, 0).
+   *
+   * @return this path for convenient call chaining.
    */
-  void reset();
+  Path reset();
 
   /**
-   * Closes the path, returning the position to the beginning of the first
-   * stroke.
+   * Closes the path, returning the position to the beginning of the first stroke.
+   *
+   * @return this path for convenient call chaining.
    */
-  void close();
+  Path close();
 
   /**
    * Moves the position to the given location.
+   *
+   * @return this path for convenient call chaining.
    */
-  void moveTo(float x, float y);
+  Path moveTo(float x, float y);
 
   /**
    * Adds a line to the path, from the current position to the specified target.
+   *
+   * @return this path for convenient call chaining.
    */
-  void lineTo(float x, float y);
+  Path lineTo(float x, float y);
 
   /**
-   * Adds a quadratic curve to the path, from the current position to the
-   * specified target, with the specified control point.
+   * Adds a quadratic curve to the path, from the current position to the specified target, with
+   * the specified control point.
+   *
+   * @return this path for convenient call chaining.
    */
-  void quadraticCurveTo(float cpx, float cpy, float x, float y);
+  Path quadraticCurveTo(float cpx, float cpy, float x, float y);
 
   /**
    * Adds a bezier curve to the path, from the current position to the specified target, using the
    * supplied control points.
+   *
+   * @return this path for convenient call chaining.
    */
-  void bezierTo(float c1x, float c1y, float c2x, float c2y, float x, float y);
+  Path bezierTo(float c1x, float c1y, float c2x, float c2y, float x, float y);
 
   // TODO(jgw): fill rules (HTML Canvas doesn't seem to have anything)
   // Android has [inverse] winding, even-odd
