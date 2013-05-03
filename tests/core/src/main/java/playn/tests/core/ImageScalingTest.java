@@ -89,7 +89,7 @@ public class ImageScalingTest extends Test {
     super.paint(alpha);
 
     float now = elapsed + alpha*UPDATE_RATE;
-    float scale = Math.max(Math.abs(FloatMath.sin(now/1000)), FloatMath.EPSILON);
+    float scale = Math.abs(FloatMath.sin(now/1000));
     player1.setScale(scale);
     player2.setScale(scale);
     slayer1.setScale(scale);

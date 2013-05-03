@@ -244,7 +244,6 @@ public abstract class AbstractLayer implements Layer {
 
   @Override
   public Layer setScaleX(float sx) {
-    Asserts.checkArgument(sx != 0, "Scale must be non-zero (got sx=%s)", sx);
     if (scaleX != sx) {
       scaleX = sx;
       setFlag(Flag.XFDIRTY, true);
@@ -254,7 +253,6 @@ public abstract class AbstractLayer implements Layer {
 
   @Override
   public Layer setScaleY(float sy) {
-    Asserts.checkArgument(sy != 0, "Scale must be non-zero (got sy=%s)", sy);
     if (scaleY != sy) {
       scaleY = sy;
       setFlag(Flag.XFDIRTY, true);
@@ -264,7 +262,6 @@ public abstract class AbstractLayer implements Layer {
 
   @Override
   public Layer setScale(float sx, float sy) {
-    Asserts.checkArgument(sx != 0 && sy != 0, "Scale must be non-zero (got sx=%s, sy=%s)", sx, sy);
     if (sx != scaleX || sy != scaleY) {
       scaleX = sx;
       scaleY = sy;
