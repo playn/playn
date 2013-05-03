@@ -1,5 +1,4 @@
-((nil . ((indent-tabs-mode . nil)
-         (fill-column . 99)))
- (java-mode . ((c-basic-offset . 2)))
- (text-mode . ((fill-column . 79)))
+((nil . ((indent-tabs-mode . nil)))
+ (java-mode . ((c-basic-offset . 2)
+               (fill-column . 99)))
  )
