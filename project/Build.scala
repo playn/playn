@@ -60,7 +60,9 @@ object PlayNBuild extends Build {
       )
       case "tests-assets" => testSettings
       case "tests-core" => testSettings
-      case "tests-java" => LWJGLPlugin.lwjglSettings ++ testSettings
+      case "tests-java" => LWJGLPlugin.lwjglSettings ++ testSettings ++ seq(
+        LWJGLPlugin.lwjgl.version := pom.getAttr("lwjgl.version").get
+      )
       case "tests-html" => gwtSettings ++ testSettings ++ seq(
         gwtVersion := pom.getAttr("gwt.version").get,
         javaOptions in Gwt ++= Seq("-mx512M"), // give GWT mo' memory
