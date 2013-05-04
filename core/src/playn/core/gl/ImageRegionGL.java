@@ -158,12 +158,17 @@ public class ImageRegionGL<GC> extends AbstractImageGL<GC> implements Image.Regi
   @Override
   void draw(GLShader shader, InternalTransform xform, int tint,
             float dx, float dy, float dw, float dh, float sx, float sy, float sw, float sh) {
-    float texWidth = (tex > 0) ? width : parent.width();
-    float texHeight = (tex > 0) ? height : parent.height();
-    sx += x();
-    sy += y();
-    parent.drawImpl(shader, xform, ensureTexture(), tint, dx, dy, dw, dh,
-                    sx / texWidth, sy / texHeight, (sx + sw) / texWidth, (sy + sh) / texHeight);
+    if (repeatX || repeatY) {
+      // if we're repeating, then we have our own texture and want to draw it normally
+      super.draw(shader, xform, tint, dx, dy, dw, dh, sx, sy, sw, sh);
+    } else {
+      float texWidth = (tex > 0) ? width : parent.width();
+      float texHeight = (tex > 0) ? height : parent.height();
+      sx += x();
+      sy += y();
+      parent.drawImpl(shader, xform, ensureTexture(), tint, dx, dy, dw, dh,
+                      sx / texWidth, sy / texHeight, (sx + sw) / texWidth, (sy + sh) / texHeight);
+    }
   }
 
   @Override
