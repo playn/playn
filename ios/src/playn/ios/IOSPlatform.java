@@ -418,6 +418,8 @@ public class IOSPlatform extends AbstractPlatform {
     runQueue.execute();
     // perform the game updates
     game.tick(tick());
+    // flush any pending draw calls (to surfaces)
+    graphics.ctx().flush();
   }
 
   void paint() {
