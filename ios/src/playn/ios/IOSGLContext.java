@@ -29,7 +29,6 @@ import pythagoras.f.FloatMath;
 import pythagoras.i.Rectangle;
 
 import playn.core.InternalTransform;
-import playn.core.PlayN;
 import playn.core.StockInternalTransform;
 import playn.core.Tint;
 import playn.core.gl.GL20;
@@ -243,7 +242,7 @@ public class IOSGLContext extends GLContext {
     if (CHECK_ERRORS) {
       ErrorCode error;
       while (!(error = GL.GetError()).Equals(ErrorCode.wrap(ErrorCode.NoError))) {
-        PlayN.log().error(op + ": glError " + error);
+        platform.log().error(op + ": glError " + error);
       }
     }
   }
@@ -300,7 +299,7 @@ public class IOSGLContext extends GLContext {
   void updateTexture(int tex, CGImage image) {
     int width = image.get_Width(), height = image.get_Height();
     if (width == 0 || height == 0) {
-      PlayN.log().warn("Ignoring texture update for empty image (" + width + "x" + height + ").");
+      platform.log().warn("Ignoring texture update for empty image (" + width + "x" + height + ").");
       return;
     }
 
