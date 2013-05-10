@@ -319,6 +319,11 @@ public class IOSPlatform extends AbstractPlatform {
     return storage;
   }
 
+  /** Returns the orientations we're configured to support. */
+  public SupportedOrients supportedOrients() {
+    return orients;
+  }
+
   @Override
   public double time() {
     return System.currentTimeMillis();
