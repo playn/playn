@@ -171,6 +171,8 @@ public class IOSPlatform extends AbstractPlatform {
   private final IOSUIOverlay uiOverlay;
   private final long start = DateTime.get_Now().get_Ticks();
 
+  private int currentOrientation;
+
   /** Returns the top-level UIWindow. */
   public UIWindow window () {
     return mainWindow;
@@ -376,8 +378,11 @@ public class IOSPlatform extends AbstractPlatform {
   }
 
   void onOrientationChange(UIDeviceOrientation orientation) {
+    if (orientation.Value == currentOrientation) return; // NOOP
     if (!orients.isSupported(orientation))
       return; // ignore unsupported (or Unknown) orientations
+
+    currentOrientation = orientation.Value;
     graphics.setOrientation(orientation);
     UIInterfaceOrientation sorient = ORIENT_MAP.get(orientation);
 
