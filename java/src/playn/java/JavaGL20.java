@@ -186,6 +186,8 @@ final class JavaGL20 implements playn.core.gl.GL20 {
       GL15.glBufferData(target, (DoubleBuffer) data, usage);
     else if (data instanceof ShortBuffer)
       GL15.glBufferData(target, (ShortBuffer) data, usage);
+    else
+      GL15.glBufferData(target, size, usage);
   }
 
   @Override

@@ -89,11 +89,6 @@ public abstract class IOSGLBuffer implements GLBuffer {
     }
 
     @Override
-    public int byteSize() {
-      return position() * 4;
-    }
-
-    @Override
     public void skip(int count) {
       position += count;
     }
@@ -114,6 +109,11 @@ public abstract class IOSGLBuffer implements GLBuffer {
     @Override
     IntPtr pointer() {
       return handle.AddrOfPinnedObject();
+    }
+
+    @Override
+    int bytesPerElement() {
+      return 4;
     }
   }
 
@@ -159,11 +159,6 @@ public abstract class IOSGLBuffer implements GLBuffer {
     }
 
     @Override
-    public int byteSize() {
-      return position() * 2;
-    }
-
-    @Override
     public void skip(int count) {
       position += count;
     }
@@ -179,6 +174,11 @@ public abstract class IOSGLBuffer implements GLBuffer {
     IntPtr pointer() {
       return handle.AddrOfPinnedObject();
     }
+
+    @Override
+    int bytesPerElement() {
+      return 2;
+    }
   }
 
   private final int bufferId;
@@ -187,6 +187,11 @@ public abstract class IOSGLBuffer implements GLBuffer {
   @Override
   public int position() {
     return position;
+  }
+
+  @Override
+  public int byteSize() {
+    return position * bytesPerElement();
   }
 
   @Override
@@ -202,6 +207,12 @@ public abstract class IOSGLBuffer implements GLBuffer {
     int oposition = position;
     position = 0;
     return oposition;
+  }
+
+  @Override
+  public void alloc(int target, int usage) {
+    GL.BufferData(BufferTarget.wrap(target), new IntPtr(capacity() * bytesPerElement()),
+                  null, BufferUsage.wrap(usage));
   }
 
   @Override
@@ -226,4 +237,6 @@ public abstract class IOSGLBuffer implements GLBuffer {
   }
 
   abstract IntPtr pointer();
+
+  abstract int bytesPerElement();
 }

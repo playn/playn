@@ -52,11 +52,6 @@ public abstract class GL20Buffer implements GLBuffer {
     }
 
     @Override
-    public int byteSize() {
-      return position() * BYTES_PER_FLOAT;
-    }
-
-    @Override
     public void skip(int count) {
       buffer.position(position()+count);
     }
@@ -65,7 +60,7 @@ public abstract class GL20Buffer implements GLBuffer {
     public void expand(int capacity) {
       // make sure we're not trying to expand this buffer while it has unflushed data
       Asserts.checkState(buffer == null || buffer.position() == 0);
-      ByteBuffer raw = ByteBuffer.allocateDirect(capacity * BYTES_PER_FLOAT).
+      ByteBuffer raw = ByteBuffer.allocateDirect(capacity * bytesPerElement()).
         order(ByteOrder.nativeOrder());
       buffer = raw.asFloatBuffer();
       intBuffer = raw.asIntBuffer();
@@ -118,7 +113,9 @@ public abstract class GL20Buffer implements GLBuffer {
       return buffer;
     }
 
-    private static final int BYTES_PER_FLOAT = 4;
+    protected int bytesPerElement() {
+      return 4;
+    }
   }
 
   public static class ShortImpl extends GL20Buffer implements GLBuffer.Short {
@@ -140,11 +137,6 @@ public abstract class GL20Buffer implements GLBuffer {
     }
 
     @Override
-    public int byteSize() {
-      return position() * BYTES_PER_SHORT;
-    }
-
-    @Override
     public void skip(int count) {
       buffer.position(position()+count);
     }
@@ -153,7 +145,7 @@ public abstract class GL20Buffer implements GLBuffer {
     public void expand(int capacity) {
       // make sure we're not trying to expand this buffer while it has unflushed data
       Asserts.checkState(buffer == null || buffer.position() == 0);
-      buffer = ByteBuffer.allocateDirect(capacity * BYTES_PER_SHORT).
+      buffer = ByteBuffer.allocateDirect(capacity * bytesPerElement()).
         order(ByteOrder.nativeOrder()).asShortBuffer();
     }
 
@@ -183,11 +175,18 @@ public abstract class GL20Buffer implements GLBuffer {
       return buffer;
     }
 
-    private static final int BYTES_PER_SHORT = 2;
+    protected int bytesPerElement() {
+      return 2;
+    }
   }
 
   protected final GL20 gl;
   protected final int bufferId;
+
+  @Override
+  public int byteSize() {
+    return position() * bytesPerElement();
+  }
 
   @Override
   public void bind(int target) {
@@ -201,6 +200,11 @@ public abstract class GL20Buffer implements GLBuffer {
     buffer.position(0);
     gl.glBufferData(target, byteSize, buffer, usage);
     return count;
+  }
+
+  @Override
+  public void alloc(int target, int usage) {
+    gl.glBufferData(target, capacity() * bytesPerElement(), null, usage);
   }
 
   @Override
@@ -218,6 +222,8 @@ public abstract class GL20Buffer implements GLBuffer {
   }
 
   protected abstract Buffer buffer();
+
+  protected abstract int bytesPerElement();
 
   protected GL20Buffer(GL20 gl) {
     this.gl = gl;
