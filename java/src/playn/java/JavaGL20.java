@@ -173,21 +173,37 @@ final class JavaGL20 implements playn.core.gl.GL20 {
     GL14.glBlendFuncSeparate(srcRGB, dstRGB, srcAlpha, dstAlpha);
   }
 
-  // FIXME(bruno): Size is unused!
   @Override
   public void glBufferData(int target, int size, Buffer data, int usage) {
-    if (data instanceof ByteBuffer)
-      GL15.glBufferData(target, (ByteBuffer) data, usage);
-    else if (data instanceof IntBuffer)
-      GL15.glBufferData(target, (IntBuffer) data, usage);
-    else if (data instanceof FloatBuffer)
-      GL15.glBufferData(target, (FloatBuffer) data, usage);
-    else if (data instanceof DoubleBuffer)
-      GL15.glBufferData(target, (DoubleBuffer) data, usage);
-    else if (data instanceof ShortBuffer)
-      GL15.glBufferData(target, (ShortBuffer) data, usage);
-    else
+    // LWJGL infers the size from Buffer.remaining()
+    if (data instanceof ByteBuffer) {
+      ByteBuffer subData = ((ByteBuffer)data).asReadOnlyBuffer();
+      subData.limit(size);
+      GL15.glBufferData(target, subData, usage);
+
+    } else if (data instanceof IntBuffer) {
+      IntBuffer subData = ((IntBuffer)data).asReadOnlyBuffer();
+      subData.limit(size/4);
+      GL15.glBufferData(target, subData, usage);
+
+    } else if (data instanceof FloatBuffer) {
+      FloatBuffer subData = ((FloatBuffer)data).asReadOnlyBuffer();
+      subData.limit(size/4);
+      GL15.glBufferData(target, subData, usage);
+
+    } else if (data instanceof DoubleBuffer) {
+      DoubleBuffer subData = ((DoubleBuffer)data).asReadOnlyBuffer();
+      subData.limit(size/8);
+      GL15.glBufferData(target, subData, usage);
+
+    } else if (data instanceof ShortBuffer) {
+      ShortBuffer subData = ((ShortBuffer)data).asReadOnlyBuffer();
+      subData.limit(size/2);
+      GL15.glBufferData(target, subData, usage);
+
+    } else {
       GL15.glBufferData(target, size, usage);
+    }
   }
 
   @Override
