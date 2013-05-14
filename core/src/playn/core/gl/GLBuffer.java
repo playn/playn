@@ -92,16 +92,6 @@ public interface GLBuffer {
    * @return the number of elements in the buffer at the time it was bound. */
   int send(int target, int usage);
 
-  /** Pre-allocate an empty underlying GL buffer using glBufferData. A call to {@link #bind} must
-   * precede this call. */
-  void alloc(int target, int count);
-
-  /** Sends this buffer's data to GL, using glBufferSubData. The buffer must already have been
-   * allocated with {@link #alloc}. A call to {@link #bind} must precede this call. This resets the
-   * buffer offset to zero and prepares the buffer for the accumulation of new elements.
-   * @return the number of elements in the buffer at the time it was bound. */
-  int send(int target);
-
   /** Releases any GL resources used by this buffer. The buffer may not be used subsequently. */
   void destroy();
 }

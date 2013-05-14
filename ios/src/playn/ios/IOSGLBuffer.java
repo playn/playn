@@ -210,22 +210,6 @@ public abstract class IOSGLBuffer implements GLBuffer {
   }
 
   @Override
-  public void alloc(int target, int usage) {
-    GL.BufferData(BufferTarget.wrap(target), new IntPtr(capacity() * bytesPerElement()),
-                  null, BufferUsage.wrap(usage));
-  }
-
-  @Override
-  public int send(int target) {
-    // TODO: why is offset/byteSize an IntPtr? File MonoTouch bug?
-    GL.BufferSubData(BufferTarget.wrap(target), new IntPtr(0),
-        new IntPtr(byteSize()), pointer());
-    int oposition = position;
-    position = 0;
-    return oposition;
-  }
-
-  @Override
   public void destroy() {
     GL.DeleteBuffers(1, new int[] { bufferId });
   }

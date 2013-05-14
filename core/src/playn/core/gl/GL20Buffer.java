@@ -203,20 +203,6 @@ public abstract class GL20Buffer implements GLBuffer {
   }
 
   @Override
-  public void alloc(int target, int usage) {
-    gl.glBufferData(target, capacity() * bytesPerElement(), null, usage);
-  }
-
-  @Override
-  public int send(int target) {
-    Buffer buffer = buffer();
-    int count = buffer.position(), byteSize = byteSize();
-    buffer.position(0);
-    gl.glBufferSubData(target, 0, byteSize, buffer);
-    return count;
-  }
-
-  @Override
   public void destroy() {
     gl.glDeleteBuffers(1, new int[] { bufferId }, 0);
   }
