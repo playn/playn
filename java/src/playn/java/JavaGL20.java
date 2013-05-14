@@ -779,8 +779,10 @@ final class JavaGL20 implements playn.core.gl.GL20 {
   }
 
   @Override
-  public void glUniform1fv(int location, int count, FloatBuffer v) {
-    GL20.glUniform1(location, v);
+  public void glUniform1fv(int location, int count, FloatBuffer buffer) {
+    buffer = buffer.asReadOnlyBuffer();
+    buffer.limit(count);
+    GL20.glUniform1(location, buffer);
   }
 
   @Override
@@ -789,8 +791,10 @@ final class JavaGL20 implements playn.core.gl.GL20 {
   }
 
   @Override
-  public void glUniform1iv(int location, int count, IntBuffer v) {
-    GL20.glUniform1(location, v);
+  public void glUniform1iv(int location, int count, IntBuffer buffer) {
+    buffer = buffer.asReadOnlyBuffer();
+    buffer.limit(count);
+    GL20.glUniform1(location, buffer);
   }
 
   @Override
@@ -799,8 +803,10 @@ final class JavaGL20 implements playn.core.gl.GL20 {
   }
 
   @Override
-  public void glUniform2fv(int location, int count, FloatBuffer v) {
-    GL20.glUniform2(location, v);
+  public void glUniform2fv(int location, int count, FloatBuffer buffer) {
+    buffer = buffer.asReadOnlyBuffer();
+    buffer.limit(2*count);
+    GL20.glUniform2(location, buffer);
   }
 
   @Override
@@ -809,8 +815,10 @@ final class JavaGL20 implements playn.core.gl.GL20 {
   }
 
   @Override
-  public void glUniform2iv(int location, int count, IntBuffer v) {
-    GL20.glUniform2(location, v);
+  public void glUniform2iv(int location, int count, IntBuffer buffer) {
+    buffer = buffer.asReadOnlyBuffer();
+    buffer.limit(2*count);
+    GL20.glUniform2(location, buffer);
   }
 
   @Override
@@ -819,8 +827,10 @@ final class JavaGL20 implements playn.core.gl.GL20 {
   }
 
   @Override
-  public void glUniform3fv(int location, int count, FloatBuffer v) {
-    GL20.glUniform3(location, v);
+  public void glUniform3fv(int location, int count, FloatBuffer buffer) {
+    buffer = buffer.asReadOnlyBuffer();
+    buffer.limit(3*count);
+    GL20.glUniform3(location, buffer);
   }
 
   @Override
@@ -829,8 +839,10 @@ final class JavaGL20 implements playn.core.gl.GL20 {
   }
 
   @Override
-  public void glUniform3iv(int location, int count, IntBuffer v) {
-    GL20.glUniform3(location, v);
+  public void glUniform3iv(int location, int count, IntBuffer buffer) {
+    buffer = buffer.asReadOnlyBuffer();
+    buffer.limit(3*count);
+    GL20.glUniform3(location, buffer);
   }
 
   @Override
@@ -839,8 +851,10 @@ final class JavaGL20 implements playn.core.gl.GL20 {
   }
 
   @Override
-  public void glUniform4fv(int location, int count, FloatBuffer v) {
-    GL20.glUniform4(location, v);
+  public void glUniform4fv(int location, int count, FloatBuffer buffer) {
+    buffer = buffer.asReadOnlyBuffer();
+    buffer.limit(4*count);
+    GL20.glUniform4(location, buffer);
   }
 
   @Override
@@ -849,23 +863,31 @@ final class JavaGL20 implements playn.core.gl.GL20 {
   }
 
   @Override
-  public void glUniform4iv(int location, int count, IntBuffer v) {
-    GL20.glUniform4(location, v);
+  public void glUniform4iv(int location, int count, IntBuffer buffer) {
+    buffer = buffer.asReadOnlyBuffer();
+    buffer.limit(4*count);
+    GL20.glUniform4(location, buffer);
   }
 
   @Override
-  public void glUniformMatrix2fv(int location, int count, boolean transpose, FloatBuffer value) {
-    GL20.glUniformMatrix2(location, transpose, value);
+  public void glUniformMatrix2fv(int location, int count, boolean transpose, FloatBuffer buffer) {
+    buffer = buffer.asReadOnlyBuffer();
+    buffer.limit(2*2*count);
+    GL20.glUniformMatrix2(location, transpose, buffer);
   }
 
   @Override
-  public void glUniformMatrix3fv(int location, int count, boolean transpose, FloatBuffer value) {
-    GL20.glUniformMatrix3(location, transpose, value);
+  public void glUniformMatrix3fv(int location, int count, boolean transpose, FloatBuffer buffer) {
+    buffer = buffer.asReadOnlyBuffer();
+    buffer.limit(3*3*count);
+    GL20.glUniformMatrix3(location, transpose, buffer);
   }
 
   @Override
-  public void glUniformMatrix4fv(int location, int count, boolean transpose, FloatBuffer value) {
-    GL20.glUniformMatrix4(location, transpose, value);
+  public void glUniformMatrix4fv(int location, int count, boolean transpose, FloatBuffer buffer) {
+    buffer = buffer.asReadOnlyBuffer();
+    buffer.limit(4*4*count);
+    GL20.glUniformMatrix4(location, transpose, buffer);
   }
 
   @Override
