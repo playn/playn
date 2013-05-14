@@ -173,6 +173,7 @@ final class JavaGL20 implements playn.core.gl.GL20 {
     GL14.glBlendFuncSeparate(srcRGB, dstRGB, srcAlpha, dstAlpha);
   }
 
+  // FIXME(bruno): Size is unused!
   @Override
   public void glBufferData(int target, int size, Buffer data, int usage) {
     if (data instanceof ByteBuffer)
@@ -183,22 +184,38 @@ final class JavaGL20 implements playn.core.gl.GL20 {
       GL15.glBufferData(target, (FloatBuffer) data, usage);
     else if (data instanceof DoubleBuffer)
       GL15.glBufferData(target, (DoubleBuffer) data, usage);
-    else if (data instanceof ShortBuffer) //
+    else if (data instanceof ShortBuffer)
       GL15.glBufferData(target, (ShortBuffer) data, usage);
   }
 
   @Override
   public void glBufferSubData(int target, int offset, int size, Buffer data) {
-    if (data instanceof ByteBuffer)
-      GL15.glBufferSubData(target, offset, (ByteBuffer) data);
-    else if (data instanceof IntBuffer)
-      GL15.glBufferSubData(target, offset, (IntBuffer) data);
-    else if (data instanceof FloatBuffer)
-      GL15.glBufferSubData(target, offset, (FloatBuffer) data);
-    else if (data instanceof DoubleBuffer)
-      GL15.glBufferSubData(target, offset, (DoubleBuffer) data);
-    else if (data instanceof ShortBuffer)
-      GL15.glBufferSubData(target, offset, (ShortBuffer) data);
+    // LWJGL infers the size from Buffer.remaining()
+    if (data instanceof ByteBuffer) {
+      ByteBuffer subData = ((ByteBuffer)data).asReadOnlyBuffer();
+      subData.limit(size);
+      GL15.glBufferSubData(target, offset, subData);
+
+    } else if (data instanceof IntBuffer) {
+      IntBuffer subData = ((IntBuffer)data).asReadOnlyBuffer();
+      subData.limit(size/4);
+      GL15.glBufferSubData(target, offset, subData);
+
+    } else if (data instanceof FloatBuffer) {
+      FloatBuffer subData = ((FloatBuffer)data).asReadOnlyBuffer();
+      subData.limit(size/4);
+      GL15.glBufferSubData(target, offset, subData);
+
+    } else if (data instanceof DoubleBuffer) {
+      DoubleBuffer subData = ((DoubleBuffer)data).asReadOnlyBuffer();
+      subData.limit(size/8);
+      GL15.glBufferSubData(target, offset, subData);
+
+    } else if (data instanceof ShortBuffer) {
+      ShortBuffer subData = ((ShortBuffer)data).asReadOnlyBuffer();
+      subData.limit(size/2);
+      GL15.glBufferSubData(target, offset, subData);
+    }
   }
 
   public int glCheckFramebufferStatus(int target) {
