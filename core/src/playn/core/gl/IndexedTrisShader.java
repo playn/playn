@@ -142,7 +142,12 @@ public class IndexedTrisShader extends GLShader {
 
       // create our vertex and index buffers
       vertices = ctx.createFloatBuffer(START_VERTS*vertexSize());
+      vertices.bind(GL20.GL_ARRAY_BUFFER);
+      vertices.send(GL20.GL_ARRAY_BUFFER, GL20.GL_STREAM_DRAW);
+
       elements = ctx.createShortBuffer(START_ELEMS);
+      elements.bind(GL20.GL_ELEMENT_ARRAY_BUFFER);
+      elements.send(GL20.GL_ELEMENT_ARRAY_BUFFER, GL20.GL_STREAM_DRAW);
     }
 
     @Override
@@ -176,9 +181,9 @@ public class IndexedTrisShader extends GLShader {
         return;
       ctx.checkGLError("Shader.flush");
 
-      vertices.send(GL20.GL_ARRAY_BUFFER, GL20.GL_STREAM_DRAW);
-      int elems = elements.send(GL20.GL_ELEMENT_ARRAY_BUFFER, GL20.GL_STREAM_DRAW);
-      ctx.checkGLError("Shader.flush BufferData");
+      vertices.send(GL20.GL_ARRAY_BUFFER);
+      int elems = elements.send(GL20.GL_ELEMENT_ARRAY_BUFFER);
+      ctx.checkGLError("Shader.flush BufferSubData");
 
       elements.drawElements(GL20.GL_TRIANGLES, elems);
       ctx.checkGLError("Shader.flush DrawElements");
@@ -269,6 +274,10 @@ public class IndexedTrisShader extends GLShader {
       while (newVerts < vertCount)
         newVerts += EXPAND_VERTS;
       vertices.expand(newVerts*vertexSize());
+
+      // Resize the underlying GL buffer object
+      // TODO(bruno): This is fugly, change GLBuffer to make it automatic?
+      vertices.send(GL20.GL_ARRAY_BUFFER, GL20.GL_STREAM_DRAW);
     }
 
     private void expandElems(int elemCount) {
@@ -276,6 +285,10 @@ public class IndexedTrisShader extends GLShader {
       while (newElems < elemCount)
         newElems += EXPAND_ELEMS;
       elements.expand(newElems);
+
+      // Resize the underlying GL buffer object
+      // TODO(bruno): This is fugly, change GLBuffer to make it automatic?
+      elements.send(GL20.GL_ELEMENT_ARRAY_BUFFER, GL20.GL_STREAM_DRAW);
     }
   }
 }
