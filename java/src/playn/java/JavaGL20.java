@@ -184,27 +184,27 @@ final class JavaGL20 implements playn.core.gl.GL20 {
     int oldLimit = data.limit();
     if (data instanceof ByteBuffer) {
       ByteBuffer subData = (ByteBuffer)data;
-      subData.limit(size);
+      subData.limit(subData.position() + size);
       GL15.glBufferData(target, subData, usage);
 
     } else if (data instanceof IntBuffer) {
       IntBuffer subData = (IntBuffer)data;
-      subData.limit(size/4);
+      subData.limit(subData.position() + size/4);
       GL15.glBufferData(target, subData, usage);
 
     } else if (data instanceof FloatBuffer) {
       FloatBuffer subData = (FloatBuffer)data;
-      subData.limit(size/4);
+      subData.limit(subData.position() + size/4);
       GL15.glBufferData(target, subData, usage);
 
     } else if (data instanceof DoubleBuffer) {
       DoubleBuffer subData = (DoubleBuffer)data;
-      subData.limit(size/8);
+      subData.limit(subData.position() + size/8);
       GL15.glBufferData(target, subData, usage);
 
     } else if (data instanceof ShortBuffer) {
       ShortBuffer subData = (ShortBuffer)data;
-      subData.limit(size/2);
+      subData.limit(subData.position() + size/2);
       GL15.glBufferData(target, subData, usage);
     }
     data.limit(oldLimit);
@@ -216,27 +216,27 @@ final class JavaGL20 implements playn.core.gl.GL20 {
     int oldLimit = data.limit();
     if (data instanceof ByteBuffer) {
       ByteBuffer subData = (ByteBuffer)data;
-      subData.limit(size);
+      subData.limit(subData.position() + size);
       GL15.glBufferSubData(target, offset, subData);
 
     } else if (data instanceof IntBuffer) {
       IntBuffer subData = (IntBuffer)data;
-      subData.limit(size/4);
+      subData.limit(subData.position() + size/4);
       GL15.glBufferSubData(target, offset, subData);
 
     } else if (data instanceof FloatBuffer) {
       FloatBuffer subData = (FloatBuffer)data;
-      subData.limit(size/4);
+      subData.limit(subData.position() + size/4);
       GL15.glBufferSubData(target, offset, subData);
 
     } else if (data instanceof DoubleBuffer) {
       DoubleBuffer subData = (DoubleBuffer)data;
-      subData.limit(size/8);
+      subData.limit(subData.position() + size/8);
       GL15.glBufferSubData(target, offset, subData);
 
     } else if (data instanceof ShortBuffer) {
       ShortBuffer subData = (ShortBuffer)data;
-      subData.limit(size/2);
+      subData.limit(subData.position() + size/2);
       GL15.glBufferSubData(target, offset, subData);
     }
     data.limit(oldLimit);
@@ -805,7 +805,7 @@ final class JavaGL20 implements playn.core.gl.GL20 {
   @Override
   public void glUniform1fv(int location, int count, FloatBuffer buffer) {
     int oldLimit = buffer.limit();
-    buffer.limit(count);
+    buffer.limit(buffer.position() + count);
     GL20.glUniform1(location, buffer);
     buffer.limit(oldLimit);
   }
@@ -818,7 +818,7 @@ final class JavaGL20 implements playn.core.gl.GL20 {
   @Override
   public void glUniform1iv(int location, int count, IntBuffer buffer) {
     int oldLimit = buffer.limit();
-    buffer.limit(count);
+    buffer.limit(buffer.position() + count);
     GL20.glUniform1(location, buffer);
     buffer.limit(oldLimit);
   }
@@ -831,7 +831,7 @@ final class JavaGL20 implements playn.core.gl.GL20 {
   @Override
   public void glUniform2fv(int location, int count, FloatBuffer buffer) {
     int oldLimit = buffer.limit();
-    buffer.limit(2*count);
+    buffer.limit(buffer.position() + 2*count);
     GL20.glUniform2(location, buffer);
     buffer.limit(oldLimit);
   }
@@ -844,7 +844,7 @@ final class JavaGL20 implements playn.core.gl.GL20 {
   @Override
   public void glUniform2iv(int location, int count, IntBuffer buffer) {
     int oldLimit = buffer.limit();
-    buffer.limit(2*count);
+    buffer.limit(buffer.position() + 2*count);
     GL20.glUniform2(location, buffer);
     buffer.limit(oldLimit);
   }
@@ -857,7 +857,7 @@ final class JavaGL20 implements playn.core.gl.GL20 {
   @Override
   public void glUniform3fv(int location, int count, FloatBuffer buffer) {
     int oldLimit = buffer.limit();
-    buffer.limit(3*count);
+    buffer.limit(buffer.position() + 3*count);
     GL20.glUniform3(location, buffer);
     buffer.limit(oldLimit);
   }
@@ -870,7 +870,7 @@ final class JavaGL20 implements playn.core.gl.GL20 {
   @Override
   public void glUniform3iv(int location, int count, IntBuffer buffer) {
     int oldLimit = buffer.limit();
-    buffer.limit(3*count);
+    buffer.limit(buffer.position() + 3*count);
     GL20.glUniform3(location, buffer);
     buffer.limit(oldLimit);
   }
@@ -883,7 +883,7 @@ final class JavaGL20 implements playn.core.gl.GL20 {
   @Override
   public void glUniform4fv(int location, int count, FloatBuffer buffer) {
     int oldLimit = buffer.limit();
-    buffer.limit(4*count);
+    buffer.limit(buffer.position() + 4*count);
     GL20.glUniform4(location, buffer);
     buffer.limit(oldLimit);
   }
@@ -896,7 +896,7 @@ final class JavaGL20 implements playn.core.gl.GL20 {
   @Override
   public void glUniform4iv(int location, int count, IntBuffer buffer) {
     int oldLimit = buffer.limit();
-    buffer.limit(4*count);
+    buffer.limit(buffer.position() + 4*count);
     GL20.glUniform4(location, buffer);
     buffer.limit(oldLimit);
   }
@@ -904,7 +904,7 @@ final class JavaGL20 implements playn.core.gl.GL20 {
   @Override
   public void glUniformMatrix2fv(int location, int count, boolean transpose, FloatBuffer buffer) {
     int oldLimit = buffer.limit();
-    buffer.limit(2*2*count);
+    buffer.limit(buffer.position() + 2*2*count);
     GL20.glUniformMatrix2(location, transpose, buffer);
     buffer.limit(oldLimit);
   }
@@ -912,7 +912,7 @@ final class JavaGL20 implements playn.core.gl.GL20 {
   @Override
   public void glUniformMatrix3fv(int location, int count, boolean transpose, FloatBuffer buffer) {
     int oldLimit = buffer.limit();
-    buffer.limit(3*3*count);
+    buffer.limit(buffer.position() + 3*3*count);
     GL20.glUniformMatrix3(location, transpose, buffer);
     buffer.limit(oldLimit);
   }
@@ -920,7 +920,7 @@ final class JavaGL20 implements playn.core.gl.GL20 {
   @Override
   public void glUniformMatrix4fv(int location, int count, boolean transpose, FloatBuffer buffer) {
     int oldLimit = buffer.limit();
-    buffer.limit(4*4*count);
+    buffer.limit(buffer.position() + 4*4*count);
     GL20.glUniformMatrix4(location, transpose, buffer);
     buffer.limit(oldLimit);
   }
