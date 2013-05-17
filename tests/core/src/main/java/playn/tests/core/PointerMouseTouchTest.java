@@ -53,7 +53,7 @@ class PointerMouseTouchTest extends Test {
   private TextLogger logger;
   private TextMapper motionLabel;
 
-  private Toggle preventDefault;
+  private Toggle preventDefault, capture;
   private NToggle<String> propagate;
 
   @Override
@@ -73,6 +73,10 @@ class PointerMouseTouchTest extends Test {
     preventDefault = new Toggle("Prevent Default");
     graphics().rootLayer().addAt(preventDefault.layer, x, y);
     x += preventDefault.layer.image().width() + 5;
+
+    capture = new Toggle("Capture");
+    graphics().rootLayer().addAt(capture.layer, x, y);
+    x += capture.layer.image().width() + 5;
 
     propagate = new NToggle<String>("Propagation", "Off", "On", "On (stop)") {
       @Override
@@ -220,13 +224,18 @@ class PointerMouseTouchTest extends Test {
 
     // add pointer listener for parent layer
     pointer.layer.addListener(new Pointer.Listener() {
+      double start;
       @Override
       public void onPointerStart(Event event) {
         logger.log(describe(event, "parent pointer start"));
+        start = event.time();
       }
       @Override
       public void onPointerDrag(Event event) {
         motionLabel.set("parent pointer drag", describe(event, ""));
+        if (capture.value() && event.time() - start > 2000) {
+          event.flags().capture();
+        }
       }
       @Override
       public void onPointerEnd(Event event) {
