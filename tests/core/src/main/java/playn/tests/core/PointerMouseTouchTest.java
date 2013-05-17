@@ -16,6 +16,7 @@
 package playn.tests.core;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -67,11 +68,11 @@ class PointerMouseTouchTest extends Test {
 
   @Override
   public void init() {
-    float y = 20;
+    float y = 20, x = 20;
 
     preventDefault = new Toggle("Prevent Default");
-    graphics().rootLayer().addAt(preventDefault.layer, 20, y);
-    y += preventDefault.layer.image().height() + 5;
+    graphics().rootLayer().addAt(preventDefault.layer, x, y);
+    x += preventDefault.layer.image().width() + 5;
 
     propagate = new NToggle<String>("Propagation", "Off", "On", "On (stop)") {
       @Override
@@ -80,32 +81,36 @@ class PointerMouseTouchTest extends Test {
         platform().setPropagateEvents(value != 0);
       }
     };
-    graphics().rootLayer().addAt(propagate.layer, 20, y);
+    graphics().rootLayer().addAt(propagate.layer, x, y);
     y += propagate.layer.image().height() + 5;
+    x = 20;
 
     float boxWidth = 300, boxHeight = 110;
     final Box mouse = new Box("Mouse", 0xffff8080, boxWidth, boxHeight);
-    graphics().rootLayer().addAt(mouse.layer, 20, y);
+    graphics().rootLayer().addAt(mouse.layer, x, y);
     y += mouse.layer.height() + 5;
 
     final Box pointer = new Box("Pointer", 0xff80ff80, boxWidth, boxHeight);
-    graphics().rootLayer().addAt(pointer.layer, 20, y);
+    graphics().rootLayer().addAt(pointer.layer, x, y);
     y += pointer.layer.height() + 5;
 
     final Box touch = new Box("Touch", 0xff8080ff, boxWidth, boxHeight);
-    graphics().rootLayer().addAt(touch.layer, 20, y);
-    y += touch.layer.height() + 5;
+    graphics().rootLayer().addAt(touch.layer, x, y);
+
+    y = mouse.layer.ty();
+    x += touch.layer.width() + 5;
 
     // setup the logger and its layer
-    createLabel("Event Log", 0, 325, 20);
-    logger = new TextLogger(375, 300, logFormat);
-    logger.layer.setTranslation(325, 40);
+    y += createLabel("Event Log", 0, x, y).height();
+    logger = new TextLogger(375, 15, logFormat);
+    logger.layer.setTranslation(x, y);
     graphics().rootLayer().add(logger.layer);
+    y += logger.layer.height() + 5;
 
     // setup the motion logger and its layer
-    createLabel("Motion Log", 0, 325, 340);
-    motionLabel = new TextMapper(375, 120, logFormat);
-    motionLabel.layer.setTranslation(325, 360);
+    y += createLabel("Motion Log", 0, x, y).height();
+    motionLabel = new TextMapper(375, 6, logFormat);
+    motionLabel.layer.setTranslation(x, y);
     graphics().rootLayer().add(motionLabel.layer);
 
     // add mouse layer listener
@@ -306,7 +311,7 @@ class PointerMouseTouchTest extends Test {
   }
 
   protected ImageLayer createLabel(String text, int bg, float x, float y) {
-    return createLabel(text, graphics().rootLayer(), 0xFF6699CC, bg, x, y, 0);
+    return createLabel(text, graphics().rootLayer(), 0xFF202020, bg, x, y, 0);
   }
 
   protected ImageLayer createLabel(String text, GroupLayer parent,
@@ -333,8 +338,9 @@ class PointerMouseTouchTest extends Test {
   }
 
   protected String describe(Events.Position event, String handler) {
+    String time = "@" + (int)(event.time() % 10000);
     String pd = event.flags().getPreventDefault() ? "pd " : "";
-    String msg = pd + handler + " (" + event.x() + "," + event.y() + ")";
+    String msg = time + " " + pd + handler + " (" + event.x() + "," + event.y() + ")";
     if (event instanceof Pointer.Event) {
       msg += " isTouch(" + ((Pointer.Event)event).isTouch() + ")";
     }
@@ -375,10 +381,10 @@ class PointerMouseTouchTest extends Test {
 
       layout = graphics().layoutText(text, format);
       if (layout.height() > image.height()) {
-        System.out.println("Clipped");
+        log().error("Clipped");
       }
       image.canvas().clear();
-      image.canvas().setFillColor(0xFF6699CC);
+      image.canvas().setFillColor(0xFF202020);
       image.canvas().fillText(layout, 0, 0);
       dirty = false;
     }
@@ -386,8 +392,8 @@ class PointerMouseTouchTest extends Test {
 
   protected class TextMapper extends Label {
     public Map<String, String> values = new TreeMap<String, String>();
-    public TextMapper(float wid, float hei, TextFormat format) {
-      super(wid, hei, format);
+    public TextMapper(float wid, int lines, TextFormat format) {
+      super(wid, graphics().layoutText(".", format).height() * lines, format);
     }
 
     public void set(String name, String value) {
@@ -397,10 +403,13 @@ class PointerMouseTouchTest extends Test {
 
     public void update () {
       StringBuilder sb = new StringBuilder();
-      for (String name : values.keySet()) {
-        sb.append(name).append(": ").append(values.get(name)).append('\n');
-      }
+      Iterator<Map.Entry<String, String>> iter = values.entrySet().iterator();
+      if (iter.hasNext()) append(sb, iter.next());
+      while (iter.hasNext()) append(sb.append('\n'), iter.next());
       set(sb.toString());
+    }
+    void append (StringBuilder sb, Map.Entry<String, String> entry) {
+      sb.append(entry.getKey()).append(": ").append(entry.getValue());
     }
   }
 
@@ -408,15 +417,9 @@ class PointerMouseTouchTest extends Test {
     private final ArrayList<String> entries = new ArrayList<String>();
     private final int lineCount;
 
-    public TextLogger(float wid, float hei, TextFormat format) {
-      super(wid, hei, format);
-      int lineCount = 1;
-      for (String maxText = "a\n";;lineCount++, maxText += "a\n") {
-        if (graphics().layoutText(maxText, format).height() > hei) {
-          break;
-        }
-      }
-      this.lineCount = lineCount - 1;
+    public TextLogger(float wid, int lines, TextFormat format) {
+      super(wid, graphics().layoutText(".", format).height() * lines, format);
+      this.lineCount = lines;
     }
 
     public void log(String text) {
