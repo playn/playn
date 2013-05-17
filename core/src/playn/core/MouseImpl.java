@@ -74,7 +74,7 @@ public abstract class MouseImpl implements Mouse {
   }
 
   public void setPropagateEvents(boolean propagate) {
-    dispatcher = Dispatcher.Util.select(propagate);
+    dispatcher = Dispatcher.select(propagate);
   }
 
   protected boolean onMouseDown(ButtonEvent.Impl event) {

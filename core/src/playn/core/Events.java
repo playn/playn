@@ -61,8 +61,27 @@ public class Events {
      */
     void setPropagationStopped(boolean stopped);
 
+    /**
+     * Where appropriate, causes all subsequent events in the current touch, point or mousedown
+     * to be sent to the current listener. Any other listeners that have an outstanding  "start"
+     * will be cancelled.
+     * <p>
+     * Only valid during dispatch of {@link Pointer.Listener} start and drag events,
+     * {@link Mouse.LayerListener} down and drag events, and {@link Touch.Listener} start and move
+     * events. Calls at other times will be ignored.
+     * <p>
+     * The classic use case for this is if some game element is scrollable and yet contains an
+     * element that is pressable. After measuring user intent, the scrollable listener can capture
+     * the event stream and thereby cancel the pressable's listener.
+     * <p>
+     * NOTE: this only works if event propagation is enabled for the platform
+     * ({@link Platform#setPropagateEvents()}).
+     */
+    void capture();
+
     public static class Impl implements Flags {
       private boolean preventDefault, stopped;
+      Capturable captureState;
 
       @Override
       public boolean getPreventDefault () {
@@ -88,6 +107,19 @@ public class Events {
       public String toString() {
         return preventDefault ? "preventDefault" : "normal";
       }
+
+      public void capture () {
+        if (captureState == null) {
+          // not supported, oh well
+          return;
+        }
+        // delegate to dispatcher
+        captureState = captureState.capture();
+      }
+    }
+
+    static abstract class Capturable {
+      abstract Capturable capture ();
     }
   }
 
@@ -131,7 +163,7 @@ public class Events {
       }
 
       protected String name() {
-          return "Events.Input";
+        return "Events.Input";
       }
 
       @Override
@@ -144,7 +176,6 @@ public class Events {
       protected void addFields(StringBuilder builder) {
         builder.append("time=").append(time).append(", flags=").append(flags);
       }
-
     }
   }
 

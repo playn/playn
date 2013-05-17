@@ -15,6 +15,7 @@
  */
 package playn.core;
 
+import playn.core.Dispatcher.EventSource;
 import pythagoras.f.Point;
 
 /**
@@ -25,7 +26,7 @@ public abstract class PointerImpl implements Pointer {
   private boolean enabled = true;
   private Dispatcher dispatcher = Dispatcher.SINGLE;
   private Listener listener;
-  private AbstractLayer activeLayer;
+  private final EventSource active = new EventSource();
 
   @Override
   public boolean isEnabled() {
@@ -49,15 +50,16 @@ public abstract class PointerImpl implements Pointer {
 
   @Override
   public void cancelLayerDrags() {
-    if (activeLayer != null) {
+    if (active.layer != null) {
       Event.Impl event = new Event.Impl(new Events.Flags.Impl(), PlayN.currentTime(), 0, 0, false);
-      dispatcher.dispatch(activeLayer, Listener.class, event, CANCEL);
-      activeLayer = null;
+      Dispatcher.setSource(event, active);
+      dispatcher.dispatch(Listener.class, event, CANCEL, null);
+      active.clear();
     }
   }
 
   public void setPropagateEvents(boolean propagate) {
-    dispatcher = Dispatcher.Util.select(propagate);
+    dispatcher = Dispatcher.select(propagate);
   }
 
   protected boolean onPointerStart(Event.Impl event, boolean preventDefault) {
@@ -75,9 +77,10 @@ public abstract class PointerImpl implements Pointer {
       root.transform().inverseTransform(p, p);
       p.x += root.originX();
       p.y += root.originY();
-      activeLayer = (AbstractLayer)root.hitTest(p);
-      if (activeLayer != null) {
-        dispatcher.dispatch(activeLayer, Listener.class, event, START);
+      active.layer = (AbstractLayer)root.hitTest(p);
+      if (active.layer != null) {
+        Dispatcher.setSource(event, active);
+        dispatcher.dispatch(Listener.class, event, START, CANCEL);
       }
     }
     return event.flags().getPreventDefault();
@@ -92,8 +95,9 @@ public abstract class PointerImpl implements Pointer {
       listener.onPointerDrag(event);
     }
 
-    if (activeLayer != null) {
-      dispatcher.dispatch(activeLayer, Listener.class, event, DRAG);
+    if (active.layer != null) {
+      Dispatcher.setSource(event, active);
+      dispatcher.dispatch(Listener.class, event, DRAG, CANCEL);
     }
     return event.flags().getPreventDefault();
   }
@@ -107,9 +111,10 @@ public abstract class PointerImpl implements Pointer {
       listener.onPointerEnd(event);
     }
 
-    if (activeLayer != null) {
-      dispatcher.dispatch(activeLayer, Listener.class, event, END);
-      activeLayer = null;
+    if (active.layer != null) {
+      Dispatcher.setSource(event, active);
+      dispatcher.dispatch(Listener.class, event, END, null);
+      active.clear();
     }
     return event.flags().getPreventDefault();
   }
@@ -123,9 +128,10 @@ public abstract class PointerImpl implements Pointer {
       listener.onPointerCancel(event);
     }
 
-    if (activeLayer != null) {
-      dispatcher.dispatch(activeLayer, Listener.class, event, CANCEL);
-      activeLayer = null;
+    if (active.layer != null) {
+      Dispatcher.setSource(event, active);
+      dispatcher.dispatch(Listener.class, event, CANCEL, null);
+      active.clear();
     }
     return event.flags().getPreventDefault();
   }

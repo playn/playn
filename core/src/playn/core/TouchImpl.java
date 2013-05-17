@@ -71,7 +71,7 @@ public class TouchImpl implements Touch {
   }
 
   public void setPropagateEvents(boolean propagate) {
-    dispatcher = Dispatcher.Util.select(propagate);
+    dispatcher = Dispatcher.select(propagate);
   }
 
   public void onTouchStart(Event.Impl[] touches) {
