@@ -96,6 +96,16 @@ public abstract class GLShader {
     void bind(int stride, int offset);
   }
 
+  protected static final String FRAGMENT_PREAMBLE =
+      "#ifdef GL_ES\n" +
+      "precision lowp float;\n" +
+      "#else\n" +
+      // Not all versions of regular OpenGL supports precision qualifiers, define placeholders
+      "#define lowp\n" +
+      "#define mediump\n" +
+      "#define highp\n" +
+      "#endif\n";
+
   protected final GLContext ctx;
   protected int refs;
   protected Core texCore, colorCore, curCore;
@@ -297,13 +307,10 @@ public abstract class GLShader {
    * remove or change the defaults.
    */
   protected String textureFragmentShader() {
-    return "#ifdef GL_ES\n" +
-      "precision highp float;\n" +
-      "#endif\n" +
-
-      "uniform sampler2D u_Texture;\n" +
-      "varying vec2 v_TexCoord;\n" +
-      "varying vec4 v_Color;\n" +
+    return FRAGMENT_PREAMBLE +
+      "uniform lowp sampler2D u_Texture;\n" +
+      "varying mediump vec2 v_TexCoord;\n" +
+      "varying lowp vec4 v_Color;\n" +
 
       "void main(void) {\n" +
       "  vec4 textureColor = texture2D(u_Texture, v_TexCoord);\n" +
@@ -325,11 +332,8 @@ public abstract class GLShader {
    * remove or change the defaults.
    */
   protected String colorFragmentShader() {
-    return "#ifdef GL_ES\n" +
-      "precision highp float;\n" +
-      "#endif\n" +
-
-      "varying vec4 v_Color;\n" +
+    return FRAGMENT_PREAMBLE +
+      "varying lowp vec4 v_Color;\n" +
 
       "void main(void) {\n" +
       "  gl_FragColor = vec4(v_Color.rgb, 1) * v_Color.a;\n" +
