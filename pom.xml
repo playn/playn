@@ -159,7 +159,7 @@
           </configuration>
         </plugin>
 
-        <!-- this shuts m2eclipse up about the maven-antrun plugin -->
+        <!-- this shuts m2eclipse up about various Maven plugins -->
         <plugin>
           <groupId>org.eclipse.m2e</groupId>
           <artifactId>lifecycle-mapping</artifactId>
@@ -220,6 +220,19 @@
                     <versionRange>[1.0,)</versionRange>
                     <goals>
                       <goal>enforce</goal>
+                    </goals>
+                  </pluginExecutionFilter>
+                  <action>
+                    <ignore />
+                  </action>
+                </pluginExecution>
+                <pluginExecution>
+                  <pluginExecutionFilter>
+                    <groupId>com.pyx4j</groupId>
+                    <artifactId>maven-junction-plugin</artifactId>
+                    <versionRange>[1.0.3,)</versionRange>
+                    <goals>
+                      <goal>link</goal>
                     </goals>
                   </pluginExecutionFilter>
                   <action>
