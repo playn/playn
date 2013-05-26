@@ -17,9 +17,7 @@ package com.google.gwt.webgl.client;
 
 import com.google.gwt.core.client.JsArrayInteger;
 import com.google.gwt.core.client.JsArrayNumber;
-import com.google.gwt.typedarrays.client.Float32ArrayNative;
 import com.google.gwt.typedarrays.client.JsUtils;
-import com.google.gwt.typedarrays.shared.ArrayBufferView;
 import com.google.gwt.typedarrays.shared.Float32Array;
 import com.google.gwt.typedarrays.shared.Int32Array;
 import com.google.gwt.typedarrays.shared.Uint16Array;

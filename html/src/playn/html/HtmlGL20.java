@@ -152,6 +152,8 @@ public final class HtmlGL20 implements playn.core.gl.GL20 {
     case TEXTURE:
       gl.deleteTexture((WebGLTexture) object);
       break;
+    default:
+      break;
     }
   }
 

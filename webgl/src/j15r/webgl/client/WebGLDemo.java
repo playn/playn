@@ -8,8 +8,6 @@ import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.ImageElement;
 import com.google.gwt.dom.client.NativeEvent;
 import com.google.gwt.typedarrays.shared.Float32Array;
-import com.google.gwt.typedarrays.shared.Int32Array;
-import com.google.gwt.typedarrays.shared.TypedArrays;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.webgl.client.ArrayUtils;
 import com.google.gwt.webgl.client.WebGLBuffer;

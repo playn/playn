@@ -51,16 +51,16 @@ public class AndroidStorage implements Storage {
   public Batch startBatch() {
     return new BatchImpl(this) {
       private SharedPreferences.Editor edit;
-      protected void onBeforeCommit() {
+      @Override protected void onBeforeCommit() {
         edit = settings.edit();
       }
-      protected void setImpl(String key, String data) {
+      @Override protected void setImpl(String key, String data) {
         edit.putString(key, data);
       }
-      protected void removeImpl(String key, String data) {
+      @Override protected void removeImpl(String key) {
         edit.remove(key);
       }
-      protected void onAfterCommit() {
+      @Override protected void onAfterCommit() {
         edit.commit();
         edit = null;
       }

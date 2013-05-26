@@ -24,7 +24,6 @@ import playn.core.Path;
 import playn.core.Pattern;
 import playn.core.TextLayout;
 import playn.core.gl.AbstractCanvasGL;
-import playn.core.gl.Scale;
 
 abstract class AbstractHtmlCanvas extends AbstractCanvasGL<Context2d> {
 
@@ -290,29 +289,29 @@ abstract class AbstractHtmlCanvas extends AbstractCanvasGL<Context2d> {
 
   private String convertComposite(Canvas.Composite composite) {
     switch (composite) {
-      case SRC:
-        return "copy";
-      case DST_ATOP:
-        return "destination-atop";
-      case SRC_OVER:
-        return "source-over";
-      case DST_OVER:
-        return "destination-over";
-      case SRC_IN:
-        return "source-in";
-      case DST_IN:
-        return "destination-in";
-      case SRC_OUT:
-        return "source-out";
-      case DST_OUT:
-        return "destination-out";
-      case SRC_ATOP:
-        return "source-atop";
-      case XOR:
-        return "xor";
-      // MULTIPLY not supported
+    case SRC:
+      return "copy";
+    case DST_ATOP:
+      return "destination-atop";
+    case SRC_OVER:
+      return "source-over";
+    case DST_OVER:
+      return "destination-over";
+    case SRC_IN:
+      return "source-in";
+    case DST_IN:
+      return "destination-in";
+    case SRC_OUT:
+      return "source-out";
+    case DST_OUT:
+      return "destination-out";
+    case SRC_ATOP:
+      return "source-atop";
+    case XOR:
+      return "xor";
+    default: // MULTIPLY not supported
+      return "copy";
     }
-    return "copy";
   }
 
   private Context2d.LineCap convertLineCap(LineCap cap) {

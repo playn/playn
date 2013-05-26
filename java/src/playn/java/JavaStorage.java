@@ -62,13 +62,13 @@ class JavaStorage implements Storage {
   @Override
   public Batch startBatch() {
     return new BatchImpl(this) {
-      protected void setImpl(String key, String data) {
+      @Override protected void setImpl(String key, String data) {
         properties.setProperty(key, data);
       }
-      protected void removeImpl(String key, String data) {
+      @Override protected void removeImpl(String key) {
         properties.remove(key);
       }
-      protected void onAfterCommit() {
+      @Override protected void onAfterCommit() {
         maybePersistProperties(properties);
       }
     };

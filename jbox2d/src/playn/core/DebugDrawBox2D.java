@@ -146,7 +146,7 @@ public class DebugDrawBox2D extends DebugDraw {
 
     getWorldToScreenToOut(xf.p, tempVec1);
     tempVec2.setZero();
-    float k_axisScale = 0.4f;
+    // float k_axisScale = 0.4f;
 
     canvas.setStrokeColor(Color.rgb(1, 0, 0)); // note: violates strokeAlpha
     tempVec2.x = xf.p.x; // + k_axisScale * xf.R.m11; // Transform no longer scales
