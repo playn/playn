@@ -13,11 +13,8 @@
  */
 package playn.shared.json;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertFalse;
-import static junit.framework.Assert.assertTrue;
-
 import org.junit.Test;
+import static org.junit.Assert.*;
 
 import playn.core.Json;
 import playn.core.Json.TypedArray;
@@ -30,10 +27,10 @@ public class JsonImplArrayTest extends AbstractJsonTest {
   public void testArrayBasics() {
     Json.Array a = json().parseArray("[1,2]");
     assertEquals(2, a.length());
-    
+
     a.remove(0);
     assertEquals(1, a.length());
-    
+
     a.remove(-1);
     a.remove(10);
     assertEquals(1, a.length());
@@ -54,7 +51,7 @@ public class JsonImplArrayTest extends AbstractJsonTest {
     assertTrue(a.isNull(0));
     assertTrue(a.isNull(1));
     assertTrue(a.isObject(2));
-    
+
     a.set(0, null);
     a.set(1, "abcdef");
 
@@ -63,10 +60,10 @@ public class JsonImplArrayTest extends AbstractJsonTest {
     a.add(0, json().createArray());
 
     assertEquals(6, a.length());
-    
+
     checkTypes(a);
   }
-  
+
   @Test
   public void testArrayAppend() {
     Json.Array a = json().createArray();
@@ -76,7 +73,7 @@ public class JsonImplArrayTest extends AbstractJsonTest {
     a.add(null);
     a.add("abcdef");
     a.add(json().createObject());
-    
+
     checkTypes(a);
   }
 
@@ -91,10 +88,10 @@ public class JsonImplArrayTest extends AbstractJsonTest {
     a.set(4, "abcdef");
     a.set(0, json().createArray());
     assertEquals(6, a.length());
-    
+
     checkTypes(a);
   }
-  
+
   @Test
   public void testIsArray() {
     assertFalse(json().isArray(json().createObject()));
@@ -107,7 +104,7 @@ public class JsonImplArrayTest extends AbstractJsonTest {
     assertFalse(json().isArray(new Double(1)));
     assertFalse(json().isArray(null));
   }
-  
+
   @Test
   public void testTypedArray() {
     Json.Array a = json().parseArray("[[1,2,3], [\"1\", \"2\"]]");
@@ -116,13 +113,13 @@ public class JsonImplArrayTest extends AbstractJsonTest {
     assertEquals(1, (int)ta.get(0));
     assertEquals(2, (int)ta.get(1));
     assertEquals(3, (int)ta.get(2));
-    
+
     TypedArray<String> ta2 = a.getArray(1, String.class);
     assertEquals(2, ta2.length());
     assertEquals("1", ta2.get(0));
     assertEquals("2", ta2.get(1));
   }
-  
+
   private void checkTypes(Json.Array a) {
     assertTrue(a.isArray(0));
     assertFalse(a.isArray(1));
@@ -172,5 +169,4 @@ public class JsonImplArrayTest extends AbstractJsonTest {
     assertTrue(a.isObject(5));
     assertFalse(a.isObject(6));
   }
-  
 }

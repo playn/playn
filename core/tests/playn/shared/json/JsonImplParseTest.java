@@ -13,16 +13,15 @@
  */
 package playn.shared.json;
 
-import static junit.framework.Assert.assertEquals;
-
 import org.junit.Test;
+import static org.junit.Assert.*;
 
 import playn.core.Json;
 
 /**
  * Test the public-facing {@link Json} parsing APIs. The underlying parser is exercised in other
  * tests.
- * 
+ *
  * Tests in this class are re-used to test HTML mode.
  */
 public class JsonImplParseTest extends AbstractJsonTest {
@@ -50,7 +49,7 @@ public class JsonImplParseTest extends AbstractJsonTest {
     assertEquals(1, a.getInt(1));
     assertEquals(1f, a.getNumber(1), 0.001f);
     assertEquals(1, a.getDouble(1), 0.001f);
-    
+
     assertEquals(true, a.getBoolean(2));
   }
 }

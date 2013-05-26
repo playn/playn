@@ -13,9 +13,8 @@
  */
 package playn.shared.json;
 
-import static junit.framework.Assert.assertEquals;
-
 import org.junit.Test;
+import static org.junit.Assert.*;
 
 import playn.core.Json;
 
