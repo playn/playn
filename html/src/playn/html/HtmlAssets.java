@@ -120,7 +120,7 @@ public class HtmlAssets extends AbstractAssets<Void> {
       String key = getKey(path);
       ImageResource resource = (ImageResource) getResource(key, clientBundle);
       if (resource != null) {
-        url = resource.getURL();
+        url = resource.getSafeUri().asString();
       }
     }
     return adaptImage(url, scale);
@@ -147,7 +147,7 @@ public class HtmlAssets extends AbstractAssets<Void> {
       String key = getKey(path);
       DataResource resource = (DataResource) getResource(key, clientBundle);
       if (resource != null) {
-        url = resource.getUrl();
+        url = resource.getSafeUri().asString();
       }
     } else {
       url += ".mp3";
