@@ -321,11 +321,13 @@ public abstract class GLContext {
   }
 
   /**
-   * Adds the given rectangle to the scissors stack, intersecting with the previous one
-   * if it exists. Intended for use by subclasses to implement {@link #startClipped()} and
-   * {@link #endClipped()}.
-   * <p>NOTE: calls to this method <b>must</b> be matched by a corresponding call
-   * {@link #popScissorState()}, or all hell will break loose.</p>
+   * Adds the given rectangle to the scissors stack, intersecting with the previous one if it
+   * exists. Intended for use by subclasses to implement {@link #startClipped} and {@link
+   * #endClipped}.
+   *
+   * <p>NOTE: calls to this method <b>must</b> be matched by a corresponding call {@link
+   * #popScissorState}, or all hell will break loose.</p>
+   *
    * @return the new clipping rectangle to use
    */
   protected Rectangle pushScissorState (int x, int y, int width, int height) {

@@ -104,20 +104,21 @@ public class Events {
     double time();
 
     /**
-     * Where appropriate, causes all subsequent events in the current touch, point or mousedown
-     * to be sent to the current listener. Any other listeners that have an outstanding  "start"
+     * Where appropriate, causes all subsequent events in the current touch, point or mousedown to
+     * be sent to the current listener. Any other layer listeners that have an outstanding "start"
      * will be cancelled.
-     * <p>
-     * Only valid during dispatch of {@link Pointer.Listener} start and drag events,
+     *
+     * <p>This is only valid during dispatch of {@link Pointer.Listener} start and drag events,
      * {@link Mouse.LayerListener} down and drag events, and {@link Touch.Listener} start and move
-     * events. Calls at other times will be ignored.
-     * <p>
-     * The classic use case for this is if some game element is scrollable and yet contains an
+     * events. Calls at other times will be ignored.</p>
+     *
+     * <p>The classic use case for this is if some game element is scrollable and yet contains an
      * element that is pressable. After measuring user intent, the scrollable listener can capture
-     * the event stream and thereby cancel the pressable's listener.
-     * <p>
-     * NOTE: this only works if event propagation is enabled for the platform
-     * ({@link Platform#setPropagateEvents()}).
+     * the event stream and thereby cancel the pressable's listener.</p>
+     *
+     * <p>NOTE: this is only meaningful if event propagation is enabled for the platform ({@link
+     * Platform#setPropagateEvents}). If event propagation is not enabled, there will only ever be
+     * a single layer listener involved in an interaction.</p>
      */
     void capture();
 

@@ -53,12 +53,12 @@ public interface Image {
   void addCallback(Callback<? super Image> callback);
 
   /**
-   * Returns whether this image repeats in the x direction. See {@link #setRepeatX}.
+   * Returns whether this image repeats in the x direction. See {@link #setRepeat}.
    */
   boolean repeatX();
 
   /**
-   * Returns whether this image repeats in the y direction. See {@link #setRepeatX}.
+   * Returns whether this image repeats in the y direction. See {@link #setRepeat}.
    */
   boolean repeatY();
 

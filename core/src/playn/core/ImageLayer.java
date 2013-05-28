@@ -18,8 +18,8 @@ package playn.core;
 /**
  * A layer that displays a bitmapped image. By default, the layer is the same size as its
  * underlying image, but its size can be changed from that default and the layer will either scale
- * or repeat the image to cause it to fill its bounds. See {@link #setSize}, {@link #setRepeatX},
- * etc.
+ * or repeat the image to cause it to fill its bounds. See {@link #setSize}, {@link
+ * Image#setRepeat}, etc.
  */
 public interface ImageLayer extends Layer.HasSize {
 

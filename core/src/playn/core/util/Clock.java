@@ -19,22 +19,22 @@ package playn.core.util;
  * Used to provide the current interpolated time. The {@code Source} implementation takes care of
  * tracking and computing the current interpolated time. Use like so:
  *
- * <pre>{@code
+ * <pre><code>
  * class MyGame extends Game.Default {
  *   private final static int UPDATE_RATE = 50;
  *   private final Clock.Source clock = new Clock.Source(UPDATE_RATE);
  *   public MyGame () {
  *     super(UPDATE_RATE);
  *   }
- *   @Override public void update (int delta) {
+ *   {@code @Override} public void update (int delta) {
  *     clock.update(delta);
  *   }
- *   @Override public void paint (float alpha) {
+ *   {@code @Override} public void paint (float alpha) {
  *     clock.paint(alpha);
  *     // pass clock into any code that needs an alpha-adjusted timestamp
  *   }
  * }
- * }</pre>
+ * </code></pre>
  */
 public interface Clock {
 

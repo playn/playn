@@ -97,7 +97,7 @@ public class PlayN {
 
   /**
    * Queues the supplied runnable for invocation on the game thread prior to the next call to
-   * {@link Game#update}.
+   * {@link Game.Default#update}.
    */
   public static void invokeLater(Runnable runnable) {
     platform.invokeLater(runnable);

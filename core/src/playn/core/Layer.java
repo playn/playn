@@ -111,12 +111,12 @@ public interface Layer {
 
   /**
    * Return the global alpha value for this layer.
-   * <p>
-   * The global alpha value for a layer controls the opacity of the layer but does not affect the
-   * current drawing operation. I.e., when {@link Game#paint(float)} is called and the {@link Layer}
-   * is drawn, this alpha value is applied to the alpha channel of the Layer.
-   * <p>
-   * By default, the alpha for a Layer is 1.0 (not transparent).
+   *
+   * <p>The global alpha value for a layer controls the opacity of the layer but does not affect
+   * the current drawing operation. I.e., when {@link Game.Default#paint(float)} is called and the
+   * {@link Layer} is drawn, this alpha value is applied to the alpha channel of the Layer.</p>
+   *
+   * <p>By default, the alpha for a Layer is 1.0 (not transparent).</p>
    *
    * @return alpha in range [0,1] where 0 is transparent and 1 is opaque
    */
@@ -148,8 +148,8 @@ public interface Layer {
    * not possible to tint layers using the HTML5 canvas and Flash backends. </p>
    *
    * <p> The tint for a layer controls the opacity of the layer but does not affect the current
-   * drawing operation. I.e., when {@link Game#paint(float)} is called and the {@link Layer} is
-   * drawn, this tint is applied when rendering the layer. </p>
+   * drawing operation. I.e., when {@link Game.Default#paint(float)} is called and the {@link
+   * Layer} is drawn, this tint is applied when rendering the layer. </p>
    *
    * @return a reference to this layer for call chaining.
    */
@@ -210,7 +210,7 @@ public interface Layer {
    * setting rotation and then setting scale will not flip the rotation like it would were these
    * applied to the transform matrix one operation at a time. </p>
    *
-   * @param x translation on x axis
+   * @param tx translation on x axis
    *
    * @return a reference to this layer for call chaining.
    */
@@ -225,7 +225,7 @@ public interface Layer {
    * setting rotation and then setting scale will not flip the rotation like it would were these
    * applied to the transform matrix one operation at a time. </p>
    *
-   * @param y translation on y axis
+   * @param ty translation on y axis
    *
    * @return a reference to this layer for call chaining.
    */
@@ -249,7 +249,7 @@ public interface Layer {
 
   /**
    * Returns this layer's current scale in the x direction. <em>Note:</em> this is the most recent
-   * value supplied to {@link #setScale(float)} or {@link setScale(float,float)}, it is
+   * value supplied to {@link #setScale(float)} or {@link #setScale(float,float)}, it is
    * <em>not</em> extracted from the underlying transform. Thus the sign of the scale returned by
    * this method is preserved. It's also substantially cheaper than extracting the scale from the
    * affine transform matrix. This also means that if you change the scale directly on the {@link
@@ -259,7 +259,7 @@ public interface Layer {
 
   /**
    * Returns this layer's current scale in the y direction. <em>Note:</em> this is the most recent
-   * value supplied to {@link #setScale(float)} or {@link setScale(float,float)}, it is
+   * value supplied to {@link #setScale(float)} or {@link #setScale(float,float)}, it is
    * <em>not</em> extracted from the underlying transform. Thus the sign of the scale returned by
    * this method is preserved. It's also substantially cheaper than extracting the scale from the
    * affine transform matrix. This also means that if you change the scale directly on the {@link
