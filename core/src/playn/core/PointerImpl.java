@@ -15,7 +15,6 @@
  */
 package playn.core;
 
-import playn.core.Dispatcher.EventSource;
 import pythagoras.f.Point;
 
 /**
@@ -26,7 +25,7 @@ public abstract class PointerImpl implements Pointer {
   private boolean enabled = true;
   private Dispatcher dispatcher = Dispatcher.SINGLE;
   private Listener listener;
-  private final EventSource active = new EventSource();
+  private final Dispatcher.CaptureState active = new Dispatcher.CaptureState();
 
   @Override
   public boolean isEnabled() {
@@ -52,7 +51,7 @@ public abstract class PointerImpl implements Pointer {
   public void cancelLayerDrags() {
     if (active.layer != null) {
       Event.Impl event = new Event.Impl(new Events.Flags.Impl(), PlayN.currentTime(), 0, 0, false);
-      Dispatcher.setSource(event, active);
+      event.captureState = active;
       dispatcher.dispatch(Listener.class, event, CANCEL, null);
       active.clear();
     }
@@ -79,7 +78,7 @@ public abstract class PointerImpl implements Pointer {
       p.y += root.originY();
       active.layer = (AbstractLayer)root.hitTest(p);
       if (active.layer != null) {
-        Dispatcher.setSource(event, active);
+        event.captureState = active;
         dispatcher.dispatch(Listener.class, event, START, CANCEL);
       }
     }
@@ -96,7 +95,7 @@ public abstract class PointerImpl implements Pointer {
     }
 
     if (active.layer != null) {
-      Dispatcher.setSource(event, active);
+      event.captureState = active;
       dispatcher.dispatch(Listener.class, event, DRAG, CANCEL);
     }
     return event.flags().getPreventDefault();
@@ -112,7 +111,7 @@ public abstract class PointerImpl implements Pointer {
     }
 
     if (active.layer != null) {
-      Dispatcher.setSource(event, active);
+      event.captureState = active;
       dispatcher.dispatch(Listener.class, event, END, null);
       active.clear();
     }
@@ -129,7 +128,7 @@ public abstract class PointerImpl implements Pointer {
     }
 
     if (active.layer != null) {
-      Dispatcher.setSource(event, active);
+      event.captureState = active;
       dispatcher.dispatch(Listener.class, event, CANCEL, null);
       active.clear();
     }

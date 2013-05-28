@@ -38,7 +38,9 @@ public interface Pointer {
 
       @Override
       public Event.Impl localize(Layer hit) {
-        return new Event.Impl(hit, flags(), time(), x(), y(), isTouch());
+        Event.Impl impl = new Event.Impl(hit, flags(), time(), x(), y(), isTouch());
+        impl.captureState = captureState;
+        return impl;
       }
 
       @Override

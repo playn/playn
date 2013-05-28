@@ -17,13 +17,12 @@
 package playn.core;
 
 import playn.core.AbstractLayer.Interaction;
-import playn.core.Events.Flags;
 import playn.core.Events.Input;
 
 /** Some internal utilities for dispatching events. */
 abstract class Dispatcher {
 
-  static class EventSource extends Flags.Capturable {
+  static class CaptureState {
     AbstractLayer layer;
     AbstractLayer captured;
     Object capturedListener;
@@ -43,13 +42,12 @@ abstract class Dispatcher {
       return didCapture;
     }
 
-    @Override Flags.Capturable capture () {
+    void capture () {
       if (!didCapture) {
         didCapture = true;
       } else {
         // TODO: warn about already being captured?
       }
-      return this;
     }
   }
 
@@ -69,21 +67,22 @@ abstract class Dispatcher {
         AbstractLayer inLayer, Class<L> listenerType, E event, Interaction<L, E> interaction,
         Interaction<L, E> cancel) {
       E localized = localize(event, inLayer);
-      EventSource esrc = getSource(event);
-      if (esrc == null) {
+      CaptureState ecap = event.captureState;
+      if (ecap == null) {
         // make no attempts to capture, etc; just dispatch to layer + parents
         for (AbstractLayer ll = inLayer; ll != null; ll = (AbstractLayer)ll.parent()) {
           tryInteract(ll, listenerType, interaction, localized);
         }
+
       } else {
         Interaction<L, E> delegator = DELEGATOR.cast();
-        if (esrc.captured == null) {
+        if (ecap.captured == null) {
           // no capture yet, dispatch to layer + parents and check for capturings
           DELEGATOR.prepare(interaction).mode = DelegatingInteraction.RECORD_CAPTURE;
           boolean captured = false;
           for (AbstractLayer ll = inLayer; ll != null; ll = (AbstractLayer)ll.parent()) {
             tryInteract(ll, listenerType, delegator, localized);
-            captured = esrc.check(captured, ll);
+            captured = ecap.check(captured, ll);
           }
 
           if (captured) {
@@ -101,7 +100,7 @@ abstract class Dispatcher {
           // someone captured on a previous dispatch, divert all events to captured layer
           // TODO: should we update the hit layer?
           DELEGATOR.prepare(interaction).mode = DelegatingInteraction.ONLY_CAPTURED;
-          tryInteract(esrc.captured, listenerType, delegator, localized);
+          tryInteract(ecap.captured, listenerType, delegator, localized);
         }
       }
     }
@@ -128,23 +127,23 @@ abstract class Dispatcher {
     }
 
     public void interact(Object listener, Input.Impl event) {
-      EventSource esrc = getSource(event);
+      CaptureState ecap = event.captureState;
       switch (mode) {
       case ONLY_CAPTURED:
-        if (listener == esrc.capturedListener) {
+        if (listener == ecap.capturedListener) {
           delegate.interact(listener, event);
         }
         break;
       case EXCEPT_CAPTURED:
-        if (listener != esrc.capturedListener) {
+        if (listener != ecap.capturedListener) {
           delegate.interact(listener, event);
         }
         break;
       case RECORD_CAPTURE:
-        boolean prevCapture = esrc.didCapture;
+        boolean prevCapture = ecap.didCapture;
         delegate.interact(listener, event);
-        if (esrc.didCapture && !prevCapture) {
-          esrc.capturedListener = listener;
+        if (ecap.didCapture && !prevCapture) {
+          ecap.capturedListener = listener;
         }
         break;
       }
@@ -167,40 +166,29 @@ abstract class Dispatcher {
     }
   }
 
-  /** Sets the event source of the event. This is an implementation detail that allows the
-   * dispatcher to track the progress of start/move/cancel interactions of the caller vis-a-vis
-   * capturing. Called by control implementations that support capturing. */
-  static void setSource (Input.Impl event, EventSource source) {
-    ((Flags.Impl)event.flags()).captureState = source;
-  }
-
-  static EventSource getSource (Input.Impl event) {
-    return (EventSource)((Flags.Impl)event.flags()).captureState;
-  }
-
   @SuppressWarnings("unchecked")
   static <E extends Input.Impl> E localize (E event, AbstractLayer layer) {
     return (E)event.localize(layer);
   }
 
-  /** Issues an interact call to a layer and listener with a localized copy of the
-   * given event, using the given cancel interaction if one of the layer listeners calls
-   * {@link Flags#capture()} and this is a multi-layer dispatcher */
-  abstract <L, E extends Input.Impl> void dispatch(AbstractLayer layer,
-      Class<L> listenerType, E event, Interaction<L, E> interaction, Interaction<L, E> cancel);
+  /** Issues an interact call to {@code layer}'s listener(s) with a localized copy of the given
+   * event. {@code onCancel} is used if this is a multi-layer dispatcher and one of the layer
+   * listeners calls {@link Events.Input#capture()}. */
+  abstract <L, E extends Input.Impl> void dispatch(
+    AbstractLayer layer, Class<L> listenerType, E event,
+    Interaction<L, E> interaction, Interaction<L, E> onCancel);
 
-  /** Issues an interact call to a layer and listener with a localized copy of the
-   * given event, using the given cancel interaction if one of the layer listeners calls
-   * {@link Flags#capture()} and this is a multi-layer dispatcher */
+  /** Issues an interact call to the captured layer's listener(s) with a localized copy of the
+   * given event. {@code onCancel} is used if this is a multi-layer dispatcher and one of the layer
+   * listeners calls {@link Events.Input#capture()}. */
   <L, E extends Input.Impl> void dispatch(
-      Class<L> listenerType, E event, Interaction<L, E> interaction, Interaction<L, E> cancel) {
-    dispatch(getSource(event).layer, listenerType, event, interaction, cancel);
+      Class<L> listenerType, E event, Interaction<L, E> interaction, Interaction<L, E> onCancel) {
+    dispatch(event.captureState.layer, listenerType, event, interaction, onCancel);
   }
 
-  /** Issues an interact call to a layer and listener with a localized copy of the
-   * given event. */
-  <L, E extends Input.Impl> void dispatch(AbstractLayer layer,
-    Class<L> listenerType, E event, Interaction<L, E> interaction) {
+  /** Issues an interact call to a layer and listener with a localized copy of the given event. */
+  <L, E extends Input.Impl> void dispatch(
+      AbstractLayer layer, Class<L> listenerType, E event, Interaction<L, E> interaction) {
     dispatch(layer, listenerType, event, interaction, null);
   }
 }

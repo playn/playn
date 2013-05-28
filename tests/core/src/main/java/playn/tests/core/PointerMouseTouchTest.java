@@ -234,7 +234,7 @@ class PointerMouseTouchTest extends Test {
       public void onPointerDrag(Event event) {
         motionLabel.set("parent pointer drag", describe(event, ""));
         if (capture.value() && event.time() - start > 2000) {
-          event.flags().capture();
+          event.capture();
         }
       }
       @Override
