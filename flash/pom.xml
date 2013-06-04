@@ -50,21 +50,6 @@
       <version>${gwt.version}</version>
       <scope>runtime</scope>
     </dependency>
-
-    <!-- not really needed, but will suppress errors during GWT compilation -->
-    <dependency>
-      <groupId>javax.validation</groupId>
-      <artifactId>validation-api</artifactId>
-      <version>1.0.0.GA</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>javax.validation</groupId>
-      <artifactId>validation-api</artifactId>
-      <version>1.0.0.GA</version>
-      <classifier>sources</classifier>
-      <scope>provided</scope>
-    </dependency>
   </dependencies>
 
   <build>
