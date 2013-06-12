@@ -16,6 +16,8 @@
 package playn.java;
 
 import java.awt.Desktop;
+import java.io.File;
+import java.lang.reflect.Method;
 import java.net.URI;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -119,6 +121,7 @@ public class JavaPlatform extends AbstractPlatform {
 
   public JavaPlatform(Config config) {
     super(new JavaLog());
+    unpackNatives();
     graphics = new JavaGraphics(this, config);
     storage = new JavaStorage(this, config);
     if (config.emulateTouch) {
@@ -295,5 +298,31 @@ public class JavaPlatform extends AbstractPlatform {
 
     // and finally stick a fork in the JVM
     System.exit(0);
+  }
+
+  protected void unpackNatives() {
+    // avoid native library unpacking if we're running in Java Web Start
+    if (isInJavaWebStart())
+      return;
+
+    SharedLibraryExtractor extractor = new SharedLibraryExtractor();
+    File nativesDir = null;
+    try {
+      nativesDir = extractor.extractLibrary("lwjgl", null).getParentFile();
+    } catch (Throwable ex) {
+      throw new RuntimeException("Unable to extract LWJGL native libraries.", ex);
+    }
+    System.setProperty("org.lwjgl.librarypath", nativesDir.getAbsolutePath());
+  }
+
+  protected boolean isInJavaWebStart() {
+    try {
+      Method method = Class.forName("javax.jnlp.ServiceManager").
+        getDeclaredMethod("lookup", new Class<?>[] { String.class });
+      method.invoke(null, "javax.jnlp.PersistenceService");
+      return true;
+    } catch (Throwable ignored) {
+      return false;
+    }
   }
 }
