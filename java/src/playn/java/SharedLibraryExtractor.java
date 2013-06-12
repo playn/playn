@@ -42,56 +42,52 @@ public class SharedLibraryExtractor {
    * @return The extracted file.
    */
   public File extractLibrary(String libraryName, String dirName) throws IOException {
+    File javaLibPath = new File(System.getProperty("java.library.path"));
     for (String sourcePath : platformNames(libraryName)) {
       InputStream cinput;
       try {
         cinput = readFile(sourcePath);
       } catch (FileNotFoundException fnfe) {
-        continue; // try the next variant in the source path
-      }
-      try {
-        String sourceCrc = crc(cinput);
-        if (dirName == null)
-          dirName = sourceCrc;
-
-        File extractedDir = new File(System.getProperty("java.io.tmpdir") + "/playn" +
-                                     System.getProperty("user.name") + "/" + dirName);
-        File extractedFile = new File(extractedDir, new File(sourcePath).getName());
-
-        String extractedCrc = null;
-        if (extractedFile.exists()) {
-          try {
-            extractedCrc = crc(new FileInputStream(extractedFile));
-          } catch (FileNotFoundException ignored) {
-          }
-        }
-
-        // if file doesn't exist or the CRC doesn't match, extract it to the temp dir
-        if (extractedCrc == null || !extractedCrc.equals(sourceCrc)) {
-          try {
-            InputStream input = readFile(sourcePath);
-            extractedDir.mkdirs();
-            FileOutputStream output = new FileOutputStream(extractedFile);
-            byte[] buffer = new byte[4096];
-            while (true) {
-              int length = input.read(buffer);
-              if (length == -1) break;
-              output.write(buffer, 0, length);
-            }
-            input.close();
-            output.close();
-          } catch (IOException ex) {
-            throw new RuntimeException("Error extracting file: " + sourcePath, ex);
-          }
-        }
-        return extractedFile;
-
-      } catch (RuntimeException ex) {
         // attempt to fallback to file at java.library.path location
-        File file = new File(System.getProperty("java.library.path"), sourcePath);
-        if (!file.exists()) throw ex;
-        return file;
+        File file = new File(javaLibPath, sourcePath);
+        if (file.exists()) return file;
+        continue; // otherwise try the next variant in the source path
       }
+
+      String sourceCrc = crc(cinput);
+      if (dirName == null)
+        dirName = sourceCrc;
+
+      File extractedDir = new File(System.getProperty("java.io.tmpdir") + "/playn" +
+                                   System.getProperty("user.name") + "/" + dirName);
+      File extractedFile = new File(extractedDir, new File(sourcePath).getName());
+      String extractedCrc = null;
+      if (extractedFile.exists()) {
+        try {
+          extractedCrc = crc(new FileInputStream(extractedFile));
+        } catch (FileNotFoundException ignored) {
+        }
+      }
+
+      // if file doesn't exist or the CRC doesn't match, extract it to the temp dir
+      if (extractedCrc == null || !extractedCrc.equals(sourceCrc)) {
+        try {
+          InputStream input = readFile(sourcePath);
+          extractedDir.mkdirs();
+          FileOutputStream output = new FileOutputStream(extractedFile);
+          byte[] buffer = new byte[4096];
+          while (true) {
+            int length = input.read(buffer);
+            if (length == -1) break;
+            output.write(buffer, 0, length);
+          }
+          input.close();
+          output.close();
+        } catch (IOException ex) {
+          throw new RuntimeException("Error extracting file: " + sourcePath, ex);
+        }
+      }
+      return extractedFile;
     }
     throw new FileNotFoundException("Unable to find shared lib for '" + libraryName + "'");
   }
