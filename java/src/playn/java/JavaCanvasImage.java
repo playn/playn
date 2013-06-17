@@ -33,7 +33,7 @@ class JavaCanvasImage extends JavaImage implements CanvasImage {
 
   JavaCanvasImage(GLContext ctx, float width, float height) {
     super(ctx, new BufferedImage(ctx.scale.scaledCeil(width), ctx.scale.scaledCeil(height),
-                                 BufferedImage.TYPE_INT_ARGB), ctx.scale);
+                                 BufferedImage.TYPE_INT_ARGB_PRE), ctx.scale);
     Graphics2D gfx = img.createGraphics();
     gfx.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
     gfx.scale(ctx.scale.factor, ctx.scale.factor);

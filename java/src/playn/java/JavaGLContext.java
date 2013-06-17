@@ -78,7 +78,7 @@ class JavaGLContext extends GL20Context {
     // use a special code path for images that are known to be INT_ARGB (which JavaCanvasImage
     // uses); this uses the GPU to swizzle ARGB to BGRA during the glTexImage2D call
     DataBuffer dbuf = image.getRaster().getDataBuffer();
-    if (dbuf instanceof DataBufferInt) {
+    if (image.getType() == BufferedImage.TYPE_INT_ARGB_PRE) {
       DataBufferInt ibuf = (DataBufferInt)dbuf;
       bbuf = checkGetImageBuffer(ibuf.getSize()*4);
       bbuf.asIntBuffer().put(ibuf.getData());
@@ -103,7 +103,7 @@ class JavaGLContext extends GL20Context {
 
       // build a byte buffer from the temporary image that be used by OpenGL to produce a texture.
       DataBufferByte dbbuf = (DataBufferByte) texImage.getRaster().getDataBuffer();
-      bbuf = checkGetImageBuffer(dbuf.getSize());
+      bbuf = checkGetImageBuffer(dbbuf.getSize());
       bbuf.put(dbbuf.getData());
       bbuf.flip();
       format = GL11.GL_RGBA;
