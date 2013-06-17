@@ -40,6 +40,7 @@ import playn.core.gl.GL20Context;
 class JavaGLContext extends GL20Context {
 
   public static final boolean CHECK_ERRORS = Boolean.getBoolean("playn.glerrors");
+  private ByteBuffer imgBuf = createImageBuffer(1024);
 
   JavaGLContext(JavaPlatform platform, float scaleFactor, int screenWidth, int screenHeight) {
     super(platform, new JavaGL20(), scaleFactor, CHECK_ERRORS);
@@ -79,8 +80,7 @@ class JavaGLContext extends GL20Context {
     DataBuffer dbuf = image.getRaster().getDataBuffer();
     if (dbuf instanceof DataBufferInt) {
       DataBufferInt ibuf = (DataBufferInt)dbuf;
-      bbuf = ByteBuffer.allocateDirect(ibuf.getSize()*4).order(ByteOrder.nativeOrder());
-      bbuf.rewind();
+      bbuf = checkGetImageBuffer(ibuf.getSize()*4);
       bbuf.asIntBuffer().put(ibuf.getData());
       bbuf.flip();
       format = GL12.GL_BGRA;
@@ -103,7 +103,7 @@ class JavaGLContext extends GL20Context {
 
       // build a byte buffer from the temporary image that be used by OpenGL to produce a texture.
       DataBufferByte dbbuf = (DataBufferByte) texImage.getRaster().getDataBuffer();
-      bbuf = ByteBuffer.allocateDirect(dbuf.getSize()).order(ByteOrder.nativeOrder());
+      bbuf = checkGetImageBuffer(dbuf.getSize());
       bbuf.put(dbbuf.getData());
       bbuf.flip();
       format = GL11.GL_RGBA;
@@ -114,5 +114,18 @@ class JavaGLContext extends GL20Context {
     GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA, image.getWidth(), image.getHeight(), 0,
                       format, type, bbuf);
     checkGLError("updateTexture");
+  }
+
+  private ByteBuffer checkGetImageBuffer (int byteSize) {
+    if (imgBuf.capacity() >= byteSize) {
+      imgBuf.clear(); // reuse it!
+    } else {
+      imgBuf = createImageBuffer(byteSize);
+    }
+    return imgBuf;
+  }
+
+  private static ByteBuffer createImageBuffer (int byteSize) {
+    return ByteBuffer.allocateDirect(byteSize).order(ByteOrder.nativeOrder());
   }
 }
