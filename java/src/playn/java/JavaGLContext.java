@@ -22,6 +22,7 @@ import java.awt.image.ColorModel;
 import java.awt.image.ComponentColorModel;
 import java.awt.image.DataBuffer;
 import java.awt.image.DataBufferByte;
+import java.awt.image.DataBufferInt;
 import java.awt.image.Raster;
 import java.awt.image.WritableRaster;
 import java.nio.ByteBuffer;
@@ -31,6 +32,7 @@ import org.lwjgl.LWJGLException;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL12;
 
 import playn.core.Asserts;
 import playn.core.gl.GL20Context;
@@ -67,38 +69,50 @@ class JavaGLContext extends GL20Context {
   }
 
   void updateTexture(int tex, BufferedImage image) {
-    ByteBuffer buf = convertImageData(image);
-    bindTexture(tex);
-    GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA, image.getWidth(), image.getHeight(), 0,
-                      GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, buf);
-    checkGLError("updateTexture");
-  }
+    Asserts.checkNotNull(image);
 
-  private ByteBuffer convertImageData(BufferedImage img) {
-    Asserts.checkNotNull(img);
-    ByteBuffer imageBuffer;
+    ByteBuffer bbuf;
+    int format, type;
 
-    // TODO(jgw): There has *got* to be a better way. None of the BufferedImage types match
-    // GL_RGBA, so we have to go through these stupid contortions to get a color model.
-    ColorModel glAlphaColorModel = new ComponentColorModel(
+    // use a special code path for images that are known to be INT_ARGB (which JavaCanvasImage
+    // uses); this uses the GPU to swizzle ARGB to BGRA during the glTexImage2D call
+    DataBuffer dbuf = image.getRaster().getDataBuffer();
+    if (dbuf instanceof DataBufferInt) {
+      DataBufferInt ibuf = (DataBufferInt)dbuf;
+      bbuf = ByteBuffer.allocateDirect(ibuf.getSize()*4).order(ByteOrder.nativeOrder());
+      bbuf.rewind();
+      bbuf.asIntBuffer().put(ibuf.getData());
+      bbuf.flip();
+      format = GL12.GL_BGRA;
+      type = GL12.GL_UNSIGNED_INT_8_8_8_8_REV;
+    }
+    // otherwise do things the hard way, by rendering the image using a special color model and
+    // then uploading the resulting bytes as GL_RGBA
+    else {
+      ColorModel glAlphaColorModel = new ComponentColorModel(
         ColorSpace.getInstance(ColorSpace.CS_sRGB), new int[] {8, 8, 8, 8}, true, false,
         Transparency.TRANSLUCENT, DataBuffer.TYPE_BYTE);
-    WritableRaster raster = Raster.createInterleavedRaster(
-      DataBuffer.TYPE_BYTE, img.getWidth(), img.getHeight(), 4, null);
-    BufferedImage texImage = new BufferedImage(glAlphaColorModel, raster, true, null);
+      WritableRaster raster = Raster.createInterleavedRaster(
+        DataBuffer.TYPE_BYTE, image.getWidth(), image.getHeight(), 4, null);
+      BufferedImage texImage = new BufferedImage(glAlphaColorModel, raster, true, null);
 
-    Graphics g = texImage.getGraphics();
-    g.setColor(new Color(0f, 0f, 0f, 0f));
-    g.fillRect(0, 0, 256, 256);
-    g.drawImage(img, 0, 0, null);
+      Graphics g = texImage.getGraphics();
+      g.setColor(new Color(0f, 0f, 0f, 0f));
+      g.fillRect(0, 0, 256, 256);
+      g.drawImage(image, 0, 0, null);
 
-    // Build a byte buffer from the temporary image that be used by OpenGL to produce a texture.
-    DataBufferByte dbuf = (DataBufferByte) texImage.getRaster().getDataBuffer();
-    imageBuffer = ByteBuffer.allocateDirect(dbuf.getSize());
-    imageBuffer.order(ByteOrder.nativeOrder());
-    imageBuffer.put(dbuf.getData());
-    imageBuffer.flip();
+      // build a byte buffer from the temporary image that be used by OpenGL to produce a texture.
+      DataBufferByte dbbuf = (DataBufferByte) texImage.getRaster().getDataBuffer();
+      bbuf = ByteBuffer.allocateDirect(dbuf.getSize()).order(ByteOrder.nativeOrder());
+      bbuf.put(dbbuf.getData());
+      bbuf.flip();
+      format = GL11.GL_RGBA;
+      type = GL11.GL_UNSIGNED_BYTE;
+    }
 
-    return imageBuffer;
+    bindTexture(tex);
+    GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA, image.getWidth(), image.getHeight(), 0,
+                      format, type, bbuf);
+    checkGLError("updateTexture");
   }
 }
