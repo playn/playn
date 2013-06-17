@@ -92,6 +92,7 @@ public class TestsGame extends Game.Default {
     new SurfaceDrawLayerTest(),
     new SubImageTest(),
     new ClippedGroupTest(),
+    new CanvasStressTest(),
     new PauseResumeTest(),
     new ImmediateTest(),
     new TextTest(),
