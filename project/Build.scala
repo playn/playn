@@ -60,7 +60,7 @@ object PlayNBuild extends samskivert.MavenBuild {
     )
     case "tests-assets" => testSettings
     case "tests-core" => testSettings
-    case "tests-java" => testSettings
+    case "tests-java" => testSettings ++ spray.revolver.RevolverPlugin.Revolver.settings
     case "tests-html" => gwtSettings ++ testSettings ++ seq(
       gwtVersion := pom.getAttr("gwt.version").get,
       javaOptions in Gwt ++= Seq("-mx512M"), // give GWT mo' memory
