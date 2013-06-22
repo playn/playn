@@ -4,7 +4,7 @@
   <parent>
     <groupId>com.googlecode.playn</groupId>
     <artifactId>playn-tests</artifactId>
-    <version>1.7.2</version>
+    <version>1.8-SNAPSHOT-SNAPSHOT</version>
   </parent>
 
   <artifactId>playn-tests-java</artifactId>
