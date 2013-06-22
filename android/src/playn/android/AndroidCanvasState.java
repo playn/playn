@@ -51,13 +51,12 @@ class AndroidCanvasState {
   }
 
   AndroidCanvasState() {
-    this(new Paint(PAINT_FLAGS),
-         0xff000000, 0xffffffff, null, null, Composite.SRC_OVER, 1f);
+    this(new Paint(PAINT_FLAGS), 0xff000000, 0xffffffff, null, null, Composite.SRC_OVER, 1f);
   }
 
   AndroidCanvasState(AndroidCanvasState toCopy) {
-    this(toCopy.paint, toCopy.fillColor, toCopy.strokeColor, toCopy.gradient, toCopy.pattern,
-        toCopy.composite, toCopy.alpha);
+    this(copy(toCopy.paint), toCopy.fillColor, toCopy.strokeColor,
+         toCopy.gradient, toCopy.pattern, toCopy.composite, toCopy.alpha);
   }
 
   AndroidCanvasState(Paint paint, int fillColor, int strokeColor, AndroidGradient gradient,
@@ -72,7 +71,7 @@ class AndroidCanvasState {
   }
 
   void setFillColor(int color) {
-    fillColor = color;
+    this.fillColor = color;
   }
 
   void setFillGradient(AndroidGradient gradient) {
@@ -96,7 +95,19 @@ class AndroidCanvasState {
   }
 
   void setStrokeColor(int color) {
-    strokeColor = color;
+    this.strokeColor = color;
+  }
+
+  void setAlpha(float alpha) {
+    this.alpha = alpha;
+  }
+
+  void setCompositeOperation(Canvas.Composite composite) {
+    this.composite = composite;
+  }
+
+  void setStrokeWidth(float strokeWidth) {
+    paint.setStrokeWidth(strokeWidth);
   }
 
   Paint prepareFill() {
@@ -135,18 +146,6 @@ class AndroidCanvasState {
     return paint;
   }
 
-  void setAlpha(float alpha) {
-    this.alpha = alpha;
-  }
-
-  void setCompositeOperation(Canvas.Composite composite) {
-    this.composite = composite;
-  }
-
-  void setStrokeWidth(float strokeWidth) {
-    paint.setStrokeWidth(strokeWidth);
-  }
-
   private Cap convertCap(Canvas.LineCap cap) {
     switch (cap) {
       case BUTT:
@@ -173,5 +172,11 @@ class AndroidCanvasState {
         return Join.ROUND;
     }
     return Join.MITER;
+  }
+
+  private static Paint copy(Paint source) {
+    Paint clone = new Paint(PAINT_FLAGS);
+    clone.set(source);
+    return clone;
   }
 }
