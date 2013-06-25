@@ -1626,22 +1626,21 @@ final class JavaGL20 implements playn.core.gl.GL20 {
   @Override
   public void glUniformMatrix2fv(int location, int count, boolean transpose,
                                  float[] value, int offset) {
-    setFloatBuffer(value, offset, count);
+    setFloatBuffer(value, offset, 2*2*count);
     GL20.glUniformMatrix2(location, transpose, floatBuffer);
   }
 
   @Override
   public void glUniformMatrix3fv(int location, int count, boolean transpose,
                                  float[] value, int offset) {
-    setFloatBuffer(value, offset, count);
-    // glUniformMatrix3 calls nglUniformMatrix3fv
+    setFloatBuffer(value, offset, 3*3*count);
     GL20.glUniformMatrix3(location, transpose, floatBuffer);
   }
 
   @Override
   public void glUniformMatrix4fv(int location, int count, boolean transpose,
                                  float[] value, int offset) {
-    setFloatBuffer(value, offset, count);
+    setFloatBuffer(value, offset, 4*4*count);
     GL20.glUniformMatrix4(location, transpose, floatBuffer);
   }
 
