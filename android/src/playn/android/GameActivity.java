@@ -72,11 +72,7 @@ public abstract class GameActivity extends Activity {
     PlayN.setPlatform(platform);
 
     // Build the Window and View
-    int windowFlags = WindowManager.LayoutParams.FLAG_FULLSCREEN;
-    if (isHoneycombOrLater()) {
-      // Use the raw constant rather than the flag to avoid blowing up on earlier Android
-      windowFlags |= 0x1000000; // flagHardwareAccelerated
-    }
+    int windowFlags = makeWindowFlags();
     getWindow().setFlags(windowFlags, windowFlags);
 
     // Create our layout and configure the window.
@@ -167,6 +163,20 @@ public abstract class GameActivity extends Activity {
     platform.onResume();
     gameView.onResume();
     super.onResume();
+  }
+
+  /**
+   * Constructs the window flags used when creating our main window. By default this will request a
+   * full-screen window, so apps that wish to preserve the notification bar will have to undo that
+   * flag.
+   */
+  protected int makeWindowFlags () {
+    int windowFlags = WindowManager.LayoutParams.FLAG_FULLSCREEN;
+    if (isHoneycombOrLater()) {
+      // Use the raw constant rather than the flag to avoid blowing up on earlier Android
+      windowFlags |= 0x1000000; // flagHardwareAccelerated
+    }
+    return windowFlags;
   }
 
   /**
