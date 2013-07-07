@@ -213,7 +213,7 @@ public class IOSPlatform extends AbstractPlatform {
     graphics = new IOSGraphics(this, screenWidth, screenHeight, viewScale, deviceScale,
       config.interpolateCanvasDrawing);
     json = new JsonImpl();
-    keyboard = new IOSKeyboard();
+    keyboard = new IOSKeyboard(this);
     net = new IOSNet(this);
     pointer = new IOSPointer(graphics);
     touch = new IOSTouch(graphics);

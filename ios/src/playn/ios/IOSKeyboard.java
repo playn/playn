@@ -29,6 +29,12 @@ import playn.core.util.Callback;
 
 public class IOSKeyboard implements Keyboard {
 
+  private final IOSPlatform platform;
+
+  public IOSKeyboard(IOSPlatform platform) {
+    this.platform = platform;
+  }
+
   @Override
   public void setListener(Listener listener) {
     PlayN.log().warn("iOS cannot generate keyboard events. Use Keyboard.getText() instead");
@@ -72,7 +78,7 @@ public class IOSKeyboard implements Keyboard {
       new cli.System.EventHandler$$00601_$$$_Lcli__MonoTouch__UIKit__UIButtonEventArgs_$$$$_.Method() {
         @Override public void Invoke(Object sender, UIButtonEventArgs args) {
           // Cancel is at button index 0
-          callback.onSuccess(args.get_ButtonIndex() == 0 ? null : field.get_Text());
+          platform.notifySuccess(callback, args.get_ButtonIndex() == 0 ? null : field.get_Text());
         }
       }));
 
