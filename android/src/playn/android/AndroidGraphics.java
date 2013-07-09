@@ -155,7 +155,7 @@ public class AndroidGraphics extends GraphicsGL {
   @Override
   public Font createFont(String name, Font.Style style, float size) {
     Pair<String,Font.Style> key = Pair.create(name, style);
-    return new AndroidFont(name, style, size, fonts.get(key), ligatureHacks.get(key));
+    return new AndroidFont(this, name, style, size, fonts.get(key), ligatureHacks.get(key));
   }
 
   @Override

@@ -55,8 +55,8 @@ public class IOSFont extends AbstractFont {
 
   final CTFont ctFont;
 
-  public IOSFont(String name, Style style, float size) {
-    super(name, style, size);
+  public IOSFont(IOSGraphics graphics, String name, Style style, float size) {
+    super(graphics, name, style, size);
     ctFont = new CTFont(iosName(), size);
   }
 

@@ -18,8 +18,9 @@ package playn.core;
 /**
  * Base {@link Font} implementation shared among platforms.
  */
-public abstract class AbstractFont implements Font
-{
+public abstract class AbstractFont implements Font {
+
+  protected final Graphics graphics;
   protected final String name;
   protected final Style style;
   protected final float size;
@@ -37,6 +38,11 @@ public abstract class AbstractFont implements Font
   @Override
   public float size() {
     return size;
+  }
+
+  @Override
+  public Font derive(float size) {
+    return graphics.createFont(name, style, size);
   }
 
   @Override
@@ -59,7 +65,8 @@ public abstract class AbstractFont implements Font
     return name + " " + style + " " + size + "pt";
   }
 
-  protected AbstractFont(String name, Style style, float size) {
+  protected AbstractFont(Graphics graphics, String name, Style style, float size) {
+    this.graphics = graphics;
     this.name = name;
     this.style = style;
     this.size = size;

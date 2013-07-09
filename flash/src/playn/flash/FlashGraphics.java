@@ -171,7 +171,7 @@ class FlashGraphics implements Graphics {
 
   @Override
   public Font createFont(String name, Font.Style style, float size) {
-    return new FlashFont(name, style, size);
+    return new FlashFont(this, name, style, size);
   }
 
   @Override

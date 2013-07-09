@@ -94,7 +94,7 @@ public abstract class HtmlGraphics implements Graphics {
    * @param lineHeight the height of a line of text in the specified font (in pixels).
    */
   public void registerFontMetrics(String name, Font.Style style, float size, float lineHeight) {
-    HtmlFont font = new HtmlFont(name, style, size);
+    HtmlFont font = new HtmlFont(this, name, style, size);
     HtmlFontMetrics metrics = getFontMetrics(font); // get emwidth via default measurement
     fontMetrics.put(font, new HtmlFontMetrics(lineHeight, metrics.emwidth));
   }
@@ -130,7 +130,7 @@ public abstract class HtmlGraphics implements Graphics {
 
   @Override
   public Font createFont(String name, Font.Style style, float size) {
-    return new HtmlFont(name, style, size);
+    return new HtmlFont(this, name, style, size);
   }
 
   @Override

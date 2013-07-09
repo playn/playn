@@ -26,15 +26,15 @@ class AndroidFont extends AbstractFont {
 
   private static final String[] NO_HACKS = {};
 
-  public static AndroidFont DEFAULT = new AndroidFont(
-    "Default", Style.PLAIN, 14, Typeface.DEFAULT, null);
+  public static final AndroidFont DEFAULT = new AndroidFont(
+    null, "Default", Style.PLAIN, 14, Typeface.DEFAULT, null);
 
   public final Typeface typeface;
   public final String[] ligatureHacks;
 
-  public AndroidFont(String name, Style style, float size, Typeface typeface,
-                     String[] ligatureHacks) {
-    super(name, style, size);
+  public AndroidFont(AndroidGraphics graphics, String name, Style style, float size,
+                     Typeface typeface, String[] ligatureHacks) {
+    super(graphics, name, style, size);
     this.typeface = (typeface != null) ? typeface :
       Typeface.create(name, TO_ANDROID_STYLE.get(style));
     this.ligatureHacks = (ligatureHacks != null) ? ligatureHacks : NO_HACKS;

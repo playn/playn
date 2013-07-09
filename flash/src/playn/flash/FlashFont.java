@@ -20,10 +20,10 @@ import playn.core.AbstractFont;
 class FlashFont extends AbstractFont {
 
   /** For use when no font is specified. */
-  public static final FlashFont DEFAULT = new FlashFont("Times New Roman", Style.PLAIN, 12);
+  public static final FlashFont DEFAULT = new FlashFont(null, "Times New Roman", Style.PLAIN, 12);
 
-  public FlashFont(String name, Style style, float size) {
-    super(quoteFontName(name), style, size);
+  public FlashFont(FlashGraphics graphics, String name, Style style, float size) {
+    super(graphics, quoteFontName(name), style, size);
   }
 
   protected static final String quoteFontName(String name) {

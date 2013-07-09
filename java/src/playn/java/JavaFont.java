@@ -24,8 +24,8 @@ class JavaFont extends AbstractFont {
 
   public final java.awt.Font jfont;
 
-  public JavaFont(String name, Style style, float size, java.awt.Font jfont) {
-    super(name, style, size);
+  public JavaFont(JavaGraphics graphics, String name, Style style, float size, java.awt.Font jfont) {
+    super(graphics, name, style, size);
     // the Font constructor takes only integer size, so we instantiate it at an arbitrary size (and
     // style) and derive a font of the desired (floating point) size (and style)
     this.jfont = jfont.deriveFont(TO_JAVA_STYLE.get(style), size);

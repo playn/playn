@@ -43,7 +43,7 @@ public class IOSGraphics extends GraphicsGL {
 
   // a shared colorspace instance for use all over the place
   static final CGColorSpace colorSpace = CGColorSpace.CreateDeviceRGB();
-  static final IOSFont defaultFont = new IOSFont("Helvetica", Font.Style.PLAIN, 12);
+  static final IOSFont defaultFont = new IOSFont(null, "Helvetica", Font.Style.PLAIN, 12);
 
   private final GroupLayerGL rootLayer;
   private final int screenWidth, screenHeight;
@@ -88,7 +88,7 @@ public class IOSGraphics extends GraphicsGL {
 
   @Override
   public Font createFont(String name, Font.Style style, float size) {
-    return new IOSFont(name, style, size);
+    return new IOSFont(this, name, style, size);
   }
 
   @Override

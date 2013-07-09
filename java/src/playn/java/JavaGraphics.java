@@ -103,7 +103,7 @@ public class JavaGraphics extends GraphicsGL {
     if (jfont == null) {
       jfont = new java.awt.Font(name, java.awt.Font.PLAIN, 12);
     }
-    return new JavaFont(name, style, size, jfont);
+    return new JavaFont(this, name, style, size, jfont);
   }
 
   @Override

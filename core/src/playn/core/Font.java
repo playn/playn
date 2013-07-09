@@ -31,4 +31,7 @@ public interface Font {
 
   /** Returns the point size of this font. */
   float size();
+
+  /** Creates a new font with the same name and style as this font, with the specified size. */
+  Font derive(float size);
 }

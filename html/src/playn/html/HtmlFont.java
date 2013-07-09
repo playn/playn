@@ -20,10 +20,10 @@ import playn.core.AbstractFont;
 class HtmlFont extends AbstractFont {
 
   /** For use when no font is specified. */
-  public static final HtmlFont DEFAULT = new HtmlFont("sans-serif", Style.PLAIN, 12);
+  public static final HtmlFont DEFAULT = new HtmlFont(null, "sans-serif", Style.PLAIN, 12);
 
-  public HtmlFont(String name, Style style, float size) {
-    super(quoteFontName(name), style, size);
+  public HtmlFont(HtmlGraphics graphics, String name, Style style, float size) {
+    super(graphics, quoteFontName(name), style, size);
   }
 
   protected static final String quoteFontName(String name) {
