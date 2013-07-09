@@ -41,8 +41,11 @@ public class IOSUIOverlay extends UIView implements UIOverlay {
     if (hidden != null && hidden.Contains(pointF)) return false;
 
     // only accept the touch if it is hitting one of our native widgets
-    for (UIView view : get_Subviews()) {
-      if (view.PointInside(ConvertPointToView(pointF, view), uiEvent)) return true;
+    UIView[] subs = get_Subviews();
+    if (subs != null) {
+      for (UIView view : subs) {
+        if (view.PointInside(ConvertPointToView(pointF, view), uiEvent)) return true;
+      }
     }
     return false;
   }
