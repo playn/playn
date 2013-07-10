@@ -42,7 +42,7 @@ public interface Clock {
   public static class Source implements Clock {
     private final int updateRate;
     private int elapsed;
-    private float current, paintDelta, alpha;
+    private float current, paintTime, paintDelta, alpha;
 
     public Source(int updateRate) {
       this.updateRate = updateRate;
@@ -72,7 +72,8 @@ public interface Clock {
     /** Call this from {@link playn.core.Game.Default#paint}. */
     public void paint(float alpha) {
       float newCurrent = elapsed + alpha * updateRate;
-      paintDelta = newCurrent - current;
+      paintDelta = newCurrent - paintTime;
+      paintTime = newCurrent;
       current = newCurrent;
       this.alpha = alpha;
     }
