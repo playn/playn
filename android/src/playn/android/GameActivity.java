@@ -29,7 +29,6 @@ import android.graphics.PixelFormat;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.KeyEvent;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
 import android.view.WindowManager;
@@ -48,7 +47,6 @@ public abstract class GameActivity extends Activity {
   private AndroidPlatform platform;
   private GameViewGL gameView;
   private KeyEventHandler keyHandler;
-  private TouchEventHandler touchHandler;
 
   /**
    * The entry-point into a PlayN game. Developers should implement main() to call
@@ -68,7 +66,6 @@ public abstract class GameActivity extends Activity {
     this.platform = new AndroidPlatform(this, gl20);
     this.gameView = new GameViewGL(appctx, platform, gl20);
     this.keyHandler = new KeyEventHandler(platform);
-    this.touchHandler = new TouchEventHandler(platform);
     PlayN.setPlatform(platform);
 
     // Build the Window and View
@@ -125,12 +122,6 @@ public abstract class GameActivity extends Activity {
   @Override
   public void onBackPressed() {
     moveTaskToBack(false);
-  }
-
-  @Override
-  public boolean onTouchEvent(MotionEvent event) {
-    touchHandler.onMotionEvent(event);
-    return super.onTouchEvent(event);
   }
 
   @Override

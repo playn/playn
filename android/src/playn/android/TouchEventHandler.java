@@ -31,9 +31,10 @@ class TouchEventHandler {
     this.platform = platform;
   }
 
-  public void onMotionEvent(MotionEvent nativeEvent) {
+  public boolean onMotionEvent(MotionEvent nativeEvent) {
     // extract the native event data while we're on the UI thread
     final int action = nativeEvent.getAction();
+    final int actionType = action & MotionEvent.ACTION_MASK;
     final double time = nativeEvent.getEventTime();
     final Events.Flags flags = new Events.Flags.Impl();
     final Touch.Event.Impl[] touches = parseMotionEvent(nativeEvent, flags);
@@ -42,7 +43,7 @@ class TouchEventHandler {
     platform.invokeLater(new Runnable() {
       public void run() {
         Touch.Event pointerEvent = touches[0];
-        switch (action & MotionEvent.ACTION_MASK) {
+        switch (actionType) {
         case MotionEvent.ACTION_DOWN:
           platform.touch().onTouchStart(touches);
           platform.pointer().onPointerStart(
@@ -74,6 +75,17 @@ class TouchEventHandler {
         }
       }
     });
+
+    // let our caller know whether we will be handling this event
+    switch (actionType) {
+    case MotionEvent.ACTION_DOWN: return true;
+    case MotionEvent.ACTION_UP: return true;
+    case MotionEvent.ACTION_POINTER_DOWN: return true;
+    case MotionEvent.ACTION_POINTER_UP: return true;
+    case MotionEvent.ACTION_MOVE: return true;
+    case MotionEvent.ACTION_CANCEL: return true;
+    default: return false;
+    }
   }
 
   private Touch.Event.Impl[] getChangedTouches(int action, Touch.Event.Impl[] touches) {
