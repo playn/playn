@@ -76,6 +76,7 @@ public class ShaderTest extends Test {
           "uniform float u_Angle;\n" +
           "uniform vec2 u_Eye;\n" +
           VERT_ATTRS +
+          PER_VERT_ATTRS +
           VERT_VARS +
 
           "void main(void) {\n" +
