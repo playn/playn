@@ -126,9 +126,10 @@ public class IndexedTrisShader extends GLShader {
 
   protected class ITCore extends Core {
     private final Uniform2f uScreenSize;
-    private final Attrib aMatrix, aTranslation, aColor; // same for whole quad
-    private final Attrib aPosition, aTexCoord; // varies per quad vertex
+    private final Attrib aMatrix, aTranslation, aColor; // stable (same for whole quad)
+    private final Attrib aPosition, aTexCoord; // changing (varies per quad vertex)
 
+    protected final GLBuffer.Float stableAttrs;
     protected final GLBuffer.Float vertices;
     protected final GLBuffer.Short elements;
 
@@ -137,17 +138,16 @@ public class IndexedTrisShader extends GLShader {
     public ITCore(String vertShader, String fragShader) {
       super(vertShader, fragShader);
 
-      // determine our same-for-whole-quad shader program locations
+      // determine our various shader program locations
       uScreenSize = prog.getUniform2f("u_ScreenSize");
       aMatrix = prog.getAttrib("a_Matrix", 4, GL20.GL_FLOAT);
       aTranslation = prog.getAttrib("a_Translation", 2, GL20.GL_FLOAT);
       aColor = prog.getAttrib("a_Color", 2, GL20.GL_FLOAT);
-
-      // determine our varies-per-quad-vertex shader program locations
       aPosition = prog.getAttrib("a_Position", 2, GL20.GL_FLOAT);
       aTexCoord = prog.getAttrib("a_TexCoord", 2, GL20.GL_FLOAT);
 
       // create our vertex and index buffers
+      stableAttrs = ctx.createFloatBuffer(stableAttrsSize());
       vertices = ctx.createFloatBuffer(START_VERTS*vertexSize());
       elements = ctx.createShortBuffer(START_ELEMS);
     }
@@ -159,15 +159,17 @@ public class IndexedTrisShader extends GLShader {
 
       vertices.bind(GL20.GL_ARRAY_BUFFER);
 
-      // bind our same-for-whole-quad attributes
-      aMatrix.bind(vertexStride(), 0);
-      aTranslation.bind(vertexStride(), 16);
-      aColor.bind(vertexStride(), 24);
+      // bind our stable attributes
+      int stride = vertexStride();
+      aMatrix.bind(stride, 0);
+      aTranslation.bind(stride, 16);
+      aColor.bind(stride, 24);
 
-      // bind our varies-per-quad-vertex attributes
-      aPosition.bind(vertexStride(), 32);
+      // bind our changing attributes
+      int offset = stableAttrsSize()*FLOAT_SIZE_BYTES;
+      aPosition.bind(stride, offset);
       if (aTexCoord != null)
-        aTexCoord.bind(vertexStride(), 40);
+        aTexCoord.bind(stride, offset+8);
 
       elements.bind(GL20.GL_ELEMENT_ARRAY_BUFFER);
       ctx.checkGLError("Shader.prepare bind");
@@ -206,22 +208,17 @@ public class IndexedTrisShader extends GLShader {
                         float x2, float y2, float sx2, float sy2,
                         float x3, float y3, float sx3, float sy3,
                         float x4, float y4, float sx4, float sy4) {
+
+      // write our stable vertex attributes into a buffer, then copy that in four times
+      stableAttrs.reset();
+      stableAttrs.add(m00, m01, m10, m11, tx, ty);
+      addExtraStableAttrs(stableAttrs);
+
       int vertIdx = beginPrimitive(4, 6);
-      vertices.add(m00, m01, m10, m11, tx, ty);
-      addExtraVertexAttribs(vertices);
-      vertices.add(x1, y1).add(sx1, sy1);
-
-      vertices.add(m00, m01, m10, m11, tx, ty);
-      addExtraVertexAttribs(vertices);
-      vertices.add(x2, y2).add(sx2, sy2);
-
-      vertices.add(m00, m01, m10, m11, tx, ty);
-      addExtraVertexAttribs(vertices);
-      vertices.add(x3, y3).add(sx3, sy3);
-
-      vertices.add(m00, m01, m10, m11, tx, ty);
-      addExtraVertexAttribs(vertices);
-      vertices.add(x4, y4).add(sx4, sy4);
+      vertices.add(stableAttrs).add(x1, y1).add(sx1, sy1);
+      vertices.add(stableAttrs).add(x2, y2).add(sx2, sy2);
+      vertices.add(stableAttrs).add(x3, y3).add(sx3, sy3);
+      vertices.add(stableAttrs).add(x4, y4).add(sx4, sy4);
 
       elements.add(vertIdx+0);
       elements.add(vertIdx+1);
@@ -234,12 +231,14 @@ public class IndexedTrisShader extends GLShader {
     @Override
     public void addTriangles(float m00, float m01, float m10, float m11, float tx, float ty,
                              float[] xys, float tw, float th, int[] indices) {
+      stableAttrs.reset();
+      stableAttrs.add(m00, m01, m10, m11, tx, ty);
+      addExtraStableAttrs(stableAttrs);
+
       int vertIdx = beginPrimitive(xys.length/2, indices.length);
       for (int ii = 0, ll = xys.length; ii < ll; ii += 2) {
         float x = xys[ii], y = xys[ii+1];
-        vertices.add(m00, m01, m10, m11, tx, ty);
-        addExtraVertexAttribs(vertices);
-        vertices.add(x, y).add(x/tw, y/th);
+        vertices.add(stableAttrs).add(x, y).add(x/tw, y/th);
       }
       for (int ii = 0, ll = indices.length; ii < ll; ii++)
         elements.add(vertIdx+indices[ii]);
@@ -248,11 +247,13 @@ public class IndexedTrisShader extends GLShader {
     @Override
     public void addTriangles(float m00, float m01, float m10, float m11, float tx, float ty,
                              float[] xys, float[] sxys, int[] indices) {
+      stableAttrs.reset();
+      stableAttrs.add(m00, m01, m10, m11, tx, ty);
+      addExtraStableAttrs(stableAttrs);
+
       int vertIdx = beginPrimitive(xys.length/2, indices.length);
       for (int ii = 0, ll = xys.length; ii < ll; ii += 2) {
-        vertices.add(m00, m01, m10, m11, tx, ty);
-        addExtraVertexAttribs(vertices);
-        vertices.add(xys[ii], xys[ii+1]).add(sxys[ii], sxys[ii+1]);
+        vertices.add(stableAttrs).add(xys[ii], xys[ii+1]).add(sxys[ii], sxys[ii+1]);
       }
       for (int ii = 0, ll = indices.length; ii < ll; ii++)
         elements.add(vertIdx+indices[ii]);
@@ -263,8 +264,15 @@ public class IndexedTrisShader extends GLShader {
       return "cq=" + (elements.capacity()/6);
     }
 
-    protected void addExtraVertexAttribs(GLBuffer.Float vertices) {
-      vertices.add(arTint, gbTint);
+    /** Returns the size (in floats) of the stable attributes. If a custom shader adds additional
+     * stable attributes, it should use this to determine the offset at which to bind them, and
+     * override this method to return the new size including their attributes. */
+    protected int stableAttrsSize() {
+      return 8;
+    }
+
+    protected void addExtraStableAttrs(GLBuffer.Float buf) {
+      buf.add(arTint, gbTint);
     }
 
     protected int beginPrimitive(int vertexCount, int elemCount) {
