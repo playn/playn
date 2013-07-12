@@ -69,4 +69,28 @@ public class Color {
   public static int withAlpha (int color, int alpha) {
     return (color & 0x00ffffff) | (alpha << 24);
   }
+
+  /**
+   * Encodes two [0..1] color values into the format used by the standard shader program. The
+   * standard shader program delivers tinting information as two floats per vertex (AR and GB).
+   */
+  public static float encode (float upper, float lower) {
+    int upquant = (int)(upper * 255), lowquant = (int)(lower * 255);
+    return (float)(upquant * 256 + lowquant);
+  }
+
+  /**
+   * Decodes and returns the upper color value in a two color value encoded by {@link #encode}.
+   */
+  public static float decodeUpper (float encoded) {
+    float lower = encoded % 256;
+    return (encoded - lower) / 255;
+  }
+
+  /**
+   * Decodes and returns the lower color value in a two color value encoded by {@link #encode}.
+   */
+  public static float decodeLower (float encoded) {
+    return (encoded % 256) / 255;
+  }
 }
