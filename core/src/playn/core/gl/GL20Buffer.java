@@ -97,11 +97,24 @@ public abstract class GL20Buffer implements GLBuffer {
     }
 
     @Override
+    public Float add(GLBuffer.Float data) {
+      FloatBuffer other = ((FloatImpl)data).buffer;
+      other.position(0);
+      buffer.put(other);
+      return this;
+    }
+
+    @Override
     public Float add(int value) {
       intBuffer.position(buffer.position());
       intBuffer.put(value);
       buffer.position(intBuffer.position());
       return this;
+    }
+
+    @Override
+    public void reset() {
+      buffer.position(0);
     }
 
     @Override
@@ -164,6 +177,11 @@ public abstract class GL20Buffer implements GLBuffer {
     @Override
     public void drawElements(int mode, int count) {
       gl.glDrawElements(mode, count, GL20.GL_UNSIGNED_SHORT, 0);
+    }
+
+    @Override
+    public void reset() {
+      buffer.position(0);
     }
 
     @Override

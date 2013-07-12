@@ -47,6 +47,12 @@ public interface GLBuffer {
      * @return this buffer for call chaining. */
     Float add(float[] data, int offset, int length);
 
+    /** Adds the suppleid values to this buffer. The entire buffer will be copied, from position 0
+     * to its capactiy.
+     * @param data the value to be added.
+     * @return this buffer for call chaining. */
+    Float add(GLBuffer.Float data);
+
     /** Adds an int to this float buffer. TODO: rename this buffer from Float to something that
      * reflects that it's for passing general data to a shader (compared to the Short buffer which
      * is for passing elements). */
@@ -91,6 +97,9 @@ public interface GLBuffer {
    * elements.
    * @return the number of elements in the buffer at the time it was bound. */
   int send(int target, int usage);
+
+  /** Resets this buffer's position to zero. */
+  void reset();
 
   /** Releases any GL resources used by this buffer. The buffer may not be used subsequently. */
   void destroy();

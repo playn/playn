@@ -76,6 +76,18 @@ public abstract class IOSGLBuffer implements GLBuffer {
     }
 
     @Override
+    public Float add(GLBuffer.Float data) {
+      float[] odata = ((FloatImpl)data).data;
+      return add(odata, 0, odata.length);
+    }
+
+    @Override
+    public Float add(int value) {
+      data[position++] = java.lang.Float.intBitsToFloat(value);
+      return this;
+    }
+
+    @Override
     public int capacity() {
       return data.length;
     }
@@ -94,16 +106,15 @@ public abstract class IOSGLBuffer implements GLBuffer {
     }
 
     @Override
+    public void reset() {
+      position = 0;
+    }
+
+    @Override
     public void destroy() {
       super.destroy();
       if (handle != null)
         handle.Free();
-    }
-
-    @Override
-    public Float add(int value) {
-      data[position++] = java.lang.Float.intBitsToFloat(value);
-      return this;
     }
 
     @Override
@@ -161,6 +172,11 @@ public abstract class IOSGLBuffer implements GLBuffer {
     @Override
     public void skip(int count) {
       position += count;
+    }
+
+    @Override
+    public void reset() {
+      position = 0;
     }
 
     @Override
