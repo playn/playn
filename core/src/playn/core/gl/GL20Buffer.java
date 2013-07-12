@@ -19,7 +19,6 @@ import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
 
 import playn.core.Asserts;
@@ -32,9 +31,6 @@ public abstract class GL20Buffer implements GLBuffer {
 
   public static class FloatImpl extends GL20Buffer implements GLBuffer.Float {
     FloatBuffer buffer;
-    // this buffer is subordinate to the float buffer; if we add to it, we position it based on the
-    // float buffer's position, add to it, and then update the float buffer's position
-    private IntBuffer intBuffer;
 
     public FloatImpl(GL20 gl, int capacity) {
       super(gl);
@@ -63,7 +59,6 @@ public abstract class GL20Buffer implements GLBuffer {
       ByteBuffer raw = ByteBuffer.allocateDirect(capacity * bytesPerElement()).
         order(ByteOrder.nativeOrder());
       buffer = raw.asFloatBuffer();
-      intBuffer = raw.asIntBuffer();
     }
 
     @Override
@@ -101,14 +96,6 @@ public abstract class GL20Buffer implements GLBuffer {
       FloatBuffer other = ((FloatImpl)data).buffer;
       other.position(0);
       buffer.put(other);
-      return this;
-    }
-
-    @Override
-    public Float add(int value) {
-      intBuffer.position(buffer.position());
-      intBuffer.put(value);
-      buffer.position(intBuffer.position());
       return this;
     }
 
