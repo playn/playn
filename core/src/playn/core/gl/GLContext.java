@@ -79,6 +79,9 @@ public abstract class GLContext {
   /** The (actual screen pixel) width and height of our current frame buffer. */
   protected int curFbufWidth, curFbufHeight;
 
+  /** Whether to use QuadShader if possible. */
+  protected boolean enableQuadShader = true;
+
   /** The (logical pixel) width and height of our view. */
   public int viewWidth, viewHeight;
 
@@ -407,7 +410,7 @@ public abstract class GLContext {
   protected abstract void bindFramebufferImpl(int fbuf, int width, int height);
 
   protected GLShader createQuadShader () {
-    if (QuadShader.isLikelyToPerform(this)) {
+    if (enableQuadShader && QuadShader.isLikelyToPerform(this)) {
       try {
         GLShader quadShader = new QuadShader(this);
         quadShader.createCores(); // force core creation to test whether it fails
