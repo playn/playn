@@ -30,7 +30,7 @@ import playn.core.StockInternalTransform;
 public abstract class GLContext {
 
   /** Used to configure texture image scaling. */
-  public static enum Filter { LINEAR, NEAREST };
+  public static enum Filter { LINEAR, NEAREST }
 
   /** Used to track and report rendering statistics. */
   public static class Stats {

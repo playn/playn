@@ -45,7 +45,7 @@ public class TextFormat {
     /** Returns the x offset for text with the specified width rendered on a line of the specified
      * width. */
     public abstract float getX(float textWidth, float lineWidth);
-  };
+  }
 
   /** The font in which to render the text (or null which indicates that the default font should be
    * used). */

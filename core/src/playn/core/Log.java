@@ -21,7 +21,7 @@ package playn.core;
 public interface Log {
 
   /** Tags a log message with a level. */
-  enum Level { DEBUG, INFO, WARN, ERROR };
+  enum Level { DEBUG, INFO, WARN, ERROR }
 
   /** Allows for collection of log messages (in addition to standard logging).
    * See {@link #setCollector}. */

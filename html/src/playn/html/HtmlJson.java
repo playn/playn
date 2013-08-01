@@ -44,7 +44,7 @@ public class HtmlJson extends JsonImpl implements Json {
 
     public void add(java.lang.Object value) {
       push0(wrapNative(value));
-    };
+    }
 
     @Override
     public Json.Array getArray(int index) {
@@ -54,7 +54,7 @@ public class HtmlJson extends JsonImpl implements Json {
     @Override
     public final Json.Array getArray(int index, Json.Array dflt) {
       return isValueArray(get0(index)) ? (Json.Array) unwrap0(get0(index)) : dflt;
-    };
+    }
 
     @Override
     public boolean getBoolean(int index) {
@@ -64,7 +64,7 @@ public class HtmlJson extends JsonImpl implements Json {
     @Override
     public final boolean getBoolean(int index, boolean dflt) {
       return isValueBoolean(get0(index)) ? unwrapBoolean0(get0(index)) : dflt;
-    };
+    }
 
     @Override
     public float getNumber(int index) {
@@ -84,7 +84,7 @@ public class HtmlJson extends JsonImpl implements Json {
     @Override
     public final double getDouble(int index, double dflt) {
       return isValueNumber(get0(index)) ? unwrapDouble0(get0(index)) : dflt;
-    };
+    }
 
     @Override
     public int getInt(int index) {
@@ -114,7 +114,7 @@ public class HtmlJson extends JsonImpl implements Json {
     @Override
     public final Json.Object getObject(int index, Json.Object dflt) {
       return isValueObject(get0(index)) ? (Json.Object) unwrap0(get0(index)) : dflt;
-    };
+    }
 
     @Override
     public String getString(int index) {
@@ -124,7 +124,7 @@ public class HtmlJson extends JsonImpl implements Json {
     @Override
     public final String getString(int index, String dflt) {
       return isValueString(get0(index)) ? (String) unwrap0(get0(index)) : dflt;
-    };
+    }
 
     @Override
     public final <T> TypedArray<T> getArray(int index, Class<T> arrayType) {
@@ -134,12 +134,12 @@ public class HtmlJson extends JsonImpl implements Json {
     @Override
     public boolean isArray(int index) {
       return isValueArray(get0(index));
-    };
+    }
 
     @Override
     public boolean isBoolean(int index) {
       return isValueBoolean(get0(index));
-    };
+    }
 
     @Override
     public native boolean isNull(int index) /*-{
@@ -149,17 +149,17 @@ public class HtmlJson extends JsonImpl implements Json {
     @Override
     public boolean isNumber(int index) {
       return isValueNumber(get0(index));
-    };
+    }
 
     @Override
     public boolean isObject(int index) {
       return isValueObject(get0(index));
-    };
+    }
 
     @Override
     public boolean isString(int index) {
       return isValueString(get0(index));
-    };
+    }
 
     @Override
     public final native int length() /*-{
@@ -227,7 +227,7 @@ public class HtmlJson extends JsonImpl implements Json {
     @Override
     public final Array getArray(String key, Json.Array dflt) {
       return isValueArray(get0(key)) ? (Json.Array) unwrap0(get0(key)) : dflt;
-    };
+    }
 
     @Override
     public boolean getBoolean(String key) {
@@ -237,7 +237,7 @@ public class HtmlJson extends JsonImpl implements Json {
     @Override
     public final boolean getBoolean(String key, boolean dflt) {
       return isValueBoolean(get0(key)) ? unwrapBoolean0(get0(key)) : dflt;
-    };
+    }
 
     @Override
     public float getNumber(String key) {
@@ -257,7 +257,7 @@ public class HtmlJson extends JsonImpl implements Json {
     @Override
     public final double getDouble(String key, double dflt) {
       return isValueNumber(get0(key)) ? unwrapDouble0(get0(key)) : dflt;
-    };
+    }
 
     @Override
     public int getInt(String key) {
@@ -287,7 +287,7 @@ public class HtmlJson extends JsonImpl implements Json {
     @Override
     public final Json.Object getObject(String key, Json.Object dflt) {
       return isValueObject(get0(key)) ? (Json.Object) unwrap0(get0(key)) : dflt;
-    };
+    }
 
     @Override
     public String getString(String key) {
@@ -297,7 +297,7 @@ public class HtmlJson extends JsonImpl implements Json {
     @Override
     public final String getString(String key, String dflt) {
       return isValueString(get0(key)) ? (String) unwrap0(get0(key)) : dflt;
-    };
+    }
 
     @Override
     public <T> TypedArray<T> getArray(String key, Class<T> valueType, TypedArray<T> dflt) {
@@ -325,12 +325,12 @@ public class HtmlJson extends JsonImpl implements Json {
     @Override
     public boolean isArray(String key) {
       return isValueArray(get0(key));
-    };
+    }
 
     @Override
     public boolean isBoolean(String key) {
       return isValueBoolean(get0(key));
-    };
+    }
 
     @Override
     public native boolean isNull(String key) /*-{
@@ -340,17 +340,17 @@ public class HtmlJson extends JsonImpl implements Json {
     @Override
     public boolean isNumber(String key) {
       return isValueNumber(get0(key));
-    };
+    }
 
     @Override
     public boolean isObject(String key) {
       return isValueObject(get0(key));
-    };
+    }
 
     @Override
     public boolean isString(String key) {
       return isValueString(get0(key));
-    };
+    }
 
     @Override
     public void put(String key, java.lang.Object value) {

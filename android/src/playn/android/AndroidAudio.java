@@ -92,7 +92,7 @@ public class AndroidAudio extends AudioImpl {
     protected void releaseImpl() {
       pool.unload(soundId);
     }
-  };
+  }
 
   public AndroidAudio(final AndroidPlatform platform) {
     super(platform);

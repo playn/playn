@@ -21,7 +21,7 @@ package playn.core;
 public interface Font {
 
   /** The styles that may be requested for a given font. */
-  public enum Style { PLAIN, BOLD, ITALIC, BOLD_ITALIC };
+  public enum Style { PLAIN, BOLD, ITALIC, BOLD_ITALIC }
 
   /** Returns the name of this font. */
   String name();

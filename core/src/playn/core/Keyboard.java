@@ -131,7 +131,7 @@ public interface Keyboard {
    * See {@link #getText}. */
   public static enum TextType {
     DEFAULT, NUMBER, EMAIL, URL;
-  };
+  }
 
   /**
    * Sets the listener that will receive keyboard events. Setting the listener to

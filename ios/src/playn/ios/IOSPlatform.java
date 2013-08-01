@@ -89,7 +89,7 @@ public class IOSPlatform extends AbstractPlatform {
     SupportedOrients(int defaultOrient) {
       this.defaultOrient = UIDeviceOrientation.wrap(defaultOrient);
     }
-  };
+  }
 
   /** Used to configure the iOS platform. */
   public static class Config {
