@@ -70,6 +70,7 @@ public class JavaNet extends NetImpl {
             String encoding = conn.getContentEncoding();
             if (encoding == null) encoding = UTF8;
             platform.notifySuccess(callback, new BinaryResponse(code, payload, encoding) {
+              @Override
               protected Map<String,List<String>> extractHeaders() {
                 return conn.getHeaderFields();
               }

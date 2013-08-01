@@ -112,10 +112,12 @@ public abstract class GL20Buffer implements GLBuffer {
       return "floatbuf:" + bufferId;
     }
 
+    @Override
     protected Buffer buffer() {
       return buffer;
     }
 
+    @Override
     protected int bytesPerElement() {
       return 4;
     }
@@ -209,10 +211,12 @@ public abstract class GL20Buffer implements GLBuffer {
       return "shortbuf:" + bufferId;
     }
 
+    @Override
     protected Buffer buffer() {
       return buffer;
     }
 
+    @Override
     protected int bytesPerElement() {
       return 2;
     }

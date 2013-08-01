@@ -63,6 +63,7 @@ abstract class Dispatcher {
 
   /** Dispatches events to a layer and all its parents. */
   static final Dispatcher PROPAGATING = new Dispatcher() {
+    @Override
     <L, E extends Input.Impl> void dispatch(
         AbstractLayer inLayer, Class<L> listenerType, E event, Interaction<L, E> interaction,
         Interaction<L, E> cancel) {

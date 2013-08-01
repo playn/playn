@@ -85,6 +85,7 @@ class AndroidNet extends NetImpl {
           String encoding = EntityUtils.getContentCharSet(entity);
           if (encoding == null) encoding = HTTP.UTF_8;
           platform.notifySuccess(callback, new BinaryResponse(code, data, encoding) {
+            @Override
             protected Map<String,List<String>> extractHeaders() {
               Map<String,List<String>> hmap = new HashMap<String,List<String>>();
               for (org.apache.http.Header header : response.getAllHeaders()) {

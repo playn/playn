@@ -347,6 +347,7 @@ public abstract class AbstractLayer implements Layer {
     this.parent = parent;
   }
 
+  @Override
   public String toString () {
     String cname = getClass().getName();
     StringBuilder bldr = new StringBuilder(cname.substring(cname.lastIndexOf(".")+1));

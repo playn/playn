@@ -381,6 +381,7 @@ public class IOSCanvas extends AbstractCanvasGL<CGBitmapContext> {
     return this;
   }
 
+  @Override
   protected void finalize() {
     dispose(); // meh
   }

@@ -51,6 +51,7 @@ public class HtmlNet extends NetImpl {
         public void onReadyStateChange(final XMLHttpRequest xhr) {
           if (xhr.getReadyState() == XMLHttpRequest.DONE) {
             callback.onSuccess(new StringResponse(xhr.getStatus(), xhr.getResponseText()) {
+              @Override
               protected Map<String,List<String>> extractHeaders() {
                 Map<String,List<String>> headers = new HashMap<String,List<String>>();
                 String block = xhr.getAllResponseHeaders();

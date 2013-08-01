@@ -198,10 +198,12 @@ public class AndroidPlatform extends AbstractPlatform {
   }
 
   // allow these to be called by GameActivity
+  @Override
   protected void onPause() {
     super.onPause();
     paused = true;
   }
+  @Override
   protected void onResume() {
     super.onResume();
     paused = false;
@@ -210,6 +212,7 @@ public class AndroidPlatform extends AbstractPlatform {
   boolean paused() {
     return paused;
   }
+  @Override
   protected void onExit() {
     super.onExit();
   }

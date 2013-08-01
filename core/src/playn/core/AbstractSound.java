@@ -105,6 +105,7 @@ public abstract class AbstractSound<I> implements Sound {
       callbacks = Callbacks.createAdd(callbacks, callback);
   }
 
+  @Override
   protected void finalize() {
     release();
   }

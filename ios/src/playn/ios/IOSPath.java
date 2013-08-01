@@ -60,6 +60,7 @@ public class IOSPath implements Path {
     return this;
   }
 
+  @Override
   protected void finalize() {
     cgPath.Dispose(); // meh
   }

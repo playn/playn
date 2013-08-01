@@ -361,14 +361,17 @@ public class IOSPlatform extends AbstractPlatform {
   }
 
   // make these accessible to IOSApplicationDelegate
+  @Override
   protected void onPause() {
     super.onPause();
     gameView.onPause();
   }
+  @Override
   protected void onResume() {
     super.onResume();
     gameView.onResume();
   }
+  @Override
   protected void onExit() {
     super.onExit();
   }
