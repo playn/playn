@@ -25,7 +25,6 @@ import playn.core.Game;
 import playn.core.Json;
 import playn.core.Mouse;
 import playn.core.MouseStub;
-import playn.core.PlayN;
 import playn.core.TouchImpl;
 import playn.core.json.JsonImpl;
 

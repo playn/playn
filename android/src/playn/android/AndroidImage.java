@@ -16,8 +16,6 @@
 package playn.android;
 
 import android.graphics.Bitmap;
-import android.graphics.Rect;
-import android.graphics.RectF;
 
 import pythagoras.f.MathUtil;
 

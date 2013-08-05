@@ -38,7 +38,6 @@ import playn.core.Image;
 import playn.core.AsyncImage;
 import playn.core.Sound;
 import playn.core.gl.Scale;
-import static playn.core.PlayN.log;
 
 public class AndroidAssets extends AbstractAssets<Bitmap> {
 
