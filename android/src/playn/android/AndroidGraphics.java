@@ -75,7 +75,7 @@ public class AndroidGraphics extends GraphicsGL {
   void onSizeChanged(int viewWidth, int viewHeight) {
     screenWidth = MathUtil.iceil(viewWidth / ctx.scale.factor);
     screenHeight = MathUtil.iceil(viewHeight / ctx.scale.factor);
-    platform.log().info("Updating size " + viewWidth + "x" + viewHeight + " / " + ctx.scale.factor  +
+    platform.log().info("Updating size " + viewWidth + "x" + viewHeight + " / " + ctx.scale.factor +
                         " -> " + screenWidth + "x" + screenHeight);
     ctx.setSize(screenWidth, screenHeight);
   }
@@ -127,7 +127,7 @@ public class AndroidGraphics extends GraphicsGL {
    * Configures the scale factor function to use for {@link CanvasImage}. By default we use the
    * current graphics scale factor, which provides maximum resolution. Apps running on memory
    * constrained devices may wish to lower to lower this scale factor to reduce memory usage for
-   * espeically large canvases.
+   * especially large canvases.
    */
   public void setCanvasScaleFunc(ScaleFunc scaleFunc) {
     canvasScaleFunc = Asserts.checkNotNull(scaleFunc, "Scale func must not be null");

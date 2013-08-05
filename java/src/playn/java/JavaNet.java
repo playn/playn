@@ -101,7 +101,7 @@ public class JavaNet extends NetImpl {
     return url;
   }
 
-  // TODO: Make this specifyable somewhere.
+  // TODO: Make this specifiable somewhere.
   private String server() {
     return "127.0.0.1:8080";
   }
