@@ -319,7 +319,6 @@ final class JsonParser {
   /**
    * Steps through to the end of the current string token (the unescaped double quote).
    */
-  @SuppressWarnings("fallthrough")
   private String consumeTokenString() throws JsonParserException {
     reusableBuffer.setLength(0);
     while (true) {
