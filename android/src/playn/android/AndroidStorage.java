@@ -24,11 +24,9 @@ import playn.core.Storage;
 
 public class AndroidStorage implements Storage {
 
-  private final AndroidPlatform platform;
   private SharedPreferences settings;
 
   public AndroidStorage(AndroidPlatform platform) {
-    this.platform = platform;
     this.settings = platform.activity.getSharedPreferences(platform.activity.prefsName(), 0);
   }
 

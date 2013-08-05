@@ -27,7 +27,6 @@ public class GameViewGL extends GLSurfaceView {
 
   private final AndroidPlatform platform;
   private final TouchEventHandler touchHandler;
-  private final AndroidGL20 gl20;
   private AtomicBoolean started = new AtomicBoolean(false);
   private AtomicBoolean paused = new AtomicBoolean(true);
 
@@ -35,7 +34,6 @@ public class GameViewGL extends GLSurfaceView {
     super(context);
     this.platform = plat;
     this.touchHandler = new TouchEventHandler(platform);
-    this.gl20 = gl20;
 
     setFocusable(true);
     setEGLContextClientVersion(2);
