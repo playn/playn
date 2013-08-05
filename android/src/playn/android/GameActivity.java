@@ -237,7 +237,7 @@ public abstract class GameActivity extends Activity {
     layout.setBackgroundColor(0xFF000000);
     layout.setGravity(Gravity.CENTER);
     layout.addView(gameView);
-    LayoutParams params = new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT);
+    LayoutParams params = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
     getWindow().setContentView(layout, params);
   }
 }
