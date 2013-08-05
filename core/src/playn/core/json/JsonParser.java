@@ -17,7 +17,7 @@ import java.math.BigInteger;
 
 /**
  * Simple JSON parser.
- * 
+ *
  * <pre>
  * Object json = {@link JsonParser}.any().from("{\"a\":[true,false], \"b\":1}");
  * Number json = ({@link Number}){@link JsonParser}.any().from("123.456e7");
@@ -81,7 +81,7 @@ final class JsonParser {
 
   /**
    * Parses a {@link JsonObject} from a source.
-   * 
+   *
    * <pre>
    * JsonObject json = {@link JsonParser}.object().from("{\"a\":[true,false], \"b\":1}");
    * </pre>
@@ -92,7 +92,7 @@ final class JsonParser {
 
   /**
    * Parses a {@link JsonArray} from a source.
-   * 
+   *
    * <pre>
    * JsonArray json = {@link JsonParser}.array().from("[1, {\"a\":[true,false], \"b\":1}]");
    * </pre>
@@ -104,7 +104,7 @@ final class JsonParser {
   /**
    * Parses any object from a source. For any valid JSON, returns either a null (for the JSON string 'null'), a
    * {@link String}, a {@link Number}, a {@link Boolean}, a {@link JsonObject} or a {@link JsonArray}.
-   * 
+   *
    * <pre>
    * Object json = {@link JsonParser}.any().from("{\"a\":[true,false], \"b\":1}");
    * Number json = ({@link Number}){@link JsonParser}.any().from("123.456e7");
