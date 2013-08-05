@@ -68,34 +68,20 @@ public abstract class GL20Buffer implements GLBuffer {
     }
 
     @Override
-    public Float add(InternalTransform xform) {
-      // TODO: optimize?
-      return add(xform.m00(), xform.m01(), xform.m10(), xform.m11(), xform.tx(), xform.ty());
-    }
-
-    @Override
     public Float add(float x, float y) {
       buffer.put(x).put(y);
       return this;
     }
 
     @Override
-    public Float add(float m00, float m01, float m10, float m11, float tx, float ty) {
-      buffer.put(m00).put(m01).put(m10).put(m11).put(tx).put(ty);
+    public Float add(float[] data) {
+      buffer.put(data, 0, data.length);
       return this;
     }
 
     @Override
     public Float add(float[] data, int offset, int length) {
       buffer.put(data, offset, length);
-      return this;
-    }
-
-    @Override
-    public Float add(GLBuffer.Float data) {
-      FloatBuffer other = ((FloatImpl)data).buffer;
-      other.position(0);
-      buffer.put(other);
       return this;
     }
 
@@ -158,6 +144,18 @@ public abstract class GL20Buffer implements GLBuffer {
     @Override
     public Short add(int x, int y) {
       buffer.put((short)x).put((short)y);
+      return this;
+    }
+
+    @Override
+    public Short add(short[] data) {
+      buffer.put(data, 0, data.length);
+      return this;
+    }
+
+    @Override
+    public Short add(short[] data, int offset, int length) {
+      buffer.put(data, offset, length);
       return this;
     }
 

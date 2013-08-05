@@ -28,30 +28,21 @@ public interface GLBuffer {
      * @return this buffer for call chaining. */
     Float add(float value);
 
-    /** Adds the matrix for the supplied transform to this buffer.
-     * @return this buffer for call chaining. */
-    Float add(InternalTransform xform);
-
     /** Adds the supplied pair of values to this buffer.
      * @return this buffer for call chaining. */
     Float add(float x, float y);
 
-    /** Adds the specified transform to this buffer.
+    /** Adds the supplied values to this buffer.
+     * @param data the values to be added.
      * @return this buffer for call chaining. */
-    Float add(float m00, float m01, float m10, float m11, float tx, float ty);
+    Float add(float[] data);
 
     /** Adds the supplied values to this buffer.
-     * @param data the value to be added.
+     * @param data the values to be added.
      * @param offset the offset into {@code data} at which to start adding.
      * @param length the number of values from {@code data} to add.
      * @return this buffer for call chaining. */
     Float add(float[] data, int offset, int length);
-
-    /** Adds the suppleid values to this buffer. The entire buffer will be copied, from position 0
-     * to its capactiy.
-     * @param data the value to be added.
-     * @return this buffer for call chaining. */
-    Float add(GLBuffer.Float data);
   }
 
   /** A buffer of 16-bit unsigned integers. */
@@ -63,6 +54,18 @@ public interface GLBuffer {
     /** Adds the supplied pair of values to this buffer.
      * @return this buffer for call chaining. */
     Short add(int x, int y);
+
+    /** Adds the supplied values to this buffer.
+     * @param data the values to be added.
+     * @return this buffer for call chaining. */
+    Short add(short[] data);
+
+    /** Adds the supplied values to this buffer.
+     * @param data the values to be added.
+     * @param offset the offset into {@code data} at which to start adding.
+     * @param length the number of values from {@code data} to add.
+     * @return this buffer for call chaining. */
+    Short add(short[] data, int offset, int length);
 
     /** Issues a draw elements call using this buffer to define the elements. */
     void drawElements(int mode, int count);

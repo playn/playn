@@ -163,16 +163,15 @@ public class QuadShader extends GLShader {
     private final Uniform2f uScreenSize;
     private final Uniform4fv uData;
     private final Attrib aVertex;
-    private final GLBuffer.Float data;
     private final GLBuffer.Short vertices, elements;
+    private final GLBuffer.Float data;
+    private final float[] quadData;
 
     private int quadCounter;
     private float arTint, gbTint;
 
     public QuadCore(String vertShader, String fragShader) {
       super(vertShader, fragShader);
-
-      data = ctx.createFloatBuffer(maxQuads*vec4sPerQuad()*4);
 
       // compile the shader and get our uniform and attribute
       uScreenSize = prog.getUniform2f("u_ScreenSize");
@@ -192,6 +191,11 @@ public class QuadShader extends GLShader {
         elements.add(base+0).add(base+1).add(base+2);
         elements.add(base+1).add(base+3).add(base+2);
       }
+
+      // create the buffer that will hold quad data, and the float array that we'll use to avoid
+      // making too many calls to FloatBuffer.put() which has crap performance on Android
+      data = ctx.createFloatBuffer(maxQuads*vec4sPerQuad()*4);
+      quadData = new float[vec4sPerQuad()*4];
 
       vertices.bind(GL20.GL_ARRAY_BUFFER);
       vertices.send(GL20.GL_ARRAY_BUFFER, GL20.GL_STATIC_DRAW);
@@ -238,18 +242,28 @@ public class QuadShader extends GLShader {
                         float x3, float y3, float sx3, float sy3,
                         float x4, float y4, float sx4, float sy4) {
       float dw = x2 - x1, dh = y3 - y1;
-      data.add(m00*dw, m01*dw, m10*dh, m11*dh, tx + m00*x1 + m10*y1, ty + m01*x1 + m11*y1);
-      data.add(sx1, sy1);
-      data.add(sx2 - sx1, sy3 - sy1);
-      addExtraData(data);
+      quadData[0] = m00*dw;
+      quadData[1] = m01*dw;
+      quadData[2] = m10*dh;
+      quadData[3] = m11*dh;
+      quadData[4] = tx + m00*x1 + m10*y1;
+      quadData[5] = ty + m01*x1 + m11*y1;
+      quadData[6] = sx1;
+      quadData[7] = sy1;
+      quadData[8] = sx2 - sx1;
+      quadData[9] = sy3 - sy1;
+      int size = addExtraData(quadData, 10);
+      data.add(quadData, 0, size);
       quadCounter++;
 
       if (quadCounter >= maxQuads)
         QuadShader.this.flush();
     }
 
-    protected void addExtraData(GLBuffer.Float data) {
-      data.add(arTint, gbTint);
+    protected int addExtraData(float[] data, int qi) {
+      data[qi++] = arTint;
+      data[qi++] = gbTint;
+      return qi;
     }
   }
 }

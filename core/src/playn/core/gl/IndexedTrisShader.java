@@ -103,17 +103,6 @@ public class IndexedTrisShader extends GLShader {
     return VERTEX_SHADER;
   }
 
-  /**
-   * Returns the number of floats per vertex.
-   */
-  protected int vertexSize() {
-      return 12;
-  }
-
-  protected int vertexStride() {
-      return vertexSize() * FLOAT_SIZE_BYTES;
-  }
-
   @Override
   protected Core createTextureCore() {
     return new ITCore(vertexShader(), textureFragmentShader());
@@ -129,9 +118,13 @@ public class IndexedTrisShader extends GLShader {
     private final Attrib aMatrix, aTranslation, aColor; // stable (same for whole quad)
     private final Attrib aPosition, aTexCoord; // changing (varies per quad vertex)
 
-    protected final GLBuffer.Float stableAttrs;
     protected final GLBuffer.Float vertices;
     protected final GLBuffer.Short elements;
+    // we prepare quad/tris in these arrays and then batch copy them into the buffers;
+    // this avoids a painful performance hit from Android's FloatBuffer.put()
+    protected final float[] stableAttrs;
+    protected final float[] vertData;
+    protected final short[] elemData;
 
     private float arTint, gbTint;
 
@@ -147,9 +140,11 @@ public class IndexedTrisShader extends GLShader {
       aTexCoord = prog.getAttrib("a_TexCoord", 2, GL20.GL_FLOAT);
 
       // create our vertex and index buffers
-      stableAttrs = ctx.createFloatBuffer(stableAttrsSize());
       vertices = ctx.createFloatBuffer(START_VERTS*vertexSize());
       elements = ctx.createShortBuffer(START_ELEMS);
+      stableAttrs = new float[stableAttrsSize()];
+      vertData = new float[4*vertexSize()]; // one quad worth
+      elemData = new short[6]; // one quad worth
     }
 
     @Override
@@ -210,53 +205,77 @@ public class IndexedTrisShader extends GLShader {
                         float x4, float y4, float sx4, float sy4) {
 
       // write our stable vertex attributes into a buffer, then copy that in four times
-      stableAttrs.reset();
-      stableAttrs.add(m00, m01, m10, m11, tx, ty);
-      addExtraStableAttrs(stableAttrs);
+      stableAttrs[0] = m00;
+      stableAttrs[1] = m01;
+      stableAttrs[2] = m10;
+      stableAttrs[3] = m11;
+      stableAttrs[4] = tx;
+      stableAttrs[5] = ty;
+      addExtraStableAttrs(stableAttrs, 6);
 
-      int vertIdx = beginPrimitive(4, 6);
-      vertices.add(stableAttrs).add(x1, y1).add(sx1, sy1);
-      vertices.add(stableAttrs).add(x2, y2).add(sx2, sy2);
-      vertices.add(stableAttrs).add(x3, y3).add(sx3, sy3);
-      vertices.add(stableAttrs).add(x4, y4).add(sx4, sy4);
+      int vertIdx = beginPrimitive(4, 6), offset = 0;
+      offset = addVert(vertData, offset, stableAttrs, x1, y1, sx1, sy1);
+      offset = addVert(vertData, offset, stableAttrs, x2, y2, sx2, sy2);
+      offset = addVert(vertData, offset, stableAttrs, x3, y3, sx3, sy3);
+      offset = addVert(vertData, offset, stableAttrs, x4, y4, sx4, sy4);
+      vertices.add(vertData, 0, offset);
 
-      elements.add(vertIdx+0);
-      elements.add(vertIdx+1);
-      elements.add(vertIdx+2);
-      elements.add(vertIdx+1);
-      elements.add(vertIdx+3);
-      elements.add(vertIdx+2);
+      addElems(elemData, vertIdx, QUAD_INDICES);
     }
 
     @Override
     public void addTriangles(float m00, float m01, float m10, float m11, float tx, float ty,
                              float[] xys, float tw, float th, int[] indices) {
-      stableAttrs.reset();
-      stableAttrs.add(m00, m01, m10, m11, tx, ty);
-      addExtraStableAttrs(stableAttrs);
+      stableAttrs[0] = m00;
+      stableAttrs[1] = m01;
+      stableAttrs[2] = m10;
+      stableAttrs[3] = m11;
+      stableAttrs[4] = tx;
+      stableAttrs[5] = ty;
+      addExtraStableAttrs(stableAttrs, 6);
 
       int vertIdx = beginPrimitive(xys.length/2, indices.length);
+      int offset = 0;
       for (int ii = 0, ll = xys.length; ii < ll; ii += 2) {
         float x = xys[ii], y = xys[ii+1];
-        vertices.add(stableAttrs).add(x, y).add(x/tw, y/th);
+        offset = addVert(vertData, offset, stableAttrs, x, y, x/tw, y/th);
+        if (offset == vertData.length) {
+          vertices.add(vertData);
+          offset = 0;
+        }
       }
-      for (int ii = 0, ll = indices.length; ii < ll; ii++)
-        elements.add(vertIdx+indices[ii]);
+      if (offset > 0) {
+        vertices.add(vertData, 0, offset);
+      }
+
+      addElems(elemData, vertIdx, indices);
     }
 
     @Override
     public void addTriangles(float m00, float m01, float m10, float m11, float tx, float ty,
                              float[] xys, float[] sxys, int[] indices) {
-      stableAttrs.reset();
-      stableAttrs.add(m00, m01, m10, m11, tx, ty);
-      addExtraStableAttrs(stableAttrs);
+      stableAttrs[0] = m00;
+      stableAttrs[1] = m01;
+      stableAttrs[2] = m10;
+      stableAttrs[3] = m11;
+      stableAttrs[4] = tx;
+      stableAttrs[5] = ty;
+      addExtraStableAttrs(stableAttrs, 6);
 
       int vertIdx = beginPrimitive(xys.length/2, indices.length);
+      int offset = 0;
       for (int ii = 0, ll = xys.length; ii < ll; ii += 2) {
-        vertices.add(stableAttrs).add(xys[ii], xys[ii+1]).add(sxys[ii], sxys[ii+1]);
+        offset = addVert(vertData, offset, stableAttrs, xys[ii], xys[ii+1], sxys[ii], sxys[ii+1]);
+        if (offset == vertData.length) {
+          vertices.add(vertData);
+          offset = 0;
+        }
       }
-      for (int ii = 0, ll = indices.length; ii < ll; ii++)
-        elements.add(vertIdx+indices[ii]);
+      if (offset > 0) {
+        vertices.add(vertData, 0, offset);
+      }
+
+      addElems(elemData, vertIdx, indices);
     }
 
     @Override
@@ -271,8 +290,18 @@ public class IndexedTrisShader extends GLShader {
       return 8;
     }
 
-    protected void addExtraStableAttrs(GLBuffer.Float buf) {
-      buf.add(arTint, gbTint);
+    protected int vertexSize() {
+      return stableAttrsSize() + 4;
+    }
+
+    protected int vertexStride() {
+      return vertexSize() * FLOAT_SIZE_BYTES;
+    }
+
+    protected int addExtraStableAttrs(float[] buf, int sidx) {
+      buf[sidx++] = arTint;
+      buf[sidx++] = gbTint;
+      return sidx;
     }
 
     protected int beginPrimitive(int vertexCount, int elemCount) {
@@ -290,6 +319,20 @@ public class IndexedTrisShader extends GLShader {
       return vertIdx;
     }
 
+    protected final void addElems(short[] data, int vertIdx, int[] indices) {
+      int offset = 0;
+      for (int ii = 0, ll = indices.length; ii < ll; ii++) {
+        data[offset++] = (short)(vertIdx+indices[ii]);
+        if (offset == data.length) {
+          elements.add(data);
+          offset = 0;
+        }
+      }
+      if (offset > 0) {
+        elements.add(data, 0, offset);
+      }
+    }
+
     private void expandVerts(int vertCount) {
       int newVerts = vertices.capacity() / vertexSize();
       while (newVerts < vertCount)
@@ -304,4 +347,17 @@ public class IndexedTrisShader extends GLShader {
       elements.expand(newElems);
     }
   }
+
+  protected static int addVert(float[] data, int offset,
+                               float[] prefix, float x, float y, float sx, float sy) {
+    System.arraycopy(prefix, 0, data, offset, prefix.length);
+    offset += prefix.length;
+    data[offset++] = x;
+    data[offset++] = y;
+    data[offset++] = sx;
+    data[offset++] = sy;
+    return offset;
+  }
+
+  protected static final int[] QUAD_INDICES = { 0, 1, 2, 1, 3, 2 };
 }

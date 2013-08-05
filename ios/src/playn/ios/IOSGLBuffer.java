@@ -45,12 +45,6 @@ public abstract class IOSGLBuffer implements GLBuffer {
     }
 
     @Override
-    public Float add(InternalTransform xform) {
-      // TODO: optimize?
-      return add(xform.m00(), xform.m01(), xform.m10(), xform.m11(), xform.tx(), xform.ty());
-    }
-
-    @Override
     public Float add(float x, float y) {
       data[position++] = x;
       data[position++] = y;
@@ -58,13 +52,9 @@ public abstract class IOSGLBuffer implements GLBuffer {
     }
 
     @Override
-    public Float add(float m00, float m01, float m10, float m11, float tx, float ty) {
-      data[position++] = m00;
-      data[position++] = m01;
-      data[position++] = m10;
-      data[position++] = m11;
-      data[position++] = tx;
-      data[position++] = ty;
+    public Float add(float[] data) {
+      System.arraycopy(data, 0, this.data, position, data.length);
+      position += data.length;
       return this;
     }
 
@@ -73,12 +63,6 @@ public abstract class IOSGLBuffer implements GLBuffer {
       System.arraycopy(data, offset, this.data, position, length);
       position += length;
       return this;
-    }
-
-    @Override
-    public Float add(GLBuffer.Float data) {
-      float[] odata = ((FloatImpl)data).data;
-      return add(odata, 0, odata.length);
     }
 
     @Override
@@ -141,6 +125,20 @@ public abstract class IOSGLBuffer implements GLBuffer {
     public Short add(int x, int y) {
       data[position++] = (short) x;
       data[position++] = (short) y;
+      return this;
+    }
+
+    @Override
+    public Short add(short[] data) {
+      System.arraycopy(data, 0, this.data, position, data.length);
+      position += data.length;
+      return this;
+    }
+
+    @Override
+    public Short add(short[] data, int offset, int length) {
+      System.arraycopy(data, offset, this.data, position, length);
+      position += length;
       return this;
     }
 
