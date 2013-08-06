@@ -111,7 +111,7 @@ public class QuadShader extends GLShader {
       throw new RuntimeException(
         "GL_MAX_VERTEX_UNIFORM_VECTORS too low: have " + maxVecs +
         ", need at least " + vec4sPerQuad());
-    this.maxQuads = maxVecs / vec4sPerQuad();
+    maxQuads = maxVecs / vec4sPerQuad();
   }
 
   @Override
