@@ -94,7 +94,7 @@ public class QuadShader extends GLShader {
   public static boolean isLikelyToPerform(GLContext ctx) {
     int maxVecs = usableMaxUniformVectors(ctx);
     // assume we're better off with indexed tris if we can't push at least 16 quads at a time
-    return false && (maxVecs >= 16*BASE_VEC4S_PER_QUAD);
+    return (maxVecs >= 16*BASE_VEC4S_PER_QUAD);
   }
 
   private static int usableMaxUniformVectors(GLContext ctx) {
