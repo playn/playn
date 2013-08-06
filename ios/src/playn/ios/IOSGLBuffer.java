@@ -39,33 +39,6 @@ public abstract class IOSGLBuffer implements GLBuffer {
     }
 
     @Override
-    public Float add(float value) {
-      data[position++] = value;
-      return this;
-    }
-
-    @Override
-    public Float add(float x, float y) {
-      data[position++] = x;
-      data[position++] = y;
-      return this;
-    }
-
-    @Override
-    public Float add(float[] data) {
-      System.arraycopy(data, 0, this.data, position, data.length);
-      position += data.length;
-      return this;
-    }
-
-    @Override
-    public Float add(float[] data, int offset, int length) {
-      System.arraycopy(data, offset, this.data, position, length);
-      position += length;
-      return this;
-    }
-
-    @Override
     public int capacity() {
       return data.length;
     }
@@ -96,6 +69,38 @@ public abstract class IOSGLBuffer implements GLBuffer {
     }
 
     @Override
+    public float[] array() {
+      return data;
+    }
+
+    @Override
+    public Float add(float value) {
+      data[position++] = value;
+      return this;
+    }
+
+    @Override
+    public Float add(float x, float y) {
+      data[position++] = x;
+      data[position++] = y;
+      return this;
+    }
+
+    @Override
+    public Float add(float[] data) {
+      System.arraycopy(data, 0, this.data, position, data.length);
+      position += data.length;
+      return this;
+    }
+
+    @Override
+    public Float add(float[] data, int offset, int length) {
+      System.arraycopy(data, offset, this.data, position, length);
+      position += length;
+      return this;
+    }
+
+    @Override
     IntPtr pointer() {
       return handle.AddrOfPinnedObject();
     }
@@ -113,6 +118,41 @@ public abstract class IOSGLBuffer implements GLBuffer {
 
     public ShortImpl(int capacity) {
       expand(capacity);
+    }
+
+    @Override
+    public int capacity() {
+      return data.length;
+    }
+
+    @Override
+    public void expand(int capacity) {
+      if (handle != null)
+        handle.Free();
+      data = new short[capacity];
+      handle = GCHandle.Alloc(data, GCHandleType.wrap(GCHandleType.Pinned));
+    }
+
+    @Override
+    public void skip(int count) {
+      position += count;
+    }
+
+    @Override
+    public void reset() {
+      position = 0;
+    }
+
+    @Override
+    public void destroy() {
+      super.destroy();
+      if (handle != null)
+        handle.Free();
+    }
+
+    @Override
+    public short[] array() {
+      return data;
     }
 
     @Override
@@ -146,36 +186,6 @@ public abstract class IOSGLBuffer implements GLBuffer {
     public void drawElements(int mode, int count) {
       GL.DrawElements(BeginMode.wrap(mode), count,
                       DrawElementsType.wrap(DrawElementsType.UnsignedShort), new IntPtr(0));
-    }
-
-    @Override
-    public int capacity() {
-      return data.length;
-    }
-
-    @Override
-    public void expand(int capacity) {
-      if (handle != null)
-        handle.Free();
-      data = new short[capacity];
-      handle = GCHandle.Alloc(data, GCHandleType.wrap(GCHandleType.Pinned));
-    }
-
-    @Override
-    public void skip(int count) {
-      position += count;
-    }
-
-    @Override
-    public void reset() {
-      position = 0;
-    }
-
-    @Override
-    public void destroy() {
-      super.destroy();
-      if (handle != null)
-        handle.Free();
     }
 
     @Override
@@ -215,6 +225,11 @@ public abstract class IOSGLBuffer implements GLBuffer {
     int oposition = position;
     position = 0;
     return oposition;
+  }
+
+  @Override
+  public void flush() {
+    // nothing needed here because we have no backing NIO buffer
   }
 
   @Override

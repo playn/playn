@@ -19,11 +19,21 @@ import playn.core.InternalTransform;
 
 /**
  * An abstraction over bulk buffers for use with {@link GLShader} and {@link GLProgram}.
+ *
+ * <p>A note on the {@code array} methods: on the Android and Java backends, the buffers are backed
+ * by an NIO buffer but the staging array is used to avoid repeated calls to {@code Buffer.put}
+ * which are very slow on Android. Since we have to use this backing array, we expose it directly
+ * so that shaders can obtain a reference to it and populate it directly rather than call dozens of
+ * methods to add floats one by one. On iOS, the buffer is backed by an array directly, so this API
+ * affords slightly higher performance on iOS as well.</p>
  */
 public interface GLBuffer {
 
   /** A buffer of 32-bit floats. */
   interface Float extends GLBuffer {
+    /** Returns the array that underlies this buffer. */
+    float[] array();
+
     /** Adds a single value to this buffer.
      * @return this buffer for call chaining. */
     Float add(float value);
@@ -47,6 +57,9 @@ public interface GLBuffer {
 
   /** A buffer of 16-bit unsigned integers. */
   interface Short extends GLBuffer {
+    /** Returns the array that underlies this buffer. */
+    short[] array();
+
     /** Adds a single value to this buffer.
      * @return this buffer for call chaining. */
     Short add(int value);
@@ -95,6 +108,10 @@ public interface GLBuffer {
    * elements.
    * @return the number of elements in the buffer at the time it was bound. */
   int send(int target, int usage);
+
+  /** Flushes this buffer's staging array to its underlying NIO buffer (if any). This is done
+   * automatically on a call to {@link #send}. */
+  void flush();
 
   /** Resets this buffer's position to zero. */
   void reset();

@@ -128,6 +128,7 @@ public class GL20Program implements GLProgram {
     final int loc = gl.glGetUniformLocation(program, name);
     return (loc < 0) ? null : new GLShader.Uniform2fv() {
       public void bind(GLBuffer.Float data, int count) {
+        data.flush();
         FloatBuffer buffer = ((GL20Buffer.FloatImpl)data).buffer;
         buffer.position(0);
         gl.glUniform2fv(loc, count, buffer);
@@ -140,6 +141,7 @@ public class GL20Program implements GLProgram {
     final int loc = gl.glGetUniformLocation(program, name);
     return (loc < 0) ? null : new GLShader.Uniform4fv() {
       public void bind(GLBuffer.Float data, int count) {
+        data.flush();
         FloatBuffer buffer = ((GL20Buffer.FloatImpl)data).buffer;
         buffer.position(0);
         gl.glUniform4fv(loc, count, buffer);
@@ -152,6 +154,7 @@ public class GL20Program implements GLProgram {
     final int loc = gl.glGetUniformLocation(program, name);
     return (loc < 0) ? null : new GLShader.UniformMatrix4fv() {
       public void bind(GLBuffer.Float data, int count) {
+        data.flush();
         FloatBuffer buffer = ((GL20Buffer.FloatImpl)data).buffer;
         buffer.position(0);
         gl.glUniformMatrix4fv(loc, count, false, buffer);

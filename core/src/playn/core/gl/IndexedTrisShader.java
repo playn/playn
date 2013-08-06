@@ -118,13 +118,9 @@ public class IndexedTrisShader extends GLShader {
     private final Attrib aMatrix, aTranslation, aColor; // stable (same for whole quad)
     private final Attrib aPosition, aTexCoord; // changing (varies per quad vertex)
 
+    protected final float[] stableAttrs;
     protected final GLBuffer.Float vertices;
     protected final GLBuffer.Short elements;
-    // we prepare quad/tris in these arrays and then batch copy them into the buffers;
-    // this avoids a painful performance hit from Android's FloatBuffer.put()
-    protected final float[] stableAttrs;
-    protected final float[] vertData;
-    protected final short[] elemData;
 
     private float arTint, gbTint;
 
@@ -140,11 +136,9 @@ public class IndexedTrisShader extends GLShader {
       aTexCoord = prog.getAttrib("a_TexCoord", 2, GL20.GL_FLOAT);
 
       // create our vertex and index buffers
+      stableAttrs = new float[stableAttrsSize()];
       vertices = ctx.createFloatBuffer(START_VERTS*vertexSize());
       elements = ctx.createShortBuffer(START_ELEMS);
-      stableAttrs = new float[stableAttrsSize()];
-      vertData = new float[4*vertexSize()]; // one quad worth
-      elemData = new short[6]; // one quad worth
     }
 
     @Override
@@ -213,14 +207,15 @@ public class IndexedTrisShader extends GLShader {
       stableAttrs[5] = ty;
       addExtraStableAttrs(stableAttrs, 6);
 
-      int vertIdx = beginPrimitive(4, 6), offset = 0;
+      int vertIdx = beginPrimitive(4, 6), offset = vertices.position();
+      float[] vertData = vertices.array();
       offset = addVert(vertData, offset, stableAttrs, x1, y1, sx1, sy1);
       offset = addVert(vertData, offset, stableAttrs, x2, y2, sx2, sy2);
       offset = addVert(vertData, offset, stableAttrs, x3, y3, sx3, sy3);
       offset = addVert(vertData, offset, stableAttrs, x4, y4, sx4, sy4);
-      vertices.add(vertData, 0, offset);
+      vertices.skip(offset - vertices.position());
 
-      addElems(elemData, vertIdx, QUAD_INDICES);
+      addElems(vertIdx, QUAD_INDICES);
     }
 
     @Override
@@ -235,20 +230,15 @@ public class IndexedTrisShader extends GLShader {
       addExtraStableAttrs(stableAttrs, 6);
 
       int vertIdx = beginPrimitive(xys.length/2, indices.length);
-      int offset = 0;
+      int offset = vertices.position();
+      float[] vertData = vertices.array();
       for (int ii = 0, ll = xys.length; ii < ll; ii += 2) {
         float x = xys[ii], y = xys[ii+1];
         offset = addVert(vertData, offset, stableAttrs, x, y, x/tw, y/th);
-        if (offset == vertData.length) {
-          vertices.add(vertData);
-          offset = 0;
-        }
       }
-      if (offset > 0) {
-        vertices.add(vertData, 0, offset);
-      }
+      vertices.skip(offset - vertices.position());
 
-      addElems(elemData, vertIdx, indices);
+      addElems(vertIdx, indices);
     }
 
     @Override
@@ -263,19 +253,14 @@ public class IndexedTrisShader extends GLShader {
       addExtraStableAttrs(stableAttrs, 6);
 
       int vertIdx = beginPrimitive(xys.length/2, indices.length);
-      int offset = 0;
+      int offset = vertices.position();
+      float[] vertData = vertices.array();
       for (int ii = 0, ll = xys.length; ii < ll; ii += 2) {
         offset = addVert(vertData, offset, stableAttrs, xys[ii], xys[ii+1], sxys[ii], sxys[ii+1]);
-        if (offset == vertData.length) {
-          vertices.add(vertData);
-          offset = 0;
-        }
       }
-      if (offset > 0) {
-        vertices.add(vertData, 0, offset);
-      }
+      vertices.skip(offset - vertices.position());
 
-      addElems(elemData, vertIdx, indices);
+      addElems(vertIdx, indices);
     }
 
     @Override
@@ -319,18 +304,13 @@ public class IndexedTrisShader extends GLShader {
       return vertIdx;
     }
 
-    protected final void addElems(short[] data, int vertIdx, int[] indices) {
-      int offset = 0;
+    protected final void addElems(int vertIdx, int[] indices) {
+      short[] data = elements.array();
+      int offset = elements.position();
       for (int ii = 0, ll = indices.length; ii < ll; ii++) {
         data[offset++] = (short)(vertIdx+indices[ii]);
-        if (offset == data.length) {
-          elements.add(data);
-          offset = 0;
-        }
       }
-      if (offset > 0) {
-        elements.add(data, 0, offset);
-      }
+      elements.skip(offset - elements.position());
     }
 
     private void expandVerts(int vertCount) {

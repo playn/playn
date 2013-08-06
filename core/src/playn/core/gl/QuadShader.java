@@ -94,7 +94,7 @@ public class QuadShader extends GLShader {
   public static boolean isLikelyToPerform(GLContext ctx) {
     int maxVecs = usableMaxUniformVectors(ctx);
     // assume we're better off with indexed tris if we can't push at least 16 quads at a time
-    return (maxVecs >= 16*BASE_VEC4S_PER_QUAD);
+    return false && (maxVecs >= 16*BASE_VEC4S_PER_QUAD);
   }
 
   private static int usableMaxUniformVectors(GLContext ctx) {
@@ -165,7 +165,6 @@ public class QuadShader extends GLShader {
     private final Attrib aVertex;
     private final GLBuffer.Short vertices, elements;
     private final GLBuffer.Float data;
-    private final float[] quadData;
 
     private int quadCounter;
     private float arTint, gbTint;
@@ -195,7 +194,6 @@ public class QuadShader extends GLShader {
       // create the buffer that will hold quad data, and the float array that we'll use to avoid
       // making too many calls to FloatBuffer.put() which has crap performance on Android
       data = ctx.createFloatBuffer(maxQuads*vec4sPerQuad()*4);
-      quadData = new float[vec4sPerQuad()*4];
 
       vertices.bind(GL20.GL_ARRAY_BUFFER);
       vertices.send(GL20.GL_ARRAY_BUFFER, GL20.GL_STATIC_DRAW);
@@ -242,28 +240,30 @@ public class QuadShader extends GLShader {
                         float x3, float y3, float sx3, float sy3,
                         float x4, float y4, float sx4, float sy4) {
       float dw = x2 - x1, dh = y3 - y1;
-      quadData[0] = m00*dw;
-      quadData[1] = m01*dw;
-      quadData[2] = m10*dh;
-      quadData[3] = m11*dh;
-      quadData[4] = tx + m00*x1 + m10*y1;
-      quadData[5] = ty + m01*x1 + m11*y1;
-      quadData[6] = sx1;
-      quadData[7] = sy1;
-      quadData[8] = sx2 - sx1;
-      quadData[9] = sy3 - sy1;
-      int size = addExtraData(quadData, 10);
-      data.add(quadData, 0, size);
+      float[] quadData = data.array();
+      int opos = data.position(), pos = opos;
+      quadData[pos++] = m00*dw;
+      quadData[pos++] = m01*dw;
+      quadData[pos++] = m10*dh;
+      quadData[pos++] = m11*dh;
+      quadData[pos++] = tx + m00*x1 + m10*y1;
+      quadData[pos++] = ty + m01*x1 + m11*y1;
+      quadData[pos++] = sx1;
+      quadData[pos++] = sy1;
+      quadData[pos++] = sx2 - sx1;
+      quadData[pos++] = sy3 - sy1;
+      pos = addExtraData(quadData, pos);
+      data.skip(pos-opos);
       quadCounter++;
 
       if (quadCounter >= maxQuads)
         QuadShader.this.flush();
     }
 
-    protected int addExtraData(float[] data, int qi) {
-      data[qi++] = arTint;
-      data[qi++] = gbTint;
-      return qi;
+    protected int addExtraData(float[] quadData, int pos) {
+      quadData[pos++] = arTint;
+      quadData[pos++] = gbTint;
+      return pos;
     }
   }
 }
