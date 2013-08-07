@@ -15,8 +15,6 @@
  */
 package playn.core.gl;
 
-import playn.core.InternalTransform;
-
 /**
  * An abstraction over bulk buffers for use with {@link GLShader} and {@link GLProgram}.
  *

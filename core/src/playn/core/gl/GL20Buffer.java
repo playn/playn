@@ -22,7 +22,6 @@ import java.nio.FloatBuffer;
 import java.nio.ShortBuffer;
 
 import playn.core.Asserts;
-import playn.core.InternalTransform;
 
 /**
  * {@link GLBuffer} implementation based on {@code java.nio} and usable with {@link GL20}.
