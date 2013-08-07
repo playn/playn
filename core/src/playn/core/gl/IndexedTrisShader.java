@@ -33,12 +33,14 @@ public class IndexedTrisShader extends GLShader {
   /** The varies-per-vert attribute variables for our shader. */
   public static final String PER_VERT_ATTRS =
     "attribute vec2 a_Position;\n" +
-    "attribute vec2 a_TexCoord;\n";
+    "attribute vec2 a_TexCoord;\n" +
+    "attribute float a_TexId;\n";
 
   /** Declares the varying variables for our shader. */
   public static final String VERT_VARS =
     "varying vec2 v_TexCoord;\n" +
-    "varying vec4 v_Color;\n";
+    "varying vec4 v_Color;\n" +
+    "varying float v_TexMults[_TEXTURE_COUNT_];\n";
 
   /** The shader code that computes {@code gl_Position}. */
   public static final String VERT_SETPOS =
@@ -56,7 +58,8 @@ public class IndexedTrisShader extends GLShader {
 
   /** The shader code that computes {@code v_TexCoord}. */
   public static final String VERT_SETTEX =
-    "v_TexCoord = a_TexCoord;\n";
+    "v_TexCoord = a_TexCoord;\n" +
+    "_TEXTURE_UNPACKING_\n";
 
   /** The shader code that computes {@code v_Color}. */
   public static final String VERT_SETCOLOR =
@@ -100,7 +103,28 @@ public class IndexedTrisShader extends GLShader {
    * remove or change the defaults.
    */
   protected String vertexShader() {
+    return baseVertexShader().
+      replace("_TEXTURE_COUNT_", ""+textureCount).
+      replace("_TEXTURE_UNPACKING_", textureUnpack());
+  }
+
+  /**
+   * Returns the vertex shader program with placeholders for a few key constants.
+   */
+  protected String baseVertexShader() {
     return VERTEX_SHADER;
+  }
+
+  /**
+   * Does the dirty work of unpacking the texture multipliers.
+   */
+  protected String textureUnpack() {
+    StringBuilder str = new StringBuilder();
+
+    for (int ii = 0; ii < textureCount; ii++)
+      str.append("v_TexMults[" + ii +"] = a_TexId == " + ii + ".0 ? 1.0 : 0.0;\n");
+
+    return str.toString();
   }
 
   @Override
@@ -115,7 +139,7 @@ public class IndexedTrisShader extends GLShader {
 
   protected class ITCore extends Core {
     private final Uniform2f uScreenSize;
-    private final Attrib aMatrix, aTranslation, aColor; // stable (same for whole quad)
+    private final Attrib aMatrix, aTranslation, aColor, aTexId; // stable (same for whole quad)
     private final Attrib aPosition, aTexCoord; // changing (varies per quad vertex)
 
     protected final float[] stableAttrs;
@@ -123,6 +147,7 @@ public class IndexedTrisShader extends GLShader {
     protected final GLBuffer.Short elements;
 
     private float arTint, gbTint;
+    private int texIdx;
 
     public ITCore(String vertShader, String fragShader) {
       super(vertShader, fragShader);
@@ -132,6 +157,7 @@ public class IndexedTrisShader extends GLShader {
       aMatrix = prog.getAttrib("a_Matrix", 4, GL20.GL_FLOAT);
       aTranslation = prog.getAttrib("a_Translation", 2, GL20.GL_FLOAT);
       aColor = prog.getAttrib("a_Color", 2, GL20.GL_FLOAT);
+      aTexId = prog.getAttrib("a_TexId", 1, GL20.GL_FLOAT);
       aPosition = prog.getAttrib("a_Position", 2, GL20.GL_FLOAT);
       aTexCoord = prog.getAttrib("a_TexCoord", 2, GL20.GL_FLOAT);
 
@@ -153,6 +179,8 @@ public class IndexedTrisShader extends GLShader {
       aMatrix.bind(stride, 0);
       aTranslation.bind(stride, 16);
       aColor.bind(stride, 24);
+      if (aTexId != null)
+        aTexId.bind(stride, 32);
 
       // bind our changing attributes
       int offset = stableAttrsSize()*FLOAT_SIZE_BYTES;
@@ -165,9 +193,10 @@ public class IndexedTrisShader extends GLShader {
     }
 
     @Override
-    public void prepare(int tint, boolean justActivated) {
+    public void prepare(int tint, int texIdx, boolean justActivated) {
       this.arTint = (tint >> 16) & 0xFFFF;
       this.gbTint = tint & 0xFFFF;
+      this.texIdx = texIdx;
     }
 
     @Override
@@ -250,6 +279,7 @@ public class IndexedTrisShader extends GLShader {
       stableAttrs[3] = m11;
       stableAttrs[4] = tx;
       stableAttrs[5] = ty;
+      stableAttrs[6] = texIdx;
       addExtraStableAttrs(stableAttrs, 6);
 
       int vertIdx = beginPrimitive(xys.length/2, indices.length);
@@ -272,7 +302,7 @@ public class IndexedTrisShader extends GLShader {
      * stable attributes, it should use this to determine the offset at which to bind them, and
      * override this method to return the new size including their attributes. */
     protected int stableAttrsSize() {
-      return 8;
+      return 9;
     }
 
     protected int vertexSize() {
@@ -286,6 +316,7 @@ public class IndexedTrisShader extends GLShader {
     protected int addExtraStableAttrs(float[] buf, int sidx) {
       buf[sidx++] = arTint;
       buf[sidx++] = gbTint;
+      buf[sidx++] = texIdx;
       return sidx;
     }
 
