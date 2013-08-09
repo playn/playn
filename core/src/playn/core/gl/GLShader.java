@@ -301,7 +301,8 @@ public abstract class GLShader {
   /** Returns how many textures to use. Defaults to all available, but subclasses may steal some,
    * put a limit on things, etc. */
   protected int getTextureCount() {
-    return ctx.getInteger(GL20.GL_MAX_TEXTURE_IMAGE_UNITS);
+    // FIXME: Temporarily cap at four.
+    return Math.min(4, ctx.getInteger(GL20.GL_MAX_TEXTURE_IMAGE_UNITS));
   }
 
   /** Creates the texture core for this shader. */
