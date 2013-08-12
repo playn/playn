@@ -101,7 +101,7 @@ class JavaGLContext extends GL20Context {
 
       Graphics g = texImage.getGraphics();
       g.setColor(new Color(0f, 0f, 0f, 0f));
-      g.fillRect(0, 0, 256, 256);
+      g.fillRect(0, 0, image.getWidth(), image.getHeight());
       g.drawImage(image, 0, 0, null);
 
       // build a byte buffer from the temporary image that be used by OpenGL to produce a texture.
