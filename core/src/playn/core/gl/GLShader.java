@@ -319,18 +319,41 @@ public abstract class GLShader {
   protected String textureFragmentShader() {
     StringBuilder str = new StringBuilder(FRAGMENT_PREAMBLE);
 
+    str.append(textureUniforms());
+    str.append(textureVaryings());
+
+    str.append("void main(void) {\n");
+
+    str.append(textureColor());
+    str.append(textureTint());
+    str.append(textureAlpha());
+
+    str.append(
+      "  gl_FragColor = textureColor;\n" +
+      "}");
+
+    return str.toString();
+  }
+
+  protected String textureUniforms() {
+    StringBuilder str = new StringBuilder(FRAGMENT_PREAMBLE);
+
     for (int ii = 0; ii < textureCount; ii++) {
         str.append("uniform lowp sampler2D u_Texture" + ii + ";\n");
     }
 
-    str.append(
+    return str.toString();
+  }
+
+  protected String textureVaryings() {
+    return
       "varying mediump vec2 v_TexCoord;\n" +
       "varying lowp vec4 v_Color;\n" +
-      "varying float v_TexMults[" + textureCount + "];\n");
+      "varying float v_TexMults[" + textureCount + "];\n";
+  }
 
-    str.append(
-      "void main(void) {\n" +
-      "  vec4 textureColor = \n");
+  protected String textureColor() {
+    StringBuilder str = new StringBuilder("  vec4 textureColor = \n");
 
     for (int ii = 0; ii < textureCount; ii++) {
       str.append("    texture2D(u_Texture" + ii + ", v_TexCoord) * v_TexMults[" + ii + "]");
@@ -341,12 +364,15 @@ public abstract class GLShader {
       }
     }
 
-    str.append(
-      "  textureColor.rgb *= v_Color.rgb;\n" +
-      "  gl_FragColor = textureColor * v_Color.a;\n" +
-      "}");
-
     return str.toString();
+  }
+
+  protected String textureTint() {
+      return "  textureColor.rgb *= v_Color.rgb;\n";
+  }
+
+  protected String textureAlpha() {
+      return "  textureColor *= v_Color.a;\n";
   }
 
   /**
