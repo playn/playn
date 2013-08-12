@@ -32,16 +32,14 @@ public class QuadShader extends GLShader {
   /** Declares the varying variables for our shader. */
   public static final String VERT_VARS =
     "varying vec2 v_TexCoord;\n" +
-    "varying vec4 v_Color;\n" +
-    "varying float v_TexMults[_TEXTURE_COUNT_];\n";
+    "varying vec4 v_Color;\n";
 
   /** Extracts the values from our data buffer. */
   public static final String VERT_EXTRACTDATA =
     "int index = _VEC4S_PER_QUAD_*int(a_Vertex.z);\n" +
     "vec4 mat = u_Data[index+0];\n" +
     "vec4 txc = u_Data[index+1];\n" +
-    "vec4 tcs = u_Data[index+2];\n" +
-    "vec4 texIdx = u_Data[index+3];\n";
+    "vec4 tcs = u_Data[index+2];\n";
 
   /** The shader code that computes {@code gl_Position}. */
   public static final String VERT_SETPOS =
@@ -59,8 +57,7 @@ public class QuadShader extends GLShader {
 
   /** The shader code that computes {@code v_TexCoord}. */
   public static final String VERT_SETTEX =
-    "v_TexCoord = a_Vertex.xy * tcs.xy + txc.zw;\n" +
-    "_TEXTURE_UNPACKING_\n";
+    "v_TexCoord = a_Vertex.xy * tcs.xy + txc.zw;\n";
 
   /** The shader code that computes {@code v_Color}. */
   public static final String VERT_SETCOLOR =
@@ -86,7 +83,7 @@ public class QuadShader extends GLShader {
   private static final int VERTICES_PER_QUAD = 4;
   private static final int ELEMENTS_PER_QUAD = 6;
   private static final int VERTEX_SIZE = 3; // 3 floats per vertex
-  private static final int BASE_VEC4S_PER_QUAD = 4; // 4 vec4s per matrix
+  private static final int BASE_VEC4S_PER_QUAD = 3; // 3 vec4s per matrix
 
   protected final int maxQuads;
 
@@ -141,11 +138,8 @@ public class QuadShader extends GLShader {
    * remove or change the defaults.
    */
   protected String vertexShader() {
-    return baseVertexShader().
-      replace("_MAX_QUADS_", ""+maxQuads).
-      replace("_VEC4S_PER_QUAD_", ""+vec4sPerQuad()).
-      replace("_TEXTURE_COUNT_", ""+textureCount).
-      replace("_TEXTURE_UNPACKING_", textureUnpack());
+    return baseVertexShader().replace("_MAX_QUADS_", ""+maxQuads).
+      replace("_VEC4S_PER_QUAD_", ""+vec4sPerQuad());
   }
 
   /**
@@ -153,19 +147,6 @@ public class QuadShader extends GLShader {
    */
   protected String baseVertexShader() {
     return VERTEX_SHADER;
-  }
-
-  /**
-   * Does the dirty work of unpacking the texture multipliers.
-   */
-  protected String textureUnpack() {
-    StringBuilder str = new StringBuilder();
-
-    for (int ii = 0; ii < textureCount; ii++) {
-      str.append("v_TexMults[" + ii +"] = texIdx[0] == " + ii + ".0 ? 1.0 : 0.0;\n");
-    }
-
-    return str.toString();
   }
 
   @Override
@@ -187,7 +168,6 @@ public class QuadShader extends GLShader {
 
     private int quadCounter;
     private float arTint, gbTint;
-    private int texIdx;
 
     public QuadCore(String vertShader, String fragShader) {
       super(vertShader, fragShader);
@@ -231,10 +211,9 @@ public class QuadShader extends GLShader {
     }
 
     @Override
-    public void prepare(int tint, int texIdx, boolean justActivated) {
+    public void prepare(int tint, boolean justActivated) {
       this.arTint = (tint >> 16) & 0xFFFF;
       this.gbTint = tint & 0xFFFF;
-      this.texIdx = texIdx;
     }
 
     @Override
@@ -284,8 +263,6 @@ public class QuadShader extends GLShader {
     protected int addExtraData(float[] quadData, int pos) {
       quadData[pos++] = arTint;
       quadData[pos++] = gbTint;
-      quadData[pos++] = texIdx;
-      pos += 3; // Pad out the rest of the vec4 being used for texIdx
       return pos;
     }
   }

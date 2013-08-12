@@ -15,8 +15,6 @@
  */
 package playn.core.gl;
 
-import java.util.Arrays;
-
 import playn.core.Asserts;
 import playn.core.InternalTransform;
 import playn.core.Surface;
@@ -109,7 +107,6 @@ public abstract class GLShader {
       "#endif\n";
 
   protected final GLContext ctx;
-  protected final int textureCount;
   protected int refs;
   protected Core texCore, colorCore, curCore;
   protected Extras texExtras, colorExtras, curExtras;
@@ -137,7 +134,8 @@ public abstract class GLShader {
       texCore.activate(ctx.curFbufWidth, ctx.curFbufHeight);
       if (GLContext.STATS_ENABLED) ctx.stats.shaderBinds++;
     }
-    texCore.prepare(tint, texExtras.prepare(tex, justActivated), justActivated);
+    texCore.prepare(tint, justActivated);
+    texExtras.prepare(tex, justActivated);
     return this;
   }
 
@@ -163,7 +161,7 @@ public abstract class GLShader {
       colorCore.activate(ctx.curFbufWidth, ctx.curFbufHeight);
       if (GLContext.STATS_ENABLED) ctx.stats.shaderBinds++;
     }
-    colorCore.prepare(tint, 0, justActivated);
+    colorCore.prepare(tint, justActivated);
     colorExtras.prepare(0, justActivated);
     return this;
   }
@@ -288,7 +286,6 @@ public abstract class GLShader {
 
   protected GLShader(GLContext ctx) {
     this.ctx = ctx;
-    textureCount = getTextureCount();
   }
 
   @Override
@@ -296,13 +293,6 @@ public abstract class GLShader {
     if (texCore != null || colorCore != null) {
       ctx.queueClearShader(this);
     }
-  }
-
-  /** Returns how many textures to use. Defaults to all available, but subclasses may steal some,
-   * put a limit on things, etc. */
-  protected int getTextureCount() {
-    // FIXME: Temporarily cap at four.
-    return Math.min(4, ctx.getInteger(GL20.GL_MAX_TEXTURE_IMAGE_UNITS));
   }
 
   /** Creates the texture core for this shader. */
@@ -336,43 +326,25 @@ public abstract class GLShader {
   }
 
   protected String textureUniforms() {
-    StringBuilder str = new StringBuilder(FRAGMENT_PREAMBLE);
-
-    for (int ii = 0; ii < textureCount; ii++) {
-        str.append("uniform lowp sampler2D u_Texture" + ii + ";\n");
-    }
-
-    return str.toString();
+    return "uniform lowp sampler2D u_Texture;\n";
   }
 
   protected String textureVaryings() {
     return
       "varying mediump vec2 v_TexCoord;\n" +
-      "varying lowp vec4 v_Color;\n" +
-      "varying float v_TexMults[" + textureCount + "];\n";
+      "varying lowp vec4 v_Color;\n";
   }
 
   protected String textureColor() {
-    StringBuilder str = new StringBuilder("  vec4 textureColor = \n");
-
-    for (int ii = 0; ii < textureCount; ii++) {
-      str.append("    texture2D(u_Texture" + ii + ", v_TexCoord) * v_TexMults[" + ii + "]");
-      if (ii < textureCount - 1) {
-        str.append(" +\n");
-      } else {
-        str.append(";\n");
-      }
-    }
-
-    return str.toString();
+    return "  vec4 textureColor = texture2D(u_Texture, v_TexCoord);\n";
   }
 
   protected String textureTint() {
-      return "  textureColor.rgb *= v_Color.rgb;\n";
+    return "  textureColor.rgb *= v_Color.rgb;\n";
   }
 
   protected String textureAlpha() {
-      return "  textureColor *= v_Color.a;\n";
+    return "  textureColor *= v_Color.a;\n";
   }
 
   /**
@@ -411,8 +383,8 @@ public abstract class GLShader {
     /** Called to setup this core's shader after initially being bound. */
     public abstract void activate(int fbufWidth, int fbufHeight);
 
-    /** Called before each primitive to update the current color and texture index. */
-    public abstract void prepare(int tint, int texIdx, boolean justActivated);
+    /** Called before each primitive to update the current color. */
+    public abstract void prepare(int tint, boolean justActivated);
 
     /** Flushes this core's queued geometry to the GPU. */
     public abstract void flush();
@@ -448,9 +420,8 @@ public abstract class GLShader {
 
   /** Handles the extra bits needed when we're using textures or flat color. */
   protected static abstract class Extras {
-    /** Performs additional binding to prepare for a texture or color render.
-     * @return the texture index to use*/
-    public abstract int prepare(int tex, boolean justActivated);
+    /** Performs additional binding to prepare for a texture or color render. */
+    public abstract void prepare(int tex, boolean justActivated);
 
     /** Called prior to flushing this shader. Defaults to NOOP. */
     public void willFlush() {}
@@ -461,64 +432,34 @@ public abstract class GLShader {
 
   /** The default texture extras. */
   protected class TextureExtras extends Extras {
-    private final Uniform1i[] uTexture;
-    private int[] textures;
+    private final Uniform1i uTexture;
+    private int lastTex;
 
     public TextureExtras(GLProgram prog) {
-      uTexture = new Uniform1i[textureCount];
-      textures = new int[textureCount];
-      for (int ii = 0; ii < textureCount; ii++) {
-        uTexture[ii] = prog.getUniform1i("u_Texture" + ii);
-        textures[ii] = 0;
-      }
+      uTexture = prog.getUniform1i("u_Texture");
     }
 
     @Override
-    public int prepare(int tex, boolean justActivated) {
+    public void prepare(int tex, boolean justActivated) {
       ctx.checkGLError("textureShader.prepare start");
-      boolean stateChanged = true;
-      int texIdx = 0;
-      // Look to see if we already know this texture, or can add it
-      for (int ii = 0; ii < textureCount; ii++) {
-        if (textures[ii] == tex) {
-          texIdx = ii;
-          stateChanged = false;
-          break;
-        }
-        if (textures[ii] == 0) {
-          // Reached first vacancy without finding it, so dibs!
-          textures[ii] = tex;
-          texIdx = ii;
-          stateChanged = false;
-          break;
-        }
-      }
-
+      boolean stateChanged = (tex != lastTex);
       if (!justActivated && stateChanged) {
         flush();
         ctx.checkGLError("textureShader.prepare flush");
       }
       if (stateChanged) {
-        Arrays.fill(textures, 0);
-        textures[0] = tex;
-        texIdx = 0;
+        lastTex = tex;
         ctx.checkGLError("textureShader.prepare end");
       }
       if (justActivated) {
-        for (int ii = 0; ii < textureCount; ii++) {
-          uTexture[ii].bind(ii);
-        }
+        ctx.activeTexture(GL20.GL_TEXTURE0);
+        uTexture.bind(0);
       }
-
-      return texIdx;
     }
 
     @Override
     public void willFlush () {
-      for (int ii = 0; ii < textureCount; ii++) {
-        ctx.activeTexture(GL20.GL_TEXTURE0 + ii);
-        ctx.bindTexture(textures[ii]);
-      }
+      ctx.bindTexture(lastTex);
     }
   }
 
@@ -529,9 +470,8 @@ public abstract class GLShader {
     }
 
     @Override
-    public int prepare(int tex, boolean justActivated) {
+    public void prepare(int tex, boolean justActivated) {
       // Nothing at all
-      return 0;
     }
   }
 }
