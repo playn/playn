@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.ArrayList;
 
 import pythagoras.f.Point;
+import pythagoras.util.NoninvertibleTransformException;
 
 /**
  * Provides implementations for per-platform concrete {@link GroupLayer}s. Because of single
@@ -117,13 +118,18 @@ public class GroupLayerImpl<L extends AbstractLayer>
       if (!child.interactive()) continue; // ignore non-interactive children
       sawInteractiveChild = true; // note that we saw an interactive child
       if (!child.visible()) continue; // ignore invisible children
-      // transform the point into the child's coordinate system
-      child.transform().inverseTransform(point.set(x, y), point);
-      point.x += child.originX();
-      point.y += child.originY();
-      Layer l = child.hitTest(point);
-      if (l != null)
-        return l;
+      try {
+        // transform the point into the child's coordinate system
+        child.transform().inverseTransform(point.set(x, y), point);
+        point.x += child.originX();
+        point.y += child.originY();
+        Layer l = child.hitTest(point);
+        if (l != null)
+          return l;
+      } catch (NoninvertibleTransformException nte) {
+        // Degenerate transform means no hit
+        continue;
+      }
     }
     // if we saw no interactive children and we don't have listeners registered directly on this
     // group, clear our own interactive flag; this lazily deactivates this group after its
