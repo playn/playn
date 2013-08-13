@@ -146,6 +146,26 @@ public class IndexedTrisShader extends GLShader {
       prog.bind();
       uScreenSize.bind(fbufWidth, fbufHeight);
 
+      ctx.checkGLError("Shader.prepare bind");
+    }
+
+    @Override
+    public void prepare(int tint, boolean justActivated) {
+      this.arTint = (tint >> 16) & 0xFFFF;
+      this.gbTint = tint & 0xFFFF;
+
+      elements.bind(GL20.GL_ELEMENT_ARRAY_BUFFER);
+    }
+
+    @Override
+    public void flush() {
+      if (vertices.position() == 0)
+        return;
+      ctx.checkGLError("Shader.flush");
+
+      // This binding SHOULD be able to happen above in activate(), however certain graphics cards
+      // (I'm looking at you, Intel) exhibit broken behavior and quads wind up with the geometry
+      // from previous images.
       vertices.bind(GL20.GL_ARRAY_BUFFER);
 
       // bind our stable attributes
@@ -159,22 +179,6 @@ public class IndexedTrisShader extends GLShader {
       aPosition.bind(stride, offset);
       if (aTexCoord != null)
         aTexCoord.bind(stride, offset+8);
-
-      elements.bind(GL20.GL_ELEMENT_ARRAY_BUFFER);
-      ctx.checkGLError("Shader.prepare bind");
-    }
-
-    @Override
-    public void prepare(int tint, boolean justActivated) {
-      this.arTint = (tint >> 16) & 0xFFFF;
-      this.gbTint = tint & 0xFFFF;
-    }
-
-    @Override
-    public void flush() {
-      if (vertices.position() == 0)
-        return;
-      ctx.checkGLError("Shader.flush");
 
       vertices.send(GL20.GL_ARRAY_BUFFER, GL20.GL_STREAM_DRAW);
       int elems = elements.send(GL20.GL_ELEMENT_ARRAY_BUFFER, GL20.GL_STREAM_DRAW);
