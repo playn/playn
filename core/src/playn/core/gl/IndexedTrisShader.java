@@ -153,8 +153,6 @@ public class IndexedTrisShader extends GLShader {
     public void prepare(int tint, boolean justActivated) {
       this.arTint = (tint >> 16) & 0xFFFF;
       this.gbTint = tint & 0xFFFF;
-
-      elements.bind(GL20.GL_ELEMENT_ARRAY_BUFFER);
     }
 
     @Override
@@ -179,6 +177,8 @@ public class IndexedTrisShader extends GLShader {
       aPosition.bind(stride, offset);
       if (aTexCoord != null)
         aTexCoord.bind(stride, offset+8);
+
+      elements.bind(GL20.GL_ELEMENT_ARRAY_BUFFER);
 
       vertices.send(GL20.GL_ARRAY_BUFFER, GL20.GL_STREAM_DRAW);
       int elems = elements.send(GL20.GL_ELEMENT_ARRAY_BUFFER, GL20.GL_STREAM_DRAW);
