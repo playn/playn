@@ -146,7 +146,7 @@ public class IndexedTrisShader extends GLShader {
       prog.bind();
       uScreenSize.bind(fbufWidth, fbufHeight);
 
-      ctx.checkGLError("Shader.prepare bind");
+      ctx.checkGLError("Shader.activate bind");
     }
 
     @Override
@@ -179,6 +179,7 @@ public class IndexedTrisShader extends GLShader {
         aTexCoord.bind(stride, offset+8);
 
       elements.bind(GL20.GL_ELEMENT_ARRAY_BUFFER);
+      ctx.checkGLError("Shader.flush bind");
 
       vertices.send(GL20.GL_ARRAY_BUFFER, GL20.GL_STREAM_DRAW);
       int elems = elements.send(GL20.GL_ELEMENT_ARRAY_BUFFER, GL20.GL_STREAM_DRAW);
