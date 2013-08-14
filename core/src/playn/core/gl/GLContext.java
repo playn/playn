@@ -105,6 +105,9 @@ public abstract class GLContext {
    */
   public abstract void setTextureFilter(Filter minFilter, Filter magFilter);
 
+  /** Returns the specified GL string parameter. */
+  public abstract String getString(int param);
+
   /** Returns the specified GL integer parameter. */
   public abstract int getInteger(int param);
 

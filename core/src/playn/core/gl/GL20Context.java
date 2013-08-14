@@ -86,6 +86,11 @@ public class GL20Context extends GLContext {
   }
 
   @Override
+  public String getString(int param) {
+    return gl.glGetString(param);
+  }
+
+  @Override
   public int getInteger(int param) {
     return gl.glGetInteger(param);
   }
