@@ -39,14 +39,14 @@ import playn.core.gl.GL20Context;
 
 class JavaGLContext extends GL20Context {
 
-  public static final boolean CHECK_ERRORS = Boolean.getBoolean("playn.glerrors");
-  public static final boolean QUAD_SHADER = Boolean.parseBoolean(
+  private final static boolean CHECK_ERRORS = Boolean.getBoolean("playn.glerrors");
+  private final static boolean ENABLE_QUAD_SHADER = Boolean.parseBoolean(
     System.getProperty("playn.quadshader", "true"));
+
   private ByteBuffer imgBuf = createImageBuffer(1024);
 
   JavaGLContext(JavaPlatform platform, float scaleFactor, int screenWidth, int screenHeight) {
     super(platform, new JavaGL20(), scaleFactor, CHECK_ERRORS);
-    enableQuadShader = QUAD_SHADER;
     setSize(screenWidth, screenHeight);
   }
 
@@ -70,6 +70,11 @@ class JavaGLContext extends GL20Context {
     }
     if (Display.isCreated())
       super.viewWasResized();
+  }
+
+  @Override
+  protected boolean shouldTryQuadShader() {
+    return ENABLE_QUAD_SHADER && super.shouldTryQuadShader();
   }
 
   void updateTexture(int tex, BufferedImage image) {
