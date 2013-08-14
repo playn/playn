@@ -85,8 +85,12 @@ public class IndexedTrisShader extends GLShader {
   private static final int EXPAND_ELEMS = 6*EXPAND_VERTS/4;
   private static final int FLOAT_SIZE_BYTES = 4;
 
+  private final boolean delayedBinding;
+
   public IndexedTrisShader(GLContext ctx) {
     super(ctx);
+    // TODO: Dave, please to refine
+    delayedBinding = "Intel".equals(ctx.getString(GL20.GL_VENDOR));
   }
 
   @Override
@@ -146,6 +150,11 @@ public class IndexedTrisShader extends GLShader {
       prog.bind();
       uScreenSize.bind(fbufWidth, fbufHeight);
 
+      // certain graphics cards (I'm looking at you, Intel) exhibit broken behavior if we bind our
+      // attributes once during activation, so for those cards we bind every time in flush()
+      if (!delayedBinding)
+        bindAttribsBufs();
+
       ctx.checkGLError("Shader.activate bind");
     }
 
@@ -161,9 +170,20 @@ public class IndexedTrisShader extends GLShader {
         return;
       ctx.checkGLError("Shader.flush");
 
-      // This binding SHOULD be able to happen above in activate(), however certain graphics cards
-      // (I'm looking at you, Intel) exhibit broken behavior and quads wind up with the geometry
-      // from previous images.
+      if (delayedBinding) { // see comments in activate()
+        bindAttribsBufs();
+        ctx.checkGLError("Shader.flush bind");
+      }
+
+      vertices.send(GL20.GL_ARRAY_BUFFER, GL20.GL_STREAM_DRAW);
+      int elems = elements.send(GL20.GL_ELEMENT_ARRAY_BUFFER, GL20.GL_STREAM_DRAW);
+      ctx.checkGLError("Shader.flush BufferData");
+
+      elements.drawElements(GL20.GL_TRIANGLES, elems);
+      ctx.checkGLError("Shader.flush DrawElements");
+    }
+
+    private void bindAttribsBufs() {
       vertices.bind(GL20.GL_ARRAY_BUFFER);
 
       // bind our stable attributes
@@ -179,14 +199,6 @@ public class IndexedTrisShader extends GLShader {
         aTexCoord.bind(stride, offset+8);
 
       elements.bind(GL20.GL_ELEMENT_ARRAY_BUFFER);
-      ctx.checkGLError("Shader.flush bind");
-
-      vertices.send(GL20.GL_ARRAY_BUFFER, GL20.GL_STREAM_DRAW);
-      int elems = elements.send(GL20.GL_ELEMENT_ARRAY_BUFFER, GL20.GL_STREAM_DRAW);
-      ctx.checkGLError("Shader.flush BufferData");
-
-      elements.drawElements(GL20.GL_TRIANGLES, elems);
-      ctx.checkGLError("Shader.flush DrawElements");
     }
 
     @Override
