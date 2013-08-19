@@ -94,6 +94,30 @@ class JavaGLContext extends GL20Context {
       format = GL12.GL_BGRA;
       type = GL12.GL_UNSIGNED_INT_8_8_8_8_REV;
     }
+    // use a special code path for images known BGR to do a faster conversion than the general
+    // purpose conversion below.
+    else if (image.getType() == BufferedImage.TYPE_3BYTE_BGR) {
+      DataBufferByte dbbuf = (DataBufferByte)dbuf;
+      bbuf = checkGetImageBuffer(dbbuf.getSize());
+      bbuf.put(dbbuf.getData());
+      bbuf.flip();
+
+      format = GL12.GL_BGR;
+      type = GL11.GL_UNSIGNED_BYTE;
+    }
+    // use a special code path for images known ABGR to do a faster conversion than the general
+    // purpose conversion below. The coerceData call takes some time, but an order of magnitude
+    // less than the full re-draw below.
+    else if (image.getType() == BufferedImage.TYPE_4BYTE_ABGR) {
+      image.coerceData(true);
+      DataBufferByte dbbuf = (DataBufferByte)dbuf;
+      bbuf = checkGetImageBuffer(dbbuf.getSize());
+      bbuf.put(dbbuf.getData());
+      bbuf.flip();
+
+      format = GL11.GL_RGBA;
+      type = GL12.GL_UNSIGNED_INT_8_8_8_8;
+    }
     // otherwise do things the hard way, by rendering the image using a special color model and
     // then uploading the resulting bytes as GL_RGBA
     else {
