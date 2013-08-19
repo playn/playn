@@ -64,6 +64,12 @@ public class JavaPlatform extends AbstractPlatform {
 
     /** If set, emulates Touch and disables Mouse. For testing. */
     public boolean emulateTouch;
+
+    /** If set, converts images into a format for fast GPU uploads when initially loaded versus
+     * doing it on demand when displayed. Assuming asynchronous image loads, this keeps that effort
+     * off the main thread so it doesn't cause slow frames.
+     */
+    public boolean convertImagesOnLoad = true;
   }
 
   /**
@@ -103,6 +109,8 @@ public class JavaPlatform extends AbstractPlatform {
     }
   }
 
+  public final boolean convertImagesOnLoad;
+
   private final JavaAnalytics analytics = new JavaAnalytics();
   private final JavaAudio audio = new JavaAudio(this);
   private final JavaNet net = new JavaNet(this);
@@ -132,6 +140,8 @@ public class JavaPlatform extends AbstractPlatform {
       mouse = new JavaMouse(this);
       touch = new TouchStub();
     }
+
+    convertImagesOnLoad = config.convertImagesOnLoad;
   }
 
   /**

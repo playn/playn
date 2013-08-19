@@ -15,16 +15,10 @@ package playn.java;
 
 import java.awt.Color;
 import java.awt.Graphics;
-import java.awt.Transparency;
-import java.awt.color.ColorSpace;
 import java.awt.image.BufferedImage;
-import java.awt.image.ColorModel;
-import java.awt.image.ComponentColorModel;
 import java.awt.image.DataBuffer;
 import java.awt.image.DataBufferByte;
 import java.awt.image.DataBufferInt;
-import java.awt.image.Raster;
-import java.awt.image.WritableRaster;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
@@ -44,6 +38,27 @@ class JavaGLContext extends GL20Context {
     System.getProperty("playn.quadshader", "true"));
 
   private ByteBuffer imgBuf = createImageBuffer(1024);
+
+  /** Converts the given image into a format for quick upload to the GPU. */
+  static BufferedImage convertImage (BufferedImage image) {
+    switch (image.getType()) {
+    case BufferedImage.TYPE_INT_ARGB_PRE:
+      return image; // Already good to go
+    case BufferedImage.TYPE_4BYTE_ABGR:
+      image.coerceData(true); // Just premultiply the alpha and it's fine
+      return image;
+    }
+
+    // Didn't know an easy thing to do, so create a whole new image in our preferred format
+    BufferedImage convertedImage = new BufferedImage(image.getWidth(), image.getHeight(),
+                                                     BufferedImage.TYPE_INT_ARGB_PRE);
+    Graphics g = convertedImage.getGraphics();
+    g.setColor(new Color(0f, 0f, 0f, 0f));
+    g.fillRect(0, 0, image.getWidth(), image.getHeight());
+    g.drawImage(image, 0, 0, null);
+
+    return convertedImage;
+  }
 
   JavaGLContext(JavaPlatform platform, float scaleFactor, int screenWidth, int screenHeight) {
     super(platform, new JavaGL20(), scaleFactor, CHECK_ERRORS);
@@ -80,12 +95,14 @@ class JavaGLContext extends GL20Context {
   void updateTexture(int tex, BufferedImage image) {
     Asserts.checkNotNull(image);
 
+    // Convert the image into a format for quick uploading
+    image = convertImage(image);
+
     ByteBuffer bbuf;
     int format, type;
 
-    // use a special code path for images that are known to be INT_ARGB (which JavaCanvasImage
-    // uses); this uses the GPU to swizzle ARGB to BGRA during the glTexImage2D call
     DataBuffer dbuf = image.getRaster().getDataBuffer();
+
     if (image.getType() == BufferedImage.TYPE_INT_ARGB_PRE) {
       DataBufferInt ibuf = (DataBufferInt)dbuf;
       bbuf = checkGetImageBuffer(ibuf.getSize()*4);
@@ -93,23 +110,7 @@ class JavaGLContext extends GL20Context {
       bbuf.flip();
       format = GL12.GL_BGRA;
       type = GL12.GL_UNSIGNED_INT_8_8_8_8_REV;
-    }
-    // use a special code path for images known BGR to do a faster conversion than the general
-    // purpose conversion below.
-    else if (image.getType() == BufferedImage.TYPE_3BYTE_BGR) {
-      DataBufferByte dbbuf = (DataBufferByte)dbuf;
-      bbuf = checkGetImageBuffer(dbbuf.getSize());
-      bbuf.put(dbbuf.getData());
-      bbuf.flip();
-
-      format = GL12.GL_BGR;
-      type = GL11.GL_UNSIGNED_BYTE;
-    }
-    // use a special code path for images known ABGR to do a faster conversion than the general
-    // purpose conversion below. The coerceData call takes some time, but an order of magnitude
-    // less than the full re-draw below.
-    else if (image.getType() == BufferedImage.TYPE_4BYTE_ABGR) {
-      image.coerceData(true);
+    } else if (image.getType() == BufferedImage.TYPE_4BYTE_ABGR) {
       DataBufferByte dbbuf = (DataBufferByte)dbuf;
       bbuf = checkGetImageBuffer(dbbuf.getSize());
       bbuf.put(dbbuf.getData());
@@ -117,29 +118,10 @@ class JavaGLContext extends GL20Context {
 
       format = GL11.GL_RGBA;
       type = GL12.GL_UNSIGNED_INT_8_8_8_8;
-    }
-    // otherwise do things the hard way, by rendering the image using a special color model and
-    // then uploading the resulting bytes as GL_RGBA
-    else {
-      ColorModel glAlphaColorModel = new ComponentColorModel(
-        ColorSpace.getInstance(ColorSpace.CS_sRGB), new int[] {8, 8, 8, 8}, true, false,
-        Transparency.TRANSLUCENT, DataBuffer.TYPE_BYTE);
-      WritableRaster raster = Raster.createInterleavedRaster(
-        DataBuffer.TYPE_BYTE, image.getWidth(), image.getHeight(), 4, null);
-      BufferedImage texImage = new BufferedImage(glAlphaColorModel, raster, true, null);
-
-      Graphics g = texImage.getGraphics();
-      g.setColor(new Color(0f, 0f, 0f, 0f));
-      g.fillRect(0, 0, image.getWidth(), image.getHeight());
-      g.drawImage(image, 0, 0, null);
-
-      // build a byte buffer from the temporary image that be used by OpenGL to produce a texture.
-      DataBufferByte dbbuf = (DataBufferByte) texImage.getRaster().getDataBuffer();
-      bbuf = checkGetImageBuffer(dbbuf.getSize());
-      bbuf.put(dbbuf.getData());
-      bbuf.flip();
-      format = GL11.GL_RGBA;
-      type = GL11.GL_UNSIGNED_BYTE;
+    } else {
+      // Something went awry and convertImage thought this image was in a good form already,
+      // except we don't know how to deal with it
+      throw new RuntimeException("Image type wasn't converted to usable: " + image.getType());
     }
 
     bindTexture(tex);

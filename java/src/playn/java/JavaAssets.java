@@ -134,6 +134,13 @@ public class JavaAssets extends AbstractAssets<BufferedImage> {
           image = scaleImage(image, viewImageRatio);
           imageScale = viewScale;
         }
+        if (platform.convertImagesOnLoad) {
+          BufferedImage convertedImage = JavaGLContext.convertImage(image);
+          if (convertedImage != image) {
+            platform.log().debug("Converted image: " + fullPath + " [type=" + image.getType() + "]");
+            image = convertedImage;
+          }
+        }
         return recv.imageLoaded(image, imageScale);
       } catch (FileNotFoundException fnfe) {
         error = fnfe; // keep going, checking for lower resolution images
