@@ -77,7 +77,7 @@ public class JavaAsyncImage extends JavaImage implements AsyncImage<BufferedImag
 
   private static BufferedImage createErrorImage(float width, float height) {
     BufferedImage img = new BufferedImage(MathUtil.iceil(width), MathUtil.iceil(height),
-                                          BufferedImage.TYPE_INT_ARGB);
+                                          BufferedImage.TYPE_INT_ARGB_PRE);
     Graphics2D g = img.createGraphics();
     try {
       g.setColor(Color.red);

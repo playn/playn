@@ -179,7 +179,7 @@ public class JavaAssets extends AbstractAssets<BufferedImage> {
   protected BufferedImage scaleImage(BufferedImage image, float viewImageRatio) {
     int swidth = MathUtil.iceil(viewImageRatio * image.getWidth());
     int sheight = MathUtil.iceil(viewImageRatio * image.getHeight());
-    BufferedImage scaled = new BufferedImage(swidth, sheight, BufferedImage.TYPE_INT_ARGB);
+    BufferedImage scaled = new BufferedImage(swidth, sheight, BufferedImage.TYPE_INT_ARGB_PRE);
     Graphics2D gfx = scaled.createGraphics();
     gfx.drawImage(image.getScaledInstance(swidth, sheight, java.awt.Image.SCALE_SMOOTH), 0, 0, null);
     gfx.dispose();
