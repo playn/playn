@@ -34,7 +34,7 @@ public abstract class AbstractAssets<IMG> implements Assets {
 
   @Override
   public Image getImageSync(String path) {
-    return loadImage(path, new ImageReceiver<IMG>() {
+    Image image = loadImage(path, new ImageReceiver<IMG>() {
       @Override
       public Image imageLoaded(IMG impl, Scale scale) {
         return createStaticImage(impl, scale);
@@ -44,6 +44,8 @@ public abstract class AbstractAssets<IMG> implements Assets {
         return createErrorImage(error);
       }
     });
+    setDebugPath(image, path);
+    return image;
   }
 
   @Override
@@ -55,6 +57,7 @@ public abstract class AbstractAssets<IMG> implements Assets {
           @Override
           public Image imageLoaded(final IMG impl, final Scale scale) {
             setImageLater(image, impl, scale);
+            setDebugPath(image, path);
             return image;
           }
           @Override
@@ -141,6 +144,9 @@ public abstract class AbstractAssets<IMG> implements Assets {
         image.setImage(impl, scale);
       }
     });
+  }
+
+  protected void setDebugPath (Image image, String path) {
   }
 
   protected void setErrorLater(final AsyncImage<?> image, final Throwable error) {

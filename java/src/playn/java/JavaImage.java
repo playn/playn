@@ -36,6 +36,8 @@ public abstract class JavaImage extends ImageGL<Graphics2D> {
 
   protected BufferedImage img;
 
+  String debugPath;
+
   public JavaImage(GLContext ctx, BufferedImage img, Scale scale) {
     super(ctx, scale);
     this.img = img;

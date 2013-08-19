@@ -153,6 +153,10 @@ public class JavaAssets extends AbstractAssets<BufferedImage> {
     return recv.loadFailed(error != null ? error : new FileNotFoundException(fullPath));
   }
 
+  protected void setDebugPath (Image image, String path) {
+      ((JavaImage)image).debugPath = path;
+  }
+
   protected InputStream getAssetStream(String path) throws IOException {
     InputStream in = getClass().getClassLoader().getResourceAsStream(pathPrefix + path);
     if (in == null) {
