@@ -89,7 +89,6 @@ public class IndexedTrisShader extends GLShader {
 
   public IndexedTrisShader(GLContext ctx) {
     super(ctx);
-    // TODO: Dave, please to refine
     delayedBinding = "Intel".equals(ctx.getString(GL20.GL_VENDOR));
   }
 
