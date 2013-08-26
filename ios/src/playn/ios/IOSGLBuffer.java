@@ -25,7 +25,6 @@ import cli.OpenTK.Graphics.ES20.BufferUsage;
 import cli.OpenTK.Graphics.ES20.DrawElementsType;
 import cli.OpenTK.Graphics.ES20.GL;
 
-import playn.core.InternalTransform;
 import playn.core.gl.GLBuffer;
 
 public abstract class IOSGLBuffer implements GLBuffer {
