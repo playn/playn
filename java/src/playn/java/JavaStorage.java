@@ -15,68 +15,81 @@
  */
 package playn.java;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.util.Properties;
+import java.util.Map;
+import java.util.prefs.AbstractPreferences;
+import java.util.prefs.BackingStoreException;
+import java.util.prefs.Preferences;
+
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 import playn.core.BatchImpl;
 import playn.core.Storage;
 
 /**
- * JavaStorage is backed by a properties file stored in the temp directory.
- *
- * TODO(pdr): probably want better handling on where the file is stored
+ * JavaStorage is backed by the Java Preferences system.
  */
 class JavaStorage implements Storage {
 
   private final JavaPlatform platform;
-  private final File tempFile;
-  private final Properties properties;
-  private boolean isPersisted = false; // false by default
+  private final Preferences preferences;
+  private boolean isPersisted;
 
   JavaStorage(JavaPlatform platform, JavaPlatform.Config config) {
     this.platform = platform;
-    this.tempFile = new File(new File(System.getProperty("java.io.tmpdir")),
-                             config.storageFileName + ".tmp");
-    this.properties = maybeRetrieveProperties();
+    Preferences prefs = null;
+    try {
+      isPersisted = Preferences.userRoot().nodeExists(config.storageFileName);
+      prefs = Preferences.userRoot().node(config.storageFileName);
+    } catch (Exception e) {
+      platform.log().warn("Couldn't open Preferences: " + e.getMessage());
+      isPersisted = false;
+      prefs = new MemoryPreferences();
+    }
+
+    preferences = prefs;
   }
 
   @Override
-  public void setItem(String key, String value) throws RuntimeException {
-    properties.setProperty(key, value);
-    maybePersistProperties(properties);
+  public void setItem(String key, String value) {
+    preferences.put(key, value);
+    maybePersistPreferences();
   }
 
   @Override
   public void removeItem(String key) {
-    properties.remove(key);
-    maybePersistProperties(properties);
+    preferences.remove(key);
+    maybePersistPreferences();
   }
 
   @Override
   public String getItem(String key) {
-    return properties.getProperty(key);
+    return preferences.get(key, null);
   }
 
   @Override
   public Batch startBatch() {
     return new BatchImpl(this) {
       @Override protected void setImpl(String key, String data) {
-        properties.setProperty(key, data);
+        preferences.put(key, data);
       }
       @Override protected void removeImpl(String key) {
-        properties.remove(key);
+        preferences.remove(key);
       }
       @Override protected void onAfterCommit() {
-        maybePersistProperties(properties);
+        maybePersistPreferences();
       }
     };
   }
 
   @Override
   public Iterable<String> keys() {
-    return properties.stringPropertyNames();
+    try {
+      return Lists.newArrayList(preferences.keys());
+    } catch (Exception e) {
+      platform.log().warn("Error reading preferences: " + e.getMessage());
+      return Lists.newArrayList();
+    }
   }
 
   @Override
@@ -84,9 +97,10 @@ class JavaStorage implements Storage {
     return isPersisted;
   }
 
-  private void maybePersistProperties(Properties properties) {
+  private void maybePersistPreferences() {
+    if (preferences instanceof MemoryPreferences) return;
     try {
-      properties.store(new FileOutputStream(tempFile), null);
+      preferences.flush();
       isPersisted = true;
     } catch (Exception e) {
       platform.log().info("Error persisting properties: " + e.getMessage());
@@ -94,20 +108,49 @@ class JavaStorage implements Storage {
     }
   }
 
-  private Properties maybeRetrieveProperties() {
-    Properties properties = new Properties();
-    if (tempFile.exists()) {
-      try {
-        properties.load(new FileInputStream(tempFile));
-        isPersisted = true;
-      } catch(Exception e) {
-        platform.log().info("Error retrieving file: " + e.getMessage());
-        isPersisted = false;
-      }
-    } else {
-      // Attempt to write newly created properties immediately to make the isPersisted valid
-      maybePersistProperties(properties);
+  /**
+   * Wraps a HashMap up as Preferences for in-memory use.
+   */
+  private class MemoryPreferences extends AbstractPreferences
+  {
+    MemoryPreferences() {
+      super(null, "");
     }
-    return properties;
+    @Override protected void putSpi (String key, String value) {
+      _values.put(key,  value);
+    }
+
+    @Override protected String getSpi (String key) {
+      return _values.get(key);
+    }
+
+    @Override protected void removeSpi (String key) {
+      _values.remove(key);
+    }
+
+    @Override protected void removeNodeSpi () throws BackingStoreException {
+      throw new BackingStoreException("Not implemented");
+    }
+
+    @Override protected String[] keysSpi () throws BackingStoreException {
+      return _values.keySet().toArray(new String[_values.size()]);
+    }
+
+    @Override protected String[] childrenNamesSpi () throws BackingStoreException {
+      throw new BackingStoreException("Not implemented");
+    }
+
+    @Override protected AbstractPreferences childSpi (String name) {
+      throw new RuntimeException("Not implemented");
+    }
+
+    @Override protected void syncSpi () throws BackingStoreException {
+      throw new BackingStoreException("Not implemented");
+    }
+
+    @Override protected void flushSpi () throws BackingStoreException {
+      throw new BackingStoreException("Not implemented");
+    }
+    protected Map<String, String> _values = Maps.newHashMap();
   }
 }
