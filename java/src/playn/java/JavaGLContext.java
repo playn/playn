@@ -34,8 +34,6 @@ import playn.core.gl.GL20Context;
 class JavaGLContext extends GL20Context {
 
   private final static boolean CHECK_ERRORS = Boolean.getBoolean("playn.glerrors");
-  private final static boolean ENABLE_QUAD_SHADER = Boolean.parseBoolean(
-    System.getProperty("playn.quadshader", "true"));
 
   private ByteBuffer imgBuf = createImageBuffer(1024);
 
@@ -87,11 +85,6 @@ class JavaGLContext extends GL20Context {
     }
     if (Display.isCreated())
       super.viewWasResized();
-  }
-
-  @Override
-  protected boolean shouldTryQuadShader() {
-    return ENABLE_QUAD_SHADER && super.shouldTryQuadShader();
   }
 
   void updateTexture(int tex, BufferedImage image) {
