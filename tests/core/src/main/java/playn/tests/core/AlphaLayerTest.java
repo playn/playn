@@ -20,7 +20,6 @@ import playn.core.CanvasImage;
 import playn.core.Color;
 import playn.core.GroupLayer;
 import playn.core.Image;
-import playn.core.ImageLayer;
 import playn.core.SurfaceImage;
 import playn.core.util.Callback;
 import static playn.core.PlayN.*;
