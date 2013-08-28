@@ -171,7 +171,7 @@ public class GL20Program implements GLProgram {
         gl.glVertexAttribPointer(loc, size, type, false, stride, offset);
       }
 
-      public void unbind () {
+      public void unbind() {
         gl.glDisableVertexAttribArray(loc);
       }
     };
