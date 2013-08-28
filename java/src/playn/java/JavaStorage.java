@@ -16,12 +16,12 @@
 package playn.java;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Map;
 import java.util.prefs.AbstractPreferences;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import playn.core.BatchImpl;
@@ -89,7 +89,7 @@ class JavaStorage implements Storage {
       return Arrays.asList(preferences.keys());
     } catch (Exception e) {
       platform.log().warn("Error reading preferences: " + e.getMessage());
-      return Lists.newArrayList();
+      return Collections.emptyList();
     }
   }
 
