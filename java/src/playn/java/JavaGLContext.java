@@ -41,6 +41,8 @@ class JavaGLContext extends GL20Context {
 
   /** Converts the given image into a format for quick upload to the GPU. */
   static BufferedImage convertImage (BufferedImage image) {
+    Asserts.checkNotNull(image);
+
     switch (image.getType()) {
     case BufferedImage.TYPE_INT_ARGB_PRE:
       return image; // Already good to go
@@ -93,15 +95,12 @@ class JavaGLContext extends GL20Context {
   }
 
   void updateTexture(int tex, BufferedImage image) {
-    Asserts.checkNotNull(image);
-
     // Convert the image into a format for quick uploading
     image = convertImage(image);
 
+    DataBuffer dbuf = image.getRaster().getDataBuffer();
     ByteBuffer bbuf;
     int format, type;
-
-    DataBuffer dbuf = image.getRaster().getDataBuffer();
 
     if (image.getType() == BufferedImage.TYPE_INT_ARGB_PRE) {
       DataBufferInt ibuf = (DataBufferInt)dbuf;
@@ -110,14 +109,15 @@ class JavaGLContext extends GL20Context {
       bbuf.flip();
       format = GL12.GL_BGRA;
       type = GL12.GL_UNSIGNED_INT_8_8_8_8_REV;
+
     } else if (image.getType() == BufferedImage.TYPE_4BYTE_ABGR) {
       DataBufferByte dbbuf = (DataBufferByte)dbuf;
       bbuf = checkGetImageBuffer(dbbuf.getSize());
       bbuf.put(dbbuf.getData());
       bbuf.flip();
-
       format = GL11.GL_RGBA;
       type = GL12.GL_UNSIGNED_INT_8_8_8_8;
+
     } else {
       // Something went awry and convertImage thought this image was in a good form already,
       // except we don't know how to deal with it
