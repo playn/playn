@@ -143,7 +143,7 @@ public class ShaderTest extends Test {
           uAngle.bind(elapsed * FloatMath.PI);
           uEye.bind(0, orange.height()/2);
         }
-      };
+      }
     };
 
     // add an image that is rotated around the (3D) y axis
