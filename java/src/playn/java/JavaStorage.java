@@ -15,6 +15,7 @@
  */
 package playn.java;
 
+import java.util.Arrays;
 import java.util.Map;
 import java.util.prefs.AbstractPreferences;
 import java.util.prefs.BackingStoreException;
@@ -85,7 +86,7 @@ class JavaStorage implements Storage {
   @Override
   public Iterable<String> keys() {
     try {
-      return Lists.newArrayList(preferences.keys());
+      return Arrays.asList(preferences.keys());
     } catch (Exception e) {
       platform.log().warn("Error reading preferences: " + e.getMessage());
       return Lists.newArrayList();
