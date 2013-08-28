@@ -94,6 +94,9 @@ public abstract class GLShader {
      * @param stride the size of a single "bundle" of values in the vertex array.
      * @param offset the offset of this attribute into the "bundle" of values. */
     void bind(int stride, int offset);
+
+    /** Disables the vertex array index for this attribute. */
+    void unbind();
   }
 
   protected static final String FRAGMENT_PREAMBLE =
@@ -171,6 +174,11 @@ public abstract class GLShader {
     curExtras.willFlush();
     curCore.flush();
     if (GLContext.STATS_ENABLED) ctx.stats.shaderFlushes++;
+  }
+
+  /** Does any necessary shutdown when no longer using this shader. */
+  public void deactivate() {
+    curCore.deactivate();
   }
 
   /** Adds an axis-aligned quad to the current render operation. {@code left, top, right, bottom}
@@ -382,6 +390,9 @@ public abstract class GLShader {
 
     /** Called to setup this core's shader after initially being bound. */
     public abstract void activate(int fbufWidth, int fbufHeight);
+
+    /** Called when this core is no longer being used. */
+    public abstract void deactivate();
 
     /** Called before each primitive to update the current color. */
     public abstract void prepare(int tint, boolean justActivated);

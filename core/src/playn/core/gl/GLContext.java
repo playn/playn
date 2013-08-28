@@ -282,9 +282,14 @@ public abstract class GLContext {
   }
 
   public void flush() {
+      flush(false);
+  }
+
+  public void flush(boolean deactivate) {
     if (curShader != null) {
       checkGLError("flush()");
       curShader.flush();
+      if (deactivate) curShader.deactivate();
       curShader = null;
     }
   }
@@ -296,7 +301,7 @@ public abstract class GLContext {
     if (curShader == shader && !forceFlush)
       return false;
     checkGLError("useShader");
-    flush();
+    flush(true);
     curShader = shader;
     return true;
   }

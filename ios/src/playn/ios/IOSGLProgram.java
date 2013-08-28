@@ -173,6 +173,10 @@ public class IOSGLProgram implements GLProgram {
         GL.VertexAttribPointer(
           loc, size, VertexAttribPointerType.wrap(type), false, stride, new IntPtr(offset));
       }
+
+      public void unbind () {
+        GL.DisableVertexAttribArray(loc);
+      }
     };
   }
 

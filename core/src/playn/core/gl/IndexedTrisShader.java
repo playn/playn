@@ -158,6 +158,16 @@ public class IndexedTrisShader extends GLShader {
     }
 
     @Override
+    public void deactivate() {
+      aMatrix.unbind();
+      aTranslation.unbind();
+      aColor.unbind();
+      aPosition.unbind();
+      if (aTexCoord != null)
+        aTexCoord.unbind();
+    }
+
+    @Override
     public void prepare(int tint, boolean justActivated) {
       this.arTint = (tint >> 16) & 0xFFFF;
       this.gbTint = tint & 0xFFFF;
