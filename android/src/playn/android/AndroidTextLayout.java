@@ -68,7 +68,7 @@ class AndroidTextLayout implements TextLayout {
 
   @Override
   public float ascent() {
-    return metrics.ascent;
+    return -metrics.ascent;
   }
 
   @Override
