@@ -35,13 +35,13 @@ public interface TextLayout {
   /** The bounds of the text on the given line. */
   Rectangle lineBounds(int line);
 
-  /** The space from the top of a line of text to the baseline. */
+  /** The number of pixels from the top of a line of text to the baseline. */
   float ascent ();
 
-  /** The space from the baseline to the bottom of a line of text. */
+  /** The number of pixels from the baseline to the bottom of a line of text. */
   float descent ();
 
-  /** The space between the bottom of one line of text and the top of the next line of text. */
+  /** The number of pixels between the bottom of one line of text and the top of the next. */
   float leading ();
 
   /** The {@link TextFormat} used to lay out this text. */
