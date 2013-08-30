@@ -324,7 +324,7 @@ public interface Mouse {
 
   /**
    * Sets the listener that will receive mouse events. Setting the listener to
-   * <code>null</code> will cause mouse events to stop being fired.
+   * {@code null} will cause mouse events to stop being fired.
    */
   void setListener(Listener listener);
 

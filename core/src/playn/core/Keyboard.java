@@ -135,7 +135,7 @@ public interface Keyboard {
 
   /**
    * Sets the listener that will receive keyboard events. Setting the listener to
-   * <code>null</code> will cause keyboard events to stop being fired.
+   * {@code null} will cause keyboard events to stop being fired.
    */
   void setListener(Listener listener);
 

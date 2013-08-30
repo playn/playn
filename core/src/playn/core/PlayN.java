@@ -21,7 +21,7 @@ package playn.core;
  *
  * <p>
  * You must register a {@link Platform} before calling any of these methods. For
- * example, <code>JavaPlatform.register();</code>.
+ * example, {@code JavaPlatform.register()}.
  * </p>
  */
 public class PlayN {

@@ -113,7 +113,7 @@ public class AssetWatcher {
    * being loaded.
    *
    * There is no need to call this method if there is no listener. {@link #isDone()} will return
-   * <code>true</code> as soon as all pending assets are loaded.
+   * {@code true} as soon as all pending assets are loaded.
    */
   public void start() {
     start = true;

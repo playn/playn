@@ -104,8 +104,8 @@ public class WatchedAssets implements Assets {
   }
 
   /**
-   * Return <code>true</code> if all requested assets have been loaded or errored out,
-   * or <code>false</code> if there are assets remaining to be retrieved
+   * Return @code true} if all requested assets have been loaded or errored out,
+   * or {@code false} if there are assets remaining to be retrieved
    */
   public boolean isDone() {
     return (this.totalRequestsCount == this.errorsCount + this.successCount);

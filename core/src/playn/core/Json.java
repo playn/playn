@@ -52,11 +52,10 @@ public interface Json {
     int length();
 
     /**
-     * Returns the value at the given index, or the default value for <code>T</code> if there's a
+     * Returns the value at the given index, or the default value for {@code T} if there's a
      * value of a different type at the index.
      *
-     * @throws ArrayIndexOutOfBoundsException if <code>index &lt; 0</code> or <code>index >=
-     * length</code>
+     * @throws ArrayIndexOutOfBoundsException if {@code index < 0} or {@code index >= length}
      */
     T get(int index);
 
@@ -64,15 +63,14 @@ public interface Json {
      * Returns the value at the given index, or the specified default value if there's a value of a
      * different type at the index.
      *
-     * @throws ArrayIndexOutOfBoundsException if <code>index &lt; 0</code> or <code>index >=
-     * length</code>
+     * @throws ArrayIndexOutOfBoundsException if {@code index < 0} or {@code index >= length}
      */
     T get(int index, T dflt);
 
     /**
      * Returns an iterator over the values of the assumed type in this array. If a value at a given
      * index isn't of the assumed type, the default value for the assumed type will be returned by
-     * <code>next</code>.
+     * {@code next}.
      */
     Iterator<T> iterator();
 
@@ -153,7 +151,7 @@ public interface Json {
     int length();
 
     /**
-     * Gets the boolean value at the given index, or <code>false</code> if there is no value at this
+     * Gets the boolean value at the given index, or {@code false} if there is no value at this
      * index.
      */
     boolean getBoolean(int index);
@@ -164,7 +162,7 @@ public interface Json {
     boolean getBoolean(int index, boolean dflt);
 
     /**
-     * Gets the float value at the given index, or <code>0</code> if there is no value at this
+     * Gets the float value at the given index, or {@code 0} if there is no value at this
      * index.
      */
     float getNumber(int index);
@@ -175,7 +173,7 @@ public interface Json {
     float getNumber(int index, float dflt);
 
     /**
-     * Gets the double value at the given index, or <code>0</code> if there is no value at this
+     * Gets the double value at the given index, or {@code 0} if there is no value at this
      * index.
      */
     double getDouble(int index);
@@ -186,7 +184,7 @@ public interface Json {
     double getDouble(int index, double dflt);
 
     /**
-     * Gets the integer value at the given index, or <code>0</code> if there is no value at this
+     * Gets the integer value at the given index, or {@code 0} if there is no value at this
      * index.
      */
     int getInt(int index);
@@ -197,7 +195,7 @@ public interface Json {
     int getInt(int index, int dflt);
 
     /**
-     * Gets the long value at the given index, or <code>0</code> if there is no value at this
+     * Gets the long value at the given index, or {@code 0} if there is no value at this
      * index. <em>NOTE:</em> this is not accurate on the HTML backend as all numbers are
      * represented as doubles, which cannot represent all possible long values. This is included
      * for projects that use only the other backends and need long values.
@@ -213,7 +211,7 @@ public interface Json {
     long getLong(int index, long dflt);
 
     /**
-     * Gets the string value at the given index, or <code>null</code> if there is no value at this
+     * Gets the string value at the given index, or {@code null} if there is no value at this
      * index.
      */
     String getString(int index);
@@ -224,7 +222,7 @@ public interface Json {
     String getString(int index, String dflt);
 
     /**
-     * Gets the object value at the given index, or <code>null</code> if there is no value at this
+     * Gets the object value at the given index, or {@code null} if there is no value at this
      * index.
      */
     Object getObject(int index);
@@ -235,7 +233,7 @@ public interface Json {
     Object getObject(int index, Object dflt);
 
     /**
-     * Gets the array value at the given index, or <code>null</code> if there is no value at this
+     * Gets the array value at the given index, or {@code null} if there is no value at this
      * index.
      */
     Array getArray(int index);
@@ -247,7 +245,7 @@ public interface Json {
 
     /**
      * Gets an array at the given index that assumes its values are of the given json type, or
-     * <code>null</code> if there is no value at this index.
+     * {@code null} if there is no value at this index.
      *
      * @param jsonType one of Json.Object, Json.Array, Boolean, Integer, Float, Double, or String
      *
@@ -256,32 +254,32 @@ public interface Json {
     <T> TypedArray<T> getArray(int index, Class<T> jsonType);
 
     /**
-     * Returns <code>true</code> if the value at the given index is an array.
+     * Returns {@code true} if the value at the given index is an array.
      */
     boolean isArray(int index);
 
     /**
-     * Returns <code>true</code> if the value at the given index is a boolean.
+     * Returns {@code true} if the value at the given index is a boolean.
      */
     boolean isBoolean(int index);
 
     /**
-     * Returns <code>true</code> if the value at the given index is null, or does not exist.
+     * Returns {@code true} if the value at the given index is null, or does not exist.
      */
     boolean isNull(int index);
 
     /**
-     * Returns <code>true</code> if the value at the given index is a number.
+     * Returns {@code true} if the value at the given index is a number.
      */
     boolean isNumber(int index);
 
     /**
-     * Returns <code>true</code> if the value at the given index is a string.
+     * Returns {@code true} if the value at the given index is a string.
      */
     boolean isString(int index);
 
     /**
-     * Returns <code>true</code> if the value at the given index is an object.
+     * Returns {@code true} if the value at the given index is an object.
      */
     boolean isObject(int index);
 
@@ -318,7 +316,7 @@ public interface Json {
    */
   interface Object {
     /**
-     * Gets the boolean value at the given key, or <code>false</code> if there is no value at this
+     * Gets the boolean value at the given key, or {@code false} if there is no value at this
      * key.
      */
     boolean getBoolean(String key);
@@ -329,7 +327,7 @@ public interface Json {
     boolean getBoolean(String key, boolean dflt);
 
     /**
-     * Gets the float value at the given key, or <code>0</code> if there is no value at this key.
+     * Gets the float value at the given key, or {@code 0} if there is no value at this key.
      */
     float getNumber(String key);
 
@@ -339,7 +337,7 @@ public interface Json {
     float getNumber(String key, float dflt);
 
     /**
-     * Gets the double value at the given key, or <code>0</code> if there is no value at this key.
+     * Gets the double value at the given key, or {@code 0} if there is no value at this key.
      */
     double getDouble(String key);
 
@@ -349,7 +347,7 @@ public interface Json {
     double getDouble(String key, double dflt);
 
     /**
-     * Gets the integer value at the given key, or <code>0</code> if there is no value at this key.
+     * Gets the integer value at the given key, or {@code 0} if there is no value at this key.
      */
     int getInt(String key);
 
@@ -359,7 +357,7 @@ public interface Json {
     int getInt(String key, int dflt);
 
     /**
-     * Gets the long value at the given key, or <code>0</code> if there is no value at this key.
+     * Gets the long value at the given key, or {@code 0} if there is no value at this key.
      * <em>NOTE:</em> this is not accurate on the HTML backend as all numbers are represented as
      * doubles, which cannot represent all possible long values. This is included for projects that
      * use only the other backends and need long values.
@@ -375,7 +373,7 @@ public interface Json {
     long getLong(String key, long dflt);
 
     /**
-     * Gets the string value at the given key, or <code>null</code> if there is no value at this
+     * Gets the string value at the given key, or {@code null} if there is no value at this
      * key.
      */
     String getString(String key);
@@ -386,7 +384,7 @@ public interface Json {
     String getString(String key, String dflt);
 
     /**
-     * Gets the object value at the given key, or <code>null</code> if there is no value at this
+     * Gets the object value at the given key, or {@code null} if there is no value at this
      * key.
      */
     Object getObject(String key);
@@ -397,7 +395,7 @@ public interface Json {
     Object getObject(String key, Object dflt);
 
     /**
-     * Gets the array value at the given key, or <code>null</code> if there is no value at this key.
+     * Gets the array value at the given key, or {@code null} if there is no value at this key.
      */
     Array getArray(String key);
 
@@ -408,7 +406,7 @@ public interface Json {
 
     /**
      * Gets an array at the given key that assumes its values are of the given json type, or
-     * <code>null</code> if there is no value at this key.
+     * {@code null} if there is no value at this key.
      *
      * @param jsonType one of Json.Object, Json.Array, Boolean, Integer, Float, Double, or String
      *
@@ -439,32 +437,32 @@ public interface Json {
     TypedArray<String> keys();
 
     /**
-     * Returns <code>true</code> if the value at the given key is an array.
+     * Returns {@code true} if the value at the given key is an array.
      */
     boolean isArray(String key);
 
     /**
-     * Returns <code>true</code> if the value at the given key is a boolean.
+     * Returns {@code true} if the value at the given key is a boolean.
      */
     boolean isBoolean(String key);
 
     /**
-     * Returns <code>true</code> if the value at the given key is null or does not exist.
+     * Returns {@code true} if the value at the given key is null or does not exist.
      */
     boolean isNull(String key);
 
     /**
-     * Returns <code>true</code> if the value at the given key is a number.
+     * Returns {@code true} if the value at the given key is a number.
      */
     boolean isNumber(String key);
 
     /**
-     * Returns <code>true</code> if the value at the given key is a string.
+     * Returns {@code true} if the value at the given key is a string.
      */
     boolean isString(String key);
 
     /**
-     * Returns <code>true</code> if the value at the given key is an object.
+     * Returns {@code true} if the value at the given key is an object.
      */
     boolean isObject(String key);
 

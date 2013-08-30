@@ -205,7 +205,7 @@ public interface Touch {
 
   /**
    * Sets the listener that will receive touch events. Setting the listener to
-   * <code>null</code> will cause touch events to stop being fired.
+   * {@code null} will cause touch events to stop being fired.
    */
   void setListener(Listener listener);
 
