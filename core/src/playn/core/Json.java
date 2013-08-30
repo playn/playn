@@ -86,37 +86,37 @@ public interface Json {
      */
     public static class Util {
 
-      /** Creates a typed array using {@code data}} as its backing data. */
+      /** Creates a typed array using {@code data} as its backing data. */
       public static TypedArray<Boolean> create (Boolean... data) {
         return Util.<Boolean>toArray(data);
       }
 
-      /** Creates a typed array using {@code data}} as its backing data. */
+      /** Creates a typed array using {@code data} as its backing data. */
       public static TypedArray<Integer> create (Integer... data) {
         return Util.<Integer>toArray(data);
       }
 
-      /** Creates a typed array using {@code data}} as its backing data. */
+      /** Creates a typed array using {@code data} as its backing data. */
       public static TypedArray<Float> create (Float... data) {
         return Util.<Float>toArray(data);
       }
 
-      /** Creates a typed array using {@code data}} as its backing data. */
+      /** Creates a typed array using {@code data} as its backing data. */
       public static TypedArray<Double> create (Double... data) {
         return Util.<Double>toArray(data);
       }
 
-      /** Creates a typed array using {@code data}} as its backing data. */
+      /** Creates a typed array using {@code data} as its backing data. */
       public static TypedArray<String> create (String... data) {
         return Util.<String>toArray(data);
       }
 
-      /** Creates a typed array using {@code data}} as its backing data. */
+      /** Creates a typed array using {@code data} as its backing data. */
       public static TypedArray<Json.Object> create (Json.Object... data) {
         return Util.<Json.Object>toArray(data);
       }
 
-      /** Creates a typed array using {@code data}} as its backing data. */
+      /** Creates a typed array using {@code data} as its backing data. */
       public static TypedArray<Json.Array> create (Json.Array... data) {
         return Util.<Json.Array>toArray(data);
       }
