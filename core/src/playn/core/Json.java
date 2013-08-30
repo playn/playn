@@ -507,7 +507,7 @@ public interface Json {
   /**
    * Creates a new {@link Writer}, which can be used to serialize data into the JSON format.
    *
-   * <code><pre>
+   * <pre>{@code
    * // An example of using the JSON writer interface.
    * String jsonString = json.newWriter()
    *     .object()
@@ -537,7 +537,7 @@ public interface Json {
    *     1, 2, 3, 4, 5
    *   ]
    * }
-   * </pre></code>
+   * }</pre>
    */
   Writer newWriter();
 
