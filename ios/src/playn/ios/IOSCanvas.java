@@ -36,7 +36,6 @@ import playn.core.gl.AbstractCanvasGL;
  */
 public class IOSCanvas extends AbstractCanvasGL<CGBitmapContext> {
 
-  private final float width, height;
   private final int texWidth, texHeight;
 
   private float strokeWidth = 1;
@@ -47,11 +46,10 @@ public class IOSCanvas extends AbstractCanvasGL<CGBitmapContext> {
   private LinkedList<IOSCanvasState> states = new LinkedList<IOSCanvasState>();
 
   public IOSCanvas(IOSGLContext ctx, float width, float height, boolean interpolate) {
+    super(width, height);
     // if our size is invalid, we'll fail below at CGBitmapContext, so fail here more usefully
     if (width <= 0 || height <= 0) throw new IllegalArgumentException(
       "Invalid size " + width + "x" + height);
-    this.width = width;
-    this.height = height;
     states.addFirst(new IOSCanvasState());
 
     // create our raw image data
@@ -102,16 +100,6 @@ public class IOSCanvas extends AbstractCanvasGL<CGBitmapContext> {
       Marshal.FreeHGlobal(data);
       data = null;
     }
-  }
-
-  @Override
-  public float width() {
-    return width;
-  }
-
-  @Override
-  public float height() {
-    return height;
   }
 
   @Override

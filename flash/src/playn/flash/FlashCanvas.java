@@ -22,6 +22,7 @@ import com.google.gwt.core.client.JavaScriptObject;
 
 import pythagoras.f.MathUtil;
 
+import playn.core.AbstractCanvas;
 import playn.core.Asserts;
 import playn.core.Canvas;
 import playn.core.Gradient;
@@ -30,7 +31,7 @@ import playn.core.Path;
 import playn.core.Pattern;
 import playn.core.TextLayout;
 
-class FlashCanvas implements Canvas {
+class FlashCanvas extends AbstractCanvas {
 
   @FlashImport({"com.googlecode.flashcanvas.CanvasRenderingContext2D"})
   final static class Context2d extends JavaScriptObject {
@@ -265,13 +266,11 @@ class FlashCanvas implements Canvas {
     }-*/;
   }
 
-  private final float width, height;
   private boolean dirty = true;
   private final Context2d context2d;
 
   FlashCanvas(float width, float height, Context2d context2d) {
-    this.width = width;
-    this.height = height;
+    super(width, height);
     this.context2d = context2d;
   }
 
@@ -405,11 +404,6 @@ class FlashCanvas implements Canvas {
   }
 
   @Override
-  public final float height() {
-    return height;
-  }
-
-  @Override
   public Canvas restore() {
     context2d.restore();
     return this;
@@ -535,11 +529,6 @@ class FlashCanvas implements Canvas {
   public Canvas translate(float x, float y) {
     context2d.translate(x, y);
     return this;
-  }
-
-  @Override
-  public final float width() {
-    return width;
   }
 
   public void quadraticCurveTo(float cpx, float cpy, float x, float y) {

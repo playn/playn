@@ -29,7 +29,8 @@ abstract class AbstractHtmlCanvas extends AbstractCanvasGL<Context2d> {
 
   private final Context2d ctx;
 
-  AbstractHtmlCanvas(Context2d ctx) {
+  AbstractHtmlCanvas(Context2d ctx, float width, float height) {
+    super(width, height);
     this.ctx = ctx;
   }
 

@@ -26,23 +26,12 @@ import playn.core.gl.Scale;
 class HtmlCanvas extends AbstractHtmlCanvas {
 
   private final CanvasElement canvas;
-  private final float width, height;
 
   public static HtmlCanvas create(Scale scale, float width, float height) {
     float sw = scale.scaledCeil(width), sh = scale.scaledCeil(height);
     HtmlCanvas canvas = new HtmlCanvas(sw, sh);
     canvas.scale(scale.factor, scale.factor);
     return canvas;
-  }
-
-  @Override
-  public final float width() {
-    return width;
-  }
-
-  @Override
-  public final float height() {
-    return height;
   }
 
   HtmlCanvas(Context2d ctx, float width, float height) {
@@ -64,9 +53,7 @@ class HtmlCanvas extends AbstractHtmlCanvas {
   }
 
   private HtmlCanvas(Context2d ctx, CanvasElement canvas, float width, float height) {
-    super(ctx);
+    super(ctx, width, height);
     this.canvas = canvas;
-    this.width = width;
-    this.height = height;
   }
 }

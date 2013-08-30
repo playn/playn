@@ -38,7 +38,6 @@ import java.util.LinkedList;
 class JavaCanvas extends AbstractCanvasGL<Graphics2D> {
 
   final Graphics2D gfx;
-  private final float width, height;
   private Deque<JavaCanvasState> stateStack = new LinkedList<JavaCanvasState>();
 
   private Ellipse2D.Float ellipse = new Ellipse2D.Float();
@@ -47,9 +46,8 @@ class JavaCanvas extends AbstractCanvasGL<Graphics2D> {
   private RoundRectangle2D.Float roundRect = new RoundRectangle2D.Float();
 
   JavaCanvas(Graphics2D graphics, float width, float height) {
+    super(width, height);
     this.gfx = graphics;
-    this.width = width;
-    this.height = height;
 
     // push default state
     stateStack.push(new JavaCanvasState());
@@ -169,11 +167,6 @@ class JavaCanvas extends AbstractCanvasGL<Graphics2D> {
     ((JavaTextLayout)layout).fill(gfx, x, y);
     isDirty = true;
     return this;
-  }
-
-  @Override
-  public float height() {
-    return height;
   }
 
   @Override
@@ -328,11 +321,6 @@ class JavaCanvas extends AbstractCanvasGL<Graphics2D> {
   public Canvas translate(float x, float y) {
     gfx.translate(x, y);
     return this;
-  }
-
-  @Override
-  public float width() {
-    return width;
   }
 
   @Override

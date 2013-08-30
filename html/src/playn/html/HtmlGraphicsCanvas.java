@@ -50,11 +50,11 @@ class HtmlGraphicsCanvas extends HtmlGraphics {
     rootElement.appendChild(elem);
     ctx = elem.getContext2d();
     ctx.scale(config.scaleFactor, config.scaleFactor);
-    canvas = new AbstractHtmlCanvas(ctx) {
-      public float width() {
+    canvas = new AbstractHtmlCanvas(ctx, 0, 0) {
+      @Override public float width() {
         return HtmlGraphicsCanvas.this.width();
       }
-      public float height() {
+      @Override public float height() {
         return HtmlGraphicsCanvas.this.height();
       }
     };

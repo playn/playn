@@ -15,6 +15,7 @@
  */
 package playn.core.gl;
 
+import playn.core.AbstractCanvas;
 import playn.core.Canvas;
 import playn.core.Image;
 
@@ -23,7 +24,7 @@ import playn.core.Image;
  * drawing images, but also provides a dirty tracking mechanism, since nearly all canvas
  * implementations need one.
  */
-public abstract class AbstractCanvasGL<GC> implements Canvas {
+public abstract class AbstractCanvasGL<GC> extends AbstractCanvas {
 
   protected boolean isDirty;
 
@@ -60,6 +61,10 @@ public abstract class AbstractCanvasGL<GC> implements Canvas {
     d.draw(gc(), dx, dy, dw, dh, sx, sy, sw, sh);
     isDirty = true;
     return this;
+  }
+
+  protected AbstractCanvasGL(float width, float height) {
+    super(width, height);
   }
 
   protected abstract GC gc();
