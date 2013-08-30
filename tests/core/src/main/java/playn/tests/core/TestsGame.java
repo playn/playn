@@ -214,7 +214,7 @@ public class TestsGame extends Game.Default {
   ImageLayer createButton (final Test test) {
     ImageLayer layer = graphics().createImageLayer(makeButtonImage(test.getName()));
     layer.addListener(new Pointer.Adapter() {
-      public void onPointerStart(Pointer.Event event) {
+      @Override public void onPointerStart(Pointer.Event event) {
         startTest(test);
       }
     });

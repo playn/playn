@@ -41,10 +41,10 @@ public class SurfaceTest extends Test {
     final Image tile = assets().getImage("images/tile.png");
     final Image orange = assets().getImage("images/orange.png");
     AssetWatcher watcher = new AssetWatcher(new AssetWatcher.Listener() {
-      public void done() {
+      @Override public void done() {
         addTests(orange, tile);
       }
-      public void error(Throwable err) {
+      @Override public void error(Throwable err) {
         addDescrip("Error: " + err.getMessage(), 10, errY, graphics().width()-20);
         errY += 30;
       }

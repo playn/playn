@@ -87,7 +87,7 @@ public class TextTest extends Test {
       final ImageLayer layer = graphics().createImageLayer(TestsGame.makeButtonImage("Set Text"));{
         layer.addListener(this);
       }
-      public void onPointerEnd(Event event) {
+      @Override public void onPointerEnd(Event event) {
         keyboard().getText(TextType.DEFAULT, "Test text", sample.replace("\n", "\\n"), this);
       }
       public void onSuccess(String result) {

@@ -106,7 +106,7 @@ public abstract class Test {
     CanvasImage image = formatText(text, true);
     ImageLayer button = graphics().createImageLayer(image);
     button.addListener(new Pointer.Adapter() {
-      public void onPointerStart(Pointer.Event event) {
+      @Override public void onPointerStart(Pointer.Event event) {
         onClick.run();
       }
     });

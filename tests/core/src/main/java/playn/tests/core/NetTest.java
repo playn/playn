@@ -56,7 +56,7 @@ public class NetTest extends Test {
     x = addButton("Enter URL", new Runnable() {
       public void run () {
         getText("Enter URL:", new TextCB() {
-          protected void gotText (String url) {
+          @Override protected void gotText (String url) {
             loadURL(url);
           }
         });
@@ -66,7 +66,7 @@ public class NetTest extends Test {
     x = addButton("Post Test", new Runnable() {
       public void run () {
         getText("Enter POST body:", new TextCB() {
-          protected void gotText(String data) {
+          @Override protected void gotText(String data) {
             Net.Builder b = net().req("http://www.posttestserver.com/post.php").setPayload(data);
             // don't add the header on HTML because it causes CORS freakoutery
             if (platformType() != Platform.Type.HTML) {
@@ -131,7 +131,7 @@ public class NetTest extends Test {
       public void run () {
         if (_websock == null) displayText("WebSocket not open.");
         else getText("Enter message:", new TextCB() {
-          protected void gotText(String msg) {
+          @Override protected void gotText(String msg) {
             if (_websock == null) displayText("WebSocket disappeared.");
             else {
               _websock.send(msg);
