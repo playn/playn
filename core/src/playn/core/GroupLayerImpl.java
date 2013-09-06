@@ -81,20 +81,24 @@ public class GroupLayerImpl<L extends AbstractLayer>
     remove(index);
   }
 
-  public void clear(GroupLayer self) {
+  public void removeAll(GroupLayer self) {
     while (!children.isEmpty()) {
       remove(children.size() - 1);
     }
   }
 
-  public void destroy(GroupLayer self) {
+  public void destroyAll(GroupLayer self) {
     AbstractLayer[] toDestroy = children.toArray(new AbstractLayer[children.size()]);
-    // first remove all children efficiently
-    self.clear();
+    // remove all of the children efficiently
+    self.removeAll();
     // now that the children have been detached, destroy them
     for (AbstractLayer child : toDestroy) {
       child.destroy();
     }
+  }
+
+  public void destroy(GroupLayer self) {
+    self.destroyAll();
   }
 
   public void onAdd(GroupLayer self) {

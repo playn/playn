@@ -107,9 +107,19 @@ public class GroupLayerCanvas extends LayerCanvas implements GroupLayer, ParentL
     impl.remove(this, (LayerCanvas) layer);
   }
 
-  @Override
+  @Deprecated @Override
   public void clear() {
-    impl.clear(this);
+    removeAll();
+  }
+
+  @Override
+  public void removeAll() {
+    impl.removeAll(this);
+  }
+
+  @Override
+  public void destroyAll() {
+    impl.destroyAll(this);
   }
 
   @Override

@@ -65,12 +65,21 @@ public interface GroupLayer extends Layer {
   void remove(Layer layer);
 
   /**
-   * Removes all the layers from this group.
+   * Removes all child layers from this group.
    */
-  void clear();
+  void removeAll();
+
+  /**
+   * Removes and destroys all child layers from this group.
+   */
+  void destroyAll();
 
   /**
    * Returns the number of layers in this group.
    */
   int size();
+
+  /** @deprecated Use {@link #removeAll}. */
+  @Deprecated
+  void clear();
 }

@@ -120,8 +120,18 @@ public class GroupLayerGL extends LayerGL implements GroupLayer, ParentLayer {
   }
 
   @Override
+  public void removeAll() {
+    impl.removeAll(this);
+  }
+
+  @Override
+  public void destroyAll() {
+    impl.destroyAll(this);
+  }
+
+  @Deprecated @Override
   public void clear() {
-    impl.clear(this);
+    removeAll();
   }
 
   @Override
