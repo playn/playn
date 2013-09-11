@@ -47,7 +47,7 @@
     <CodesignKey>iPhone Developer</CodesignKey>
     <MtouchDebug>True</MtouchDebug>
     <MtouchProfiling>True</MtouchProfiling>
-    <MtouchExtraArgs>-aot "nimt-trampolines=512" -nosymbolstrip -nostrip</MtouchExtraArgs>
+    <MtouchExtraArgs>-nosymbolstrip -nostrip</MtouchExtraArgs>
     <MtouchArch>ARMv7</MtouchArch>
     <IpaPackageName />
     <MtouchI18n />
@@ -62,6 +62,9 @@
     <CodesignKey>iPhone Developer</CodesignKey>
     <MtouchExtraArgs>-aot "nimt-trampolines=512" -nosymbolstrip -nostrip</MtouchExtraArgs>
     <MtouchArch>ARMv7</MtouchArch>
+    <MtouchLink>Full</MtouchLink>
+    <MtouchI18n />
+    <IpaPackageName />
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
