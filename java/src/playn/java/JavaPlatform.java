@@ -30,6 +30,7 @@ import playn.core.AbstractPlatform;
 import playn.core.Analytics;
 import playn.core.Game;
 import playn.core.Json;
+import playn.core.Key;
 import playn.core.Keyboard;
 import playn.core.Mouse;
 import playn.core.Net;
@@ -64,6 +65,9 @@ public class JavaPlatform extends AbstractPlatform {
 
     /** If set, emulates Touch and disables Mouse. For testing. */
     public boolean emulateTouch;
+
+    /** If {link #emulateTouch} is set, sets the pivot for a two-finger touch when pressed. */
+    public Key multiTouchKey = Key.F11;
 
     /** If set, converts images into a format for fast GPU uploads when initially loaded versus
      * doing it on demand when displayed. Assuming asynchronous image loads, this keeps that effort
@@ -133,7 +137,7 @@ public class JavaPlatform extends AbstractPlatform {
     graphics = new JavaGraphics(this, config);
     storage = new JavaStorage(this, config);
     if (config.emulateTouch) {
-      JavaEmulatedTouch emuTouch = new JavaEmulatedTouch();
+      JavaEmulatedTouch emuTouch = new JavaEmulatedTouch(config.multiTouchKey);
       mouse = emuTouch.createMouse(this);
       touch = emuTouch;
     } else {

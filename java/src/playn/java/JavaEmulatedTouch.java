@@ -32,12 +32,18 @@ public class JavaEmulatedTouch extends TouchImpl
   private Point pivot;
   private float x, y;
   private int currentId;
+  private final Key multiTouchKey;
+
   Keyboard.Listener keyListener = new Keyboard.Adapter() {
     @Override public void onKeyUp (playn.core.Keyboard.Event event) {
-      if (event.key() == Key.F11)
+      if (event.key() == multiTouchKey)
         pivot = new Point(x, y);
     }
   };
+
+  public JavaEmulatedTouch (Key multiTouchKey) {
+    this.multiTouchKey = multiTouchKey;
+  }
 
   @Override public boolean hasTouch() {
     return true;
