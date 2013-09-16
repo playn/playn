@@ -23,16 +23,17 @@ import org.lwjgl.input.Keyboard;
 
 import playn.core.Events;
 import playn.core.Key;
+import playn.core.PlayN;
 import playn.core.util.Callback;
 
 class JavaKeyboard implements playn.core.Keyboard {
-
-  private Listener listener;
+  private Listener[] listeners = {null};
+  // TODO: set this from somewhere?
   private JFrame frame;
 
   @Override
   public void setListener(Listener listener) {
-    this.listener = listener;
+    listeners[0] = listener;
   }
 
   @Override
@@ -49,31 +50,34 @@ class JavaKeyboard implements playn.core.Keyboard {
 
   void init() throws LWJGLException {
     Keyboard.create();
+    // let our friend the touch emulator have key messages too
+    if (PlayN.touch() instanceof JavaEmulatedTouch)
+      listeners = new Listener[] {listeners[0], ((JavaEmulatedTouch)PlayN.touch()).keyListener};
   }
 
   void update() {
     while (Keyboard.next()) {
-      if (listener == null) {
-        continue;
-      }
-
       double time = (double) (Keyboard.getEventNanoseconds() / 1000);
       int keyCode = Keyboard.getEventKey();
 
       if (Keyboard.getEventKeyState()) {
         Key key = translateKey(keyCode);
-        if (key != null)
-          listener.onKeyDown(new playn.core.Keyboard.Event.Impl(
-            new Events.Flags.Impl(), time, key));
+        if (key != null) {
+          for (Listener l : listeners)
+            if (l != null)
+              l.onKeyDown(new Event.Impl(new Events.Flags.Impl(), time, key));
+        }
         char keyChar = Keyboard.getEventCharacter();
         if (!Character.isISOControl(keyChar))
-          listener.onKeyTyped(new playn.core.Keyboard.TypedEvent.Impl(
-            new Events.Flags.Impl(), time, keyChar));
+          for (Listener l : listeners)
+            if (l != null)
+              l.onKeyTyped(new TypedEvent.Impl(new Events.Flags.Impl(), time, keyChar));
       } else {
         Key key = translateKey(keyCode);
         if (key != null)
-          listener.onKeyUp(new playn.core.Keyboard.Event.Impl(
-            new Events.Flags.Impl(), time, key));
+          for (Listener l : listeners)
+            if (l != null)
+              l.onKeyUp(new Event.Impl(new Events.Flags.Impl(), time, key));
       }
     }
   }
