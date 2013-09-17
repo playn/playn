@@ -163,7 +163,7 @@ public abstract class GLContext {
   /** Creates a framebuffer that will render into the supplied texture. */
   public int createFramebuffer(int tex) {
     flush();
-    return createFramebufferImpl(tex);
+    return (lastFramebuffer = createFramebufferImpl(tex));
   }
 
   /** Deletes the supplied frame buffer (which will have come from {@link #createFramebuffer}). */
