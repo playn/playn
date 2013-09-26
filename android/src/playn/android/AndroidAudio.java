@@ -67,6 +67,12 @@ public class AndroidAudio extends AudioImpl {
     }
 
     @Override
+    protected boolean prepareImpl() {
+      pool.play(soundId, 0, 0, 0, 0, 1);
+      return true; // Well, it's not prepared, but preparING...
+    }
+
+    @Override
     protected void stopImpl() {
       if (streamId != 0) {
         pool.stop(streamId);
