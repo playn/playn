@@ -256,16 +256,17 @@ final class JsonParser {
    * Steps through to the end of the current number token (a non-digit token).
    */
   private Number consumeTokenNumber(char c) throws JsonParserException {
-    reusableBuffer.setLength(0);
-    reusableBuffer.append(c);
+    int start = index - 1;
+    int end = index;
+
     boolean isDouble = false;
     while (isDigitCharacter(peekChar())) {
       char next = (char)advanceChar();
       isDouble = next == '.' || next == 'e' || next == 'E' || isDouble;
-      reusableBuffer.append(next);
+      end++;
     }
 
-    String number = reusableBuffer.toString();
+    String number = string.substring(start, end);
 
     try {
       if (isDouble) {
