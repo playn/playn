@@ -93,6 +93,7 @@ class AndroidTextLayout implements TextLayout {
     paint = new Paint(Paint.ANTI_ALIAS_FLAG);
     paint.setTypeface(font.typeface);
     paint.setTextSize(font.size());
+    paint.setSubpixelText(true);
     metrics = paint.getFontMetrics();
 
     // normalize newlines in the text (Windows: CRLF -> LF, Mac OS pre-X: CR -> LF)
@@ -178,6 +179,7 @@ class AndroidTextLayout implements TextLayout {
   void draw(Canvas canvas, float x, float y, Paint paint) {
     paint.setTypeface(font.typeface);
     paint.setTextSize(font.size());
+    paint.setSubpixelText(true);
 
     float yoff = TOP_FUDGE;
     for (Line line : lines) {
