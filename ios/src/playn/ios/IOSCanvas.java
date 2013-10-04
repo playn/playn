@@ -42,6 +42,7 @@ public class IOSCanvas extends AbstractCanvasGL<CGBitmapContext> {
   private int strokeColor = 0xFF000000;
   private IntPtr data;
   private CGBitmapContext bctx;
+  private IOSGLContext ctx;
 
   private LinkedList<IOSCanvasState> states = new LinkedList<IOSCanvasState>();
 
@@ -51,6 +52,8 @@ public class IOSCanvas extends AbstractCanvasGL<CGBitmapContext> {
     if (width <= 0 || height <= 0) throw new IllegalArgumentException(
       "Invalid size " + width + "x" + height);
     states.addFirst(new IOSCanvasState());
+
+    this.ctx = ctx;
 
     // create our raw image data
     texWidth = ctx.scale.scaledCeil(width);
@@ -224,7 +227,34 @@ public class IOSCanvas extends AbstractCanvasGL<CGBitmapContext> {
 
   @Override
   public Canvas fillText(TextLayout layout, float x, float y) {
-    ((IOSTextLayout) layout).fill(bctx, x, y);
+
+    IOSGradient gradient = currentState().gradient;
+    if (gradient == null) {
+      ((IOSTextLayout) layout).fill(bctx, x, y);
+    } else {
+      bctx.SaveState();
+
+      // Draw our text into a fresh context so we can use it as a mask for the gradient
+      CGBitmapContext maskContext = new CGBitmapContext(
+        Marshal.AllocHGlobal(texWidth * texHeight * 4), texWidth, texHeight, 8, 4 * texWidth,
+        IOSGraphics.colorSpace, CGImageAlphaInfo.wrap(CGImageAlphaInfo.PremultipliedLast));
+
+      // No need to translate or scale the y here.
+      maskContext.ScaleCTM(ctx.scale.factor, ctx.scale.factor);
+
+      // Clear and set the fill color to white to prepare our mask
+      maskContext.ClearRect(new RectangleF(0, 0, texWidth, texHeight));
+      maskContext.SetFillColor(toCGColor(0xFFFFFFFF));
+
+      // Fill the text and set the current context's mask
+      ((IOSTextLayout) layout).fill(maskContext, x, y);
+      bctx.ClipToMask(new RectangleF(x, y, width, height), maskContext.ToImage());
+
+      gradient.fill(bctx);
+
+      bctx.RestoreState();
+    }
+
     isDirty = true;
     return this;
   }
