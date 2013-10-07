@@ -44,7 +44,7 @@ public class ClearBackgroundTest extends Test {
   @Override
   public void init() {
     // remove the background layer added by default
-    graphics().rootLayer().clear();
+    graphics().rootLayer().removeAll();
 
     // add a grey square
     SurfaceImage surf = graphics().createSurface(width, height);
