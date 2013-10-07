@@ -172,7 +172,7 @@ public class Events {
     }
   }
 
-  /** The base for all events with pointer position. */
+  /** The base for all events with a screen position. */
   public interface Position extends Input {
     /**
      * The screen x-coordinate associated with this event.
@@ -263,6 +263,27 @@ public class Events {
         super.addFields(builder);
         builder.append(", x=").append(x).append(", y=").append(y).append(", hit=").append(hit);
       }
+    }
+  }
+
+  public static class Util {
+
+    public static Point screenPos (Position ev) {
+      return screenPos(ev, new Point());
+    }
+
+    public static Point screenPos (Position ev, Point dest) {
+      dest.set(ev.x(),  ev.y());
+      return dest;
+    }
+
+    public static Point localPos (Position ev) {
+      return localPos(ev, new Point());
+    }
+
+    public static Point localPos (Position ev, Point dest) {
+      dest.set(ev.localX(),  ev.localY());
+      return dest;
     }
   }
 }
