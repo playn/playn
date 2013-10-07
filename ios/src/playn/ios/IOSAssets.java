@@ -18,7 +18,12 @@ package playn.ios;
 import java.io.FileNotFoundException;
 
 import cli.System.IO.File;
+import cli.System.IO.FileAccess;
+import cli.System.IO.FileMode;
+import cli.System.IO.FileShare;
+import cli.System.IO.FileStream;
 import cli.System.IO.Path;
+import cli.System.IO.BinaryReader;
 import cli.System.IO.StreamReader;
 
 import cli.MonoTouch.Foundation.NSData;
@@ -112,6 +117,23 @@ public class IOSAssets extends AbstractAssets<UIImage> {
     try {
       reader = new StreamReader(fullPath);
       return reader.ReadToEnd();
+    } finally {
+      if (reader != null) {
+        reader.Close();
+      }
+    }
+  }
+
+  @Override
+  public byte[] getBytesSync(String path) throws Exception {
+    String fullPath = Path.Combine(pathPrefix, path);
+    // platform.log().debug("Loading bytes " + fullPath);
+    BinaryReader reader = null;
+    try {
+      FileStream stream = new FileStream(fullPath, FileMode.wrap(FileMode.Open),
+        FileAccess.wrap(FileAccess.Read), FileShare.wrap(FileShare.Read));
+      reader = new BinaryReader(stream);
+      return reader.ReadBytes((int)stream.get_Length());
     } finally {
       if (reader != null) {
         reader.Close();

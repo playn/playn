@@ -185,6 +185,16 @@ public class HtmlAssets extends AbstractAssets<Void> {
   }
 
   @Override
+  public byte[] getBytesSync(String path) throws Exception {
+    throw new UnsupportedOperationException("getTextSync(" + path + ")");
+  }
+
+  @Override
+  public void getBytes(final String path, final Callback<byte[]> callback) {
+    throw new UnsupportedOperationException("getText(" + path + ")");
+  }
+
+  @Override
   protected Image createErrorImage(Throwable cause, float width, float height) {
     ImageElement img = Document.get().createImageElement();
     img.setWidth(MathUtil.iceil(width));

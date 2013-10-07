@@ -100,4 +100,21 @@ public interface Assets {
    * @param path the path to the text asset.
    */
   void getText(String path, Callback<String> callback);
+
+  /**
+   * Returns the raw bytes of the asset - useful for custom binary formatted files.
+   *
+   * @param path the path to the text asset.
+   * @throws Exception if there is an error loading the data (for example, if it does not exist).
+   * @throws UnsupportedOperationException on platforms that cannot support synchronous asset
+   * loading (e.g. HTML5 and Flash).
+   */
+  byte[] getBytesSync(String path) throws Exception;
+
+  /**
+   * Calls back with the bytes of a binary asset - useful for custom binary formatted files.
+   *
+   * @param path the path to the binary asset.
+   */
+  void getBytes(String path, Callback<byte[]> callback);
 }

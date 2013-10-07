@@ -111,6 +111,16 @@ public class FlashAssets extends AbstractAssets<Void> {
   }
 
   @Override
+  public byte[] getBytesSync(String path) throws Exception {
+    throw new UnsupportedOperationException("getBytesSync(" + path + ")");
+  }
+
+  @Override
+  public void getBytes(String path, Callback<byte[]> callback) {
+    throw new UnsupportedOperationException("getBytes(" + path + ")");
+  }
+
+  @Override
   protected Image createErrorImage(Throwable cause, float width, float height) {
     // TODO: proper error image that reports failure to callbacks
     return new FlashImage("error");

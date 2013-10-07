@@ -98,6 +98,19 @@ public abstract class AbstractAssets<IMG> implements Assets {
     });
   }
 
+  @Override
+  public void getBytes(final String path, final Callback<byte[]> callback) {
+    platform.invokeAsync(new Runnable() {
+      public void run () {
+        try {
+          platform.notifySuccess(callback, getBytesSync(path));
+        } catch (Throwable t) {
+          platform.notifyFailure(callback, t);
+        }
+      }
+    });
+  }
+
   protected AbstractAssets(AbstractPlatform platform) {
     this.platform = platform;
   }

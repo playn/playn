@@ -16,6 +16,7 @@
 package playn.android;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -34,8 +35,8 @@ import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
 
 import playn.core.AbstractAssets;
-import playn.core.Image;
 import playn.core.AsyncImage;
+import playn.core.Image;
 import playn.core.Sound;
 import playn.core.gl.Scale;
 
@@ -141,6 +142,26 @@ public class AndroidAssets extends AbstractAssets<Bitmap> {
     } finally {
       is.close();
     }
+  }
+
+  @Override
+  public byte[] getBytesSync(String path) throws Exception {
+      InputStream is = openAsset(path);
+      try {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        byte[] buf = new byte[1024];
+        while (true) {
+          int r = is.read(buf);
+          if (r == -1) {
+            break;
+          }
+          out.write(buf, 0, r);
+        }
+
+        return out.toByteArray();
+      } finally {
+        is.close();
+      }
   }
 
   @Override

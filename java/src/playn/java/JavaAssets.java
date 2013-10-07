@@ -19,6 +19,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+
 import javax.imageio.ImageIO;
 
 import com.google.common.base.Charsets;
@@ -108,6 +109,11 @@ public class JavaAssets extends AbstractAssets<BufferedImage> {
   @Override
   public String getTextSync(String path) throws Exception {
     return Resources.toString(requireResource(pathPrefix + path), Charsets.UTF_8);
+  }
+
+  @Override
+  public byte[] getBytesSync(String path) throws Exception {
+    return Resources.toByteArray(requireResource(pathPrefix + path));
   }
 
   @Override

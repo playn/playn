@@ -103,4 +103,16 @@ public class CachingAssets implements Assets {
     // no caching for text loading
     delegate.getText(path, callback);
   }
+
+  @Override
+  public byte[] getBytesSync(String path) throws Exception {
+    // no caching for arbitrary binary loading
+    return delegate.getBytesSync(path);
+  }
+
+  @Override
+  public void getBytes(String path, Callback<byte[]> callback) {
+    // no caching for arbitrary binary loading
+    delegate.getBytes(path, callback);
+  }
 }
