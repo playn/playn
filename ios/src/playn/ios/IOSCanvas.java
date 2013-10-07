@@ -227,32 +227,33 @@ public class IOSCanvas extends AbstractCanvasGL<CGBitmapContext> {
 
   @Override
   public Canvas fillText(TextLayout layout, float x, float y) {
-
     IOSGradient gradient = currentState().gradient;
+    IOSTextLayout ilayout = (IOSTextLayout) layout;
     if (gradient == null) {
-      ((IOSTextLayout) layout).fill(bctx, x, y);
+      ilayout.fill(bctx, x, y);
+
     } else {
-      bctx.SaveState();
-
-      // Draw our text into a fresh context so we can use it as a mask for the gradient
+      // draw our text into a fresh context so we can use it as a mask for the gradient
+      IntPtr data = Marshal.AllocHGlobal(texWidth * texHeight * 4);
       CGBitmapContext maskContext = new CGBitmapContext(
-        Marshal.AllocHGlobal(texWidth * texHeight * 4), texWidth, texHeight, 8, 4 * texWidth,
-        IOSGraphics.colorSpace, CGImageAlphaInfo.wrap(CGImageAlphaInfo.PremultipliedLast));
-
-      // No need to translate or scale the y here.
-      maskContext.ScaleCTM(ctx.scale.factor, ctx.scale.factor);
-
-      // Clear and set the fill color to white to prepare our mask
+        data, texWidth, texHeight, 8, 4 * texWidth, IOSGraphics.colorSpace,
+        CGImageAlphaInfo.wrap(CGImageAlphaInfo.PremultipliedLast));
       maskContext.ClearRect(new RectangleF(0, 0, texWidth, texHeight));
+      // scale the context based on our scale factor
+      maskContext.ScaleCTM(ctx.scale.factor, ctx.scale.factor);
+      // fill the text into this temp context in white for use as a mask
       maskContext.SetFillColor(toCGColor(0xFFFFFFFF));
+      ilayout.fill(maskContext, x, y);
 
-      // Fill the text and set the current context's mask
-      ((IOSTextLayout) layout).fill(maskContext, x, y);
+      // now fill the gradient, using our temp context as a mask
+      bctx.SaveState();
       bctx.ClipToMask(new RectangleF(x, y, width, height), maskContext.ToImage());
-
       gradient.fill(bctx);
-
       bctx.RestoreState();
+
+      // finally free the temp context and its associated buffer
+      maskContext.Dispose();
+      Marshal.FreeHGlobal(data);
     }
 
     isDirty = true;
