@@ -62,6 +62,7 @@ public class SurfaceGL extends AbstractSurfaceGL {
   protected void createTexture() {
     tex = ctx.createTexture(texWidth, texHeight, false, false, false);
     fbuf = ctx.createFramebuffer(tex);
+    ctx.bindFramebuffer(fbuf, texWidth, texHeight);
     ctx.clear(0, 0, 0, 0);
   }
 

@@ -160,10 +160,12 @@ public abstract class GLContext {
    */
   public abstract GLBuffer.Short createShortBuffer(int capacity);
 
-  /** Creates a framebuffer that will render into the supplied texture. */
+  /** Creates a framebuffer that will render into the supplied texture. <em>NOTE:</em> this must be
+   * followed immediately by a call to {@link #bindFramebuffer(int,int,int)} or {@link
+   * #pushFramebuffer}. */
   public int createFramebuffer(int tex) {
     flush();
-    return (lastFramebuffer = createFramebufferImpl(tex));
+    return createFramebufferImpl(tex);
   }
 
   /** Deletes the supplied frame buffer (which will have come from {@link #createFramebuffer}). */
