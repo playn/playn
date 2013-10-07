@@ -158,6 +158,17 @@ public class CanvasTest extends Test {
       }
     });
 
+    addTestCanvas("gradient filled text", 100, 100, new Drawer() {
+      public void draw(Canvas canvas) {
+        // draw a rounded rect directly
+        canvas.setFillGradient(graphics().createLinearGradient(
+                                 0, 0, 100, 100, new int[] { 0xFF0000FF, 0xFF00FF00 },
+                                 new float[] { 0, 1 }));
+        TextLayout capF = graphics().layoutText("F", new TextFormat().withFont(F_FONT.derive(96)));
+        canvas.fillText(capF, 15, 5);
+      }
+    });
+
     addTestCanvas("nested round rect", 100, 100, new Drawer() {
       public void draw(Canvas canvas) {
         // demonstrates a bug (now worked around) in Android round-rect drawing
@@ -187,8 +198,7 @@ public class CanvasTest extends Test {
       public void draw(Canvas canvas) {
         canvas.setFillColor(0xFFCCCCCC).fillRect(0, 0, 50, 50);
         canvas.setFillColor(0xFFCCCCCC).fillRect(50, 50, 50, 50);
-        TextLayout capF = graphics().layoutText(
-          "F", new TextFormat().withFont(graphics().createFont("Helvetica", Font.Style.BOLD, 48)));
+        TextLayout capF = graphics().layoutText("F", new TextFormat().withFont(F_FONT));
         float theta = -FloatMath.PI/4, tsin = FloatMath.sin(theta), tcos = FloatMath.cos(theta);
         canvas.setFillColor(0xFF000000).fillText(capF, 0, 0);
         canvas.transform(tcos, -tsin, tsin, tcos, 50, 50);
@@ -296,4 +306,6 @@ public class CanvasTest extends Test {
     });
     addTestLayer(descrip, width, height, graphics().createImageLayer(target));
   }
+
+  private Font F_FONT = graphics().createFont("Helvetica", Font.Style.BOLD, 48);
 }
