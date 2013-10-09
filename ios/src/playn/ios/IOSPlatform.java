@@ -233,9 +233,22 @@ public class IOSPlatform extends AbstractPlatform {
     if (app.get_Delegate() instanceof IOSApplicationDelegate)
       ((IOSApplicationDelegate) app.get_Delegate()).setPlatform(this);
 
-    // configure our orientation to a supported default, a notification will come in later that
-    // will adjust us to the device's current orientation
-    onOrientationChange(orients.defaultOrient);
+    // use the status bar orientation during startup. The device orientation will not be known
+    // for some time and most games will want to show a "right side up" loading screen, i.e.
+    // matching the iOS "default" splash
+    int sorient = UIApplication.get_SharedApplication().get_StatusBarOrientation().Value;
+    UIDeviceOrientation dorient = null;
+    for (Map.Entry<UIDeviceOrientation, UIInterfaceOrientation> e : ORIENT_MAP.entrySet()) {
+      if (e.getValue().Value == sorient) {
+        dorient = e.getKey();
+        break;
+      }
+    }
+    // if it isn't supported, use the game's default
+    if (dorient == null || !orients.isSupported(dorient)) {
+      dorient = orients.defaultOrient;
+    }
+    onOrientationChange(dorient);
   }
 
   @Override
