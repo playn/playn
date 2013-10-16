@@ -29,9 +29,14 @@ public class IOSLog extends LogImpl {
     Console.WriteLine(level + ": " + msg);
 
     if (e != null) {
-      StringWriter sw = new StringWriter();
-      e.printStackTrace(new PrintWriter(sw));
-      Console.WriteLine(sw.toString());
+      try {
+        StringWriter sw = new StringWriter();
+        e.printStackTrace(new PrintWriter(sw));
+        Console.WriteLine(sw.toString());
+      } catch (Throwable t) {
+        Console.WriteLine(e);
+        Console.WriteLine("<stack trace generation failed: " + t + ">");
+      }
     }
   }
 }
