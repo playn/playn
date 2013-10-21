@@ -27,6 +27,7 @@ import playn.core.gl.AbstractCanvasGL;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
@@ -54,6 +55,12 @@ class JavaCanvas extends AbstractCanvasGL<Graphics2D> {
 
     // All clears go to rgba(0,0,0,0).
     gfx.setBackground(new Color(0, true));
+  }
+
+  public void setAntialiasing (boolean antialias) {
+      Object value = antialias ? RenderingHints.VALUE_ANTIALIAS_ON :
+          RenderingHints.VALUE_ANTIALIAS_OFF;
+      gfx.setRenderingHint(RenderingHints.KEY_ANTIALIASING, value);
   }
 
   public float alpha() {

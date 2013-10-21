@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import playn.core.AbstractTextLayout;
+import playn.core.Canvas;
 import playn.core.TextFormat;
 import pythagoras.f.Rectangle;
 
@@ -124,6 +125,19 @@ class JavaTextLayout extends AbstractTextLayout {
     return layouts.size() == 0 ? 0 : layouts.get(0).getLeading();
   }
 
+  @Override
+  protected void fillOutline (Canvas canvas, int outlineColor, float x, float y) {
+    if (canvas instanceof JavaCanvas) {
+      // turn off antialiasing while drawing to avoid artifacts caused by overlapping edges
+      JavaCanvas javaCanvas = (JavaCanvas) canvas;
+      javaCanvas.setAntialiasing(false);
+      super.fillOutline(canvas, outlineColor, x, y);
+      javaCanvas.setAntialiasing(true);
+    } else {
+      super.fillOutline(canvas, outlineColor, x, y);
+    }
+  }
+
   void stroke(Graphics2D gfx, float x, float y) {
     paint(gfx, x+pad, y+pad, true);
   }
@@ -158,7 +172,7 @@ class JavaTextLayout extends AbstractTextLayout {
 
   private static FontRenderContext createDummyFRC() {
     Graphics2D gfx = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB).createGraphics();
-    gfx.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+    gfx.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
     return gfx.getFontRenderContext();
   }
 }
