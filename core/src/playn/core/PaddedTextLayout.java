@@ -19,8 +19,7 @@ public abstract class PaddedTextLayout extends AbstractTextLayout
     return super.height() + 2*pad;
   }
 
-  protected PaddedTextLayout (Graphics gfx, String text, TextFormat format)
-  {
+  protected PaddedTextLayout (Graphics gfx, String text, TextFormat format) {
     super(text, format);
     this.pad = 1/gfx.scaleFactor();
   }
