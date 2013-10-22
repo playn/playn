@@ -16,25 +16,19 @@
 package playn.java;
 
 import java.awt.Graphics2D;
-import java.awt.RenderingHints;
-import java.awt.font.FontRenderContext;
 import java.awt.font.LineBreakMeasurer;
 import java.awt.font.TextAttribute;
 import java.awt.font.TextLayout;
 import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
 import java.text.AttributedString;
 import java.util.ArrayList;
 import java.util.List;
 
 import playn.core.PaddedTextLayout;
-import playn.core.Canvas;
 import playn.core.TextFormat;
 import pythagoras.f.Rectangle;
 
 class JavaTextLayout extends PaddedTextLayout {
-
-  private static FontRenderContext dummyFontContext = createDummyFRC();
 
   private List<TextLayout> layouts = new ArrayList<TextLayout>();
   private final float xAdjust;
@@ -56,7 +50,7 @@ class JavaTextLayout extends PaddedTextLayout {
     }
 
     if (format.shouldWrap() || ltext.indexOf('\n') != -1) {
-      LineBreakMeasurer measurer = new LineBreakMeasurer(astring.getIterator(), dummyFontContext);
+      LineBreakMeasurer measurer = new LineBreakMeasurer(astring.getIterator(), gfx.fontContext);
       char eol = '\n'; // TODO: platform line endings?
       int lastPos = ltext.length();
       while (measurer.getPosition() < lastPos) {
@@ -67,7 +61,7 @@ class JavaTextLayout extends PaddedTextLayout {
         layouts.add(measurer.nextLayout(format.wrapWidth, nextRet, false));
       }
     } else {
-      layouts.add(new TextLayout(astring.getIterator(), dummyFontContext));
+      layouts.add(new TextLayout(astring.getIterator(), gfx.fontContext));
     }
 
     // some font glyphs start rendering at a negative inset, blowing outside their bounding box
@@ -125,19 +119,6 @@ class JavaTextLayout extends PaddedTextLayout {
     return layouts.size() == 0 ? 0 : layouts.get(0).getLeading();
   }
 
-  @Override
-  protected void fillOutline (Canvas canvas, int outlineColor, float x, float y) {
-    if (canvas instanceof JavaCanvas) {
-      // turn off antialiasing while drawing to avoid artifacts caused by overlapping edges
-      JavaCanvas javaCanvas = (JavaCanvas) canvas;
-      javaCanvas.setAntialiasing(false);
-      super.fillOutline(canvas, outlineColor, x, y);
-      javaCanvas.setAntialiasing(true);
-    } else {
-      super.fillOutline(canvas, outlineColor, x, y);
-    }
-  }
-
   void stroke(Graphics2D gfx, float x, float y) {
     paint(gfx, x+pad, y+pad, true);
   }
@@ -168,11 +149,5 @@ class JavaTextLayout extends PaddedTextLayout {
     // this leading whitespace, but we need to include it in our bounds; we don't need to worry
     // about xAdjust here because that's accounted elsewhere
     return (float)(Math.max(0, bounds.getX()) + bounds.getWidth());
-  }
-
-  private static FontRenderContext createDummyFRC() {
-    Graphics2D gfx = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB).createGraphics();
-    gfx.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
-    return gfx.getFontRenderContext();
   }
 }

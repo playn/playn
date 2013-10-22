@@ -46,8 +46,4 @@ public interface TextLayout {
 
   /** The {@link TextFormat} used to lay out this text. */
   TextFormat format();
-
-  /** Draws this text outlined on the given {@link Canvas}. */
-  void outline (Canvas canvas, int textColor, int outlineColor, boolean underlined, float x,
-      float y);
 }

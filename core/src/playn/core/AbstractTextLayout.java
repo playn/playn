@@ -15,8 +15,6 @@
  */
 package playn.core;
 
-import pythagoras.f.Rectangle;
-
 /**
  * Base {@link TextLayout} implementation shared among platforms.
  */
@@ -41,40 +39,7 @@ public abstract class AbstractTextLayout implements TextLayout {
     return format;
   }
 
-  @Override
-  public void outline (Canvas canvas, int textColor, int outlineColor, boolean underlined, float x,
-    float y) {
-    canvas.save();
-    if (underlined) {
-      for (int ii = 0; ii < lineCount(); ii++) {
-        Rectangle bounds = lineBounds(ii);
-        float sx = x + bounds.x + 1;
-        float sy = y + bounds.y + bounds.height();
-        canvas.setFillColor(outlineColor);
-        canvas.fillRect(sx - 1, sy - 1, bounds.width() + 3, 3);
-        canvas.setFillColor(textColor);
-        canvas.fillRect(sx, sy, bounds.width(), 1);
-      }
-    }
-    fillOutline(canvas, outlineColor, x, y);
-    canvas.setFillColor(textColor);
-    canvas.fillText(this, x+1, y+1);
-    canvas.restore();
-  }
-
   protected AbstractTextLayout (String text, TextFormat format) {
     this.format = format;
-  }
-
-  protected void fillOutline (Canvas canvas, int outlineColor, float x, float y) {
-    canvas.setFillColor(outlineColor);
-    canvas.fillText(this, x+0, y+0);
-    canvas.fillText(this, x+0, y+1);
-    canvas.fillText(this, x+0, y+2);
-    canvas.fillText(this, x+1, y+0);
-    canvas.fillText(this, x+1, y+2);
-    canvas.fillText(this, x+2, y+0);
-    canvas.fillText(this, x+2, y+1);
-    canvas.fillText(this, x+2, y+2);
   }
 }

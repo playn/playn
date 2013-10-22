@@ -15,6 +15,9 @@
  */
 package playn.java;
 
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
+import java.awt.font.FontRenderContext;
 import java.awt.image.BufferedImage;
 import java.util.HashMap;
 import java.util.Map;
@@ -39,6 +42,7 @@ public class JavaGraphics extends GraphicsGL {
 
   private final GroupLayerGL rootLayer;
   private final GL20Context ctx;
+  final FontRenderContext fontContext;
 
   public JavaGraphics(JavaPlatform platform, JavaPlatform.Config config) {
     // if we're being run in headless mode, create a stub GL context which does not trigger the
@@ -49,6 +53,12 @@ public class JavaGraphics extends GraphicsGL {
       protected void viewWasResized () {}
     } : new JavaGLContext(platform, config.scaleFactor, config.width, config.height);
     this.rootLayer = new GroupLayerGL(ctx);
+
+    // set up the dummy font context
+    Graphics2D gfx = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB).createGraphics();
+    gfx.setRenderingHint(RenderingHints.KEY_ANTIALIASING, config.antialiasFonts ?
+      RenderingHints.VALUE_ANTIALIAS_ON : RenderingHints.VALUE_ANTIALIAS_OFF);
+    fontContext = gfx.getFontRenderContext();
   }
 
   /**

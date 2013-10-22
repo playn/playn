@@ -58,9 +58,9 @@ class JavaCanvas extends AbstractCanvasGL<Graphics2D> {
   }
 
   public void setAntialiasing (boolean antialias) {
-      Object value = antialias ? RenderingHints.VALUE_ANTIALIAS_ON :
-          RenderingHints.VALUE_ANTIALIAS_OFF;
-      gfx.setRenderingHint(RenderingHints.KEY_ANTIALIASING, value);
+    Object value = antialias ? RenderingHints.VALUE_ANTIALIAS_ON :
+      RenderingHints.VALUE_ANTIALIAS_OFF;
+    gfx.setRenderingHint(RenderingHints.KEY_ANTIALIASING, value);
   }
 
   public float alpha() {
@@ -334,6 +334,14 @@ class JavaCanvas extends AbstractCanvasGL<Graphics2D> {
   protected Graphics2D gc() {
     currentState().prepareFill(gfx);
     return gfx;
+  }
+
+  @Override
+  protected void fillOutline (TextLayout text, int outlineColor, float x, float y) {
+    // turn off antialiasing while drawing to avoid artifacts caused by overlapping edges
+    setAntialiasing(false);
+    super.fillOutline(text, outlineColor, x, y);
+    setAntialiasing(true);
   }
 
   private JavaCanvasState currentState() {
