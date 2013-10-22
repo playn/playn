@@ -27,12 +27,12 @@ import java.text.AttributedString;
 import java.util.ArrayList;
 import java.util.List;
 
-import playn.core.AbstractTextLayout;
+import playn.core.PaddedTextLayout;
 import playn.core.Canvas;
 import playn.core.TextFormat;
 import pythagoras.f.Rectangle;
 
-class JavaTextLayout extends AbstractTextLayout {
+class JavaTextLayout extends PaddedTextLayout {
 
   private static FontRenderContext dummyFontContext = createDummyFRC();
 

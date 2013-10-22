@@ -23,21 +23,17 @@ import pythagoras.f.Rectangle;
 public abstract class AbstractTextLayout implements TextLayout {
 
   protected final TextFormat format;
-  // this is used to reserve one pixel of padding around the edge of our rendered text which makes
-  // antialising work much more nicely
-  protected final float pad;
+
   protected float width, height;
 
   @Override
   public float width() {
-    // reserve a pixel on the left and right to make antialiasing work better
-    return width + 2*pad;
+    return width;
   }
 
   @Override
   public float height() {
-    // reserve a pixel on the top and bottom to make antialiasing work better
-    return height + 2*pad;
+    return height;
   }
 
   @Override
@@ -66,9 +62,8 @@ public abstract class AbstractTextLayout implements TextLayout {
     canvas.restore();
   }
 
-  protected AbstractTextLayout (Graphics gfx, String text, TextFormat format) {
+  protected AbstractTextLayout (String text, TextFormat format) {
     this.format = format;
-    this.pad = 1/gfx.scaleFactor();
   }
 
   protected void fillOutline (Canvas canvas, int outlineColor, float x, float y) {

@@ -21,16 +21,14 @@ import java.util.List;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 
+import playn.core.AbstractTextLayout;
 import playn.core.TextFormat;
-import playn.core.TextLayout;
 import pythagoras.f.Rectangle;
 
-class AndroidTextLayout implements TextLayout {
+class AndroidTextLayout extends AbstractTextLayout {
 
-  private final TextFormat format;
   private final AndroidFont font;
   private final Paint paint;
-  private final float width, height;
   private final Paint.FontMetrics metrics;
   private final List<Line> lines = new ArrayList<Line>();
 
@@ -41,16 +39,6 @@ class AndroidTextLayout implements TextLayout {
       this.text = text;
       this.width = width;
     }
-  }
-
-  @Override
-  public float width() {
-    return width;
-  }
-
-  @Override
-  public float height() {
-    return height;
   }
 
   @Override
@@ -81,13 +69,8 @@ class AndroidTextLayout implements TextLayout {
     return metrics.leading;
   }
 
-  @Override
-  public TextFormat format() {
-    return format;
-  }
-
   AndroidTextLayout(String text, TextFormat format) {
-    this.format = format;
+    super(text, format);
     this.font = (format.font == null) ? AndroidFont.DEFAULT : (AndroidFont)format.font;
 
     paint = new Paint(Paint.ANTI_ALIAS_FLAG);

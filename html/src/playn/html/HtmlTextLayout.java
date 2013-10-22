@@ -17,9 +17,9 @@ package playn.html;
 
 import com.google.gwt.canvas.dom.client.Context2d;
 
+import playn.core.AbstractTextLayout;
 import playn.core.Font;
 import playn.core.TextFormat;
-import playn.core.TextLayout;
 import pythagoras.f.Rectangle;
 
 import java.util.ArrayList;
@@ -27,11 +27,9 @@ import java.util.List;
 
 import static playn.core.PlayN.graphics;
 
-class HtmlTextLayout implements TextLayout {
+class HtmlTextLayout extends AbstractTextLayout {
 
-  private TextFormat format;
   private HtmlFontMetrics metrics;
-  private float width, height;
   private List<Line> lines = new ArrayList<Line>();
 
   private static class Line {
@@ -44,8 +42,8 @@ class HtmlTextLayout implements TextLayout {
   }
 
   HtmlTextLayout(Context2d ctx, String text, TextFormat format) {
+    super(text, format);
     Font font = getFont(format);
-    this.format = format;
     this.metrics = ((HtmlGraphics)graphics()).getFontMetrics(font);
     configContext(ctx);
 
@@ -79,16 +77,6 @@ class HtmlTextLayout implements TextLayout {
   }
 
   @Override
-  public float width() {
-    return width;
-  }
-
-  @Override
-  public float height() {
-    return height;
-  }
-
-  @Override
   public int lineCount() {
     return lines.size();
   }
@@ -115,11 +103,6 @@ class HtmlTextLayout implements TextLayout {
   public float leading() {
     // TODO
     return 0;
-  }
-
-  @Override
-  public TextFormat format() {
-    return format;
   }
 
   void stroke(Context2d ctx, float x, float y) {

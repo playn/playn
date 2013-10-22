@@ -29,11 +29,11 @@ import cli.MonoTouch.Foundation.NSRange;
 import cli.System.Drawing.PointF;
 import cli.System.Drawing.RectangleF;
 
-import playn.core.AbstractTextLayout;
+import playn.core.PaddedTextLayout;
 import playn.core.TextFormat;
 import pythagoras.f.Rectangle;
 
-class IOSTextLayout extends AbstractTextLayout {
+class IOSTextLayout extends PaddedTextLayout {
 
   // There are numerous impedance mismatches between how PlayN wants to layout text and how iOS
   // allows text to be laid out. Fortunately, with some hackery, we can make things work (quite

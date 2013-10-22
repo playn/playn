@@ -18,18 +18,16 @@ package playn.flash;
 import java.util.ArrayList;
 import java.util.List;
 
+import playn.core.AbstractTextLayout;
 import playn.core.Font;
 import playn.core.TextFormat;
-import playn.core.TextLayout;
 import pythagoras.f.Rectangle;
 
 import static playn.core.PlayN.graphics;
 
-class FlashTextLayout implements TextLayout {
+class FlashTextLayout extends AbstractTextLayout {
 
-  private TextFormat format;
   private FlashFontMetrics metrics;
-  private float width, height;
   private List<Line> lines = new ArrayList<Line>();
 
   private static class Line {
@@ -42,8 +40,8 @@ class FlashTextLayout implements TextLayout {
   }
 
   FlashTextLayout(FlashCanvas.Context2d ctx, String text, TextFormat format) {
+    super(text, format);
     Font font = getFont(format);
-    this.format = format;
     this.metrics = ((FlashGraphics)graphics()).getFontMetrics(font);
     configContext(ctx);
 
@@ -62,7 +60,7 @@ class FlashTextLayout implements TextLayout {
       height = metrics.height * lines.size();
 
     } else {
-      width = (float)ctx.measureText(text).getWidth();
+      width = ctx.measureText(text).getWidth();
       height = metrics.height;
       lines.add(new Line(text, width));
     }
@@ -74,16 +72,6 @@ class FlashTextLayout implements TextLayout {
     case BOLD_ITALIC: width += metrics.emwidth/6; break;
     default: break; // nada
     }
-  }
-
-  @Override
-  public float width() {
-    return width;
-  }
-
-  @Override
-  public float height() {
-    return height;
   }
 
   @Override
@@ -113,11 +101,6 @@ class FlashTextLayout implements TextLayout {
   public float leading() {
     // TODO
     return 0;
-  }
-
-  @Override
-  public TextFormat format() {
-    return format;
   }
 
   void stroke(FlashCanvas.Context2d ctx, float x, float y) {
