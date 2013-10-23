@@ -73,7 +73,7 @@ class AndroidTextLayout extends AbstractTextLayout {
     super(text, format);
     this.font = (format.font == null) ? AndroidFont.DEFAULT : (AndroidFont)format.font;
 
-    paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    paint = new Paint(format.antialias ? Paint.ANTI_ALIAS_FLAG : 0);
     paint.setTypeface(font.typeface);
     paint.setTextSize(font.size());
     paint.setSubpixelText(true);
@@ -160,16 +160,23 @@ class AndroidTextLayout extends AbstractTextLayout {
   }
 
   void draw(Canvas canvas, float x, float y, Paint paint) {
-    paint.setTypeface(font.typeface);
-    paint.setTextSize(font.size());
-    paint.setSubpixelText(true);
+    boolean oldAA = paint.isAntiAlias();
+    paint.setAntiAlias(format.antialias);
+    try {
+      paint.setTypeface(font.typeface);
+      paint.setTextSize(font.size());
+      paint.setSubpixelText(true);
 
-    float yoff = TOP_FUDGE;
-    for (Line line : lines) {
-      float rx = format.align.getX(line.width, width-LEFT_FUDGE-RIGHT_FUDGE);
-      yoff -= metrics.ascent;
-      canvas.drawText(line.text, x + rx + LEFT_FUDGE, y + yoff, paint);
-      yoff += metrics.descent + metrics.leading;
+      float yoff = TOP_FUDGE;
+      for (Line line : lines) {
+        float rx = format.align.getX(line.width, width-LEFT_FUDGE-RIGHT_FUDGE);
+        yoff -= metrics.ascent;
+        canvas.drawText(line.text, x + rx + LEFT_FUDGE, y + yoff, paint);
+        yoff += metrics.descent + metrics.leading;
+      }
+
+    } finally {
+      paint.setAntiAlias(oldAA);
     }
   }
 
