@@ -265,10 +265,6 @@ public interface Canvas {
    */
   Canvas fillText(TextLayout text, float x, float y);
 
-  /** Draws the text with a pixel outline with specified location and colors. */
-  Canvas outlineText(TextLayout text, int textColor, int outlineColor, boolean underlined, float x,
-    float y);
-
   /**
    * The height of this canvas.
    */

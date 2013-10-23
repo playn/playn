@@ -58,16 +58,18 @@ public class TextFormat {
   /** The alignment to use for multiline text. */
   public final Alignment align;
 
+  /** Whether or not the text should be antialiased. Defaults to true.
+   * TODO: only supported on Java platform right now. */
+  public final boolean antialias;
+
   /** Creates a default text format instance. */
   public TextFormat() {
-    this(null, Float.MAX_VALUE, Alignment.LEFT);
+    this(null, Float.MAX_VALUE, Alignment.LEFT, true);
   }
 
-  /** Creates a configured text format instance. */
+  @Deprecated /** @deprecated Use {@link TextFormat()} and configuration methods. */
   public TextFormat(Font font, float wrapWidth, Alignment align) {
-    this.font = font;
-    this.wrapWidth = wrapWidth;
-    this.align = align;
+    this(font, wrapWidth, align, true);
   }
 
   /** Returns true if line wrapping is desired. */
@@ -77,23 +79,28 @@ public class TextFormat {
 
   /** Returns a clone of this text format with the font configured as specified. */
   public TextFormat withFont(Font font) {
-    return new TextFormat(font, this.wrapWidth, this.align);
+    return new TextFormat(font, this.wrapWidth, this.align, this.antialias);
   }
 
   /** Returns a clone of this text format with the wrap width and alignment configured as
    * specified. */
   public TextFormat withWrapping(float wrapWidth, Alignment align) {
-    return new TextFormat(this.font, wrapWidth, align);
+    return new TextFormat(this.font, wrapWidth, align, this.antialias);
   }
 
   /** Returns a clone of this text format with the wrap width configured as specified. */
   public TextFormat withWrapWidth(float wrapWidth) {
-    return new TextFormat(this.font, wrapWidth, this.align);
+    return new TextFormat(this.font, wrapWidth, this.align, this.antialias);
   }
 
   /** Returns a clone of this text format with the alignment configured as specified. */
   public TextFormat withAlignment(Alignment align) {
-    return new TextFormat(this.font, this.wrapWidth, align);
+    return new TextFormat(this.font, this.wrapWidth, align, this.antialias);
+  }
+
+  /** Returns a clone of this text format with {@link #antialias} configured as specified. */
+  public TextFormat withAntialias(boolean antialias) {
+    return new TextFormat(this.font, this.wrapWidth, this.align, antialias);
   }
 
   @Override
@@ -118,5 +125,13 @@ public class TextFormat {
     int hash = align.hashCode() ^ (int)wrapWidth;
     if (font != null) hash ^= font.hashCode();
     return hash;
+  }
+
+  /** Creates a configured text format instance. */
+  private TextFormat(Font font, float wrapWidth, Alignment align, boolean antialias) {
+    this.font = font;
+    this.wrapWidth = wrapWidth;
+    this.align = align;
+    this.antialias = antialias;
   }
 }

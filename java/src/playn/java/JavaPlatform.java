@@ -74,11 +74,6 @@ public class JavaPlatform extends AbstractPlatform {
      * off the main thread so it doesn't cause slow frames.
      */
     public boolean convertImagesOnLoad = true;
-
-    /** If set, enable antialiased fonts when generating text layouts. By default, fonts are
-     * antialiased only if the JVM is verion 6 or less.
-     */
-    public boolean antialiasFonts = !isJava7();
   }
 
   /**
@@ -341,17 +336,6 @@ public class JavaPlatform extends AbstractPlatform {
       method.invoke(null, "javax.jnlp.PersistenceService");
       return true;
     } catch (Throwable ignored) {
-      return false;
-    }
-  }
-
-  protected static boolean isJava7 () {
-    try {
-      String[] ver = System.getProperty("java.version").split("\\.");
-      int major = Integer.parseInt(ver[0]);
-      int minor = Integer.parseInt(ver[1]);
-      return major > 1 || (major >= 1 && minor >= 7);
-    } catch (Exception ex) {
       return false;
     }
   }

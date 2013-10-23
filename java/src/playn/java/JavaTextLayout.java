@@ -16,6 +16,8 @@
 package playn.java;
 
 import java.awt.Graphics2D;
+import java.awt.RenderingHints;
+import java.awt.font.FontRenderContext;
 import java.awt.font.LineBreakMeasurer;
 import java.awt.font.TextAttribute;
 import java.awt.font.TextLayout;
@@ -49,8 +51,9 @@ class JavaTextLayout extends PaddedTextLayout {
       astring.addAttribute(TextAttribute.FONT, ((JavaFont)format.font).jfont);
     }
 
+    FontRenderContext frc = format.antialias ? gfx.aaFontContext : gfx.aFontContext;
     if (format.shouldWrap() || ltext.indexOf('\n') != -1) {
-      LineBreakMeasurer measurer = new LineBreakMeasurer(astring.getIterator(), gfx.fontContext);
+      LineBreakMeasurer measurer = new LineBreakMeasurer(astring.getIterator(), frc);
       char eol = '\n'; // TODO: platform line endings?
       int lastPos = ltext.length();
       while (measurer.getPosition() < lastPos) {
@@ -61,7 +64,7 @@ class JavaTextLayout extends PaddedTextLayout {
         layouts.add(measurer.nextLayout(format.wrapWidth, nextRet, false));
       }
     } else {
-      layouts.add(new TextLayout(astring.getIterator(), gfx.fontContext));
+      layouts.add(new TextLayout(astring.getIterator(), frc));
     }
 
     // some font glyphs start rendering at a negative inset, blowing outside their bounding box
@@ -129,18 +132,27 @@ class JavaTextLayout extends PaddedTextLayout {
 
   void paint(Graphics2D gfx, float x, float y, boolean stroke) {
     float yoff = y;
-    for (TextLayout layout : layouts) {
-      Rectangle2D bounds = layout.getBounds();
-      float sx = x + xAdjust + format.align.getX(getWidth(bounds), width);
-      yoff += layout.getAscent();
-      if (stroke) {
-        gfx.translate(sx, yoff);
-        gfx.draw(layout.getOutline(null));
-        gfx.translate(-sx, -yoff);
-      } else {
+    Object ohint = gfx.getRenderingHint(RenderingHints.KEY_ANTIALIASING);
+    try {
+      gfx.setRenderingHint(RenderingHints.KEY_ANTIALIASING, format.antialias ?
+                           RenderingHints.VALUE_ANTIALIAS_ON : RenderingHints.VALUE_ANTIALIAS_OFF);
+
+      for (TextLayout layout : layouts) {
+        Rectangle2D bounds = layout.getBounds();
+        float sx = x + xAdjust + format.align.getX(getWidth(bounds), width);
+        yoff += layout.getAscent();
+        if (stroke) {
+          gfx.translate(sx, yoff);
+          gfx.draw(layout.getOutline(null));
+          gfx.translate(-sx, -yoff);
+        } else {
           layout.draw(gfx, sx, yoff);
+        }
+        yoff += layout.getDescent() + layout.getLeading();
       }
-      yoff += layout.getDescent() + layout.getLeading();
+
+    } finally {
+      gfx.setRenderingHint(RenderingHints.KEY_ANTIALIASING, ohint);
     }
   }
 

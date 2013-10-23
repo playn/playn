@@ -15,8 +15,6 @@
  */
 package playn.core;
 
-import pythagoras.f.Rectangle;
-
 /**
  * A base {@link Canvas} implementation shared by all platforms.
  */
@@ -34,42 +32,8 @@ public abstract class AbstractCanvas implements Canvas {
     return height;
   }
 
-  @Override
-  public Canvas outlineText(TextLayout text, int textColor, int outlineColor, boolean underlined,
-    float x, float y) {
-    save();
-    if (underlined) {
-      for (int ii = 0; ii < text.lineCount(); ii++) {
-        Rectangle bounds = text.lineBounds(ii);
-        float sx = x + bounds.x + 1;
-        float sy = y + bounds.y + bounds.height();
-        setFillColor(outlineColor);
-        fillRect(sx - 1, sy - 1, bounds.width() + 3, 3);
-        setFillColor(textColor);
-        fillRect(sx, sy, bounds.width(), 1);
-      }
-    }
-    fillOutline(text, outlineColor, x, y);
-    setFillColor(textColor);
-    fillText(text, x+1, y+1);
-    restore();
-    return this;
-  }
-
   protected AbstractCanvas(float width, float height) {
     this.width = width;
     this.height = height;
-  }
-
-  protected void fillOutline(TextLayout text, int outlineColor, float x, float y) {
-    setFillColor(outlineColor);
-    fillText(text, x+0, y+0);
-    fillText(text, x+0, y+1);
-    fillText(text, x+0, y+2);
-    fillText(text, x+1, y+0);
-    fillText(text, x+1, y+2);
-    fillText(text, x+2, y+0);
-    fillText(text, x+2, y+1);
-    fillText(text, x+2, y+2);
   }
 }
