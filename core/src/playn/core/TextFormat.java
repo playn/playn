@@ -58,8 +58,8 @@ public class TextFormat {
   /** The alignment to use for multiline text. */
   public final Alignment align;
 
-  /** Whether or not the text should be antialiased. Defaults to true.
-   * TODO: only supported on Java platform right now. */
+  /** Whether or not the text should be antialiased. Defaults to true. NOTE: this is not supported
+   * by the HTML5 and Flash backends. */
   public final boolean antialias;
 
   /** Creates a default text format instance. */
