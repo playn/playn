@@ -81,26 +81,22 @@ class FlashTextLayout extends AbstractTextLayout {
 
   @Override
   public Rectangle lineBounds(int line) {
-    // TODO
-    return null;
+    throw new UnsupportedOperationException("Line bounds not supported in Flash backend."); // TODO
   }
 
   @Override
   public float ascent() {
-    // TODO
-    return 0;
+    throw new UnsupportedOperationException("Text ascent not supported in Flash backend."); // TODO
   }
 
   @Override
   public float descent() {
-    // TODO
-    return 0;
+    throw new UnsupportedOperationException("Text descent not supported in Flash backend."); // TODO
   }
 
   @Override
   public float leading() {
-    // TODO
-    return 0;
+    throw new UnsupportedOperationException("Text leading not supported in Flash backend."); // TODO
   }
 
   void stroke(FlashCanvas.Context2d ctx, float x, float y) {
