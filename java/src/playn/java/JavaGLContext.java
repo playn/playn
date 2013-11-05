@@ -21,6 +21,7 @@ import java.awt.image.DataBufferByte;
 import java.awt.image.DataBufferInt;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.Arrays;
 
 import org.lwjgl.LWJGLException;
 import org.lwjgl.opengl.Display;
@@ -29,6 +30,7 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 
 import playn.core.Asserts;
+import playn.core.PlayN;
 import playn.core.gl.GL20Context;
 
 class JavaGLContext extends GL20Context {
@@ -69,7 +71,7 @@ class JavaGLContext extends GL20Context {
   public void init() {
     try {
       Display.create();
-      super.viewWasResized();
+      super.viewConfigChanged();
       super.init();
     } catch (LWJGLException e) {
       throw new RuntimeException(e);
@@ -77,14 +79,77 @@ class JavaGLContext extends GL20Context {
   }
 
   @Override
-  protected void viewWasResized() {
+  public boolean isFullscreen () {
+    return Display.isFullscreen();
+  }
+
+  @Override
+  protected void viewConfigChanged() {
+    DisplayMode mode = null;
     try {
-      Display.setDisplayMode(new DisplayMode(defaultFbufWidth, defaultFbufHeight));
-    } catch (LWJGLException e) {
-      throw new RuntimeException(e);
+      int wid = defaultFbufWidth, hei = defaultFbufHeight;
+      boolean fullscreen = fullscreenPref == null ? isFullscreen() : fullscreenPref;
+      mode = Display.getDisplayMode();
+
+      // check if current mode is suitable
+      if (fullscreen == isFullscreen() && mode.getWidth() == wid && mode.getHeight() == hei) {
+        return;
+      }
+
+      if (fullscreen) {
+        // try and find a mode matching width and height
+        DisplayMode matching = null;
+        for (DisplayMode test : Display.getAvailableDisplayModes()) {
+          if (test.getWidth() == wid && test.getHeight() == hei &&
+              test.isFullscreenCapable()) {
+            matching = test;
+          }
+        }
+
+        if (matching == null) {
+          dlog("Could not find a matching fullscreen mode, available: " +
+              Arrays.asList(Display.getAvailableDisplayModes()));
+        } else {
+          mode = matching;
+        }
+
+      } else {
+        mode = new DisplayMode(wid, hei);
+      }
+
+      dlog("Updating display mode: " + mode + ", fullscreen: " + fullscreen);
+      // TODO: fix crashes when fullscreen is toggled repeatedly
+      if (fullscreen) {
+        Display.setDisplayModeAndFullscreen(mode);
+        // TODO: fix alt-tab, maybe add a key listener or something?
+      } else {
+        Display.setDisplayMode(mode);
+      }
+
+      mode = Display.getDisplayMode();
+
+    } catch (LWJGLException ex) {
+      throw new RuntimeException(ex);
     }
-    if (Display.isCreated())
-      super.viewWasResized();
+
+    if (Display.isCreated()) {
+      dlog("Rebinding for mode: " + mode);
+      super.viewConfigChanged();
+    }
+
+    dlog("Finished mode change: " + mode);
+  }
+
+  void dlog (String str) {
+    if (fullscreenPref == null) {
+      // don't clutter the log for uninteresting size changes
+      return;
+    }
+    if (PlayN.platform() == null) {
+      System.out.println(str);
+      return;
+    }
+    PlayN.log().info(str);
   }
 
   void updateTexture(int tex, BufferedImage image) {

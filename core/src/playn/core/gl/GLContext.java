@@ -67,6 +67,7 @@ public abstract class GLContext {
   protected final Stats stats = new Stats();
 
   protected final Platform platform;
+  protected Boolean fullscreenPref;
   private GLShader curShader;
   private int lastFramebuffer, epoch;
   private int pushedFramebuffer = -1, pushedWidth, pushedHeight;
@@ -89,12 +90,28 @@ public abstract class GLContext {
    * Sets the view width to the specified width and height (in pixels). The framebuffer will
    * potentially be larger than this size if a HiDPI scale factor is in effect.
    */
-  public void setSize(int width, int height) {
+  public final void setSize(int width, int height) {
+    setSize(width, height, null);
+  }
+
+  /** Sets the view size to the specified width and height (in pixels) and fullscreen preference.
+   * The framebuffer will potentially be larger than the size if a HiDPI scale factor is in
+   * effect.
+   * @param fullscreen (experimental) whether the caller wants to use the full screen, or
+   * null to do the default. If this is non-null, a displaymode change may be attempted. */
+  public void setSize(int width, int height, Boolean fullscreen) {
     viewWidth = width;
     viewHeight = height;
     curFbufWidth = defaultFbufWidth = scale.scaledCeil(width);
     curFbufHeight = defaultFbufHeight = scale.scaledCeil(height);
-    viewWasResized();
+    fullscreenPref = fullscreen;
+    viewConfigChanged();
+  }
+
+  /** Returns whether the display mode is set to full screen. */
+  public boolean isFullscreen () {
+    // default is never in fullscreen
+    return false;
   }
 
   /**
@@ -381,7 +398,7 @@ public abstract class GLContext {
     this.platform = platform;
   }
 
-  protected void viewWasResized () {
+  protected void viewConfigChanged () {
     bindFramebufferImpl(defaultFrameBuffer(), defaultFbufWidth, defaultFbufHeight);
   }
 
