@@ -12,8 +12,8 @@ object PlayNBuild extends samskivert.MavenBuild {
   )
   // avoid publishing our test projects to Ivy
   val testSettings = seq(
-    publishLocal := false,
-    publish := false
+    publishLocal := (),
+    publish := ()
   )
 
   def excludePath (path :String) :FileFilter = new FileFilter {
@@ -47,12 +47,7 @@ object PlayNBuild extends samskivert.MavenBuild {
         "com.novocode" % "junit-interface" % "0.7" % "test->default"
       )
     )
-    case "jbox2d" => srcDirSettings ++ seq(
-      // exclude GWT generator and supersource code
-      excludeFilter in unmanagedSources ~= {
-        _ || "PoolingStackGenerator.java" || excludePath("org/jbox2d/emul")
-      }
-    )
+    case "jbox2d" => srcDirSettings
     case "webgl" | "flash" | "ios" => srcDirSettings
     case "html" => srcDirSettings ++ seq(
       // exclude GWT supersource code
