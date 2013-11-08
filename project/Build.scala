@@ -1,7 +1,7 @@
 import java.io.File
 import sbt._
 import Keys._
-import net.thunderklaus.GwtPlugin._
+// import net.thunderklaus.GwtPlugin._
 
 object PlayNBuild extends samskivert.MavenBuild {
 
@@ -61,18 +61,18 @@ object PlayNBuild extends samskivert.MavenBuild {
     case "tests-assets" => testSettings
     case "tests-core" => testSettings
     case "tests-java" => testSettings ++ spray.revolver.RevolverPlugin.Revolver.settings
-    case "tests-html" => gwtSettings ++ testSettings ++ seq(
-      gwtVersion := pom.getAttr("gwt.version").get,
-      javaOptions in Gwt ++= Seq("-mx512M"), // give GWT mo' memory
-      libraryDependencies ++= Seq(
-        "org.mortbay.jetty" % "jetty" % "6.1.22" % "container",
-        "com.novocode" % "junit-interface" % "0.7" % "test->default"
-      )
-    )
+    // case "tests-html" => gwtSettings ++ testSettings ++ seq(
+    //   gwtVersion := pom.getAttr("gwt.version").get,
+    //   javaOptions in Gwt ++= Seq("-mx512M"), // give GWT mo' memory
+    //   libraryDependencies ++= Seq(
+    //     "org.mortbay.jetty" % "jetty" % "6.1.22" % "container",
+    //     "com.novocode" % "junit-interface" % "0.7" % "test->default"
+    //   )
+    // )
     case _ => Nil
   }
 
   override protected def projects (builder :samskivert.ProjectBuilder) =
     super.projects(builder) ++ Seq(builder("tests-assets"), builder("tests-core"),
-                                   builder("tests-java"), builder("tests-html"))
+                                   builder("tests-java") /*, builder("tests-html")*/)
 }

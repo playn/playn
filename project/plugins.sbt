@@ -9,4 +9,4 @@ libraryDependencies += "com.samskivert" % "sbt-pom-util" % "0.6-SNAPSHOT"
 addSbtPlugin("io.spray" % "sbt-revolver" % "0.7.1")
 
 // handles GWT stuff for test-html build (also pulls in xsbt-web-plugin)
-addSbtPlugin("net.thunderklaus" % "sbt-gwt-plugin" % "1.1-SNAPSHOT")
+// addSbtPlugin("net.thunderklaus" % "sbt-gwt-plugin" % "1.1-SNAPSHOT")
