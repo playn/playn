@@ -67,8 +67,8 @@ public class TextFormat {
     this(null, Float.MAX_VALUE, Alignment.LEFT, true);
   }
 
-  @Deprecated /** @deprecated Use {@link TextFormat()} and configuration methods. */
-  public TextFormat(Font font, float wrapWidth, Alignment align) {
+  /** @deprecated Use {@link TextFormat()} and configuration methods. */
+  @Deprecated public TextFormat(Font font, float wrapWidth, Alignment align) {
     this(font, wrapWidth, align, true);
   }
 
