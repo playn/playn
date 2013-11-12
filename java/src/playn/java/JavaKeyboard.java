@@ -15,6 +15,10 @@
  */
 package playn.java;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
@@ -26,10 +30,20 @@ import playn.core.Key;
 import playn.core.PlayN;
 import playn.core.util.Callback;
 
-class JavaKeyboard implements playn.core.Keyboard {
+public class JavaKeyboard implements playn.core.Keyboard {
   private Listener[] listeners = {null};
   // TODO: set this from somewhere?
   private JFrame frame;
+  private final List<Queued<?>> queue = Collections.synchronizedList(new ArrayList<Queued<?>>());
+  private final Dispatcher<Event> down = new Dispatcher<Event>() {
+    public void send (Listener l, Event e) { l.onKeyDown(e); }
+  };
+  private final Dispatcher<Event> up = new Dispatcher<Event>() {
+    public void send (Listener l, Event e) { l.onKeyUp(e); }
+  };
+  private final Dispatcher<TypedEvent> typed = new Dispatcher<TypedEvent>() {
+    public void send (Listener l, TypedEvent e) { l.onKeyTyped(e); }
+  };
 
   @Override
   public void setListener(Listener listener) {
@@ -48,11 +62,30 @@ class JavaKeyboard implements playn.core.Keyboard {
     callback.onSuccess((String) result);
   }
 
+  /** Posts a key event received from elsewhere (i.e. an AWT component). This is useful for
+   * applications that are using GL in Canvas mode and sharing keyboard focus with other (non-GL)
+   * components. The event will be queued and dispatched on the next frame, after GL keyboard
+   * events.
+   * <p><em>Note</em>: the resulting event will be sent with time = 0, since the GL event time
+   * is inaccessible and platform dependent.</p>
+   * @param key the key that was pressed or released, or null for a char typed event
+   * @param pressed whether the key was pressed or released, ignored if key is null
+   * @param typedCh the character that was typed, ignored if key is not null */
+  public void post (Key key, boolean pressed, char typedCh) {
+      queue.add(key == null ?
+        new Queued<TypedEvent>(new TypedEvent.Impl(new Events.Flags.Impl(), 0, typedCh), typed) :
+        new Queued<Event>(new Event.Impl(new Events.Flags.Impl(), 0, key), pressed ? down : up));
+  }
+
   void init() throws LWJGLException {
     Keyboard.create();
     // let our friend the touch emulator have key messages too
     if (PlayN.touch() instanceof JavaEmulatedTouch)
       listeners = new Listener[] {listeners[0], ((JavaEmulatedTouch)PlayN.touch()).keyListener};
+  }
+
+  private <E extends Events.Input> void dispatch (E e, Dispatcher<E> d) {
+    for (Listener l : listeners) if (l != null) d.send(l, e);
   }
 
   void update() {
@@ -62,24 +95,19 @@ class JavaKeyboard implements playn.core.Keyboard {
 
       if (Keyboard.getEventKeyState()) {
         Key key = translateKey(keyCode);
-        if (key != null) {
-          for (Listener l : listeners)
-            if (l != null)
-              l.onKeyDown(new Event.Impl(new Events.Flags.Impl(), time, key));
-        }
+        if (key != null)
+          dispatch(new Event.Impl(new Events.Flags.Impl(), time, key), down);
         char keyChar = Keyboard.getEventCharacter();
         if (!Character.isISOControl(keyChar))
-          for (Listener l : listeners)
-            if (l != null)
-              l.onKeyTyped(new TypedEvent.Impl(new Events.Flags.Impl(), time, keyChar));
+          dispatch(new TypedEvent.Impl(new Events.Flags.Impl(), time, keyChar), typed);
       } else {
         Key key = translateKey(keyCode);
         if (key != null)
-          for (Listener l : listeners)
-            if (l != null)
-              l.onKeyUp(new Event.Impl(new Events.Flags.Impl(), time, key));
+          dispatch(new Event.Impl(new Events.Flags.Impl(), time, key), up);
       }
     }
+    while (!queue.isEmpty())
+      queue.remove(0).dispatch();
   }
 
   private Key translateKey(int keyCode) {
@@ -219,5 +247,23 @@ class JavaKeyboard implements playn.core.Keyboard {
     }
 
     return null;
+  }
+
+  private interface Dispatcher<E extends Events.Input> {
+    void send (Listener l, E e);
+  }
+
+  private class Queued<E extends Events.Input> {
+    final E event;
+    final Dispatcher<E> dispatcher;
+
+    Queued (E event, Dispatcher<E> dispatcher) {
+      this.event = event;
+      this.dispatcher = dispatcher;
+    }
+
+    void dispatch () {
+      JavaKeyboard.this.dispatch(event, dispatcher);
+    }
   }
 }
