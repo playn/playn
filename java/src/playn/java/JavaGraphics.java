@@ -54,10 +54,8 @@ public class JavaGraphics extends GraphicsGL {
     // if we're being run in headless mode, create a stub GL context which does not trigger the
     // initialization of LWJGL; this allows tests to run against non-graphics services without
     // needing to configure LWJGL native libraries
-    this.ctx = config.headless ? new GL20Context(platform, null, config.scaleFactor, false) {
-      @Override
-      protected void viewConfigChanged () {}
-    } : new JavaGLContext(platform, config.scaleFactor);
+    this.ctx = config.headless ? new GL20Context(platform, null, config.scaleFactor, false) :
+      new JavaGLContext(platform, config.scaleFactor);
     this.rootLayer = new GroupLayerGL(ctx);
 
     // set up the dummy font contexts
@@ -68,7 +66,9 @@ public class JavaGraphics extends GraphicsGL {
     aGfx.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
     aFontContext = aGfx.getFontRenderContext();
 
-    setDisplayMode(config.width, config.height, false);
+    if (!config.headless) {
+      setDisplayMode(config.width, config.height, false);
+    }
   }
 
   /**
@@ -98,9 +98,8 @@ public class JavaGraphics extends GraphicsGL {
 
   protected void setDisplayMode(int width, int height, boolean fullscreen) {
     try {
-      DisplayMode mode = Display.getDisplayMode();
-
       // check if current mode is suitable
+      DisplayMode mode = Display.getDisplayMode();
       if (fullscreen == Display.isFullscreen() &&
           mode.getWidth() == width && mode.getHeight() == height)
         return;
@@ -109,8 +108,7 @@ public class JavaGraphics extends GraphicsGL {
         // try and find a mode matching width and height
         DisplayMode matching = null;
         for (DisplayMode test : Display.getAvailableDisplayModes()) {
-          if (test.getWidth() == width && test.getHeight() == height &&
-              test.isFullscreenCapable()) {
+          if (test.getWidth() == width && test.getHeight() == height && test.isFullscreenCapable()) {
             matching = test;
           }
         }
@@ -126,7 +124,7 @@ public class JavaGraphics extends GraphicsGL {
         mode = new DisplayMode(width, height);
       }
 
-      platform.log().info("Updating display mode: " + mode + ", fullscreen: " + fullscreen);
+      platform.log().debug("Updating display mode: " + mode + ", fullscreen: " + fullscreen);
       // TODO: fix crashes when fullscreen is toggled repeatedly
       if (fullscreen) {
         Display.setDisplayModeAndFullscreen(mode);

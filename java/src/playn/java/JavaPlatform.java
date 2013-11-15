@@ -114,6 +114,7 @@ public class JavaPlatform extends AbstractPlatform {
 
   public final boolean convertImagesOnLoad;
 
+  private final Config config;
   private final JavaAnalytics analytics = new JavaAnalytics();
   private final JavaAudio audio = new JavaAudio(this);
   private final JavaNet net = new JavaNet(this);
@@ -132,6 +133,7 @@ public class JavaPlatform extends AbstractPlatform {
 
   public JavaPlatform(Config config) {
     super(new JavaLog());
+    this.config = config;
     unpackNatives();
     graphics = createGraphics(config);
     keyboard = createKeyboard();
@@ -260,10 +262,12 @@ public class JavaPlatform extends AbstractPlatform {
 
   @Override
   public void run(final Game game) {
-    try {
-      Display.create();
-    } catch (LWJGLException e) {
-      throw new RuntimeException(e);
+    if (!config.headless) {
+      try {
+        Display.create();
+      } catch (LWJGLException e) {
+        throw new RuntimeException(e);
+      }
     }
     init(game);
 
