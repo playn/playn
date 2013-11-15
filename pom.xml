@@ -36,6 +36,7 @@
     <module>html</module>
     <module>ios</module>
     <module>java</module>
+    <module>swt-java</module>
     <module>payments</module>
     <module>server</module>
     <module>tests</module>

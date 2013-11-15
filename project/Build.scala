@@ -22,7 +22,7 @@ object PlayNBuild extends samskivert.MavenBuild {
 
   override val globalSettings = Seq(
     crossPaths   := false,
-    scalaVersion := "2.9.2",
+    scalaVersion := "2.10.1",
     javacOptions ++= Seq("-Xlint", "-Xlint:-serial", "-source", "1.6", "-target", "1.6"),
     javaOptions ++= Seq("-ea"),
     fork in Compile := true,
@@ -42,20 +42,24 @@ object PlayNBuild extends samskivert.MavenBuild {
         "com.novocode" % "junit-interface" % "0.7" % "test->default"
       )
     )
+    case "jbox2d" | "webgl" | "flash" | "ios" => srcDirSettings
     case "java" | "android" => srcDirSettings ++ seq(
       libraryDependencies ++= Seq(
         "com.novocode" % "junit-interface" % "0.7" % "test->default"
       )
     )
-    case "jbox2d" => srcDirSettings
-    case "webgl" | "flash" | "ios" => srcDirSettings
+    case "swt-java" => srcDirSettings ++ seq(
+      resolvers += "SWT Repo" at "https://swt-repo.googlecode.com/svn/repo/"
+    )
     case "html" => srcDirSettings ++ seq(
       // exclude GWT supersource code
       excludeFilter in unmanagedSources ~= { _ || excludePath("playn/super") }
     )
     case "tests-assets" => testSettings
     case "tests-core" => testSettings
-    case "tests-java" => testSettings ++ spray.revolver.RevolverPlugin.Revolver.settings
+    case "tests-java" => testSettings ++ spray.revolver.RevolverPlugin.Revolver.settings ++ seq(
+      javaOptions ++= Seq("-XstartOnFirstThread")
+    )
     // case "tests-html" => gwtSettings ++ testSettings ++ seq(
     //   gwtVersion := pom.getAttr("gwt.version").get,
     //   javaOptions in Gwt ++= Seq("-mx512M"), // give GWT mo' memory
