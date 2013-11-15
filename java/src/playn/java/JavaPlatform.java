@@ -35,7 +35,6 @@ import playn.core.Keyboard;
 import playn.core.Mouse;
 import playn.core.Net;
 import playn.core.PlayN;
-import playn.core.Pointer;
 import playn.core.RegularExpression;
 import playn.core.Storage;
 import playn.core.Touch;
@@ -121,7 +120,7 @@ public class JavaPlatform extends AbstractPlatform {
   private final JavaRegularExpression regex = new JavaRegularExpression();
   private final JavaStorage storage;
   private final JsonImpl json = new JsonImpl();
-  private final JavaKeyboard keyboard = new JavaKeyboard();
+  private final JavaKeyboard keyboard;
   private final JavaPointer pointer = new JavaPointer();
   private final TouchImpl touch;
   private final JavaGraphics graphics;
@@ -134,14 +133,15 @@ public class JavaPlatform extends AbstractPlatform {
   public JavaPlatform(Config config) {
     super(new JavaLog());
     unpackNatives();
-    graphics = new JavaGraphics(this, config);
+    graphics = createGraphics(config);
+    keyboard = createKeyboard();
     storage = new JavaStorage(this, config);
     if (config.emulateTouch) {
       JavaEmulatedTouch emuTouch = new JavaEmulatedTouch(config.multiTouchKey);
       mouse = emuTouch.createMouse(this);
       touch = emuTouch;
     } else {
-      mouse = new JavaMouse(this);
+      mouse = createMouse();
       touch = new TouchStub();
     }
 
@@ -193,7 +193,7 @@ public class JavaPlatform extends AbstractPlatform {
   }
 
   @Override
-  public Pointer pointer() {
+  public JavaPointer pointer() {
     return pointer;
   }
 
@@ -261,44 +261,50 @@ public class JavaPlatform extends AbstractPlatform {
   @Override
   public void run(final Game game) {
     try {
-      // initialize LWJGL (and show the display) now that the game has been initialized
-      graphics.init();
-      // now that the display is initialized we can init our mouse and keyboard
-      mouse.init();
-      keyboard.init();
+      Display.create();
     } catch (LWJGLException e) {
-      throw new RuntimeException("Unrecoverable initialization error", e);
+      throw new RuntimeException(e);
     }
-    game.init();
+    init(game);
 
     boolean wasActive = Display.isActive();
     while (!Display.isCloseRequested()) {
-      // Event handling.
-      mouse.update();
-      keyboard.update();
-      pointer.update();
-
       // Notify the app if lose or regain focus (treat said as pause/resume).
-      if (wasActive != Display.isActive()) {
+      boolean newActive = Display.isActive();
+      if (wasActive != newActive) {
         if (wasActive)
           onPause();
         else
           onResume();
-        wasActive = Display.isActive();
+        wasActive = newActive;
       }
-
-      // Execute any pending runnables.
-      runQueue.execute();
-
-      // Run the game loop, render the scene graph, and update the display.
-      game.tick(tick());
-      graphics.paint();
+      processFrame(game);
       Display.update();
-
       // Sleep until it's time for the next frame.
       Display.sync(60);
     }
 
+    shutdown();
+  }
+
+  protected JavaGraphics createGraphics(Config config) {
+    return new JavaGraphics(this, config);
+  }
+  protected JavaMouse createMouse() {
+    return new JavaLWJGLMouse(this);
+  }
+  protected JavaKeyboard createKeyboard() {
+    return new JavaLWJGLKeyboard();
+  }
+
+  protected void init(Game game) {
+    graphics.init();
+    mouse.init();
+    keyboard.init(touch);
+    game.init();
+  }
+
+  protected void shutdown() {
     // let the game run any of its exit hooks
     onExit();
 
@@ -312,6 +318,20 @@ public class JavaPlatform extends AbstractPlatform {
 
     // and finally stick a fork in the JVM
     System.exit(0);
+  }
+
+  protected void processFrame(Game game) {
+    // Event handling.
+    mouse.update();
+    keyboard.update();
+    pointer.update();
+
+    // Execute any pending runnables.
+    runQueue.execute();
+
+    // Run the game loop, render the scene graph, and update the display.
+    game.tick(tick());
+    graphics.paint();
   }
 
   protected void unpackNatives() {

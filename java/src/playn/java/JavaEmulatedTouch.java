@@ -50,7 +50,7 @@ public class JavaEmulatedTouch extends TouchImpl
   }
 
   JavaMouse createMouse (JavaPlatform platform) {
-    return new JavaMouse(platform) {
+    return new JavaLWJGLMouse(platform) {
 
       @Override public boolean hasMouse() {
         return false;
