@@ -29,25 +29,22 @@ object PlayNBuild extends samskivert.MavenBuild {
     autoScalaLibrary := false, // no scala-library dependency
     publishArtifact in (Compile, packageDoc) := false, // no scaladocs; it fails
     resolvers    += "Forplay Legacy" at "http://forplay.googlecode.com/svn/mavenrepo",
-    // no parallel test execution to avoid confusions
-    parallelExecution in Test := false
+    // wire junit into SBT
+    libraryDependencies ++= Seq(
+      "com.novocode" % "junit-interface" % "0.10" % "test->default"
+    ),
+    testOptions += Tests.Argument(TestFrameworks.JUnit, "-a", "-v"),
+    parallelExecution in Test := false // no parallel test execution to avoid confusions
   )
 
   override def moduleSettings (name :String, pom :pomutil.POM) = name match {
     case "core" => srcDirSettings ++ seq(
       unmanagedBase <<= baseDirectory { base => base / "disabled" },
       // tests depends on resource files mixed into source directory, yay!
-      unmanagedResourceDirectories in Test <+= baseDirectory / "tests",
-      libraryDependencies ++= Seq(
-        "com.novocode" % "junit-interface" % "0.7" % "test->default"
-      )
+      unmanagedResourceDirectories in Test <+= baseDirectory / "tests"
     )
     case "jbox2d" | "webgl" | "flash" | "ios" => srcDirSettings
-    case "java" | "android" => srcDirSettings ++ seq(
-      libraryDependencies ++= Seq(
-        "com.novocode" % "junit-interface" % "0.7" % "test->default"
-      )
-    )
+    case "java" | "android" => srcDirSettings
     case "swt-java" => srcDirSettings ++ seq(
       resolvers += "SWT Repo" at "https://swt-repo.googlecode.com/svn/repo/"
     )
@@ -64,8 +61,7 @@ object PlayNBuild extends samskivert.MavenBuild {
     //   gwtVersion := pom.getAttr("gwt.version").get,
     //   javaOptions in Gwt ++= Seq("-mx512M"), // give GWT mo' memory
     //   libraryDependencies ++= Seq(
-    //     "org.mortbay.jetty" % "jetty" % "6.1.22" % "container",
-    //     "com.novocode" % "junit-interface" % "0.7" % "test->default"
+    //     "org.mortbay.jetty" % "jetty" % "6.1.22" % "container"
     //   )
     // )
     case _ => Nil
