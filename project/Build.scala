@@ -54,7 +54,8 @@ object PlayNBuild extends samskivert.MavenBuild {
     )
     case "tests-assets" => testSettings
     case "tests-core" => testSettings
-    case "tests-java" => testSettings ++ spray.revolver.RevolverPlugin.Revolver.settings ++ seq(
+    case "tests-java" => testSettings ++ spray.revolver.RevolverPlugin.Revolver.settings
+    case "tests-swt-java" => testSettings ++ spray.revolver.RevolverPlugin.Revolver.settings ++ seq(
       javaOptions ++= Seq("-XstartOnFirstThread")
     )
     // case "tests-html" => gwtSettings ++ testSettings ++ seq(
@@ -69,5 +70,6 @@ object PlayNBuild extends samskivert.MavenBuild {
 
   override protected def projects (builder :samskivert.ProjectBuilder) =
     super.projects(builder) ++ Seq(builder("tests-assets"), builder("tests-core"),
-                                   builder("tests-java") /*, builder("tests-html")*/)
+                                   builder("tests-java"), builder("tests-swt-java")
+                                   /*, builder("tests-html")*/)
 }
