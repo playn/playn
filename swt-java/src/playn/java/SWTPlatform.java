@@ -82,6 +82,6 @@ public class SWTPlatform extends JavaPlatform {
   }
 
   @Override protected JavaKeyboard createKeyboard() {
-    return new SWTKeyboard();
+    return new SWTKeyboard(this);
   }
 }
