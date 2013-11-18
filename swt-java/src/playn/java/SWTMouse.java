@@ -1,9 +1,7 @@
 package playn.java;
 
 import org.eclipse.swt.*;
-import org.eclipse.swt.layout.*;
 import org.eclipse.swt.widgets.*;
-import org.eclipse.swt.events.*;
 
 import pythagoras.f.Point;
 
@@ -36,6 +34,12 @@ public class SWTMouse extends JavaMouse {
         onMouseMove(event.time, xy.x, xy.y, dx, dy);
       }
       private float lastX, lastY;
+    });
+    platform.display.addFilter(SWT.MouseWheel, new org.eclipse.swt.widgets.Listener() {
+      public void handleEvent (Event event) {
+        Point xy = scaleCoord(event);
+        onMouseWheelScroll(event.time, xy.x, xy.y, -event.count);
+      }
     });
   }
 
