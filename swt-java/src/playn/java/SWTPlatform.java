@@ -3,12 +3,9 @@ package playn.java;
 import org.eclipse.swt.*;
 import org.eclipse.swt.layout.*;
 import org.eclipse.swt.widgets.*;
-import org.eclipse.swt.graphics.*;
 import org.eclipse.swt.events.*;
 
 import playn.core.Game;
-import playn.core.Keyboard;
-import playn.core.Mouse;
 import playn.core.PlayN;
 
 public class SWTPlatform extends JavaPlatform {
