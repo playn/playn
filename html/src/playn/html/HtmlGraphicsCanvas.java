@@ -62,12 +62,12 @@ class HtmlGraphicsCanvas extends HtmlGraphics {
 
   @Override
   public int width() {
-    return (int)scale.invScaled(elem.getOffsetWidth());
+    return scale.invScaledFloor(elem.getOffsetWidth());
   }
 
   @Override
   public int height() {
-    return (int)scale.invScaled(elem.getOffsetHeight());
+    return scale.invScaledFloor(elem.getOffsetHeight());
   }
 
   @Override

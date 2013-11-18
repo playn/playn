@@ -83,6 +83,16 @@ public class Scale {
     return length/factor;
   }
 
+  /** Returns the supplied length inverse scaled by our scale factor and rounded down. */
+  public int invScaledFloor(float length) {
+    return MathUtil.ifloor(invScaled(length));
+  }
+
+  /** Returns the supplied length inverse scaled by our scale factor and rounded up. */
+  public int invScaledCeil(float length) {
+    return MathUtil.iceil(invScaled(length));
+  }
+
   /**
    * Returns an ordered series of scaled resources to try when loading an asset. The highest
    * resolution will be tried first, then half that resolution and so forth down to a normal
