@@ -38,6 +38,7 @@ public class JavaLWJGLKeyboard extends JavaKeyboard {
     callback.onSuccess((String) result);
   }
 
+  @Override
   void init(Touch touch) {
     try {
       Keyboard.create();
@@ -47,6 +48,7 @@ public class JavaLWJGLKeyboard extends JavaKeyboard {
     super.init(touch);
   }
 
+  @Override
   void update() {
     while (Keyboard.next()) {
       double time = (double) (Keyboard.getEventNanoseconds() / 1000);
