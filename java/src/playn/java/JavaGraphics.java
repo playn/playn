@@ -67,7 +67,7 @@ public class JavaGraphics extends GraphicsGL {
     aFontContext = aGfx.getFontRenderContext();
 
     if (!config.headless) {
-      setDisplayMode(config.width, config.height, false);
+      setDisplayMode(ctx.scale.scaledCeil(config.width), ctx.scale.scaledCeil(config.height), false);
     }
   }
 
@@ -92,7 +92,8 @@ public class JavaGraphics extends GraphicsGL {
    * Changes the size of the PlayN window.
    */
   public void setSize(int width, int height, boolean fullscreen) {
-    setDisplayMode(width, height, fullscreen);
+    int swidth = ctx.scale.scaledCeil(width), sheight = ctx.scale.scaledCeil(height);
+    setDisplayMode(swidth, sheight, fullscreen);
     ctx.setSize(width, height);
   }
 
@@ -176,12 +177,12 @@ public class JavaGraphics extends GraphicsGL {
 
   @Override
   public int screenWidth() {
-    return Display.getDesktopDisplayMode().getWidth();
+    return ctx.scale.invScaledFloor(Display.getDesktopDisplayMode().getWidth());
   }
 
   @Override
   public int screenHeight() {
-    return Display.getDesktopDisplayMode().getHeight();
+    return ctx.scale.invScaledFloor(Display.getDesktopDisplayMode().getHeight());
   }
 
   @Override
@@ -204,7 +205,8 @@ public class JavaGraphics extends GraphicsGL {
 
   protected void init() {
     DisplayMode mode = Display.getDisplayMode();
-    ctx.setSize(mode.getWidth(), mode.getHeight());
+    ctx.setSize(ctx.scale.invScaledFloor(mode.getWidth()),
+                ctx.scale.invScaledFloor(mode.getHeight()));
     ctx.init();
   }
 
