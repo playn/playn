@@ -55,6 +55,14 @@ public class SWTPlatform extends JavaPlatform {
     shutdown();
   }
 
+  public Shell shell () {
+    return shell;
+  }
+
+  public Composite composite () {
+    return comp;
+  }
+
   protected SWTPlatform (Config config) {
     super(config);
   }

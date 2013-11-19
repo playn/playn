@@ -50,7 +50,7 @@ public class SWTKeyboard extends JavaKeyboard {
     });
   }
 
-  private Key translateKey(int keyCode) {
+  public Key translateKey(int keyCode) {
     switch (keyCode) {
     case SWT.ALT             : return Key.ALT;
     case SWT.ARROW_DOWN      : return Key.DOWN;
