@@ -243,7 +243,7 @@ public class IOSCanvas extends AbstractCanvasGL<CGBitmapContext> {
       maskContext.ScaleCTM(ctx.scale.factor, ctx.scale.factor);
       // fill the text into this temp context in white for use as a mask
       maskContext.SetFillColor(toCGColor(0xFFFFFFFF));
-      ilayout.fill(maskContext, x, y);
+      ilayout.fill(maskContext, 0, 0);
 
       // now fill the gradient, using our temp context as a mask
       bctx.SaveState();
