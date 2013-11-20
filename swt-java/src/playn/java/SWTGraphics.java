@@ -13,7 +13,7 @@ import org.lwjgl.LWJGLException;
 public class SWTGraphics extends JavaGraphics {
 
   private final SWTPlatform platform;
-  private GLCanvas canvas; // initialized in createGLContext
+  GLCanvas canvas; // initialized in createGLContext
 
   public SWTGraphics (SWTPlatform platform, JavaPlatform.Config config, final Composite comp) {
     super(platform, config);

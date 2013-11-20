@@ -55,6 +55,11 @@ public class SWTPlatform extends JavaPlatform {
     shutdown();
   }
 
+  @Override
+  public SWTGraphics graphics () {
+    return (SWTGraphics)super.graphics();
+  }
+
   public Shell shell () {
     return shell;
   }

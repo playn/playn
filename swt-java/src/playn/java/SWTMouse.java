@@ -17,28 +17,36 @@ public class SWTMouse extends JavaMouse {
   public void init() {
     platform.display.addFilter(SWT.MouseDown, new org.eclipse.swt.widgets.Listener() {
       public void handleEvent (Event event) {
-        Point xy = scaleCoord(event);
-        onMouseDown(event.time, xy.x, xy.y, mapButton(event.button));
+        if (event.widget == platform.graphics().canvas) {
+          Point xy = scaleCoord(event);
+          onMouseDown(event.time, xy.x, xy.y, mapButton(event.button));
+        }
       }
     });
     platform.display.addFilter(SWT.MouseUp, new org.eclipse.swt.widgets.Listener() {
       public void handleEvent (Event event) {
-        Point xy = scaleCoord(event);
-        onMouseUp(event.time, xy.x, xy.y, mapButton(event.button));
+        if (event.widget == platform.graphics().canvas) {
+          Point xy = scaleCoord(event);
+          onMouseUp(event.time, xy.x, xy.y, mapButton(event.button));
+        }
       }
     });
     platform.display.addFilter(SWT.MouseMove, new org.eclipse.swt.widgets.Listener() {
       public void handleEvent (Event event) {
-        Point xy = scaleCoord(event);
-        float dx = xy.x - lastX, dy = xy.y - lastY;
-        onMouseMove(event.time, xy.x, xy.y, dx, dy);
+        if (event.widget == platform.graphics().canvas) {
+          Point xy = scaleCoord(event);
+          float dx = xy.x - lastX, dy = xy.y - lastY;
+          onMouseMove(event.time, xy.x, xy.y, dx, dy);
+        }
       }
       private float lastX, lastY;
     });
     platform.display.addFilter(SWT.MouseWheel, new org.eclipse.swt.widgets.Listener() {
       public void handleEvent (Event event) {
-        Point xy = scaleCoord(event);
-        onMouseWheelScroll(event.time, xy.x, xy.y, -event.count);
+        if (event.widget == platform.graphics().canvas) {
+          Point xy = scaleCoord(event);
+          onMouseWheelScroll(event.time, xy.x, xy.y, -event.count);
+        }
       }
     });
   }
