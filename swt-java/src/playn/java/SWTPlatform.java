@@ -10,7 +10,10 @@ import playn.core.PlayN;
 
 public class SWTPlatform extends JavaPlatform {
 
-  // initialized in createGraphics(), sigh
+  protected static final long FRAME_MILLIS = 1000/60; // TODO: allow config?
+  private long lastFrame;
+
+  // these are initialized in createGraphics(), sigh
   Display display;
   Shell shell;
   Composite comp;
@@ -30,25 +33,24 @@ public class SWTPlatform extends JavaPlatform {
   public void run(final Game game) {
     init(game);
 
-    final Runnable run = new Runnable() {
-      public void run () {
-        if (!((SWTGraphics)graphics()).isDisposed()) {
-          processFrame(game);
-          display.asyncExec(this);
-        }
-      }
-    };
     // canvas.addListener(SWT.Paint, new Listener() {
     //   public void handleEvent (Event event) {
     //     run.run();
     //   }
     // });
-    display.asyncExec(run);
     shell.open();
 
     while (!shell.isDisposed()) {
-      if (!display.readAndDispatch())
-        display.sleep();
+      long now = tick();
+      if (now - lastFrame >= FRAME_MILLIS) {
+        processFrame(game);
+        lastFrame = now;
+      }
+      if (!display.readAndDispatch()) {
+        try {
+          Thread.sleep(1);
+        } catch (InterruptedException ie) {} // no problem!
+      }
     }
     display.dispose();
 

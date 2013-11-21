@@ -42,10 +42,6 @@ public class SWTGraphics extends JavaGraphics {
     platform.shell.setSize(ctx.scale.scaledCeil(config.width), ctx.scale.scaledCeil(config.height));
   }
 
-  boolean isDisposed () {
-    return canvas.isDisposed();
-  }
-
   @Override
   public void setSize(int width, int height, boolean fullscreen) {
     int rawWidth = ctx.scale.scaledCeil(width), rawHeight = ctx.scale.scaledCeil(height);
