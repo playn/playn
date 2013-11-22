@@ -151,7 +151,9 @@ public class JavaPlatform extends AbstractPlatform {
       touch = new TouchStub();
     }
 
-    setTitle(config.appName);
+    if (!config.headless) {
+      setTitle(config.appName);
+    }
     convertImagesOnLoad = config.convertImagesOnLoad;
   }
 
