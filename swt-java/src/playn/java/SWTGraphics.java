@@ -33,20 +33,22 @@ public class SWTGraphics extends JavaGraphics {
         comp.setBounds(bounds);
         canvas.setBounds(bounds);
         makeCurrent();
-        SWTGraphics.this.platform.log().info("Resized " + bounds.width + "x" + bounds.height);
+        // SWTGraphics.this.platform.log().info("Resized " + bounds.width + "x" + bounds.height);
         ctx.setSize(ctx.scale.invScaledFloor(bounds.width), ctx.scale.invScaledFloor(bounds.height));
       }
     });
 
-    platform.log().info("Setting size " + config.width + "x" + config.height);
-    platform.shell.setSize(ctx.scale.scaledCeil(config.width), ctx.scale.scaledCeil(config.height));
+    // platform.log().info("Setting size " + config.width + "x" + config.height);
+    platform.comp.setSize(ctx.scale.scaledCeil(config.width), ctx.scale.scaledCeil(config.height));
+    platform.shell.pack();
   }
 
   @Override
   public void setSize(int width, int height, boolean fullscreen) {
     int rawWidth = ctx.scale.scaledCeil(width), rawHeight = ctx.scale.scaledCeil(height);
-    platform.shell.setSize(rawWidth, rawHeight);
+    platform.comp.setSize(rawWidth, rawHeight);
     platform.shell.setFullScreen(fullscreen);
+    platform.shell.pack();
   }
 
   public GLCanvas canvas () {
