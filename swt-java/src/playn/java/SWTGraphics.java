@@ -49,6 +49,10 @@ public class SWTGraphics extends JavaGraphics {
     platform.shell.setFullScreen(fullscreen);
   }
 
+  public GLCanvas canvas () {
+    return canvas;
+  }
+
   @Override
   protected void init() {
     // don't call super here, as we don't want to init LWJGL
