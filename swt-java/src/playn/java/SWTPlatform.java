@@ -75,10 +75,11 @@ public class SWTPlatform extends JavaPlatform {
   }
 
   @Override protected JavaGraphics createGraphics (Config config) {
+    Display.setAppName(config.appName);
     display = new Display();
     shell = new Shell(display);
     shell.setLayout(new FillLayout());
-    shell.setText("Game");
+    shell.setText(config.appName);
     shell.addShellListener(new ShellAdapter() {
       public void shellActivated (ShellEvent e) {
         onResume();

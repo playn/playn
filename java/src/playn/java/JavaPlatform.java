@@ -73,6 +73,10 @@ public class JavaPlatform extends AbstractPlatform {
      * off the main thread so it doesn't cause slow frames.
      */
     public boolean convertImagesOnLoad = true;
+
+    /** If supported by the backend and platform, configures the application's name and initial
+     * window title. Currently only supported for SWT backend. */
+    public String appName = "Game";
   }
 
   /**
@@ -133,6 +137,7 @@ public class JavaPlatform extends AbstractPlatform {
 
   public JavaPlatform(Config config) {
     super(new JavaLog());
+    Display.setTitle(config.appName);
     this.config = config;
     unpackNatives();
     graphics = createGraphics(config);
