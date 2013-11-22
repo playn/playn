@@ -139,7 +139,6 @@ public class JavaPlatform extends AbstractPlatform {
     super(new JavaLog());
     this.config = config;
     unpackNatives();
-    Display.setTitle(config.appName);
     graphics = createGraphics(config);
     keyboard = createKeyboard();
     storage = new JavaStorage(this, config);
@@ -152,6 +151,7 @@ public class JavaPlatform extends AbstractPlatform {
       touch = new TouchStub();
     }
 
+    setTitle(config.appName);
     convertImagesOnLoad = config.convertImagesOnLoad;
   }
 

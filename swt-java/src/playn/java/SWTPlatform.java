@@ -79,7 +79,6 @@ public class SWTPlatform extends JavaPlatform {
     display = new Display();
     shell = new Shell(display);
     shell.setLayout(new FillLayout());
-    shell.setText(config.appName);
     shell.addShellListener(new ShellAdapter() {
       public void shellActivated (ShellEvent e) {
         onResume();
