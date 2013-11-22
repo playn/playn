@@ -137,9 +137,9 @@ public class JavaPlatform extends AbstractPlatform {
 
   public JavaPlatform(Config config) {
     super(new JavaLog());
-    Display.setTitle(config.appName);
     this.config = config;
     unpackNatives();
+    Display.setTitle(config.appName);
     graphics = createGraphics(config);
     keyboard = createKeyboard();
     storage = new JavaStorage(this, config);
