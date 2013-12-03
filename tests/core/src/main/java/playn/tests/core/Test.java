@@ -51,6 +51,10 @@ public abstract class Test {
     return false;
   }
 
+  public boolean available () {
+    return true;
+  }
+
   protected float addTest(float lx, float ly, Layer.HasSize layer, String descrip) {
     return addTest(lx, ly, layer, descrip, layer.width());
   }

@@ -15,10 +15,20 @@
  */
 package playn.tests.java;
 
-import playn.core.PlayN;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.lwjgl.LWJGLException;
+import org.lwjgl.opengl.Display;
+import org.lwjgl.opengl.DisplayMode;
+
+import playn.java.SWTGraphics;
 import playn.java.SWTPlatform;
 
 import playn.tests.core.TestsGame;
+
+import static playn.core.PlayN.*;
+import static playn.tests.core.FullscreenTest.*;
 
 public class TestsGameJava {
 
@@ -31,6 +41,38 @@ public class TestsGameJava {
     config.height = 600;
     SWTPlatform platform = SWTPlatform.register(config);
     platform.setTitle("Tests");
-    PlayN.run(new TestsGame());
+
+    // plug in a lwjgl implementation for fullscreen test
+    setHost(new LWJGLFullscreen());
+
+    run(new TestsGame());
+  }
+
+  public static class LWJGLFullscreen implements Host {
+    @Override public void setMode (Mode mode) {
+      ((SWTGraphics)graphics()).setSize(mode.width, mode.height, true);
+    }
+
+    @Override public Mode[] enumerateModes () {
+      List<Mode> modes = new ArrayList<Mode>();
+      try {
+        DisplayMode desktop = Display.getDesktopDisplayMode();
+        int bpp = desktop.getBitsPerPixel();
+        for (DisplayMode dmode : Display.getAvailableDisplayModes()) {
+          if (dmode.getBitsPerPixel() != bpp) {
+            continue;
+          }
+          Mode mode = new Mode();
+          mode.width = dmode.getWidth();
+          mode.height = dmode.getHeight();
+          mode.depth = dmode.getBitsPerPixel();
+          modes.add(mode);
+        }
+      }
+      catch (LWJGLException ex) {
+        throw new RuntimeException(ex);
+      }
+      return modes.toArray(new Mode[modes.size()]);
+    }
   }
 }
