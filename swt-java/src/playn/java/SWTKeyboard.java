@@ -61,6 +61,7 @@ public class SWTKeyboard extends JavaKeyboard {
     case SWT.CAPS_LOCK       : return Key.CAPS_LOCK;
     case SWT.COMMAND         : return Key.META;
     case SWT.CONTROL         : return Key.CONTROL;
+    case SWT.DEL             : return Key.DELETE;
     case SWT.END             : return Key.END;
     case SWT.ESC             : return Key.ESCAPE;
     case SWT.F1              : return Key.F1;
