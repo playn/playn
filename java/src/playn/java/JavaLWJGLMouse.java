@@ -71,8 +71,7 @@ class JavaLWJGLMouse extends JavaMouse {
         if (Mouse.getEventButtonState()) {
           onMouseDown(time, m.x, m.y, btn);
         } else {
-          onMouseUp(new ButtonEvent.Impl(new Events.Flags.Impl(), time, m.x, m.y, btn));
-          pointer.onMouseUp(time, m.x, m.y);
+          onMouseUp(time, m.x, m.y, btn);
         }
       } else if (Mouse.getEventDWheel() != 0) {
         int delta = Mouse.getEventDWheel() > 0 ? -1 : 1;
