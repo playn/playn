@@ -22,7 +22,7 @@ import playn.core.MouseImpl;
 abstract class JavaMouse extends MouseImpl {
 
   protected final JavaPlatform platform;
-  protected final JavaPointer pointer;
+  private final JavaPointer pointer;
 
   public JavaMouse(JavaPlatform platform) {
     this.platform = platform;
@@ -34,12 +34,14 @@ abstract class JavaMouse extends MouseImpl {
 
   protected void onMouseDown(double time, float x, float y, int btn) {
     onMouseDown(new ButtonEvent.Impl(new Events.Flags.Impl(), time, x, y, btn));
-    pointer.onMouseDown(time, x, y);
+    if (btn == 0)
+      pointer.onMouseDown(time, x, y);
   }
 
   protected void onMouseUp(double time, float x, float y, int btn) {
     onMouseUp(new ButtonEvent.Impl(new Events.Flags.Impl(), time, x, y, btn));
-    pointer.onMouseUp(time, x, y);
+    if (btn == 0)
+      pointer.onMouseUp(time, x, y);
   }
 
   protected void onMouseMove(double time, float x, float y, float dx, float dy) {
