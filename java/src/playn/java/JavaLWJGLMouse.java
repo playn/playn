@@ -21,8 +21,6 @@ import org.lwjgl.opengl.Display;
 
 import pythagoras.f.Point;
 
-import playn.core.Events;
-
 class JavaLWJGLMouse extends JavaMouse {
 
   public JavaLWJGLMouse(JavaPlatform platform) {
