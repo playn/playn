@@ -23,6 +23,9 @@ import pythagoras.f.Rectangle;
  */
 public interface TextLayout {
 
+  /** The text that was laid out. */
+  String text();
+
   /** The width of the bounding box that contains all of the rendered text. */
   float width();
 

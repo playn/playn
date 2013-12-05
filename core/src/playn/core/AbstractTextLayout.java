@@ -20,9 +20,15 @@ package playn.core;
  */
 public abstract class AbstractTextLayout implements TextLayout {
 
+  protected final String text;
   protected final TextFormat format;
 
   protected float width, height;
+
+  @Override
+  public String text() {
+    return text;
+  }
 
   @Override
   public float width() {
@@ -40,6 +46,7 @@ public abstract class AbstractTextLayout implements TextLayout {
   }
 
   protected AbstractTextLayout (String text, TextFormat format) {
+    this.text = text;
     this.format = format;
   }
 }
