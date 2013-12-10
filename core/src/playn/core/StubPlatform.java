@@ -40,7 +40,6 @@ import playn.core.util.Callback;
  * <li> {@link #mouse} - allows listener registration, never generates events
  * <li> {@link #touch} - allows listener registration, never generates events
  * <li> {@link #keyboard} - allows listener registration, never generates events
- * <li> {@link #uiOverlay} - returns a UIOverlayStub
  * </ul>
  */
 public class StubPlatform implements Platform {
@@ -210,10 +209,5 @@ public class StubPlatform implements Platform {
   @Override
   public RegularExpression regularExpression() {
     throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public UIOverlay uiOverlay() {
-    return new UIOverlayStub();
   }
 }

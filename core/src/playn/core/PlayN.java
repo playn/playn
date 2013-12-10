@@ -203,13 +203,6 @@ public class PlayN {
   }
 
   /**
-   * Returns the {@link UIOverlay} uiOverlay service.
-   */
-  public static UIOverlay uiOverlay() {
-    return platform.uiOverlay();
-  }
-
-  /**
    * Configures the current {@link Platform}. Do not call this directly unless you're implementing
    * a new platform.
    */

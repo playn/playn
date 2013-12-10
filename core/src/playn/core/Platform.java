@@ -65,6 +65,4 @@ public interface Platform {
   Analytics analytics();
 
   RegularExpression regularExpression();
-
-  UIOverlay uiOverlay();
 }

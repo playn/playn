@@ -32,6 +32,7 @@ import cli.MonoTouch.UIKit.UIApplication;
 import cli.MonoTouch.UIKit.UIDeviceOrientation;
 import cli.MonoTouch.UIKit.UIInterfaceOrientation;
 import cli.MonoTouch.UIKit.UIScreen;
+import cli.MonoTouch.UIKit.UIView;
 import cli.MonoTouch.UIKit.UIViewController;
 import cli.MonoTouch.UIKit.UIWindow;
 
@@ -89,6 +90,11 @@ public class IOSPlatform extends AbstractPlatform {
     SupportedOrients(int defaultOrient) {
       this.defaultOrient = UIDeviceOrientation.wrap(defaultOrient);
     }
+  }
+
+  // TODO: this should be generalized and shared among platforms that do orientation
+  public interface OrientationChangeListener {
+    void orientationChanged(CGAffineTransform trans, boolean landscape);
   }
 
   /** Used to configure the iOS platform. */
@@ -168,10 +174,11 @@ public class IOSPlatform extends AbstractPlatform {
   private final UIWindow mainWindow;
   private final IOSRootViewController rootViewController;
   private final IOSGameView gameView;
-  private final IOSUIOverlay uiOverlay;
   private final long start = DateTime.get_Now().get_Ticks();
 
   private int currentOrientation;
+
+  private OrientationChangeListener orientationChangeListener;
 
   /** Returns the top-level UIWindow. */
   public UIWindow window () {
@@ -181,16 +188,6 @@ public class IOSPlatform extends AbstractPlatform {
   /** Returns the controller for the root view. */
   public UIViewController rootViewController() {
     return rootViewController;
-  }
-
-  /**
-   * Returns a view to which native overlays may be added. This view will be properly oriented when
-   * the device orientation changes, so views added to it will also be correctly oriented without
-   * additional effort on the part of the caller.
-   */
-  @Override
-  public IOSUIOverlay uiOverlay() {
-    return uiOverlay;
   }
 
   protected IOSPlatform(UIApplication app, Config config) {
@@ -225,9 +222,6 @@ public class IOSPlatform extends AbstractPlatform {
     gameView = new IOSGameView(this, bounds, deviceScale);
     rootViewController = new IOSRootViewController(this, gameView);
     mainWindow.set_RootViewController(rootViewController);
-
-    uiOverlay = new IOSUIOverlay(bounds);
-    gameView.Add(uiOverlay);
 
     // if the game supplied a proper delegate, configure it (for lifecycle notifications)
     if (app.get_Delegate() instanceof IOSApplicationDelegate)
@@ -373,6 +367,15 @@ public class IOSPlatform extends AbstractPlatform {
     mainWindow.MakeKeyAndVisible();
   }
 
+  public UIView gameView () {
+    return gameView;
+  }
+
+  public void setOrientationChangeListener (OrientationChangeListener listener) {
+    orientationChangeListener = listener;
+    dispatchOrientationChange(currentOrientation);
+  }
+
   // make these accessible to IOSApplicationDelegate
   @Override
   protected void onPause() {
@@ -400,11 +403,22 @@ public class IOSPlatform extends AbstractPlatform {
 
     currentOrientation = orientation.Value;
     graphics.setOrientation(orientation);
+
     UIInterfaceOrientation sorient = ORIENT_MAP.get(orientation);
+    if (!sorient.equals(app.get_StatusBarOrientation())) {
+      app.SetStatusBarOrientation(sorient, !app.get_StatusBarHidden());
+    }
+    dispatchOrientationChange(orientation.Value);
+  }
+
+  void dispatchOrientationChange (int orientationValue) {
+    if (orientationChangeListener == null) {
+        return;
+    }
 
     CGAffineTransform trans = CGAffineTransform.MakeIdentity();
     boolean landscape = false;
-    switch (orientation.Value) {
+    switch (orientationValue) {
     default:
     case UIDeviceOrientation.Portrait:
       break;
@@ -420,23 +434,8 @@ public class IOSPlatform extends AbstractPlatform {
       trans.Rotate(-FloatMath.PI / 2);
       break;
     }
-    uiOverlay().set_Transform(trans);
 
-    RectangleF overlayBounds = uiOverlay().get_Bounds();
-    if ((overlayBounds.get_Width() > overlayBounds.get_Height()) != landscape) {
-      // swap the width and height
-      float width = overlayBounds.get_Width();
-      overlayBounds.set_Width(overlayBounds.get_Height());
-      overlayBounds.set_Height(width);
-      uiOverlay().set_Bounds(overlayBounds);
-    }
-    // update the overlay's hidden area, if any
-    uiOverlay.updateHidden();
-
-    if (!sorient.equals(app.get_StatusBarOrientation())) {
-      app.SetStatusBarOrientation(sorient, !app.get_StatusBarHidden());
-    }
-    // TODO: notify the game of the orientation change
+    orientationChangeListener.orientationChanged(trans, landscape);
   }
 
   void update() {
