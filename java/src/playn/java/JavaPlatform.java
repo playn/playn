@@ -142,13 +142,11 @@ public class JavaPlatform extends AbstractPlatform {
     graphics = createGraphics(config);
     keyboard = createKeyboard();
     storage = new JavaStorage(this, config);
-    if (config.emulateTouch) {
-      JavaEmulatedTouch emuTouch = new JavaEmulatedTouch(config.multiTouchKey);
-      mouse = emuTouch.createMouse(this);
-      touch = emuTouch;
+    touch = createTouch(config);
+    if (touch instanceof JavaEmulatedTouch) {
+      mouse = ((JavaEmulatedTouch)touch).createMouse(this);
     } else {
       mouse = createMouse();
-      touch = new TouchStub();
     }
 
     if (!config.headless) {
@@ -300,6 +298,13 @@ public class JavaPlatform extends AbstractPlatform {
 
   protected JavaGraphics createGraphics(Config config) {
     return new JavaGraphics(this, config);
+  }
+  protected TouchImpl createTouch(Config config) {
+    if (config.emulateTouch) {
+      return new JavaEmulatedTouch(config.multiTouchKey);
+    } else {
+      return new TouchStub();
+    }
   }
   protected JavaMouse createMouse() {
     return new JavaLWJGLMouse(this);

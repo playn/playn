@@ -7,6 +7,7 @@ import org.eclipse.swt.events.*;
 
 import playn.core.Game;
 import playn.core.PlayN;
+import playn.core.TouchImpl;
 
 public class SWTPlatform extends JavaPlatform {
 
@@ -90,6 +91,14 @@ public class SWTPlatform extends JavaPlatform {
     comp = new Composite(shell, SWT.NONE);
     comp.setLayout(null);
     return new SWTGraphics(this, config, comp);
+  }
+
+  @Override protected TouchImpl createTouch (Config config) {
+    if (config.emulateTouch) {
+      return new SWTEmulatedTouch(config.multiTouchKey);
+    } else {
+      return super.createTouch(config);
+    }
   }
 
   @Override protected JavaMouse createMouse() {
