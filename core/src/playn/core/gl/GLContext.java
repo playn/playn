@@ -292,7 +292,6 @@ public abstract class GLContext {
       checkGLError("flush()");
       curShader.flush();
       if (deactivate) curShader.deactivate();
-      curShader = null;
     }
   }
 
