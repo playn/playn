@@ -26,7 +26,6 @@ import cli.System.Drawing.RectangleF;
 import cli.System.Threading.ThreadPool;
 import cli.System.Threading.WaitCallback;
 
-import cli.MonoTouch.CoreGraphics.CGAffineTransform;
 import cli.MonoTouch.Foundation.NSUrl;
 import cli.MonoTouch.UIKit.UIApplication;
 import cli.MonoTouch.UIKit.UIDeviceOrientation;
@@ -35,8 +34,6 @@ import cli.MonoTouch.UIKit.UIScreen;
 import cli.MonoTouch.UIKit.UIView;
 import cli.MonoTouch.UIKit.UIViewController;
 import cli.MonoTouch.UIKit.UIWindow;
-
-import pythagoras.f.FloatMath;
 
 import playn.core.AbstractPlatform;
 import playn.core.Game;
@@ -94,7 +91,7 @@ public class IOSPlatform extends AbstractPlatform {
 
   // TODO: this should be generalized and shared among platforms that do orientation
   public interface OrientationChangeListener {
-    void orientationChanged(CGAffineTransform trans, boolean landscape);
+    void orientationChanged(int orientationValue);
   }
 
   /** Used to configure the iOS platform. */
@@ -415,27 +412,7 @@ public class IOSPlatform extends AbstractPlatform {
     if (orientationChangeListener == null) {
         return;
     }
-
-    CGAffineTransform trans = CGAffineTransform.MakeIdentity();
-    boolean landscape = false;
-    switch (orientationValue) {
-    default:
-    case UIDeviceOrientation.Portrait:
-      break;
-    case UIDeviceOrientation.PortraitUpsideDown:
-      trans.Rotate(FloatMath.PI);
-      break;
-    case UIDeviceOrientation.LandscapeLeft:
-      landscape = true;
-      trans.Rotate(FloatMath.PI / 2);
-      break;
-    case UIDeviceOrientation.LandscapeRight:
-      landscape = true;
-      trans.Rotate(-FloatMath.PI / 2);
-      break;
-    }
-
-    orientationChangeListener.orientationChanged(trans, landscape);
+    orientationChangeListener.orientationChanged(orientationValue);
   }
 
   void update() {
