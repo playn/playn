@@ -284,7 +284,7 @@ public abstract class GLContext {
   }
 
   public void flush() {
-      flush(false);
+    flush(false);
   }
 
   public void flush(boolean deactivate) {
