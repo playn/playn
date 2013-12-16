@@ -73,7 +73,6 @@ public class IOSAudio extends AudioImpl {
   public Sound createSound(String path, boolean isMusic) {
     // if the file is meant to be music, or if it's not uncompressed CAFF, we need to use
     // AVAudioPlayer; if it's uncompressed CAFF, we can use OpenAL
-    platform.log().info("Creating sound " + path);
     return (isMusic || !path.endsWith(".caf")) ?
       createAVAP(NSUrl.FromFilename(path)) : createOAL(path);
   }

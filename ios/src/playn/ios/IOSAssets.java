@@ -176,7 +176,6 @@ public class IOSAssets extends AbstractAssets<UIImage> {
     for (String encpath : new String[] { path + ".caf", path + ".aifc", path + ".mp3" }) {
       String fullPath = Path.Combine(pathPrefix, encpath);
       if (!File.Exists(fullPath)) continue;
-      platform.log().info("Loading sound " + cli.System.IO.Path.GetFullPath(fullPath));
       return platform.audio().createSound(fullPath, isMusic);
     }
 
