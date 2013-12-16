@@ -25,7 +25,6 @@ import cli.System.IntPtr;
 import cli.OpenTK.Audio.OpenAL.AL;
 import cli.OpenTK.Audio.OpenAL.ALError;
 import cli.OpenTK.Audio.OpenAL.ALFormat;
-import cli.OpenTK.Audio.OpenAL.XRamExtension;
 
 /**
  * Loads CAFF audio data and uploads it to an OpenAL buffer.
@@ -101,11 +100,6 @@ public class CAFLoader {
   }
 
   public static void load(String path, int bufferId) {
-    XRamExtension XRam = new XRamExtension();
-    if (XRam.get_IsInitialized())
-      XRam.SetBufferMode(1, new int[] { bufferId },
-                         XRamExtension.XRamStorage.wrap(XRamExtension.XRamStorage.Hardware));
-
     BinaryReader br = new BinaryReader(File.OpenRead(path));
     byte[] bytes = new byte[1];
     if (!new String(br.ReadChars(4)).equals("caff"))
