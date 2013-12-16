@@ -20,9 +20,10 @@ import cli.MonoTouch.AVFoundation.AVAudioPlayer;
 import playn.core.AbstractSound;
 
 /**
- * An implementation of Sound using the AVAudioPlayer.
+ * An implementation of Sound using the AVAudioPlayer. This is used for compressed audio,
+ * especially lengthy music tracks.
  */
-public class IOSSound extends AbstractSound<AVAudioPlayer> {
+public class IOSSoundAVAP extends AbstractSound<AVAudioPlayer> {
 
   @Override
   protected boolean prepareImpl() {

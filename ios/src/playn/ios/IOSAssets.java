@@ -96,17 +96,13 @@ public class IOSAssets extends AbstractAssets<UIImage> {
   }
 
   @Override
-  public Sound getSound(final String path) {
-    // first try the .caf sound, then fall back to .mp3
-    for (String encpath : new String[] { path + ".caf", path + ".mp3" }) {
-      String fullPath = Path.Combine(pathPrefix, encpath);
-      if (!File.Exists(fullPath)) continue;
-      // platform.log().debug("Loading sound " + path);
-      return platform.audio().createSound(fullPath);
-    }
+  public Sound getSound(String path) {
+    return createSound(path, false);
+  }
 
-    platform.log().warn("Missing sound: " + path);
-    return new Sound.Error(new FileNotFoundException(path));
+  @Override
+  public Sound getMusic(String path) {
+    return createSound(path, true);
   }
 
   @Override
@@ -173,5 +169,18 @@ public class IOSAssets extends AbstractAssets<UIImage> {
       error = new FileNotFoundException(fullPath);
     }
     return recv.loadFailed(error);
+  }
+
+  private Sound createSound(String path, boolean isMusic) {
+    // look for .caf (uncompressed), .aifc (compressed, but fast), then .mp3
+    for (String encpath : new String[] { path + ".caf", path + ".aifc", path + ".mp3" }) {
+      String fullPath = Path.Combine(pathPrefix, encpath);
+      if (!File.Exists(fullPath)) continue;
+      platform.log().info("Loading sound " + cli.System.IO.Path.GetFullPath(fullPath));
+      return platform.audio().createSound(fullPath, isMusic);
+    }
+
+    platform.log().warn("Missing sound: " + path);
+    return new Sound.Error(new FileNotFoundException(path));
   }
 }

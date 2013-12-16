@@ -121,6 +121,13 @@ public class IOSPlatform extends AbstractPlatform {
      * implications.
      */
     public boolean interpolateCanvasDrawing = true;
+
+    /** The number of audio channels to reserve for OpenAL. This dictates the number of
+     * simultaneous sounds that can be played via OpenAL. It can't be higher than 32, and can be
+     * reduced from the default of 24 if you plan to play a lot of compressed sound effects
+     * simultaneously (those don't go through OpenAL, they go through AVAudioPlayer, and I presume
+     * AVAudioPlayer competes with OpenAL for sound channels). */
+    public int openALSources = 24;
   }
 
   /**
@@ -203,7 +210,7 @@ public class IOSPlatform extends AbstractPlatform {
       screenHeight /= 2;
     }
 
-    audio = new IOSAudio(this);
+    audio = new IOSAudio(this, config.openALSources);
     graphics = new IOSGraphics(this, screenWidth, screenHeight, viewScale, deviceScale,
       config.interpolateCanvasDrawing);
     json = new JsonImpl();
