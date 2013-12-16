@@ -15,10 +15,13 @@
  */
 package playn.ios;
 
+import cli.System.EventArgs;
+import cli.System.EventHandler;
 import cli.System.Threading.ThreadPool;
 import cli.System.Threading.WaitCallback;
 
 import cli.MonoTouch.AVFoundation.AVAudioPlayer;
+import cli.MonoTouch.AudioToolbox.AudioSession;
 import cli.MonoTouch.Foundation.NSError;
 import cli.MonoTouch.Foundation.NSUrl;
 
@@ -29,13 +32,14 @@ import cli.OpenTK.Audio.OpenAL.ALSourceState;
 import cli.OpenTK.Audio.OpenAL.ALSourceb;
 import cli.OpenTK.Audio.OpenAL.ALSourcef;
 import cli.OpenTK.Audio.OpenAL.ALSourcei;
+import cli.OpenTK.Audio.OpenAL.Alc;
+import cli.OpenTK.ContextHandle;
 
 import playn.core.AudioImpl;
 import playn.core.Sound;
 
 public class IOSAudio extends AudioImpl {
 
-  @SuppressWarnings("unused") // retain a reference to keep OpenTK Audio kosher
   private final AudioContext actx;
   private final int[] result = new int[1]; // used for AL.GetSource
 
@@ -46,11 +50,24 @@ public class IOSAudio extends AudioImpl {
   public IOSAudio(IOSPlatform platform, int numSources) {
     super(platform);
     actx = new AudioContext();
+
     // obtain our desired number of sources
     sources = new int[numSources];
     AL.GenSources(sources.length, sources);
     active = new IOSSoundOAL[sources.length];
     started = new int[sources.length];
+
+    // clear and restore our OAL context on audio session interruption
+    AudioSession.add_Interrupted(new EventHandler(new EventHandler.Method() {
+      public void Invoke(Object sender, EventArgs event) {
+        Alc.MakeContextCurrent(ContextHandle.Zero);
+      }
+    }));
+    AudioSession.add_Resumed(new EventHandler(new EventHandler.Method() {
+      public void Invoke(Object sender, EventArgs event) {
+        actx.MakeCurrent(); // calls Alc.MakeContextCurrent under the hood
+      }
+    }));
   }
 
   public Sound createSound(String path, boolean isMusic) {
