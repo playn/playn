@@ -18,9 +18,12 @@ package playn.ios;
 import cli.System.Array;
 import cli.System.BitConverter;
 import cli.System.IO.BinaryReader;
-import cli.System.IO.File;
 import cli.System.IO.MemoryStream;
 import cli.System.IntPtr;
+
+import cli.MonoTouch.Foundation.NSData;
+import cli.MonoTouch.Foundation.NSDataReadingOptions;
+import cli.MonoTouch.Foundation.NSError;
 
 import cli.OpenTK.Audio.OpenAL.AL;
 import cli.OpenTK.Audio.OpenAL.ALError;
@@ -100,21 +103,28 @@ public class CAFLoader {
   }
 
   public static void load(String path, int bufferId) {
-    BinaryReader br = new BinaryReader(File.OpenRead(path));
-    byte[] bytes = new byte[1];
+    // mmap (if possible) the audio file for efficient reading/uploading
+    NSError[] err = new NSError[1];
+    NSData data = NSData.FromFile(path, NSDataReadingOptions.wrap(READ_OPTS), err);
+    if (err[0] != null) {
+      throw new RuntimeException(err[0].ToString());
+    }
+
+    // read the CAFF metdata to find out the audio format and the data offset/length
+    BinaryReader br = new BinaryReader(data.AsStream());
     if (!new String(br.ReadChars(4)).equals("caff"))
       throw new RuntimeException("Input file not CAFF: " + path);
-
     br.ReadBytes(4); // rest of caf file header
     CAFDesc desc = null;
-
+    int offset = 8, dataOffset = 0, dataLength = 0;
     do {
       String type = new String(br.ReadChars(4));
       int size = (int)BitConverter.ToInt64(reverse(br.ReadBytes(8)), 0);
+      offset += 12;
 
       if (type.equals("data")) {
-        bytes = new byte[size];
-        bytes = br.ReadBytes(size);
+        dataOffset = offset;
+        dataLength = size;
       } else if (type.equals("desc")) {
         desc = new CAFDesc(br.ReadBytes(size));
         if ("ima4".equalsIgnoreCase(desc.formatID))
@@ -123,21 +133,23 @@ public class CAFLoader {
       } else {
         br.ReadBytes(size);
       }
-    } while (bytes.length == 1);
 
+      offset += size;
+    } while (dataOffset == 0);
     br.Close();
 
-    // TODO: pin instead of alloc and copy
-    IntPtr ptr = cli.System.Runtime.InteropServices.Marshal.AllocHGlobal(bytes.length);
-    cli.System.Runtime.InteropServices.Marshal.Copy(bytes, 0, ptr, bytes.length);
-    AL.BufferData(bufferId, desc.GetALFormat(), ptr, bytes.length, (int)desc.sampleRate);
+    // upload the audio data to OpenAL straight from the mmap'd file
+    AL.BufferData(bufferId, desc.GetALFormat(), IntPtr.Add(data.get_Bytes(), dataOffset), dataLength,
+                  (int)desc.sampleRate);
 
+    // now dispose the mmap'd file to free up resources
+    data.Dispose();
+
+    // finally freak out if OpenAL didn't like what we sent it
     ALError error = AL.GetError();
     if (error.Value != ALError.NoError) {
       throw new RuntimeException(error.ToString());
     }
-
-    // TODO: free ptr?
   }
 
   protected static byte[] reverse (byte[] data) {
@@ -145,4 +157,6 @@ public class CAFLoader {
     Array.Reverse((Array)(Object)data);
     return data;
   }
+
+  private static final int READ_OPTS = NSDataReadingOptions.Mapped|NSDataReadingOptions.Uncached;
 }
