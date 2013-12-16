@@ -91,49 +91,17 @@
     <None Include=".settings">
       <Visible>False</Visible>
     </None>
-    <None Include="assets\sounds\bling.mp3">
-      <Visible>False</Visible>
-    </None>
-    <None Include="assets\sounds\bling.wav">
-      <Visible>False</Visible>
-    </None>
-    <None Include="assets\sounds\fanfare.mp3">
-      <Visible>False</Visible>
-    </None>
-    <None Include="assets\sounds\fanfare.wav">
-      <Visible>False</Visible>
-    </None>
-    <None Include="assets\images\star.png">
-      <Visible>False</Visible>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Main.cs" />
   </ItemGroup>
-  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
     <Content Include="Default%402x.png" />
     <Content Include="Default-568h%402x.png" />
-    <Content Include="assets\images\alphalayertest%402x.png" />
-    <Content Include="assets\images\alphalayertest.png" />
-    <Content Include="assets\images\alphalayertest_expected%402x.png" />
-    <Content Include="assets\images\alphalayertest_expected.png" />
-    <Content Include="assets\images\cat.png" />
-    <Content Include="assets\images\horns.png" />
-    <Content Include="assets\images\imagetypetest%402x.png" />
-    <Content Include="assets\images\imagetypetest.png" />
-    <Content Include="assets\images\imagetypetest_expected%402x.png" />
-    <Content Include="assets\images\imagetypetest_expected.png" />
-    <Content Include="assets\images\orange%4015x.png" />
-    <Content Include="assets\images\orange%402x.png" />
-    <Content Include="assets\images\orange.png" />
-    <Content Include="assets\images\princess.png" />
-    <Content Include="assets\images\tile.png" />
-    <Content Include="assets\sounds\bling.caf" />
-    <Content Include="assets\sounds\fanfare.caf" />
     <Content Include="touch-icon-57x57.png" />
   </ItemGroup>
-  <ItemGroup>
-    <BundleResource Include="assets\images\star.png" />
+  <ItemGroup Label="assets">
+    <Content Include="assets\**\*" />
   </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

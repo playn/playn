@@ -6,10 +6,11 @@ package playn.tests.core;
 import java.util.ArrayList;
 import java.util.List;
 
-import playn.core.Sound;
 import playn.core.CanvasImage;
-import static playn.core.PlayN.*;
+import playn.core.Sound;
 import playn.core.TextFormat;
+import playn.core.util.Callback;
+import static playn.core.PlayN.*;
 
 /**
  * Tests sound playback support.
@@ -30,7 +31,7 @@ public class SoundTest extends Test {
   public void init() {
     float x = 50;
 
-    final Sound fanfare = assets().getSound("sounds/fanfare");
+    final Sound fanfare = loadSound("sounds/fanfare");
     x = addButton("Play Fanfare", new Runnable() {
       public void run() {
         fanfare.play();
@@ -38,18 +39,29 @@ public class SoundTest extends Test {
       }
     }, x, 100);
 
-    Sound lfanfare = assets().getSound("sounds/fanfare");
+    Sound lfanfare = loadSound("sounds/fanfare");
     lfanfare.setLooping(true);
     x = addLoopButtons("Fanfare", lfanfare, x);
 
-    Sound bling = assets().getSound("sounds/bling");
+    Sound bling = loadSound("sounds/bling");
     bling.setLooping(true);
     x = addLoopButtons("Bling", bling, x);
 
     graphics().rootLayer().addAt(graphics().createImageLayer(_actionsImage), 50, 150);
   }
 
-  protected float addLoopButtons (final String name, final Sound sound, float x) {
+  protected Sound loadSound(final String path) {
+    Sound sound = assets().getSound(path);
+    sound.addCallback(new Callback<Sound>() {
+      public void onSuccess(Sound sound) {} // noop
+      public void onFailure(Throwable cause) {
+        log().warn("Sound loading error: " + path, cause);
+      }
+    });
+    return sound;
+  }
+
+  protected float addLoopButtons(final String name, final Sound sound, float x) {
     x = addButton("Loop " + name, new Runnable() {
       public void run() {
         if (!sound.isPlaying()) {
@@ -69,7 +81,7 @@ public class SoundTest extends Test {
     return x;
   }
 
-  protected void addAction (String action) {
+  protected void addAction(String action) {
     _actions.add(0, action);
     if (_actions.size() > 10)
       _actions.subList(10, _actions.size()).clear();
