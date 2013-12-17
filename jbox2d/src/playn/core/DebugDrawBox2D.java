@@ -211,6 +211,7 @@ public class DebugDrawBox2D extends DebugDraw {
 
   public void setFillAlpha(int fillAlpha) {
     this.fillAlpha = fillAlpha;
+    setFillColorFromCache();
   }
 
   public void setFlipY(boolean flip) {
@@ -219,6 +220,7 @@ public class DebugDrawBox2D extends DebugDraw {
 
   public void setStrokeAlpha(int strokeAlpha) {
     this.strokeAlpha = strokeAlpha;
+    setStrokeColorFromCache();
   }
 
   public void setStrokeWidth(float strokeWidth) {
