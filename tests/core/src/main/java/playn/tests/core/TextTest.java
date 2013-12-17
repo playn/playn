@@ -15,19 +15,22 @@
  */
 package playn.tests.core;
 
-import playn.core.Font.Style;
-import playn.core.Image;
-import playn.core.Keyboard.TextType;
-import playn.core.Pointer;
-import playn.core.Pointer.Event;
-import playn.core.TextFormat;
+import pythagoras.f.IRectangle;
+import pythagoras.f.Rectangle;
+
 import playn.core.Canvas;
 import playn.core.CanvasImage;
+import playn.core.Font.Style;
+import playn.core.Image;
 import playn.core.ImageLayer;
-import playn.core.TextFormat.Alignment;
+import playn.core.Keyboard.TextType;
+import playn.core.Pointer.Event;
+import playn.core.Pointer;
+import playn.core.TextFormat;
 import playn.core.TextLayout;
+import playn.core.TextWrap;
 import playn.core.util.Callback;
-import pythagoras.f.Rectangle;
+import playn.core.util.TextBlock;
 import static playn.core.PlayN.graphics;
 import static playn.core.PlayN.keyboard;
 
@@ -51,7 +54,7 @@ public class TextTest extends Test {
   NToggle<Style> style;
   NToggle<String> draw;
   NToggle<String> effect;
-  NToggle<Alignment> align;
+  NToggle<TextBlock.Align> align;
   NToggle<String> font;
   NToggle<Integer> wrap;
   Toggle lineBounds;
@@ -79,8 +82,8 @@ public class TextTest extends Test {
     addToRow((effect = new NToggle<String>(
         "Effect", "None", "ShadowUL", "ShadowLR", "Outline")).layer);
     addToRow((wrap = new NToggle<Integer>("Wrap", 0, 20, 50, 100)).layer);
-    addToRow((align = new NToggle<Alignment>(
-        "Align", Alignment.LEFT, Alignment.CENTER, Alignment.RIGHT)).layer);
+    addToRow((align = new NToggle<TextBlock.Align>(
+        "Align", TextBlock.Align.LEFT, TextBlock.Align.CENTER, TextBlock.Align.RIGHT)).layer);
     addToRow((font = new NToggle<String>("Font", "Times New Roman", "Helvetica")).layer);
 
     class SetText extends Pointer.Adapter implements Callback<String> {
@@ -140,36 +143,24 @@ public class TextTest extends Test {
   }
 
   protected Image makeTextImage() {
-    TextLayout layout = graphics().layoutText(sample, format());
-    float twidth = adjustWidth(layout.width());
-    float theight = adjustHeight(layout.height());
-    CanvasImage image = graphics().createImage(twidth, theight);
-    image.canvas().setStrokeColor(0xFFFFCCCC);
-    image.canvas().strokeRect(0, 0, twidth, theight);
-    render(image.canvas(), layout);
-    if (lineBounds.value()) {
-      for (int ll = 0; ll < layout.lineCount(); ll++) {
-        Rectangle bounds = layout.lineBounds(ll);
-        image.canvas().setStrokeColor(0xFFFFCCCC);
-        image.canvas().setStrokeWidth(1);
-        image.canvas().strokeRect(bounds.x, bounds.y, bounds.width, bounds.height);
-      }
-    }
+    TextFormat format = new TextFormat(graphics().createFont(font.value(), style.value(), 24), true);
+    float wrapWidth = wrap.value() == 0 ? Float.MAX_VALUE : graphics().width()*wrap.value()/100;
+    TextBlock block = new TextBlock(graphics().layoutText(sample, format, new TextWrap(wrapWidth)));
+    float awidth = adjustWidth(block.bounds.width()), aheight = adjustHeight(block.bounds.height());
+    float pad = TextBlock.pad();
+    CanvasImage image = graphics().createImage(awidth+2*pad, aheight+2*pad);
+    image.canvas().translate(pad, pad);
+    image.canvas().setStrokeColor(0xFFFFCCCC).strokeRect(0, 0, awidth, aheight);
+    render(image.canvas(), block, align.value(), lineBounds.value());
     return image;
-  }
-
-  protected TextFormat format () {
-    TextFormat format = new TextFormat().withFont(
-      graphics().createFont(font.value(), style.value(), 24)).withAlignment(align.value());
-    return wrap.value() == 0 ? format : format.withWrapWidth(graphics().width()*wrap.value()/100);
   }
 
   protected float adjustDim (float value) {
     String effect = this.effect.value();
     if (effect.startsWith("Shadow")) {
-      value+=2;
+      value += 2;
     } else if (effect.equals("Outline")) {
-      value+=outlineWidth*2;
+      value += outlineWidth*2;
     }
     return value;
   }
@@ -179,32 +170,45 @@ public class TextTest extends Test {
   protected float adjustHeight(float height) {
     return adjustDim(height);
   }
-  protected void render (Canvas canvas, TextLayout text, int color, float x, float y) {
-    if (draw.value().equals("Fill")) {
-      canvas.setFillColor(color);
-      canvas.fillText(text, x, y);
-    } else {
-      canvas.setStrokeColor(color);
-      canvas.strokeText(text, x, y);
+
+  protected void render (Canvas canvas, String strokeFill, TextBlock block, TextBlock.Align align,
+                         int color, float x, float y, boolean showBounds) {
+    float sy = y + block.bounds.y();
+    for (TextLayout layout : block.lines) {
+      float sx = x + block.bounds.x() + align.getX(
+        layout.width(), block.bounds.width()-block.bounds.x());
+      if (showBounds) {
+        IRectangle lbounds = layout.bounds();
+        canvas.setStrokeColor(0xFFFFCCCC).setStrokeWidth(1);
+        canvas.strokeRect(sx+lbounds.x(), sy+lbounds.y(), lbounds.width(), lbounds.height());
+      }
+      if (strokeFill.equals("Fill")) {
+        canvas.setFillColor(color).fillText(layout, sx, sy);
+      } else {
+        canvas.setStrokeColor(color).strokeText(layout, sx, sy);
+      }
+      sy += layout.ascent() + layout.descent() + layout.leading();
     }
   }
-  protected void render (Canvas canvas, TextLayout text) {
-    String effect = this.effect.value();
+
+  protected void render (Canvas canvas, TextBlock block, TextBlock.Align align, boolean showBounds) {
+    String effect = this.effect.value(), strokeFill = draw.value();
     if (effect.equals("ShadowUL")) {
-      render(canvas, text, 0xFFCCCCCC, 0, 0);
-      render(canvas, text, 0xFF6699CC, 2, 2);
+      render(canvas, strokeFill, block, align, 0xFFCCCCCC, 0, 0, showBounds);
+      render(canvas, strokeFill, block, align, 0xFF6699CC, 2, 2, false);
     } else if (effect.equals("ShadowLR")) {
-      render(canvas, text, 0xFFCCCCCC, 2, 2);
-      render(canvas, text, 0xFF6699CC, 0, 0);
+      render(canvas, strokeFill, block, align, 0xFFCCCCCC, 2, 2, false);
+      render(canvas, strokeFill, block, align, 0xFF6699CC, 0, 0, showBounds);
     } else if (effect.equals("Outline")) {
       canvas.setStrokeWidth(2*outlineWidth);
-      canvas.setStrokeColor(0xFF336699);
       canvas.setLineCap(Canvas.LineCap.ROUND);
       canvas.setLineJoin(Canvas.LineJoin.ROUND);
-      canvas.strokeText(text, outlineWidth, outlineWidth);
-      render(canvas, text, 0xFF6699CC, outlineWidth, outlineWidth);
+      render(canvas, "Stroke", block, align, 0xFF336699,
+             outlineWidth, outlineWidth, false);
+      render(canvas, "Fill", block, align, 0xFF6699CC,
+             outlineWidth, outlineWidth, showBounds);
     } else {
-      render(canvas, text, 0xFF6699CC, 0, 0);
+      render(canvas, strokeFill, block, align, 0xFF6699CC, 0, 0, showBounds);
     }
   }
 }

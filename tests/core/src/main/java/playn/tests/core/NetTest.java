@@ -22,6 +22,7 @@ import playn.core.Keyboard;
 import playn.core.Net;
 import playn.core.Platform;
 import playn.core.util.Callback;
+import playn.core.util.TextBlock;
 import static playn.core.PlayN.*;
 
 public class NetTest extends Test {
@@ -184,7 +185,7 @@ public class NetTest extends Test {
   }
 
   protected void displayText (String text) {
-    output.setImage(formatText(TEXT_FMT.withWrapWidth(graphics().width()-20), text, false));
+    output.setImage(wrapText(text, graphics().width()-20, TextBlock.Align.LEFT));
   }
 
   private Callback<Net.Response> displayer = new Callback<Net.Response>() {

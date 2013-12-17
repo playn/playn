@@ -23,8 +23,10 @@ import playn.core.Layer;
 import playn.core.Pointer;
 import playn.core.TextFormat;
 import playn.core.TextLayout;
+import playn.core.TextWrap;
 import playn.core.gl.GLShader;
 import playn.core.gl.IndexedTrisShader;
+import playn.core.util.TextBlock;
 import static playn.core.PlayN.graphics;
 
 public abstract class Test {
@@ -81,12 +83,12 @@ public abstract class Test {
   }
 
   protected static ImageLayer createDescripLayer(String descrip, float width) {
-    TextLayout layout = graphics().layoutText(
-      descrip, TEXT_FMT.withWrapping(width, TextFormat.Alignment.CENTER));
-    CanvasImage image = graphics().createImage(layout.width(), layout.height());
-    image.canvas().setFillColor(0xFF000000);
-    image.canvas().fillText(layout, 0, 0);
-    return graphics().createImageLayer(image);
+    return graphics().createImageLayer(wrapText(descrip, width, TextBlock.Align.CENTER));
+  }
+
+  protected static CanvasImage wrapText(String text, float width, TextBlock.Align align) {
+    TextLayout[] layouts = graphics().layoutText(text, TEXT_FMT, new TextWrap(width));
+    return new TextBlock(layouts).toImage(align, 0xFF000000);
   }
 
   protected static CanvasImage formatText (String text, boolean border) {

@@ -15,10 +15,12 @@
  */
 package playn.tests.core;
 
-import playn.core.Font;
 import playn.core.CanvasImage;
+import playn.core.Font;
 import playn.core.TextFormat;
 import playn.core.TextLayout;
+import playn.core.TextWrap;
+import playn.core.util.TextBlock;
 import static playn.core.PlayN.graphics;
 
 public class ScaledTextTest extends Test {
@@ -37,17 +39,17 @@ public class ScaledTextTest extends Test {
   public void init() {
     String text = "The quick brown fox jumped over the lazy dog.";
     TextFormat format = new TextFormat().
-      withFont(graphics().createFont("Helvetica", Font.Style.PLAIN, 18)).
-      withWrapping(100, TextFormat.Alignment.RIGHT);
-    TextLayout layout = graphics().layoutText(text, format);
+      withFont(graphics().createFont("Helvetica", Font.Style.PLAIN, 18));
+    TextBlock block = new TextBlock(graphics().layoutText(text, format, new TextWrap(100)));
 
     float x = 5;
     for (float scale : new float[] { 1f, 2f, 3f }) {
-      float swidth = layout.width() * scale, sheight = layout.height() * scale;
+      float swidth = block.bounds.width() * scale, sheight = block.bounds.height() * scale;
       CanvasImage image = graphics().createImage(swidth, sheight);
       image.canvas().setStrokeColor(0xFFFFCCCC).strokeRect(0, 0, swidth-0.5f, sheight-0.5f);
       image.canvas().scale(scale, scale);
-      image.canvas().setFillColor(0xFF000000).fillText(layout, 0, 0);
+      image.canvas().setFillColor(0xFF000000);
+      block.fill(image.canvas(), TextBlock.Align.RIGHT, 0, 0);
       graphics().rootLayer().addAt(graphics().createImageLayer(image), x, 5);
       addInfo(image, x + swidth/2, sheight + 10);
       x += swidth + 5;
