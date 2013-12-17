@@ -205,6 +205,8 @@ public class DebugDrawBox2D extends DebugDraw {
   public void setCanvas(CanvasImage image) {
     this.canvas = image.canvas();
     canvas.setStrokeWidth(strokeWidth);
+    setStrokeColorFromCache();
+    setFillColorFromCache();
   }
 
   public void setFillAlpha(int fillAlpha) {
@@ -238,11 +240,18 @@ public class DebugDrawBox2D extends DebugDraw {
       cacheFillR = color.x;
       cacheFillG = color.y;
       cacheFillB = color.z;
-      canvas
-          .setFillColor(
-              Color.argb(fillAlpha, (int) (255 * color.x), (int) (255 * color.y),
-                  (int) (255 * color.z)));
+      setFillColorFromCache();
     }
+  }
+
+  /**
+   * Sets the fill color from the cached rgb values.
+   */
+  private void setFillColorFromCache() {
+    canvas
+        .setFillColor(
+            Color.argb(fillAlpha, (int) (255 * cacheFillR), (int) (255 * cacheFillG),
+                (int) (255 * cacheFillB)));
   }
 
   /**
@@ -257,10 +266,17 @@ public class DebugDrawBox2D extends DebugDraw {
       cacheStrokeR = color.x;
       cacheStrokeG = color.y;
       cacheStrokeB = color.z;
-      canvas.setStrokeColor(
-          Color.argb(strokeAlpha, (int) (255 * color.x), (int) (255 * color.y),
-              (int) (255 * color.z)));
+      setStrokeColorFromCache();
     }
+  }
+
+  /**
+   * Sets the fill color from the cached rgb values.
+   */
+  private void setStrokeColorFromCache() {
+    canvas.setStrokeColor(
+        Color.argb(strokeAlpha, (int) (255 * cacheStrokeR), (int) (255 * cacheStrokeG),
+            (int) (255 * cacheStrokeB)));
   }
 
   private void updateCamera() {
