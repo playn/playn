@@ -37,6 +37,11 @@ import java.util.LinkedList;
 
 class JavaCanvas extends AbstractCanvasGL<Graphics2D> {
 
+  interface Drawable {
+    void fill(Graphics2D gfx, float x, float y);
+    void stroke(Graphics2D gfx, float x, float y);
+  }
+
   final Graphics2D gfx;
   private Deque<JavaCanvasState> stateStack = new LinkedList<JavaCanvasState>();
 
@@ -164,7 +169,7 @@ class JavaCanvas extends AbstractCanvasGL<Graphics2D> {
   @Override
   public Canvas fillText(TextLayout layout, float x, float y) {
     currentState().prepareFill(gfx);
-    ((JavaTextLayout)layout).fill(gfx, x, y);
+    ((Drawable)layout).fill(gfx, x, y);
     isDirty = true;
     return this;
   }
@@ -306,7 +311,7 @@ class JavaCanvas extends AbstractCanvasGL<Graphics2D> {
   @Override
   public Canvas strokeText(TextLayout layout, float x, float y) {
     currentState().prepareStroke(gfx);
-    ((JavaTextLayout)layout).stroke(gfx, x, y);
+    ((Drawable)layout).stroke(gfx, x, y);
     isDirty = true;
     return this;
   }

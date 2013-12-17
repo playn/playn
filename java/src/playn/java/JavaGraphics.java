@@ -34,6 +34,7 @@ import playn.core.Font;
 import playn.core.Gradient;
 import playn.core.TextFormat;
 import playn.core.TextLayout;
+import playn.core.TextWrap;
 import playn.core.gl.GL20;
 import playn.core.gl.GL20Context;
 import playn.core.gl.GraphicsGL;
@@ -172,7 +173,16 @@ public class JavaGraphics extends GraphicsGL {
 
   @Override
   public TextLayout layoutText(String text, TextFormat format) {
-    return new JavaTextLayout(this, text, format);
+    // TEMP: handle multiline in TextFormat until that's removed
+    if (format.shouldWrap() || text.indexOf('\n') != -1 ||  text.indexOf('\r') != -1)
+      return new OldJavaTextLayout(this, text, format);
+    else
+      return JavaTextLayout.layoutText(this, text, format);
+  }
+
+  @Override
+  public TextLayout[] layoutText(String text, TextFormat format, TextWrap wrap) {
+    return JavaTextLayout.layoutText(this, text, format, wrap);
   }
 
   @Override

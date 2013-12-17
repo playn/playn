@@ -1,5 +1,5 @@
 /**
- * Copyright 2010 The PlayN Authors
+ * Copyright 2013 The PlayN Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
@@ -26,24 +26,33 @@ import java.text.AttributedString;
 import java.util.ArrayList;
 import java.util.List;
 
-import playn.core.PaddedTextLayout;
-import playn.core.TextFormat;
+import pythagoras.f.IRectangle;
 import pythagoras.f.Rectangle;
 
-class JavaTextLayout extends PaddedTextLayout {
+import playn.core.AbstractTextLayout;
+import playn.core.TextFormat;
+import playn.core.TextWrap;
 
-  private List<TextLayout> layouts = new ArrayList<TextLayout>();
-  private final float xAdjust;
+class JavaTextLayout implements playn.core.TextLayout, JavaCanvas.Drawable {
 
-  public JavaTextLayout(JavaGraphics gfx, String text, TextFormat format) {
-    super(gfx, text, format);
+  public static JavaTextLayout layoutText(JavaGraphics gfx, String text, TextFormat format) {
+    // we do some fiddling to work around the fact that TextLayout chokes on the empty string
+    AttributedString astring = new AttributedString(text.length() == 0 ? " " : text);
+    if (format.font != null) {
+      astring.addAttribute(TextAttribute.FONT, ((JavaFont)format.font).jfont);
+    }
+    FontRenderContext frc = format.antialias ? gfx.aaFontContext : gfx.aFontContext;
+    return new JavaTextLayout(text, format, new TextLayout(astring.getIterator(), frc));
+  }
 
+  public static JavaTextLayout[] layoutText(JavaGraphics gfx, String text, TextFormat format,
+                                            TextWrap wrap) {
     // normalize newlines in the text (Windows: CRLF -> LF, Mac OS pre-X: CR -> LF)
-    text = text.replace("\r\n", "\n").replace('\r', '\n');
+    char eol = '\n';
+    text = AbstractTextLayout.normalizeEOL(text);
 
     // we do some fiddling to work around the fact that TextLayout chokes on the empty string
-    boolean isEmptyString = text.length() == 0;
-    String ltext = isEmptyString ? " " : text;
+    String ltext = text.length() == 0 ? " " : text;
 
     // set up an attributed character iterator so that we can measure the text
     AttributedString astring = new AttributedString(ltext);
@@ -51,115 +60,119 @@ class JavaTextLayout extends PaddedTextLayout {
       astring.addAttribute(TextAttribute.FONT, ((JavaFont)format.font).jfont);
     }
 
+    List<JavaTextLayout> layouts = new ArrayList<JavaTextLayout>();
     FontRenderContext frc = format.antialias ? gfx.aaFontContext : gfx.aFontContext;
-    if (format.shouldWrap() || ltext.indexOf('\n') != -1) {
-      LineBreakMeasurer measurer = new LineBreakMeasurer(astring.getIterator(), frc);
-      char eol = '\n'; // TODO: platform line endings?
-      int lastPos = ltext.length();
-      while (measurer.getPosition() < lastPos) {
-        int nextRet = ltext.indexOf(eol, measurer.getPosition()+1);
-        if (nextRet == -1) {
-          nextRet = lastPos;
-        }
-        layouts.add(measurer.nextLayout(format.wrapWidth, nextRet, false));
+    LineBreakMeasurer measurer = new LineBreakMeasurer(astring.getIterator(), frc);
+    int lastPos = ltext.length(), curPos = 0;
+    while (curPos < lastPos) {
+      int nextRet = ltext.indexOf(eol, measurer.getPosition()+1);
+      if (nextRet == -1) {
+        nextRet = lastPos;
       }
-    } else {
-      layouts.add(new TextLayout(astring.getIterator(), frc));
+      TextLayout layout = measurer.nextLayout(wrap.width, nextRet, false);
+      int endPos = measurer.getPosition();
+      while (curPos < endPos && ltext.charAt(curPos) == eol)
+        curPos += 1; // skip over EOLs
+      layouts.add(new JavaTextLayout(ltext.substring(curPos, endPos), format, layout));
+      curPos = endPos;
     }
+    return layouts.toArray(new JavaTextLayout[layouts.size()]);
+  }
 
-    // some font glyphs start rendering at a negative inset, blowing outside their bounding box
-    // (naughty!); in such cases, we shift everything to the right to ensure that we don't paint
-    // outside our reported bounding box (so that someone can create a single canvas of bounding
-    // box size and render this text layout into it at (0,0) and nothing will get cut off)
-    float maxXAdjust = 0;
-    // compute our total width and height
-    float twidth = 0, theight = 0;
-    for (TextLayout layout : layouts) {
-      Rectangle2D bounds = layout.getBounds();
-      maxXAdjust = Math.max(maxXAdjust, -Math.min(0, (float)bounds.getX()));
-      twidth = Math.max(twidth, getWidth(bounds));
-      if (layout != layouts.get(0)) {
-        theight += layout.getLeading(); // leading only applied to lines after 0
-      }
-      theight += (layout.getAscent() + layout.getDescent());
-    }
-    width = isEmptyString ? 0 : twidth;
-    height = theight;
-    xAdjust = maxXAdjust;
+  private final String text;
+  private final TextFormat format;
+  private final TextLayout layout;
+  private final Rectangle bounds;
+
+  JavaTextLayout(String text, TextFormat format, TextLayout layout) {
+    this.text = text;
+    this.format = format;
+    this.layout = layout;
+    Rectangle2D bounds = layout.getBounds();
+    // the y position of the bounds includes a negative ascent, but we don't want that showing up
+    // in our bounds since we render from 0 rather than from the baseline
+    this.bounds = new Rectangle((float)bounds.getX(), (float)bounds.getY() + layout.getAscent(),
+                                (float)bounds.getWidth(), (float)bounds.getHeight());
+  }
+
+  @Override
+  public String text() {
+    return text;
+  }
+
+  @Override
+  public TextFormat format() {
+    return format;
   }
 
   @Override
   public float width() {
-    return super.width() + xAdjust;
+    // if the x position is positive, we need to include extra space in our full-width for it
+    return Math.max(bounds.x, 0) + bounds.width;
   }
 
   @Override
+  public float height() {
+    return ascent() + descent();
+  }
+
+  @Override
+  public IRectangle bounds() {
+    return bounds;
+  }
+
+  @Override
+  public float ascent () {
+    return layout.getAscent();
+  }
+
+  @Override
+  public float descent () {
+    return layout.getDescent();
+  }
+
+  @Override
+  public float leading () {
+    return layout.getLeading();
+  }
+
+  @Override @Deprecated
   public int lineCount() {
-    return layouts.size();
+    return 1;
   }
 
-  @Override
+  @Override @Deprecated
   public Rectangle lineBounds(int line) {
-    Rectangle2D bounds = layouts.get(line).getBounds();
-    float lineWidth = getWidth(bounds);
-    float x = xAdjust + format.align.getX(lineWidth, width);
-    float y = line == 0 ? 0 : line * (ascent() + descent() + leading());
-    return new Rectangle(x+pad, y+pad, lineWidth, ascent()+descent());
+    return new Rectangle(bounds);
   }
 
   @Override
-  public float ascent() {
-    return layouts.size() == 0 ? 0 : layouts.get(0).getAscent();
+  public void stroke(Graphics2D gfx, float x, float y) {
+    paint(gfx, x, y, true);
   }
 
   @Override
-  public float descent() {
-    return layouts.size() == 0 ? 0 : layouts.get(0).getDescent();
-  }
-
-  @Override
-  public float leading() {
-    return layouts.size() == 0 ? 0 : layouts.get(0).getLeading();
-  }
-
-  void stroke(Graphics2D gfx, float x, float y) {
-    paint(gfx, x+pad, y+pad, true);
-  }
-
-  void fill(Graphics2D gfx, float x, float y) {
-    paint(gfx, x+pad, y+pad, false);
+  public void fill(Graphics2D gfx, float x, float y) {
+    paint(gfx, x, y, false);
   }
 
   void paint(Graphics2D gfx, float x, float y, boolean stroke) {
-    float yoff = y;
     Object ohint = gfx.getRenderingHint(RenderingHints.KEY_ANTIALIASING);
     try {
       gfx.setRenderingHint(RenderingHints.KEY_ANTIALIASING, format.antialias ?
                            RenderingHints.VALUE_ANTIALIAS_ON : RenderingHints.VALUE_ANTIALIAS_OFF);
 
-      for (TextLayout layout : layouts) {
-        Rectangle2D bounds = layout.getBounds();
-        float sx = x + xAdjust + format.align.getX(getWidth(bounds), width);
-        yoff += layout.getAscent();
-        if (stroke) {
-          gfx.translate(sx, yoff);
-          gfx.draw(layout.getOutline(null));
-          gfx.translate(-sx, -yoff);
-        } else {
-          layout.draw(gfx, sx, yoff);
-        }
-        yoff += layout.getDescent() + layout.getLeading();
+      float yoff = y + layout.getAscent();
+      if (stroke) {
+        gfx.translate(x, yoff);
+        gfx.draw(layout.getOutline(null));
+        gfx.translate(-x, -yoff);
+      } else {
+        layout.draw(gfx, x, yoff);
       }
 
     } finally {
       gfx.setRenderingHint(RenderingHints.KEY_ANTIALIASING, ohint);
     }
-  }
-
-  private static float getWidth(Rectangle2D bounds) {
-    // if the x position is positive, we need to account for the fact that getWidth doesn't include
-    // this leading whitespace, but we need to include it in our bounds; we don't need to worry
-    // about xAdjust here because that's accounted elsewhere
-    return (float)(Math.max(0, bounds.getX()) + bounds.getWidth());
   }
 }
