@@ -64,12 +64,28 @@ public class TextFormat {
 
   /** Creates a default text format instance. */
   public TextFormat() {
-    this(null, Float.MAX_VALUE, Alignment.LEFT, true);
+    this(null, true);
   }
 
   /** @deprecated Use {@link TextFormat()} and configuration methods. */
   @Deprecated public TextFormat(Font font, float wrapWidth, Alignment align) {
     this(font, wrapWidth, align, true);
+  }
+
+  /** Creates a configured text format instance. */
+  public TextFormat(Font font, boolean antialias) {
+    this.font = font;
+    this.wrapWidth = Float.MAX_VALUE;
+    this.align = Alignment.LEFT;
+    this.antialias = antialias;
+  }
+
+  /** @deprecated {@code wrapWidth} and {@code align} are no longer supported. */
+  @Deprecated public TextFormat(Font font, float wrapWidth, Alignment align, boolean antialias) {
+    this.font = font;
+    this.wrapWidth = wrapWidth;
+    this.align = align;
+    this.antialias = antialias;
   }
 
   /** Returns true if line wrapping is desired. */
@@ -82,19 +98,21 @@ public class TextFormat {
     return new TextFormat(font, this.wrapWidth, this.align, this.antialias);
   }
 
-  /** Returns a clone of this text format with the wrap width and alignment configured as
-   * specified. */
-  public TextFormat withWrapping(float wrapWidth, Alignment align) {
+  /** @deprecated Use {@link Graphics#layoutText(String,TextFormat,float)} and render the wrapped
+   * lines individually. */
+  @Deprecated public TextFormat withWrapping(float wrapWidth, Alignment align) {
     return new TextFormat(this.font, wrapWidth, align, this.antialias);
   }
 
-  /** Returns a clone of this text format with the wrap width configured as specified. */
-  public TextFormat withWrapWidth(float wrapWidth) {
+  /** @deprecated Use {@link Graphics#layoutText(String,TextFormat,float)} and render the wrapped
+   * lines individually. */
+  @Deprecated public TextFormat withWrapWidth(float wrapWidth) {
     return new TextFormat(this.font, wrapWidth, this.align, this.antialias);
   }
 
-  /** Returns a clone of this text format with the alignment configured as specified. */
-  public TextFormat withAlignment(Alignment align) {
+  /** @deprecated Use {@link Graphics#layoutText(String,TextFormat,float)} and render the wrapped
+   * lines individually (aligning them as desired). */
+  @Deprecated public TextFormat withAlignment(Alignment align) {
     return new TextFormat(this.font, this.wrapWidth, align, this.antialias);
   }
 
@@ -105,8 +123,7 @@ public class TextFormat {
 
   @Override
   public String toString() {
-    String wrapStr = shouldWrap() ? ""+wrapWidth : "n/a";
-    return "[font=" + font + ", wrapWidth=" + wrapStr + ", align=" + align + "]";
+    return "[font=" + font + ", antialias=" + antialias + "]";
   }
 
   @Override
@@ -114,7 +131,7 @@ public class TextFormat {
     if (other instanceof TextFormat) {
       TextFormat ofmt = (TextFormat)other;
       return (font == ofmt.font || (font != null && font.equals(ofmt.font))) &&
-        wrapWidth == ofmt.wrapWidth && align == ofmt.align;
+        wrapWidth == ofmt.wrapWidth && align == ofmt.align && antialias == ofmt.antialias;
     } else {
       return false;
     }
@@ -122,16 +139,8 @@ public class TextFormat {
 
   @Override
   public int hashCode() {
-    int hash = align.hashCode() ^ (int)wrapWidth;
+    int hash = align.hashCode() ^ (int)wrapWidth ^ (antialias ? 1 : 0);
     if (font != null) hash ^= font.hashCode();
     return hash;
-  }
-
-  /** Creates a configured text format instance. */
-  private TextFormat(Font font, float wrapWidth, Alignment align, boolean antialias) {
-    this.font = font;
-    this.wrapWidth = wrapWidth;
-    this.align = align;
-    this.antialias = antialias;
   }
 }

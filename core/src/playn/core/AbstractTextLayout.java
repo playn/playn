@@ -20,6 +20,11 @@ package playn.core;
  */
 public abstract class AbstractTextLayout implements TextLayout {
 
+  public static String normalizeEOL(String text) {
+    // normalize newlines in the text (Windows: CRLF -> LF, Mac OS pre-X: CR -> LF)
+    return text.replace("\r\n", "\n").replace('\r', '\n');
+  }
+
   protected final String text;
   protected final TextFormat format;
 
