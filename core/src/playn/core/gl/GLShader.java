@@ -443,8 +443,8 @@ public abstract class GLShader {
 
   /** The default texture extras. */
   protected class TextureExtras extends Extras {
-    private final Uniform1i uTexture;
-    private int lastTex;
+    protected final Uniform1i uTexture;
+    protected int lastTex;
 
     public TextureExtras(GLProgram prog) {
       uTexture = prog.getUniform1i("u_Texture");
