@@ -36,6 +36,7 @@ import playn.core.SurfaceImage;
 import playn.core.SurfaceLayer;
 import playn.core.TextFormat;
 import playn.core.TextLayout;
+import playn.core.TextWrap;
 import playn.core.gl.GL20;
 import playn.core.gl.GLContext;
 
@@ -177,6 +178,11 @@ class FlashGraphics implements Graphics {
   @Override
   public TextLayout layoutText(String text, TextFormat format) {
     return new FlashTextLayout(dummyCtx, text, format);
+  }
+
+  @Override
+  public TextLayout[] layoutText(String text, TextFormat format, TextWrap wrap) {
+    throw new UnsupportedOperationException();
   }
 
   @Override

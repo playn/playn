@@ -22,6 +22,7 @@ import playn.core.AbstractTextLayout;
 import playn.core.Font;
 import playn.core.TextFormat;
 import pythagoras.f.Rectangle;
+import pythagoras.f.IRectangle;
 
 import static playn.core.PlayN.graphics;
 
@@ -72,6 +73,11 @@ class FlashTextLayout extends AbstractTextLayout {
     case BOLD_ITALIC: width += metrics.emwidth/6; break;
     default: break; // nada
     }
+  }
+
+  @Override
+  public IRectangle bounds() {
+    throw new UnsupportedOperationException();
   }
 
   @Override
