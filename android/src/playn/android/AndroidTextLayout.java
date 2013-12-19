@@ -1,5 +1,5 @@
 /**
- * Copyright 2011 The PlayN Authors
+ * Copyright 2013 The PlayN Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
@@ -18,40 +18,135 @@ package playn.android;
 import java.util.ArrayList;
 import java.util.List;
 
-import android.graphics.Canvas;
-import android.graphics.Paint;
+import pythagoras.f.Rectangle;
+import pythagoras.f.IRectangle;
 
 import playn.core.AbstractTextLayout;
 import playn.core.TextFormat;
-import pythagoras.f.Rectangle;
+import playn.core.TextLayout;
+import playn.core.TextWrap;
 
-class AndroidTextLayout extends AbstractTextLayout {
+import android.graphics.Canvas;
+import android.graphics.Paint;
 
+class AndroidTextLayout implements TextLayout, AndroidCanvas.Drawable {
+
+  private final String text;
+  private final TextFormat format;
   private final AndroidFont font;
-  private final Paint paint;
+
   private final Paint.FontMetrics metrics;
-  private final List<Line> lines = new ArrayList<Line>();
+  private final Rectangle bounds;
 
-  private static class Line {
-    public final String text;
-    public final float width;
-    public Line(String text, float width) {
-      this.text = text;
-      this.width = width;
+  public static TextLayout layoutText(String text, TextFormat format) {
+    AndroidFont font = (format.font == null) ? AndroidFont.DEFAULT : (AndroidFont)format.font;
+    Paint paint = new Paint(format.antialias ? Paint.ANTI_ALIAS_FLAG : 0);
+    paint.setTypeface(font.typeface);
+    paint.setTextSize(font.size());
+    paint.setSubpixelText(true);
+    Paint.FontMetrics metrics = paint.getFontMetrics();
+    return new AndroidTextLayout(text, format, font, metrics, paint.measureText(text));
+  }
+
+  public static TextLayout[] layoutText(String text, TextFormat format, TextWrap wrap) {
+    AndroidFont font = (format.font == null) ? AndroidFont.DEFAULT : (AndroidFont)format.font;
+    Paint paint = new Paint(format.antialias ? Paint.ANTI_ALIAS_FLAG : 0);
+    paint.setTypeface(font.typeface);
+    paint.setTextSize(font.size());
+    paint.setSubpixelText(true);
+    Paint.FontMetrics metrics = paint.getFontMetrics();
+
+    List<TextLayout> layouts = new ArrayList<TextLayout>();
+    float[] measuredWidth = new float[1];
+    for (String ltext : AbstractTextLayout.normalizeEOL(text).split("\\n")) {
+      // if we're only wrapping on newlines, then just add the whole line now
+      if (wrap.width <= 0 || wrap.width == Float.MAX_VALUE) {
+        layouts.add(new AndroidTextLayout(ltext, format, font, metrics, paint.measureText(ltext)));
+
+      } else {
+        int start = 0, end = ltext.length();
+        while (start < end) {
+          // breakText only breaks on characters; we want to break on word boundaries
+          int count = paint.breakText(ltext, start, end, true, wrap.width, measuredWidth);
+
+          // breakText exhibits a bug where ligaturized text sequences (e.g. "fi") are counted as a
+          // single character in the returned count when in reality they consume multiple
+          // characters of the source text; so we use a hacky table of known ligatures for the font
+          // in question to adjust the count if the text passed to breakText contains any known
+          // ligatures
+          int lineEnd = start+count;
+          if (lineEnd < end && font.ligatureHacks.length > 0) {
+            int adjust = accountForLigatures(ltext, start, count, font.ligatureHacks);
+            count += adjust;
+            lineEnd += adjust;
+          }
+
+          // if we matched the rest of the line, things are simple
+          if (lineEnd == end) {
+            layouts.add(new AndroidTextLayout(ltext.substring(start, lineEnd), format, font, metrics,
+                                              measuredWidth[0]));
+            start += count;
+
+          } else {
+            // if we ended in the middle of a word, back up until we hit whitespace
+            if (!Character.isWhitespace(ltext.charAt(lineEnd-1)) &&
+                !Character.isWhitespace(ltext.charAt(lineEnd))) {
+              do {
+                --lineEnd;
+              } while (lineEnd > start && !Character.isWhitespace(ltext.charAt(lineEnd)));
+            }
+
+            // if there is no whitespace on the line, then we hard-break in the middle of the word
+            if (lineEnd == start) {
+              layouts.add(new AndroidTextLayout(ltext.substring(start, start+count), format, font,
+                                                metrics, measuredWidth[0]));
+              start += count;
+
+            } else {
+              // otherwise we're now positioned on some sort of whitespace; trim it
+              while (Character.isWhitespace(ltext.charAt(lineEnd-1))) {
+                --lineEnd;
+              }
+              String line = ltext.substring(start, lineEnd);
+              float size = paint.measureText(line);
+              layouts.add(new AndroidTextLayout(line, format, font, metrics, size));
+              start = lineEnd;
+            }
+
+            // now trim any whitespace from start to the first non-whitespace character
+            while (start < end && Character.isWhitespace(ltext.charAt(start))) {
+              start++;
+            }
+          }
+        }
+      }
     }
+    return layouts.toArray(new TextLayout[layouts.size()]);
   }
 
   @Override
-  public int lineCount() {
-    return lines.size();
+  public String text() {
+    return text;
   }
 
   @Override
-  public Rectangle lineBounds(int lineIdx) {
-    Line line = lines.get(lineIdx);
-    float x = LEFT_FUDGE + format.align.getX(line.width, width-LEFT_FUDGE-RIGHT_FUDGE);
-    float y = TOP_FUDGE + lineIdx * (ascent() + descent() + leading());
-    return new Rectangle(x, y, line.width, ascent() + descent());
+  public TextFormat format() {
+    return format;
+  }
+
+  @Override
+  public float width() {
+    return bounds.width;
+  }
+
+  @Override
+  public float height() {
+    return ascent() + descent();
+  }
+
+  @Override
+  public IRectangle bounds() {
+    return bounds;
   }
 
   @Override
@@ -69,115 +164,38 @@ class AndroidTextLayout extends AbstractTextLayout {
     return metrics.leading;
   }
 
-  AndroidTextLayout(String text, TextFormat format) {
-    super(text, format);
-    this.font = (format.font == null) ? AndroidFont.DEFAULT : (AndroidFont)format.font;
-
-    paint = new Paint(format.antialias ? Paint.ANTI_ALIAS_FLAG : 0);
-    paint.setTypeface(font.typeface);
-    paint.setTextSize(font.size());
-    paint.setSubpixelText(true);
-    metrics = paint.getFontMetrics();
-
-    // normalize newlines in the text (Windows: CRLF -> LF, Mac OS pre-X: CR -> LF)
-    text = text.replace("\r\n", "\n").replace('\r', '\n');
-
-    // we always break lines on newlines
-    for (String line : text.split("\\n")) {
-      // we may break lines between newlines if we have a wrap width
-      if (format.shouldWrap()) {
-        breakLine(line);
-      } else {
-        lines.add(new Line(line, paint.measureText(line)));
-      }
-    }
-
-    // compute the text height based on the metrics
-    float twidth = 0;
-    for (Line line : lines) {
-      twidth = Math.max(twidth, line.width);
-    }
-    width = twidth + LEFT_FUDGE + RIGHT_FUDGE;
-    height = lines.size() * (-metrics.ascent + metrics.descent) +
-      // leading only applies to lines after 0
-      (lines.size()-1) * metrics.leading + TOP_FUDGE;
+  @Override @Deprecated
+  public int lineCount() {
+    return 1;
   }
 
-  void breakLine(String text) {
-    float[] measuredWidth = new float[1];
-    int start = 0, end = text.length();
-    while (start < end) {
-      // breakText only breaks on characters; we want to break on word boundaries
-      int count = paint.breakText(text, start, end, true, format.wrapWidth, measuredWidth);
-
-      // breakText exhibits a bug where ligaturized text sequences (e.g. "fi") are counted as a
-      // single character in the returned count when in reality they consume multiple characters of
-      // the source text; so we use a hacky table of known ligatures for the font in question to
-      // adjust the count if the text passed to breakText contains any known ligatures
-      int lineEnd = start+count;
-      if (lineEnd < end && font.ligatureHacks.length > 0) {
-        int adjust = accountForLigatures(text, start, count, font.ligatureHacks);
-        count += adjust;
-        lineEnd += adjust;
-      }
-
-      // if we matched the rest of the line, things are simple
-      if (lineEnd == end) {
-        lines.add(new Line(text.substring(start, lineEnd), measuredWidth[0]));
-        start += count;
-
-      } else {
-        // if we ended in the middle of a word, back up until we hit whitespace
-        if (!Character.isWhitespace(text.charAt(lineEnd-1)) &&
-            !Character.isWhitespace(text.charAt(lineEnd))) {
-          do {
-            --lineEnd;
-          } while (lineEnd > start && !Character.isWhitespace(text.charAt(lineEnd)));
-        }
-
-        // if there is no whitespace on the line, then we hard-break in the middle of the word
-        if (lineEnd == start) {
-          lines.add(new Line(text.substring(start, start+count), measuredWidth[0]));
-          start += count;
-
-        } else {
-          // otherwise we're now positioned on some sort of whitespace; trim it
-          while (Character.isWhitespace(text.charAt(lineEnd-1))) {
-            --lineEnd;
-          }
-          String line = text.substring(start, lineEnd);
-          float size = paint.measureText(line);
-          lines.add(new Line(line, size));
-          start = lineEnd;
-        }
-
-        // now trim any whitespace from start to the first non-whitespace character
-        while (start < end && Character.isWhitespace(text.charAt(start))) {
-          start++;
-        }
-      }
-    }
+  @Override @Deprecated
+  public Rectangle lineBounds(int line) {
+    return new Rectangle(bounds);
   }
 
-  void draw(Canvas canvas, float x, float y, Paint paint) {
+  public void draw(Canvas canvas, float x, float y, Paint paint) {
     boolean oldAA = paint.isAntiAlias();
     paint.setAntiAlias(format.antialias);
     try {
       paint.setTypeface(font.typeface);
       paint.setTextSize(font.size());
       paint.setSubpixelText(true);
-
-      float yoff = TOP_FUDGE;
-      for (Line line : lines) {
-        float rx = format.align.getX(line.width, width-LEFT_FUDGE-RIGHT_FUDGE);
-        yoff -= metrics.ascent;
-        canvas.drawText(line.text, x + rx + LEFT_FUDGE, y + yoff, paint);
-        yoff += metrics.descent + metrics.leading;
-      }
+      canvas.drawText(text, x, y-metrics.ascent, paint);
 
     } finally {
       paint.setAntiAlias(oldAA);
     }
+  }
+
+  AndroidTextLayout(String text, TextFormat format, AndroidFont font, Paint.FontMetrics metrics,
+                    float width) {
+    this.text = text;
+    this.format = format;
+    this.font = font;
+    this.metrics = metrics;
+    // Android doesn't provide a way to get precise text bounds, so we half-ass it, woo!
+    this.bounds = new Rectangle(0, 0, width, -metrics.ascent+metrics.descent);
   }
 
   static int accountForLigatures (String text, int start, int count, String[] ligatures) {
@@ -195,8 +213,4 @@ class AndroidTextLayout extends AbstractTextLayout {
     }
     return adjust;
   }
-
-  protected static final float TOP_FUDGE = 1;
-  protected static final float LEFT_FUDGE = 1;
-  protected static final float RIGHT_FUDGE = 2;
 }

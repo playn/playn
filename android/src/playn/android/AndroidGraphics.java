@@ -37,6 +37,7 @@ import playn.core.Gradient;
 import playn.core.GroupLayer;
 import playn.core.TextFormat;
 import playn.core.TextLayout;
+import playn.core.TextWrap;
 import playn.core.gl.GL20;
 import playn.core.gl.GLContext;
 import playn.core.gl.GraphicsGL;
@@ -177,7 +178,16 @@ public class AndroidGraphics extends GraphicsGL {
 
   @Override
   public TextLayout layoutText(String text, TextFormat format) {
-    return new AndroidTextLayout(text, format);
+    // TEMP: handle multiline in TextFormat until that's removed
+    if (format.shouldWrap() || text.indexOf('\n') != -1 ||  text.indexOf('\r') != -1)
+      return new OldAndroidTextLayout(text, format);
+    else
+      return AndroidTextLayout.layoutText(text, format);
+  }
+
+  @Override
+  public TextLayout[] layoutText(String text, TextFormat format, TextWrap wrap) {
+    return AndroidTextLayout.layoutText(text, format, wrap);
   }
 
   @Override
