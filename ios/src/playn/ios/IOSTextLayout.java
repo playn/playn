@@ -20,260 +20,173 @@ import cli.MonoTouch.CoreGraphics.CGPath;
 import cli.MonoTouch.CoreText.CTFrame;
 import cli.MonoTouch.CoreText.CTFramesetter;
 import cli.MonoTouch.CoreText.CTLine;
-import cli.MonoTouch.CoreText.CTParagraphStyle;
-import cli.MonoTouch.CoreText.CTParagraphStyleSettings;
 import cli.MonoTouch.CoreText.CTStringAttributes;
-import cli.MonoTouch.CoreText.CTTextAlignment;
 import cli.MonoTouch.Foundation.NSAttributedString;
 import cli.MonoTouch.Foundation.NSRange;
 import cli.System.Drawing.PointF;
 import cli.System.Drawing.RectangleF;
 
-import playn.core.PaddedTextLayout;
-import playn.core.TextFormat;
+import pythagoras.f.IRectangle;
 import pythagoras.f.Rectangle;
 
-class IOSTextLayout extends PaddedTextLayout {
+import playn.core.AbstractTextLayout;
+import playn.core.TextFormat;
+import playn.core.TextLayout;
+import playn.core.TextWrap;
 
-  // There are numerous impedance mismatches between how PlayN wants to layout text and how iOS
-  // allows text to be laid out. Fortunately, with some hackery, we can make things work (quite
-  // nicely, in fact: iOS does not lie about its text measurements, unlike every other platform for
-  // which I've ever written text rendering code).
-  //
-  // The first problem is the inverted coordinate system: CoreGraphics uses OpenGL coordinates, and
-  // PlayN uses "Imperial" origin-in-upper-left coordinates. This impacts the actual rendering
-  // (where we have to do the same unflipping that we do when rendering images), but it also
-  // impacts text wrapping. When wrapping text in iOS you give it a rectangle (an arbitrary "clip"
-  // path, actually) into which to constrain the text, and the coordinates at which the text is
-  // laid out are retained and used later when rendering. This is problematic because we want to
-  // lay out text into an infinitely tall rectangle. That's not a problem when lines start at 0,0
-  // and y increases for each line, until you get to the last. But in iOS/OpenGL coordinates, that
-  // means lines starts at 0,MAX_FLOAT and y decreases line by line until the last line, which is
-  // still at some exceedingly large y value. To accommodate that, we use a rectangle of height
-  // MAX_HEIGHT (a large value used instead of Float.MAX_VALUE to avoid overflow problems). We now
-  // render lines ourselves instead of having the CTFrame do the rendering, so we only need
-  // MAX_HEIGHT during layout. We ignore the assigned y positions during rendering.
-  //
-  // The next problem is that when wrapping text in said region, the x position of each line is
-  // recorded and used when rendering the text. This x coordinate accounts for justification, so if
-  // I say I want a maximum line width of 200, the lines will be laid out such that they are flush
-  // to the right of a rectangle that is 200 pixels wide. The widest line may only be 180 pixels,
-  // and that line will start at x = 20. In PlayN, we want to "trim" the bounds of the wrapped text
-  // to the width of the widest line and report the width of the entire TextLayout as that widest
-  // line's width. The aligned text is then aligned based on the bounds established by that widest
-  // line. To achieve that behavior, we record the smallest x offset of any of the lines and store
-  // that in adjustX, then translate by -adjustX when rendering the text. More hackery!
-  //
-  // We have to be careful about measuring the width of text layout as well. GetImageBounds()
-  // returns the precise pixel bounds of the rendered text, but some glyphs have extra whitespace
-  // to their right, so we can't use the width of the widest line (as computed by GetImageBounds())
-  // to compute the width of the entire TextLayout, rather we have to measure the maximum X pixel
-  // of each line and subtract minX from maxX to ensure that we accommodate the rightmost rendered
-  // pixel, which may be on a line other than the widest.
-  //
-  // Finally, we have to use the line origins reported by CTFrame to calculate the inter-line
-  // spacing, because that does not seem to be reported by CTFont.LeadingMetric (which is where I
-  // would expect it to be reported), and it is non-zero.
+class IOSTextLayout implements TextLayout {
 
-  private abstract class IOSTextStamp {
-    public float width, height, ascent, descent, leading;
-
-    public abstract int lineCount();
-    public abstract Rectangle lineBounds(int line);
-    public abstract void paint(CGBitmapContext bctx, float x, float y, boolean antialias);
+  public static IOSTextLayout layoutText(IOSGraphics gfx, final String text, TextFormat format) {
+    final IOSFont font = (format.font == null) ? IOSGraphics.defaultFont : (IOSFont) format.font;
+    CTStringAttributes attribs = createAttribs(font);
+    CTLine line = new CTLine(new NSAttributedString(text, attribs));
+    return new IOSTextLayout(gfx, text, format, font, line);
   }
 
-  private class Wrapped extends IOSTextStamp {
-    protected static final float MAX_HEIGHT = 10000f;
-    private final CTLine[] lines;
-    private final PointF[] origins;
-    private final float adjustX;
-    private final float lineHeight;
+  public static IOSTextLayout[] layoutText(IOSGraphics gfx, String text, TextFormat format,
+                                           TextWrap wrap) {
+    text = AbstractTextLayout.normalizeEOL(text);
 
-    Wrapped(IOSFont font, CTStringAttributes attribs, String text) {
-      this.ascent = font.ctFont.get_AscentMetric();
-      this.descent = font.ctFont.get_DescentMetric();
-      this.leading = font.ctFont.get_LeadingMetric();
-      this.lineHeight = ascent + descent + leading;
+    final IOSFont font = (format.font == null) ? IOSGraphics.defaultFont : (IOSFont) format.font;
+    CTStringAttributes attribs = createAttribs(font);
+    CTLine[] lines = wrapLines(gfx, new NSAttributedString(text, attribs), wrap.width);
 
-      NSAttributedString atext = new NSAttributedString(text, attribs);
-      CTFramesetter fs = new CTFramesetter(atext);
-      try {
-        CGPath path = new CGPath();
-        path.AddRect(new RectangleF(0, 0, format.wrapWidth, MAX_HEIGHT));
-        CTFrame frame = fs.GetFrame(new NSRange(0, 0), path, null);
-        this.lines = frame.GetLines();
-        this.origins = new PointF[lines.length];
-        frame.GetLineOrigins(new NSRange(0, 0), origins);
-        float minX = Float.MAX_VALUE, maxX = 0;
-        for (int ii = 0; ii < lines.length; ii++) {
-          RectangleF bounds = lines[ii].GetImageBounds(gfx.scratchCtx);
-          float ox = origins[ii].get_X(), lineX = ox + bounds.get_X() + bounds.get_Width();
-          minX = Math.min(ox, minX);
-          maxX = Math.max(maxX, lineX);
-        }
-        this.adjustX = -minX;
-        this.width = maxX - minX;
-        this.height = lineHeight * lines.length - leading;
-
-      } finally {
-        fs.Dispose();
-      }
+    IOSTextLayout[] layouts = new IOSTextLayout[lines.length];
+    for (int ii = 0; ii < lines.length; ii++) {
+      NSRange range = lines[ii].get_StringRange();
+      String ltext = text.substring(range.Location, range.Location+range.Length);
+      layouts[ii] = new IOSTextLayout(gfx, ltext, format, font, lines[ii]);
     }
+    return layouts;
+  }
 
-    @Override
-    public int lineCount() {
-      return lines.length;
-    }
+  private static CTStringAttributes createAttribs(IOSFont font) {
+    CTStringAttributes attribs = new CTStringAttributes();
+    attribs.set_Font(font.ctFont);
+    attribs.set_ForegroundColorFromContext(true);
+    return attribs;
+  }
 
-    @Override
-    public Rectangle lineBounds (int line) {
-      // TODO: maybe cache bounds for lines?
-      RectangleF bounds = lines[line].GetImageBounds(gfx.scratchCtx);
-      return new Rectangle(origins[line].get_X()+pad+adjustX, line*lineHeight+pad,
-        bounds.get_Width(), lineHeight);
-    }
+  private static void addStroke(CTStringAttributes attribs, IOSFont font,
+                                float strokeWidth, int strokeColor) {
+    // stroke width is expressed as a percentage of the font size in iOS
+    float strokePct = 100 * strokeWidth / font.size();
+    attribs.set_StrokeWidth(new cli.System.Nullable$$00601_$$$_F_$$$$_(strokePct));
+    // unfortunately we have to set the stroke color here, we cannot inherit it from the context
+    attribs.set_StrokeColor(IOSCanvas.toCGColor(strokeColor));
+  }
 
-    @Override
-    public void paint(CGBitmapContext bctx, float x, float y, boolean antialias) {
-      float dx = x + adjustX, dy = y + ascent;
-      bctx.SaveState();
-      bctx.TranslateCTM(dx, dy);
-      bctx.ScaleCTM(1, -1);
-      bctx.SetShouldAntialias(antialias);
-      PointF origin = new PointF(0, 0);
-      for (int ii = 0; ii < lines.length; ii++) {
-        origin.set_X(origins[ii].get_X());
-        bctx.set_TextPosition(origin);
-        lines[ii].Draw(bctx);
-        bctx.TranslateCTM(0, -lineHeight);
-      }
-      bctx.RestoreState();
+  private static CTLine[] wrapLines(IOSGraphics gfx, NSAttributedString astring, float wrapWidth) {
+    CTFramesetter fs = new CTFramesetter(astring);
+    try {
+      CGPath path = new CGPath();
+      // iOS lays things out from max-y up to zero (inverted coordinate system); so we need to
+      // provide a large height for our rectangle to ensure that all lines "fit"
+      path.AddRect(new RectangleF(0, 0, wrapWidth, Float.MAX_VALUE/2));
+      CTFrame frame = fs.GetFrame(new NSRange(0, 0), path, null);
+      return frame.GetLines();
+    } finally {
+      fs.Dispose();
     }
   }
 
-  private class Single extends IOSTextStamp {
-    private final CTLine line;
-    private final RectangleF bounds;
-
-    Single(IOSFont font, CTStringAttributes attribs, String text) {
-      this.ascent = font.ctFont.get_AscentMetric();
-      this.descent = font.ctFont.get_DescentMetric();
-      this.leading = font.ctFont.get_LeadingMetric();
-      this.line = new CTLine(new NSAttributedString(text, attribs));
-      this.bounds = line.GetImageBounds(gfx.scratchCtx);
-      this.width = bounds.get_X() + bounds.get_Width();
-      this.height = ascent + descent;
-    }
-
-    @Override
-    public int lineCount() {
-      return 1;
-    }
-
-    @Override
-    public Rectangle lineBounds(int line) {
-      return new Rectangle(pad, pad, width, height);
-    }
-
-    @Override
-    public void paint(CGBitmapContext bctx, float x, float y, boolean antialias) {
-      float dy = y + ascent;
-      bctx.SaveState();
-      bctx.TranslateCTM(x, dy);
-      bctx.ScaleCTM(1, -1);
-      bctx.SetShouldAntialias(antialias);
-      bctx.set_TextPosition(new PointF(0, 0));
-      line.Draw(bctx);
-      bctx.RestoreState();
-    }
-  }
-
-  private final IOSGraphics gfx;
   private final String text;
-  private final IOSTextStamp fillStamp;
-  private IOSTextStamp strokeStamp; // initialized lazily
+  private final TextFormat format;
+  private final IOSFont font;
+  private final CTLine fillLine;
+  private final Rectangle bounds;
+  private CTLine strokeLine; // initialized lazily
   private float strokeWidth;
+  private int strokeColor;
 
-  public IOSTextLayout(IOSGraphics gfx, String text, TextFormat format) {
-    super(gfx, text, format);
-    this.gfx = gfx;
-    // normalize newlines in the text (Windows: CRLF -> LF, Mac OS pre-X: CR -> LF)
-    this.text = text.replace("\r\n", "\n").replace('\r', '\n');
-    this.fillStamp = createStamp(this.text, null, null);
-    this.width = fillStamp.width;
-    this.height = fillStamp.height;
+  private IOSTextLayout(IOSGraphics gfx, String text, TextFormat format, IOSFont font,
+                        CTLine fillLine) {
+    this.text = text;
+    this.format = format;
+    this.font = font;
+    this.fillLine = fillLine;
+    RectangleF bounds = fillLine.GetImageBounds(gfx.scratchCtx);
+    // the y coordinate of bounds is a little tricky: iOS reports y as the number of pixels to
+    // below the baseline that the text extends (the descent, but precisely for this text, not the
+    // font's "maximum" descent) and the value is negative (due to the inverted coordinate system);
+    // so we have to do some math to recover the desired y value which is the number of pixels
+    // below the top-left of the line bounding box
+    this.bounds = new Rectangle(bounds.get_X(), ascent() - (bounds.get_Height() + bounds.get_Y()),
+                                bounds.get_Width(), bounds.get_Height());
+  }
+
+  @Override
+  public String text() {
+    return text;
+  }
+
+  @Override
+  public TextFormat format() {
+    return format;
+  }
+
+  @Override
+  public float width() {
+    return Math.max(bounds.x, 0) + bounds.width;
+  }
+
+  @Override
+  public float height() {
+    return ascent() + descent();
+  }
+
+  @Override
+  public IRectangle bounds() {
+    return bounds;
   }
 
   @Override
   public int lineCount() {
-    return fillStamp.lineCount();
+    throw new UnsupportedOperationException();
   }
 
   @Override
   public Rectangle lineBounds(int line) {
-    return fillStamp.lineBounds(line);
+    throw new UnsupportedOperationException();
   }
 
   @Override
   public float ascent() {
-    return fillStamp.ascent;
+    return font.ctFont.get_AscentMetric();
   }
 
   @Override
   public float descent() {
-    return fillStamp.descent;
+    return font.ctFont.get_DescentMetric();
   }
 
   @Override
   public float leading() {
-    return fillStamp.leading;
+    return font.ctFont.get_LeadingMetric();
   }
 
   void stroke(CGBitmapContext bctx, float x, float y, float strokeWidth, int strokeColor) {
-    if (strokeStamp == null || strokeWidth != this.strokeWidth) {
+    if (strokeLine == null || strokeWidth != this.strokeWidth || strokeColor != this.strokeColor) {
       this.strokeWidth = strokeWidth;
-      strokeStamp = createStamp(text, strokeWidth, strokeColor);
+      this.strokeColor = strokeColor;
+      CTStringAttributes attribs = createAttribs(font);
+      addStroke(attribs, font, strokeWidth, strokeColor);
+      strokeLine = new CTLine(new NSAttributedString(text, attribs));
     }
-    strokeStamp.paint(bctx, x+pad, y+pad, format.antialias);
+    paint(bctx, strokeLine, x, y);
   }
 
   void fill(CGBitmapContext bctx, float x, float y) {
-    fillStamp.paint(bctx, x+pad, y+pad, format.antialias);
+    paint(bctx, fillLine, x, y);
   }
 
-  private IOSTextStamp createStamp(String text, Float strokeWidth, Integer strokeColor) {
-    CTStringAttributes attribs = new CTStringAttributes();
-    IOSFont font = (format.font == null) ? IOSGraphics.defaultFont : (IOSFont) format.font;
-    attribs.set_Font(font.ctFont);
-    attribs.set_ForegroundColorFromContext(true);
-
-    if (strokeWidth != null) {
-      // stroke width is expressed as a percentage of the font size in iOS
-      float strokePct = 100 * strokeWidth / font.size();
-      attribs.set_StrokeWidth(new cli.System.Nullable$$00601_$$$_F_$$$$_(strokePct));
-      // unfortunately we have to set the stroke color here, we cannot inherit it from the context
-      attribs.set_StrokeColor(IOSCanvas.toCGColor(strokeColor));
-    }
-
-    CTParagraphStyleSettings pstyle = new CTParagraphStyleSettings();
-    // the "view C# as Java" abstraction is suffering a bit here; please avert your eyes
-    pstyle.set_Alignment(new cli.System.Nullable$$00601_$$$_Lcli__MonoTouch__CoreText__CTTextAlignment_$$$$_(toCT(format.align)));
-    attribs.set_ParagraphStyle(new CTParagraphStyle(pstyle));
-
-    if (format.shouldWrap() || text.indexOf('\n') != -1) {
-      return new Wrapped(font, attribs, text);
-    } else {
-      return new Single(font, attribs, text);
-    }
-  }
-
-  private static CTTextAlignment toCT(TextFormat.Alignment align) {
-    switch (align) {
-    default:
-    case LEFT: return CTTextAlignment.wrap(CTTextAlignment.Left);
-    case CENTER: return CTTextAlignment.wrap(CTTextAlignment.Center);
-    case RIGHT: return CTTextAlignment.wrap(CTTextAlignment.Right);
-    }
+  private void paint(CGBitmapContext bctx, CTLine line, float x, float y) {
+    bctx.SaveState();
+    bctx.TranslateCTM(x, y + ascent());
+    bctx.ScaleCTM(1, -1);
+    bctx.SetShouldAntialias(format.antialias);
+    bctx.set_TextPosition(new PointF(0, 0));
+    line.Draw(bctx);
+    bctx.RestoreState();
   }
 }
