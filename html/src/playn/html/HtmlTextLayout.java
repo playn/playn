@@ -1,5 +1,5 @@
 /**
- * Copyright 2010 The PlayN Authors
+ * Copyright 2013 The PlayN Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
@@ -17,68 +17,88 @@ package playn.html;
 
 import com.google.gwt.canvas.dom.client.Context2d;
 
-import playn.core.AbstractTextLayout;
-import playn.core.Font;
-import playn.core.TextFormat;
+import pythagoras.f.IRectangle;
 import pythagoras.f.Rectangle;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static playn.core.PlayN.graphics;
+import playn.core.AbstractTextLayout;
+import playn.core.Font;
+import playn.core.TextFormat;
+import playn.core.TextLayout;
+import playn.core.TextWrap;
 
-class HtmlTextLayout extends AbstractTextLayout {
+class HtmlTextLayout implements TextLayout {
 
-  private HtmlFontMetrics metrics;
-  private List<Line> lines = new ArrayList<Line>();
-
-  private static class Line {
-    public final String text;
-    public final float width;
-    public Line(String text, float width) {
-      this.text = text;
-      this.width = width;
-    }
+  public static TextLayout layoutText(HtmlGraphics gfx, Context2d ctx, String text,
+                                      TextFormat format) {
+    HtmlFontMetrics metrics = gfx.getFontMetrics(getFont(format));
+    configContext(ctx, format);
+    float width = (float)ctx.measureText(text).getWidth();
+    return new HtmlTextLayout(text, format, metrics, width);
   }
 
-  HtmlTextLayout(Context2d ctx, String text, TextFormat format) {
-    super(text, format);
-    Font font = getFont(format);
-    this.metrics = ((HtmlGraphics)graphics()).getFontMetrics(font);
-    configContext(ctx);
+  public static TextLayout[] layoutText(HtmlGraphics gfx, Context2d ctx, String text,
+                                        TextFormat format, TextWrap wrap) {
+    HtmlFontMetrics metrics = gfx.getFontMetrics(getFont(format));
+    configContext(ctx, format);
+    List<TextLayout> layouts = new ArrayList<TextLayout>();
 
     // normalize newlines in the text (Windows: CRLF -> LF, Mac OS pre-X: CR -> LF)
-    text = text.replace("\r\n", "\n").replace('\r', '\n');
-
-    if (format.shouldWrap() || text.indexOf('\n') != -1) {
-      for (String line : text.split("\\n")) {
-        String[] words = line.split("\\s"); // TODO: preserve intra-line whitespace
-        for (int idx = 0; idx < words.length; ) {
-          // note: measureLine has the side effect of adding the measured line to this.lines and
-          // setting this.width to the maximum of the current width and the measured line width
-          idx = measureLine(ctx, words, idx);
-        }
+    text = AbstractTextLayout.normalizeEOL(text);
+    for (String line : text.split("\\n")) {
+      String[] words = line.split("\\s"); // TODO: preserve intra-line whitespace
+      for (int idx = 0; idx < words.length; ) {
+        // note: measureLine has the side effect of adding the measured line to this.lines and
+        // setting this.width to the maximum of the current width and the measured line width
+        idx = measureLine(ctx, format, wrap, metrics, words, idx, layouts);
       }
-      height = metrics.height * lines.size();
-
-    } else {
-      width = (float)ctx.measureText(text).getWidth();
-      height = metrics.height;
-      lines.add(new Line(text, width));
     }
+    return layouts.toArray(new TextLayout[layouts.size()]);
+  }
 
-    // Canvas.measureText does not account for the extra width consumed by italic characters, so we
-    // fudge in a fraction of an em and hope the font isn't too slanted
-    switch (font.style()) {
-    case ITALIC:      width += metrics.emwidth/8; break;
-    case BOLD_ITALIC: width += metrics.emwidth/6; break;
-    default: break; // nada
-    }
+  private final String text;
+  private final TextFormat format;
+  private final HtmlFontMetrics metrics;
+  private final Rectangle bounds;
+
+  HtmlTextLayout(String text, TextFormat format, HtmlFontMetrics metrics, float width) {
+    this.text = text;
+    this.format = format;
+    this.metrics = metrics;
+    this.bounds = new Rectangle(0, 0, metrics.adjustWidth(width), metrics.height);
+  }
+
+  @Override
+  public String text() {
+    return text;
+  }
+
+  @Override
+  public TextFormat format() {
+    return format;
+  }
+
+  @Override
+  public float width() {
+    // if the x position is positive, we need to include extra space in our full-width for it
+    return Math.max(bounds.x, 0) + bounds.width;
+  }
+
+  @Override
+  public float height() {
+    return ascent() + descent();
+  }
+
+  @Override
+  public IRectangle bounds() {
+    return bounds;
   }
 
   @Override
   public int lineCount() {
-    return lines.size();
+    throw new UnsupportedOperationException();
   }
 
   @Override
@@ -88,38 +108,30 @@ class HtmlTextLayout extends AbstractTextLayout {
 
   @Override
   public float ascent() {
-    throw new UnsupportedOperationException("Text ascent not supported in HTML backend."); // TODO
+    return metrics.ascent();
   }
 
   @Override
   public float descent() {
-    throw new UnsupportedOperationException("Text descent not supported in HTML backend."); // TODO
+    return metrics.descent();
   }
 
   @Override
   public float leading() {
-    throw new UnsupportedOperationException("Text leading not supported in HTML backend."); // TODO
+    return metrics.leading();
   }
 
   void stroke(Context2d ctx, float x, float y) {
-    configContext(ctx);
-    float ypos = 0;
-    for (Line line : lines) {
-      ctx.strokeText(line.text, x + format.align.getX(line.width, width), y + ypos);
-      ypos += metrics.height;
-    }
+    configContext(ctx, format);
+    ctx.strokeText(text, x, y);
   }
 
   void fill(Context2d ctx, float x, float y) {
-    configContext(ctx);
-    float ypos = 0;
-    for (Line line : lines) {
-      ctx.fillText(line.text, x + format.align.getX(line.width, width), y + ypos);
-      ypos += metrics.height;
-    }
+    configContext(ctx, format);
+    ctx.fillText(text, x, y);
   }
 
-  void configContext(Context2d ctx) {
+  static void configContext(Context2d ctx, TextFormat format) {
     Font font = getFont(format);
     String style = "";
     switch (font.style()) {
@@ -133,11 +145,12 @@ class HtmlTextLayout extends AbstractTextLayout {
     ctx.setTextBaseline(Context2d.TextBaseline.TOP);
   }
 
-  Font getFont(TextFormat format) {
-    return format.font == null ? HtmlFont.DEFAULT : format.font;
+  static HtmlFont getFont(TextFormat format) {
+    return (format.font == null) ? HtmlFont.DEFAULT : (HtmlFont)format.font;
   }
 
-  int measureLine(Context2d ctx, String[] words, int idx) {
+  static int measureLine(Context2d ctx, TextFormat format, TextWrap wrap, HtmlFontMetrics metrics,
+                         String[] words, int idx, List<TextLayout> layouts) {
     // we always put at least one word on a line
     String line = words[idx++];
     int startIdx = idx;
@@ -145,32 +158,32 @@ class HtmlTextLayout extends AbstractTextLayout {
     // build a rough estimate line based on character count and emwidth
     for (; idx < words.length; idx++) {
       String nline = line + " " + words[idx];
-      if (nline.length() * metrics.emwidth > format.wrapWidth) break;
+      if (nline.length() * metrics.emwidth > wrap.width) break;
       line = nline;
     }
 
     // now, based on exact measurements, either add more words...
     double lineWidth = ctx.measureText(line).getWidth();
-    if (lineWidth < format.wrapWidth) {
+    if (lineWidth < wrap.width) {
       for (; idx < words.length; idx++) {
         String nline = line + " " + words[idx];
         double nlineWidth = ctx.measureText(nline).getWidth();
-        if (nlineWidth > format.wrapWidth) break;
+        if (nlineWidth > wrap.width) break;
         line = nline;
         lineWidth = nlineWidth;
       }
     }
 
     // or pop words off...
-    while (lineWidth > format.wrapWidth && idx > (startIdx+1)) { // don't pop off the last word
+    while (lineWidth > wrap.width && idx > (startIdx+1)) { // don't pop off the last word
       line = line.substring(0, line.length() - words[--idx].length() - 1);
       lineWidth = ctx.measureText(line).getWidth();
     }
 
     // finally, if we're still over the limit (we have a single looong word), hard break
-    if (lineWidth > format.wrapWidth) {
+    if (lineWidth > wrap.width) {
       StringBuilder remainder = new StringBuilder();
-      while (lineWidth > format.wrapWidth && line.length() > 1) {
+      while (lineWidth > wrap.width && line.length() > 1) {
         // this could be more efficient, but this edge case should be rare enough not to matter
         int lastIdx = line.length()-1;
         remainder.insert(0, line.charAt(lastIdx));
@@ -180,8 +193,7 @@ class HtmlTextLayout extends AbstractTextLayout {
       words[--idx] = remainder.toString();
     }
 
-    lines.add(new Line(line, (float)lineWidth));
-    width = (float)Math.max(width, lineWidth);
+    layouts.add(new HtmlTextLayout(line, format, metrics, (float)lineWidth));
     return idx;
   }
 }

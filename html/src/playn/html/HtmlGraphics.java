@@ -37,6 +37,7 @@ import playn.core.Gradient;
 import playn.core.Graphics;
 import playn.core.TextFormat;
 import playn.core.TextLayout;
+import playn.core.TextWrap;
 import playn.core.gl.GL20;
 import playn.core.gl.Scale;
 
@@ -96,7 +97,7 @@ public abstract class HtmlGraphics implements Graphics {
   public void registerFontMetrics(String name, Font.Style style, float size, float lineHeight) {
     HtmlFont font = new HtmlFont(this, name, style, size);
     HtmlFontMetrics metrics = getFontMetrics(font); // get emwidth via default measurement
-    fontMetrics.put(font, new HtmlFontMetrics(lineHeight, metrics.emwidth));
+    fontMetrics.put(font, new HtmlFontMetrics(font, lineHeight, metrics.emwidth));
   }
 
   @Override
@@ -135,7 +136,16 @@ public abstract class HtmlGraphics implements Graphics {
 
   @Override
   public TextLayout layoutText(String text, TextFormat format) {
-    return new HtmlTextLayout(dummyCtx, text, format);
+    // TEMP: handle multiline in TextFormat until that's removed
+    if (format.shouldWrap() || text.indexOf('\n') != -1 ||  text.indexOf('\r') != -1)
+      return new OldHtmlTextLayout(dummyCtx, text, format);
+    else
+      return HtmlTextLayout.layoutText(this, dummyCtx, text, format);
+  }
+
+  @Override
+  public TextLayout[] layoutText(String text, TextFormat format, TextWrap wrap) {
+    return HtmlTextLayout.layoutText(this, dummyCtx, text, format, wrap);
   }
 
   @Override
@@ -216,7 +226,7 @@ public abstract class HtmlGraphics implements Graphics {
 
   abstract Scale scale();
 
-  HtmlFontMetrics getFontMetrics(Font font) {
+  HtmlFontMetrics getFontMetrics(HtmlFont font) {
     HtmlFontMetrics metrics = fontMetrics.get(font);
     if (metrics == null) {
       // TODO: when Context2d.measureText some day returns a height, nix this hackery
@@ -237,7 +247,7 @@ public abstract class HtmlGraphics implements Graphics {
       float height = measureElement.getOffsetHeight();
       measureElement.setInnerText(EMWIDTH_TEXT);
       float emwidth = measureElement.getOffsetWidth();
-      metrics = new HtmlFontMetrics(height, emwidth);
+      metrics = new HtmlFontMetrics(font, height, emwidth);
       fontMetrics.put(font, metrics);
     }
     return metrics;
