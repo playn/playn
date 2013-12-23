@@ -19,7 +19,6 @@ import java.util.LinkedList;
 
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
-import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.graphics.RectF;
@@ -33,10 +32,6 @@ import playn.core.TextLayout;
 import playn.core.gl.AbstractCanvasGL;
 
 class AndroidCanvas extends AbstractCanvasGL<AndroidCanvas> {
-
-  interface Drawable {
-    void draw(android.graphics.Canvas canvas, float x, float y, Paint paint);
-  }
 
   private static Matrix m = new Matrix();
   private static Rect rect = new Rect();
@@ -157,7 +152,7 @@ class AndroidCanvas extends AbstractCanvasGL<AndroidCanvas> {
 
   @Override
   public Canvas fillText(TextLayout layout, float x, float y) {
-    ((Drawable)layout).draw(canvas, x, y, currentState().prepareFill());
+    ((AndroidTextLayout)layout).draw(canvas, x, y, currentState().prepareFill());
     isDirty = true;
     return this;
   }
@@ -295,7 +290,7 @@ class AndroidCanvas extends AbstractCanvasGL<AndroidCanvas> {
 
   @Override
   public Canvas strokeText(TextLayout layout, float x, float y) {
-    ((Drawable)layout).draw(canvas, x, y, currentState().prepareStroke());
+    ((AndroidTextLayout)layout).draw(canvas, x, y, currentState().prepareStroke());
     isDirty = true;
     return this;
   }

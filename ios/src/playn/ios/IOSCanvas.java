@@ -36,11 +36,6 @@ import playn.core.gl.AbstractCanvasGL;
  */
 public class IOSCanvas extends AbstractCanvasGL<CGBitmapContext> {
 
-  public interface Drawable {
-    void stroke(CGBitmapContext bctx, float x, float y, float strokeWidth, int strokeColor);
-    void fill(CGBitmapContext bctx, float x, float y);
-  }
-
   private final int texWidth, texHeight;
 
   private float strokeWidth = 1;
@@ -233,7 +228,7 @@ public class IOSCanvas extends AbstractCanvasGL<CGBitmapContext> {
   @Override
   public Canvas fillText(TextLayout layout, float x, float y) {
     IOSGradient gradient = currentState().gradient;
-    Drawable ilayout = (Drawable) layout;
+    IOSTextLayout ilayout = (IOSTextLayout) layout;
     if (gradient == null) {
       ilayout.fill(bctx, x, y);
 
@@ -388,7 +383,7 @@ public class IOSCanvas extends AbstractCanvasGL<CGBitmapContext> {
 
   @Override
   public Canvas strokeText(TextLayout layout, float x, float y) {
-    ((Drawable) layout).stroke(bctx, x, y, strokeWidth, strokeColor);
+    ((IOSTextLayout) layout).stroke(bctx, x, y, strokeWidth, strokeColor);
     isDirty = true;
     return this;
   }

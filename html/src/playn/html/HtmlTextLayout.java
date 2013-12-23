@@ -17,7 +17,6 @@ package playn.html;
 
 import com.google.gwt.canvas.dom.client.Context2d;
 
-import pythagoras.f.IRectangle;
 import pythagoras.f.Rectangle;
 
 import java.util.ArrayList;
@@ -29,7 +28,7 @@ import playn.core.TextFormat;
 import playn.core.TextLayout;
 import playn.core.TextWrap;
 
-class HtmlTextLayout implements TextLayout, AbstractHtmlCanvas.Drawable {
+class HtmlTextLayout extends AbstractTextLayout {
 
   public static TextLayout layoutText(HtmlGraphics gfx, Context2d ctx, String text,
                                       TextFormat format) {
@@ -58,52 +57,11 @@ class HtmlTextLayout implements TextLayout, AbstractHtmlCanvas.Drawable {
     return layouts.toArray(new TextLayout[layouts.size()]);
   }
 
-  private final String text;
-  private final TextFormat format;
   private final HtmlFontMetrics metrics;
-  private final Rectangle bounds;
 
   HtmlTextLayout(String text, TextFormat format, HtmlFontMetrics metrics, float width) {
-    this.text = text;
-    this.format = format;
+    super(text, format, new Rectangle(0, 0, metrics.adjustWidth(width), metrics.height));
     this.metrics = metrics;
-    this.bounds = new Rectangle(0, 0, metrics.adjustWidth(width), metrics.height);
-  }
-
-  @Override
-  public String text() {
-    return text;
-  }
-
-  @Override
-  public TextFormat format() {
-    return format;
-  }
-
-  @Override
-  public float width() {
-    // if the x position is positive, we need to include extra space in our full-width for it
-    return Math.max(bounds.x, 0) + bounds.width;
-  }
-
-  @Override
-  public float height() {
-    return ascent() + descent();
-  }
-
-  @Override
-  public IRectangle bounds() {
-    return bounds;
-  }
-
-  @Override
-  public int lineCount() {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public Rectangle lineBounds(int line) {
-    throw new UnsupportedOperationException("Line bounds not supported in HTML backend."); // TODO
   }
 
   @Override
@@ -121,12 +79,12 @@ class HtmlTextLayout implements TextLayout, AbstractHtmlCanvas.Drawable {
     return metrics.leading();
   }
 
-  public void stroke(Context2d ctx, float x, float y) {
+  void stroke(Context2d ctx, float x, float y) {
     configContext(ctx, format);
     ctx.strokeText(text, x, y);
   }
 
-  public void fill(Context2d ctx, float x, float y) {
+  void fill(Context2d ctx, float x, float y) {
     configContext(ctx, format);
     ctx.fillText(text, x, y);
   }

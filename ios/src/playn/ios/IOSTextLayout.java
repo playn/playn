@@ -26,15 +26,13 @@ import cli.MonoTouch.Foundation.NSRange;
 import cli.System.Drawing.PointF;
 import cli.System.Drawing.RectangleF;
 
-import pythagoras.f.IRectangle;
 import pythagoras.f.Rectangle;
 
 import playn.core.AbstractTextLayout;
 import playn.core.TextFormat;
-import playn.core.TextLayout;
 import playn.core.TextWrap;
 
-class IOSTextLayout implements TextLayout, IOSCanvas.Drawable {
+class IOSTextLayout extends AbstractTextLayout {
 
   public static IOSTextLayout layoutText(IOSGraphics gfx, final String text, TextFormat format) {
     final IOSFont font = (format.font == null) ? IOSGraphics.defaultFont : (IOSFont) format.font;
@@ -45,7 +43,7 @@ class IOSTextLayout implements TextLayout, IOSCanvas.Drawable {
 
   public static IOSTextLayout[] layoutText(IOSGraphics gfx, String text, TextFormat format,
                                            TextWrap wrap) {
-    text = AbstractTextLayout.normalizeEOL(text);
+    text = normalizeEOL(text);
 
     final IOSFont font = (format.font == null) ? IOSGraphics.defaultFont : (IOSFont) format.font;
     CTStringAttributes attribs = createAttribs(font);
@@ -90,64 +88,17 @@ class IOSTextLayout implements TextLayout, IOSCanvas.Drawable {
     }
   }
 
-  private final String text;
-  private final TextFormat format;
   private final IOSFont font;
   private final CTLine fillLine;
-  private final Rectangle bounds;
   private CTLine strokeLine; // initialized lazily
   private float strokeWidth;
   private int strokeColor;
 
   private IOSTextLayout(IOSGraphics gfx, String text, TextFormat format, IOSFont font,
                         CTLine fillLine) {
-    this.text = text;
-    this.format = format;
+    super(text, format, computeBounds(font, fillLine.GetImageBounds(gfx.scratchCtx)));
     this.font = font;
     this.fillLine = fillLine;
-    RectangleF bounds = fillLine.GetImageBounds(gfx.scratchCtx);
-    // the y coordinate of bounds is a little tricky: iOS reports y as the number of pixels to
-    // below the baseline that the text extends (the descent, but precisely for this text, not the
-    // font's "maximum" descent) and the value is negative (due to the inverted coordinate system);
-    // so we have to do some math to recover the desired y value which is the number of pixels
-    // below the top-left of the line bounding box
-    this.bounds = new Rectangle(bounds.get_X(), ascent() - (bounds.get_Height() + bounds.get_Y()),
-                                bounds.get_Width(), bounds.get_Height());
-  }
-
-  @Override
-  public String text() {
-    return text;
-  }
-
-  @Override
-  public TextFormat format() {
-    return format;
-  }
-
-  @Override
-  public float width() {
-    return Math.max(bounds.x, 0) + bounds.width;
-  }
-
-  @Override
-  public float height() {
-    return ascent() + descent();
-  }
-
-  @Override
-  public IRectangle bounds() {
-    return bounds;
-  }
-
-  @Override
-  public int lineCount() {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public Rectangle lineBounds(int line) {
-    throw new UnsupportedOperationException();
   }
 
   @Override
@@ -165,7 +116,7 @@ class IOSTextLayout implements TextLayout, IOSCanvas.Drawable {
     return font.ctFont.get_LeadingMetric();
   }
 
-  public void stroke(CGBitmapContext bctx, float x, float y, float strokeWidth, int strokeColor) {
+  void stroke(CGBitmapContext bctx, float x, float y, float strokeWidth, int strokeColor) {
     if (strokeLine == null || strokeWidth != this.strokeWidth || strokeColor != this.strokeColor) {
       this.strokeWidth = strokeWidth;
       this.strokeColor = strokeColor;
@@ -176,7 +127,7 @@ class IOSTextLayout implements TextLayout, IOSCanvas.Drawable {
     paint(bctx, strokeLine, x, y);
   }
 
-  public void fill(CGBitmapContext bctx, float x, float y) {
+  void fill(CGBitmapContext bctx, float x, float y) {
     paint(bctx, fillLine, x, y);
   }
 
@@ -188,5 +139,16 @@ class IOSTextLayout implements TextLayout, IOSCanvas.Drawable {
     bctx.set_TextPosition(new PointF(0, 0));
     line.Draw(bctx);
     bctx.RestoreState();
+  }
+
+  private static Rectangle computeBounds(IOSFont font, RectangleF bounds) {
+    // the y coordinate of bounds is a little tricky: iOS reports y as the number of pixels to
+    // below the baseline that the text extends (the descent, but precisely for this text, not the
+    // font's "maximum" descent) and the value is negative (due to the inverted coordinate system);
+    // so we have to do some math to recover the desired y value which is the number of pixels
+    // below the top-left of the line bounding box
+    float ascent = font.ctFont.get_AscentMetric();
+    return new Rectangle(bounds.get_X(), ascent - (bounds.get_Height() + bounds.get_Y()),
+                         bounds.get_Width(), bounds.get_Height());
   }
 }

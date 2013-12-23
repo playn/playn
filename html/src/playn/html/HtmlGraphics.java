@@ -136,11 +136,7 @@ public abstract class HtmlGraphics implements Graphics {
 
   @Override
   public TextLayout layoutText(String text, TextFormat format) {
-    // TEMP: handle multiline in TextFormat until that's removed
-    if (format.shouldWrap() || text.indexOf('\n') != -1 ||  text.indexOf('\r') != -1)
-      return new OldHtmlTextLayout(dummyCtx, text, format);
-    else
-      return HtmlTextLayout.layoutText(this, dummyCtx, text, format);
+    return HtmlTextLayout.layoutText(this, dummyCtx, text, format);
   }
 
   @Override

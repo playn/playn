@@ -19,7 +19,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import pythagoras.f.Rectangle;
-import pythagoras.f.IRectangle;
 
 import playn.core.AbstractTextLayout;
 import playn.core.TextFormat;
@@ -29,14 +28,10 @@ import playn.core.TextWrap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 
-class AndroidTextLayout implements TextLayout, AndroidCanvas.Drawable {
+class AndroidTextLayout extends AbstractTextLayout {
 
-  private final String text;
-  private final TextFormat format;
   private final AndroidFont font;
-
   private final Paint.FontMetrics metrics;
-  private final Rectangle bounds;
 
   public static TextLayout layoutText(String text, TextFormat format) {
     AndroidFont font = (format.font == null) ? AndroidFont.DEFAULT : (AndroidFont)format.font;
@@ -125,31 +120,6 @@ class AndroidTextLayout implements TextLayout, AndroidCanvas.Drawable {
   }
 
   @Override
-  public String text() {
-    return text;
-  }
-
-  @Override
-  public TextFormat format() {
-    return format;
-  }
-
-  @Override
-  public float width() {
-    return bounds.width;
-  }
-
-  @Override
-  public float height() {
-    return ascent() + descent();
-  }
-
-  @Override
-  public IRectangle bounds() {
-    return bounds;
-  }
-
-  @Override
   public float ascent() {
     return -metrics.ascent;
   }
@@ -164,17 +134,15 @@ class AndroidTextLayout implements TextLayout, AndroidCanvas.Drawable {
     return metrics.leading;
   }
 
-  @Override @Deprecated
-  public int lineCount() {
-    return 1;
+  AndroidTextLayout(String text, TextFormat format, AndroidFont font, Paint.FontMetrics metrics,
+                    float width) {
+    // Android doesn't provide a way to get precise text bounds, so we half-ass it, woo!
+    super(text, format, new Rectangle(0, 0, width, -metrics.ascent+metrics.descent));
+    this.font = font;
+    this.metrics = metrics;
   }
 
-  @Override @Deprecated
-  public Rectangle lineBounds(int line) {
-    return new Rectangle(bounds);
-  }
-
-  public void draw(Canvas canvas, float x, float y, Paint paint) {
+  void draw(Canvas canvas, float x, float y, Paint paint) {
     boolean oldAA = paint.isAntiAlias();
     paint.setAntiAlias(format.antialias);
     try {
@@ -186,16 +154,6 @@ class AndroidTextLayout implements TextLayout, AndroidCanvas.Drawable {
     } finally {
       paint.setAntiAlias(oldAA);
     }
-  }
-
-  AndroidTextLayout(String text, TextFormat format, AndroidFont font, Paint.FontMetrics metrics,
-                    float width) {
-    this.text = text;
-    this.format = format;
-    this.font = font;
-    this.metrics = metrics;
-    // Android doesn't provide a way to get precise text bounds, so we half-ass it, woo!
-    this.bounds = new Rectangle(0, 0, width, -metrics.ascent+metrics.descent);
   }
 
   static int accountForLigatures (String text, int start, int count, String[] ligatures) {

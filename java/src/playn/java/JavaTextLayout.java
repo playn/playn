@@ -26,14 +26,13 @@ import java.text.AttributedString;
 import java.util.ArrayList;
 import java.util.List;
 
-import pythagoras.f.IRectangle;
 import pythagoras.f.Rectangle;
 
 import playn.core.AbstractTextLayout;
 import playn.core.TextFormat;
 import playn.core.TextWrap;
 
-class JavaTextLayout implements playn.core.TextLayout, JavaCanvas.Drawable {
+class JavaTextLayout extends AbstractTextLayout {
 
   public static JavaTextLayout layoutText(JavaGraphics gfx, String text, TextFormat format) {
     // we do some fiddling to work around the fact that TextLayout chokes on the empty string
@@ -48,8 +47,7 @@ class JavaTextLayout implements playn.core.TextLayout, JavaCanvas.Drawable {
   public static JavaTextLayout[] layoutText(JavaGraphics gfx, String text, TextFormat format,
                                             TextWrap wrap) {
     // normalize newlines in the text (Windows: CRLF -> LF, Mac OS pre-X: CR -> LF)
-    char eol = '\n';
-    text = AbstractTextLayout.normalizeEOL(text);
+    text = normalizeEOL(text);
 
     // we do some fiddling to work around the fact that TextLayout chokes on the empty string
     String ltext = text.length() == 0 ? " " : text;
@@ -64,6 +62,7 @@ class JavaTextLayout implements playn.core.TextLayout, JavaCanvas.Drawable {
     FontRenderContext frc = format.antialias ? gfx.aaFontContext : gfx.aFontContext;
     LineBreakMeasurer measurer = new LineBreakMeasurer(astring.getIterator(), frc);
     int lastPos = ltext.length(), curPos = 0;
+    char eol = '\n';
     while (curPos < lastPos) {
       int nextRet = ltext.indexOf(eol, measurer.getPosition()+1);
       if (nextRet == -1) {
@@ -79,46 +78,11 @@ class JavaTextLayout implements playn.core.TextLayout, JavaCanvas.Drawable {
     return layouts.toArray(new JavaTextLayout[layouts.size()]);
   }
 
-  private final String text;
-  private final TextFormat format;
   private final TextLayout layout;
-  private final Rectangle bounds;
 
   JavaTextLayout(String text, TextFormat format, TextLayout layout) {
-    this.text = text;
-    this.format = format;
+    super(text, format, computeBounds(layout));
     this.layout = layout;
-    Rectangle2D bounds = layout.getBounds();
-    // the y position of the bounds includes a negative ascent, but we don't want that showing up
-    // in our bounds since we render from 0 rather than from the baseline
-    this.bounds = new Rectangle((float)bounds.getX(), (float)bounds.getY() + layout.getAscent(),
-                                (float)bounds.getWidth(), (float)bounds.getHeight());
-  }
-
-  @Override
-  public String text() {
-    return text;
-  }
-
-  @Override
-  public TextFormat format() {
-    return format;
-  }
-
-  @Override
-  public float width() {
-    // if the x position is positive, we need to include extra space in our full-width for it
-    return Math.max(bounds.x, 0) + bounds.width;
-  }
-
-  @Override
-  public float height() {
-    return ascent() + descent();
-  }
-
-  @Override
-  public IRectangle bounds() {
-    return bounds;
   }
 
   @Override
@@ -136,23 +100,11 @@ class JavaTextLayout implements playn.core.TextLayout, JavaCanvas.Drawable {
     return layout.getLeading();
   }
 
-  @Override @Deprecated
-  public int lineCount() {
-    return 1;
-  }
-
-  @Override @Deprecated
-  public Rectangle lineBounds(int line) {
-    return new Rectangle(bounds);
-  }
-
-  @Override
-  public void stroke(Graphics2D gfx, float x, float y) {
+  void stroke(Graphics2D gfx, float x, float y) {
     paint(gfx, x, y, true);
   }
 
-  @Override
-  public void fill(Graphics2D gfx, float x, float y) {
+  void fill(Graphics2D gfx, float x, float y) {
     paint(gfx, x, y, false);
   }
 
@@ -174,5 +126,13 @@ class JavaTextLayout implements playn.core.TextLayout, JavaCanvas.Drawable {
     } finally {
       gfx.setRenderingHint(RenderingHints.KEY_ANTIALIASING, ohint);
     }
+  }
+
+  private static Rectangle computeBounds (TextLayout layout) {
+    Rectangle2D bounds = layout.getBounds();
+    // the y position of the bounds includes a negative ascent, but we don't want that showing up
+    // in our bounds since we render from 0 rather than from the baseline
+    return new Rectangle((float)bounds.getX(), (float)bounds.getY() + layout.getAscent(),
+                         (float)bounds.getWidth(), (float)bounds.getHeight());
   }
 }

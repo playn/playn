@@ -178,11 +178,7 @@ public class AndroidGraphics extends GraphicsGL {
 
   @Override
   public TextLayout layoutText(String text, TextFormat format) {
-    // TEMP: handle multiline in TextFormat until that's removed
-    if (format.shouldWrap() || text.indexOf('\n') != -1 ||  text.indexOf('\r') != -1)
-      return new OldAndroidTextLayout(text, format);
-    else
-      return AndroidTextLayout.layoutText(text, format);
+    return AndroidTextLayout.layoutText(text, format);
   }
 
   @Override

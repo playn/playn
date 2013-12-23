@@ -94,11 +94,7 @@ public class IOSGraphics extends GraphicsGL {
 
   @Override
   public TextLayout layoutText(String text, TextFormat format) {
-    // TEMP: handle multiline in TextFormat until that's removed
-    if (format.shouldWrap() || text.indexOf('\n') != -1 ||  text.indexOf('\r') != -1)
-      return new OldIOSTextLayout(this, text, format);
-    else
-      return IOSTextLayout.layoutText(this, text, format);
+    return IOSTextLayout.layoutText(this, text, format);
   }
 
   @Override

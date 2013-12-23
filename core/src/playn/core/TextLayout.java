@@ -16,7 +16,6 @@
 package playn.core;
 
 import pythagoras.f.IRectangle;
-import pythagoras.f.Rectangle;
 
 import playn.core.util.TextBlock;
 
@@ -54,12 +53,4 @@ public interface TextLayout {
 
   /** The number of pixels between the bottom of one line of text and the top of the next. */
   float leading ();
-
-  /** @deprecated Use {@link Graphics#layoutText(String,TextFormat,float)} and handle multiple
-   * lines separately. */
-  @Deprecated int lineCount();
-
-  /** @deprecated Use {@link Graphics#layoutText(String,TextFormat,float)} and handle multiple
-   * lines separately. */
-  @Deprecated Rectangle lineBounds(int line);
 }
