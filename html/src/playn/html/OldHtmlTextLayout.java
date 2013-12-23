@@ -27,7 +27,7 @@ import playn.core.AbstractTextLayout;
 import playn.core.TextFormat;
 import static playn.core.PlayN.graphics;
 
-class OldHtmlTextLayout extends AbstractTextLayout {
+class OldHtmlTextLayout extends AbstractTextLayout implements AbstractHtmlCanvas.Drawable {
 
   private HtmlFontMetrics metrics;
   private List<Line> lines = new ArrayList<Line>();
@@ -106,7 +106,7 @@ class OldHtmlTextLayout extends AbstractTextLayout {
     throw new UnsupportedOperationException("Text leading not supported in HTML backend."); // TODO
   }
 
-  void stroke(Context2d ctx, float x, float y) {
+  public void stroke(Context2d ctx, float x, float y) {
     configContext(ctx);
     float ypos = 0;
     for (Line line : lines) {
@@ -115,7 +115,7 @@ class OldHtmlTextLayout extends AbstractTextLayout {
     }
   }
 
-  void fill(Context2d ctx, float x, float y) {
+  public void fill(Context2d ctx, float x, float y) {
     configContext(ctx);
     float ypos = 0;
     for (Line line : lines) {

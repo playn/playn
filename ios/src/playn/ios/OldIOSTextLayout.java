@@ -34,7 +34,7 @@ import playn.core.TextFormat;
 import pythagoras.f.IRectangle;
 import pythagoras.f.Rectangle;
 
-class OldIOSTextLayout extends PaddedTextLayout {
+class OldIOSTextLayout extends PaddedTextLayout implements IOSCanvas.Drawable {
 
   // There are numerous impedance mismatches between how PlayN wants to layout text and how iOS
   // allows text to be laid out. Fortunately, with some hackery, we can make things work (quite
@@ -236,7 +236,7 @@ class OldIOSTextLayout extends PaddedTextLayout {
     return fillStamp.leading;
   }
 
-  void stroke(CGBitmapContext bctx, float x, float y, float strokeWidth, int strokeColor) {
+  public void stroke(CGBitmapContext bctx, float x, float y, float strokeWidth, int strokeColor) {
     if (strokeStamp == null || strokeWidth != this.strokeWidth) {
       this.strokeWidth = strokeWidth;
       strokeStamp = createStamp(text, strokeWidth, strokeColor);
@@ -244,7 +244,7 @@ class OldIOSTextLayout extends PaddedTextLayout {
     strokeStamp.paint(bctx, x+pad, y+pad, format.antialias);
   }
 
-  void fill(CGBitmapContext bctx, float x, float y) {
+  public void fill(CGBitmapContext bctx, float x, float y) {
     fillStamp.paint(bctx, x+pad, y+pad, format.antialias);
   }
 

@@ -34,7 +34,7 @@ import playn.core.TextFormat;
 import playn.core.TextLayout;
 import playn.core.TextWrap;
 
-class IOSTextLayout implements TextLayout {
+class IOSTextLayout implements TextLayout, IOSCanvas.Drawable {
 
   public static IOSTextLayout layoutText(IOSGraphics gfx, final String text, TextFormat format) {
     final IOSFont font = (format.font == null) ? IOSGraphics.defaultFont : (IOSFont) format.font;
@@ -165,7 +165,7 @@ class IOSTextLayout implements TextLayout {
     return font.ctFont.get_LeadingMetric();
   }
 
-  void stroke(CGBitmapContext bctx, float x, float y, float strokeWidth, int strokeColor) {
+  public void stroke(CGBitmapContext bctx, float x, float y, float strokeWidth, int strokeColor) {
     if (strokeLine == null || strokeWidth != this.strokeWidth || strokeColor != this.strokeColor) {
       this.strokeWidth = strokeWidth;
       this.strokeColor = strokeColor;
@@ -176,7 +176,7 @@ class IOSTextLayout implements TextLayout {
     paint(bctx, strokeLine, x, y);
   }
 
-  void fill(CGBitmapContext bctx, float x, float y) {
+  public void fill(CGBitmapContext bctx, float x, float y) {
     paint(bctx, fillLine, x, y);
   }
 

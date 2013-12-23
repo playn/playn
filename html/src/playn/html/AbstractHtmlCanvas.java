@@ -27,6 +27,11 @@ import playn.core.gl.AbstractCanvasGL;
 
 abstract class AbstractHtmlCanvas extends AbstractCanvasGL<Context2d> {
 
+  public interface Drawable {
+    void stroke(Context2d ctx, float x, float y);
+    void fill(Context2d ctx, float x, float y);
+  }
+
   private final Context2d ctx;
 
   AbstractHtmlCanvas(Context2d ctx, float width, float height) {

@@ -29,7 +29,7 @@ import playn.core.TextFormat;
 import playn.core.TextLayout;
 import playn.core.TextWrap;
 
-class HtmlTextLayout implements TextLayout {
+class HtmlTextLayout implements TextLayout, AbstractHtmlCanvas.Drawable {
 
   public static TextLayout layoutText(HtmlGraphics gfx, Context2d ctx, String text,
                                       TextFormat format) {
@@ -121,12 +121,12 @@ class HtmlTextLayout implements TextLayout {
     return metrics.leading();
   }
 
-  void stroke(Context2d ctx, float x, float y) {
+  public void stroke(Context2d ctx, float x, float y) {
     configContext(ctx, format);
     ctx.strokeText(text, x, y);
   }
 
-  void fill(Context2d ctx, float x, float y) {
+  public void fill(Context2d ctx, float x, float y) {
     configContext(ctx, format);
     ctx.fillText(text, x, y);
   }
