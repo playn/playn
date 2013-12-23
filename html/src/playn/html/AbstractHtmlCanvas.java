@@ -134,7 +134,7 @@ abstract class AbstractHtmlCanvas extends AbstractCanvasGL<Context2d> {
 
   @Override
   public Canvas fillText(TextLayout layout, float x, float y) {
-    ((HtmlTextLayout)layout).fill(ctx, x, y);
+    ((Drawable)layout).fill(ctx, x, y);
     isDirty = true;
     return this;
   }
@@ -260,7 +260,7 @@ abstract class AbstractHtmlCanvas extends AbstractCanvasGL<Context2d> {
 
   @Override
   public Canvas strokeText(TextLayout layout, float x, float y) {
-    ((HtmlTextLayout)layout).stroke(ctx, x, y);
+    ((Drawable)layout).stroke(ctx, x, y);
     isDirty = true;
     return this;
   }
