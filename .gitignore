@@ -5,25 +5,9 @@
 .settings
 target
 
-# /android/
-/android/bin
-/android/gen
-
-# /core/
-/core/bin
-/core/.gwt
-
 # /html/
 /html/tests/playn/shared/json
 
-# /server/
-/server/bin
-
-# /test/manualtests
-/tests/html/war/WEB-INF/classes
-/tests/html/war/WEB-INF/deploy
-/tests/html/war/manualtestsgame
-/tests/html/gwt-unitCache
-/tests/flash/war/WEB-INF/classes
+# /tests/
 /tests/android/assets
 /tests/ios/assets
