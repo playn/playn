@@ -15,7 +15,6 @@ package playn.html;
 
 import com.google.gwt.user.client.Window;
 
-import playn.core.PlayN;
 import playn.html.HtmlPlatform.Mode;
 
 /**
