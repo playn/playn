@@ -53,29 +53,6 @@
         <include>favicon.ico</include>
       </includes>
     </fileSet>
-    <!-- flash module -->
-    <fileSet filtered="true" encoding="UTF-8">
-      <directory>flash</directory>
-      <includes>
-        <include>pom.xml</include>
-      </includes>
-    </fileSet>
-    <fileSets>
-      <fileSet filtered="true" packaged="true" encoding="UTF-8">
-        <directory>flash/src/main/java</directory>
-        <includes>
-          <include>**/*.xml</include>
-          <include>**/*.java</include>
-        </includes>
-      </fileSet>
-      <fileSet filtered="true" encoding="UTF-8">
-        <directory>flash/src/main/webapp</directory>
-        <includes>
-          <include>**/*.xml</include>
-          <include>**/*.html</include>
-        </includes>
-      </fileSet>
-    </fileSets>
     <!-- android module -->
     <fileSet filtered="true" encoding="UTF-8">
       <directory>android</directory>

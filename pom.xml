@@ -31,7 +31,6 @@
     <module>archetype</module>
     <module>benchmark</module>
     <module>core</module>
-    <module>flash</module>
     <module>jbox2d</module>
     <module>html</module>
     <module>ios</module>

@@ -37,9 +37,5 @@
       <id>html</id>
       <modules><module>html</module></modules>
     </profile>
-    <profile>
-      <id>flash</id>
-      <modules><module>flash</module></modules>
-    </profile>
   </profiles>
 </project>

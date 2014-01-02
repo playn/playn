@@ -43,7 +43,7 @@ object PlayNBuild extends samskivert.MavenBuild {
       // tests depends on resource files mixed into source directory, yay!
       unmanagedResourceDirectories in Test <+= baseDirectory / "tests"
     )
-    case "jbox2d" | "webgl" | "flash" | "ios" => srcDirSettings
+    case "jbox2d" | "webgl" | "ios" => srcDirSettings
     case "java" | "android" => srcDirSettings
     case "swt-java" => srcDirSettings ++ seq(
       resolvers += "SWT Repo" at "https://swt-repo.googlecode.com/svn/repo/"

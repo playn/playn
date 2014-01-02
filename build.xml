@@ -10,7 +10,6 @@
     <ant dir="webgl" target="clean"/>
     <ant dir="java" target="clean"/>
     <ant dir="html" target="clean"/>
-    <ant dir="flash" target="clean"/>
     <ant dir="android" target="clean"/>
     <ant dir="server" target="clean"/>
     <ant dir="test/benchmark" target="clean"/>
@@ -23,7 +22,6 @@
     <ant dir="webgl" target="compile"/>
     <ant dir="java" target="compile"/>
     <ant dir="html" target="compile"/>
-    <ant dir="flash" target="compile"/>
     <ant dir="android" target="compile"/>
     <ant dir="server" target="compile"/>
     <ant dir="test/benchmark" target="compile"/>
@@ -37,7 +35,6 @@
     <ant dir="webgl" target="install"/>
     <ant dir="java" target="install"/>
     <ant dir="html" target="install"/>
-    <ant dir="flash" target="install"/>
     <ant dir="android" target="install"/>
     <ant dir="server" target="install"/>
     <!-- install the playn-project artifact which is just a pom -->
