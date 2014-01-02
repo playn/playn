@@ -200,14 +200,4 @@ public class StubPlatform implements Platform {
   public Storage storage() {
     return storage;
   }
-
-  @Override
-  public Analytics analytics() {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public RegularExpression regularExpression() {
-    throw new UnsupportedOperationException();
-  }
 }

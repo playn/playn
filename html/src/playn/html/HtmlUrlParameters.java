@@ -24,22 +24,6 @@ import playn.html.HtmlPlatform.Mode;
  */
 public interface HtmlUrlParameters {
 
-  public static class Analytics {
-    static final String PARAM_NAME = "analytics";
-
-    public static float getRandom() {
-      float random = PlayN.random();
-      String val = Window.Location.getParameter(PARAM_NAME);
-      if (val != null) {
-        try {
-          random = Float.parseFloat(val);
-        } catch (Exception ignore) {
-        }
-      }
-      return random;
-    }
-  }
-
   /**
    * This interface serves solely as documentation for the URL parameter implemented by gwt-log.
    */

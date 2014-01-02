@@ -22,7 +22,6 @@ import com.google.gwt.user.client.Window;
 
 import playn.core.AbstractPlatform;
 import playn.core.Storage;
-import playn.core.Analytics;
 import playn.core.Audio;
 import playn.core.PlayN;
 import playn.core.Game;
@@ -32,7 +31,6 @@ import playn.core.Net;
 import playn.core.Pointer;
 import playn.core.Mouse;
 import playn.core.Touch;
-import playn.core.RegularExpression;
 import playn.html.HtmlUrlParameters.Renderer;
 
 public class HtmlPlatform extends AbstractPlatform {
@@ -144,7 +142,6 @@ public class HtmlPlatform extends AbstractPlatform {
 
   private final HtmlAssets assets = new HtmlAssets(this);
   private final HtmlAudio audio = new HtmlAudio();
-  private final HtmlRegularExpression regularExpression = new HtmlRegularExpression();
   private final HtmlGraphics graphics;
   private final HtmlJson json = new HtmlJson();
   private final HtmlKeyboard keyboard = new HtmlKeyboard();
@@ -153,7 +150,6 @@ public class HtmlPlatform extends AbstractPlatform {
   private final HtmlMouse mouse;
   private final HtmlTouch touch;
   private final HtmlStorage storage = new HtmlStorage();
-  private final HtmlAnalytics analytics = new HtmlAnalytics();
 
   // installs backwards compat Date.now() if needed and calls it
   private final double start = initNow();
@@ -189,7 +185,6 @@ public class HtmlPlatform extends AbstractPlatform {
   }
 
   public void init() {
-    analytics.init();
     audio.init();
     keyboard.init();
   }
@@ -245,18 +240,8 @@ public class HtmlPlatform extends AbstractPlatform {
   }
 
   @Override
-  public Analytics analytics() {
-    return analytics;
-  }
-
-  @Override
   public float random() {
     return (float) Math.random();
-  }
-
-  @Override
-  public RegularExpression regularExpression() {
-    return regularExpression;
   }
 
   @Override

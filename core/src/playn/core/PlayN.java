@@ -175,13 +175,6 @@ public class PlayN {
   }
 
   /**
-   * Returns the {@link RegularExpression} service.
-   */
-  public static RegularExpression regularExpression() {
-    return platform.regularExpression();
-  }
-
-  /**
    * Returns the {@link Touch} input service.
    */
   public static Touch touch() {
@@ -193,13 +186,6 @@ public class PlayN {
    */
   public static Storage storage() {
     return platform.storage();
-  }
-
-  /**
-   * Returns the {@link Analytics} analytics service.
-   */
-  public static Analytics analytics() {
-    return platform.analytics();
   }
 
   /**

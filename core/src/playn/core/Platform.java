@@ -61,8 +61,4 @@ public interface Platform {
   Touch touch();
 
   Storage storage();
-
-  Analytics analytics();
-
-  RegularExpression regularExpression();
 }

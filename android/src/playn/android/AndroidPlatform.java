@@ -36,7 +36,6 @@ public class AndroidPlatform extends AbstractPlatform {
   GameActivity activity;
   private boolean paused;
 
-  private final AndroidAnalytics analytics;
   private final AndroidAssets assets;
   private final AndroidAudio audio;
   private final AndroidGraphics graphics;
@@ -54,7 +53,6 @@ public class AndroidPlatform extends AbstractPlatform {
 
     audio = new AndroidAudio(this);
     graphics = new AndroidGraphics(this, gl20, activity.preferredBitmapConfig());
-    analytics = new AndroidAnalytics();
     assets = new AndroidAssets(this);
     json = new JsonImpl();
     keyboard = new AndroidKeyboard(this);
@@ -101,11 +99,6 @@ public class AndroidPlatform extends AbstractPlatform {
   @Override
   public AndroidAssets assets() {
     return assets;
-  }
-
-  @Override
-  public AndroidAnalytics analytics() {
-    return analytics;
   }
 
   @Override
@@ -157,11 +150,6 @@ public class AndroidPlatform extends AbstractPlatform {
   @Override
   public float random() {
     return (float) Math.random();
-  }
-
-  @Override
-  public AndroidRegularExpression regularExpression() {
-    return new AndroidRegularExpression();
   }
 
   @Override

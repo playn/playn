@@ -41,7 +41,6 @@ import playn.core.Json;
 import playn.core.Mouse;
 import playn.core.MouseStub;
 import playn.core.PlayN;
-import playn.core.RegularExpression;
 import playn.core.json.JsonImpl;
 
 /**
@@ -168,7 +167,6 @@ public class IOSPlatform extends AbstractPlatform {
   private final IOSStorage storage;
   private final IOSTouch touch;
   private final IOSAssets assets;
-  private final IOSAnalytics analytics;
 
   private Game game;
 
@@ -219,7 +217,6 @@ public class IOSPlatform extends AbstractPlatform {
     pointer = new IOSPointer(graphics);
     touch = new IOSTouch(graphics);
     assets = new IOSAssets(this);
-    analytics = new IOSAnalytics();
     storage = new IOSStorage();
 
     mainWindow = new UIWindow(bounds);
@@ -273,11 +270,6 @@ public class IOSPlatform extends AbstractPlatform {
   }
 
   @Override
-  public IOSAnalytics analytics() {
-    return analytics;
-  }
-
-  @Override
   public IOSAudio audio() {
     return audio;
   }
@@ -320,11 +312,6 @@ public class IOSPlatform extends AbstractPlatform {
   @Override
   public float random() {
     return (float) Math.random();
-  }
-
-  @Override
-  public RegularExpression regularExpression() {
-    return null; // new IOSRegularExpression();
   }
 
   @Override
