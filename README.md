@@ -20,7 +20,7 @@ Licensing
 
 Unless otherwise stated, all source files are licensed under the Apache License, Version 2.0:
 
-    Copyright 2011-2013 The PlayN Authors
+    Copyright 2011-2014 The PlayN Authors
 
     Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file
     except in compliance with the License. You may obtain a copy of the License at
