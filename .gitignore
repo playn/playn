@@ -19,11 +19,6 @@ target
 # /server/
 /server/bin
 
-# /benchmark
-/benchmark/html/war/WEB-INF/classes
-/benchmark/html/war/WEB-INF/deploy/
-/benchmark/html/war/bench/
-
 # /test/manualtests
 /tests/html/war/WEB-INF/classes
 /tests/html/war/WEB-INF/deploy

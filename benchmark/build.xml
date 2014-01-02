@@ -1,7 +1,0 @@
-<?xml version="1.0"?>
-<project name="benchmark" default="compile">
-  <property name="java.classname" value="playn.bench.java.BenchJava"/>
-  <property name="html.classname" value="playn.bench.html.BenchHtml"/>
-  <property name="html.index" value="Bench.html"/>
-  <import file="../../sample/build-common.xml"/>
-</project>

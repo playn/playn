@@ -29,7 +29,6 @@
   <modules>
     <module>android</module>
     <module>archetype</module>
-    <module>benchmark</module>
     <module>core</module>
     <module>jbox2d</module>
     <module>html</module>
