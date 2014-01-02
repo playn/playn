@@ -1,4 +1,0 @@
-<?xml version="1.0"?>
-<project name="playn-java" default="compile">
-  <import file="../etc/build-common.xml"/>
-</project>
