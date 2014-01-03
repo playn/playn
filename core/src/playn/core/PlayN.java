@@ -112,6 +112,15 @@ public class PlayN {
   }
 
   /**
+   * Configures whether events on a layer (pointer, touch and mouse) are automatically dispatched
+   * to the layer's ancestors. This is a global option that may affect performance, so applications
+   * must call this opt in.
+   */
+  public static void setPropagateEvents (boolean propagate) {
+    platform.setPropagateEvents(propagate);
+  }
+
+  /**
    * Returns the {@link Audio} service.
    */
   public static Audio audio() {
