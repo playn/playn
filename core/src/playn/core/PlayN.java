@@ -116,7 +116,7 @@ public class PlayN {
    * to the layer's ancestors. This is a global option that may affect performance, so applications
    * must call this opt in.
    */
-  public static void setPropagateEvents (boolean propagate) {
+  public static void setPropagateEvents(boolean propagate) {
     platform.setPropagateEvents(propagate);
   }
 
