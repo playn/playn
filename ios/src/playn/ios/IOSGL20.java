@@ -16,9 +16,12 @@
 package playn.ios;
 
 import cli.OpenTK.Graphics.ES20.GL;
+import cli.OpenTK.Graphics.ES20.PixelFormat;
+import cli.OpenTK.Graphics.ES20.PixelInternalFormat;
+import cli.OpenTK.Graphics.ES20.PixelType;
+import cli.OpenTK.Graphics.ES20.TextureTarget;
 import cli.System.Runtime.InteropServices.GCHandle;
 import cli.System.Runtime.InteropServices.GCHandleType;
-import static cli.OpenTK.Graphics.ES20.All.*;
 
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
@@ -1070,12 +1073,13 @@ public class IOSGL20 implements GL20 {
          int border, int format, int type, Buffer pixels) {
     if (pixels != null) {
       GCHandle handle = createHandle(pixels);
-      GL.TexImage2D(wrap(target), level, internalformat, width, height, border,
-                    wrap(format), wrap(type), handle.AddrOfPinnedObject());
+      GL.TexImage2D(TextureTarget.wrap(target), level, PixelInternalFormat.wrap(internalformat),
+                    width, height, border, PixelFormat.wrap(format), PixelType.wrap(type),
+                    handle.AddrOfPinnedObject());
       handle.Free();
     } else {
-      GL.TexImage2D(wrap(target), level, internalformat, width, height, border,
-                    wrap(format), wrap(type), null);
+      GL.TexImage2D(TextureTarget.wrap(target), level, PixelInternalFormat.wrap(internalformat),
+                    width, height, border, PixelFormat.wrap(format), PixelType.wrap(type), null);
     }
   }
 

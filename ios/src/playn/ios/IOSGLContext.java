@@ -100,7 +100,7 @@ public class IOSGLContext extends GLContext {
 
   @Override
   public String getString(int param) {
-    return GL.GetString(All.wrap(param));
+    return GL.GetString(StringName.wrap(param));
   }
 
   @Override
