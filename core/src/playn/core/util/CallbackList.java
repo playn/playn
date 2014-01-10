@@ -39,7 +39,7 @@ public class CallbackList<T> implements Callback<T>
   /**
    * Adds the supplied callback to the list.
    *
-   * @return this instance for conveninent chaining.
+   * @return this instance for convenient chaining.
    * @throws IllegalStateException if this callback has already fired.
    */
   public CallbackList<T> add(Callback<T> callback) {
