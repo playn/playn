@@ -73,12 +73,12 @@ public class IOSCanvas extends AbstractCanvasGL<CGBitmapContext> {
       bctx.set_InterpolationQuality(CGInterpolationQuality.wrap(CGInterpolationQuality.None));
     }
 
+    // clear the canvas before we scale our bitmap context to avoid artifacts
+    bctx.ClearRect(new RectangleF(0, 0, texWidth, texHeight));
+
     // CG coordinate system is OpenGL-style (0,0 in lower left); so we flip it
     bctx.TranslateCTM(0, ctx.scale.scaled(height));
     bctx.ScaleCTM(ctx.scale.factor, -ctx.scale.factor);
-
-    // clear the canvas to start
-    clear();
   }
 
   public IntPtr data() {
