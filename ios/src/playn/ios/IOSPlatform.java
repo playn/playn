@@ -183,13 +183,30 @@ public class IOSPlatform extends AbstractPlatform {
   private OrientationChangeListener orientationChangeListener;
 
   /** Returns the top-level UIWindow. */
-  public UIWindow window () {
+  public UIWindow window() {
     return mainWindow;
   }
 
   /** Returns the controller for the root view. */
   public UIViewController rootViewController() {
     return rootViewController;
+  }
+
+  /** Returns the main game view. You can add subviews to this view if you wish to overlay views
+   * onto your game. */
+  public UIView gameView() {
+    return gameView;
+  }
+
+  /** Returns the orientations we're configured to support. */
+  public SupportedOrients supportedOrients() {
+    return orients;
+  }
+
+  /** Configures a listener that is notified when the game orientation changes. */
+  public void setOrientationChangeListener(OrientationChangeListener listener) {
+    orientationChangeListener = listener;
+    dispatchOrientationChange(currentOrientation);
   }
 
   protected IOSPlatform(UIApplication app, Config config) {
@@ -319,11 +336,6 @@ public class IOSPlatform extends AbstractPlatform {
     return storage;
   }
 
-  /** Returns the orientations we're configured to support. */
-  public SupportedOrients supportedOrients() {
-    return orients;
-  }
-
   @Override
   public double time() {
     return System.currentTimeMillis();
@@ -356,15 +368,6 @@ public class IOSPlatform extends AbstractPlatform {
     gameView.RunWithFrameInterval(frameInterval);
     // make our main window visible
     mainWindow.MakeKeyAndVisible();
-  }
-
-  public UIView gameView () {
-    return gameView;
-  }
-
-  public void setOrientationChangeListener (OrientationChangeListener listener) {
-    orientationChangeListener = listener;
-    dispatchOrientationChange(currentOrientation);
   }
 
   // make these accessible to IOSApplicationDelegate
