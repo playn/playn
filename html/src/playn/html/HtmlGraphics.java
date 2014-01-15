@@ -70,7 +70,7 @@ public abstract class HtmlGraphics implements Graphics {
   private final Map<Font,HtmlFontMetrics> fontMetrics = new HashMap<Font,HtmlFontMetrics>();
 
   private static final String HEIGHT_TEXT =
-    "THEQUICKBROWNFOXJUMPEDOVERTHELAZYDOGthequickbrownfoxjumpedoverthelazydog";
+    "THEQUICKBROWNFOXJUMPEDOVERTHELAZYDOGthequickbrownfoxjumpedoverthelazydog_-+!.,";
   private static final String EMWIDTH_TEXT = "m";
 
   // Temporary hack to fix mouse coordinates for scaled fullscreen mode.
@@ -195,6 +195,7 @@ public abstract class HtmlGraphics implements Graphics {
     measureElement.getStyle().setPosition(Style.Position.ABSOLUTE);
     measureElement.getStyle().setTop(-500, Unit.PX);
     measureElement.getStyle().setOverflow(Style.Overflow.VISIBLE);
+    measureElement.getStyle().setWhiteSpace(Style.WhiteSpace.NOWRAP);
     rootElement.appendChild(measureElement);
 
     if (config.experimentalFullscreen) {
@@ -233,6 +234,7 @@ public abstract class HtmlGraphics implements Graphics {
       measureElement.getStyle().setFontSize(font.size(), Unit.PX);
       measureElement.getStyle().setFontWeight(Style.FontWeight.NORMAL);
       measureElement.getStyle().setFontStyle(Style.FontStyle.NORMAL);
+      measureElement.getStyle().setProperty("fontFamily", font.name());
       measureElement.setInnerText(HEIGHT_TEXT);
       switch (font.style()) {
       case BOLD:
