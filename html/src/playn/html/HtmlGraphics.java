@@ -70,7 +70,7 @@ public abstract class HtmlGraphics implements Graphics {
   private final Map<Font,HtmlFontMetrics> fontMetrics = new HashMap<Font,HtmlFontMetrics>();
 
   private static final String HEIGHT_TEXT =
-    "THEQUICKBROWNFOXJUMPEDOVERTHELAZYDOGthequickbrownfoxjumpedoverthelazydog_-+!.,";
+    "THEQUICKBROWNFOXJUMPEDOVERTHELAZYDOGthequickbrownfoxjumpedoverthelazydog_-+!.,[]0123456789";
   private static final String EMWIDTH_TEXT = "m";
 
   // Temporary hack to fix mouse coordinates for scaled fullscreen mode.
