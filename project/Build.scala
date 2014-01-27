@@ -54,7 +54,9 @@ object PlayNBuild extends samskivert.MavenBuild {
     )
     case "tests-assets" => testSettings
     case "tests-core" => testSettings
-    case "tests-java" => testSettings ++ spray.revolver.RevolverPlugin.Revolver.settings
+    case "tests-java" => testSettings ++ spray.revolver.RevolverPlugin.Revolver.settings ++ seq(
+      mainClass in (Compile, run) := Some("playn.tests.java.TestsGameJava")
+    )
     case "tests-swt-java" => testSettings ++ spray.revolver.RevolverPlugin.Revolver.settings ++ seq(
       javaOptions ++= Seq("-XstartOnFirstThread")
     )
