@@ -166,7 +166,8 @@ public abstract class GLContext {
    * followed immediately by a call to {@link #bindFramebuffer(int,int,int)} or {@link
    * #pushFramebuffer}. */
   public int createFramebuffer(int tex) {
-    flush();
+    flush(true); // flush any pending rendering calls, because createFramebufferImpl (necessarily)
+                 // binds the new framebuffer in order to bind it to the specified texture (meh)
     return createFramebufferImpl(tex);
   }
 
@@ -246,8 +247,8 @@ public abstract class GLContext {
 
   public void bindFramebuffer(int fbuf, int width, int height) {
     if (fbuf != lastFramebuffer) {
+      flush(true); // flush and deactivate any shader rendering to the old framebuffer
       checkGLError("bindFramebuffer");
-      flush();
       bindFramebufferImpl(lastFramebuffer = fbuf, curFbufWidth = width, curFbufHeight = height);
     }
   }
@@ -293,7 +294,10 @@ public abstract class GLContext {
     if (curShader != null) {
       checkGLError("flush()");
       curShader.flush();
-      if (deactivate) curShader.deactivate();
+      if (deactivate) {
+        curShader.deactivate();
+        curShader = null;
+      }
     }
   }
 
