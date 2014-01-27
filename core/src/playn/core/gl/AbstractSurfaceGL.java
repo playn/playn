@@ -122,7 +122,8 @@ abstract class AbstractSurfaceGL implements Surface {
                        0, 0, length/fillPattern.width(), width/fillPattern.height());
       }
     } else {
-      shader.prepareColor(Tint.combine(fillColor, tint));
+      int tex = ctx.fillImage().ensureTexture();
+      shader.prepareTexture(tex, Tint.combine(fillColor, tint));
       shader.addQuad(l, 0, 0, length, width, 0, 0, 1, 1);
     }
     return this;
@@ -141,7 +142,8 @@ abstract class AbstractSurfaceGL implements Surface {
         shader.addQuad(topTransform(), x, y, x+width, y+height, x / tw, y / th, r / tw, b / th);
       }
     } else {
-      shader.prepareColor(Tint.combine(fillColor, tint));
+      int tex = ctx.fillImage().ensureTexture();
+      shader.prepareTexture(tex, Tint.combine(fillColor, tint));
       shader.addQuad(topTransform(), x, y, x+width, y+height, 0, 0, 1, 1);
     }
     return this;
@@ -159,7 +161,8 @@ abstract class AbstractSurfaceGL implements Surface {
         shader.addTriangles(topTransform(), xys, fillPattern.width(), fillPattern.height(), indices);
       }
     } else {
-      shader.prepareColor(Tint.combine(fillColor, tint));
+      int tex = ctx.fillImage().ensureTexture();
+      shader.prepareTexture(tex, Tint.combine(fillColor, tint));
       shader.addTriangles(topTransform(), xys, 1, 1, indices);
     }
     return this;

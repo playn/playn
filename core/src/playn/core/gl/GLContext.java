@@ -22,6 +22,7 @@ import java.util.List;
 import pythagoras.i.Rectangle;
 
 import playn.core.Asserts;
+import playn.core.CanvasImage;
 import playn.core.Image;
 import playn.core.InternalTransform;
 import playn.core.Platform;
@@ -72,6 +73,7 @@ public abstract class GLContext {
   private int pushedFramebuffer = -1, pushedWidth, pushedHeight;
   private List<Rectangle> scissors = new ArrayList<Rectangle>();
   private int scissorDepth;
+  private Image fillImage;
 
   /** The (actual screen pixel) width and height of our default frame buffer. */
   protected int defaultFbufWidth, defaultFbufHeight;
@@ -327,6 +329,19 @@ public abstract class GLContext {
    */
   public String trisShaderInfo() {
     return String.valueOf(trisShader());
+  }
+
+  /**
+   * Returns a (created on demand, then cached) 4x4 image used when filling solid color quads or
+   * triangles. We use a 4x4 rather than a 1x1 to avoid aliasing at non-integral scale factors.
+   */
+  Image fillImage() {
+    if (fillImage == null) {
+      CanvasImage image = platform.graphics().createImage(4, 4);
+      image.canvas().setFillColor(0xFFFFFFFF).fillRect(0, 0, 4, 4);
+      fillImage = image;
+    }
+    return fillImage;
   }
 
   /**
