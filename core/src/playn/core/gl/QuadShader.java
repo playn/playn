@@ -154,11 +154,6 @@ public class QuadShader extends GLShader {
     return new QuadCore(vertexShader(), textureFragmentShader());
   }
 
-  @Override
-  protected Core createColorCore() {
-    return new QuadCore(vertexShader(), colorFragmentShader());
-  }
-
   protected class QuadCore extends Core {
     private final Uniform2f uScreenSize;
     private final Uniform4fv uData;

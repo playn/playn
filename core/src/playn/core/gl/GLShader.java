@@ -25,15 +25,13 @@ import playn.core.Surface;
  *
  * <ul>
  * <li> One or more of the following call pairs:<br/>
- * {@link #prepareTexture} or {@link #prepareColor} followed by
- * {@link #addQuad} or {@link #addTriangles}.
+ * {@link #prepareTexture} followed by {@link #addQuad} or {@link #addTriangles}.
  * <li> A call to {@link #flush} to send everything to the GPU.
  * </li>
  *
  * Because a shader may be prepared multiple times, care should be taken to avoid rebinding the
  * shader program, uniforms, attributes, etc. if a shader is bound again before being flushed. The
- * base implementation takes care of this, as well as provides a framework for handling the small
- * variance between texture and color shaders ({@link Core}, {@link Extras}).
+ * base implementation takes care of this.
  */
 public abstract class GLShader {
 
@@ -111,9 +109,9 @@ public abstract class GLShader {
 
   protected final GLContext ctx;
   protected int refs;
-  protected Core texCore, colorCore, curCore;
-  protected Extras texExtras, colorExtras, curExtras;
-  private int texEpoch, colorEpoch;
+  protected Core texCore, curCore;
+  protected Extras texExtras, curExtras;
+  private int texEpoch;
 
   /** Prepares this shader to render the specified texture, etc. */
   public GLShader prepareTexture(int tex, int tint) {
@@ -139,33 +137,6 @@ public abstract class GLShader {
     }
     texCore.prepare(tint, justActivated);
     texExtras.prepare(tex, justActivated);
-    return this;
-  }
-
-  /** Prepares this shader to render the specified color, etc. */
-  public GLShader prepareColor(int tint) {
-    // if our GL context has been lost and regained we may need to recreate our core
-    if (colorEpoch != ctx.epoch()) {
-      // we don't destroy because the underlying resources are gone and destroying using our stale
-      // handles might result in destroying some newly created resources
-      colorCore = null;
-      colorExtras = null;
-    }
-    // create our core lazily so that we ensure we're on the GL thread when it happens
-    if (colorCore == null) {
-      this.colorEpoch = ctx.epoch();
-      this.colorCore = createColorCore();
-      this.colorExtras = createColorExtras(colorCore.prog);
-    }
-    boolean justActivated = ctx.useShader(this, curCore != colorCore);
-    if (justActivated) {
-      curCore = colorCore;
-      curExtras = colorExtras;
-      colorCore.activate(ctx.curFbufWidth, ctx.curFbufHeight);
-      if (GLContext.STATS_ENABLED) ctx.stats.shaderBinds++;
-    }
-    colorCore.prepare(tint, justActivated);
-    colorExtras.prepare(0, justActivated);
     return this;
   }
 
@@ -271,12 +242,6 @@ public abstract class GLShader {
       texCore = null;
       texExtras = null;
     }
-    if (colorCore != null) {
-      colorCore.destroy();
-      colorExtras.destroy();
-      colorCore = null;
-      colorExtras = null;
-    }
     curCore = null;
     curExtras = null;
   }
@@ -288,8 +253,6 @@ public abstract class GLShader {
   public void createCores() {
     this.texCore = createTextureCore();
     this.texExtras = createTextureExtras(texCore.prog);
-    this.colorCore = createColorCore();
-    this.colorExtras = createColorExtras(colorCore.prog);
   }
 
   protected GLShader(GLContext ctx) {
@@ -298,16 +261,13 @@ public abstract class GLShader {
 
   @Override
   protected void finalize() {
-    if (texCore != null || colorCore != null) {
+    if (texCore != null) {
       ctx.queueClearShader(this);
     }
   }
 
   /** Creates the texture core for this shader. */
   protected abstract Core createTextureCore();
-
-  /** Creates the color core for this shader. */
-  protected abstract Core createColorCore();
 
   /**
    * Returns the texture fragment shader program. Note that this program <em>must</em> preserve the
@@ -360,27 +320,6 @@ public abstract class GLShader {
    */
   protected Extras createTextureExtras(GLProgram prog) {
     return new TextureExtras(prog);
-  }
-
-  /**
-   * Returns the color fragment shader program. Note that this program <em>must</em> preserve the
-   * use of the existing varying attributes. You can add new varying attributes, but you cannot
-   * remove or change the defaults.
-   */
-  protected String colorFragmentShader() {
-    return FRAGMENT_PREAMBLE +
-      "varying lowp vec4 v_Color;\n" +
-
-      "void main(void) {\n" +
-      "  gl_FragColor = vec4(v_Color.rgb, 1) * v_Color.a;\n" +
-      "}";
-  }
-
-  /**
-   * Creates the extras instance that handles the color fragment shader.
-   */
-  protected Extras createColorExtras(GLProgram prog) {
-    return new ColorExtras(prog);
   }
 
   /** Implements the core of the indexed tris shader. */
@@ -471,18 +410,6 @@ public abstract class GLShader {
     @Override
     public void willFlush () {
       ctx.bindTexture(lastTex);
-    }
-  }
-
-  /** The default color extras. */
-  // TODO(bruno): Remove?
-  protected class ColorExtras extends Extras {
-    public ColorExtras(GLProgram prog) {
-    }
-
-    @Override
-    public void prepare(int tex, boolean justActivated) {
-      // Nothing at all
     }
   }
 }

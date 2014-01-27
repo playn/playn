@@ -94,7 +94,7 @@ public class IndexedTrisShader extends GLShader {
 
   @Override
   public String toString() {
-    return "itris/" + texCore + "/" + colorCore;
+    return "itris/" + texCore;
   }
 
   /**
@@ -109,11 +109,6 @@ public class IndexedTrisShader extends GLShader {
   @Override
   protected Core createTextureCore() {
     return new ITCore(vertexShader(), textureFragmentShader());
-  }
-
-  @Override
-  protected Core createColorCore() {
-    return new ITCore(vertexShader(), colorFragmentShader());
   }
 
   protected class ITCore extends Core {
