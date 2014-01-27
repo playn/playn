@@ -33,7 +33,7 @@ public abstract class ImageGL<GC> extends AbstractImageGL<GC> {
 
   @Override
   public int ensureTexture() {
-    if (tex != 0) {
+    if (tex > 0) {
       return tex;
     } else if (!isReady()) {
       return 0;
