@@ -87,7 +87,7 @@ public class TestsGame extends Game.Default {
   }
 
   // args passed to the Java launcher
-  public static String[] args;
+  public static String[] args = {};
 
   private Test[] tests = new Test[] {
     new CanvasTest(),
