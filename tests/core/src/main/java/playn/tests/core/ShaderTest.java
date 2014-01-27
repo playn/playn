@@ -124,11 +124,6 @@ public class ShaderTest extends Test {
         return new RotCore(vertexShader(), textureFragmentShader());
       }
 
-      @Override
-      protected Core createColorCore() {
-        return new RotCore(vertexShader(), colorFragmentShader());
-      }
-
       class RotCore extends ITCore {
         private final Uniform1f uAngle = prog.getUniform1f("u_Angle");
         private final Uniform2f uEye = prog.getUniform2f("u_Eye");

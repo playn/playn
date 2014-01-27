@@ -304,8 +304,8 @@ public abstract class GLContext {
   /**
    * Makes the supplied shader the current shader, flushing any previous shader.
    */
-  public boolean useShader(GLShader shader, boolean forceFlush) {
-    if (curShader == shader && !forceFlush)
+  public boolean useShader(GLShader shader) {
+    if (curShader == shader)
       return false;
     checkGLError("useShader");
     flush(true);
@@ -442,7 +442,7 @@ public abstract class GLContext {
     if (shouldTryQuadShader()) {
       try {
         GLShader quadShader = new QuadShader(this);
-        quadShader.createCores(); // force core creation to test whether it fails
+        quadShader.createCore(); // force core creation to test whether it fails
         return quadShader;
       } catch (Throwable t) {
         platform.log().warn("Failed to create QuadShader: " + t);

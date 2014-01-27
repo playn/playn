@@ -198,6 +198,7 @@ public class IOSGLContext extends GLContext {
 
   @Override
   public void destroyTexture(int texObj) {
+    flush(); // flush in case this texture is queued up to be drawn
     GL.DeleteTextures(1, new int[] { texObj });
   }
 
@@ -336,7 +337,7 @@ public class IOSGLContext extends GLContext {
       GL.Clear(ClearBufferMask.wrap(ClearBufferMask.ColorBufferBit | // clear to transparent
                                     ClearBufferMask.DepthBufferBit));
       rootLayer.paint(rootTransform, Tint.NOOP_TINT, null); // paint all the layers
-      useShader(null, false); // guarantee a shader flush
+      useShader(null); // guarantee a shader flush
     }
     if (STATS_ENABLED) stats.frames++;
   }

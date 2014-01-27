@@ -109,47 +109,39 @@ public abstract class GLShader {
 
   protected final GLContext ctx;
   protected int refs;
-  protected Core texCore, curCore;
-  protected Extras texExtras, curExtras;
+  protected Core texCore;
   private int texEpoch;
 
   /** Prepares this shader to render the specified texture, etc. */
   public GLShader prepareTexture(int tex, int tint) {
-    // if our GL context has been lost and regained we may need to recreate our core
+    // if our GL context has been lost and regained we may need to recreate our core; we don't
+    // destroy the old core because the underlying resources are gone and destroying using our
+    // stale handles might result in destroying someone else's newly created resources
     if (texEpoch != ctx.epoch()) {
-      // we don't destroy because the underlying resources are gone and destroying using our stale
-      // handles might result in destroying some newly created resources
       texCore = null;
-      texExtras = null;
     }
     // create our core lazily so that we ensure we're on the GL thread when it happens
     if (texCore == null) {
-      this.texEpoch = ctx.epoch();
-      this.texCore = createTextureCore();
-      this.texExtras = createTextureExtras(texCore.prog);
+      createCore();
     }
-    boolean justActivated = ctx.useShader(this, curCore != texCore);
+    boolean justActivated = ctx.useShader(this);
     if (justActivated) {
-      curCore = texCore;
-      curExtras = texExtras;
       texCore.activate(ctx.curFbufWidth, ctx.curFbufHeight);
       if (GLContext.STATS_ENABLED) ctx.stats.shaderBinds++;
     }
-    texCore.prepare(tint, justActivated);
-    texExtras.prepare(tex, justActivated);
+    texCore.prepare(tex, tint, justActivated);
     return this;
   }
 
   /** Sends all accumulated vertex/element info to GL. */
   public void flush() {
-    curExtras.willFlush();
-    curCore.flush();
+    texCore.flush();
     if (GLContext.STATS_ENABLED) ctx.stats.shaderFlushes++;
   }
 
   /** Does any necessary shutdown when no longer using this shader. */
   public void deactivate() {
-    curCore.deactivate();
+    texCore.deactivate();
   }
 
   /** Adds an axis-aligned quad to the current render operation. {@code left, top, right, bottom}
@@ -157,7 +149,7 @@ public abstract class GLShader {
   public void addQuad(float m00, float m01, float m10, float m11, float tx, float ty,
                       float left, float top, float right, float bottom,
                       float sl, float st, float sr, float sb) {
-    curCore.addQuad(m00, m01, m10, m11, tx, ty,
+    texCore.addQuad(m00, m01, m10, m11, tx, ty,
                     left,  top,    sl, st,
                     right, top,    sr, st,
                     left,  bottom, sl, sb,
@@ -169,7 +161,7 @@ public abstract class GLShader {
    * define the bounds of the quad. {@code sl, st, sr, sb} define the texture coordinates. */
   public void addQuad(InternalTransform local, float left, float top, float right, float bottom,
                       float sl, float st, float sr, float sb) {
-    curCore.addQuad(local.m00(), local.m01(), local.m10(), local.m11(), local.tx(), local.ty(),
+    texCore.addQuad(local.m00(), local.m01(), local.m10(), local.m11(), local.tx(), local.ty(),
                     left,  top,    sl, st,
                     right, top,    sr, st,
                     left,  bottom, sl, sb,
@@ -187,7 +179,7 @@ public abstract class GLShader {
    * be in proper winding order for OpenGL rendering.
    */
   public void addTriangles(InternalTransform local, float[] xys, float tw, float th, int[] indices) {
-    curCore.addTriangles(local.m00(), local.m01(), local.m10(), local.m11(), local.tx(), local.ty(),
+    texCore.addTriangles(local.m00(), local.m01(), local.m10(), local.m11(), local.tx(), local.ty(),
                          xys, tw, th, indices);
     if (GLContext.STATS_ENABLED) ctx.stats.trisRendered += indices.length/3;
   }
@@ -202,7 +194,7 @@ public abstract class GLShader {
    * be in proper winding order for OpenGL rendering.
    */
   public void addTriangles(InternalTransform local, float[] xys, float[] sxys, int[] indices) {
-    curCore.addTriangles(local.m00(), local.m01(), local.m10(), local.m11(), local.tx(), local.ty(),
+    texCore.addTriangles(local.m00(), local.m01(), local.m10(), local.m11(), local.tx(), local.ty(),
                          xys, sxys, indices);
     if (GLContext.STATS_ENABLED) ctx.stats.trisRendered += indices.length/3;
   }
@@ -238,21 +230,17 @@ public abstract class GLShader {
   public void clearProgram() {
     if (texCore != null) {
       texCore.destroy();
-      texExtras.destroy();
       texCore = null;
-      texExtras = null;
     }
-    curCore = null;
-    curExtras = null;
   }
 
   /**
-   * Forces the creation of our shader cores. Used during GLContext.init to determine whether we
+   * Forces the creation of our shader core. Used during GLContext.init to determine whether we
    * need to fall back to a less sophisticated quad shader.
    */
-  public void createCores() {
+  void createCore() {
+    this.texEpoch = ctx.epoch();
     this.texCore = createTextureCore();
-    this.texExtras = createTextureExtras(texCore.prog);
   }
 
   protected GLShader(GLContext ctx) {
@@ -315,14 +303,8 @@ public abstract class GLShader {
     return "  textureColor *= v_Color.a;\n";
   }
 
-  /**
-   * Creates the extras instance that handles the texture fragment shader.
-   */
-  protected Extras createTextureExtras(GLProgram prog) {
-    return new TextureExtras(prog);
-  }
-
-  /** Implements the core of the indexed tris shader. */
+  /** Implements the actual core of the shader. This is factored out to allow the core to be
+   * created/destroyed multiple times within the lifespan of its containing GLShader instance. */
   protected abstract class Core {
     /** This core's shader program. */
     public final GLProgram prog;
@@ -334,10 +316,32 @@ public abstract class GLShader {
     public abstract void deactivate();
 
     /** Called before each primitive to update the current color. */
-    public abstract void prepare(int tint, boolean justActivated);
+    public void prepare(int tex, int tint, boolean justActivated) {
+      ctx.checkGLError("textureShader.prepare start");
+      boolean stateChanged = (tex != lastTex);
+      if (!justActivated && stateChanged) {
+        GLShader.this.flush();
+        ctx.checkGLError("textureShader.prepare flush");
+      }
+      if (stateChanged) {
+        lastTex = tex;
+        ctx.checkGLError("textureShader.prepare end");
+      }
+      if (justActivated) {
+        ctx.activeTexture(GL20.GL_TEXTURE0);
+        uTexture.bind(0);
+      }
+    }
 
     /** Flushes this core's queued geometry to the GPU. */
-    public abstract void flush();
+    public void flush() {
+      ctx.bindTexture(lastTex);
+    }
+
+    /** Destroys this core's shader program and any other GL resources it maintains. */
+    public void destroy() {
+      prog.destroy();
+    }
 
     /** See {@link GLShader#addQuad}. */
     public abstract void addQuad(float m00, float m01, float m10, float m11, float tx, float ty,
@@ -358,58 +362,12 @@ public abstract class GLShader {
       throw new UnsupportedOperationException("Triangles not supported by this shader");
     }
 
-    /** Destroys this core's shader program and any other GL resources it maintains. */
-    public void destroy() {
-      prog.destroy();
-    }
-
-    protected Core(String vertShader, String fragShader) {
-      this.prog = ctx.createProgram(vertShader, fragShader);
-    }
-  }
-
-  /** Handles the extra bits needed when we're using textures or flat color. */
-  protected static abstract class Extras {
-    /** Performs additional binding to prepare for a texture or color render. */
-    public abstract void prepare(int tex, boolean justActivated);
-
-    /** Called prior to flushing this shader. Defaults to NOOP. */
-    public void willFlush() {}
-
-    /** Destroys any GL resources maintained by this extras. Defaults to NOOP. */
-    public void destroy() {}
-  }
-
-  /** The default texture extras. */
-  protected class TextureExtras extends Extras {
     protected final Uniform1i uTexture;
     protected int lastTex;
 
-    public TextureExtras(GLProgram prog) {
-      uTexture = prog.getUniform1i("u_Texture");
-    }
-
-    @Override
-    public void prepare(int tex, boolean justActivated) {
-      ctx.checkGLError("textureShader.prepare start");
-      boolean stateChanged = (tex != lastTex);
-      if (!justActivated && stateChanged) {
-        flush();
-        ctx.checkGLError("textureShader.prepare flush");
-      }
-      if (stateChanged) {
-        lastTex = tex;
-        ctx.checkGLError("textureShader.prepare end");
-      }
-      if (justActivated) {
-        ctx.activeTexture(GL20.GL_TEXTURE0);
-        uTexture.bind(0);
-      }
-    }
-
-    @Override
-    public void willFlush () {
-      ctx.bindTexture(lastTex);
+    protected Core(String vertShader, String fragShader) {
+      this.prog = ctx.createProgram(vertShader, fragShader);
+      this.uTexture = prog.getUniform1i("u_Texture");
     }
   }
 }

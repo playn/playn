@@ -163,13 +163,15 @@ public class IndexedTrisShader extends GLShader {
     }
 
     @Override
-    public void prepare(int tint, boolean justActivated) {
+    public void prepare(int tex, int tint, boolean justActivated) {
+      super.prepare(tex, tint, justActivated);
       this.arTint = (tint >> 16) & 0xFFFF;
       this.gbTint = tint & 0xFFFF;
     }
 
     @Override
     public void flush() {
+      super.flush();
       if (vertices.position() == 0)
         return;
       ctx.checkGLError("Shader.flush");

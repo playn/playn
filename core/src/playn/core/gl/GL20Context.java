@@ -69,7 +69,7 @@ public class GL20Context extends GLContext {
       bindFramebuffer();
       gl.glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear to transparent
       rootLayer.paint(rootXform, Tint.NOOP_TINT, null); // paint all the layers
-      useShader(null, false); // flush any pending shader
+      useShader(null); // flush any pending shader
     }
     if (STATS_ENABLED) stats.frames++;
   }
