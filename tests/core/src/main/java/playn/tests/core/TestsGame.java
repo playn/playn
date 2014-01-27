@@ -86,6 +86,9 @@ public class TestsGame extends Game.Default {
     return image;
   }
 
+  // args passed to the Java launcher
+  public static String[] args;
+
   private Test[] tests = new Test[] {
     new CanvasTest(),
     new SurfaceTest(),
@@ -167,7 +170,13 @@ public class TestsGame extends Game.Default {
     });
 
     displayMenu();
-    // startTest(tests[3]);
+
+    for (String arg : args) {
+      if (arg.startsWith("test")) {
+        startTest(tests[Integer.parseInt(arg.substring(4))]);
+        break;
+      }
+    }
   }
 
   // defers display of menu by one frame to avoid the right click or touch being processed by the

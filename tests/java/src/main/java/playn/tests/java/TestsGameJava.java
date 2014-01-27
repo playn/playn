@@ -24,13 +24,20 @@ public class TestsGameJava {
 
   public static void main(String[] args) {
     JavaPlatform.Config config = new JavaPlatform.Config();
-    if (args.length > 0) {
-      config.scaleFactor = Float.parseFloat(args[0]);
+    for (String arg : args) {
+      if (arg.startsWith("@") && arg.endsWith("x")) {
+        config.scaleFactor = Float.parseFloat(arg.substring(1, arg.length()-1));
+      }
     }
     config.width = 800;
     config.height = 600;
     JavaPlatform platform = JavaPlatform.register(config);
     platform.setTitle("Tests");
+    // let the caller know that we accept some args
+    platform.log().info("Usage: TestsGameJava [@Nx] [test#]");
+    platform.log().info("  [@Nx] specifies a scale factor: @2x, @1.5x");
+    platform.log().info("  [test#] specifies a test to launch directly: test0, test12 ");
+    TestsGame.args = args;
     PlayN.run(new TestsGame());
   }
 }
