@@ -25,13 +25,13 @@ class JavaLog extends LogImpl {
     default:
       System.out.println(msg);
       if (e != null)
-        e.printStackTrace(System.err);
+        e.printStackTrace(System.out);
       break;
     case WARN:
     case ERROR:
       System.err.println(msg);
       if (e != null)
-        e.printStackTrace(System.out);
+        e.printStackTrace(System.err);
       break;
     }
   }
