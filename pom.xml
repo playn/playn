@@ -250,28 +250,19 @@
 
   <profiles>
     <profile>
-      <id>prod</id>
-      <properties>
-        <gwt.version>2.3.0</gwt.version>
-        <gwt.loglevel>ERROR</gwt.loglevel>
-        <gwt.outputstyle>OBF</gwt.outputstyle>
-        <gwt.xdisable>true</gwt.xdisable>
-      </properties>
-    </profile>
-    <profile>
       <id>deploy-local</id>
       <distributionManagement>
         <repository>
           <id>deploy-local</id>
-          <name>Local maven repository</name>
+          <name>Local Maven repository</name>
           <url>${deploy-local.dir}</url>
         </repository>
-	<snapshotRepository>
-	  <uniqueVersion>false</uniqueVersion>
-	  <id>deploy-local-snapshots</id>
-	  <name>Local maven snapshot repository</name>
-	  <url>${deploy-local.dir}</url>
-	</snapshotRepository>
+        <snapshotRepository>
+          <uniqueVersion>false</uniqueVersion>
+          <id>deploy-local-snapshots</id>
+          <name>Local Maven snapshot repository</name>
+          <url>${deploy-local.dir}</url>
+        </snapshotRepository>
       </distributionManagement>
     </profile>
   </profiles>
