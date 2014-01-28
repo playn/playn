@@ -65,7 +65,7 @@ class JavaCanvasImage extends JavaImage implements CanvasImage {
     // the latest canvas data
     if (canvas.dirty()) {
       canvas.clearDirty();
-      if (tex > 0) updateTexture(tex);
+      refreshTexture();
     }
     return super.ensureTexture();
   }

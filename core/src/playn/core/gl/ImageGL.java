@@ -91,6 +91,17 @@ public abstract class ImageGL<GC> extends AbstractImageGL<GC> {
     return powtex;
   }
 
+  /**
+   * Called by canvas image implementations in {@link #ensureTexture} to either cause their texture
+   * data to be reuploaded (in the simple case where the image is neither repeated nor mipmapped),
+   * or their texture to be destroyed so that it is subsequently recreated with updated texture
+   * data.
+   */
+  protected void refreshTexture() {
+    if (repeatX || repeatY || mipmapped) clearTexture();
+    else if (tex > 0) updateTexture(tex);
+  }
+
   private int scaleTexture() {
     int scaledWidth = scale.scaledCeil(width());
     int scaledHeight = scale.scaledCeil(height());

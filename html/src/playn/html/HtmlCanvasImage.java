@@ -48,7 +48,7 @@ class HtmlCanvasImage extends HtmlImage implements CanvasImage {
   public int ensureTexture() {
     if (canvas.dirty()) {
       canvas.clearDirty();
-      if (tex > 0) updateTexture(tex);
+      refreshTexture();
     }
     return super.ensureTexture();
   }
