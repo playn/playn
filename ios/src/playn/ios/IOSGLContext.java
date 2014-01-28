@@ -325,6 +325,7 @@ public class IOSGLContext extends GLContext {
   }
 
   void updateTexture(int tex, int width, int height, IntPtr data) {
+    GL.BindTexture(TextureTarget.wrap(TextureTarget.Texture2D), tex);
     GL.TexImage2D(TextureTarget.wrap(TextureTarget.Texture2D), 0,
                   PixelInternalFormat.wrap(PixelInternalFormat.Rgba), width, height, 0,
                   PixelFormat.wrap(PixelFormat.Rgba), PixelType.wrap(PixelType.UnsignedByte), data);
