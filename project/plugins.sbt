@@ -1,5 +1,5 @@
 // pom-util POM helpers
-libraryDependencies += "com.samskivert" % "sbt-pom-util" % "0.6-SNAPSHOT"
+libraryDependencies += "com.samskivert" % "sbt-pom-util" % "0.6"
 
 // TEMP: force use of locally installed version as mine has gwt-superdevmode
 // a Maven repo needed for the sbt-gwt-plugin
