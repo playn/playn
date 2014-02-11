@@ -40,13 +40,13 @@ public class SurfaceLayerCanvas extends LayerCanvas implements SurfaceLayer {
 
   @Override
   public float width() {
-    Asserts.checkNotNull(surface, "Surface must not be null");
+    Asserts.checkNotNull(surface, "Surface has been destroyed");
     return surface.width();
   }
 
   @Override
   public float height() {
-    Asserts.checkNotNull(surface, "Surface must not be null");
+    Asserts.checkNotNull(surface, "Surface has been destroyed");
     return surface.height();
   }
 

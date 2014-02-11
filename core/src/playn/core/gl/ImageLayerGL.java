@@ -100,14 +100,12 @@ public class ImageLayerGL extends LayerGL implements ImageLayer {
 
   @Override
   public float width() {
-    Asserts.checkNotNull(img, "Image must not be null");
-    return widthSet ? width : img.width();
+    return widthSet ? width : Asserts.checkNotNull(img, "Image has not yet been set").width();
   }
 
   @Override
   public float height() {
-    Asserts.checkNotNull(img, "Image must not be null");
-    return heightSet ? height : img.height();
+    return heightSet ? height : Asserts.checkNotNull(img, "Image has not yet been set").height();
   }
 
   @Override
