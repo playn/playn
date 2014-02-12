@@ -22,12 +22,11 @@ import com.google.gwt.user.client.Window;
 import playn.core.Events;
 import playn.core.Key;
 import playn.core.Keyboard;
+import playn.core.KeyboardImpl;
 import playn.core.PlayN;
 import playn.core.util.Callback;
 
-class HtmlKeyboard implements Keyboard {
-
-  private Listener listener;
+class HtmlKeyboard extends KeyboardImpl {
 
   public void init() {
     // Key handlers.
@@ -71,11 +70,6 @@ class HtmlKeyboard implements Keyboard {
         }
       }
     });
-  }
-
-  @Override
-  public void setListener(Listener listener) {
-    this.listener = listener;
   }
 
   @Override

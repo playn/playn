@@ -23,21 +23,17 @@ import cli.MonoTouch.UIKit.UIReturnKeyType;
 import cli.MonoTouch.UIKit.UITextAutocapitalizationType;
 import cli.MonoTouch.UIKit.UITextAutocorrectionType;
 import cli.MonoTouch.UIKit.UITextField;
-import playn.core.Keyboard;
+
+import playn.core.KeyboardImpl;
 import playn.core.PlayN;
 import playn.core.util.Callback;
 
-public class IOSKeyboard implements Keyboard {
+public class IOSKeyboard extends KeyboardImpl {
 
   private final IOSPlatform platform;
 
   public IOSKeyboard(IOSPlatform platform) {
     this.platform = platform;
-  }
-
-  @Override
-  public void setListener(Listener listener) {
-    PlayN.log().warn("iOS cannot generate keyboard events. Use Keyboard.getText() instead");
   }
 
   @Override

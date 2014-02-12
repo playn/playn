@@ -84,12 +84,10 @@ public class StubPlatform implements Platform {
     }
   };
 
-  private Keyboard keyboard = new Keyboard() {
-    @Override public void setListener(Listener listener) {} // noop
+  private Keyboard keyboard = new KeyboardImpl() {
     @Override public boolean hasHardwareKeyboard() { return false; }
-    @Override
-    public void getText(Keyboard.TextType textType, String label, String initialValue,
-                        Callback<String> callback) {
+    @Override public void getText(Keyboard.TextType textType, String label, String initialValue,
+                                  Callback<String> callback) {
       callback.onSuccess(null);
     }
   };

@@ -20,21 +20,15 @@ import android.content.DialogInterface;
 import android.text.InputType;
 import android.widget.EditText;
 
-import playn.core.Keyboard;
+import playn.core.KeyboardImpl;
 import playn.core.util.Callback;
 
-public class AndroidKeyboard implements Keyboard {
+public class AndroidKeyboard extends KeyboardImpl {
 
   private final AndroidPlatform platform;
-  private Listener listener;
 
   public AndroidKeyboard (AndroidPlatform platform) {
     this.platform = platform;
-  }
-
-  @Override
-  public synchronized void setListener(Listener listener) {
-    this.listener = listener;
   }
 
   @Override

@@ -58,6 +58,11 @@ public abstract class JavaKeyboard implements playn.core.Keyboard {
   }
 
   @Override
+  public Listener listener() {
+    return listeners[0];
+  }
+
+  @Override
   public void setListener(Listener listener) {
     listeners[0] = listener;
   }

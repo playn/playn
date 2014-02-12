@@ -134,6 +134,11 @@ public interface Keyboard {
   }
 
   /**
+   * Returns the currently configured global keyboard listener, or null.
+   */
+  Listener listener ();
+
+  /**
    * Sets the listener that will receive keyboard events. Setting the listener to
    * {@code null} will cause keyboard events to stop being fired.
    */
