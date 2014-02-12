@@ -21,9 +21,9 @@
   </issueManagement>
 
   <scm>
-    <connection>scm:git:https://code.google.com/p/playn/</connection>
-    <developerConnection>scm:git:https://code.google.com/p/playn/</developerConnection>
-    <url>http://code.google.com/p/playn/</url>
+    <connection>scm:git:git://github.com/threerings/playn.git</connection>
+    <developerConnection>scm:git:git@github.com:threerings/playn.git</developerConnection>
+    <url>https://github.com/threerings/playn/</url>
   </scm>
 
   <modules>
