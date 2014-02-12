@@ -175,13 +175,13 @@ public abstract class HtmlGraphics implements Graphics {
     dummyCanvas = doc.createCanvasElement();
     dummyCtx = dummyCanvas.getContext2d();
 
-    rootElement = doc.getElementById("playn-root");
+    rootElement = doc.getElementById(config.rootId);
     if (rootElement == null) {
       rootElement = doc.createDivElement();
       rootElement.setAttribute("style", "width: 640px; height: 480px");
       doc.getBody().appendChild(rootElement);
     } else {
-      // clear the contents of the "playn-root" element, if present
+      // clear the contents of the root element, if present
       rootElement.setInnerHTML("");
     }
 

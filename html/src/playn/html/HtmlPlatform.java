@@ -35,11 +35,23 @@ import playn.html.HtmlUrlParameters.Renderer;
 
 public class HtmlPlatform extends AbstractPlatform {
 
+  /** Configures the PlayN HTML platform. */
   public static class Config {
+    /** Whether to use GL or Canvas mode, or to auto-detect. */
     public Mode mode = Renderer.requestedMode();
+
+    /** Whether the canvas that contains the game should be transparent. */
     public boolean transparentCanvas = false;
+
+    /** Whether anti-aliasing should be enabled in the WebGL context. */
     public boolean antiAliasing = true;
+
+    /** The HiDPI scale factor to use. */
     public float scaleFactor = 1;
+
+    /** The id of the {@code <div>} element where the game will be inserted. */
+    public String rootId = "playn-root";
+
     // Scale up the canvas on fullscreen. Highly experimental.
     public boolean experimentalFullscreen = false;
   }
