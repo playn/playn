@@ -35,7 +35,8 @@ public class CanvasTest extends Test {
   private float nextX, nextY, maxY;
 
   private CanvasImage timeImg;
-  private double startMillis;
+  private ImageLayer tileLayer;
+  private float elapsedMillis;
   private int lastSecs;
 
   @Override
@@ -51,7 +52,6 @@ public class CanvasTest extends Test {
   @Override
   public void init() {
     nextX = nextY = GAP;
-    startMillis = currentTime();
     lastSecs = -1;
 
     addTestCanvas("radial fill gradient", 100, 100, new Drawer() {
@@ -238,13 +238,24 @@ public class CanvasTest extends Test {
         inner(canvas, y);
       }
     });
+
+    Image tileimg = assets().getImage("images/tile.png");
+    tileimg.setRepeat(true, true);
+    addTestLayer("img layer anim setWidth", 100, 100,
+                 tileLayer = graphics().createImageLayer(tileimg));
+    tileLayer.setSize(0, 100);
+  }
+
+  @Override
+  public void update(int delta) {
+    super.update(delta);
+    elapsedMillis += delta;
   }
 
   @Override
   public void paint(float delta) {
     super.paint(delta);
 
-    double elapsedMillis = currentTime() - startMillis;
     int curSecs = (int)(elapsedMillis/1000);
     if (curSecs != lastSecs) {
       timeImg.canvas().clear();
@@ -253,6 +264,9 @@ public class CanvasTest extends Test {
       timeImg.canvas().drawText(""+curSecs, 40, 55);
       lastSecs = curSecs;
     }
+
+    // round the width so that it goes to zero sometimes (which should be fine)
+    tileLayer.setWidth(Math.round(Math.abs(FloatMath.sin(elapsedMillis/2)) * 100));
   }
 
   private interface Drawer {

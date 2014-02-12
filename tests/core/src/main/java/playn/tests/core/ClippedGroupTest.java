@@ -123,7 +123,7 @@ public class ClippedGroupTest extends Test {
     elapsed += delta/1000f;
     i1.setRotation(elapsed * FloatMath.PI/2);
     s1.setRotation(elapsed * FloatMath.PI/2);
-    g2.setWidth(Math.max(1f, Math.abs(100 * FloatMath.sin(elapsed))));
+    g2.setWidth(Math.round(Math.abs(100 * FloatMath.sin(elapsed))));
     inner.setOrigin(FloatMath.sin(elapsed * 2f) * 50, FloatMath.cos(elapsed * 2f) * 50);
     g5Inner.setTranslation(-25 + 50 * FloatMath.cos(elapsed), -25 + 50 * FloatMath.sin(elapsed));
   }

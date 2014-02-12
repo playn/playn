@@ -107,8 +107,9 @@ public class SubImageTest extends Test {
   public void update(int delta) {
     elapsed += delta;
     if (osci != null) {
-      float osciCurWidth = Math.abs(FloatMath.sin(elapsed/1000f)) * osci.parent().width();
-      osci.setBounds(0, 0, osciCurWidth, osci.parent().height());
+      // round the width so that it sometimes goes to zero; just to be sure zero doesn't choke
+      float width = Math.round(Math.abs(FloatMath.sin(elapsed/1000f)) * osci.parent().width());
+      osci.setBounds(0, 0, width, osci.parent().height());
     }
   }
 
