@@ -152,8 +152,8 @@ public class IOSGLContext extends GLContext {
     int tex = texw[0];
     if (tex == 0) {
       throw new IllegalStateException(
-        "Attempted to generate texture before GL was initialized. " +
-        "You cannot create and render SurfaceLayer in Game.init() on iOS.");
+        "Attempted to generate texture before GL was initialized. Unfortunately, " +
+        "you cannot create and render to a SurfaceImage in Game.init() on iOS.");
     }
 
     TextureTarget tt = TextureTarget.wrap(TextureTarget.Texture2D);
