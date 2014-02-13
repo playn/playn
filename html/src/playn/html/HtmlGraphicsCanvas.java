@@ -25,11 +25,9 @@ import playn.core.ImmediateLayer;
 import playn.core.InternalTransform;
 import playn.core.StockInternalTransform;
 import playn.core.SurfaceImage;
-import playn.core.SurfaceLayer;
 import playn.core.canvas.GroupLayerCanvas;
 import playn.core.canvas.ImageLayerCanvas;
 import playn.core.canvas.ImmediateLayerCanvas;
-import playn.core.canvas.SurfaceLayerCanvas;
 import playn.core.gl.Scale;
 
 class HtmlGraphicsCanvas extends HtmlGraphics {
@@ -101,11 +99,6 @@ class HtmlGraphicsCanvas extends HtmlGraphics {
   @Override
   public ImageLayer createImageLayer(Image img) {
     return createImageLayer().setImage(img);
-  }
-
-  @Override @Deprecated
-  public SurfaceLayer createSurfaceLayer(float width, float height) {
-    return new SurfaceLayerCanvas(createXform(), createImage(width, height));
   }
 
   @Override

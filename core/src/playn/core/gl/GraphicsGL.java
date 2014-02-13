@@ -21,7 +21,6 @@ import playn.core.Image;
 import playn.core.ImageLayer;
 import playn.core.ImmediateLayer;
 import playn.core.SurfaceImage;
-import playn.core.SurfaceLayer;
 
 /**
  * Handles the common implementation of {@link Graphics} for GL-based backends.
@@ -61,11 +60,6 @@ public abstract class GraphicsGL implements Graphics {
   @Override
   public ImageLayer createImageLayer(Image image) {
     return new ImageLayerGL(ctx()).setImage(image);
-  }
-
-  @Deprecated @Override
-  public SurfaceLayer createSurfaceLayer(float width, float height) {
-    return new SurfaceLayerGL(ctx(), createSurfaceGL(width, height));
   }
 
   @Override

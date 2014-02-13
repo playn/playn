@@ -108,12 +108,6 @@ public interface Graphics {
   ImageLayer createImageLayer(Image image);
 
   /**
-   * @deprecated Use {@link #createSurface} and {@link #createImageLayer}.
-   */
-  @Deprecated
-  SurfaceLayer createSurfaceLayer(float width, float height);
-
-  /**
    * Creates an image that can be painted using the {@link Canvas} interface.
    */
   CanvasImage createImage(float width, float height);

@@ -151,9 +151,7 @@ public class IOSGLContext extends GLContext {
     GL.GenTextures(1, texw);
     int tex = texw[0];
     if (tex == 0) {
-      throw new IllegalStateException(
-        "Attempted to generate texture before GL was initialized. Unfortunately, " +
-        "you cannot create and render to a SurfaceImage in Game.init() on iOS.");
+      throw new IllegalStateException(NO_SURF_IN_INIT_ERR);
     }
 
     TextureTarget tt = TextureTarget.wrap(TextureTarget.Texture2D);
@@ -270,9 +268,7 @@ public class IOSGLContext extends GLContext {
 
     int fbuf = fbufw[0];
     if (fbuf == 0) {
-      throw new IllegalStateException(
-        "Attempted to generate frame buffer before GL was initialized. " +
-        "You cannot create SurfaceLayer in Game.init() on iOS.");
+      throw new IllegalStateException(NO_SURF_IN_INIT_ERR);
     }
 
     GL.BindFramebuffer(FramebufferTarget.wrap(FramebufferTarget.Framebuffer), fbuf);
@@ -362,4 +358,8 @@ public class IOSGLContext extends GLContext {
     default: return filter;
     }
   }
+
+  protected static final String NO_SURF_IN_INIT_ERR =
+    "Attempted to generate texture before GL was initialized. Unfortunately, " +
+    "you cannot create and render to a SurfaceImage in Game.init() on iOS.";
 }

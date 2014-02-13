@@ -24,7 +24,6 @@ import playn.core.Image;
 import playn.core.ImageLayer;
 import playn.core.ImmediateLayer;
 import playn.core.SurfaceImage;
-import playn.core.SurfaceLayer;
 import playn.core.gl.GL20;
 import playn.core.gl.GroupLayerGL;
 import playn.core.gl.ImageLayerGL;
@@ -32,7 +31,6 @@ import playn.core.gl.ImmediateLayerGL;
 import playn.core.gl.Scale;
 import playn.core.gl.SurfaceGL;
 import playn.core.gl.SurfaceImageGL;
-import playn.core.gl.SurfaceLayerGL;
 
 class HtmlGraphicsGL extends HtmlGraphics {
 
@@ -100,11 +98,6 @@ class HtmlGraphicsGL extends HtmlGraphics {
   @Override
   public ImageLayer createImageLayer(Image img) {
     return new ImageLayerGL(ctx).setImage(img);
-  }
-
-  @Override @Deprecated
-  public SurfaceLayer createSurfaceLayer(float width, float height) {
-    return new SurfaceLayerGL(ctx, new SurfaceGL(ctx(), width, height));
   }
 
   @Override

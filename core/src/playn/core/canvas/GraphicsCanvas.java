@@ -22,7 +22,6 @@ import playn.core.Image;
 import playn.core.ImageLayer;
 import playn.core.ImmediateLayer;
 import playn.core.InternalTransform;
-import playn.core.SurfaceLayer;
 import playn.core.gl.Scale;
 
 /**
@@ -70,11 +69,6 @@ public abstract class GraphicsCanvas implements Graphics {
   @Override
   public ImageLayer createImageLayer(Image img) {
     return createImageLayer().setImage(img);
-  }
-
-  @Override @Deprecated
-  public SurfaceLayer createSurfaceLayer(float width, float height) {
-    return new SurfaceLayerCanvas(createXform(), createImage(width, height));
   }
 
   @Override
