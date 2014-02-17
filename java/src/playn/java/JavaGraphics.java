@@ -85,7 +85,7 @@ public class JavaGraphics extends GraphicsGL {
         java.awt.Font.TRUETYPE_FONT, ((JavaAssets) assets()).getAssetStream(path));
       _fonts.put(name, font);
     } catch (Exception e) {
-      log().warn("Failed to load font [name=" + name + ", path=" + path + "]", e);
+      platform.reportError("Failed to load font [name=" + name + ", path=" + path + "]", e);
     }
   }
 

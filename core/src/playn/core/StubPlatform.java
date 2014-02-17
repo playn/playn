@@ -42,24 +42,7 @@ import playn.core.util.Callback;
  * <li> {@link #keyboard} - allows listener registration, never generates events
  * </ul>
  */
-public class StubPlatform implements Platform {
-
-  private final Log log = new LogImpl() {
-    @Override
-    protected void logImpl(Level level, String msg, Throwable e) {
-      String prefix;
-      switch (level) {
-      default:
-      case DEBUG: prefix = "D: "; break;
-      case INFO: prefix = ""; break;
-      case WARN: prefix = "W: "; break;
-      case ERROR: prefix = "E: "; break;
-      }
-      System.err.println(prefix + msg);
-      if (e != null)
-        e.printStackTrace(System.err);
-    }
-  };
+public class StubPlatform extends AbstractPlatform {
 
   private Storage storage = new Storage() {
     private final Map<String,String> _data = new HashMap<String,String>();
@@ -98,7 +81,24 @@ public class StubPlatform implements Platform {
   private Pointer pointer = new PointerImpl() {};
   private final long start = System.currentTimeMillis();
 
-  protected PlayN.LifecycleListener _lifecycleListener;
+  public StubPlatform() {
+    super(new LogImpl() {
+      @Override
+      protected void logImpl(Level level, String msg, Throwable e) {
+        String prefix;
+        switch (level) {
+        default:
+        case DEBUG: prefix = "D: "; break;
+        case INFO: prefix = ""; break;
+        case WARN: prefix = "W: "; break;
+        case ERROR: prefix = "E: "; break;
+        }
+        System.err.println(prefix + msg);
+        if (e != null)
+          e.printStackTrace(System.err);
+      }
+    });
+  }
 
   @Override
   public void run(Game game) {
@@ -140,11 +140,6 @@ public class StubPlatform implements Platform {
   }
 
   @Override
-  public void setLifecycleListener(PlayN.LifecycleListener listener) {
-    _lifecycleListener = listener;
-  }
-
-  @Override
   public Audio audio() {
     throw new UnsupportedOperationException();
   }
@@ -167,11 +162,6 @@ public class StubPlatform implements Platform {
   @Override
   public Keyboard keyboard() {
     return keyboard;
-  }
-
-  @Override
-  public Log log() {
-    return log;
   }
 
   @Override

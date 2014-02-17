@@ -99,7 +99,7 @@ public class AndroidGraphics extends GraphicsGL {
     try {
       registerFont(platform.assets().getTypeface(path), name, style, ligatureGlyphs);
     } catch (Exception e) {
-      platform.log().warn("Failed to load font [name=" + name + ", path=" + path + "]", e);
+      platform.reportError("Failed to load font [name=" + name + ", path=" + path + "]", e);
     }
   }
 

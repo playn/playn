@@ -270,7 +270,7 @@ public class AndroidAssets extends AbstractAssets<Bitmap> {
     } catch (Exception e) {
       // Could provide a more explicit error message for IOException or IllegalStateException
       getRequest.abort();
-      platform.log().warn("Error while retrieving bitmap from " + url, e);
+      platform.reportError("Error while retrieving bitmap from " + url, e);
       throw e;
 
     } finally {

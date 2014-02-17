@@ -270,7 +270,7 @@ public class IOSPlatform extends AbstractPlatform {
         try {
           action.run();
         } catch (Throwable t) {
-          log.warn("Async task failure [task=" + action + "]", t);
+          reportError("Async task failure [task=" + action + "]", t);
         }
       }
     }));

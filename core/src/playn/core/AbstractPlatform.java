@@ -29,6 +29,11 @@ public abstract class AbstractPlatform implements Platform {
   private PlayN.LifecycleListener lifecycleListener;
 
   @Override
+  public void reportError(String message, Throwable err) {
+    log.warn(message, err);
+  }
+
+  @Override
   public void invokeLater(Runnable runnable) {
     runQueue.add(runnable);
   }
@@ -75,7 +80,7 @@ public abstract class AbstractPlatform implements Platform {
 
   protected AbstractPlatform(Log log) {
     this.log = log;
-    this.runQueue = new RunQueue(log);
+    this.runQueue = new RunQueue(this);
   }
 
   protected void onPause() {
@@ -83,7 +88,7 @@ public abstract class AbstractPlatform implements Platform {
       try {
         lifecycleListener.onPause();
       } catch (Exception e) {
-        log.warn("LifecycleListener.onPause failure", e);
+        reportError("LifecycleListener.onPause failure", e);
       }
     }
   }
@@ -93,7 +98,7 @@ public abstract class AbstractPlatform implements Platform {
       try {
         lifecycleListener.onResume();
       } catch (Exception e) {
-        log.warn("LifecycleListener.onResume failure", e);
+        reportError("LifecycleListener.onResume failure", e);
       }
     }
   }
@@ -103,7 +108,7 @@ public abstract class AbstractPlatform implements Platform {
       try {
         lifecycleListener.onExit();
       } catch (Exception e) {
-        log.warn("LifecycleListener.onExit failure", e);
+        reportError("LifecycleListener.onExit failure", e);
       }
     }
   }

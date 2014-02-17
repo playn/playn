@@ -27,10 +27,13 @@ import playn.core.Storage;
  * back to using an in-memory map.
  */
 class HtmlStorage implements Storage {
-  private Map<String, String> storageMap;
+
+  private final HtmlPlatform platform;
+  private final Map<String, String> storageMap;
   private boolean isPersisted;
 
-  public HtmlStorage() {
+  public HtmlStorage(HtmlPlatform platform) {
+    this.platform = platform;
     com.google.gwt.storage.client.Storage storage =
         com.google.gwt.storage.client.Storage.getLocalStorageIfSupported();
     if (storage != null) {
@@ -57,7 +60,7 @@ class HtmlStorage implements Storage {
     try {
       storageMap.remove(key);
     } catch (RuntimeException e) {
-      // ignore
+      platform.reportError("Failed to remove() Storage item [key=" + key + "]", e);
     }
   }
 
@@ -66,7 +69,7 @@ class HtmlStorage implements Storage {
     try {
       return storageMap.get(key);
     } catch (RuntimeException e) {
-      // ignore
+      platform.reportError("Failed to get() Storage item [key=" + key + "]", e);
     }
     return null;
   }

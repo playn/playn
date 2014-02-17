@@ -181,7 +181,7 @@ public class AndroidAudio extends AudioImpl {
               });
               mp.prepareAsync();
             } catch (Exception e) {
-              platform.log().warn("Sound load error '" + path + "'", e);
+              platform.reportError("Sound load error '" + path + "'", e);
               dispatchLoadError(sound, e);
             }
           }

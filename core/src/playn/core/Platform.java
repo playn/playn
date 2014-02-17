@@ -22,6 +22,13 @@ public interface Platform {
 
   enum Type { JAVA, HTML, ANDROID, IOS, FLASH, STUB }
 
+  /**
+   * Called when a backend (or other framework code) encounters an exception that it can recover
+   * from, but which it would like to report in some orderly fashion. <em>NOTE:</em> this method
+   * may be called from threads other than the main PlayN thread.
+   */
+  void reportError(String message, Throwable cause);
+
   void run(Game game);
 
   Platform.Type type();

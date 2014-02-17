@@ -242,6 +242,7 @@ public abstract class HtmlGraphics implements Graphics {
       case BOLD_ITALIC:
         measureElement.getStyle().setFontWeight(Style.FontWeight.BOLD);
         measureElement.getStyle().setFontStyle(Style.FontStyle.ITALIC);
+        break;
       default:
         break; // nada
       }

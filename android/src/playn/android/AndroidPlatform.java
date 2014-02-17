@@ -87,7 +87,7 @@ public class AndroidPlatform extends AbstractPlatform {
             try {
               action.run();
             } catch (Exception e) {
-              log.warn("Async task failure [task=" + action + "]", e);
+              reportError("Async task failure [task=" + action + "]", e);
             }
             return null;
           }

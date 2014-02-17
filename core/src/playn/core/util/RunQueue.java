@@ -15,7 +15,7 @@
  */
 package playn.core.util;
 
-import playn.core.Log;
+import playn.core.AbstractPlatform;
 import playn.core.Platform;
 
 /**
@@ -24,7 +24,7 @@ import playn.core.Platform;
  */
 public class RunQueue {
 
-  private final Log log;
+  private final AbstractPlatform platform;
   private Entry head;
 
   private class Entry {
@@ -37,10 +37,9 @@ public class RunQueue {
 
   /**
    * Creates a run queue.
-   * @param log the log instance to which to report any runnable execution failures.
    */
-  public RunQueue(Log log) {
-    this.log = log;
+  public RunQueue(AbstractPlatform platform) {
+    this.platform = platform;
   }
 
   /**
@@ -56,7 +55,7 @@ public class RunQueue {
       try {
         head.runnable.run();
       } catch (Throwable t) {
-        log.warn("Failure executing runnable: " + head.runnable, t);
+        platform.reportError("Failure executing runnable: " + head.runnable, t);
       }
       head = head.next;
     }

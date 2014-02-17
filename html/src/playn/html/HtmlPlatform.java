@@ -161,7 +161,7 @@ public class HtmlPlatform extends AbstractPlatform {
   private final HtmlPointer pointer;
   private final HtmlMouse mouse;
   private final HtmlTouch touch;
-  private final HtmlStorage storage = new HtmlStorage();
+  private final HtmlStorage storage = new HtmlStorage(this);
 
   // installs backwards compat Date.now() if needed and calls it
   private final double start = initNow();

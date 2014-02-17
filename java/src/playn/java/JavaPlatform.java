@@ -240,7 +240,7 @@ public class JavaPlatform extends AbstractPlatform {
     try {
       Desktop.getDesktop().browse(URI.create(url));
     } catch (Exception e) {
-      log.warn("Failed to open URL [url=" + url + ", error=" + e + "]");
+      reportError("Failed to open URL [url=" + url + "]", e);
     }
   }
 

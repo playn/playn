@@ -21,9 +21,8 @@ import pythagoras.i.Rectangle;
 
 import playn.core.Image;
 import playn.core.InternalTransform;
-import playn.core.Platform;
+import playn.core.AbstractPlatform;
 import playn.core.Tint;
-import static playn.core.PlayN.log;
 import static playn.core.gl.GL20.*;
 
 /**
@@ -38,7 +37,7 @@ public class GL20Context extends GLContext {
   private int minFilter = GL_LINEAR, magFilter = GL_LINEAR;
   private GLShader quadShader, trisShader;
 
-  public GL20Context(Platform platform, GL20 gl, float scaleFactor, boolean checkErrors) {
+  public GL20Context(AbstractPlatform platform, GL20 gl, float scaleFactor, boolean checkErrors) {
     super(platform, scaleFactor);
     this.gl = gl;
     this.checkErrors = checkErrors;
@@ -213,7 +212,7 @@ public class GL20Context extends GLContext {
     if (checkErrors) {
       int error;
       while ((error = gl.glGetError()) != GL_NO_ERROR) {
-        log().error(this.getClass().getName() + " -- " + op + ": glError " + error);
+        platform.log().warn(this.getClass().getName() + " -- " + op + ": glError " + error);
       }
     }
   }

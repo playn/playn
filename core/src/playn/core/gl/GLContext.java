@@ -21,11 +21,11 @@ import java.util.List;
 
 import pythagoras.i.Rectangle;
 
+import playn.core.AbstractPlatform;
 import playn.core.Asserts;
 import playn.core.CanvasImage;
 import playn.core.Image;
 import playn.core.InternalTransform;
-import playn.core.Platform;
 import playn.core.StockInternalTransform;
 
 public abstract class GLContext {
@@ -67,7 +67,7 @@ public abstract class GLContext {
   protected static final boolean STATS_ENABLED = true;
   protected final Stats stats = new Stats();
 
-  protected final Platform platform;
+  protected final AbstractPlatform platform;
   private GLShader curShader;
   private int lastFramebuffer, epoch;
   private int pushedFramebuffer = -1, pushedWidth, pushedHeight;
@@ -394,7 +394,7 @@ public abstract class GLContext {
       return scissorDepth;
   }
 
-  protected GLContext(Platform platform, float scaleFactor) {
+  protected GLContext(AbstractPlatform platform, float scaleFactor) {
     this.scale = new Scale(scaleFactor);
     this.platform = platform;
   }
@@ -445,7 +445,7 @@ public abstract class GLContext {
         quadShader.createCore(); // force core creation to test whether it fails
         return quadShader;
       } catch (Throwable t) {
-        platform.log().warn("Failed to create QuadShader: " + t);
+        platform.reportError("Failed to create QuadShader", t);
       }
     }
     return new IndexedTrisShader(this);
