@@ -23,14 +23,21 @@ import playn.core.util.RunQueue;
  */
 public abstract class AbstractPlatform implements Platform {
 
+  protected final PlayN.ErrorReporter DEFAULT_REPORTER = new PlayN.ErrorReporter() {
+    public void reportError(String message, Throwable err) {
+      log.warn(message, err);
+    }
+  };
+
   protected final RunQueue runQueue;
   protected final Log log;
 
   private PlayN.LifecycleListener lifecycleListener;
+  private PlayN.ErrorReporter errorReporter;
 
   @Override
   public void reportError(String message, Throwable err) {
-    log.warn(message, err);
+    errorReporter.reportError(message, err);
   }
 
   @Override
@@ -41,6 +48,11 @@ public abstract class AbstractPlatform implements Platform {
   @Override
   public void setLifecycleListener(PlayN.LifecycleListener listener) {
     lifecycleListener = listener;
+  }
+
+  @Override
+  public void setErrorReporter(PlayN.ErrorReporter reporter) {
+    errorReporter = (reporter == null) ? DEFAULT_REPORTER : reporter;
   }
 
   @Override

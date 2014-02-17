@@ -73,7 +73,7 @@ public class AndroidSurfaceGL extends SurfaceGL
         cachedPixels.delete();
         cachedPixels = null;
       } catch (IOException e) {
-        PlayN.platform().reportError("Error reading cached surface pixels from file.", e);
+        PlayN.reportError("Error reading cached surface pixels from file.", e);
       }
     }
   }
@@ -93,12 +93,12 @@ public class AndroidSurfaceGL extends SurfaceGL
         out.write(pixelBuffer.array());
         out.close();
       } catch (IOException e) {
-        PlayN.platform().reportError("IOException writing cached Surface to file.", e);
+        PlayN.reportError("IOException writing cached Surface to file.", e);
         cachedPixels = null;
       }
       pixelBuffer = null;
     } catch (OutOfMemoryError e) {
-      PlayN.platform().reportError("OutOfMemoryError reading cached Surface to buffer.", e);
+      PlayN.reportError("OutOfMemoryError reading cached Surface to buffer.", e);
       cachedPixels = null;
     }
     clearTexture();

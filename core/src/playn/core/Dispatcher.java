@@ -162,8 +162,8 @@ abstract class Dispatcher {
     try {
       layer.interact(listenerType, interaction, event);
     } catch (Throwable t) {
-      PlayN.platform().reportError("Interaction failure [layer=" + layer + ", iact=" + interaction +
-                                   ", event=" + event + "]", t);
+      PlayN.reportError("Interaction failure [layer=" + layer + ", iact=" + interaction +
+                        ", event=" + event + "]", t);
     }
   }
 

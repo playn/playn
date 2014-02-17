@@ -38,13 +38,15 @@ public class PlayN {
     void onExit();
   }
 
-  /**
-   * Call this method to start your {@link Game}. It must be called only once,
-   * and all work after this call is made will be performed in {@link Game}'s
-   * callback methods.
-   */
-  public static void run(Game game) {
-    platform.run(game);
+  /** Used to customize top-level error reporting. See {@link #setErrorReporter}. */
+  public static interface ErrorReporter {
+    /** Called to report a top-level error. This is called by internal PlayN backend code when it
+     * encounters an error from which it can recover, but which it would like to report in an
+     * orderly fashion. <em>NOTE:</em> this method may be called from any thread, not just the main
+     * PlayN thread. So an implementation must take care to get back onto the PlayN thread if it's
+     * going to do anything other than turn around and log the message.
+     */
+    void reportError(String message, Throwable err);
   }
 
   /**
@@ -61,6 +63,24 @@ public class PlayN {
    */
   public static Platform.Type platformType() {
     return platform.type();
+  }
+
+  /**
+   * Call this method to start your {@link Game}. It must be called only once,
+   * and all work after this call is made will be performed in {@link Game}'s
+   * callback methods.
+   */
+  public static void run(Game game) {
+    platform.run(game);
+  }
+
+  /**
+   * Called when a backend (or other framework code) encounters an exception that it can recover
+   * from, but which it would like to report in some orderly fashion. <em>NOTE:</em> this method
+   * may be called from threads other than the main PlayN thread.
+   */
+  public static void reportError(String message, Throwable err) {
+    platform.reportError(message, err);
   }
 
   /**
@@ -109,6 +129,17 @@ public class PlayN {
    */
   public static void setLifecycleListener(LifecycleListener listener) {
     platform.setLifecycleListener(listener);
+  }
+
+  /**
+   * Configures the top-level error reporter. Any previous reporter will be overwritten. Supply
+   * null to revert to the default error reporter. <em>NOTE:</em> the error reporter may be called
+   * from any thread, not just the main PlayN thread. So an implementation must take care to get
+   * back onto the PlayN thread if it's going to do anything other than turn around and log the
+   * message.
+   */
+  public static void setErrorReporter(ErrorReporter reporter) {
+    platform.setErrorReporter(reporter);
   }
 
   /**
