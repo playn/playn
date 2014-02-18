@@ -25,7 +25,6 @@ import cli.MonoTouch.UIKit.UITextAutocorrectionType;
 import cli.MonoTouch.UIKit.UITextField;
 
 import playn.core.KeyboardImpl;
-import playn.core.PlayN;
 import playn.core.util.Callback;
 
 public class IOSKeyboard extends KeyboardImpl {
