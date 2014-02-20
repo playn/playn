@@ -68,7 +68,8 @@ public class JavaGraphics extends GraphicsGL {
     aFontContext = aGfx.getFontRenderContext();
 
     if (!config.headless) {
-      setDisplayMode(ctx.scale.scaledCeil(config.width), ctx.scale.scaledCeil(config.height), false);
+      setDisplayMode(ctx.scale.scaledCeil(config.width), ctx.scale.scaledCeil(config.height),
+                     config.fullscreen);
     }
   }
 

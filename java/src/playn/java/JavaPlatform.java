@@ -60,6 +60,10 @@ public class JavaPlatform extends AbstractPlatform {
     /** The height of the PlayN window, in pixels. */
     public int height = 480;
 
+    /** Whether or not to run the game in fullscreen mode. <em>Note:</em> this is not well tested,
+     * so you may discover issues. Consider yourself warned. */
+    public boolean fullscreen;
+
     /** If set, emulates Touch and disables Mouse. For testing. */
     public boolean emulateTouch;
 
