@@ -33,7 +33,7 @@ public abstract class AbstractPlatform implements Platform {
   protected final Log log;
 
   private PlayN.LifecycleListener lifecycleListener;
-  private PlayN.ErrorReporter errorReporter;
+  private PlayN.ErrorReporter errorReporter = DEFAULT_REPORTER;
 
   @Override
   public void reportError(String message, Throwable err) {
