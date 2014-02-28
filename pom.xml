@@ -70,13 +70,6 @@
     </repository>
   </repositories>
 
-  <pluginRepositories>
-    <pluginRepository>
-      <id>codehaus.snapshots</id>
-      <url>http://snapshots.repository.codehaus.org/</url>
-    </pluginRepository>
-  </pluginRepositories>
-
   <!-- Common dependencies for all modules -->
   <dependencies>
     <dependency>
