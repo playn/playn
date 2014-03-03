@@ -19,7 +19,10 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
+
+import playn.core.Asserts;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.ext.Generator;
@@ -29,6 +32,7 @@ import com.google.gwt.core.ext.UnableToCompleteException;
 import com.google.gwt.core.ext.typeinfo.JClassType;
 import com.google.gwt.core.ext.typeinfo.NotFoundException;
 import com.google.gwt.core.ext.typeinfo.TypeOracle;
+import com.google.gwt.dev.resource.Resource;
 import com.google.gwt.dev.util.collect.HashMap;
 import com.google.gwt.resources.client.ClientBundleWithLookup;
 import com.google.gwt.resources.client.DataResource;
@@ -37,8 +41,6 @@ import com.google.gwt.resources.client.ResourcePrototype;
 import com.google.gwt.resources.client.TextResource;
 import com.google.gwt.user.rebind.ClassSourceFileComposerFactory;
 import com.google.gwt.user.rebind.SourceWriter;
-
-import playn.core.Asserts;
 
 /**
  * Automatically generate a client bundle from the resources available in the provided interface's
@@ -84,8 +86,8 @@ public class AutoClientBundleGenerator extends Generator {
     EXTENSION_MAP.put(".json", "text/json");
   }
 
-  private static String getContentType(TreeLogger logger, File file) {
-    String name = file.getName().toLowerCase();
+  private static String getContentType(TreeLogger logger, Resource resource) {
+    String name = resource.getPath().toLowerCase();
     int pos = name.lastIndexOf('.');
     String extension = pos == -1 ? "" : name.substring(pos);
     String contentType = EXTENSION_MAP.get(extension);
@@ -165,7 +167,7 @@ public class AutoClientBundleGenerator extends Generator {
     String baseClassesPath = classesDirectory.getPath();
     logger.log(TreeLogger.DEBUG, "baseClassesPath: " + baseClassesPath);
 
-    Set<File> files = preferMp3(getFiles(resourcesDirectory, fileFilter));
+    Set<Resource> resources = preferMp3(getResources(context, userType, fileFilter));
     Set<String> methodNames = new HashSet<String>();
 
     PrintWriter pw = context.tryCreate(logger, packageName, className + "Impl");
@@ -192,12 +194,10 @@ public class AutoClientBundleGenerator extends Generator {
       sw.indent();
       sw.println("MyBundle INSTANCE = GWT.create(MyBundle.class);");
 
-      for (File file : files) {
-        String filepath = file.getPath();
-        String relativePath = filepath.replace(baseClassesPath, "").replace('\\', '/').replaceFirst(
-            "^/", "");
-        String filename = file.getName();
-        String contentType = getContentType(logger, file);
+      for (Resource resource : resources) {
+        String relativePath = resource.getPath();
+        String filename = resource.getPath().substring(resource.getPath().lastIndexOf('/') + 1);
+        String contentType = getContentType(logger, resource);
         String methodName = stripExtension(filename);
 
         if (!isValidMethodName(methodName)) {
@@ -243,41 +243,38 @@ public class AutoClientBundleGenerator extends Generator {
   /**
    * Filter file set, preferring *.mp3 files where alternatives exist.
    */
-  private HashSet<File> preferMp3(Set<File> files) {
-    HashMap<String, File> map = new HashMap<String, File>();
-    for (File file : files) {
+  private HashSet<Resource> preferMp3(HashSet<Resource> files) {
+    HashMap<String, Resource> map = new HashMap<String, Resource>();
+    for (Resource file : files) {
       String path = stripExtension(file.getPath());
-      if (file.getName().endsWith(".mp3") || !map.containsKey(path)) {
+      if (file.getPath().endsWith(".mp3") || !map.containsKey(path)) {
         map.put(path, file);
       }
     }
-    return new HashSet<File>(map.values());
+    return new HashSet<Resource>(map.values());
   }
 
   /**
-   * Recursively get a list of files in the provided directory.
+   * Get all related resources of the auto resource bundler.
+   * 
    */
-  private HashSet<File> getFiles(File dir, FileFilter filter) {
-    Asserts.checkNotNull(dir);
-    Asserts.checkNotNull(filter);
-    Asserts.checkArgument(dir.isDirectory());
-
-    HashSet<File> fileList = new HashSet<File>();
-    File[] files = dir.listFiles(filter);
-    for (int i = 0; i < files.length; i++) {
-      File f = files[i];
-      if (f.isFile()) {
-        // f = file
-        fileList.add(f);
-      } else {
-        // f = directory
-        if (filter.accept(f)) {
-          fileList.addAll(getFiles(f, filter));
-        }
-      }
+  private HashSet<Resource> getResources(GeneratorContext context, JClassType userType, FileFilter filter) {
+    Map<String, Resource> map = context.getResourcesOracle().getResourceMap();
+    final String pack = userType.getPackage().getName().replace('.', '/');
+   
+    HashSet<Resource> resourceList = new HashSet<Resource>();
+    for (Entry<String, Resource> entry : map.entrySet()) {
+      String path = entry.getKey();
+      if (!path.startsWith(pack))
+        continue;
+      String ext = getExtension(path);
+      if (EXTENSION_MAP.containsKey(ext))
+        resourceList.add(entry.getValue());
     }
-    return fileList;
+
+    return resourceList;
   }
+
 
   private Class<? extends ResourcePrototype> getResourcePrototype(String contentType) {
     Class<? extends ResourcePrototype> returnType;
