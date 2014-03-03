@@ -6,5 +6,6 @@
 # doing other miscellaneous business.
 
 if [[ $TRAVIS_BRANCH == 'master' ]]; then
+    git clone https://github.com/samskivert/travis-maven-deploy.git target/travis
     mvn deploy --settings target/travis/settings.xml
 fi
