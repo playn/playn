@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -e
 #
 # Deploys artifacts to SonaType snapshots repository if we're building master branch.
 #
