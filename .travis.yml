@@ -1,5 +1,5 @@
 language: java
-script: tools/travis-deploy.sh
+after_success: tools/travis-deploy.sh
 
 jdk:
   - openjdk7
