@@ -16,6 +16,7 @@
 package playn.java;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -65,10 +66,13 @@ public class JavaNet extends NetImpl {
           // issue the request and process the response
           try {
             int code = conn.getResponseCode();
-            byte[] payload = ByteStreams.toByteArray(
-              code >= 400 ? conn.getErrorStream() : conn.getInputStream());
+
+            InputStream stream = code >= 400 ? conn.getErrorStream() : conn.getInputStream();
+            byte[] payload = stream == null ? null : ByteStreams.toByteArray(stream);
+
             String encoding = conn.getContentEncoding();
             if (encoding == null) encoding = UTF8;
+
             platform.notifySuccess(callback, new BinaryResponse(code, payload, encoding) {
               @Override
               protected Map<String,List<String>> extractHeaders() {
