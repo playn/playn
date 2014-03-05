@@ -54,8 +54,7 @@ public abstract class AbstractLayer implements Layer {
     DESTROYED(1 << 0),
     VISIBLE(1 << 1),
     INTERACTIVE(1 << 2),
-    SHOWN(1 << 3), // used by HtmlLayerDom
-    XFDIRTY(1 << 4);
+    XFDIRTY(1 << 3);
 
     public final int bitmask;
 
