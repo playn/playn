@@ -54,7 +54,7 @@ public class HtmlAssets extends AbstractAssets<Void> {
   private final HtmlPlatform platform;
   private final Map<String, AutoClientBundleWithLookup> clientBundles =
     new HashMap<String, AutoClientBundleWithLookup>();
-  private String pathPrefix = "";
+  private String pathPrefix = GWT.getModuleBaseForStaticFiles();
   private Scale assetScale = null;
   private ImageManifest imageManifest;
 
