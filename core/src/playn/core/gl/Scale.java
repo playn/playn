@@ -20,8 +20,6 @@ import java.util.List;
 
 import pythagoras.f.MathUtil;
 
-import playn.core.Asserts;
-
 /**
  * Encapsulates a scale factor, provides useful utility methods.
  */
@@ -59,7 +57,6 @@ public class Scale {
   public final float factor;
 
   public Scale (float factor) {
-    Asserts.checkArgument(factor >= 1, "Scale factor cannot be less than one.");
     this.factor = factor;
   }
 
