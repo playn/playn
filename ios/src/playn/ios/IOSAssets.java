@@ -36,7 +36,6 @@ import cli.MonoTouch.Foundation.NSUrlRequest;
 import cli.MonoTouch.UIKit.UIImage;
 
 import playn.core.AbstractAssets;
-import playn.core.Asserts;
 import playn.core.AsyncImage;
 import playn.core.Image;
 import playn.core.Sound;
@@ -59,10 +58,10 @@ public class IOSAssets extends AbstractAssets<UIImage> {
    * multiple components with embedded path separators.
    */
   public void setPathPrefix(String... components) {
-    Asserts.checkArgument(components.length > 0);
+    assert components.length > 0;
     for (String component : components) {
-      Asserts.checkArgument(!component.contains("/") && !component.contains("\\"),
-                            "Path components must not contain path separators: " + component);
+      assert !component.contains("/") && !component.contains("\\") :
+        "Path components must not contain path separators: " + component;
     }
     pathPrefix = Path.Combine(components);
   }

@@ -21,7 +21,6 @@ import java.util.List;
 import pythagoras.f.FloatMath;
 import pythagoras.f.MathUtil;
 
-import playn.core.Asserts;
 import playn.core.Image;
 import playn.core.InternalTransform;
 import playn.core.Layer;
@@ -184,7 +183,7 @@ abstract class AbstractSurfaceGL implements Surface {
 
   @Override
   public Surface restore() {
-    Asserts.checkState(transformStack.size() > 1, "Unbalanced save/restore");
+    assert transformStack.size() > 1 : "Unbalanced save/restore";
     transformStack.remove(transformStack.size() - 1);
     return this;
   }
@@ -239,7 +238,7 @@ abstract class AbstractSurfaceGL implements Surface {
   @Override
   public Surface setFillPattern(Pattern pattern) {
     // TODO: Add it to the state stack.
-    Asserts.checkArgument(pattern instanceof GLPattern);
+    assert pattern instanceof GLPattern;
     this.fillPattern = ((GLPattern) pattern).image();
     this.fillPattern.setRepeat(true, true);
     return this;

@@ -30,7 +30,6 @@ import com.google.gwt.user.client.Window;
 
 import pythagoras.f.Point;
 
-import playn.core.Asserts;
 import playn.core.CanvasImage;
 import playn.core.Font;
 import playn.core.Gradient;
@@ -108,7 +107,7 @@ public abstract class HtmlGraphics implements Graphics {
   @Override
   public Gradient createLinearGradient(float x0, float y0, float x1, float y1,
       int[] colors, float[] positions) {
-    Asserts.checkArgument(colors.length == positions.length);
+    assert colors.length == positions.length;
 
     CanvasGradient gradient = dummyCtx.createLinearGradient(x0, y0, x1, y1);
     for (int i = 0; i < colors.length; ++i) {
@@ -120,7 +119,7 @@ public abstract class HtmlGraphics implements Graphics {
   @Override
   public Gradient createRadialGradient(float x, float y, float r, int[] colors,
       float[] positions) {
-    Asserts.checkArgument(colors.length == positions.length);
+    assert colors.length == positions.length;
 
     CanvasGradient gradient = dummyCtx.createRadialGradient(x, y, 0, x, y, r);
     for (int i = 0; i < colors.length; ++i) {

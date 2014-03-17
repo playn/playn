@@ -22,7 +22,6 @@ import java.util.List;
 import pythagoras.i.Rectangle;
 
 import playn.core.AbstractPlatform;
-import playn.core.Asserts;
 import playn.core.CanvasImage;
 import playn.core.Image;
 import playn.core.InternalTransform;
@@ -261,7 +260,7 @@ public abstract class GLContext {
    * This must be followed by a call to {@link #popFramebuffer}. Also, it is not allowed to push a
    * framebuffer if a framebuffer is already pushed. Only one level of nesting is supported. */
   public void pushFramebuffer(int fbuf, int width, int height) {
-    Asserts.checkState(pushedFramebuffer == -1, "Already have a pushed framebuffer");
+    assert pushedFramebuffer == -1 : "Already have a pushed framebuffer";
     pushedFramebuffer = lastFramebuffer;
     pushedWidth = curFbufWidth;
     pushedHeight = curFbufHeight;
@@ -271,7 +270,7 @@ public abstract class GLContext {
   /** Pops the framebuffer pushed by a previous call to {@link #pushFramebuffer} and restores the
    * framebuffer that was active prior to that call. */
   public void popFramebuffer() {
-    Asserts.checkState(pushedFramebuffer != -1, "Have no pushed framebuffer");
+    assert pushedFramebuffer != -1 : "Have no pushed framebuffer";
     bindFramebuffer(pushedFramebuffer, pushedWidth, pushedHeight);
     pushedFramebuffer = -1;
   }

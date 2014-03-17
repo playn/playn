@@ -13,8 +13,6 @@
  */
 package playn.core.gl;
 
-import playn.core.Asserts;
-
 public class GLUtil {
   /**
    * Returns the next largest power of two, or zero if x is already a power of two.
@@ -22,7 +20,7 @@ public class GLUtil {
    * TODO(jgw): Is there no better way to do this than all this bit twiddling?
    */
   public static int nextPowerOfTwo(int x) {
-    Asserts.checkArgument(x < 0x10000);
+    assert x < 0x10000;
 
     int bit = 0x8000, highest = -1, count = 0;
     for (int i = 15; i >= 0; --i, bit >>= 1) {

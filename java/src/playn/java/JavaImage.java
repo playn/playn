@@ -24,7 +24,6 @@ import java.awt.image.BufferedImage;
 
 import pythagoras.f.MathUtil;
 
-import playn.core.Asserts;
 import playn.core.Image;
 import playn.core.Pattern;
 import playn.core.gl.AbstractImageGL;
@@ -66,7 +65,7 @@ public abstract class JavaImage extends ImageGL<Graphics2D> {
 
   @Override
   public Pattern toPattern() {
-    Asserts.checkState(isReady(), "Cannot generate a pattern from unready image.");
+    assert isReady() : "Cannot generate a pattern from unready image.";
     Rectangle2D rect = new Rectangle2D.Float(0, 0, width(), height());
     return new JavaPattern(this, repeatX, repeatY, new TexturePaint(img, rect));
   }
@@ -111,7 +110,7 @@ public abstract class JavaImage extends ImageGL<Graphics2D> {
   @Override
   protected Pattern toSubPattern(AbstractImageGL<?> image, boolean repeatX, boolean repeatY,
                                  float x, float y, float width, float height) {
-    Asserts.checkState(isReady(), "Cannot generate a pattern from unready image.");
+    assert isReady() : "Cannot generate a pattern from unready image.";
     // we have to account for the scale factor when extracting our subimage
     BufferedImage subImage = img.getSubimage(
       scale.scaledFloor(x), scale.scaledFloor(y),
@@ -122,7 +121,7 @@ public abstract class JavaImage extends ImageGL<Graphics2D> {
 
   @Override
   protected void updateTexture(int tex) {
-    Asserts.checkState(img != null);
+    assert img != null;
     ((JavaGLContext) ctx).updateTexture(tex, img);
   }
 }

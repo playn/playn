@@ -87,7 +87,7 @@ public class AssetWatcher {
    * Adds an image resource to be watched.
    */
   public void add(Image image) {
-    Asserts.checkState(!start || listener == null);
+    assert !start || listener == null;
     ++total;
     image.addCallback(callback);
   }
@@ -96,7 +96,7 @@ public class AssetWatcher {
    * Adds a sound resource to be watched.
    */
   public void add(Sound sound) {
-    Asserts.checkState(!start || listener == null);
+    assert !start || listener == null;
     ++total;
     sound.addCallback(callback);
   }

@@ -18,7 +18,6 @@ import java.util.List;
 import pythagoras.f.Point;
 import pythagoras.f.Vector;
 
-import playn.core.Asserts;
 import playn.core.GroupLayer;
 import playn.core.GroupLayerImpl;
 import playn.core.InternalTransform;
@@ -104,7 +103,7 @@ public class GroupLayerGL extends LayerGL implements GroupLayer, ParentLayer {
 
   @Override
   public void add(Layer layer) {
-    Asserts.checkArgument(layer instanceof LayerGL);
+    assert layer instanceof LayerGL;
     impl.add(this, (LayerGL) layer);
   }
 
@@ -115,7 +114,7 @@ public class GroupLayerGL extends LayerGL implements GroupLayer, ParentLayer {
 
   @Override
   public void remove(Layer layer) {
-    Asserts.checkArgument(layer instanceof LayerGL);
+    assert layer instanceof LayerGL;
     impl.remove(this, (LayerGL) layer);
   }
 

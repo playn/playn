@@ -15,7 +15,6 @@
  */
 package playn.java;
 
-import playn.core.Asserts;
 import playn.core.Events;
 import playn.core.MouseImpl;
 
@@ -26,7 +25,8 @@ abstract class JavaMouse extends MouseImpl {
 
   public JavaMouse(JavaPlatform platform) {
     this.platform = platform;
-    this.pointer = Asserts.checkNotNull(platform.pointer());
+    this.pointer = platform.pointer();
+    assert pointer != null; // catch init ordering fiddly biz
   }
 
   abstract void init();

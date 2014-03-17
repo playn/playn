@@ -17,7 +17,6 @@ package playn.java;
 
 import pythagoras.f.MathUtil;
 
-import playn.core.Asserts;
 import playn.core.Canvas;
 import playn.core.Gradient;
 import playn.core.Path;
@@ -77,7 +76,6 @@ class JavaCanvas extends AbstractCanvasGL<Graphics2D> {
 
   @Override
   public Canvas clip(Path path) {
-    Asserts.checkArgument(path instanceof JavaPath);
     currentState().clipper = (JavaPath) path;
     return this;
   }
@@ -135,8 +133,6 @@ class JavaCanvas extends AbstractCanvasGL<Graphics2D> {
 
   @Override
   public Canvas fillPath(Path path) {
-    Asserts.checkArgument(path instanceof JavaPath);
-
     currentState().prepareFill(gfx);
     gfx.fill(((JavaPath) path).path);
     isDirty = true;
@@ -219,8 +215,6 @@ class JavaCanvas extends AbstractCanvasGL<Graphics2D> {
 
   @Override
   public Canvas setFillGradient(Gradient gradient) {
-    Asserts.checkArgument(gradient instanceof JavaGradient);
-
     currentState().fillGradient = (JavaGradient) gradient;
     currentState().fillPattern = null;
     currentState().fillColor = 0;
@@ -229,8 +223,6 @@ class JavaCanvas extends AbstractCanvasGL<Graphics2D> {
 
   @Override
   public Canvas setFillPattern(Pattern pattern) {
-    Asserts.checkArgument(pattern instanceof JavaPattern);
-
     currentState().fillPattern = (JavaPattern) pattern;
     currentState().fillGradient = null;
     currentState().fillColor = 0;

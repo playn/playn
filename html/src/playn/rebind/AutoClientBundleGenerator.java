@@ -22,8 +22,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import playn.core.Asserts;
-
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.ext.Generator;
 import com.google.gwt.core.ext.GeneratorContext;
@@ -156,13 +154,13 @@ public class AutoClientBundleGenerator extends Generator {
     composerFactory.addImport(TextResource.class.getName());
 
     File warDirectory = getWarDirectory(logger);
-    Asserts.check(warDirectory.isDirectory());
+    assert warDirectory.isDirectory();
 
     File classesDirectory = new File(warDirectory, WEB_INF_CLASSES);
-    Asserts.check(classesDirectory.isDirectory());
+    assert classesDirectory.isDirectory();
 
     File resourcesDirectory = new File(classesDirectory, packageName.replace('.', '/'));
-    Asserts.check(resourcesDirectory.isDirectory());
+    assert resourcesDirectory.isDirectory();
 
     String baseClassesPath = classesDirectory.getPath();
     logger.log(TreeLogger.DEBUG, "baseClassesPath: " + baseClassesPath);

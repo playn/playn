@@ -30,7 +30,6 @@ import pythagoras.f.IPoint;
 import pythagoras.f.MathUtil;
 import pythagoras.f.Point;
 
-import playn.core.Asserts;
 import playn.core.CanvasImage;
 import playn.core.Font;
 import playn.core.Gradient;
@@ -148,7 +147,8 @@ public class AndroidGraphics extends GraphicsGL {
    * especially large canvases.
    */
   public void setCanvasScaleFunc(ScaleFunc scaleFunc) {
-    canvasScaleFunc = Asserts.checkNotNull(scaleFunc, "Scale func must not be null");
+    if (scaleFunc == null) throw new NullPointerException("Scale func must not be null");
+    canvasScaleFunc = scaleFunc;
   }
 
   @Override

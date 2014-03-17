@@ -20,7 +20,6 @@ import java.util.*;
 import android.graphics.Bitmap;
 import android.opengl.GLUtils;
 
-import playn.core.Asserts;
 import playn.core.gl.GL20;
 import playn.core.gl.GL20Context;
 
@@ -65,10 +64,12 @@ class AndroidGLContext extends GL20Context {
   }
 
   void addRefreshable(Refreshable ref) {
-    refreshables.put(Asserts.checkNotNull(ref), null);
+    assert ref != null;
+    refreshables.put(ref, null);
   }
 
   void removeRefreshable(Refreshable ref) {
-    refreshables.remove(Asserts.checkNotNull(ref));
+    assert ref != null;
+    refreshables.remove(ref);
   }
 }

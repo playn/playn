@@ -15,7 +15,6 @@
  */
 package playn.core.gl;
 
-import playn.core.Asserts;
 import playn.core.InternalTransform;
 import playn.core.Surface;
 
@@ -214,7 +213,7 @@ public abstract class GLShader {
    * release the GL resources it uses.
    */
   public void release() {
-    Asserts.checkState(refs > 0, "Released an shader with no references!");
+    assert refs > 0 : "Released an shader with no references!";
     if (--refs == 0) {
       clearProgram();
     }

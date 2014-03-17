@@ -15,7 +15,6 @@
  */
 package playn.core.canvas;
 
-import playn.core.Asserts;
 import playn.core.Canvas;
 import playn.core.Image;
 import playn.core.ImageLayer;
@@ -49,12 +48,16 @@ public class ImageLayerCanvas extends LayerCanvas implements ImageLayer {
 
   @Override
   public float width() {
-    return widthSet ? width : Asserts.checkNotNull(img, "Image has not yet been set").width();
+    if (widthSet) return width;
+    assert img != null : "Image has not yet been set";
+    return img.width();
   }
 
   @Override
   public float height() {
-    return heightSet ? height : Asserts.checkNotNull(img, "Image has not yet been set").height();
+    if (heightSet) return height;
+    assert img != null : "Image has not yet been set";
+    return img.height();
   }
 
   @Override
@@ -69,22 +72,22 @@ public class ImageLayerCanvas extends LayerCanvas implements ImageLayer {
 
   @Override
   public void setHeight(float height) {
-    Asserts.checkArgument(height >= 0, "Height must be >= 0");
+    assert height >= 0 : "Height must be >= 0";
     heightSet = true;
     this.height = height;
   }
 
   @Override
   public void setWidth(float width) {
-    Asserts.checkArgument(width >= 0, "Width must be >= 0");
+    assert width >= 0 : "Width must be >= 0";
     widthSet = true;
     this.width = width;
   }
 
   @Override
   public void setSize(float width, float height) {
-    Asserts.checkArgument(width >= 0 && height >= 0,
-                          "Width and height must be >= 0 (got %dx%d)", width, height);
+    assert width >= 0 && height >= 0 :
+      String.format("Width and height must be >= 0 (got %dx%d)", width, height);
     widthSet = true;
     this.width = width;
     heightSet = true;

@@ -30,7 +30,8 @@ public abstract class LogImpl implements Log {
 
   @Override
   public void setMinLevel(Level level) {
-    minLevel = Asserts.checkNotNull(level);
+    assert level != null;
+    minLevel = level;
   }
 
   @Override

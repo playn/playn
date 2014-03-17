@@ -25,7 +25,6 @@ import com.google.gwt.dom.client.NativeEvent;
 
 import pythagoras.f.MathUtil;
 
-import playn.core.Asserts;
 import playn.core.Image;
 import playn.core.Pattern;
 import playn.core.gl.AbstractImageGL;
@@ -104,14 +103,14 @@ public class HtmlImage extends ImageGL<Context2d> {
 
   @Override
   public Pattern toPattern() {
-    Asserts.checkState(isReady(), "Cannot toPattern() a non-ready image");
+    assert isReady() : "Cannot toPattern() a non-ready image";
     return new HtmlPattern(this, repeatX, repeatY);
   }
 
   @Override
   public void getRgb(int startX, int startY, int width, int height, int[] rgbArray, int offset,
                      int scanSize) {
-    Asserts.checkState(isReady(), "Cannot getRgb() a non-ready image");
+    assert isReady() : "Cannot getRgb() a non-ready image";
 
     if (canvas == null) {
         canvas = img.getOwnerDocument().createCanvasElement();

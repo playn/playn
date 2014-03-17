@@ -48,8 +48,8 @@ public abstract class NetImpl implements Net {
     public byte[] payloadBytes;
 
     public BuilderImpl(String url) {
-      Asserts.checkArgument(url.startsWith("http:") || url.startsWith("https:"),
-                            "Only http and https URLs are supported");
+      assert url.startsWith("http:") || url.startsWith("https:") :
+        "Only http and https URLs are supported";
       this.url = url;
     }
 

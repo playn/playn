@@ -15,7 +15,6 @@
  */
 package playn.core.gl;
 
-import playn.core.Asserts;
 import playn.core.Image;
 import playn.core.InternalTransform;
 import playn.core.Pattern;
@@ -49,7 +48,7 @@ public abstract class AbstractImageGL<GC> implements Image {
    * that may no longer be part of the scene graph.
    */
   public void release() {
-    Asserts.checkState(refs > 0, "Released an image with no references!");
+    assert refs > 0 : "Released an image with no references!";
     if (--refs == 0) {
       clearTexture();
     }

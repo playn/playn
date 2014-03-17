@@ -25,7 +25,6 @@ import java.nio.ByteOrder;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 
-import playn.core.Asserts;
 import playn.core.gl.GL20Context;
 
 public class JavaGLContext extends GL20Context {
@@ -36,8 +35,6 @@ public class JavaGLContext extends GL20Context {
 
   /** Converts the given image into a format for quick upload to the GPU. */
   static BufferedImage convertImage (BufferedImage image) {
-    Asserts.checkNotNull(image);
-
     switch (image.getType()) {
     case BufferedImage.TYPE_INT_ARGB_PRE:
       return image; // Already good to go

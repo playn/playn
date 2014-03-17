@@ -17,7 +17,6 @@ package playn.core.canvas;
 
 import pythagoras.f.Point;
 
-import playn.core.Asserts;
 import playn.core.Canvas;
 import playn.core.GroupLayer;
 import playn.core.GroupLayerImpl;
@@ -92,7 +91,6 @@ public class GroupLayerCanvas extends LayerCanvas implements GroupLayer, ParentL
 
   @Override
   public void add(Layer layer) {
-    Asserts.checkArgument(layer instanceof LayerCanvas);
     impl.add(this, (LayerCanvas) layer);
   }
 
@@ -103,7 +101,6 @@ public class GroupLayerCanvas extends LayerCanvas implements GroupLayer, ParentL
 
   @Override
   public void remove(Layer layer) {
-    Asserts.checkArgument(layer instanceof LayerCanvas);
     impl.remove(this, (LayerCanvas) layer);
   }
 
@@ -152,7 +149,6 @@ public class GroupLayerCanvas extends LayerCanvas implements GroupLayer, ParentL
 
   @Override
   public void depthChanged(Layer layer, float oldDepth) {
-    Asserts.checkArgument(layer instanceof LayerCanvas);
     impl.depthChanged(this, layer, oldDepth);
   }
 

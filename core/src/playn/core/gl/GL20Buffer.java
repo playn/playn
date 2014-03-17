@@ -21,8 +21,6 @@ import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.nio.ShortBuffer;
 
-import playn.core.Asserts;
-
 /**
  * {@link GLBuffer} implementation based on {@code java.nio} and usable with {@link GL20}.
  */
@@ -56,7 +54,7 @@ public abstract class GL20Buffer implements GLBuffer {
     @Override
     public void expand(int capacity) {
       // make sure we're not trying to expand this buffer while it has unflushed data
-      Asserts.checkState(stagingPos == 0);
+      assert stagingPos == 0;
       ByteBuffer raw = ByteBuffer.allocateDirect(capacity * bytesPerElement()).
         order(ByteOrder.nativeOrder());
       buffer = raw.asFloatBuffer();
@@ -151,7 +149,7 @@ public abstract class GL20Buffer implements GLBuffer {
     @Override
     public void expand(int capacity) {
       // make sure we're not trying to expand this buffer while it has unflushed data
-      Asserts.checkState(stagingPos == 0);
+      assert stagingPos == 0;
       buffer = ByteBuffer.allocateDirect(capacity * bytesPerElement()).
         order(ByteOrder.nativeOrder()).asShortBuffer();
       staging = new short[capacity];

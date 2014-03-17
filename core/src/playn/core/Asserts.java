@@ -15,86 +15,32 @@
  */
 package playn.core;
 
-/**
- * Simple static methods to be called at the start of your own methods to verify correct arguments
- * and state. This allows constructs such as
- * <pre>
- *     if (count <= 0) {
- *       throw new IllegalArgumentException("must be positive: " + count);
- *     }</pre>
- *
- * to be replaced with the more compact
- * <pre>
- *     checkArgument(count > 0, "must be positive: %s", count);</pre>
- *
- * Note that the sense of the expression is inverted; with {@code Asserts} you declare what you
- * expect to be <i>true</i>, just as you do with an
- * <a href="http://java.sun.com/j2se/1.5.0/docs/guide/language/assert.html">{@code assert}</a> or a
- * JUnit {@code assertTrue} call.
- *
- * <p><b>Warning:</b> only the {@code "%s"} specifier is recognized as a placeholder in these
- * messages, not the full range of {@link String#format(String, Object[])} specifiers.
- *
- * <p>Note that because the PlayN library must provide performant code in performance-challenged
- * target environments, the checks provided by the {@code Asserts} class are designed to permit
- * removal from production code. In this way the {@code Asserts} class are more like Java's {@code
- * assert} keyword, except that they are enabled by default. One <em>must ensure</em> that the
- * removal of the checks will not render their code incorrect. Generally this is accomplished by
- * avoiding side-effects in the arguments to the asserting methods, and by ensuring that callers do
- * not violate the assertions in the final "bug free" production code.
- *
- * @author Kevin Bourrillion (adapted for use in PlayN)
- */
+/** @deprecated Use stock java assert statement. These methods cannot be properly optimized away. */
+@Deprecated
 public class Asserts
 {
   private Asserts() {}
 
   private static final boolean assertsEnabled = Asserts.class.desiredAssertionStatus();
 
-  /**
-   * Ensures the truth of an expression that is not more appropriately checked by one of the more
-   * specific check methods ({@link #checkArgument}, etc.).
-   *
-   * @param expression a boolean expression
-   * @throws AssertionError if {@code expression} is false
-   */
+  /** @deprecated Use stock java assert statement. This method cannot be properly optimized away. */
+  @Deprecated
   public static void check(boolean expression) {
     if (assertsEnabled && !expression) {
       throw new AssertionError();
     }
   }
 
-  /**
-   * Ensures the truth of an expression that is not more appropriately checked by one of the more
-   * specific check methods ({@link #checkArgument}, etc.).
-   *
-   * @param expression a boolean expression
-   * @param errorMessage the exception message to use if the check fails; will be converted to a
-   *     string using {@link String#valueOf(Object)}
-   * @throws AssertionError if {@code expression} is false
-   */
+  /** @deprecated Use stock java assert statement. This method cannot be properly optimized away. */
+  @Deprecated
   public static void check(boolean expression, Object errorMessage) {
     if (assertsEnabled && !expression) {
       throw new AssertionError(String.valueOf(errorMessage));
     }
   }
 
-  /**
-   * Ensures the truth of an expression that is not more appropriately checked by one of the more
-   * specific check methods ({@link #checkArgument}, etc.).
-   *
-   * @param expression a boolean expression
-   * @param errorMessageTemplate a template for the exception message should the check fail. The
-   *     message is formed by replacing each {@code %s} placeholder in the template with an
-   *     argument. These are matched by position - the first {@code %s} gets {@code
-   *     errorMessageArgs[0]}, etc. Unmatched arguments will be appended to the formatted message
-   *     in square braces. Unmatched placeholders will be left as-is.
-   * @param errorMessageArgs the arguments to be substituted into the message template. Arguments
-   *     are converted to strings using {@link String#valueOf(Object)}.
-   * @throws AssertionError if {@code expression} is false
-   * @throws NullPointerException if the check fails and either {@code errorMessageTemplate} or
-   *     {@code errorMessageArgs} is null (don't let this happen)
-   */
+  /** @deprecated Use stock java assert statement. This method cannot be properly optimized away. */
+  @Deprecated
   public static void check(boolean expression, String errorMessageTemplate,
                            Object... errorMessageArgs) {
     if (assertsEnabled && !expression) {
@@ -102,47 +48,24 @@ public class Asserts
     }
   }
 
-  /**
-   * Ensures the truth of an expression involving one or more parameters to the calling method.
-   *
-   * @param expression a boolean expression
-   * @throws IllegalArgumentException if {@code expression} is false
-   */
+  /** @deprecated Use stock java assert statement. This method cannot be properly optimized away. */
+  @Deprecated
   public static void checkArgument(boolean expression) {
     if (assertsEnabled && !expression) {
       throw new IllegalArgumentException();
     }
   }
 
-  /**
-   * Ensures the truth of an expression involving one or more parameters to the calling method.
-   *
-   * @param expression a boolean expression
-   * @param errorMessage the exception message to use if the check fails; will be converted to a
-   *     string using {@link String#valueOf(Object)}
-   * @throws IllegalArgumentException if {@code expression} is false
-   */
+  /** @deprecated Use stock java assert statement. This method cannot be properly optimized away. */
+  @Deprecated
   public static void checkArgument(boolean expression, Object errorMessage) {
     if (assertsEnabled && !expression) {
       throw new IllegalArgumentException(String.valueOf(errorMessage));
     }
   }
 
-  /**
-   * Ensures the truth of an expression involving one or more parameters to the calling method.
-   *
-   * @param expression a boolean expression
-   * @param errorMessageTemplate a template for the exception message should the check fail. The
-   *     message is formed by replacing each {@code %s} placeholder in the template with an
-   *     argument. These are matched by position - the first {@code %s} gets {@code
-   *     errorMessageArgs[0]}, etc. Unmatched arguments will be appended to the formatted message
-   *     in square braces. Unmatched placeholders will be left as-is.
-   * @param errorMessageArgs the arguments to be substituted into the message template. Arguments
-   *     are converted to strings using {@link String#valueOf(Object)}.
-   * @throws IllegalArgumentException if {@code expression} is false
-   * @throws NullPointerException if the check fails and either {@code errorMessageTemplate} or
-   *     {@code errorMessageArgs} is null (don't let this happen)
-   */
+  /** @deprecated Use stock java assert statement. This method cannot be properly optimized away. */
+  @Deprecated
   public static void checkArgument(boolean expression, String errorMessageTemplate,
                                    Object... errorMessageArgs) {
     if (assertsEnabled && !expression) {
@@ -150,50 +73,24 @@ public class Asserts
     }
   }
 
-  /**
-   * Ensures the truth of an expression involving the state of the calling instance, but not
-   * involving any parameters to the calling method.
-   *
-   * @param expression a boolean expression
-   * @throws IllegalStateException if {@code expression} is false
-   */
+  /** @deprecated Use stock java assert statement. This method cannot be properly optimized away. */
+  @Deprecated
   public static void checkState(boolean expression) {
     if (assertsEnabled && !expression) {
       throw new IllegalStateException();
     }
   }
 
-  /**
-   * Ensures the truth of an expression involving the state of the calling instance, but not
-   * involving any parameters to the calling method.
-   *
-   * @param expression a boolean expression
-   * @param errorMessage the exception message to use if the check fails; will be converted to a
-   *     string using {@link String#valueOf(Object)}
-   * @throws IllegalStateException if {@code expression} is false
-   */
+  /** @deprecated Use stock java assert statement. This method cannot be properly optimized away. */
+  @Deprecated
   public static void checkState(boolean expression, Object errorMessage) {
     if (assertsEnabled && !expression) {
       throw new IllegalStateException(String.valueOf(errorMessage));
     }
   }
 
-  /**
-   * Ensures the truth of an expression involving the state of the calling instance, but not
-   * involving any parameters to the calling method.
-   *
-   * @param expression a boolean expression
-   * @param errorMessageTemplate a template for the exception message should the check fail. The
-   *     message is formed by replacing each {@code %s} placeholder in the template with an
-   *     argument. These are matched by position - the first {@code %s} gets {@code
-   *     errorMessageArgs[0]}, etc. Unmatched arguments will be appended to the formatted message
-   *     in square braces. Unmatched placeholders will be left as-is.
-   * @param errorMessageArgs the arguments to be substituted into the message template. Arguments
-   *     are converted to strings using {@link String#valueOf(Object)}.
-   * @throws IllegalStateException if {@code expression} is false
-   * @throws NullPointerException if the check fails and either {@code errorMessageTemplate} or
-   *     {@code errorMessageArgs} is null (don't let this happen)
-   */
+  /** @deprecated Use stock java assert statement. This method cannot be properly optimized away. */
+  @Deprecated
   public static void checkState(boolean expression, String errorMessageTemplate,
                                 Object... errorMessageArgs) {
     if (assertsEnabled && !expression) {
@@ -201,13 +98,8 @@ public class Asserts
     }
   }
 
-  /**
-   * Ensures that an object reference passed as a parameter to the calling method is not null.
-   *
-   * @param reference an object reference
-   * @return the non-null reference that was validated
-   * @throws NullPointerException if {@code reference} is null
-   */
+  /** @deprecated Use stock java assert statement. This method cannot be properly optimized away. */
+  @Deprecated
   public static <T> T checkNotNull(T reference) {
     if (assertsEnabled && reference == null) {
       throw new NullPointerException();
@@ -215,15 +107,8 @@ public class Asserts
     return reference;
   }
 
-  /**
-   * Ensures that an object reference passed as a parameter to the calling method is not null.
-   *
-   * @param reference an object reference
-   * @param errorMessage the exception message to use if the check fails; will be converted to a
-   *     string using {@link String#valueOf(Object)}
-   * @return the non-null reference that was validated
-   * @throws NullPointerException if {@code reference} is null
-   */
+  /** @deprecated Use stock java assert statement. This method cannot be properly optimized away. */
+  @Deprecated
   public static <T> T checkNotNull(T reference, Object errorMessage) {
     if (assertsEnabled && reference == null) {
       throw new NullPointerException(String.valueOf(errorMessage));
@@ -231,20 +116,8 @@ public class Asserts
     return reference;
   }
 
-  /**
-   * Ensures that an object reference passed as a parameter to the calling method is not null.
-   *
-   * @param reference an object reference
-   * @param errorMessageTemplate a template for the exception message should the check fail. The
-   *     message is formed by replacing each {@code %s} placeholder in the template with an
-   *     argument. These are matched by position - the first {@code %s} gets {@code
-   *     errorMessageArgs[0]}, etc. Unmatched arguments will be appended to the formatted message
-   *     in square braces. Unmatched placeholders will be left as-is.
-   * @param errorMessageArgs the arguments to be substituted into the message template. Arguments
-   *     are converted to strings using {@link String#valueOf(Object)}.
-   * @return the non-null reference that was validated
-   * @throws NullPointerException if {@code reference} is null
-   */
+  /** @deprecated Use stock java assert statement. This method cannot be properly optimized away. */
+  @Deprecated
   public static <T> T checkNotNull(T reference, String errorMessageTemplate,
                                    Object... errorMessageArgs) {
     if (assertsEnabled && reference == null) {
@@ -254,64 +127,14 @@ public class Asserts
     return reference;
   }
 
-  /*
-   * All recent hotspots (as of 2009) *really* like to have the natural code
-   *
-   * if (guardExpression) {
-   *    throw new BadException(messageExpression);
-   * }
-   *
-   * refactored so that messageExpression is moved to a separate
-   * String-returning method.
-   *
-   * if (guardExpression) {
-   *    throw new BadException(badMsg(...));
-   * }
-   *
-   * The alternative natural refactorings into void or Exception-returning
-   * methods are much slower.  This is a big deal - we're talking factors of
-   * 2-8 in microbenchmarks, not just 10-20%.  (This is a hotspot optimizer
-   * bug, which should be fixed, but that's a separate, big project).
-   *
-   * The coding pattern above is heavily used in java.util, e.g. in ArrayList.
-   * There is a RangeCheckMicroBenchmark in the JDK that was used to test this.
-   *
-   * But the methods in this class want to throw different exceptions,
-   * depending on the args, so it appears that this pattern is not directly
-   * applicable.  But we can use the ridiculous, devious trick of throwing an
-   * exception in the middle of the construction of another exception.
-   * Hotspot is fine with that.
-   */
-
-  /**
-   * Ensures that {@code index} specifies a valid <i>element</i> in an array, list or string of
-   * size {@code size}. An element index may range from zero, inclusive, to {@code size},
-   * exclusive.
-   *
-   * @param index a user-supplied index identifying an element of an array, list or string
-   * @param size the size of that array, list or string
-   * @return the value of {@code index}
-   * @throws IndexOutOfBoundsException if {@code index} is negative or is not less than {@code
-   *     size}
-   * @throws IllegalArgumentException if {@code size} is negative
-   */
+  /** @deprecated Use stock java assert statement. This method cannot be properly optimized away. */
+  @Deprecated
   public static int checkElementIndex(int index, int size) {
     return checkElementIndex(index, size, "index");
   }
 
-  /**
-   * Ensures that {@code index} specifies a valid <i>element</i> in an array, list or string of
-   * size {@code size}. An element index may range from zero, inclusive, to {@code size},
-   * exclusive.
-   *
-   * @param index a user-supplied index identifying an element of an array, list or string
-   * @param size the size of that array, list or string
-   * @param desc the text to use to describe this index in an error message
-   * @return the value of {@code index}
-   * @throws IndexOutOfBoundsException if {@code index} is negative or is not less than {@code
-   *     size}
-   * @throws IllegalArgumentException if {@code size} is negative
-   */
+  /** @deprecated Use stock java assert statement. This method cannot be properly optimized away. */
+  @Deprecated
   public static int checkElementIndex(int index, int size, String desc) {
     // Carefully optimized for execution by hotspot (explanatory comment above)
     if (assertsEnabled && (index < 0 || index >= size)) {
@@ -330,31 +153,14 @@ public class Asserts
     }
   }
 
-  /**
-   * Ensures that {@code index} specifies a valid <i>position</i> in an array, list or string of
-   * size {@code size}. A position index may range from zero to {@code size}, inclusive.
-   *
-   * @param index a user-supplied index identifying a position in an array, list or string
-   * @param size the size of that array, list or string
-   * @return the value of {@code index}
-   * @throws IndexOutOfBoundsException if {@code index} is negative or is greater than {@code size}
-   * @throws IllegalArgumentException if {@code size} is negative
-   */
+  /** @deprecated Use stock java assert statement. This method cannot be properly optimized away. */
+  @Deprecated
   public static int checkPositionIndex(int index, int size) {
     return checkPositionIndex(index, size, "index");
   }
 
-  /**
-   * Ensures that {@code index} specifies a valid <i>position</i> in an array, list or string of
-   * size {@code size}. A position index may range from zero to {@code size}, inclusive.
-   *
-   * @param index a user-supplied index identifying a position in an array, list or string
-   * @param size the size of that array, list or string
-   * @param desc the text to use to describe this index in an error message
-   * @return the value of {@code index}
-   * @throws IndexOutOfBoundsException if {@code index} is negative or is greater than {@code size}
-   * @throws IllegalArgumentException if {@code size} is negative
-   */
+  /** @deprecated Use stock java assert statement. This method cannot be properly optimized away. */
+  @Deprecated
   public static int checkPositionIndex(int index, int size, String desc) {
     // Carefully optimized for execution by hotspot (explanatory comment above)
     if (assertsEnabled && (index < 0 || index > size)) {
@@ -373,18 +179,8 @@ public class Asserts
     }
   }
 
-  /**
-   * Ensures that {@code start} and {@code end} specify a valid <i>positions</i> in an array, list
-   * or string of size {@code size}, and are in order. A position index may range from zero to
-   * {@code size}, inclusive.
-   *
-   * @param start a user-supplied index identifying a starting position in an array, list or string
-   * @param end a user-supplied index identifying a ending position in an array, list or string
-   * @param size the size of that array, list or string
-   * @throws IndexOutOfBoundsException if either index is negative or is greater than {@code size},
-   *     or if {@code end} is less than {@code start}
-   * @throws IllegalArgumentException if {@code size} is negative
-   */
+  /** @deprecated Use stock java assert statement. This method cannot be properly optimized away. */
+  @Deprecated
   public static void checkPositionIndexes(int start, int end, int size) {
     // Carefully optimized for execution by hotspot (explanatory comment above)
     if (assertsEnabled && (start < 0 || end < start || end > size)) {

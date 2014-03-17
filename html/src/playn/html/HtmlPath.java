@@ -18,7 +18,6 @@ package playn.html;
 import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.core.client.JsArrayNumber;
 
-import playn.core.Asserts;
 import playn.core.Path;
 
 class HtmlPath implements Path {
@@ -129,14 +128,14 @@ class HtmlPath implements Path {
 
   float[] getVertices() {
     int len = list.length();
-    Asserts.check(len % 2 == 0);
+    assert len % 2 == 0;
     float[] vertices = new float[len];
     for (int v = 0; v < len;) {
       int cmd = (int) list.get(v);
       if (v == vertices.length -2) {
-        Asserts.check(cmd == CMD_CLOSE);
+        assert cmd == CMD_CLOSE;
       } else {
-        Asserts.check(cmd == CMD_MOVE);
+        assert cmd == CMD_MOVE;
       }
       vertices[v] = (float) list.get(v + 1);
       vertices[v+1] = (float) list.get(v + 2);
