@@ -25,6 +25,7 @@ public interface Callback<T>
     private Callback<?> onFailure;
 
     public Chain(Callback<?> onFailure) {
+      assert onFailure != null;
       this.onFailure = onFailure;
     }
 
