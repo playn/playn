@@ -87,7 +87,7 @@ public class ImageLayerCanvas extends LayerCanvas implements ImageLayer {
   @Override
   public void setSize(float width, float height) {
     assert width >= 0 && height >= 0 :
-      String.format("Width and height must be >= 0 (got %dx%d)", width, height);
+      "Width and height must be >= 0 (got " + width + "x" + height + ")";
     widthSet = true;
     this.width = width;
     heightSet = true;
