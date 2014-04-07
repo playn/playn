@@ -134,6 +134,7 @@
         <artifactId>gwt-maven-plugin</artifactId>
         <configuration>
           <mode>htmlunit</mode>
+          <sourceLevel>1.6</sourceLevel>
         </configuration>
         <executions>
           <execution>
