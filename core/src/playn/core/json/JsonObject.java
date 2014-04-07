@@ -13,24 +13,27 @@
  */
 package playn.core.json;
 
-import java.util.HashMap;
+import java.util.TreeMap;
 import java.util.Map;
 
 import playn.core.Json;
 import playn.core.Json.TypedArray;
 
 /**
- * Extends a {@link HashMap} with helper methods to determine the underlying JSON type of the map
+ * Extends a {@link Map} with helper methods to determine the underlying JSON type of the map
  * element.
  */
 class JsonObject implements Json.Object {
-  private final HashMap<String, Object> map;
+  private final Map<String, Object> map;
 
   /**
    * Creates an empty {@link JsonObject} with the default capacity.
    */
   public JsonObject() {
-    map = new HashMap<String, Object>();
+    // we use a tree map here to ensure predictable iteration order; for better or worse we have a
+    // bunch of tests that rely on a specific iteration order and those broke when we moved from
+    // JDK7 to 8; now we use an API that guarantees iteration order
+    map = new TreeMap<String, Object>();
   }
 
   /**

@@ -130,7 +130,7 @@ public class InternalJsonTypesTest {
     //@formatter:on
 
     assertEquals(
-        "[true,1.0,1.0,1,1234567890,\"hi\",{\"abc\":123},[1,null],[1,2,3],{\"b\":null,\"c\":null,\"a\":null}]",
+        "[true,1.0,1.0,1,1234567890,\"hi\",{\"abc\":123},[1,null],[1,2,3],{\"a\":null,\"b\":null,\"c\":null}]",
         JsonStringWriter.toString(a));
   }
 
@@ -158,8 +158,9 @@ public class InternalJsonTypesTest {
     //@formatter:on
 
     assertEquals(
-        "{\"bigint\":1234567890,\"int\":1,\"string\":\"hi\",\"existingObject\":{\"b\":null,\"c\":null,\"a\":null},"
-            + "\"existingArray\":[1,2,3],\"object\":{\"abc\":123},\"bool\":true,\"double\":1.0,\"float\":1.0,\"null\":null,\"array\":[1,null]}",
+      "{\"array\":[1,null],\"bigint\":1234567890,\"bool\":true,\"double\":1.0," +
+      "\"existingArray\":[1,2,3],\"existingObject\":{\"a\":null,\"b\":null,\"c\":null}," +
+      "\"float\":1.0,\"int\":1,\"null\":null,\"object\":{\"abc\":123},\"string\":\"hi\"}",
         JsonStringWriter.toString(a));
   }
 

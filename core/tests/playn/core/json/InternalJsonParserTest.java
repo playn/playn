@@ -108,7 +108,7 @@ public class InternalJsonParserTest {
     // TODO: Is this deterministic if we use string keys?
     JsonObject o = JsonParser.object().from(
       "{\"abc\":123, \"def\":456.0, \"ghi\":[true, false], \"jkl\":null, \"mno\":true}");
-    assertEquals("{jkl=null, abc=123, ghi=[true, false], def=456.0, mno=true}", o.toString());
+    assertEquals("{abc=123, def=456.0, ghi=[true, false], jkl=null, mno=true}", o.toString());
     assertEquals(123, o.getInt("abc"));
     assertEquals(456, o.getInt("def"));
     assertEquals(true, o.getArray("ghi").getBoolean(0));
