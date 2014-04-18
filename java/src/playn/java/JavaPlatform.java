@@ -138,7 +138,9 @@ public class JavaPlatform extends AbstractPlatform {
   public JavaPlatform(Config config) {
     super(new JavaLog());
     this.config = config;
-    unpackNatives();
+    if (!config.headless) {
+      unpackNatives();
+    }
     graphics = createGraphics(config);
     keyboard = createKeyboard();
     storage = new JavaStorage(this, config);
