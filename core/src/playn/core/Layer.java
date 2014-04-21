@@ -18,6 +18,7 @@ package playn.core;
 import pythagoras.f.IPoint;
 import pythagoras.f.Point;
 import pythagoras.f.Transform;
+import pythagoras.util.NoninvertibleTransformException;
 
 import playn.core.gl.GLShader;
 
@@ -578,6 +579,82 @@ public interface Layer {
       return (
           point.x() >= 0 &&  point.y() >= 0 &&
           point.x() <= layer.width() && point.y() <= layer.height());
+    }
+
+    /**
+     * Gets the layer underneath the given screen coordinates, ignoring hit testers. This is
+     * useful for inspecting the scene graph for debugging purposes, and is not intended for use
+     * is shipped code. The layer returned is the one that has a size and is the deepest within
+     * the graph and contains the coordinate.
+     */
+    public static Layer.HasSize layerUnderPoint (float x, float y) {
+      GroupLayer root = PlayN.graphics().rootLayer();
+      Point p = new Point(x, y);
+      root.transform().inverseTransform(p, p);
+      p.x += root.originX();
+      p.y += root.originY();
+      return layerUnderPoint(root, p);
+    }
+
+    /**
+     * Returns the index of the given layer within its parent, or -1 if the parent is null.
+     */
+    public static int indexInParent (Layer layer) {
+      GroupLayer parent = layer.parent();
+      if (parent == null) {
+        return -1;
+      }
+      for (int ii = parent.size()-1; ii >= 0; ii--) {
+        if (parent.get(ii) == layer) {
+          return ii;
+        }
+      }
+      throw new AssertionError();
+    }
+
+    /**
+     * Returns the depth of the given layer in its local scene graph. A root layer (one with null
+     * parent) will always return 0.
+     */
+    public static int graphDepth (Layer layer) {
+      int depth = -1;
+      while (layer != null) {
+        layer = layer.parent();
+        depth++;
+      }
+      return depth;
+    }
+
+    /**
+     * Performs the recursion for {@link layerUnderPoint(float, float)}.
+     */
+    protected static Layer.HasSize layerUnderPoint (Layer layer, Point pt) {
+      float x = pt.x, y = pt.y;
+      if (layer instanceof GroupLayer) {
+        GroupLayer gl = (GroupLayer)layer;
+        for (int ii = gl.size()-1; ii >= 0; ii--) {
+          Layer child = gl.get(ii);
+          if (!child.visible()) continue; // ignore invisible children
+          try {
+            // transform the point into the child's coordinate system
+            child.transform().inverseTransform(pt.set(x, y), pt);
+            pt.x += child.originX();
+            pt.y += child.originY();
+            Layer.HasSize l = layerUnderPoint(child, pt);
+            if (l != null)
+              return l;
+          } catch (NoninvertibleTransformException nte) {
+            continue;
+          }
+        }
+      }
+      if (layer instanceof Layer.HasSize) {
+        Layer.HasSize sl = (Layer.HasSize)layer;
+        if (x >= 0 && x < sl.width() && y >= 0 && y < sl.height()) {
+          return sl;
+        }
+      }
+      return null;
     }
   }
 }
