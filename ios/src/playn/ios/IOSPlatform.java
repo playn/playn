@@ -370,20 +370,29 @@ public class IOSPlatform extends AbstractPlatform {
     mainWindow.MakeKeyAndVisible();
   }
 
-  // make these accessible to IOSApplicationDelegate
-  @Override
-  protected void onPause() {
-    super.onPause();
-    gameView.onPause();
+  // iOS lifecycle doesn't match up perfectly to PlayN lifecycle, so we expose iOS lifecycle
+  // methods here (called from IOSApplicationDelegate) and work things out here
+  void onActivated() {
+    gameView.onActivated();
   }
-  @Override
-  protected void onResume() {
-    super.onResume();
-    gameView.onResume();
+  void willEnterForeground() {
+    invokeLater(new Runnable() {
+      public void run() {
+        onResume();
+      }
+    });
   }
-  @Override
-  protected void onExit() {
-    super.onExit();
+  void onResignActivation() {
+    gameView.onResignActivation();
+  }
+  void didEnterBackground() {
+    // we call this directly rather than via invokeLater() because the PlayN thread is already
+    // stopped at this point so a) there's no point in worrying about racing with that thread, and
+    // b) onPause would never get called, since the PlayN thread is not processing events
+    onPause();
+  }
+  void willTerminate() {
+    onExit();
   }
 
   void viewDidInit(int defaultFrameBuffer) {

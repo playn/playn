@@ -35,7 +35,7 @@ import cli.MonoTouch.UIKit.UIWindow;
 public class IOSGameView extends iPhoneOSGameView {
 
   private final IOSPlatform platform;
-  private boolean paused;
+  private boolean activated;
   private boolean createdCtx;
 
   public IOSGameView(IOSPlatform platform, RectangleF bounds, float scale) {
@@ -61,15 +61,14 @@ public class IOSGameView extends iPhoneOSGameView {
         }}));
   }
 
-  // called when we're put into the background; normally we'll stop executing shortly after this,
-  // but if the game requests additional time in the background, we need to stop rendering while
-  // we're in the background
-  void onPause() {
-    paused = true;
+  // called when our app is activated and when we resign activation; per iOS policy we stop our
+  // renderer when we're not activated; the app may still be visible in the background (probably
+  // blurred out in iOS 7) while the user decides whether to answer a phone call or whatever
+  synchronized void onActivated() {
+    activated = true;
   }
-
-  void onResume() {
-    paused = false;
+  synchronized void onResignActivation() {
+    activated = false;
   }
 
   @Override
@@ -86,7 +85,7 @@ public class IOSGameView extends iPhoneOSGameView {
   }
 
   @Override
-  protected void ConfigureLayer (CAEAGLLayer eaglLayer) {
+  protected void ConfigureLayer(CAEAGLLayer eaglLayer) {
     eaglLayer.set_Opaque(true);
     super.ConfigureLayer(eaglLayer);
   }
@@ -98,15 +97,15 @@ public class IOSGameView extends iPhoneOSGameView {
     platform.viewDidInit(get_Framebuffer());
   }
 
-  @Override
-  protected void OnClosed(EventArgs e) {
-    super.OnClosed(e);
-  }
+  // @Override
+  // protected void OnClosed(EventArgs e) {
+  //   super.OnClosed(e);
+  // }
 
-  @Override
-  protected void OnDisposed(EventArgs e) {
-    super.OnDisposed(e);
-  }
+  // @Override
+  // protected void OnDisposed(EventArgs e) {
+  //   super.OnDisposed(e);
+  // }
 
   @Override
   protected void OnLoad(EventArgs e) {
@@ -128,15 +127,15 @@ public class IOSGameView extends iPhoneOSGameView {
     UIDevice.get_CurrentDevice().EndGeneratingDeviceOrientationNotifications();
   }
 
-  @Override
-  protected void OnResize(EventArgs e) {
-    super.OnResize(e);
-  }
+  // @Override
+  // protected void OnResize(EventArgs e) {
+  //   super.OnResize(e);
+  // }
 
-  @Override
-  protected void OnTitleChanged(EventArgs e) {
-    super.OnTitleChanged(e);
-  }
+  // @Override
+  // protected void OnTitleChanged(EventArgs e) {
+  //   super.OnTitleChanged(e);
+  // }
 
   @Override
   protected void OnUpdateFrame(FrameEventArgs e) {
@@ -148,7 +147,7 @@ public class IOSGameView extends iPhoneOSGameView {
   protected void OnRenderFrame(FrameEventArgs e) {
     super.OnRenderFrame(e);
 
-    if (!paused) {
+    if (activated) {
       MakeCurrent();
       platform.paint();
       SwapBuffers();

@@ -31,35 +31,37 @@ public class IOSApplicationDelegate extends UIApplicationDelegate {
   }
 
   @Override
-  public void OnActivated(UIApplication app) {
-    // UIApplicationDelegate specifically disallows calling super here
+  public void WillEnterForeground(UIApplication app) {
     if (platform != null) {
-      platform.invokeLater(new Runnable() {
-        public void run() {
-          platform.onResume();
-        }
-      });
+      platform.willEnterForeground();
+    }
+  }
+
+  @Override
+  public void OnActivated(UIApplication app) {
+    if (platform != null) {
+      platform.onActivated();
     }
   }
 
   @Override
   public void OnResignActivation(UIApplication app) {
-    // UIApplicationDelegate specifically disallows calling super here
     if (platform != null) {
-      // we call this directly because routing it through the GL thread results in iOS thinking
-      // that we're done and can be suspended immediately; the GL thread will already have been
-      // suspended at this point, so race conditions should not be an issue (modulo invisible
-      // changes sitting in another CPU's cache which we can do nothing about)
-      platform.onPause();
+      platform.onResignActivation();
+    }
+  }
+
+  @Override
+  public void DidEnterBackground(UIApplication app) {
+    if (platform != null) {
+      platform.didEnterBackground();
     }
   }
 
   @Override
   public void WillTerminate(UIApplication app) {
-    // UIApplicationDelegate specifically disallows calling super here
     if (platform != null) {
-      // we call this directly for the same reason as onPause
-      platform.onExit();
+      platform.willTerminate();
     }
   }
 }
