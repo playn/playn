@@ -16,6 +16,8 @@
 package playn.ios;
 
 import cli.MonoTouch.AVFoundation.AVAudioPlayer;
+import cli.System.EventArgs;
+import cli.System.EventHandler;
 
 import playn.core.AbstractSound;
 
@@ -25,6 +27,8 @@ import playn.core.AbstractSound;
  */
 public class IOSSoundAVAP extends AbstractSound<AVAudioPlayer> {
 
+  private EventHandler interruptionHandler;
+    
   @Override
   protected boolean prepareImpl() {
     return impl.PrepareToPlay();
@@ -38,11 +42,18 @@ public class IOSSoundAVAP extends AbstractSound<AVAudioPlayer> {
   @Override
   protected boolean playImpl() {
     impl.set_CurrentTime(0);
-    return impl.Play();
+    if (impl.Play()) {
+      setInterruptionHandler();
+      return true;
+    } else {
+      clearInterruptionHandler();
+      return false;
+    }
   }
 
   @Override
   protected void stopImpl() {
+    clearInterruptionHandler();
     impl.Stop();
     impl.set_CurrentTime(0);
   }
@@ -59,6 +70,27 @@ public class IOSSoundAVAP extends AbstractSound<AVAudioPlayer> {
 
   @Override
   protected void releaseImpl() {
+    clearInterruptionHandler();
     impl.Dispose();
+  }
+
+  void setInterruptionHandler() {
+    if (interruptionHandler == null) {
+      interruptionHandler = new EventHandler(new EventHandler.Method() {
+        @Override public void Invoke(Object sender, EventArgs event) {
+          impl.set_CurrentTime(0);
+          impl.PrepareToPlay();
+          impl.Play();
+        }
+      });
+      impl.add_EndInterruption(interruptionHandler);
+    }
+  }
+  
+  void clearInterruptionHandler() {
+    if (interruptionHandler != null) {
+      impl.remove_EndInterruption(interruptionHandler);
+      interruptionHandler = null;
+    }
   }
 }

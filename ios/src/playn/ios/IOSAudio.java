@@ -57,15 +57,20 @@ public class IOSAudio extends AudioImpl {
     active = new IOSSoundOAL[sources.length];
     started = new int[sources.length];
 
+    AudioSession.Initialize();
+    AudioSession.SetActive(true);
+
     // clear and restore our OAL context on audio session interruption
     AudioSession.add_Interrupted(new EventHandler(new EventHandler.Method() {
       public void Invoke(Object sender, EventArgs event) {
+        AudioSession.SetActive(false);
         Alc.MakeContextCurrent(ContextHandle.Zero);
       }
     }));
     AudioSession.add_Resumed(new EventHandler(new EventHandler.Method() {
       public void Invoke(Object sender, EventArgs event) {
         actx.MakeCurrent(); // calls Alc.MakeContextCurrent under the hood
+        AudioSession.SetActive(true);
       }
     }));
   }
