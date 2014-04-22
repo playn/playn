@@ -22,7 +22,6 @@ import java.util.TreeMap;
 
 import pythagoras.f.Point;
 import pythagoras.f.Vector;
-
 import playn.core.CanvasImage;
 import playn.core.Events;
 import playn.core.Font;
@@ -31,6 +30,7 @@ import playn.core.ImageLayer;
 import playn.core.ImmediateLayer;
 import playn.core.Layer;
 import playn.core.Mouse;
+import playn.core.TextWrap;
 import playn.core.Mouse.WheelEvent;
 import playn.core.Pointer;
 import playn.core.Surface;
@@ -368,7 +368,7 @@ class PointerMouseTouchTest extends Test {
 
     private final CanvasImage image;
     private final TextFormat format;
-    private TextLayout layout;
+    private TextLayout[] layout;
     private String text;
     private boolean dirty;
 
@@ -388,13 +388,17 @@ class PointerMouseTouchTest extends Test {
         return;
       }
 
-      layout = graphics().layoutText(text, format);
-      if (layout.height() > image.height()) {
-        log().error("Clipped");
-      }
       image.canvas().clear();
       image.canvas().setFillColor(0xFF202020);
-      image.canvas().fillText(layout, 0, 0);
+      layout = graphics().layoutText(text, format, TextWrap.MANUAL);
+      float yy = 0;
+      for (int line = 0; line < layout.length; line++) {
+          image.canvas().fillText(layout[line], 0, yy);
+          yy += layout[line].height();
+      }
+      if (yy > image.height()) {
+        log().error("Clipped");
+      }
       dirty = false;
     }
   }
