@@ -68,7 +68,7 @@ public class JavaPlatform extends AbstractPlatform {
     public boolean emulateTouch;
 
     /** If {link #emulateTouch} is set, sets the pivot for a two-finger touch when pressed. */
-    public Key multiTouchKey = Key.F11;
+    public Key pivotKey = Key.F11;
 
     /** If set, converts images into a format for fast GPU uploads when initially loaded versus
      * doing it on demand when displayed. Assuming asynchronous image loads, this keeps that effort
@@ -131,6 +131,7 @@ public class JavaPlatform extends AbstractPlatform {
   private final JavaGraphics graphics;
   private final JavaMouse mouse;
   private final JavaAssets assets = new JavaAssets(this);
+  private final Keyboard.Listener keyListener;
 
   private final ExecutorService _exec = Executors.newFixedThreadPool(4);
   private final long start = System.nanoTime();
@@ -149,6 +150,18 @@ public class JavaPlatform extends AbstractPlatform {
       mouse = ((JavaEmulatedTouch)touch).createMouse(this);
     } else {
       mouse = createMouse();
+    }
+
+    if (touch instanceof JavaEmulatedTouch) {
+      final Key pivotKey = (touch instanceof JavaEmulatedTouch) ? config.pivotKey : null;
+      keyListener = new Keyboard.Adapter() {
+        @Override public void onKeyUp (playn.core.Keyboard.Event event) {
+          if (event.key() == pivotKey)
+            ((JavaEmulatedTouch)touch).updatePivot();
+        }
+      };
+    } else {
+      keyListener = null;
     }
 
     if (!config.headless) {
@@ -293,7 +306,7 @@ public class JavaPlatform extends AbstractPlatform {
   }
   protected TouchImpl createTouch(Config config) {
     if (config.emulateTouch) {
-      return new JavaEmulatedTouch(config.multiTouchKey);
+      return new JavaEmulatedTouch();
     } else {
       return new TouchStub();
     }
@@ -308,7 +321,7 @@ public class JavaPlatform extends AbstractPlatform {
   protected void init(Game game) {
     graphics.init();
     mouse.init();
-    keyboard.init(touch);
+    keyboard.init(keyListener);
     game.init();
   }
 

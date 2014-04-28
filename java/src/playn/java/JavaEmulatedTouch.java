@@ -16,8 +16,6 @@
 package playn.java;
 
 import playn.core.Events;
-import playn.core.Key;
-import playn.core.Keyboard;
 import playn.core.Mouse;
 import playn.core.Mouse.ButtonEvent.Impl;
 import playn.core.TouchImpl;
@@ -32,21 +30,13 @@ public class JavaEmulatedTouch extends TouchImpl
   private Point pivot;
   private float x, y;
   private int currentId;
-  private final Key multiTouchKey;
-
-  Keyboard.Listener keyListener = new Keyboard.Adapter() {
-    @Override public void onKeyUp (playn.core.Keyboard.Event event) {
-      if (event.key() == multiTouchKey)
-        pivot = new Point(x, y);
-    }
-  };
-
-  public JavaEmulatedTouch (Key multiTouchKey) {
-    this.multiTouchKey = multiTouchKey;
-  }
 
   @Override public boolean hasTouch() {
     return true;
+  }
+
+  void updatePivot () {
+    pivot = new Point(x, y);
   }
 
   JavaMouse createMouse (JavaPlatform platform) {

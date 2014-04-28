@@ -23,7 +23,6 @@ import org.lwjgl.input.Keyboard;
 
 import playn.core.Events;
 import playn.core.Key;
-import playn.core.Touch;
 import playn.core.util.Callback;
 
 public class JavaLWJGLKeyboard extends JavaKeyboard {
@@ -39,13 +38,13 @@ public class JavaLWJGLKeyboard extends JavaKeyboard {
   }
 
   @Override
-  void init(Touch touch) {
+  void init(Listener platformListener) {
     try {
       Keyboard.create();
     } catch (LWJGLException e) {
       throw new RuntimeException(e);
     }
-    super.init(touch);
+    super.init(platformListener);
   }
 
   @Override

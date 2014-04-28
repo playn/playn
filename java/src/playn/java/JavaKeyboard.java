@@ -21,7 +21,6 @@ import java.util.List;
 
 import playn.core.Events;
 import playn.core.Key;
-import playn.core.Touch;
 
 public abstract class JavaKeyboard implements playn.core.Keyboard {
 
@@ -72,10 +71,10 @@ public abstract class JavaKeyboard implements playn.core.Keyboard {
     return true;
   }
 
-  void init(Touch touch) {
+  void init(Listener platformListener) {
     // let our friend the touch emulator have key messages too
-    if (touch instanceof JavaEmulatedTouch)
-      listeners = new Listener[] { listeners[0], ((JavaEmulatedTouch)touch).keyListener };
+    if (platformListener !=null)
+      listeners = new Listener[] { listeners[0], platformListener };
   }
 
   void update() {

@@ -19,7 +19,6 @@ import org.eclipse.swt.SWT;
 
 import playn.core.Events;
 import playn.core.Key;
-import playn.core.Touch;
 import playn.core.util.Callback;
 
 public class SWTKeyboard extends JavaKeyboard {
@@ -37,8 +36,8 @@ public class SWTKeyboard extends JavaKeyboard {
     callback.onFailure(new Exception("TODO"));
   }
 
-  void init(Touch touch) {
-    super.init(touch);
+  void init(Listener platformListener) {
+    super.init(platformListener);
 
     platform.display.addFilter(SWT.KeyDown, new org.eclipse.swt.widgets.Listener() {
       public void handleEvent (org.eclipse.swt.widgets.Event event) {

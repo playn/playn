@@ -15,16 +15,11 @@
  */
 package playn.java;
 
-import playn.core.Key;
 import playn.core.Mouse;
 import playn.core.Mouse.ButtonEvent.Impl;
 
 public class SWTEmulatedTouch extends JavaEmulatedTouch
 {
-  public SWTEmulatedTouch (Key multiTouchKey) {
-    super(multiTouchKey);
-  }
-
   @Override JavaMouse createMouse (JavaPlatform platform) {
     final JavaEmulatedTouch self = this;
     return new SWTMouse((SWTPlatform)platform) {
