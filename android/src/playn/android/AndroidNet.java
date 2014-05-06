@@ -81,29 +81,62 @@ class AndroidNet extends NetImpl {
           final HttpResponse response = httpclient.execute(hreq);
           int code = response.getStatusLine().getStatusCode();
           HttpEntity entity = response.getEntity();
-          byte[] data = EntityUtils.toByteArray(entity);
-          String encoding = EntityUtils.getContentCharSet(entity);
-          if (encoding == null) encoding = HTTP.UTF_8;
-          platform.notifySuccess(callback, new BinaryResponse(code, data, encoding) {
-            @Override
-            protected Map<String,List<String>> extractHeaders() {
-              Map<String,List<String>> hmap = new HashMap<String,List<String>>();
-              for (org.apache.http.Header header : response.getAllHeaders()) {
-                String name = header.getName();
-                List<String> values = hmap.get(name);
-                if (values == null) hmap.put(name, values = new ArrayList<String>());
-                values.add(header.getValue());
+
+          ResponseImpl impl;
+          if (entity == null) {
+              impl = new ResponseImpl(code) {
+                @Override
+                public String payloadString() {
+                    return null;
+                }
+
+                @Override
+                public byte[] payload() {
+                    return null;
+                }
+
+                @Override
+                protected Map<String, List<String>> extractHeaders() {
+                    return extractResponseHeaders(response);
+                }
+            };
+          } else {
+              byte[] data = EntityUtils.toByteArray(entity);
+              String encoding = EntityUtils.getContentCharSet(entity);
+              if (encoding == null) {
+                encoding = HTTP.UTF_8;
               }
-              return hmap;
-            }
-          });
+
+              impl = new BinaryResponse(code, data, encoding) {
+                  @Override
+                  protected Map<String,List<String>> extractHeaders() {
+                      return extractResponseHeaders(response);
+                  }
+                };
+          }
+
+          platform.notifySuccess(callback, impl);
         } catch (Exception e) {
           platform.notifyFailure(callback, e);
         }
       }
+
       @Override
       public String toString() {
         return "AndroidNet.exec(" + req.method() + ", " + req.url + ")";
+      }
+
+      private Map<String,List<String>> extractResponseHeaders(HttpResponse response) {
+          Map<String,List<String>> hmap = new HashMap<String,List<String>>();
+          for (org.apache.http.Header header : response.getAllHeaders()) {
+            String name = header.getName();
+            List<String> values = hmap.get(name);
+            if (values == null) {
+                hmap.put(name, values = new ArrayList<String>());
+            }
+            values.add(header.getValue());
+          }
+          return hmap;
       }
     });
   }
