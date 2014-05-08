@@ -64,7 +64,8 @@ public class SurfaceTest extends Test {
   protected void addTests (final Image orange, Image tile) {
     final Pattern pattern = tile.toPattern();
 
-    int samples = 128; // big enough to force a buffer size increase
+    // make samples big enough to force a buffer size increase
+    final int samples = 128, hsamples = samples/2;
     final float[] verts = new float[(samples+1)*4];
     final int[] indices = new int[samples*6];
     tessellateCurve(0, 40*(float)Math.PI, verts, indices, new F() {
@@ -110,8 +111,13 @@ public class SurfaceTest extends Test {
         surf.setFillPattern(pattern).fillRect(10, 0, 100, 100);
         // use same fill pattern for the triangles
         surf.translate(0, 160);
-        surf.fillTriangles(verts, indices);
+        // render a sliding window of half of our triangles to test the slice rendering
+        surf.fillTriangles(verts, offset*4, (hsamples+1)*4, indices, offset*6, hsamples*6, offset*2);
+        offset += doff;
+        if (offset == 0) doff = 1;
+        else if (offset == hsamples) doff = -1;
       }
+      private int offset = 0, doff = 1;
     }, 120, 210, "ImmediateLayer patterned fillRect, fillTriangles");
 
     SurfaceImage patted = graphics().createSurface(100, 100);
@@ -221,7 +227,7 @@ public class SurfaceTest extends Test {
   void tessellateCurve (float minx, float maxx, float[] verts, int[] indices, F f) {
     int slices = (verts.length-1)/4, vv = 0;
     float dx = (maxx-minx)/slices;
-    for (float x = minx; x < maxx; x += dx) {
+    for (float x = minx; vv < verts.length; x += dx) {
       verts[vv++] = x;
       verts[vv++] = 0;
       verts[vv++] = x;

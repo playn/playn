@@ -194,17 +194,70 @@ public interface Surface {
   Surface fillTriangles(float[] xys, int[] indices);
 
   /**
-   * Fills the supplied batch of triangles with the current fill pattern. Note: this method only
-   * honors the texture coordinates on OpenGL-based backends (Anrdoid, iOS, HTML-WebGL, etc.). On
-   * non-OpenGL-based backends (HTML-Canvas, HTML-Flash) it behaves like a call to {@link
-   * #fillTriangles(float[],int[])}.
+   * Fills the supplied batch of triangles with the current fill color or pattern.
+   *
+   * <p>Note: this method is only performant on OpenGL-based backends (Android, iOS, HTML-WebGL,
+   * etc.). On non-OpenGL-based backends (HTML-Canvas, HTML-Flash) it converts the triangles to a
+   * path on every rendering call.</p>
    *
    * @param xys the xy coordinates of the triangles, as an array: {@code [x1, y1, x2, y2, ...]}.
+   * @param xysOffset the offset of the coordinates array, must not be negative and no greater than
+   * {@code xys.length}. Note: this is an absolute offset; since {@code xys} contains pairs of
+   * values, this will be some multiple of two.
+   * @param xysLen the number of coordinates to read, must be no less than zero and no greater than
+   * {@code xys.length - xysOffset}. Note: this is an absolute length; since {@code xys} contains
+   * pairs of values, this will be some multiple of two.
+   * @param indices the index of each vertex of each triangle in the {@code xys} array. Because
+   * this method renders a slice of {@code xys}, one must also specify {@code indexBase} which
+   * tells us how to interpret indices. The index into {@code xys} will be computed as: {@code
+   * 2*(indices[ii] - indexBase)}, so if your indices reference vertices relative to the whole
+   * array you should pass {@code xysOffset/2} for {@code indexBase}, but if your indices reference
+   * vertices relative to <em>the slice</em> then you should pass zero.
+   * @param indicesOffset the offset of the indices array, must not be negative and no greater than
+   * {@code indices.length}.
+   * @param indicesLen the number of indices to read, must be no less than zero and no greater than
+   * {@code indices.length - indicesOffset}.
+   * @param indexBase the basis for interpreting {@code indices}. See the docs for {@code indices}
+   * for details.
+   */
+  Surface fillTriangles(float[] xys, int xysOffset, int xysLen,
+                        int[] indices, int indicesOffset, int indicesLen, int indexBase);
+
+  /**
+   * Fills the supplied batch of triangles with the current fill pattern.
+   *
+   * <p>Note: this method only honors the texture coordinates on OpenGL-based backends (Anrdoid,
+   * iOS, HTML-WebGL, etc.). On non-OpenGL-based backends (HTML-Canvas, HTML-Flash) it behaves like
+   * a call to {@link #fillTriangles(float[],int[])}.</p>
+   *
+   * @param xys see {@link #fillTriangles(float[],int[])}.
    * @param sxys the texture coordinates for each vertex of the triangles, as an array:
    * {@code [sx1, sy1, sx2, sy2, ...]}. This must be the same length as {@code xys}.
-   * @param indices the index of each vertex of each triangle in the {@code xys} array.
+   * @param indices see {@link #fillTriangles(float[],int[])}.
    *
    * @throws IllegalStateException if no fill pattern is currently set.
    */
   Surface fillTriangles(float[] xys, float[] sxys, int[] indices);
+
+  /**
+   * Fills the supplied batch of triangles with the current fill pattern.
+   *
+   * <p>Note: this method only honors the texture coordinates on OpenGL-based backends (Anrdoid,
+   * iOS, HTML-WebGL, etc.). On non-OpenGL-based backends (HTML-Canvas, HTML-Flash) it behaves like
+   * a call to {@link #fillTriangles(float[],int[])}.</p>
+   *
+   * @param xys see {@link #fillTriangles(float[],int,int,int[],int,int,int)}.
+   * @param sxys the texture coordinates for each vertex of the triangles, as an array.
+   * {@code [sx1, sy1, sx2, sy2, ...]}. This must be the same length as {@code xys}.
+   * @param xysOffset see {@link #fillTriangles(float[],int,int,int[],int,int,int)}.
+   * @param xysLen see {@link #fillTriangles(float[],int,int,int[],int,int,int)}.
+   * @param indices see {@link #fillTriangles(float[],int,int,int[],int,int,int)}.
+   * @param indicesOffset see {@link #fillTriangles(float[],int,int,int[],int,int,int)}.
+   * @param indicesLen see {@link #fillTriangles(float[],int,int,int[],int,int,int)}.
+   * @param indexBase see {@link #fillTriangles(float[],int,int,int[],int,int,int)}.
+   *
+   * @throws IllegalStateException if no fill pattern is currently set.
+   */
+  Surface fillTriangles(float[] xys, float[] sxys, int xysOffset, int xysLen,
+                        int[] indices, int indicesOffset, int indicesLen, int indexBase);
 }
