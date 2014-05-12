@@ -26,17 +26,6 @@ package playn.core;
  * <p>
  * All methods that modify the Canvas return it to allow calls to be chained.
  * </p>
- *
- * TODO: - alpha (Flash and Java2D implementations are tricky). - textAlign?
- *
- * TODO (maybe): - textBaseline? Don't see it in Android. - font? Abstracting
- * this is going to be tricky. - measureText? Canvas API is pretty anemic, but
- * would be easy to implement on Android/Flash. - pattern repetition flags? Not
- * clear that Flash supports them.
- *
- * Notes: - Clipping is going to be tricky in Flash. It requires that a separate
- * DisplayObject be used as a "mask". I think this can be made to work with this
- * API, but I'm not sure.
  */
 public interface Canvas {
 
