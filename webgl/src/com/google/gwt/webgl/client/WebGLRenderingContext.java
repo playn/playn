@@ -471,7 +471,7 @@ public class WebGLRenderingContext extends JavaScriptObject {
    * context is available.
    */
   public static native WebGLRenderingContext getContext(CanvasElement canvas, WebGLContextAttributes attributes) /*-{
-    var names = ["experimental-webgl", "webgl", "moz-webgl", "webkit-webgl", "webkit-3d"];
+    var names = ["webgl", "experimental-webgl", "moz-webgl", "webkit-webgl", "webkit-3d"];
     for (var i = 0; i < names.length; i++) {
       try {
         var ctx = canvas.getContext(names[i], attributes);
