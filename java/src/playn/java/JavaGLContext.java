@@ -68,8 +68,10 @@ public class JavaGLContext extends GL20Context {
 
     if (image.getType() == BufferedImage.TYPE_INT_ARGB_PRE) {
       DataBufferInt ibuf = (DataBufferInt)dbuf;
-      bbuf = checkGetImageBuffer(ibuf.getSize()*4);
+      int iSize = ibuf.getSize()*4;
+      bbuf = checkGetImageBuffer(iSize);
       bbuf.asIntBuffer().put(ibuf.getData());
+      bbuf.position(bbuf.position()+iSize);
       bbuf.flip();
       format = GL12.GL_BGRA;
       type = GL12.GL_UNSIGNED_INT_8_8_8_8_REV;
