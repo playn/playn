@@ -21,11 +21,10 @@ import java.io.PrintStream;
 import java.util.HashMap;
 import java.util.Map;
 
-import cli.System.DateTime;
+import cli.System.Environment;
 import cli.System.Drawing.RectangleF;
 import cli.System.Threading.ThreadPool;
 import cli.System.Threading.WaitCallback;
-
 import cli.MonoTouch.Foundation.NSUrl;
 import cli.MonoTouch.UIKit.UIApplication;
 import cli.MonoTouch.UIKit.UIDeviceOrientation;
@@ -176,7 +175,7 @@ public class IOSPlatform extends AbstractPlatform {
   private final UIWindow mainWindow;
   private final IOSRootViewController rootViewController;
   private final IOSGameView gameView;
-  private final long start = DateTime.get_Now().get_Ticks();
+  private final int start = Environment.get_TickCount();
 
   private int currentOrientation;
 
@@ -343,7 +342,7 @@ public class IOSPlatform extends AbstractPlatform {
 
   @Override
   public int tick() {
-    return (int)((DateTime.get_Now().get_Ticks() - start) / 10000);
+    return Environment.get_TickCount() - start;
   }
 
   @Override
