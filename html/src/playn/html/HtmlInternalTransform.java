@@ -170,12 +170,12 @@ public class HtmlInternalTransform extends AbstractTransform implements Internal
 
   @Override
   public Transform setTransform(float m00, float m01, float m10, float m11, float tx, float ty) {
-  	matrix.set(0, m00);
-  	matrix.set(1, m01);
-  	matrix.set(2, m10);
-  	matrix.set(3, m11);
-  	matrix.set(4, tx);
-  	matrix.set(5, ty);
+    matrix.set(0, m00);
+    matrix.set(1, m01);
+    matrix.set(2, m10);
+    matrix.set(3, m11);
+    matrix.set(4, tx);
+    matrix.set(5, ty);
     return this;
   }
 
