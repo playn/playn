@@ -199,6 +199,21 @@ public class HtmlInternalTransform extends AbstractTransform implements Internal
   }
 
   @Override
+  public Transform shear (float sx, float sy) {
+    return multiply(this, 1, sy, sx, 1, 0, 0, this);
+  }
+
+  @Override
+  public Transform shearX (float sx) {
+    return multiply(this, 1, 0, sx, 1, 0, 0, this);
+  }
+
+  @Override
+  public Transform shearY (float sy) {
+    return multiply(this, 1, sy, 0, 1, 0, 0, this);
+  }
+
+  @Override
   public Transform rotate(float angle) {
     float sina = FloatMath.sin(angle), cosa = FloatMath.cos(angle);
     return multiply(cosa, sina, -sina, cosa, 0, 0, this, this);
