@@ -14,8 +14,6 @@
 package playn.html;
 
 import com.google.gwt.typedarrays.shared.Float32Array;
-import com.google.gwt.typedarrays.shared.TypedArrays;
-import com.google.gwt.webgl.client.ArrayUtils;
 
 import pythagoras.f.AbstractTransform;
 import pythagoras.f.AffineTransform;
@@ -38,7 +36,7 @@ public class HtmlInternalTransform extends AbstractTransform implements Internal
 
   /** Creates an identity transform. */
   public HtmlInternalTransform() {
-    this(new float[] {1, 0, 0, 1, 0, 0});
+    this(1, 0, 0, 1, 0, 0);
   }
 
   // Pythagoras Transform implementation
@@ -230,11 +228,11 @@ public class HtmlInternalTransform extends AbstractTransform implements Internal
       throw new NoninvertibleTransformException(this.toString());
     }
     float rdet = 1f / det;
-    return new HtmlInternalTransform(new float[] {
+    return new HtmlInternalTransform(
       +m11 * rdet,                  -m10 * rdet,
       -m01 * rdet,                  +m00 * rdet,
       (m10 * ty - m11 * tx) * rdet, (m01 * tx - m00 * ty) * rdet
-    });
+    );
   }
 
   @Override
@@ -263,11 +261,11 @@ public class HtmlInternalTransform extends AbstractTransform implements Internal
         ? (HtmlInternalTransform) other : new HtmlInternalTransform(other);
     float m00 = m00(), m01 = m01(), m10 = m10(), m11 = m11(), tx = tx(), ty = ty();
     float o00 = o.m00(), o01 = o.m01(), o10 = o.m10(), o11 = o.m11(), otx = o.tx(), oty = o.ty();
-    return new HtmlInternalTransform(new float[] {
+    return new HtmlInternalTransform(
       m00 + t * (o00 - m00), m01 + t * (o01 - m01),
       m10 + t * (o10 - m10), m11 + t * (o11 - m11),
       tx  + t * (otx -  tx),  ty + t * (oty -  ty)
-    });
+    );
   }
 
   @Override
@@ -332,7 +330,7 @@ public class HtmlInternalTransform extends AbstractTransform implements Internal
 
   @Override
   public HtmlInternalTransform copy() {
-    return new HtmlInternalTransform(TypedArrays.createFloat32Array(matrix.buffer()));
+    return new HtmlInternalTransform(copyMatrix(matrix));
   }
 
   @Override
@@ -401,21 +399,19 @@ public class HtmlInternalTransform extends AbstractTransform implements Internal
 
   // private bits
 
-  private Float32Array matrix;
+  private final Float32Array matrix;
 
   private HtmlInternalTransform(Transform other) {
+    this();
     float scaleX = other.scaleX(), scaleY = other.scaleY(), angle = other.rotation();
     float sina = FloatMath.sin(angle), cosa = FloatMath.cos(angle);
-    setM00(cosa * scaleX);
-    setM01(sina * scaleY);
-    setM10(-sina * scaleX);
-    setM11(cosa * scaleY);
-    setTx(other.tx());
-    setTy(other.ty());
+    setTransform(cosa * scaleX, sina * scaleY, -sina * scaleX, cosa * scaleY,
+                 other.tx(), other.ty());
   }
 
-  private HtmlInternalTransform(float[] matrix) {
-    this(ArrayUtils.createFloat32Array(matrix));
+  private HtmlInternalTransform(float m00, float m01, float m10, float m11, float tx, float ty) {
+    this(newMatrix());
+    setTransform(m00, m01, m10, m11, tx, ty);
   }
 
   private HtmlInternalTransform(Float32Array matrix) {
@@ -438,31 +434,38 @@ public class HtmlInternalTransform extends AbstractTransform implements Internal
     matrix.set(3, value);
   }
 
+  private static native Float32Array newMatrix() /*-{
+    return new Float32Array(6);
+  }-*/;
+
+  private static native Float32Array copyMatrix(Float32Array matrix) /*-{
+    return new Float32Array(matrix);
+  }-*/;
+
   private static HtmlInternalTransform multiply(HtmlInternalTransform a, HtmlInternalTransform b,
       HtmlInternalTransform into) {
     return multiply(a.m00(), a.m01(), a.m10(), a.m11(), a.tx(), a.ty(),
-        b.m00(), b.m01(), b.m10(), b.m11(), b.tx(), b.ty(), into);
+                    b.m00(), b.m01(), b.m10(), b.m11(), b.tx(), b.ty(), into);
   }
 
   private static HtmlInternalTransform multiply(HtmlInternalTransform a, float m00, float m01,
       float m10, float m11, float tx, float ty, HtmlInternalTransform into) {
-    return multiply(a.m00(), a.m01(), a.m10(), a.m11(), a.tx(), a.ty(), m00, m01, m10, m11, tx, ty,
-        into);
+    return multiply(a.m00(), a.m01(), a.m10(), a.m11(), a.tx(), a.ty(),
+                    m00,     m01,     m10,     m11,     tx,     ty, into);
   }
 
   private static HtmlInternalTransform multiply(float m00, float m01, float m10, float m11,
       float tx, float ty, HtmlInternalTransform b, HtmlInternalTransform into) {
-    return multiply(m00, m01, m10, m11, tx, ty, b.m00(), b.m01(), b.m10(), b.m11(), b.tx(), b.ty(),
-        into);
+    return multiply(m00,     m01,     m10,     m11,     tx,     ty,
+                    b.m00(), b.m01(), b.m10(), b.m11(), b.tx(), b.ty(), into);
   }
 
   private static HtmlInternalTransform multiply(float am00, float am01, float am10, float am11,
       float atx, float aty, float bm00, float bm01, float bm10, float bm11, float btx, float bty,
       HtmlInternalTransform into) {
-    into.setTransform(
-      am00 * bm00 + am10 * bm01, am01 * bm00 + am11 * bm01,
-      am00 * bm10 + am10 * bm11, am01 * bm10 + am11 * bm11,
-      am00 * btx + am10 * bty + atx, am01 * btx + am11 * bty + aty);
+    into.setTransform(am00 * bm00 + am10 * bm01, am01 * bm00 + am11 * bm01,
+                      am00 * bm10 + am10 * bm11, am01 * bm10 + am11 * bm11,
+                      am00 * btx + am10 * bty + atx, am01 * btx + am11 * bty + aty);
     return into;
   }
 }
