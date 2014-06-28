@@ -15,6 +15,8 @@ package playn.java;
 
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -39,10 +41,14 @@ import playn.core.gl.Scale;
 public class JavaAssets extends AbstractAssets<BufferedImage> {
 
   private final JavaPlatform platform;
+  private File[] directories = {};
 
   private String pathPrefix = "assets/";
   private Scale assetScale = null;
 
+  /**
+   * Creates a new java assets.
+   */
   public JavaAssets(JavaPlatform platform) {
     super(platform);
     this.platform = platform;
@@ -56,6 +62,7 @@ public class JavaAssets extends AbstractAssets<BufferedImage> {
    * supplied to this method should not contain leading or trailing slashes. Note that this prefix
    * should always use '/' as a path separator as it is used to construct URLs, not filesystem
    * paths.
+   * <p>NOTE: the path prefix is not used when searching extra directories</p>
    */
   public void setPathPrefix(String prefix) {
     if (prefix.startsWith("/") || prefix.endsWith("/")) {
@@ -70,6 +77,17 @@ public class JavaAssets extends AbstractAssets<BufferedImage> {
    */
   public String getPathPrefix() {
     return pathPrefix;
+  }
+
+  /**
+   * Adds the given directory to the search path for resources.
+   * <p>TODO: remove? get?</p>
+   */
+  public void addDirectory(File dir) {
+    File[] ndirs = new File[directories.length + 1];
+    System.arraycopy(directories, 0, ndirs, 0, directories.length);
+    ndirs[ndirs.length - 1] = dir;
+    directories = ndirs;
   }
 
   /**
@@ -108,12 +126,12 @@ public class JavaAssets extends AbstractAssets<BufferedImage> {
 
   @Override
   public String getTextSync(String path) throws Exception {
-    return Resources.toString(requireResource(pathPrefix + path), Charsets.UTF_8);
+    return Resources.toString(requireResource(path), Charsets.UTF_8);
   }
 
   @Override
   public byte[] getBytesSync(String path) throws Exception {
-    return Resources.toByteArray(requireResource(pathPrefix + path));
+    return Resources.toByteArray(requireResource(path));
   }
 
   @Override
@@ -127,8 +145,7 @@ public class JavaAssets extends AbstractAssets<BufferedImage> {
   }
 
   @Override
-  protected Image loadImage(String path, ImageReceiver<BufferedImage> recv) {
-    String fullPath = pathPrefix + path;
+  protected Image loadImage(String fullPath, ImageReceiver<BufferedImage> recv) {
     Exception error = null;
     for (Scale.ScaledResource rsrc : assetScale().getScaledResources(fullPath)) {
       try {
@@ -159,12 +176,24 @@ public class JavaAssets extends AbstractAssets<BufferedImage> {
     return recv.loadFailed(error != null ? error : new FileNotFoundException(fullPath));
   }
 
+  /**
+   * Attempts to locate the resource at the given path, and returns an input stream. First, the
+   * path prefix is prepended (see {@link #setPathPrefix(String)}) and the the class loader checked.
+   * If not found, then the extra directories, if any, are checked, in order. If the file is not
+   * found in any of the extra directories either, then an exception is thrown.
+   */
   protected InputStream getAssetStream(String path) throws IOException {
     InputStream in = getClass().getClassLoader().getResourceAsStream(pathPrefix + path);
-    if (in == null) {
-      throw new FileNotFoundException(path);
+    if (in != null) {
+      return in;
     }
-    return in;
+    for (File dir : directories) {
+      File f = new File(dir, path);
+      if (f.exists()) {
+        return new FileInputStream(f);
+      }
+    }
+    throw new FileNotFoundException();
   }
 
   protected Sound getSound(String path, boolean music) {
@@ -181,12 +210,24 @@ public class JavaAssets extends AbstractAssets<BufferedImage> {
     return new Sound.Error(err);
   }
 
-  protected URL requireResource(String path) throws FileNotFoundException {
-    URL url = getClass().getClassLoader().getResource(path);
-    if (url == null) {
-      throw new FileNotFoundException(path);
+  /**
+   * Attempts to locate the resource at the given path, and returns the URL. First, the path prefix
+   * is prepended (see {@link #setPathPrefix(String)}) and the the class loader checked. If not
+   * found, then the extra directories, if any, are checked, in order. If the file is not found in
+   * any of the extra directories either, then an exception is thrown.
+   */
+  protected URL requireResource(String path) throws IOException {
+    URL url = getClass().getClassLoader().getResource(pathPrefix + path);
+    if (url != null) {
+      return url;
     }
-    return url;
+    for (File dir : directories) {
+      File f = new File(dir, path).getCanonicalFile();
+      if (f.exists()) {
+        return f.toURI().toURL();
+      }
+    }
+    throw new FileNotFoundException(path);
   }
 
   protected BufferedImage scaleImage(BufferedImage image, float viewImageRatio) {
