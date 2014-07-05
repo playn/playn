@@ -21,10 +21,10 @@ import java.io.PrintStream;
 import java.util.HashMap;
 import java.util.Map;
 
-import cli.System.Environment;
 import cli.System.Drawing.RectangleF;
 import cli.System.Threading.ThreadPool;
 import cli.System.Threading.WaitCallback;
+import cli.MonoTouch.CoreAnimation.CAAnimation;
 import cli.MonoTouch.Foundation.NSUrl;
 import cli.MonoTouch.UIKit.UIApplication;
 import cli.MonoTouch.UIKit.UIDeviceOrientation;
@@ -175,7 +175,7 @@ public class IOSPlatform extends AbstractPlatform {
   private final UIWindow mainWindow;
   private final IOSRootViewController rootViewController;
   private final IOSGameView gameView;
-  private final int start = Environment.get_TickCount();
+  private final double start = CAAnimation.CurrentMediaTime();
 
   private int currentOrientation;
 
@@ -342,7 +342,7 @@ public class IOSPlatform extends AbstractPlatform {
 
   @Override
   public int tick() {
-    return Environment.get_TickCount() - start;
+    return (int)((CAAnimation.CurrentMediaTime() - start) * 1000);
   }
 
   @Override
