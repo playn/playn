@@ -27,6 +27,7 @@ import playn.core.TextWrap;
 
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.graphics.Path;
 
 class AndroidTextLayout extends AbstractTextLayout {
 
@@ -149,7 +150,11 @@ class AndroidTextLayout extends AbstractTextLayout {
       paint.setTypeface(font.typeface);
       paint.setTextSize(font.size());
       paint.setSubpixelText(true);
-      canvas.drawText(text, x, y-metrics.ascent, paint);
+      
+      // draw to a path rather than directly drawing text to work around KitKat bug
+      Path path = new Path();
+      paint.getTextPath(text, 0, text.length(), x, y - metrics.ascent, path);
+      canvas.drawPath(path, paint);
 
     } finally {
       paint.setAntiAlias(oldAA);
