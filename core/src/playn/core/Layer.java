@@ -171,8 +171,8 @@ public interface Layer {
    * <p>
    * This sets the origin of the layer's transformation matrix.
    *
-   * @param x origin on x axis
-   * @param y origin on y axis
+   * @param x origin on x axis in pixels
+   * @param y origin on y axis in pixels
    *
    * @return a reference to this layer for call chaining.
    */
@@ -341,7 +341,8 @@ public interface Layer {
   float rotation();
 
   /**
-   * Sets the current rotation of this layer, in radians.
+   * Sets the current rotation of this layer, in radians. The rotation is done around the currently set origin, 
+   * See {@link Layer#setOrigin}.
    *
    * <p><em>Note:</em> all transform changes are deferred until {@link #transform} is called
    * (which happens during rendering, if not before) at which point the current scale, rotation and
