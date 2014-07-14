@@ -341,8 +341,8 @@ public interface Layer {
   float rotation();
 
   /**
-   * Sets the current rotation of this layer, in radians. The rotation is done around the currently set origin, 
-   * See {@link Layer#setOrigin}.
+   * Sets the current rotation of this layer, in radians. The rotation is done around the currently
+   * set origin, See {@link Layer#setOrigin}.
    *
    * <p><em>Note:</em> all transform changes are deferred until {@link #transform} is called
    * (which happens during rendering, if not before) at which point the current scale, rotation and
