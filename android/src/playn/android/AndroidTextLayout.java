@@ -150,11 +150,16 @@ class AndroidTextLayout extends AbstractTextLayout {
       paint.setTypeface(font.typeface);
       paint.setTextSize(font.size());
       paint.setSubpixelText(true);
-      
-      // draw to a path rather than directly drawing text to work around KitKat bug
-      Path path = new Path();
-      paint.getTextPath(text, 0, text.length(), x, y - metrics.ascent, path);
-      canvas.drawPath(path, paint);
+
+      // if we're drawing REALLY BIG TEXT, draw to a path rather than directly drawing text to work
+      // around KitKat bug: https://code.google.com/p/android/issues/detail?id=62800
+      if (font.size() > 250) {
+        Path path = new Path();
+        paint.getTextPath(text, 0, text.length(), x, y - metrics.ascent, path);
+        canvas.drawPath(path, paint);
+      } else {
+        canvas.drawText(text, x, y-metrics.ascent, paint);
+      }
 
     } finally {
       paint.setAntiAlias(oldAA);
