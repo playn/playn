@@ -20,7 +20,7 @@
   <inherits name="com.google.gwt.logging.Logging" />
   <source path="gwt" />
 
-  <replace-with class="playn.html.HtmlLogGwt">
+  <replace-with class="playn.logging.gwt.HtmlLogGwt">
     <when-type-assignable class="playn.html.HtmlLog" />
   </replace-with>
 
