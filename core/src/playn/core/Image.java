@@ -25,16 +25,14 @@ import playn.core.util.Callback;
 public interface Image {
 
   /**
-   * This image's width in pixels. In case the image is loaded asynchronously, this will 
-   * be 0 until the image is loaded and ready for use - see {@link Image#isReady()} and 
-   * {@link Assets#getImage()}
+   * This image's width in pixels. When the image is loaded asynchronously, this will be 0 until the
+   * image is loaded and ready for use. See {@link Image#isReady} and {@link Assets#getImage}.
    */
   float width();
 
   /**
-   * This image's height in pixels. In case the image is loaded asynchronously, this will 
-   * be 0 until the image is loaded and ready for use - see {@link Image#isReady()} and 
-   * {@link Assets#getImage()}
+   * This image's height in pixels. When the image is loaded asynchronously, this will be 0 until
+   * the image is loaded and ready for use. See {@link Image#isReady} and {@link Assets#getImage}.
    */
    */
   float height();
