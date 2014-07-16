@@ -33,6 +33,8 @@
   <set-property name="gwt.logging.simpleRemoteHandler" value="DISABLED" />
 
   <!-- TODO: Remove these settings when gwt 2.7 is released -->
+  <set-property name="gwt.logging.firebugHandler" value="DISABLED" />
+  <set-property name="gwt.logging.popupHandler" value="DISABLED" />
   <set-property name="gwt.logging.enabled" value="TRUE">
     <when-property-is name="superdevmode" value="on"/>
   </set-property>
