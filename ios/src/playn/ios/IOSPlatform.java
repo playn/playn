@@ -21,19 +21,6 @@ import java.io.PrintStream;
 import java.util.HashMap;
 import java.util.Map;
 
-import cli.System.Drawing.RectangleF;
-import cli.System.Threading.ThreadPool;
-import cli.System.Threading.WaitCallback;
-import cli.MonoTouch.CoreAnimation.CAAnimation;
-import cli.MonoTouch.Foundation.NSUrl;
-import cli.MonoTouch.UIKit.UIApplication;
-import cli.MonoTouch.UIKit.UIDeviceOrientation;
-import cli.MonoTouch.UIKit.UIInterfaceOrientation;
-import cli.MonoTouch.UIKit.UIScreen;
-import cli.MonoTouch.UIKit.UIView;
-import cli.MonoTouch.UIKit.UIViewController;
-import cli.MonoTouch.UIKit.UIWindow;
-
 import playn.core.AbstractPlatform;
 import playn.core.Game;
 import playn.core.Json;
@@ -41,6 +28,19 @@ import playn.core.Mouse;
 import playn.core.MouseStub;
 import playn.core.PlayN;
 import playn.core.json.JsonImpl;
+import cli.MonoTouch.CoreAnimation.CAAnimation;
+import cli.MonoTouch.Foundation.NSUrl;
+import cli.MonoTouch.UIKit.UIApplication;
+import cli.MonoTouch.UIKit.UIApplicationDelegate;
+import cli.MonoTouch.UIKit.UIDeviceOrientation;
+import cli.MonoTouch.UIKit.UIInterfaceOrientation;
+import cli.MonoTouch.UIKit.UIScreen;
+import cli.MonoTouch.UIKit.UIView;
+import cli.MonoTouch.UIKit.UIViewController;
+import cli.MonoTouch.UIKit.UIWindow;
+import cli.System.Drawing.RectangleF;
+import cli.System.Threading.ThreadPool;
+import cli.System.Threading.WaitCallback;
 
 /**
  * Provides access to all the PlayN services on iOS.
@@ -139,11 +139,28 @@ public class IOSPlatform extends AbstractPlatform {
    * Registers your application using the supplied configuration.
    */
   public static IOSPlatform register(UIApplication app, Config config) {
-    IOSPlatform platform = new IOSPlatform(app, config);
+    return register(app, config, null);
+  }
+
+  /**
+   * Registers your application using the supplied configuration and window.
+   * 
+   * The window is used for a game integrated as a part of application. An iOS application typically
+   * just works on one screen so that the game has to share the window created by other controllers
+   * (typically created by the story board). If no window is specified, the platform will create one
+   * taking over the whole application.
+   * 
+   * The lifecyle management should be carefully designed and implemented when cooperating with
+   * other controllers. At least, the {@link UIApplicationDelegate#OnActivated(UIApplication)}
+   * should be called to avoid the frozen graphics.
+   * 
+   */
+  public static IOSPlatform register(UIApplication app, Config config, UIWindow window) {
+    IOSPlatform platform = new IOSPlatform(app, config, window);
     PlayN.setPlatform(platform);
     return platform;
   }
-
+  
   static {
     // disable output to System.out/err as that will result in a crash due to iOS disallowing
     // writes to stdout/stderr
@@ -208,7 +225,7 @@ public class IOSPlatform extends AbstractPlatform {
     dispatchOrientationChange(currentOrientation);
   }
 
-  protected IOSPlatform(UIApplication app, Config config) {
+  protected IOSPlatform(UIApplication app, Config config, UIWindow window) {
     super(new IOSLog());
     this.app = app;
     this.orients = config.orients;
@@ -235,7 +252,7 @@ public class IOSPlatform extends AbstractPlatform {
     assets = new IOSAssets(this);
     storage = new IOSStorage();
 
-    mainWindow = new UIWindow(bounds);
+    mainWindow = window == null ? new UIWindow(bounds) : window;
     gameView = new IOSGameView(this, bounds, deviceScale);
     rootViewController = new IOSRootViewController(this, gameView);
     mainWindow.set_RootViewController(rootViewController);
