@@ -77,6 +77,12 @@ public class AndroidAssets extends AbstractAssets<Bitmap> {
     this.assetMgr = platform.activity.getResources().getAssets();
   }
 
+  /**
+   * Configures a prefix which is prepended to all asset paths prior to loading. Android assets are
+   * normally loaded via the Android AssetManager, which expects all assets to be in the {@code
+   * assets} directory. This prefix is thus inserted between {@code assets} and the path supplied
+   * to any of the various {@code get} methods.
+   */
   public void setPathPrefix(String prefix) {
     if (prefix.startsWith("/") || prefix.endsWith("/")) {
       throw new IllegalArgumentException("Prefix must not start or end with '/'.");
