@@ -129,13 +129,10 @@ public class IOSPlatform extends AbstractPlatform {
      * simultaneously (those don't go through OpenAL, they go through AVAudioPlayer, and I presume
      * AVAudioPlayer competes with OpenAL for sound channels). */
     public int openALSources = 24;
-    
-    /**
-     * Seconds waiting for the last game loop done. Ignore this if your game controller is the whole
-     * application. This takes affect when the game is used as a part of application, especially
-     * used as a normal iOS controller.
-     * 
-     */
+
+    /** Seconds to wait for the game loop to terminate before terminating GL and AL services. This
+     * is only used if PlayN is integrated into a larger iOS application and does not control the
+     * application lifecycle. */
     public double timeForTermination = 0.5;
   }
 
@@ -155,22 +152,20 @@ public class IOSPlatform extends AbstractPlatform {
 
   /**
    * Registers your application using the supplied configuration and window.
-   * 
-   * The window is used for a game integrated as a part of application. An iOS application typically
-   * just works on one screen so that the game has to share the window created by other controllers
-   * (typically created by the story board). If no window is specified, the platform will create one
-   * taking over the whole application.
-   * 
+   *
+   * The window is used for a game integrated as a part of application. An iOS application
+   * typically just works on one screen so that the game has to share the window created by other
+   * controllers (typically created by the story board). If no window is specified, the platform
+   * will create one taking over the whole application.
+   *
    * Note that PlayN will still install a RootViewController on the supplied UIWindow. If a custom
    * root view controller is needed, your application should subclass {@link IOSRootViewController}
    * or replicate its functionality in your root view controller.
-   * 
+   *
    * The lifecyle management should be carefully designed and implemented when cooperating with
    * other controllers. At least, {@link UIApplicationDelegate#OnActivated(UIApplication)} and
-   * {@link UIApplicationDelegate#WillTerminate(UIApplication)} should be called to get the platform
-   * started and terminated respectively.
-   * 
-   * 
+   * {@link UIApplicationDelegate#WillTerminate(UIApplication)} should be called to get the
+   * platform started and terminated respectively.
    */
   public static IOSPlatform register(UIApplication app, UIWindow window, Config config) {
     IOSPlatform platform = new IOSPlatform(app, window, config);
@@ -428,20 +423,18 @@ public class IOSPlatform extends AbstractPlatform {
   }
   void willTerminate() {
     onExit();
-    
-    NSAction.Method method = new NSAction.Method() {
-      @Override
-      public void Invoke() {
-        // Stop the Gl stuff.
+
+    NSTimer.CreateScheduledTimer(timeForTermination, new NSAction(new NSAction.Method() {
+      @Override public void Invoke() {
+        // stop the GL view
         gameView.Stop();
-        // Stop and release the AL stuff.
+        // stop and release the AL resources
         audio.terminate();
-        // Tear down the platform in order to make sure the game creation flow can be repeated when
-        // it is just used as a part of application.
+        // clear out the platform in order to make sure the game creation flow can be repeated when
+        // it is used as a part of a larger application
         PlayN.setPlatform(null);
       }
-    };
-    NSTimer.CreateScheduledTimer(timeForTermination, new NSAction(method));
+    }));
   }
 
   void viewDidInit(int defaultFrameBuffer) {

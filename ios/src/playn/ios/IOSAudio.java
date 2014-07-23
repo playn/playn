@@ -171,8 +171,7 @@ public class IOSAudio extends AudioImpl {
   }
 
   void terminate() {
-     if (actx.get_IsProcessing())
-         actx.Suspend();
-     actx.Dispose();
+    if (actx.get_IsProcessing()) actx.Suspend();
+    actx.Dispose();
   }
 }
