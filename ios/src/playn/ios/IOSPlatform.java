@@ -18,11 +18,17 @@ package playn.ios;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import cli.MonoTouch.CoreAnimation.CAAnimation;
 import cli.MonoTouch.Foundation.NSAction;
+import cli.MonoTouch.Foundation.NSNotification;
+import cli.MonoTouch.Foundation.NSNotificationCenter;
+import cli.MonoTouch.Foundation.NSObject;
+import cli.MonoTouch.Foundation.NSString;
 import cli.MonoTouch.Foundation.NSTimer;
 import cli.MonoTouch.Foundation.NSUrl;
 import cli.MonoTouch.UIKit.UIApplication;
@@ -33,6 +39,7 @@ import cli.MonoTouch.UIKit.UIScreen;
 import cli.MonoTouch.UIKit.UIView;
 import cli.MonoTouch.UIKit.UIViewController;
 import cli.MonoTouch.UIKit.UIWindow;
+import cli.System.Action;
 import cli.System.Drawing.RectangleF;
 import cli.System.Threading.ThreadPool;
 import cli.System.Threading.WaitCallback;
@@ -161,11 +168,6 @@ public class IOSPlatform extends AbstractPlatform {
    * Note that PlayN will still install a RootViewController on the supplied UIWindow. If a custom
    * root view controller is needed, your application should subclass {@link IOSRootViewController}
    * or replicate its functionality in your root view controller.
-   *
-   * The lifecyle management should be carefully designed and implemented when cooperating with
-   * other controllers. At least, {@link UIApplicationDelegate#OnActivated(UIApplication)} and
-   * {@link UIApplicationDelegate#WillTerminate(UIApplication)} should be called to get the
-   * platform started and terminated respectively.
    */
   public static IOSPlatform register(UIApplication app, UIWindow window, Config config) {
     IOSPlatform platform = new IOSPlatform(app, window, config);
@@ -195,17 +197,18 @@ public class IOSPlatform extends AbstractPlatform {
   private final IOSStorage storage;
   private final IOSTouch touch;
   private final IOSAssets assets;
-  private final double timeForTermination;
 
   private Game game;
 
   private final SupportedOrients orients;
   private final int frameInterval;
+  private final double timeForTermination;
   private final UIApplication app;
   private final UIWindow mainWindow;
   private final IOSRootViewController rootViewController;
   private final IOSGameView gameView;
   private final double start = CAAnimation.CurrentMediaTime();
+  private final List<NSObject> lifecycleObservers = new ArrayList<NSObject>();
 
   private int currentOrientation;
 
@@ -243,6 +246,7 @@ public class IOSPlatform extends AbstractPlatform {
     this.app = app;
     this.orients = config.orients;
     this.frameInterval = config.frameInterval;
+    this.timeForTermination = config.timeForTermination;
 
     float deviceScale = UIScreen.get_MainScreen().get_Scale();
     RectangleF bounds = UIScreen.get_MainScreen().get_Bounds();
@@ -269,11 +273,19 @@ public class IOSPlatform extends AbstractPlatform {
     gameView = new IOSGameView(this, bounds, deviceScale);
     rootViewController = new IOSRootViewController(this, gameView);
     mainWindow.set_RootViewController(rootViewController);
-    timeForTermination = config.timeForTermination;
 
-    // if the game supplied a proper delegate, configure it (for lifecycle notifications)
-    if (app.get_Delegate() instanceof IOSApplicationDelegate)
-      ((IOSApplicationDelegate) app.get_Delegate()).setPlatform(this);
+    // observe lifecycle events (we deviate from "standard code style" here to make it easier to
+    // ignore the repeated boilerplate and see the actual important bits)
+    observeLifecycle(UIApplication.get_DidBecomeActiveNotification(),
+                     new Runnable() { public void run () { didBecomeActive(); }});
+    observeLifecycle(UIApplication.get_WillEnterForegroundNotification(),
+                     new Runnable() { public void run () { willEnterForeground(); }});
+    observeLifecycle(UIApplication.get_WillResignActiveNotification(),
+                     new Runnable() { public void run () { willResignActive(); }});
+    observeLifecycle(UIApplication.get_DidEnterBackgroundNotification(),
+                     new Runnable() { public void run () { didEnterBackground(); }});
+    observeLifecycle(UIApplication.get_WillTerminateNotification(),
+                     new Runnable() { public void run () { willTerminate(); }});
 
     // use the status bar orientation during startup. The device orientation will not be known
     // for some time and most games will want to show a "right side up" loading screen, i.e.
@@ -400,43 +412,6 @@ public class IOSPlatform extends AbstractPlatform {
     mainWindow.MakeKeyAndVisible();
   }
 
-  // iOS lifecycle doesn't match up perfectly to PlayN lifecycle, so we expose iOS lifecycle
-  // methods here (called from IOSApplicationDelegate) and work things out here
-  void onActivated() {
-    gameView.onActivated();
-  }
-  void willEnterForeground() {
-    invokeLater(new Runnable() {
-      public void run() {
-        onResume();
-      }
-    });
-  }
-  void onResignActivation() {
-    gameView.onResignActivation();
-  }
-  void didEnterBackground() {
-    // we call this directly rather than via invokeLater() because the PlayN thread is already
-    // stopped at this point so a) there's no point in worrying about racing with that thread, and
-    // b) onPause would never get called, since the PlayN thread is not processing events
-    onPause();
-  }
-  void willTerminate() {
-    onExit();
-
-    NSTimer.CreateScheduledTimer(timeForTermination, new NSAction(new NSAction.Method() {
-      @Override public void Invoke() {
-        // stop the GL view
-        gameView.Stop();
-        // stop and release the AL resources
-        audio.terminate();
-        // clear out the platform in order to make sure the game creation flow can be repeated when
-        // it is used as a part of a larger application
-        PlayN.setPlatform(null);
-      }
-    }));
-  }
-
   void viewDidInit(int defaultFrameBuffer) {
     graphics.ctx.viewDidInit(defaultFrameBuffer);
   }
@@ -474,6 +449,60 @@ public class IOSPlatform extends AbstractPlatform {
 
   void paint() {
     graphics.paint();
+  }
+
+  // lifecycle callbacks
+  private void didBecomeActive() {
+    gameView.onActivated();
+  }
+  private void willEnterForeground() {
+    invokeLater(new Runnable() {
+      public void run() {
+        onResume();
+      }
+    });
+  }
+  private void willResignActive () {
+    gameView.onResignActivation();
+  }
+  private void didEnterBackground () {
+    // we call this directly rather than via invokeLater() because the PlayN thread is already
+    // stopped at this point so a) there's no point in worrying about racing with that thread,
+    // and b) onPause would never get called, since the PlayN thread is not processing events
+    onPause();
+  }
+  private void willTerminate () {
+    // let the app know that we're terminating
+    onExit();
+
+    // terminate our lifecycle observers
+    for (NSObject obs : lifecycleObservers) {
+      NSNotificationCenter.get_DefaultCenter().RemoveObserver(obs);
+    }
+    lifecycleObservers.clear();
+
+    // wait for the desired interval and then terminate the GL and AL systems
+    NSTimer.CreateScheduledTimer(timeForTermination, new NSAction(new NSAction.Method() {
+      @Override public void Invoke() {
+        // stop the GL view
+        gameView.Stop();
+        // stop and release the AL resources
+        audio.terminate();
+        // clear out the platform in order to make sure the game creation flow can be repeated when
+        // it is used as a part of a larger application
+        PlayN.setPlatform(null);
+      }
+    }));
+  }
+
+  private void observeLifecycle (NSString event, final Runnable action) {
+    // avert your eyes from this horrible abomination; I'm not even going to try to wrap the code
+    // in any sort of sensible way
+    lifecycleObservers.add(NSNotificationCenter.get_DefaultCenter().AddObserver(event, new cli.System.Action$$00601_$$$_Lcli__MonoTouch__Foundation__NSNotification_$$$$_(new cli.System.Action$$00601_$$$_Lcli__MonoTouch__Foundation__NSNotification_$$$$_.Method() {
+      @Override public void Invoke(NSNotification n) {
+        action.run();
+      }
+    })));
   }
 
   protected static final Map<UIDeviceOrientation,UIInterfaceOrientation> ORIENT_MAP =

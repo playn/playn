@@ -15,53 +15,12 @@
  */
 package playn.ios;
 
-import cli.MonoTouch.UIKit.UIApplication;
 import cli.MonoTouch.UIKit.UIApplicationDelegate;
 
 /**
- * PlayN iOS games must extend this class for their AppDelegate. It wires up the appropriate
- * lifecycle events.
+ * @deprecated No longer needed. Just use a stock UIApplicationDelegate.
  */
+@Deprecated
 public class IOSApplicationDelegate extends UIApplicationDelegate {
 
-  private IOSPlatform platform;
-
-  void setPlatform(IOSPlatform platform) {
-    this.platform = platform;
-  }
-
-  @Override
-  public void WillEnterForeground(UIApplication app) {
-    if (platform != null) {
-      platform.willEnterForeground();
-    }
-  }
-
-  @Override
-  public void OnActivated(UIApplication app) {
-    if (platform != null) {
-      platform.onActivated();
-    }
-  }
-
-  @Override
-  public void OnResignActivation(UIApplication app) {
-    if (platform != null) {
-      platform.onResignActivation();
-    }
-  }
-
-  @Override
-  public void DidEnterBackground(UIApplication app) {
-    if (platform != null) {
-      platform.didEnterBackground();
-    }
-  }
-
-  @Override
-  public void WillTerminate(UIApplication app) {
-    if (platform != null) {
-      platform.willTerminate();
-    }
-  }
 }

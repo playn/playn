@@ -9,7 +9,7 @@ using ${package}.core;
 namespace ${package}
 {
   [Register ("AppDelegate")]
-  public partial class AppDelegate : IOSApplicationDelegate {
+  public partial class AppDelegate : UIApplicationDelegate {
     public override bool FinishedLaunching (UIApplication app, NSDictionary options) {
       app.SetStatusBarHidden(true, true);
       var pconfig = new IOSPlatform.Config();
