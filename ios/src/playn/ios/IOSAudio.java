@@ -169,4 +169,10 @@ public class IOSAudio extends AudioImpl {
       // OpenAL uses gain between 0 and 1, rather than raw db-based gain
       AL.Source(sources[sourceIdx], ALSourcef.wrap(ALSourcef.Gain), volume);
   }
+
+  void terminate() {
+     if (actx.get_IsProcessing())
+         actx.Suspend();
+     actx.Dispose();
+  }
 }
