@@ -87,11 +87,11 @@ class AndroidNet extends NetImpl {
             impl = new ResponseImpl(code) {
               @Override
               public String payloadString() {
-                return null;
+                return "";
               }
               @Override
               public byte[] payload() {
-                return null;
+                return new byte[0];
               }
               @Override
               protected Map<String, List<String>> extractHeaders() {
