@@ -188,7 +188,7 @@ public class IOSPlatform extends AbstractPlatform {
     System.setErr(new PrintStream(noop));
   }
 
-  private final IOSAudio audio;
+  private IOSAudio audio; // lazily initialized
   private final IOSGraphics graphics;
   private final Json json;
   private final IOSKeyboard keyboard;
@@ -254,7 +254,6 @@ public class IOSPlatform extends AbstractPlatform {
       screenHeight /= 2;
     }
 
-    audio = new IOSAudio(this, config.openALSources);
     graphics = new IOSGraphics(this, screenWidth, screenHeight, viewScale, deviceScale,
       config.interpolateCanvasDrawing);
     json = new JsonImpl();
@@ -326,6 +325,7 @@ public class IOSPlatform extends AbstractPlatform {
 
   @Override
   public IOSAudio audio() {
+    if (audio == null) audio = new IOSAudio(this, config.openALSources);
     return audio;
   }
 
@@ -482,8 +482,8 @@ public class IOSPlatform extends AbstractPlatform {
       @Override public void Invoke() {
         // stop the GL view
         gameView.Stop();
-        // stop and release the AL resources
-        audio.terminate();
+        // stop and release the AL resources (if audio was ever initialized)
+        if (audio != null) audio.terminate();
         // clear out the platform in order to make sure the game creation flow can be repeated when
         // it is used as a part of a larger application
         PlayN.setPlatform(null);
