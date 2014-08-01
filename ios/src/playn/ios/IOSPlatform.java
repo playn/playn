@@ -200,9 +200,7 @@ public class IOSPlatform extends AbstractPlatform {
 
   private Game game;
 
-  private final SupportedOrients orients;
-  private final int frameInterval;
-  private final double timeForTermination;
+  private final Config config;
   private final UIApplication app;
   private final UIWindow mainWindow;
   private final IOSRootViewController rootViewController;
@@ -232,7 +230,7 @@ public class IOSPlatform extends AbstractPlatform {
 
   /** Returns the orientations we're configured to support. */
   public SupportedOrients supportedOrients() {
-    return orients;
+    return config.orients;
   }
 
   /** Configures a listener that is notified when the game orientation changes. */
@@ -244,9 +242,7 @@ public class IOSPlatform extends AbstractPlatform {
   protected IOSPlatform(UIApplication app, UIWindow window, Config config) {
     super(new IOSLog());
     this.app = app;
-    this.orients = config.orients;
-    this.frameInterval = config.frameInterval;
-    this.timeForTermination = config.timeForTermination;
+    this.config = config;
 
     float deviceScale = UIScreen.get_MainScreen().get_Scale();
     RectangleF bounds = UIScreen.get_MainScreen().get_Bounds();
@@ -299,8 +295,8 @@ public class IOSPlatform extends AbstractPlatform {
       }
     }
     // if it isn't supported, use the game's default
-    if (dorient == null || !orients.isSupported(dorient)) {
-      dorient = orients.defaultOrient;
+    if (dorient == null || !config.orients.isSupported(dorient)) {
+      dorient = config.orients.defaultOrient;
     }
     onOrientationChange(dorient);
   }
@@ -407,7 +403,7 @@ public class IOSPlatform extends AbstractPlatform {
     // initialize the game and start things off
     game.init();
     // start the main game loop
-    gameView.RunWithFrameInterval(frameInterval);
+    gameView.RunWithFrameInterval(config.frameInterval);
     // make our main window visible
     mainWindow.MakeKeyAndVisible();
   }
@@ -418,7 +414,7 @@ public class IOSPlatform extends AbstractPlatform {
 
   void onOrientationChange(UIDeviceOrientation orientation) {
     if (orientation.Value == currentOrientation) return; // NOOP
-    if (!orients.isSupported(orientation))
+    if (!config.orients.isSupported(orientation))
       return; // ignore unsupported (or Unknown) orientations
 
     currentOrientation = orientation.Value;
@@ -482,7 +478,7 @@ public class IOSPlatform extends AbstractPlatform {
     lifecycleObservers.clear();
 
     // wait for the desired interval and then terminate the GL and AL systems
-    NSTimer.CreateScheduledTimer(timeForTermination, new NSAction(new NSAction.Method() {
+    NSTimer.CreateScheduledTimer(config.timeForTermination, new NSAction(new NSAction.Method() {
       @Override public void Invoke() {
         // stop the GL view
         gameView.Stop();
