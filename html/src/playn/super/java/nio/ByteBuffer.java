@@ -937,7 +937,6 @@ public final class ByteBuffer extends Buffer implements Comparable<ByteBuffer>, 
 //        return new StringByteBuffer(s);
 //    }
 
-
     public ArrayBufferView getTypedArray () {
       return byteArray;
     }

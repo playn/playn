@@ -1463,7 +1463,6 @@ public final class HtmlGL20 implements playn.core.gl.GL20 {
     throw new RuntimeException("NYI glProgramBinary");
   }
 
-
   @Override
   public void glShaderBinary(int n, int[] shaders, int offset, int binaryformat, Buffer binary,
                              int length) {

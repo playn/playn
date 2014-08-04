@@ -273,7 +273,6 @@ public class AutoClientBundleGenerator extends Generator {
     return resourceList;
   }
 
-
   private Class<? extends ResourcePrototype> getResourcePrototype(String contentType) {
     Class<? extends ResourcePrototype> returnType;
     if (contentType.startsWith("image/")) {
