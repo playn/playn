@@ -141,6 +141,14 @@ public class IOSPlatform extends AbstractPlatform {
      * is only used if PlayN is integrated into a larger iOS application and does not control the
      * application lifecycle. */
     public double timeForTermination = 0.5;
+
+    /** Indicates that PlayN is to be embedded in a larger iOS app. This disables the default
+      * lifecycle listeners. The main app must call {@link IOSPlatform#activate} when the view
+      * containing the PlayN app is about to be shown, and {@link IOSPlatform#terminate} when the
+      * view goes away. Note that while PlayN is activated, it will automatically listen for and
+      * handle background and foreground notifications, so those need not be performed manually.
+      */
+    public boolean embedded = false;
   }
 
   /**
@@ -239,6 +247,23 @@ public class IOSPlatform extends AbstractPlatform {
     dispatchOrientationChange(currentOrientation);
   }
 
+  /** Manually activates the PlayN platform. This is for use by applications which are embedding
+    * PlayN into a larger iOS app. {@link Config#embedded} must also be true in that case. */
+  public void activate () {
+    if (!config.embedded) throw new IllegalStateException(
+      "Config.embedded must be true to enable manual lifecycle control");
+    registerLifecycleObservers();
+    didBecomeActive();
+  }
+
+  /** Manually terminates the PlayN platform. This is for use by applications which are embedding
+    * PlayN into a larger iOS app. {@link Config#embedded} must also be true in that case. */
+  public void terminate () {
+    if (!config.embedded) throw new IllegalStateException(
+      "Config.embedded must be true to enable manual lifecycle control");
+    willTerminate();
+  }
+
   protected IOSPlatform(UIApplication app, UIWindow window, Config config) {
     super(new IOSLog());
     this.app = app;
@@ -269,18 +294,8 @@ public class IOSPlatform extends AbstractPlatform {
     rootViewController = new IOSRootViewController(this, gameView);
     mainWindow.set_RootViewController(rootViewController);
 
-    // observe lifecycle events (we deviate from "standard code style" here to make it easier to
-    // ignore the repeated boilerplate and see the actual important bits)
-    observeLifecycle(UIApplication.get_DidBecomeActiveNotification(),
-                     new Runnable() { public void run () { didBecomeActive(); }});
-    observeLifecycle(UIApplication.get_WillEnterForegroundNotification(),
-                     new Runnable() { public void run () { willEnterForeground(); }});
-    observeLifecycle(UIApplication.get_WillResignActiveNotification(),
-                     new Runnable() { public void run () { willResignActive(); }});
-    observeLifecycle(UIApplication.get_DidEnterBackgroundNotification(),
-                     new Runnable() { public void run () { didEnterBackground(); }});
-    observeLifecycle(UIApplication.get_WillTerminateNotification(),
-                     new Runnable() { public void run () { willTerminate(); }});
+    // if we're not in embedded mode, register our lifecycle observers
+    if (!config.embedded) registerLifecycleObservers();
 
     // use the status bar orientation during startup. The device orientation will not be known
     // for some time and most games will want to show a "right side up" loading screen, i.e.
@@ -491,6 +506,20 @@ public class IOSPlatform extends AbstractPlatform {
     }));
   }
 
+  private void registerLifecycleObservers() {
+    // observe lifecycle events (we deviate from "standard code style" here to make it easier to
+    // ignore the repeated boilerplate and see the actual important bits)
+    observeLifecycle(UIApplication.get_DidBecomeActiveNotification(),
+                     new Runnable() { public void run () { didBecomeActive(); }});
+    observeLifecycle(UIApplication.get_WillEnterForegroundNotification(),
+                     new Runnable() { public void run () { willEnterForeground(); }});
+    observeLifecycle(UIApplication.get_WillResignActiveNotification(),
+                     new Runnable() { public void run () { willResignActive(); }});
+    observeLifecycle(UIApplication.get_DidEnterBackgroundNotification(),
+                     new Runnable() { public void run () { didEnterBackground(); }});
+    observeLifecycle(UIApplication.get_WillTerminateNotification(),
+                     new Runnable() { public void run () { willTerminate(); }});
+  }
   private void observeLifecycle (NSString event, final Runnable action) {
     // avert your eyes from this horrible abomination; I'm not even going to try to wrap the code
     // in any sort of sensible way
