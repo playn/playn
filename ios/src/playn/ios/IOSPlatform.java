@@ -248,7 +248,7 @@ public class IOSPlatform extends AbstractPlatform {
 
   /** Manually activates the PlayN platform. This is for use by applications which are embedding
     * PlayN into a larger iOS app. {@link Config#embedded} must also be true in that case. */
-  public void activate () {
+  public void activate() {
     if (!config.embedded) throw new IllegalStateException(
       "Config.embedded must be true to enable manual lifecycle control");
     registerLifecycleObservers();
@@ -257,7 +257,7 @@ public class IOSPlatform extends AbstractPlatform {
 
   /** Manually terminates the PlayN platform. This is for use by applications which are embedding
     * PlayN into a larger iOS app. {@link Config#embedded} must also be true in that case. */
-  public void terminate () {
+  public void terminate() {
     if (!config.embedded) throw new IllegalStateException(
       "Config.embedded must be true to enable manual lifecycle control");
     willTerminate();
