@@ -83,6 +83,9 @@ public class JavaPlatform extends AbstractPlatform {
     /** If supported by the backend and platform, configures the application's name and initial
      * window title. Currently only supported for SWT backend. */
     public String appName = "Game";
+
+    /** Stop processing frames while the app is "inactive", to better emulate iOS. */
+    public boolean truePause;
   }
 
   /**
@@ -300,7 +303,9 @@ public class JavaPlatform extends AbstractPlatform {
           onResume();
         wasActive = newActive;
       }
-      processFrame(game);
+      // Process frame, if we don't need to provide true pausing
+      if (newActive || !config.truePause)
+        processFrame(game);
       Display.update();
       // Sleep until it's time for the next frame.
       Display.sync(60);
