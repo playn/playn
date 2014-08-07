@@ -68,7 +68,7 @@ public class JavaNet extends NetImpl {
             int code = conn.getResponseCode();
 
             InputStream stream = code >= 400 ? conn.getErrorStream() : conn.getInputStream();
-            byte[] payload = stream == null ? null : ByteStreams.toByteArray(stream);
+            byte[] payload = stream == null ? new byte[0] : ByteStreams.toByteArray(stream);
 
             String encoding = conn.getContentEncoding();
             if (encoding == null) encoding = UTF8;
