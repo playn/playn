@@ -70,6 +70,9 @@ class AndroidNet extends NetImpl {
               httppost.setEntity(new ByteArrayEntity(req.payloadBytes));
             }
             hreq = httppost;
+
+            // override the content type
+            hreq.addHeader(HTTP.CONTENT_TYPE, req.contentType());
           } else {
             hreq = new HttpGet(req.url);
           }
