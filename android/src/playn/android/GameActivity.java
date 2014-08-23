@@ -62,7 +62,7 @@ public abstract class GameActivity extends Activity {
     AndroidGL20 gl20 = (isHoneycombOrLater() || !AndroidGL20Native.available) ?
       new AndroidGL20() :      // uses platform methods for everything
       new AndroidGL20Native(); // uses our own native bindings for some missing methods
-    this.platform = new AndroidPlatform(this, gl20);
+    this.platform = createPlatform(gl20);
     this.gameView = new GameViewGL(appctx, platform, gl20);
     this.keyHandler = new KeyEventHandler(platform);
     PlayN.setPlatform(platform);
@@ -225,6 +225,14 @@ public abstract class GameActivity extends Activity {
 
   boolean isHoneycombOrLater() {
     return android.os.Build.VERSION.SDK_INT >= 11;
+  }
+  
+  /**
+   * Returns a new AndroidPlatform. This method is protected to provide subclasses a chance to
+   * adjust the platform. 
+   */
+  protected AndroidPlatform createPlatform (AndroidGL20 gl) {
+    return new AndroidPlatform(this, gl);
   }
 
   protected AndroidPlatform platform() {

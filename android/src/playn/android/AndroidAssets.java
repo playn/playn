@@ -71,7 +71,7 @@ public class AndroidAssets extends AbstractAssets<Bitmap> {
     public void adjustOptions(String path, BitmapOptions options) {} // noop!
   };
 
-  AndroidAssets(AndroidPlatform platform) {
+  public AndroidAssets(AndroidPlatform platform) {
     super(platform);
     this.platform = platform;
     this.assetMgr = platform.activity.getResources().getAssets();
@@ -237,13 +237,13 @@ public class AndroidAssets extends AbstractAssets<Bitmap> {
     return Typeface.createFromAsset(assetMgr, normalizePath(pathPrefix + path));
   }
 
-  AssetFileDescriptor openAssetFd(String path) throws IOException {
+  protected AssetFileDescriptor openAssetFd(String path) throws IOException {
     String fullPath = normalizePath(pathPrefix + path);
     return (expansionFile == null) ? assetMgr.openFd(fullPath) :
       expansionFile.getAssetFileDescriptor(fullPath);
   }
 
-  private Scale assetScale () {
+  protected Scale assetScale () {
     return (assetScale != null) ? assetScale : platform.graphics().ctx.scale;
   }
 
@@ -251,7 +251,7 @@ public class AndroidAssets extends AbstractAssets<Bitmap> {
    * Attempts to open the asset with the given name, throwing an {@link IOException} in case of
    * failure.
    */
-  private InputStream openAsset(String path) throws IOException {
+  protected InputStream openAsset(String path) throws IOException {
     String fullPath = normalizePath(pathPrefix + path);
     InputStream is = (expansionFile == null) ?
       assetMgr.open(fullPath, AssetManager.ACCESS_STREAMING) :
@@ -261,7 +261,7 @@ public class AndroidAssets extends AbstractAssets<Bitmap> {
     return is;
   }
 
-  private BitmapOptions createOptions(String path, boolean purgeable, Scale scale) {
+  protected BitmapOptions createOptions(String path, boolean purgeable, Scale scale) {
     BitmapOptions options = new BitmapOptions();
     options.inScaled = false; // don't scale bitmaps based on device parameters
     options.inDither = true;
@@ -276,7 +276,7 @@ public class AndroidAssets extends AbstractAssets<Bitmap> {
 
   // Taken from
   // http://android-developers.blogspot.com/2010/07/multithreading-for-performance.html
-  private Bitmap downloadBitmap(String url, BitmapOptions options) throws Exception {
+  protected Bitmap downloadBitmap(String url, BitmapOptions options) throws Exception {
     AndroidHttpClient client = AndroidHttpClient.newInstance("Android");
     HttpGet getRequest = new HttpGet(url);
 
