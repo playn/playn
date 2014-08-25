@@ -36,17 +36,16 @@ import playn.core.Storage;
 
 public class IOSStorage implements Storage {
 
-  private static final String STORAGE_FILE_NAME = "playn.db";
   private static final String STORAGE_SCHEMA =
     "CREATE TABLE Data (DataKey ntext PRIMARY KEY, DataValue ntext NOT NULL)";
 
   private SqliteConnection conn;
 
-  public IOSStorage() {
+  public IOSStorage(String storageFileName) {
     String dbDir = null;
     try {
       dbDir = Environment.GetFolderPath(SpecialFolder.wrap(SpecialFolder.Personal));
-      String db = Path.Combine(dbDir, STORAGE_FILE_NAME);
+      String db = Path.Combine(dbDir, storageFileName);
       boolean needCreate = !File.Exists(db);
       if (needCreate)
         SqliteConnection.CreateFile(db);

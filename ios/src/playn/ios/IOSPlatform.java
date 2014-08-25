@@ -38,7 +38,6 @@ import cli.MonoTouch.UIKit.UIScreen;
 import cli.MonoTouch.UIKit.UIView;
 import cli.MonoTouch.UIKit.UIViewController;
 import cli.MonoTouch.UIKit.UIWindow;
-import cli.System.Action;
 import cli.System.Drawing.RectangleF;
 import cli.System.Threading.ThreadPool;
 import cli.System.Threading.WaitCallback;
@@ -148,6 +147,11 @@ public class IOSPlatform extends AbstractPlatform {
       * handle background and foreground notifications, so those need not be performed manually.
       */
     public boolean embedded = false;
+    
+    
+    /** Dictates the name of the temporary file used by {@link IOSStorage}. Configure this if you
+     * want to embed multiple games into your application*/
+    public String storageFileName = "playn.db";
   }
 
   /**
@@ -286,7 +290,7 @@ public class IOSPlatform extends AbstractPlatform {
     pointer = new IOSPointer(graphics);
     touch = new IOSTouch(graphics);
     assets = new IOSAssets(this);
-    storage = new IOSStorage();
+    storage = new IOSStorage(config.storageFileName);
 
     mainWindow = (window == null) ? new UIWindow(bounds) : window;
     gameView = new IOSGameView(this, bounds, deviceScale);
