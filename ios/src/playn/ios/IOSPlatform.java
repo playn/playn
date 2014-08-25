@@ -141,14 +141,13 @@ public class IOSPlatform extends AbstractPlatform {
     public double timeForTermination = 0.5;
 
     /** Indicates that PlayN is to be embedded in a larger iOS app. This disables the default
-      * lifecycle listeners. The main app must call {@link IOSPlatform#activate} when the view
-      * containing the PlayN app is about to be shown, and {@link IOSPlatform#terminate} when the
-      * view goes away. Note that while PlayN is activated, it will automatically listen for and
-      * handle background and foreground notifications, so those need not be performed manually.
-      */
+     * lifecycle listeners. The main app must call {@link IOSPlatform#activate} when the view
+     * containing the PlayN app is about to be shown, and {@link IOSPlatform#terminate} when the
+     * view goes away. Note that while PlayN is activated, it will automatically listen for and
+     * handle background and foreground notifications, so those need not be performed manually.
+     */
     public boolean embedded = false;
-    
-    
+
     /** Dictates the name of the temporary file used by {@link IOSStorage}. Configure this if you
      * want to embed multiple games into your application*/
     public String storageFileName = "playn.db";
