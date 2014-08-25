@@ -124,8 +124,7 @@ public class IOSPlatform extends AbstractPlatform {
     /** If true, calls to CanvasImage.draw() on a retina device using a non-retina image as the
      * source will use the default interpolation defined for CGBitmapContext. This will potentially
      * make scaled non-retina images look better, but has performance and pixel accuracy
-     * implications.
-     */
+     * implications. */
     public boolean interpolateCanvasDrawing = true;
 
     /** The number of audio channels to reserve for OpenAL. This dictates the number of
@@ -144,12 +143,11 @@ public class IOSPlatform extends AbstractPlatform {
      * lifecycle listeners. The main app must call {@link IOSPlatform#activate} when the view
      * containing the PlayN app is about to be shown, and {@link IOSPlatform#terminate} when the
      * view goes away. Note that while PlayN is activated, it will automatically listen for and
-     * handle background and foreground notifications, so those need not be performed manually.
-     */
+     * handle background and foreground notifications, so those need not be performed manually. */
     public boolean embedded = false;
 
     /** Dictates the name of the temporary file used by {@link IOSStorage}. Configure this if you
-     * want to embed multiple games into your application*/
+     * want to embed multiple games into your application. */
     public String storageFileName = "playn.db";
   }
 
