@@ -17,7 +17,7 @@ package playn.android;
 
 import playn.core.AbstractSound;
 
-abstract class AndroidSound<I> extends AbstractSound<I> {
+public abstract class AndroidSound<I> extends AbstractSound<I> {
 
   abstract void onPause();
 

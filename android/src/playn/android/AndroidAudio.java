@@ -33,7 +33,7 @@ import playn.core.AudioImpl;
 
 public class AndroidAudio extends AudioImpl {
 
-  interface Resolver<I> {
+  protected interface Resolver<I> {
     void resolve(AndroidSound<I> sound);
   }
 
