@@ -34,7 +34,8 @@ public class AndroidPlatform extends AbstractPlatform {
 
   Game game;
   GameActivity activity;
-  private boolean paused;
+  private enum State { RUNNING, PAUSED, EXITED };
+  private State state = State.RUNNING;
 
   private final AndroidAssets assets;
   private final AndroidAudio audio;
@@ -68,14 +69,24 @@ public class AndroidPlatform extends AbstractPlatform {
 
   @Override
   public void invokeLater(Runnable runnable) {
-    // if we're paused, we need to run these on the main app thread instead of queueing them up for
-    // processing on the run queue, because the run queue isn't processed while we're paused; the
-    // main thread will ensure they're run serially, but also that they don't linger until the next
-    // time the app is resumed (if that happens at all)
-    if (paused)
-      activity.runOnUiThread(runnable);
-    else
+    switch (state) {
+    default:
+    case RUNNING:
       super.invokeLater(runnable);
+      break;
+    case PAUSED:
+      // if we're paused, we need to run these on the main app thread instead of queueing them up
+      // for processing on the run queue, because the run queue isn't processed while we're paused;
+      // the main thread will ensure they're run serially, but also that they don't linger until the
+      // next time the app is resumed (if that happens at all)
+      activity.runOnUiThread(runnable);
+      break;
+    case EXITED:
+      // if our activity has already exited, we have to drop this runnable, because we don't want to
+      // conflict with another instance of our activity which may have already started up
+      // (especially not its GL thread)
+      break;
+    }
   }
 
   @Override
@@ -184,24 +195,21 @@ public class AndroidPlatform extends AbstractPlatform {
     return Type.ANDROID;
   }
 
-  // allow these to be called by GameActivity
+  // note: these are called by GameActivity
   @Override
   protected void onPause() {
     super.onPause();
-    paused = true;
+    state = State.PAUSED;
   }
   @Override
   protected void onResume() {
     super.onResume();
-    paused = false;
-  }
-
-  boolean paused() {
-    return paused;
+    state = State.RUNNING;
   }
   @Override
   protected void onExit() {
     super.onExit();
+    state = State.EXITED;
   }
 
   void update() {
