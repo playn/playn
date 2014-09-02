@@ -71,22 +71,15 @@ public class SharedLibraryExtractor {
 
       // if file doesn't exist or the CRC doesn't match, extract it to the temp dir
       if (extractedCrc == null || !extractedCrc.equals(sourceCrc)) {
-        try {
-          InputStream input = readFile(sourcePath);
-          extractedDir.mkdirs();
-          FileOutputStream output = new FileOutputStream(extractedFile);
-          byte[] buffer = new byte[4096];
-          while (true) {
-            int length = input.read(buffer);
-            if (length == -1) break;
-            output.write(buffer, 0, length);
-          }
-          input.close();
-          output.close();
-        } catch (IOException ex) {
-          throw new RuntimeException("Error extracting file: " + sourcePath, ex);
+        extractedDir.mkdirs();
+        copyTo(sourcePath, extractedFile);
+        // a hack to cope with Mac OS Java dropping support for .jnilib files
+        if (sourcePath.endsWith(".jnilib")) {
+          String hackPath = sourcePath.replaceAll(".jnilib", ".dylib");
+          copyTo(sourcePath, new File(extractedDir, new File(hackPath).getName()));
         }
       }
+
       return extractedFile;
     }
     throw new FileNotFoundException("Unable to find shared lib for '" + libraryName + "'");
@@ -127,5 +120,22 @@ public class SharedLibraryExtractor {
     if (input == null)
       throw new FileNotFoundException("Unable to read file for extraction: " + path);
     return input;
+  }
+
+  private void copyTo (String sourcePath, File target) {
+    try {
+      InputStream input = readFile(sourcePath);
+      FileOutputStream output = new FileOutputStream(target);
+      byte[] buffer = new byte[4096];
+      while (true) {
+        int length = input.read(buffer);
+        if (length == -1) break;
+        output.write(buffer, 0, length);
+      }
+      input.close();
+      output.close();
+    } catch (IOException ex) {
+      throw new RuntimeException("Error extracting file: " + sourcePath, ex);
+    }
   }
 }
