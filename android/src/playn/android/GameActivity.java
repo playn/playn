@@ -74,12 +74,8 @@ public abstract class GameActivity extends Activity {
     // Create our layout and configure the window.
     setContentView(gameView);
 
-    // Default to landscape orientation.
-    if (usePortraitOrientation()) {
-      setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-    } else {
-      setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-    }
+    // Set the preferred orientation.
+    setRequestedOrientation(orientation());
 
     // Make sure the AndroidManifest.xml is set up correctly.
     try {
@@ -177,6 +173,16 @@ public abstract class GameActivity extends Activity {
    */
   protected boolean usePortraitOrientation() {
     return false;
+  }
+  
+  /**
+   * Returns the orientation. Defaults to {@code ActivityInfo.SCREEN_ORIENTATION_PORTRAIT} or
+   * {@code ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE} based off the response from
+   * {@link #usePortraitOrientation()}.
+   */
+  protected int orientation() {
+    return usePortraitOrientation() ? ActivityInfo.SCREEN_ORIENTATION_PORTRAIT :
+      ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE;
   }
 
   /**
