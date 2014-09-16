@@ -106,7 +106,7 @@ public class IOSAssets extends AbstractAssets<UIImage> {
 
   @Override
   public String getTextSync(String path) throws Exception {
-    String fullPath = Path.Combine(pathPrefix, path);
+    String fullPath = resolvePath(path);
     // platform.log().debug("Loading text " + fullPath);
     StreamReader reader = null;
     try {
@@ -121,7 +121,7 @@ public class IOSAssets extends AbstractAssets<UIImage> {
 
   @Override
   public byte[] getBytesSync(String path) throws Exception {
-    String fullPath = Path.Combine(pathPrefix, path);
+    String fullPath = resolvePath(path);
     // platform.log().debug("Loading bytes " + fullPath);
     BinaryReader reader = null;
     try {
@@ -149,31 +149,36 @@ public class IOSAssets extends AbstractAssets<UIImage> {
   @Override
   protected Image loadImage(String path, ImageReceiver<UIImage> recv) {
     Throwable error = null;
-    String fullPath = Path.Combine(pathPrefix, path);
-    for (Scale.ScaledResource rsrc : platform.graphics().ctx().scale.getScaledResources(fullPath)) {
-      if (!File.Exists(rsrc.path)) continue;
+    for (Scale.ScaledResource rsrc : platform.graphics().ctx().scale.getScaledResources(path)) {
+      String fullPath = resolvePath(rsrc.path);
+      if (!File.Exists(fullPath)) continue;
 
-      // platform.log().debug("Loading image: " + rsrc.path);
-      UIImage img = UIImage.FromFile(rsrc.path);
+      // platform.log().debug("Loading image: " + fullPath);
+      UIImage img = UIImage.FromFile(fullPath);
       if (img != null) return recv.imageLoaded(img, rsrc.scale);
 
       // note this error if this is the lowest resolution image, but fall back to lower resolution
       // images if not; in the Java backend we'd fail here, but this is a production backend, so we
       // want to try to make things work
-      platform.log().warn("Failed to load image '" + rsrc.path + "'.");
-      error = new Exception("Failed to load " + rsrc.path);
+      platform.log().warn("Failed to load image '" + fullPath + "'.");
+      error = new Exception("Failed to load " + fullPath);
     }
     if (error == null) {
+      String fullPath = resolvePath(path);
       platform.log().warn("Missing image '" + fullPath + "'.");
       error = new FileNotFoundException(fullPath);
     }
     return recv.loadFailed(error);
   }
 
+  protected String resolvePath (String path) {
+    return Path.Combine(pathPrefix, path);
+  }
+
   private Sound createSound(String path, boolean isMusic) {
     // look for .caf (uncompressed), .aifc (compressed, but fast), then .mp3
     for (String encpath : new String[] { path + ".caf", path + ".aifc", path + ".mp3" }) {
-      String fullPath = Path.Combine(pathPrefix, encpath);
+      String fullPath = resolvePath(encpath);
       if (!File.Exists(fullPath)) continue;
       return platform.audio().createSound(fullPath, isMusic);
     }
