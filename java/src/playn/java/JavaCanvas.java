@@ -61,6 +61,7 @@ class JavaCanvas extends AbstractCanvasGL<Graphics2D> {
 
   @Override
   public Canvas clear() {
+    currentState().prepareClear(gfx);
     gfx.clearRect(0, 0, MathUtil.iceil(width), MathUtil.iceil(height));
     isDirty = true;
     return this;
@@ -68,6 +69,7 @@ class JavaCanvas extends AbstractCanvasGL<Graphics2D> {
 
   @Override
   public Canvas clearRect(float x, float y, float width, float height) {
+    currentState().prepareClear(gfx);
     gfx.clearRect(MathUtil.ifloor(x), MathUtil.ifloor(y),
                   MathUtil.iceil(width), MathUtil.iceil(height));
     isDirty = true;

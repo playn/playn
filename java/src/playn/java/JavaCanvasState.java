@@ -82,6 +82,11 @@ class JavaCanvasState {
   }
 
   // TODO: optimize this so we're not setting this stuff all the time.
+  void prepareClear(Graphics2D gfx) {
+    clipper.setClip(gfx);
+  }
+
+  // TODO: optimize this so we're not setting this stuff all the time.
   void prepareStroke(Graphics2D gfx) {
     gfx.setStroke(new BasicStroke(strokeWidth, convertLineCap(), convertLineJoin(), miterLimit));
     gfx.setColor(convertColor(strokeColor));
