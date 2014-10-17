@@ -86,6 +86,7 @@ public class ClippedGroupTest extends Test {
     g1.addAt(i1, 50, 50);
     rootLayer.addAt(g1, 75, 25);
 
+    // static image inside and animated clipped width
     g2 = graphics().createGroupLayer(100, 100);
     g2.setOrigin(50, 50);
     g2.addAt(graphics().createImageLayer(img), (100 - img.width())/2, (100 - img.height())/2);
@@ -125,6 +126,13 @@ public class ClippedGroupTest extends Test {
     s1.setRotation(elapsed * FloatMath.PI/2);
     g2.setWidth(Math.round(Math.abs(100 * FloatMath.sin(elapsed))));
     inner.setOrigin(FloatMath.sin(elapsed * 2f) * 50, FloatMath.cos(elapsed * 2f) * 50);
-    g5Inner.setTranslation(-25 + 50 * FloatMath.cos(elapsed), -25 + 50 * FloatMath.sin(elapsed));
+    float cycle = elapsed / (FloatMath.PI * 2);
+    if (FloatMath.ifloor(cycle) % 2 == 0) {
+      // go in a circle without going out of bounds
+      g5Inner.setTranslation(-25 + 50 * FloatMath.cos(elapsed), -25 + 50 * FloatMath.sin(elapsed));
+    } else {
+      // go out of bounds on right and left
+      g5Inner.setTranslation(25 + 250 * FloatMath.cos(elapsed + FloatMath.PI/2), -25);
+    }
   }
 }
