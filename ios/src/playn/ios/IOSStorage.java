@@ -48,8 +48,8 @@ public class IOSStorage implements Storage {
     String dbDir = null;
     try {
       dbDir = NSFileManager.get_DefaultManager().GetUrls(
-    			NSSearchPathDirectory.wrap(NSSearchPathDirectory.DocumentDirectory),
-    			NSSearchPathDomain.wrap(NSSearchPathDomain.User))[0].get_Path();
+        NSSearchPathDirectory.wrap(NSSearchPathDirectory.DocumentDirectory),
+        NSSearchPathDomain.wrap(NSSearchPathDomain.User))[0].get_Path();
       String db = Path.Combine(dbDir, storageFileName);
       boolean needCreate = !File.Exists(db);
       if (needCreate)
