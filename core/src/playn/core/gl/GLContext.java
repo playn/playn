@@ -196,8 +196,9 @@ public abstract class GLContext {
 
   /** Starts a series of drawing commands that are clipped to the specified rectangle (in view
    * coordinates, not OpenGL coordinates). Thus must be followed by a call to {@link #endClipped}
-   * when the clipped drawing commands are done. */
-  public abstract void startClipped(int x, int y, int width, int height);
+   * when the clipped drawing commands are done.
+   * @return whether the resulting clip rectangle is not empty */
+  public abstract boolean startClipped(int x, int y, int width, int height);
 
   /** Ends a series of drawing commands that were clipped per a call to {@link #startClipped}. */
   public abstract void endClipped();

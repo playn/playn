@@ -201,7 +201,7 @@ public class IOSGLContext extends GLContext {
   }
 
   @Override
-  public void startClipped(int x, int y, int width, int height) {
+  public boolean startClipped(int x, int y, int width, int height) {
     flush(); // flush any pending unclipped calls
     Rectangle r;
     switch (orient) {
@@ -222,6 +222,7 @@ public class IOSGLContext extends GLContext {
     GL.Scissor(r.x, r.y, r.width, r.height);
     checkGLError("GL.Scissor");
     if (getScissorDepth() == 1) GL.Enable(EnableCap.wrap(EnableCap.ScissorTest));
+    return !r.isEmpty();
   }
 
   @Override

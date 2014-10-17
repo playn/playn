@@ -186,11 +186,12 @@ public class GL20Context extends GLContext {
   }
 
   @Override
-  public void startClipped(int x, int y, int width, int height) {
+  public boolean startClipped(int x, int y, int width, int height) {
     flush(); // flush any pending unclipped calls
     Rectangle r = pushScissorState(x, curFbufHeight - y - height, width, height);
     gl.glScissor(r.x, r.y, r.width, r.height);
     if (getScissorDepth() == 1) gl.glEnable(GL_SCISSOR_TEST);
+    return !r.isEmpty();
   }
 
   @Override

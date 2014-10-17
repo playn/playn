@@ -80,10 +80,12 @@ public class GroupLayerGL extends LayerGL implements GroupLayer, ParentLayer {
       xform.transform(pos.set(-originX, -originY), pos);
       xform.transform(size.set(width, height), size);
       xform.translate(-originX, -originY);
-      ctx.startClipped((int) pos.x, (int) pos.y,
+      boolean nonEmpty = ctx.startClipped((int) pos.x, (int) pos.y,
                        Math.round(Math.abs(size.x)), Math.round(Math.abs(size.y)));
       try {
-        super.render(xform, curTint, shader);
+        if (nonEmpty) {
+          super.render(xform, curTint, shader);
+        }
       } finally {
         ctx.endClipped();
       }
