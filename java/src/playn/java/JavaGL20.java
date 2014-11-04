@@ -36,6 +36,7 @@ import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
 import org.lwjgl.opengl.GL41;
+import playn.core.gl.AbstractGL20;
 
 /**
  * An implementation of the {@link GL20} interface based on Jogl. Note that Jogl
@@ -46,71 +47,14 @@ import org.lwjgl.opengl.GL41;
  *
  * @author mzechner
  */
-final class JavaGL20 implements playn.core.gl.GL20 {
+final class JavaGL20 extends AbstractGL20 {
 
-  // Sizes based on LWJGL's APIUtil
-  private IntBuffer intBuffer = BufferUtils.createIntBuffer(32);
-  private FloatBuffer floatBuffer = BufferUtils.createFloatBuffer(32);
-  private ByteBuffer byteBuffer = BufferUtils.createByteBuffer(256);
-
-  private void setIntBuffer(final int[] source, final int offset, final int length) {
-    resizeIntBuffer(length);
-    intBuffer.put(source, offset, length);
-    intBuffer.rewind();
-  }
-
-  private void setFloatBuffer(final float[] source, final int offset, final int length) {
-    resizeFloatBuffer(length);
-    floatBuffer.put(source, offset, length);
-    floatBuffer.rewind();
-  }
-
-  private void setByteBuffer(final byte[] source, final int offset, final int length) {
-    resizeByteBuffer(length);
-    byteBuffer.put(source, offset, length);
-    byteBuffer.rewind();
-  }
-
-  private void resizeByteBuffer(final int length) {
-    final int cap = byteBuffer.capacity();
-    if (cap < length) {
-      int newLength = cap << 1;
-      while (newLength < length) {
-        newLength <<= 1;
+  public JavaGL20() {
+    super(new Buffers() {
+      public ByteBuffer createByteBuffer(int size) {
+        return BufferUtils.createByteBuffer(size);
       }
-      byteBuffer = BufferUtils.createByteBuffer(newLength);
-    } else {
-      byteBuffer.position(0);
-    }
-    byteBuffer.limit(length);
-  }
-
-  private void resizeIntBuffer(final int length) {
-    final int cap = intBuffer.capacity();
-    if (cap < length) {
-      int newLength = cap << 1;
-      while (newLength < length) {
-        newLength <<= 1;
-      }
-      intBuffer = BufferUtils.createIntBuffer(newLength);
-    } else {
-      intBuffer.position(0);
-    }
-    intBuffer.limit(length);
-  }
-
-  private void resizeFloatBuffer(final int length) {
-    final int cap = floatBuffer.capacity();
-    if (cap < length) {
-      int newLength = cap << 1;
-      while (newLength < length) {
-        newLength <<= 1;
-      }
-      floatBuffer = BufferUtils.createFloatBuffer(newLength);
-    } else {
-      floatBuffer.position(0);
-    }
-    floatBuffer.limit(length);
+    });
   }
 
   public void glActiveTexture(int texture) {
@@ -1101,30 +1045,6 @@ final class JavaGL20 implements playn.core.gl.GL20 {
   }
 
   @Override
-  public void glDeleteBuffers(int n, int[] buffers, int offset) {
-    setIntBuffer(buffers, offset, n);
-    GL15.glDeleteBuffers(intBuffer);
-  }
-
-  @Override
-  public void glDeleteFramebuffers(int n, int[] framebuffers, int offset) {
-    setIntBuffer(framebuffers, offset, n);
-    EXTFramebufferObject.glDeleteFramebuffersEXT(intBuffer);
-  }
-
-  @Override
-  public void glDeleteRenderbuffers(int n, int[] renderbuffers, int offset) {
-    setIntBuffer(renderbuffers, offset, n);
-    EXTFramebufferObject.glDeleteRenderbuffersEXT(intBuffer);
-  }
-
-  @Override
-  public void glDeleteTextures(int n, int[] textures, int offset) {
-    setIntBuffer(textures, offset, n);
-    GL11.glDeleteTextures(intBuffer);
-  }
-
-  @Override
   public void glDepthRange(double zNear, double zFar) {
     GL11.glDepthRange(zNear, zFar);
   }
@@ -1136,56 +1056,28 @@ final class JavaGL20 implements playn.core.gl.GL20 {
   }
 
   @Override
-  public void glGenBuffers(int n, int[] buffers, int offset) {
-    resizeIntBuffer(n);
-    GL15.glGenBuffers(intBuffer);
-    intBuffer.get(buffers, offset, n);
-  }
-
-  @Override
-  public void glGenFramebuffers(int n, int[] framebuffers, int offset) {
-    resizeIntBuffer(n);
-    EXTFramebufferObject.glGenFramebuffersEXT(intBuffer);
-    intBuffer.get(framebuffers, offset, n);
-  }
-
-  @Override
-  public void glGenRenderbuffers(int n, int[] renderbuffers, int offset) {
-    resizeIntBuffer(n);
-    EXTFramebufferObject.glGenRenderbuffersEXT(intBuffer);
-    intBuffer.get(renderbuffers, offset, n);
-  }
-
-  @Override
-  public void glGenTextures(int n, int[] textures, int offset) {
-    resizeIntBuffer(n);
-    GL11.glGenTextures(intBuffer);
-    intBuffer.get(textures, offset, n);
-  }
-
-  @Override
   public void glGetActiveAttrib(int program, int index, int bufsize, int[] length, int lengthOffset,
                                 int[] size, int sizeOffset, int[] type, int typeOffset,
                                 byte[] name, int nameOffset) {
     // http://www.khronos.org/opengles/sdk/docs/man/xhtml/glGetActiveAttrib.xml
     // Returns length, size, type, name
-    resizeIntBuffer(2);
+    bufs.resizeIntBuffer(2);
 
     // Return name, length
-    final String nameString = GL20.glGetActiveAttrib(program, index, bufsize, intBuffer);
+    final String nameString = GL20.glGetActiveAttrib(program, index, bufsize, bufs.intBuffer);
     try {
       final byte[] nameBytes = nameString.getBytes("UTF-8");
       final int nameLength = nameBytes.length - nameOffset;
-      setByteBuffer(nameBytes, nameOffset, nameLength);
-      byteBuffer.get(name, nameOffset, nameLength);
+      bufs.setByteBuffer(nameBytes, nameOffset, nameLength);
+      bufs.byteBuffer.get(name, nameOffset, nameLength);
       length[lengthOffset] = nameLength;
     } catch (UnsupportedEncodingException e) {
       e.printStackTrace();
     }
 
     // Return size, type
-    intBuffer.get(size, 0, 1);
-    intBuffer.get(type, 0, 1);
+    bufs.intBuffer.get(size, 0, 1);
+    bufs.intBuffer.get(type, 0, 1);
   }
 
   @Override
@@ -1201,23 +1093,23 @@ final class JavaGL20 implements playn.core.gl.GL20 {
   public void glGetActiveUniform(int program, int index, int bufsize,
                                  int[] length, int lengthOffset, int[] size, int sizeOffset,
                                  int[] type, int typeOffset, byte[] name, int nameOffset) {
-    resizeIntBuffer(2);
+    bufs.resizeIntBuffer(2);
 
     // Return name, length
-    final String nameString = GL20.glGetActiveUniform(program, index, 256, intBuffer);
+    final String nameString = GL20.glGetActiveUniform(program, index, 256, bufs.intBuffer);
     try {
       final byte[] nameBytes = nameString.getBytes("UTF-8");
       final int nameLength = nameBytes.length - nameOffset;
-      setByteBuffer(nameBytes, nameOffset, nameLength);
-      byteBuffer.get(name, nameOffset, nameLength);
+      bufs.setByteBuffer(nameBytes, nameOffset, nameLength);
+      bufs.byteBuffer.get(name, nameOffset, nameLength);
       length[lengthOffset] = nameLength;
     } catch (UnsupportedEncodingException e) {
       e.printStackTrace();
     }
 
     // Return size, type
-    intBuffer.get(size, 0, 1);
-    intBuffer.get(type, 0, 1);
+    bufs.intBuffer.get(size, 0, 1);
+    bufs.intBuffer.get(type, 0, 1);
   }
 
   @Override
@@ -1227,21 +1119,6 @@ final class JavaGL20 implements playn.core.gl.GL20 {
     GL20.glGetActiveAttrib(program, index, 256, typeTmp);
     type.put(typeTmp.get(0));
     type.rewind();
-  }
-
-  @Override
-  public void glGetAttachedShaders(int program, int maxcount, int[] count, int countOffset,
-                                   int[] shaders, int shadersOffset) {
-    final int countLength = count.length - countOffset;
-    resizeIntBuffer(countLength);
-
-    final int shadersLength = shaders.length - shadersOffset;
-    final IntBuffer intBuffer2 = BufferUtils.createIntBuffer(shadersLength);
-    GL20.glGetAttachedShaders(program, intBuffer, intBuffer2);
-
-    // Return count, shaders
-    intBuffer.get(count, countOffset, countLength);
-    intBuffer2.get(shaders, shadersOffset, shadersLength);
   }
 
   @Override
@@ -1255,14 +1132,6 @@ final class JavaGL20 implements playn.core.gl.GL20 {
   }
 
   @Override
-  public void glGetBooleanv(int pname, byte[] params, int offset) {
-    final int length = params.length - offset;
-    resizeByteBuffer(length);
-    GL11.glGetBoolean(pname, byteBuffer);
-    byteBuffer.get(params, offset, length);
-  }
-
-  @Override
   public void glGetBooleanv(int pname, ByteBuffer params) {
     GL11.glGetBoolean(pname, params);
   }
@@ -1273,34 +1142,8 @@ final class JavaGL20 implements playn.core.gl.GL20 {
   }
 
   @Override
-  public void glGetBufferParameteriv(int target, int pname, int[] params, int offset) {
-    final int length = params.length - offset;
-    resizeIntBuffer(length);
-    GL15.glGetBufferParameter(target, pname, intBuffer);
-    intBuffer.get(params, offset, length);
-  }
-
-  @Override
   public float glGetFloat(int pname) {
     return GL11.glGetFloat(pname);
-  }
-
-  @Override
-  public void glGetFloatv(int pname, float[] params, int offset) {
-    final int length = params.length - offset;
-    resizeFloatBuffer(length);
-    GL11.glGetFloat(pname, floatBuffer);
-    floatBuffer.get(params, offset, length);
-  }
-
-  @Override
-  public void glGetFramebufferAttachmentParameteriv(int target, int attachment, int pname,
-                                                    int[] params, int offset) {
-    final int length = params.length - offset;
-    resizeIntBuffer(length);
-    EXTFramebufferObject.glGetFramebufferAttachmentParameterEXT(
-      target, attachment, pname, intBuffer);
-    intBuffer.get(params, offset, length);
   }
 
   @Override
@@ -1309,48 +1152,9 @@ final class JavaGL20 implements playn.core.gl.GL20 {
   }
 
   @Override
-  public void glGetIntegerv(int pname, int[] params, int offset) {
-    final int length = params.length - offset;
-    resizeIntBuffer(length);
-    GL11.glGetInteger(pname, intBuffer);
-    intBuffer.get(params, offset, length);
-  }
-
-  @Override
-  public void glGetProgramBinary(int program, int bufsize, int[] length, int lengthOffset,
-                                 int[] binaryformat, int binaryformatOffset, Buffer binary) {
-    final int lengthLength = bufsize - lengthOffset;
-    resizeIntBuffer(lengthLength);
-
-    final int binaryformatLength = bufsize - binaryformatOffset;
-    final IntBuffer intBuffer2 = BufferUtils.createIntBuffer(binaryformatLength);
-    GL41.glGetProgramBinary(program, intBuffer, intBuffer2, (ByteBuffer) binary);
-
-    // Return length, binaryformat
-    intBuffer.get(length, lengthOffset, lengthLength);
-    intBuffer2.get(binaryformat, binaryformatOffset, binaryformatLength);
-  }
-
-  @Override
   public void glGetProgramBinary(int program, int bufSize, IntBuffer length,
                                  IntBuffer binaryFormat, Buffer binary) {
     GL41.glGetProgramBinary(program, length, binaryFormat, (ByteBuffer) binary);
-  }
-
-  @Override
-  public void glGetProgramInfoLog(int program, int bufsize, int[] length, int lengthOffset,
-                                  byte[] infolog, int infologOffset) {
-    final int intLength = length.length - lengthOffset;
-    resizeIntBuffer(intLength);
-
-    final int byteLength = bufsize - infologOffset;
-    resizeByteBuffer(byteLength);
-
-    GL20.glGetProgramInfoLog(program, intBuffer, byteBuffer);
-    // length is the length of the infoLog string being returned
-    intBuffer.get(length, lengthOffset, intLength);
-    // infoLog is the char array of the infoLog
-    byteBuffer.get(infolog, byteLength, infologOffset);
   }
 
   @Override
@@ -1364,46 +1168,8 @@ final class JavaGL20 implements playn.core.gl.GL20 {
   }
 
   @Override
-  public void glGetProgramiv(int program, int pname, int[] params, int offset) {
-    final int length = params.length - offset;
-    resizeIntBuffer(length);
-    GL20.glGetProgram(program, pname, intBuffer);
-    intBuffer.get(params, offset, length);
-  }
-
-  @Override
-  public void glGetRenderbufferParameteriv(int target, int pname, int[] params, int offset) {
-    final int length = params.length - offset;
-    resizeIntBuffer(length);
-    EXTFramebufferObject.glGetRenderbufferParameterEXT(target, pname, intBuffer);
-    intBuffer.get(params, offset, length);
-  }
-
-  @Override
-  public void glGetShaderInfoLog(int shader, int bufsize, int[] length, int lengthOffset,
-                                 byte[] infolog, int infologOffset) {
-    final int intLength = length.length - lengthOffset;
-    resizeIntBuffer(intLength);
-    final int byteLength = bufsize - infologOffset;
-    resizeByteBuffer(byteLength);
-    GL20.glGetShaderInfoLog(shader, intBuffer, byteBuffer);
-    // length is the length of the infoLog string being returned
-    intBuffer.get(length, lengthOffset, intLength);
-    // infoLog is the char array of the infoLog
-    byteBuffer.get(infolog, byteLength, infologOffset);
-  }
-
-  @Override
   public void glGetShaderInfoLog(int shader, int bufsize, IntBuffer length, ByteBuffer infolog) {
     GL20.glGetShaderInfoLog(shader, length, infolog);
-  }
-
-  @Override
-  public void glGetShaderiv(int shader, int pname, int[] params, int offset) {
-    final int length = params.length - offset;
-    resizeIntBuffer(length);
-    GL20.glGetShader(shader, pname, intBuffer);
-    intBuffer.get(params, offset, length);
   }
 
   @Override
@@ -1422,54 +1188,6 @@ final class JavaGL20 implements playn.core.gl.GL20 {
   @Override
   public void glGetShaderSource(int shader, int bufsize, IntBuffer length, ByteBuffer source) {
     throw new UnsupportedOperationException("NYI");
-  }
-
-  @Override
-  public void glGetTexParameterfv(int target, int pname, float[] params, int offset) {
-    final int length = params.length - offset;
-    resizeFloatBuffer(length);
-    GL11.glGetTexParameter(target, pname, floatBuffer);
-    floatBuffer.get(params, offset, length);
-  }
-
-  @Override
-  public void glGetTexParameteriv(int target, int pname, int[] params, int offset) {
-    final int length = params.length - offset;
-    resizeIntBuffer(length);
-    GL11.glGetTexParameter(target, pname, intBuffer);
-    intBuffer.get(params, offset, length);
-  }
-
-  @Override
-  public void glGetUniformfv(int program, int location, float[] params, int offset) {
-    final int length = params.length - offset;
-    resizeFloatBuffer(length);
-    GL20.glGetUniform(program, location, floatBuffer);
-    floatBuffer.get(params, offset, length);
-  }
-
-  @Override
-  public void glGetUniformiv(int program, int location, int[] params, int offset) {
-    final int length = params.length - offset;
-    resizeIntBuffer(length);
-    GL20.glGetUniform(program, location, intBuffer);
-    intBuffer.get(params, offset, length);
-  }
-
-  @Override
-  public void glGetVertexAttribfv(int index, int pname, float[] params, int offset) {
-    final int length = params.length - offset;
-    resizeFloatBuffer(length);
-    GL20.glGetVertexAttrib(index, pname, floatBuffer);
-    floatBuffer.get(params, offset, length);
-  }
-
-  @Override
-  public void glGetVertexAttribiv(int index, int pname, int[] params, int offset) {
-    final int length = params.length - offset;
-    resizeIntBuffer(length);
-    GL20.glGetVertexAttrib(index, pname, intBuffer);
-    intBuffer.get(params, offset, length);
   }
 
   @Override
@@ -1538,20 +1256,6 @@ final class JavaGL20 implements playn.core.gl.GL20 {
   }
 
   @Override
-  public void glTexParameterfv(int target, int pname, float[] params, int offset) {
-    final int length = params.length - offset;
-    setFloatBuffer(params, offset, length);
-    GL11.glTexParameter(target, pname, floatBuffer);
-  }
-
-  @Override
-  public void glTexParameteriv(int target, int pname, int[] params, int offset) {
-    final int length = params.length - offset;
-    setIntBuffer(params, offset, length);
-    GL11.glTexParameter(target, pname, intBuffer);
-  }
-
-  @Override
   public void glTexSubImage2D(int target, int level, int xoffset, int yoffset, int width, int height, int format,
                               int type, int pixels) {
     GL11.glTexSubImage2D(target, level, xoffset, yoffset, width, height, format, type, pixels);
@@ -1576,99 +1280,8 @@ final class JavaGL20 implements playn.core.gl.GL20 {
   }
 
   @Override
-  public void glUniform1fv(int location, int count, float[] v, int offset) {
-    setFloatBuffer(v, offset, count);
-    GL20.glUniform1(location, floatBuffer);
-  }
-
-  @Override
-  public void glUniform1iv(int location, int count, int[] v, int offset) {
-    setIntBuffer(v, offset, count);
-    GL20.glUniform1(location, intBuffer);
-  }
-
-  @Override
-  public void glUniform2fv(int location, int count, float[] v, int offset) {
-    setFloatBuffer(v, offset, count);
-    GL20.glUniform2(location, floatBuffer);
-  }
-
-  @Override
-  public void glUniform2iv(int location, int count, int[] v, int offset) {
-    setIntBuffer(v, offset, count);
-    GL20.glUniform2(location, intBuffer);
-  }
-
-  @Override
-  public void glUniform3fv(int location, int count, float[] v, int offset) {
-    setFloatBuffer(v, offset, count);
-    GL20.glUniform3(location, floatBuffer);
-  }
-
-  @Override
-  public void glUniform3iv(int location, int count, int[] v, int offset) {
-    setIntBuffer(v, offset, count);
-    GL20.glUniform3(location, intBuffer);
-  }
-
-  @Override
-  public void glUniform4fv(int location, int count, float[] v, int offset) {
-    setFloatBuffer(v, offset, count);
-    GL20.glUniform4(location, floatBuffer);
-  }
-
-  @Override
-  public void glUniform4iv(int location, int count, int[] v, int offset) {
-    setIntBuffer(v, offset, count);
-    GL20.glUniform4(location, intBuffer);
-  }
-
-  @Override
-  public void glUniformMatrix2fv(int location, int count, boolean transpose,
-                                 float[] value, int offset) {
-    setFloatBuffer(value, offset, 2*2*count);
-    GL20.glUniformMatrix2(location, transpose, floatBuffer);
-  }
-
-  @Override
-  public void glUniformMatrix3fv(int location, int count, boolean transpose,
-                                 float[] value, int offset) {
-    setFloatBuffer(value, offset, 3*3*count);
-    GL20.glUniformMatrix3(location, transpose, floatBuffer);
-  }
-
-  @Override
-  public void glUniformMatrix4fv(int location, int count, boolean transpose,
-                                 float[] value, int offset) {
-    setFloatBuffer(value, offset, 4*4*count);
-    GL20.glUniformMatrix4(location, transpose, floatBuffer);
-  }
-
-  @Override
   public boolean glUnmapBuffer(int target) {
     return GL15.glUnmapBuffer(target);
-  }
-
-  @Override
-  public void glVertexAttrib1fv(int indx, float[] values, int offset) {
-    GL20.glVertexAttrib1f(indx, values[indx + offset]);
-  }
-
-  @Override
-  public void glVertexAttrib2fv(int indx, float[] values, int offset) {
-    GL20.glVertexAttrib2f(indx, values[indx + offset], values[indx + 1 + offset]);
-  }
-
-  @Override
-  public void glVertexAttrib3fv(int indx, float[] values, int offset) {
-    GL20.glVertexAttrib3f(indx, values[indx + offset], values[indx + 1 + offset],
-                          values[indx + 2 + offset]);
-  }
-
-  @Override
-  public void glVertexAttrib4fv(int indx, float[] values, int offset) {
-    GL20.glVertexAttrib4f(indx, values[indx + offset], values[indx + 1 + offset],
-                          values[indx + 2 + offset], values[indx + 3 + offset]);
   }
 
   @Override
