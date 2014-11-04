@@ -423,8 +423,8 @@ public class IOSPlatform extends AbstractPlatform {
     mainWindow.MakeKeyAndVisible();
   }
 
-  void viewDidInit(int defaultFrameBuffer) {
-    graphics.ctx.viewDidInit(defaultFrameBuffer);
+  void viewDidInit(int defaultFramebuffer) {
+    graphics.ctx.viewDidInit(defaultFramebuffer);
   }
 
   void onOrientationChange(UIDeviceOrientation orientation) {

@@ -48,7 +48,7 @@ public class IOSGLContext extends GLContext {
   private final InternalTransform rootTransform = new StockInternalTransform();
   private int orient;
   private int minFilter = All.Linear, magFilter = All.Linear;
-  private int defaultFrameBuffer = -1; // configured in init()
+  private int defaultFramebuffer = -1; // configured in init()
   private GLShader quadShader, trisShader;
 
   public IOSGLContext(IOSPlatform platform, IOSGL20 gl,
@@ -59,8 +59,8 @@ public class IOSGLContext extends GLContext {
     setSize(screenWidth, screenHeight);
   }
 
-  void viewDidInit(int defaultFrameBuffer) {
-    this.defaultFrameBuffer = defaultFrameBuffer;
+  void viewDidInit(int defaultFramebuffer) {
+    this.defaultFramebuffer = defaultFramebuffer;
     GL.Disable(EnableCap.wrap(EnableCap.CullFace));
     GL.Enable(EnableCap.wrap(EnableCap.Blend));
     GL.BlendFunc(BlendingFactorSrc.wrap(BlendingFactorSrc.One),
@@ -258,8 +258,8 @@ public class IOSGLContext extends GLContext {
   }
 
   @Override
-  protected int defaultFrameBuffer() {
-    return defaultFrameBuffer;
+  protected int defaultFramebuffer() {
+    return defaultFramebuffer;
   }
 
   @Override

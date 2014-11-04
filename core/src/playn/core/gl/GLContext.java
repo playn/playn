@@ -254,7 +254,7 @@ public abstract class GLContext {
   }
 
   public void bindFramebuffer() {
-    bindFramebuffer(defaultFrameBuffer(), defaultFbufWidth, defaultFbufHeight);
+    bindFramebuffer(defaultFramebuffer(), defaultFbufWidth, defaultFbufHeight);
   }
 
   /** Stores the metadata for the currently bound frame buffer, and binds the supplied framebuffer.
@@ -400,7 +400,7 @@ public abstract class GLContext {
   }
 
   protected void viewConfigChanged () {
-    bindFramebufferImpl(defaultFrameBuffer(), defaultFbufWidth, defaultFbufHeight);
+    bindFramebuffer();
   }
 
   /**
@@ -422,7 +422,7 @@ public abstract class GLContext {
   /**
    * Returns the default framebuffer.
    */
-  protected abstract int defaultFrameBuffer();
+  protected abstract int defaultFramebuffer();
 
   /**
    * Creates a framebuffer that will render into the supplied texture.

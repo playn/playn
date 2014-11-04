@@ -219,7 +219,7 @@ public class GL20Context extends GLContext {
   }
 
   @Override
-  protected int defaultFrameBuffer() {
+  protected int defaultFramebuffer() {
     return 0;
   }
 
