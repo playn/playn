@@ -30,10 +30,11 @@
     <module>android</module>
     <module>archetype</module>
     <module>core</module>
-    <module>jbox2d</module>
     <module>html</module>
     <module>ios</module>
     <module>java</module>
+    <module>jbox2d</module>
+    <module>robovm</module>
     <module>swt-java</module>
     <module>tests</module>
     <module>webgl</module>
@@ -48,6 +49,8 @@
     <gwt.version>2.6.1</gwt.version>
     <jbox2d.version>2.2.1.1</jbox2d.version>
     <lwjgl.version>2.9.0</lwjgl.version>
+    <robovm.version>1.0.0-alpha-04</robovm.version>
+    <robovm.maven.version>1.0.0-alpha-04</robovm.maven.version>
     <!--
       GWT log levels:
       ERROR, WARN, INFO, TRACE, DEBUG, SPAM, or ALL

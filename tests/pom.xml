@@ -35,6 +35,10 @@
       <modules><module>ios</module></modules>
     </profile>
     <profile>
+      <id>robovm</id>
+      <modules><module>robovm</module></modules>
+    </profile>
+    <profile>
       <id>html</id>
       <modules><module>html</module></modules>
     </profile>
