@@ -56,9 +56,7 @@ public class RoboGraphics extends GraphicsGL {
 
   // a scratch bitmap context used for measuring text
   private static final int S_SIZE = 10;
-  final CGBitmapContext scratchCtx = CGBitmapContext.create(
-    S_SIZE, S_SIZE, 8, 4 * S_SIZE, colorSpace,
-    new CGBitmapInfo(CGImageAlphaInfo.PremultipliedLast.value()));
+  final CGBitmapContext scratchCtx = createCGBitmap(S_SIZE, S_SIZE);
 
   final RoboGLContext ctx;
 
@@ -155,9 +153,8 @@ public class RoboGraphics extends GraphicsGL {
   }
 
   static CGBitmapContext createCGBitmap(int width, int height) {
-    return CGBitmapContext.create(
-      width, height, 8, 4 * width, colorSpace,
-      new CGBitmapInfo(CGImageAlphaInfo.PremultipliedLast.value()));
+    return CGBitmapContext.create(width, height, 8, 4 * width, colorSpace, new CGBitmapInfo(
+      CGImageAlphaInfo.PremultipliedLast.value()));
   }
 
   void setOrientation(UIDeviceOrientation orientation) {

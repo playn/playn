@@ -18,6 +18,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
+import org.robovm.apple.foundation.NSBundle;
 import org.robovm.apple.foundation.NSData;
 import org.robovm.apple.uikit.UIImage;
 
@@ -32,7 +33,8 @@ import playn.core.util.Callback;
 public class RoboAssets extends AbstractAssets<UIImage> {
 
   private final RoboPlatform platform;
-  private String pathPrefix = "";
+  private final File bundleRoot = new File(NSBundle.getMainBundle().getBundlePath());
+  private File assetRoot = bundleRoot;
 
   public RoboAssets(RoboPlatform platform) {
     super(platform);
@@ -43,7 +45,7 @@ public class RoboAssets extends AbstractAssets<UIImage> {
    * Configures the prefix prepended to asset paths before fetching them from the app directory.
    */
   public void setPathPrefix(String pathPrefix) {
-    this.pathPrefix = pathPrefix;
+    this.assetRoot = new File(bundleRoot, pathPrefix);
   }
 
   @Override
@@ -128,7 +130,7 @@ public class RoboAssets extends AbstractAssets<UIImage> {
   }
 
   protected File resolvePath (String path) {
-    return new File(new File(pathPrefix), path);
+    return new File(assetRoot, path);
   }
 
   private Sound createSound(String path, boolean isMusic) {

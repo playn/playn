@@ -237,7 +237,7 @@ public class RoboCanvas extends AbstractCanvasGL<CGBitmapContext> {
       // scale the context based on our scale factor
       maskContext.scaleCTM(ctx.scale.factor, ctx.scale.factor);
       // fill the text into this temp context in white for use as a mask
-      maskContext.setFillColor(toComponents(0xFFFFFFFF));
+      setFillColor(maskContext, 0xFFFFFFFF);
       ilayout.fill(maskContext, 0, 0);
 
       // now fill the gradient, using our temp context as a mask
@@ -295,7 +295,7 @@ public class RoboCanvas extends AbstractCanvasGL<CGBitmapContext> {
   @Override
   public Canvas setFillColor(int color) {
     currentState().gradient = null;
-    bctx.setFillColor(toComponents(color));
+    setFillColor(bctx, color);
     return this;
   }
 
@@ -334,7 +334,7 @@ public class RoboCanvas extends AbstractCanvasGL<CGBitmapContext> {
   @Override
   public Canvas setStrokeColor(int color) {
     this.strokeColor = color;
-    bctx.setStrokeColor(toComponents(color));
+    setStrokeColor(bctx, color);
     return this;
   }
 
@@ -419,7 +419,7 @@ public class RoboCanvas extends AbstractCanvasGL<CGBitmapContext> {
     return states.peek();
   }
 
-  static float[] toComponents(int color) {
+  static void setStrokeColor(CGBitmapContext bctx, int color) {
     float blue = (color & 0xFF) / 255f;
     color >>= 8;
     float green = (color & 0xFF) / 255f;
@@ -427,7 +427,18 @@ public class RoboCanvas extends AbstractCanvasGL<CGBitmapContext> {
     float red = (color & 0xFF) / 255f;
     color >>= 8;
     float alpha = (color & 0xFF) / 255f;
-    return new float[] { red, green, blue, alpha };
+    bctx.setRGBStrokeColor(red, green, blue, alpha);
+  }
+
+  static void setFillColor(CGBitmapContext bctx, int color) {
+    float blue = (color & 0xFF) / 255f;
+    color >>= 8;
+    float green = (color & 0xFF) / 255f;
+    color >>= 8;
+    float red = (color & 0xFF) / 255f;
+    color >>= 8;
+    float alpha = (color & 0xFF) / 255f;
+    bctx.setRGBFillColor(red, green, blue, alpha);
   }
 
   private static Map<Composite,CGBlendMode> compToBlend = new HashMap<Composite,CGBlendMode>();

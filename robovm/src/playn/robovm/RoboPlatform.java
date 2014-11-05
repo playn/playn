@@ -16,6 +16,8 @@ package playn.robovm;
 import java.util.ArrayList;
 import java.util.List;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import org.robovm.apple.coregraphics.CGRect;
 import org.robovm.apple.foundation.NSInvocation;
 import org.robovm.apple.foundation.NSNotificationCenter;
@@ -24,6 +26,7 @@ import org.robovm.apple.foundation.NSString;
 import org.robovm.apple.foundation.NSTimer;
 import org.robovm.apple.foundation.NSURL;
 import org.robovm.apple.glkit.GLKView;
+import org.robovm.apple.glkit.GLKViewDrawableColorFormat;
 import org.robovm.apple.opengles.EAGLContext;
 import org.robovm.apple.opengles.EAGLRenderingAPI;
 import org.robovm.apple.uikit.UIApplication;
@@ -86,6 +89,10 @@ public class RoboPlatform extends AbstractPlatform {
       * view goes away. Note that while PlayN is activated, it will automatically listen for and
       * handle background and foreground notifications, so those need not be performed manually. */
     public boolean embedded = false;
+
+    /** Configures the format of the GL framebuffer. The default is RGBA8888, but one can use
+      * RGB565 for higher performance at the cost of lower color fidelity. */
+    public GLKViewDrawableColorFormat glBufferFormat = GLKViewDrawableColorFormat.RGBA8888;
 
     /** Dictates the name of the temporary file used by {@link RoboStorage}. Configure this if you
       * want to embed multiple games into your application. */
@@ -174,6 +181,7 @@ public class RoboPlatform extends AbstractPlatform {
   private final RoboRootViewController rootViewController;
   private final long gameStart = System.nanoTime();
   private final List<NSObject> lifecycleObservers = new ArrayList<NSObject>();
+  private final ExecutorService pool = Executors.newFixedThreadPool(3);
 
   final int osVersion = getOSVersion();
   final Config config;
@@ -221,6 +229,11 @@ public class RoboPlatform extends AbstractPlatform {
     //   dorient = config.orients.defaultOrient;
     // }
     // onOrientationChange(dorient);
+  }
+
+  @Override
+  public void invokeAsync(Runnable action) {
+    pool.execute(action);
   }
 
   @Override

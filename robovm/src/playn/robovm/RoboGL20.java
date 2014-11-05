@@ -395,7 +395,7 @@ public class RoboGL20 extends AbstractGL20 {
     throw new RuntimeException("Not implemented");
   }
   public void glPixelStorei(int pname, int param) {
-    throw new RuntimeException("Not implemented");
+    OpenGLES.glPixelStorei(pname, param);
   }
   public void glPolygonOffset(float factor, float units) {
     throw new RuntimeException("Not implemented");
@@ -457,9 +457,7 @@ public class RoboGL20 extends AbstractGL20 {
     throw new RuntimeException("Not implemented");
   }
   public void glTexImage2D(int target, int level, int internalformat, int width, int height, int border, int format, int type, Buffer pixels) {
-    throw new RuntimeException("Not implemented");
-    // TODO: sort out Buffer vs. VoidPtr problem...
-    // OpenGLES.glTexImage2D(target, level, internalformat, width, height, border, format, type, pixels);
+    OpenGLES.glTexImage2D(target, level, internalformat, width, height, border, format, type, pixels);
   }
   public void glTexImage2D(int arg0, int arg1, int arg2, int arg3, int arg4, int arg5, int arg6, int arg7, int arg8) {
     throw new RuntimeException("Not implemented");

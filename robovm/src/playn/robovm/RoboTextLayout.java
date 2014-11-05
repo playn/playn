@@ -50,7 +50,6 @@ class RoboTextLayout extends AbstractTextLayout {
     final RoboFont font = (format.font == null) ? RoboGraphics.defaultFont : (RoboFont) format.font;
     NSAttributedStringAttributes attribs = createAttribs(font);
     List<CTLine> lines = wrapLines(new NSAttributedString(text, attribs), wrap.width);
-    playn.core.PlayN.log().info("Lines: " + lines);
 
     RoboTextLayout[] layouts = new RoboTextLayout[lines.size()];
     for (int ii = 0; ii < layouts.length; ii++) {
@@ -79,17 +78,20 @@ class RoboTextLayout extends AbstractTextLayout {
   }
 
   private static List<CTLine> wrapLines(NSAttributedString astring, float wrapWidth) {
-    CTFramesetter fs = CTFramesetter.create(astring);
-    try {
-      // iOS lays things out from max-y up to zero (inverted coordinate system); so we need to
-      // provide a large height for our rectangle to ensure that all lines "fit"
-      CGPath path = CGPath.createWithRect(
-        new CGRect(0, 0, wrapWidth, Float.MAX_VALUE/2), CGAffineTransform.Identity());
-      CTFrame frame = fs.createFrame(new CFRange(0, 0), path, null);
-      return frame.getLines();
-    } finally {
-      fs.dispose();
-    }
+    // CTFramesetter fs = CTFramesetter.create(astring);
+    // try {
+    //   // iOS lays things out from max-y up to zero (inverted coordinate system); so we need to
+    //   // provide a large height for our rectangle to ensure that all lines "fit"
+    //   CGPath path = CGPath.createWithRect(
+    //     new CGRect(0, 0, wrapWidth, Float.MAX_VALUE/2), CGAffineTransform.Identity());
+    //   CTFrame frame = fs.createFrame(new CFRange(0, 0), path, null);
+    //   return frame.getLines();
+    // } finally {
+    //   fs.dispose();
+    // }
+
+    // TEMP: the above crashes, so don't wrap for the moment
+    return java.util.Collections.singletonList(CTLine.create(astring));
   }
 
   private final RoboFont font;

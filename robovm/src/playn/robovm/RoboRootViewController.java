@@ -18,6 +18,9 @@ import org.robovm.apple.foundation.NSSet;
 import org.robovm.apple.glkit.GLKView;
 import org.robovm.apple.glkit.GLKViewController;
 import org.robovm.apple.glkit.GLKViewControllerDelegate;
+import org.robovm.apple.glkit.GLKViewDrawableColorFormat;
+import org.robovm.apple.glkit.GLKViewDrawableDepthFormat;
+import org.robovm.apple.glkit.GLKViewDrawableStencilFormat;
 import org.robovm.apple.opengles.EAGLContext;
 import org.robovm.apple.uikit.UIEvent;
 import org.robovm.apple.uikit.UIInterfaceOrientation;
@@ -63,9 +66,10 @@ public class RoboRootViewController extends GLKViewController implements GLKView
       }
     };
     view.setMultipleTouchEnabled(true);
-    // view.setBackgroundColor(UIColor.yellow());
+    view.setDrawableColorFormat(platform.config.glBufferFormat);
+    // view.setDrawableDepthFormat(GLKViewDrawableDepthFormat._16);
+    // view.setDrawableStencilFormat(GLKViewDrawableStencilFormat.None);
     setView(view);
-    System.err.println("Hello?");
     setDelegate(this);
     setPreferredFramesPerSecond(60); // TODO
   }

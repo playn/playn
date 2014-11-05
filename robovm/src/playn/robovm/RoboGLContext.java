@@ -40,6 +40,7 @@ public class RoboGLContext extends GL20Context {
   public static final boolean CHECK_ERRORS = false;
 
   private final RoboPlatform platform;
+  private int defaultFramebuffer = -1; // initted in viewDidInit
   // private UIDeviceOrientation orient;
 
   public RoboGLContext(RoboPlatform platform, RoboGL20 gl, float scaleFactor) {
@@ -49,6 +50,14 @@ public class RoboGLContext extends GL20Context {
   }
 
   void viewDidInit(int width, int height) {
+    // Apple re-disables GL_BLEND &c between our call to init() and the eventual call to
+    // viewDidInit(); why why why? I want my six hours spend on bullshit debugging back!
+    gl.glDisable(GL_CULL_FACE);
+    gl.glEnable(GL_BLEND);
+    gl.glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+    gl.glClearColor(0, 0, 0, 1);
+
+    defaultFramebuffer = gl.glGetInteger(GL_FRAMEBUFFER_BINDING);
     setSize(width, height);
   }
 
@@ -99,35 +108,30 @@ public class RoboGLContext extends GL20Context {
   // }
 
   @Override
-  public void bindFramebuffer() {
-    platform.gameView().bindDrawable();
-  }
-
-  @Override
   protected int defaultFramebuffer() {
-    throw new AssertionError("defaultFramebuffer must not be used");
+    return defaultFramebuffer;
   }
 
   void updateTexture(int tex, CGImage image) {
     int width = (int)image.getWidth(), height = (int)image.getHeight();
     if (width == 0 || height == 0) {
-      platform.log().warn("Ignoring texture update for empty image (" + width + "x" + height + ").");
+      platform.log().warn(
+        "Ignoring texture update for empty image (" + width + "x" + height + ").");
       return;
     }
 
     CGBitmapContext bctx = RoboGraphics.createCGBitmap(width, height);
     CGRect rect = new CGRect(0, 0, width, height);
     bctx.clearRect(rect);
-    // bctx.translateCTM(0, height - imageSize.Height);
     bctx.drawImage(rect, image);
-
     updateTexture(tex, width, height, bctx.getData());
-
     bctx.dispose();
   }
 
   void updateTexture(int tex, int width, int height, VoidPtr data) {
     gl.glBindTexture(GL_TEXTURE_2D, tex);
-    OpenGLES.glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+    gl.glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+    OpenGLES.glTexImage2Dp(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0,
+                           GL_RGBA, GL_UNSIGNED_BYTE, data);
   }
 }
