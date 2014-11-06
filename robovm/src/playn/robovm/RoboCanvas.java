@@ -26,6 +26,7 @@ import org.robovm.apple.coregraphics.CGImage;
 import org.robovm.apple.coregraphics.CGInterpolationQuality;
 import org.robovm.apple.coregraphics.CGLineCap;
 import org.robovm.apple.coregraphics.CGLineJoin;
+import org.robovm.apple.coregraphics.CGMutablePath;
 import org.robovm.apple.coregraphics.CGRect;
 import org.robovm.apple.coregraphics.CGTextEncoding;
 import org.robovm.rt.bro.ptr.VoidPtr;
@@ -173,7 +174,10 @@ public class RoboCanvas extends AbstractCanvasGL<CGBitmapContext> {
     if (gradient == null) {
       bctx.fillEllipseInRect(new CGRect(x-radius, y-radius, 2*radius, 2*radius));
     } else {
-      // TODO: clip to circle
+      CGMutablePath cgPath = CGMutablePath.createMutable();
+      cgPath.addArc(null, x, y, radius, 0, 2*Math.PI, false);
+      bctx.addPath(cgPath);
+      bctx.clip();
       gradient.fill(bctx);
     }
     isDirty = true;
