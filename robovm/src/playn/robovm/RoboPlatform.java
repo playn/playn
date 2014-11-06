@@ -209,26 +209,6 @@ public class RoboPlatform extends AbstractPlatform {
 
     // if we're not in embedded mode, register our lifecycle observers
     if (!config.embedded) registerLifecycleObservers();
-
-    // // use the status bar orientation during startup. The device orientation will not be known
-    // // for some time and most games will want to show a "right side up" loading screen, i.e.
-    // // matching the iOS "default" splash
-    // UIInterfaceOrientation sorient = app.getStatusBarOrientation();
-    // UIDeviceOrientation dorient = null;
-    // if (!config.orients.contains(sorient)) {
-    //   dorient = 
-    // }
-    // for (Map.Entry<UIDeviceOrientation, UIInterfaceOrientation> e : ORIENT_MAP.entrySet()) {
-    //   if (e.getValue() == sorient) {
-    //     dorient = e.getKey();
-    //     break;
-    //   }
-    // }
-    // // if it isn't supported, use the game's default
-    // if (dorient == null || !config.orients.isSupported(dorient)) {
-    //   dorient = config.orients.defaultOrient;
-    // }
-    // onOrientationChange(dorient);
   }
 
   @Override
