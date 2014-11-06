@@ -16,12 +16,16 @@ package playn.robovm;
 import java.io.File;
 
 import org.robovm.apple.audiotoolbox.AudioSession;
+import org.robovm.apple.avfoundation.AVAudioPlayer;
+import org.robovm.apple.foundation.NSError;
+import org.robovm.apple.foundation.NSURL;
 
 import playn.core.AudioImpl;
 import playn.core.Sound;
 
 public class RoboAudio extends AudioImpl {
 
+  private final RoboPlatform platform;
   // private final AudioContext actx;
   // private final int[] result = new int[1]; // used for AL.GetSource
 
@@ -31,6 +35,7 @@ public class RoboAudio extends AudioImpl {
 
   public RoboAudio(RoboPlatform platform, int numSources) {
     super(platform);
+    this.platform = platform;
     // actx = new AudioContext();
 
     // // obtain our desired number of sources
@@ -58,100 +63,101 @@ public class RoboAudio extends AudioImpl {
   }
 
   public Sound createSound(File path, boolean isMusic) {
-    // // if the file is meant to be music, or if it's not uncompressed CAFF, we need to use
-    // // AVAudioPlayer; if it's uncompressed CAFF, we can use OpenAL
-    // return (isMusic || !path.endsWith(".caf")) ?
-    //   createAVAP(new NSUrl(path.toFile())) : createOAL(path);
-    throw new RuntimeException("TODO");
+    // if the file is meant to be music, or if it's not uncompressed CAFF, we need to use
+    // AVAudioPlayer; if it's uncompressed CAFF, we can use OpenAL
+    return (isMusic || !path.getName().endsWith(".caf")) ?
+      createAVAP(new NSURL(path)) : createOAL(path);
   }
 
-  // Sound createAVAP(NSUrl url) {
-  //   final RoboSoundAVAP sound = new RoboSoundAVAP();
-  //   ThreadPool.QueueUserWorkItem(new WaitCallback(new WaitCallback.Method() {
-  //     public void Invoke(Object arg) {
-  //       NSUrl url = (NSUrl) arg;
-  //       NSError[] error = new NSError[1];
-  //       AVAudioPlayer player = AVAudioPlayer.FromUrl(url, error);
-  //       if (error[0] == null) {
-  //         dispatchLoaded(sound, player);
-  //       } else {
-  //         platform.log().warn("Error loading sound [" + url + ", " + error[0] + "]");
-  //         dispatchLoadError(sound, new Exception(error[0].ToString()));
-  //       }
-  //     }
-  //   }), url);
-  //   return sound;
-  // }
+  Sound createAVAP(final NSURL url) {
+    final RoboSoundAVAP sound = new RoboSoundAVAP();
+    platform.invokeAsync(new Runnable() {
+      public void run () {
+        NSError.NSErrorPtr error = new NSError.NSErrorPtr();
+        AVAudioPlayer player = new AVAudioPlayer(url, error);
+        if (error.get() == null) {
+          dispatchLoaded(sound, player);
+        } else {
+          String errstr = error.get().toString();
+          platform.log().warn("Error loading sound [" + url + ", " + errstr + "]");
+          dispatchLoadError(sound, new Exception(errstr));
+        }
+      }
+    });
+    return sound;
+  }
 
-  // Sound createOAL(Path assetPath) {
-  //   final RoboSoundOAL sound = new RoboSoundOAL(this);
-  //   ThreadPool.QueueUserWorkItem(new WaitCallback(new WaitCallback.Method() {
-  //     public void Invoke(Object arg) {
-  //       Path path = (Path) arg;
-  //       int bufferId = 0;
-  //       try {
-  //         bufferId = AL.GenBuffer();
-  //         CAFLoader.load(path, bufferId);
-  //         dispatchLoaded(sound, bufferId);
-  //       } catch (Throwable t) {
-  //         if (bufferId != 0)
-  //           AL.DeleteBuffer(bufferId);
-  //         dispatchLoadError(sound, t);
-  //       }
-  //     }
-  //   }), assetPath);
-  //   return sound;
-  // }
+  Sound createOAL(File assetPath) {
+    final RoboSoundOAL sound = new RoboSoundOAL(this);
+    // ThreadPool.QueueUserWorkItem(new WaitCallback(new WaitCallback.Method() {
+    //   public void Invoke(Object arg) {
+    //     Path path = (Path) arg;
+    //     int bufferId = 0;
+    //     try {
+    //       bufferId = AL.GenBuffer();
+    //       CAFLoader.load(path, bufferId);
+    //       dispatchLoaded(sound, bufferId);
+    //     } catch (Throwable t) {
+    //       if (bufferId != 0)
+    //         AL.DeleteBuffer(bufferId);
+    //       dispatchLoadError(sound, t);
+    //     }
+    //   }
+    // }), assetPath);
+    return sound;
+  }
 
-  // boolean isPlaying(int sourceIdx, RoboSoundOAL sound) {
-  //   if (active[sourceIdx] != sound)
-  //     return false;
-  //   AL.GetSource(sources[sourceIdx], ALGetSourcei.wrap(ALGetSourcei.SourceState), result);
-  //   return (result[0] == ALSourceState.Playing);
-  // }
+  boolean isPlaying(int sourceIdx, RoboSoundOAL sound) {
+    // if (active[sourceIdx] != sound)
+    //   return false;
+    // AL.GetSource(sources[sourceIdx], ALGetSourcei.wrap(ALGetSourcei.SourceState), result);
+    // return (result[0] == ALSourceState.Playing);
+    return false; // TODO
+  }
 
-  // int play(RoboSoundOAL sound, float volume, boolean looping) {
-  //   // find a source that's not currently playing
-  //   int sourceIdx = -1, eldestIdx = 0;
-  //   for (int ii = 0; ii < sources.length; ii++) {
-  //     if (!isPlaying(ii, active[ii])) {
-  //       sourceIdx = ii;
-  //       break;
-  //     } else if (started[ii] < started[eldestIdx]) {
-  //       eldestIdx = ii;
-  //     }
-  //   }
-  //   // if all of our sources are playing, stop the oldest source and steal it
-  //   if (sourceIdx < 0) {
-  //     stop(eldestIdx, active[eldestIdx]);
-  //     sourceIdx = eldestIdx;
-  //   }
-  //   // prepare the source to play this sound's buffer
-  //   int sourceId = sources[sourceIdx];
-  //   AL.Source(sourceId, ALSourcei.wrap(ALSourcei.Buffer), sound.bufferId());
-  //   AL.Source(sourceId, ALSourcef.wrap(ALSourcef.Gain), volume);
-  //   AL.Source(sourceId, ALSourceb.wrap(ALSourceb.Looping), looping);
-  //   AL.SourcePlay(sourceId);
-  //   active[sourceIdx] = sound;
-  //   started[sourceIdx] = platform.tick();
-  //   return sourceIdx;
-  // }
+  int play(RoboSoundOAL sound, float volume, boolean looping) {
+    // // find a source that's not currently playing
+    // int sourceIdx = -1, eldestIdx = 0;
+    // for (int ii = 0; ii < sources.length; ii++) {
+    //   if (!isPlaying(ii, active[ii])) {
+    //     sourceIdx = ii;
+    //     break;
+    //   } else if (started[ii] < started[eldestIdx]) {
+    //     eldestIdx = ii;
+    //   }
+    // }
+    // // if all of our sources are playing, stop the oldest source and steal it
+    // if (sourceIdx < 0) {
+    //   stop(eldestIdx, active[eldestIdx]);
+    //   sourceIdx = eldestIdx;
+    // }
+    // // prepare the source to play this sound's buffer
+    // int sourceId = sources[sourceIdx];
+    // AL.Source(sourceId, ALSourcei.wrap(ALSourcei.Buffer), sound.bufferId());
+    // AL.Source(sourceId, ALSourcef.wrap(ALSourcef.Gain), volume);
+    // AL.Source(sourceId, ALSourceb.wrap(ALSourceb.Looping), looping);
+    // AL.SourcePlay(sourceId);
+    // active[sourceIdx] = sound;
+    // started[sourceIdx] = platform.tick();
+    // return sourceIdx;
+    return 0; // TODO
+  }
 
-  // void stop(int sourceIdx, RoboSoundOAL sound) {
-  //   if (active[sourceIdx] == sound)
-  //     AL.SourceStop(sources[sourceIdx]);
-  // }
+  void stop(int sourceIdx, RoboSoundOAL sound) {
+    // if (active[sourceIdx] == sound)
+    //   AL.SourceStop(sources[sourceIdx]);
+  }
 
-  // void setLooping(int sourceIdx, RoboSoundOAL sound, boolean looping) {
-  //   if (active[sourceIdx] == sound)
-  //     AL.Source(sources[sourceIdx], ALSourceb.wrap(ALSourceb.Looping), looping);
-  // }
+  void setLooping(int sourceIdx, RoboSoundOAL sound, boolean looping) {
+    // if (active[sourceIdx] == sound)
+    //   AL.Source(sources[sourceIdx], ALSourceb.wrap(ALSourceb.Looping), looping);
+  }
 
-  // void setVolume(int sourceIdx, RoboSoundOAL sound, float volume) {
-  //   if (active[sourceIdx] == sound)
-  //     // OpenAL uses gain between 0 and 1, rather than raw db-based gain
-  //     AL.Source(sources[sourceIdx], ALSourcef.wrap(ALSourcef.Gain), volume);
-  // }
+  void setVolume(int sourceIdx, RoboSoundOAL sound, float volume) {
+    // if (active[sourceIdx] == sound)
+    //   // OpenAL uses gain between 0 and 1, rather than raw db-based gain
+    //   AL.Source(sources[sourceIdx], ALSourcef.wrap(ALSourcef.Gain), volume);
+  }
 
   void terminate() {
     // if (actx.get_IsProcessing()) actx.Suspend();
