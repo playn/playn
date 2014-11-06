@@ -13,8 +13,19 @@
  */
 package playn.robovm;
 
+import java.io.File;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.robovm.apple.foundation.NSFileManager;
+import org.robovm.apple.foundation.NSSearchPathDirectory;
+import org.robovm.apple.foundation.NSSearchPathDomainMask;
 
 import playn.core.BatchImpl;
 import playn.core.PlayN;
@@ -22,28 +33,39 @@ import playn.core.Storage;
 
 public class RoboStorage implements Storage {
 
-  // private static final String STORAGE_SCHEMA =
-  //   "CREATE TABLE Data (DataKey ntext PRIMARY KEY, DataValue ntext NOT NULL)";
+  private final RoboPlatform platform;
+  private final Connection conn;
 
-  // private SqliteConnection conn;
+  public RoboStorage(RoboPlatform platform) {
+    this.platform = platform;
 
-  public RoboStorage(String storageFileName) {
-    // String dbDir = null;
-    // try {
-    //   dbDir = NSFileManager.get_DefaultManager().GetUrls(
-    //     NSSearchPathDirectory.wrap(NSSearchPathDirectory.DocumentDirectory),
-    //     NSSearchPathDomain.wrap(NSSearchPathDomain.User))[0].get_Path();
-    //   String db = Path.Combine(dbDir, storageFileName);
-    //   boolean needCreate = !File.Exists(db);
-    //   if (needCreate)
-    //     SqliteConnection.CreateFile(db);
-    //   conn = new SqliteConnection("Data Source=" + db);
-    //   if (needCreate)
-    //     executeUpdate(createCommand(STORAGE_SCHEMA));
-    // } catch (Throwable t) {
-    //   throw new RuntimeException(
-    //     "Failed to initialize storage [dbDir=" + dbDir + "]: " + t.getMessage());
-    // }
+    String dbDir = null;
+    try {
+      // we access SqlLite via JDBC... egads
+      try {
+        Class.forName("SQLite.JDBCDriver");
+      } catch (ClassNotFoundException e) {
+        throw new RuntimeException(e);
+      }
+
+      dbDir = NSFileManager.getDefaultManager().getURLsForDirectory(
+        NSSearchPathDirectory.DocumentDirectory,
+        NSSearchPathDomainMask.UserDomainMask).get(0).getPath();
+      File dbFile = new File(dbDir, platform.config.storageFileName);
+      dbFile.getParentFile().mkdirs();
+
+      platform.log().info("Using db in file: " + dbFile.getAbsolutePath());
+      conn = DriverManager.getConnection("jdbc:sqlite:" + dbFile.getAbsolutePath());
+
+      // create our schema if needed
+      try (Statement stmt = conn.createStatement()) {
+        stmt.executeUpdate("CREATE TABLE IF NOT EXISTS " +
+          "Data (DataKey ntext PRIMARY KEY, DataValue ntext NOT NULL)");
+      }
+
+    } catch (SQLException sqe) {
+      throw new RuntimeException("Failed to initialize storage [dbDir=" + dbDir + "]", sqe);
+    }
   }
 
   @Override
@@ -53,93 +75,75 @@ public class RoboStorage implements Storage {
 
   @Override
   public Iterable<String> keys() {
-    // try {
-    //   List<String> keys = new ArrayList<String>();
-    //   DbCommand cmd = createCommand("select DataKey from Data");
+    try {
+      List<String> keys = new ArrayList<String>();
+      try (Statement stmt = conn.createStatement()) {
+        ResultSet rs = stmt.executeQuery("select DataKey from Data");
+        while (rs.next()) {
+          keys.add(rs.getString(0));
+        }
+      }
+      return keys;
 
-    //   IDataReader reader = null;
-    //   try {
-    //     conn.Open();
-    //     reader = cmd.ExecuteReader();
-    //     while (reader.Read()) {
-    //       keys.add(reader.GetString(0));
-    //     }
-    //     return keys;
-
-    //   } finally {
-    //     if (reader != null)
-    //       reader.Dispose();
-    //     cmd.Dispose();
-    //     conn.Close();
-    //     conn.Dispose();
-    //   }
-
-    // } catch (Throwable t) {
-    //   throw new RuntimeException("keys() failed: " + t);
-    // }
-    throw new RuntimeException("TODO");
+    } catch (SQLException sqe) {
+      throw new RuntimeException("keys() failed", sqe);
+    }
   }
 
   @Override
   public String getItem(String key) {
-    // try {
-    //   DbCommand cmd = createCommand("select DataValue from Data where DataKey = @key");
-    //   cmd.get_Parameters().Add(createParam(cmd, "@key", key));
+    try {
+      String sql = "select DataValue from Data where DataKey = ?";
+      try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+        stmt.setString(1, key);
+        ResultSet rs = stmt.executeQuery();
+        String result = null;
+        while (rs.next()) {
+          result = rs.getString(1);
+        }
+        return result;
+      }
 
-    //   IDataReader reader = null;
-    //   try {
-    //     conn.Open();
-    //     reader = cmd.ExecuteReader();
-    //     return reader.Read() ? reader.GetString(0) : null;
-
-    //   } finally {
-    //     if (reader != null)
-    //       reader.Dispose();
-    //     cmd.Dispose();
-    //     conn.Close();
-    //     conn.Dispose();
-    //   }
-
-    // } catch (Throwable t) {
-    //   throw new RuntimeException("getItem(" + key + ") failed: " + t);
-    // }
-    throw new RuntimeException("TODO");
+    } catch (SQLException sqe) {
+      throw new RuntimeException("getItem(" + key + ") failed", sqe);
+    }
   }
 
   @Override
   public void setItem(String key, String value) throws RuntimeException {
-    // try {
-    //   // first try to update
-    //   DbCommand cmd = createCommand("update Data set DataValue = @value where DataKey = @key");
-    //   cmd.get_Parameters().Add(createParam(cmd, "@value", value));
-    //   cmd.get_Parameters().Add(createParam(cmd, "@key", key));
+    try {
+      String usql = "update Data set DataValue = ? where DataKey = ?";
+      try (PreparedStatement ustmt = conn.prepareStatement(usql)) {
+        ustmt.setString(1, value);
+        ustmt.setString(2, key);
+        if (ustmt.executeUpdate() > 0) return;
+      }
 
-    //   // if that modified zero rows, then insert
-    //   if (executeUpdate(cmd) == 0) {
-    //     cmd = createCommand("insert into Data (DataKey, DataValue) values (@key, @value)");
-    //     cmd.get_Parameters().Add(createParam(cmd, "@key", key));
-    //     cmd.get_Parameters().Add(createParam(cmd, "@value", value));
-    //     if (executeUpdate(cmd) == 0) {
-    //       PlayN.log().warn("Failed to insert storage item [key=" + key + "]");
-    //     }
-    //   }
+      String isql = "insert into Data (DataKey, DataValue) values (?, ?)";
+      try (PreparedStatement istmt = conn.prepareStatement(isql)) {
+        istmt.setString(1, key);
+        istmt.setString(2, value);
+        if (istmt.executeUpdate() == 0) {
+          platform.log().warn("Failed to insert storage item [key=" + key + "]");
+        }
+      }
 
-    // } catch (Throwable t) {
-    //   throw new RuntimeException("setItem(" + key + ", " + value + ") failed: " + t);
-    // }
-    throw new RuntimeException("TODO");
+    } catch (SQLException sqe) {
+      throw new RuntimeException("setItem(" + key + ", " + value + ") failed", sqe);
+    }
   }
 
   @Override
   public void removeItem(String key) {
-    // try {
-    //   DbCommand cmd = createCommand("delete from Data where DataKey = @key");
-    //   cmd.get_Parameters().Add(createParam(cmd, "@key", key));
-    //   executeUpdate(cmd);
-    // } catch (Throwable t) {
-    //   throw new RuntimeException("removeItem(" + key + ") failed: " + t);
-    // }
-    throw new RuntimeException("TODO");
+    try {
+      String sql = "delete from Data where DataKey = ?";
+      try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+        stmt.setString(1, key);
+        stmt.executeUpdate();
+      }
+    } catch (SQLException sqe) {
+      throw new RuntimeException("removeItem(" + key + ") failed", sqe);
+    }
   }
 
   @Override
@@ -148,30 +152,4 @@ public class RoboStorage implements Storage {
     // SQL commands are already pretty fast, so it might not be necessary
     return new BatchImpl(this);
   }
-
-  // private DbParameter createParam(DbCommand cmd, String name, String value) {
-  //   DbParameter param = cmd.CreateParameter();
-  //   param.set_ParameterName(name);
-  //   param.set_DbType(DbType.wrap(DbType.String));
-  //   param.set_Value(value);
-  //   return param;
-  // }
-
-  // private DbCommand createCommand(String sql) {
-  //   DbCommand cmd = conn.CreateCommand();
-  //   cmd.set_CommandText(sql);
-  //   cmd.set_CommandType(CommandType.wrap(CommandType.Text));
-  //   return cmd;
-  // }
-
-  // private int executeUpdate(DbCommand cmd) {
-  //   try {
-  //     conn.Open();
-  //     return cmd.ExecuteNonQuery();
-  //   } finally {
-  //     cmd.Dispose();
-  //     conn.Close();
-  //     conn.Dispose();
-  //   }
-  // }
 }

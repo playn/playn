@@ -205,7 +205,7 @@ public class RoboPlatform extends AbstractPlatform {
     pointer = new RoboPointer(this);
     touch = new RoboTouch(this);
     assets = new RoboAssets(this);
-    storage = new RoboStorage(config.storageFileName);
+    storage = new RoboStorage(this);
 
     // if we're not in embedded mode, register our lifecycle observers
     if (!config.embedded) registerLifecycleObservers();
