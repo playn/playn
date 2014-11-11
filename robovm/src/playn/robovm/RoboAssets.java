@@ -34,7 +34,7 @@ public class RoboAssets extends AbstractAssets<UIImage> {
 
   private final RoboPlatform platform;
   private final File bundleRoot = new File(NSBundle.getMainBundle().getBundlePath());
-  private File assetRoot = bundleRoot;
+  private File assetRoot = new File(bundleRoot, "assets");
 
   public RoboAssets(RoboPlatform platform) {
     super(platform);
