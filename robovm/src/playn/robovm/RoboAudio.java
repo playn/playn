@@ -15,49 +15,61 @@ package playn.robovm;
 
 import java.io.File;
 
-import org.robovm.apple.audiotoolbox.AudioSession;
 import org.robovm.apple.avfoundation.AVAudioPlayer;
+import org.robovm.apple.avfoundation.AVAudioSession;
 import org.robovm.apple.foundation.NSError;
 import org.robovm.apple.foundation.NSURL;
 
 import playn.core.AudioImpl;
 import playn.core.Sound;
+import static playn.robovm.OpenAL.*;
 
 public class RoboAudio extends AudioImpl {
 
   private final RoboPlatform platform;
-  // private final AudioContext actx;
-  // private final int[] result = new int[1]; // used for AL.GetSource
+  private final AVAudioSession session;
+  private final long oalDevice;
+  private final long oalContext;
 
-  // private final int[] sources;
-  // private final RoboSoundOAL[] active;
-  // private final int[] started;
+  private final int[] sources;
+  private final RoboSoundOAL[] active;
+  private final int[] started;
 
   public RoboAudio(RoboPlatform platform, int numSources) {
     super(platform);
     this.platform = platform;
-    // actx = new AudioContext();
 
-    // // obtain our desired number of sources
-    // sources = new int[numSources];
-    // AL.GenSources(sources.length, sources);
-    // active = new RoboSoundOAL[sources.length];
-    // started = new int[sources.length];
+    session = AVAudioSession.sharedInstance();
+    session.setActive(true, null); // TODO: options?
 
-    // AudioSession.Initialize();
-    // AudioSession.SetActive(true);
+    oalDevice = alcOpenDevice(null);
+    if (oalDevice != 0) {
+      oalContext = alcCreateContext(oalDevice, null);
+      alcMakeContextCurrent(oalContext);
+    } else {
+      platform.log().warn("Unable to open OpenAL device. Disabling OAL sound.");
+      oalContext = 0;
+    }
 
-    // // clear and restore our OAL context on audio session interruption
+    // obtain our desired number of sources
+    sources = new int[numSources];
+    alGenSources(numSources, sources);
+    active = new RoboSoundOAL[sources.length];
+    started = new int[sources.length];
+
+    // TODO: this should use AVAudioSessionInterruptionNotification
+
+    // clear and restore our OAL context on audio session interruption
     // AudioSession.add_Interrupted(new EventHandler(new EventHandler.Method() {
     //   public void Invoke(Object sender, EventArgs event) {
-    //     AudioSession.SetActive(false);
-    //     Alc.MakeContextCurrent(ContextHandle.Zero);
+    //     // not needed?: session.setActive(false, null);
+    //     OpenAL.alcMakeContextCurrent(0);
     //   }
     // }));
     // AudioSession.add_Resumed(new EventHandler(new EventHandler.Method() {
     //   public void Invoke(Object sender, EventArgs event) {
-    //     actx.MakeCurrent(); // calls Alc.MakeContextCurrent under the hood
-    //     AudioSession.SetActive(true);
+    //     OpenAL.alcMakeContextCurrent(alcContext);
+    //     // not needed?: session.setActive(true, null);
     //   }
     // }));
   }
@@ -87,79 +99,81 @@ public class RoboAudio extends AudioImpl {
     return sound;
   }
 
-  Sound createOAL(File assetPath) {
+  Sound createOAL(final File assetPath) {
     final RoboSoundOAL sound = new RoboSoundOAL(this);
-    // ThreadPool.QueueUserWorkItem(new WaitCallback(new WaitCallback.Method() {
-    //   public void Invoke(Object arg) {
-    //     Path path = (Path) arg;
-    //     int bufferId = 0;
-    //     try {
-    //       bufferId = AL.GenBuffer();
-    //       CAFLoader.load(path, bufferId);
-    //       dispatchLoaded(sound, bufferId);
-    //     } catch (Throwable t) {
-    //       if (bufferId != 0)
-    //         AL.DeleteBuffer(bufferId);
-    //       dispatchLoadError(sound, t);
-    //     }
-    //   }
-    // }), assetPath);
+    platform.invokeAsync(new Runnable() {
+      public void run () {
+        int bufferId = 0;
+        try {
+          bufferId = alGenBuffer();
+          CAFLoader.load(assetPath, bufferId);
+          dispatchLoaded(sound, bufferId);
+        } catch (Throwable t) {
+          if (bufferId != 0)
+            alDeleteBuffer(bufferId);
+          dispatchLoadError(sound, t);
+        }
+      }
+    });
     return sound;
   }
 
   boolean isPlaying(int sourceIdx, RoboSoundOAL sound) {
-    // if (active[sourceIdx] != sound)
-    //   return false;
-    // AL.GetSource(sources[sourceIdx], ALGetSourcei.wrap(ALGetSourcei.SourceState), result);
-    // return (result[0] == ALSourceState.Playing);
-    return false; // TODO
+    if (active[sourceIdx] != sound)
+      return false;
+    int[] result = new int[1];
+    alGetSourcei(sources[sourceIdx], AL_SOURCE_STATE, result);
+    return (result[0] == AL_PLAYING);
   }
 
   int play(RoboSoundOAL sound, float volume, boolean looping) {
-    // // find a source that's not currently playing
-    // int sourceIdx = -1, eldestIdx = 0;
-    // for (int ii = 0; ii < sources.length; ii++) {
-    //   if (!isPlaying(ii, active[ii])) {
-    //     sourceIdx = ii;
-    //     break;
-    //   } else if (started[ii] < started[eldestIdx]) {
-    //     eldestIdx = ii;
-    //   }
-    // }
-    // // if all of our sources are playing, stop the oldest source and steal it
-    // if (sourceIdx < 0) {
-    //   stop(eldestIdx, active[eldestIdx]);
-    //   sourceIdx = eldestIdx;
-    // }
-    // // prepare the source to play this sound's buffer
-    // int sourceId = sources[sourceIdx];
-    // AL.Source(sourceId, ALSourcei.wrap(ALSourcei.Buffer), sound.bufferId());
-    // AL.Source(sourceId, ALSourcef.wrap(ALSourcef.Gain), volume);
-    // AL.Source(sourceId, ALSourceb.wrap(ALSourceb.Looping), looping);
-    // AL.SourcePlay(sourceId);
-    // active[sourceIdx] = sound;
-    // started[sourceIdx] = platform.tick();
-    // return sourceIdx;
-    return 0; // TODO
+    // find a source that's not currently playing
+    int sourceIdx = -1, eldestIdx = 0;
+    for (int ii = 0; ii < sources.length; ii++) {
+      if (!isPlaying(ii, active[ii])) {
+        sourceIdx = ii;
+        break;
+      } else if (started[ii] < started[eldestIdx]) {
+        eldestIdx = ii;
+      }
+    }
+    // if all of our sources are playing, stop the oldest source and steal it
+    if (sourceIdx < 0) {
+      stop(eldestIdx, active[eldestIdx]);
+      sourceIdx = eldestIdx;
+    }
+    // prepare the source to play this sound's buffer
+    int sourceId = sources[sourceIdx];
+    alSourcei(sourceId, AL_BUFFER, sound.bufferId());
+    alSourcef(sourceId, AL_GAIN, volume);
+    alSourcei(sourceId, AL_LOOPING, looping ? AL_TRUE : AL_FALSE);
+    alSourcePlay(sourceId);
+    active[sourceIdx] = sound;
+    started[sourceIdx] = platform.tick();
+    return sourceIdx;
   }
 
   void stop(int sourceIdx, RoboSoundOAL sound) {
-    // if (active[sourceIdx] == sound)
-    //   AL.SourceStop(sources[sourceIdx]);
+    if (active[sourceIdx] == sound) {
+      alSourceStop(sources[sourceIdx]);
+    }
   }
 
   void setLooping(int sourceIdx, RoboSoundOAL sound, boolean looping) {
-    // if (active[sourceIdx] == sound)
-    //   AL.Source(sources[sourceIdx], ALSourceb.wrap(ALSourceb.Looping), looping);
+    if (active[sourceIdx] == sound) {
+      alSourcei(sources[sourceIdx], AL_LOOPING, looping ? AL_TRUE : AL_FALSE);
+    }
   }
 
   void setVolume(int sourceIdx, RoboSoundOAL sound, float volume) {
-    // if (active[sourceIdx] == sound)
-    //   // OpenAL uses gain between 0 and 1, rather than raw db-based gain
-    //   AL.Source(sources[sourceIdx], ALSourcef.wrap(ALSourcef.Gain), volume);
+    if (active[sourceIdx] == sound) {
+      // OpenAL uses gain between 0 and 1, rather than raw db-based gain
+      alSourcef(sources[sourceIdx], AL_GAIN, volume);
+    }
   }
 
   void terminate() {
+    // TODO: ?
     // if (actx.get_IsProcessing()) actx.Suspend();
     // actx.Dispose();
   }
