@@ -15,13 +15,15 @@ package playn.robovm;
 
 import java.util.List;
 
+import org.robovm.apple.corefoundation.CFArray;
 import org.robovm.apple.corefoundation.CFRange;
 import org.robovm.apple.coregraphics.CGAffineTransform;
 import org.robovm.apple.coregraphics.CGBitmapContext;
 import org.robovm.apple.coregraphics.CGPath;
 import org.robovm.apple.coregraphics.CGRect;
-import org.robovm.apple.coretext.CTFrame;
-import org.robovm.apple.coretext.CTFramesetter;
+// TODO: restore these when stock CTFrame binding is no longer broken
+// import org.robovm.apple.coretext.CTFrame;
+// import org.robovm.apple.coretext.CTFramesetter;
 import org.robovm.apple.coretext.CTLine;
 import org.robovm.apple.foundation.NSAttributedString;
 import org.robovm.apple.uikit.NSAttributedStringAttribute;
@@ -49,11 +51,11 @@ class RoboTextLayout extends AbstractTextLayout {
 
     final RoboFont font = (format.font == null) ? RoboGraphics.defaultFont : (RoboFont) format.font;
     NSAttributedStringAttributes attribs = createAttribs(font);
-    List<CTLine> lines = wrapLines(new NSAttributedString(text, attribs), wrap.width);
+    CFArray lines = wrapLines(new NSAttributedString(text, attribs), wrap.width);
 
-    RoboTextLayout[] layouts = new RoboTextLayout[lines.size()];
+    RoboTextLayout[] layouts = new RoboTextLayout[(int)lines.size()];
     for (int ii = 0; ii < layouts.length; ii++) {
-      CTLine line = lines.get(ii);
+      CTLine line = lines.get(ii, CTLine.class);
       CFRange range = line.getStringRange();
       String ltext = text.substring((int)range.location(), (int)(range.location()+range.length()));
       layouts[ii] = new RoboTextLayout(gfx, ltext, format, font, line);
@@ -77,21 +79,18 @@ class RoboTextLayout extends AbstractTextLayout {
     attribs.setStrokeColor(toUIColor(strokeColor));
   }
 
-  private static List<CTLine> wrapLines(NSAttributedString astring, float wrapWidth) {
-    // CTFramesetter fs = CTFramesetter.create(astring);
-    // try {
-    //   // iOS lays things out from max-y up to zero (inverted coordinate system); so we need to
-    //   // provide a large height for our rectangle to ensure that all lines "fit"
-    //   CGPath path = CGPath.createWithRect(
-    //     new CGRect(0, 0, wrapWidth, Float.MAX_VALUE/2), CGAffineTransform.Identity());
-    //   CTFrame frame = fs.createFrame(new CFRange(0, 0), path, null);
-    //   return frame.getLines();
-    // } finally {
-    //   fs.dispose();
-    // }
-
-    // TEMP: the above crashes, so don't wrap for the moment
-    return java.util.Collections.singletonList(CTLine.create(astring));
+  private static CFArray wrapLines(NSAttributedString astring, float wrapWidth) {
+    CTFramesetter fs = CTFramesetter.create(astring);
+    try {
+      // iOS lays things out from max-y up to zero (inverted coordinate system); so we need to
+      // provide a large height for our rectangle to ensure that all lines "fit"
+      CGPath path = CGPath.createWithRect(
+        new CGRect(0, 0, wrapWidth, Float.MAX_VALUE/2), CGAffineTransform.Identity());
+      CTFrame frame = fs.createFrame(new CFRange(0, 0), path, null);
+      return frame.getLines();
+    } finally {
+      fs.dispose();
+    }
   }
 
   private final RoboFont font;
