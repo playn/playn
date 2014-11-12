@@ -17,6 +17,7 @@ import org.robovm.apple.foundation.NSAutoreleasePool;
 import org.robovm.apple.uikit.UIApplication;
 import org.robovm.apple.uikit.UIApplicationDelegateAdapter;
 import org.robovm.apple.uikit.UIApplicationLaunchOptions;
+import org.robovm.apple.uikit.UIInterfaceOrientationMask;
 
 import playn.robovm.RoboPlatform;
 import playn.tests.core.TestsGame;
@@ -26,7 +27,9 @@ public class TestsGameRoboVM extends UIApplicationDelegateAdapter {
   @Override
   public boolean didFinishLaunching (UIApplication app, UIApplicationLaunchOptions launchOpts) {
 
-    RoboPlatform pf = RoboPlatform.register(app);
+    RoboPlatform.Config config = new RoboPlatform.Config();
+    config.orients = UIInterfaceOrientationMask.All;
+    RoboPlatform pf = RoboPlatform.register(app, config);
     // Retain platform object until the application is deallocated. Prevents Java GC from
     // collecting things too early.
     addStrongRef(pf);
