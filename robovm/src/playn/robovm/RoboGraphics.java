@@ -49,10 +49,9 @@ public class RoboGraphics extends GraphicsGL {
 
   private final RoboPlatform platform;
   private final GroupLayerGL rootLayer;
-  private final int screenWidth, screenHeight;
   private final float touchScale;
   private final Point touchTemp = new Point();
-  private boolean invertSizes;
+  private int screenWidth, screenHeight;
 
   // a scratch bitmap context used for measuring text
   private static final int S_SIZE = 10;
@@ -78,11 +77,9 @@ public class RoboGraphics extends GraphicsGL {
       screenHeight /= 2;
     }
 
-    this.screenWidth = screenWidth;
-    this.screenHeight = screenHeight;
     this.touchScale = deviceScale;
     ctx = new RoboGLContext(platform, new RoboGL20(), viewScale);
-    ctx.setSize(screenWidth, screenHeight); // TODO
+    setSize(screenWidth, screenHeight);
     rootLayer = new GroupLayerGL(ctx);
   }
 
@@ -119,22 +116,22 @@ public class RoboGraphics extends GraphicsGL {
 
   @Override
   public int screenHeight() {
-    return invertSizes ? screenWidth : screenHeight;
+    return screenHeight;
   }
 
   @Override
   public int screenWidth() {
-    return invertSizes ? screenHeight : screenWidth;
+    return screenWidth;
   }
 
   @Override
   public int height() {
-    return invertSizes ? ctx.viewWidth : ctx.viewHeight;
+    return ctx.viewHeight;
   }
 
   @Override
   public int width() {
-    return invertSizes ? ctx.viewHeight : ctx.viewWidth;
+    return ctx.viewWidth;
   }
 
   @Override
@@ -157,9 +154,10 @@ public class RoboGraphics extends GraphicsGL {
       CGImageAlphaInfo.PremultipliedLast.value()));
   }
 
-  void setOrientation(UIDeviceOrientation orientation) {
-    // invertSizes = ctx.setOrientation(orientation);
-    invertSizes = false;
+  void setSize(int screenWidth, int screenHeight) {
+    this.screenWidth = screenWidth;
+    this.screenHeight = screenHeight;
+    ctx.setSize(screenWidth, screenHeight);
   }
 
   IPoint transformTouch(float x, float y) {

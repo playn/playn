@@ -81,23 +81,30 @@ public class RoboRootViewController extends GLKViewController implements GLKView
 
   @Override // from GLKViewControllerDelegate
   public void willPause (GLKViewController self, boolean paused) {
-    platform.log().debug("willPause(" + paused + ")");
+    // platform.log().debug("willPause(" + paused + ")");
   }
 
   @Override // from ViewController
   public void viewDidAppear (boolean animated) {
     super.viewDidAppear(animated);
     CGRect bounds = getView().getBounds();
-    platform.log().debug("viewDidAppear(" + animated + "): " + bounds);
+    // platform.log().debug("viewDidAppear(" + animated + "): " + bounds);
     platform.graphics().ctx.viewDidInit((int)bounds.getWidth(), (int)bounds.getHeight());
   }
 
   @Override // from ViewController
-  public void didRotate (UIInterfaceOrientation orientation) {
-    super.didRotate(orientation);
+  public void willRotate(UIInterfaceOrientation toOrient, double duration) {
+    super.willRotate(toOrient, duration);
+    platform.willRotate(toOrient, duration);
+  }
+
+  @Override // from ViewController
+  public void didRotate (UIInterfaceOrientation fromOrient) {
+    super.didRotate(fromOrient);
     CGRect bounds = getView().getBounds();
-    platform.log().debug("didRotate(" + orientation + "): " + bounds);
-    platform.graphics().ctx.setSize((int)bounds.getWidth(), (int)bounds.getHeight());
+    // platform.log().debug("didRotate(" + fromOrient + "): " + bounds);
+    platform.graphics().setSize((int)bounds.getWidth(), (int)bounds.getHeight());
+    platform.didRotate(fromOrient);
   }
 
   @Override // from ViewController

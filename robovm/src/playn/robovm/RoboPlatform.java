@@ -99,6 +99,12 @@ public class RoboPlatform extends AbstractPlatform {
     public String storageFileName = "playn.db";
   }
 
+  /** Enables games to respond to device orientation changes. */
+  public static interface OrientationListener {
+    void willRotate(UIInterfaceOrientation toOrient, double duration);
+    void didRotate(UIInterfaceOrientation orientation);
+  }
+
   /**
    * Registers your application using the default configuration.
    */
@@ -147,6 +153,11 @@ public class RoboPlatform extends AbstractPlatform {
     return rootViewController.view;
   }
 
+  /** Configures a listener to be notified when the device rotates. */
+  public void setListener(OrientationListener listener) {
+    orientListener = listener;
+  }
+
   /** Manually activates the PlayN platform. This is for use by applications which are embedding
     * PlayN into a larger iOS app. {@link Config#embedded} must also be true in that case. */
   public void activate() {
@@ -175,6 +186,7 @@ public class RoboPlatform extends AbstractPlatform {
   private final RoboAssets assets;
 
   private Game game;
+  private OrientationListener orientListener;
 
   private final UIApplication app;
   private final UIWindow mainWindow;
@@ -309,27 +321,17 @@ public class RoboPlatform extends AbstractPlatform {
     mainWindow.makeKeyAndVisible();
   }
 
-  // void onOrientationChange(UIDeviceOrientation orientation) {
-  //   if (orientation.Value == currentOrientation) return; // NOOP
-  //   if (!config.orients.isSupported(orientation))
-  //     return; // ignore unsupported (or Unknown) orientations
+  void willRotate(UIInterfaceOrientation toOrient, double duration) {
+    if (orientListener != null) {
+      orientListener.willRotate(toOrient, duration);
+    }
+  }
 
-  //   currentOrientation = orientation.Value;
-  //   graphics.setOrientation(orientation);
-
-  //   UIInterfaceOrientation sorient = ORIENT_MAP.get(orientation);
-  //   if (!sorient.equals(app.get_StatusBarOrientation())) {
-  //     app.SetStatusBarOrientation(sorient, !app.get_StatusBarHidden());
-  //   }
-  //   dispatchOrientationChange(orientation.Value);
-  // }
-
-  // void dispatchOrientationChange (int orientationValue) {
-  //   if (orientationChangeListener == null) {
-  //       return;
-  //   }
-  //   orientationChangeListener.orientationChanged(orientationValue);
-  // }
+  void didRotate (UIInterfaceOrientation fromOrient) {
+    if (orientListener != null) {
+      orientListener.didRotate(fromOrient);
+    }
+  }
 
   void update() {
     // process pending actions
