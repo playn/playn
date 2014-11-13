@@ -1,0 +1,17 @@
+<config>
+  <executableName>${app.executable}</executableName>
+  <mainClass>${app.mainclass}</mainClass>
+  <os>ios</os>
+  <arch>thumbv7</arch>
+  <resources>
+    <resource>
+      <directory>resources</directory>
+    </resource>
+  </resources>
+  <target>ios</target>
+  <iosInfoPList>Info.plist.xml</iosInfoPList>
+  <forceLinkClasses>
+    <pattern>SQLite.JDBCDriver</pattern>
+    <pattern>SQLite.JDBC2z.JDBCConnection</pattern>
+  </forceLinkClasses>
+</config>

@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>${groupId}</groupId>
+    <artifactId>${rootArtifactId}</artifactId>
+    <version>${version}</version>
+  </parent>
+
+  <artifactId>${artifactId}-java</artifactId>
+  <packaging>jar</packaging>
+  <name>${JavaGameClassName} RoboVM</name>
+
+  <properties>
+    <mainClass>${package}.robovm.${JavaGameClassName}RoboVM</mainClass>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>${groupId}</groupId>
+      <artifactId>${rootArtifactId}-core</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.googlecode.playn</groupId>
+      <artifactId>playn-robovm</artifactId>
+      <version>${playn.version}</version>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>com.pyx4j</groupId>
+        <artifactId>maven-junction-plugin</artifactId>
+        <version>1.0.3</version>
+        <executions>
+          <execution>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>link</goal>
+            </goals>
+          </execution>
+        </executions>
+        <!-- generate a symlink to our assets directory in the proper location -->
+        <configuration>
+          <links>
+            <link>
+              <src>${basedir}/../assets/src/main/resources/assets</src>
+              <dst>${basedir}/resources/assets</dst>
+            </link>
+          </links>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+  <profiles>
+    <profile>
+      <id>robosim</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.robovm</groupId>
+            <artifactId>robovm-maven-plugin</artifactId>
+            <version>${robovm.maven.version}</version>
+            <configuration>
+              <deviceName>iPad-Retina</deviceName>
+            </configuration>
+            <executions>
+              <execution>
+                <phase>test</phase>
+                <goals>
+                  <goal>ipad-sim</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>robodev</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.robovm</groupId>
+            <artifactId>robovm-maven-plugin</artifactId>
+            <version>${robovm.maven.version}</version>
+            <executions>
+              <execution>
+                <phase>install</phase>
+                <goals>
+                  <goal>ios-device</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+</project>

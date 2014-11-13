@@ -103,6 +103,29 @@
         <include>proguard.cfg</include>
       </includes>
     </fileSet>
+    <!-- robovm module -->
+    <fileSet filtered="true" encoding="UTF-8">
+      <directory>robovm</directory>
+      <includes>
+        <include>pom.xml</include>
+        <include>robovm.properties</include>
+      </includes>
+    </fileSet>
+    <fileSet filtered="true" packaged="true" encoding="UTF-8">
+      <directory>robovm/src/main/java</directory>
+      <includes>
+        <include>**/*.java</include>
+      </includes>
+    </fileSet>
+    <fileSet encoding="UTF-8">
+      <directory>robovm</directory>
+      <includes>
+        <include>robovm.xml</include>
+        <include>Info.plist.xml</include>
+        <include>resources/*.png</include>
+        <include>resources/iTunesArtwork</include>
+      </includes>
+    </fileSet>
     <!-- ios module -->
     <fileSet filtered="true" encoding="UTF-8">
       <directory>ios</directory>

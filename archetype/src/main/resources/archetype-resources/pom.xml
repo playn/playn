@@ -30,6 +30,14 @@
       <modules><module>android</module></modules>
     </profile>
     <profile>
+      <id>robosim</id>
+      <modules><module>robovm</module></modules>
+    </profile>
+    <profile>
+      <id>robodev</id>
+      <modules><module>robovm</module></modules>
+    </profile>
+    <profile>
       <id>ios</id>
       <modules><module>ios</module></modules>
     </profile>
