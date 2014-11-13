@@ -141,7 +141,7 @@ public interface Json {
   }
 
   /**
-   * Represents a parsed JSON array as a simple int->value map.
+   * Represents a parsed JSON array as a simple {@code int->value} map.
    */
   interface Array {
 
@@ -312,7 +312,7 @@ public interface Json {
   }
 
   /**
-   * Represents a parsed JSON object as a simple string->value map.
+   * Represents a parsed JSON object as a simple {@code string->value} map.
    */
   interface Object {
     /**

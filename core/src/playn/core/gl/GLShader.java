@@ -23,10 +23,10 @@ import playn.core.Surface;
  * the following series of calls:
  *
  * <ul>
- * <li> One or more of the following call pairs:<br/>
+ * <li> One or more of the following call pairs:<br>
  * {@link #prepareTexture} followed by {@link #addQuad} or {@link #addTriangles}.
  * <li> A call to {@link #flush} to send everything to the GPU.
- * </li>
+ * </ul>
  *
  * Because a shader may be prepared multiple times, care should be taken to avoid rebinding the
  * shader program, uniforms, attributes, etc. if a shader is bound again before being flushed. The

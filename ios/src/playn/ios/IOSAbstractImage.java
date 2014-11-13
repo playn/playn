@@ -46,9 +46,9 @@ public abstract class IOSAbstractImage extends ImageGL<CGBitmapContext> implemen
   }
 
   /**
-   * Returns the {@link BufferedImage} that underlies this image. This is public so that games that
-   * need to write custom backend code to do special stuff can access it. No promises are made,
-   * caveat coder.
+   * Returns the {@link CGImage} that underlies this image. This is public so that games that need
+   * to write custom backend code to do special stuff can access it. No promises are made, caveat
+   * coder.
    */
   public abstract CGImage cgImage();
 

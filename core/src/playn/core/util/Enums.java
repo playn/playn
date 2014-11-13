@@ -20,15 +20,18 @@ package playn.core.util;
  */
 public class Enums
 {
-  /** Finds the enum instance in the given array whose name matches the given value. This is a
+  /**
+   * Finds the enum instance in the given array whose name matches the given value. This is a
    * substitute for {@link Enum#valueOf(Class, String)}, which crashes on iOS. This is apparently
    * due to the fact that IKVM does not support {@link Class#getEnumConstants()}. However, the
    * static {@code values()} method on enum types is supported, so this method can be used instead.
+   *
    * <p>Just pass in the values directly, for example:
-   * <pre>
+   * <pre>{@code
    *   String enumName = ...;
    *   MyEnum value = Enums.valueOf(MyEnum.values(), enumName);
-   * </pre></p> */
+   * }</pre>
+   */
   public static <E extends Enum<?>> E valueOf (E[] values, String name){
     for (E e : values) {
       if (e.name().equals(name)) {

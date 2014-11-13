@@ -8,7 +8,8 @@ import com.google.gwt.core.client.JavaScriptObject;
  * Internet Explorer's {@code XDomainRequest} object, which must be used instead of
  * {@code XMLHttpRequest} for cross domain requests.
  *
- * @see http://msdn.microsoft.com/en-us/library/cc288060(v=vs.85).aspx
+ * @see <a href="http://msdn.microsoft.com/en-us/library/cc288060%28v%3dvs.85%29.aspx">
+ * JavaScript docs</a>
  */
 public final class XDomainRequest extends JavaScriptObject {
 

@@ -29,7 +29,7 @@ import com.google.gwt.core.ext.linker.EmittedArtifact;
 import com.google.gwt.core.linker.CrossSiteIframeLinker;
 
 /**
- * AppCacheLinker - linker for public path resources in the Application Cache. <br/>
+ * AppCacheLinker - linker for public path resources in the Application Cache. <br>
  * To use:
  * <ol>
  * <li>Add {@code manifest="YOURMODULENAME/appcache.nocache.manifest"} to the
@@ -96,7 +96,7 @@ public class AppCacheLinker extends CrossSiteIframeLinker {
    * manifest. Subclasses may override this method in order to filter out
    * specific file patterns.
    *
-   * @param file the path of the resource being considered
+   * @param path the path of the resource being considered
    * @return true if the file should be included in the manifest
    */
   protected boolean accept(String path) {

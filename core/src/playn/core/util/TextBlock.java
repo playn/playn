@@ -18,9 +18,7 @@ package playn.core.util;
 import pythagoras.f.IRectangle;
 import pythagoras.f.Rectangle;
 
-import playn.core.Canvas;
-import playn.core.CanvasImage;
-import playn.core.TextLayout;
+import playn.core.*;
 import static playn.core.PlayN.graphics;
 
 /**
@@ -56,8 +54,8 @@ public class TextBlock {
     public abstract float getX(float lineWidth, float blockWidth);
   }
 
-  /** The individual lines of text in this block. Obtained by a call to {@link
-   * Graphics#layoutText(String,playn.core.TextFormat,playn.core.TextWrap}}. */
+  /** The individual lines of text in this block. Obtained by a call to
+    * {@link Graphics#layoutText(String,TextFormat,TextWrap)}. */
   public final TextLayout[] lines;
 
   /** The bounds of this block of text. The {@code x} component of the bounds may be positive,

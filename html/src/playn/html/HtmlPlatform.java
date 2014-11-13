@@ -56,7 +56,7 @@ public class HtmlPlatform extends AbstractPlatform {
     public boolean experimentalFullscreen = false;
   }
 
-  /** Used by {@link #register(Mode)}. */
+  /** Used for {@link Config#mode}. */
   public static enum Mode {
     WEBGL, CANVAS, AUTODETECT;
   }

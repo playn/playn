@@ -43,19 +43,14 @@ import org.apache.http.protocol.BasicHttpProcessor;
 import org.apache.http.protocol.HttpContext;
 
 /**
- * <p>
- * Subclass of the Apache {@link DefaultHttpClient} that is configured with
- * reasonable default settings and registered schemes for Android, and also lets
- * the user add {@link HttpRequestInterceptor} classes. Don't create this
- * directly, use the {@link #newInstance} factory method.
- * </p>
- * <p/>
- * <p>
- * This client processes cookies but does not retain them by default. To retain
- * cookies, simply add a cookie store to the HttpContext:
+ * Subclass of the Apache {@link DefaultHttpClient} that is configured with reasonable default
+ * settings and registered schemes for Android, and also lets the user add {@link
+ * HttpRequestInterceptor} classes. Don't create this directly, use the {@link #newInstance}
+ * factory method.
  *
- * <pre>context.setAttribute(ClientContext.COOKIE_STORE, cookieStore);</pre>
- * </p>
+ * <p>This client processes cookies but does not retain them by default. To retain cookies, simply
+ * add a cookie store to the HttpContext:
+ * {@code context.setAttribute(ClientContext.COOKIE_STORE, cookieStore);}
  */
 public final class AndroidHttpClient implements HttpClient {
 

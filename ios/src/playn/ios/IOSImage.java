@@ -17,6 +17,7 @@ package playn.ios;
 
 import cli.MonoTouch.CoreGraphics.CGImage;
 
+import playn.core.Image;
 import playn.core.gl.GLContext;
 import playn.core.gl.Scale;
 

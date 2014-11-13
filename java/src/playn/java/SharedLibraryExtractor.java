@@ -36,7 +36,7 @@ public class SharedLibraryExtractor {
   /**
    * Extracts the specified library into the specified temp directory (if it has not already been
    * extracted thereto, or if the CRC does not match).
-   * @param sourcePath The file to extract from the classpath or JAR.
+   * @param libraryName The library to extract from the classpath or JAR.
    * @param dirName The name of the subdirectory where the file will be extracted. If null, the
    * file's CRC will be used.
    * @return The extracted file.

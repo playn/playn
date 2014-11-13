@@ -107,11 +107,11 @@ public class IOSPlatform extends AbstractPlatform {
     public SupportedOrients orients = SupportedOrients.PORTRAITS;
 
     /** If true, an iPad will be treated like a 2x Retina device with resolution 384x512 and which
-     * will use @2x images. A Retina iPad will also have resolution 384x512 and will use @4x images
-     * if they exist, then fall back to @2x (and default (1x) if necessary). If false, iPad will be
-     * treated as a non-Retina device with resolution 768x1024 and will use default (1x) images,
-     * and a Retina iPad will be treated as a Retina device with resolution 768x1024 and will use
-     * @2x images. */
+     * will use {@code @2x} images. A Retina iPad will also have resolution 384x512 and will use
+     * {@code @4x} images if they exist, then fall back to {@code @2x} (and default (1x) if
+     * necessary). If false, iPad will be treated as a non-Retina device with resolution 768x1024
+     * and will use default (1x) images, and a Retina iPad will be treated as a Retina device with
+     * resolution 768x1024 and will use {@code @2x} images. */
     public boolean iPadLikePhone = false;
 
     /** Indicates the frequency at which the game should be rendered (and updated). Defaults to

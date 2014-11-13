@@ -98,20 +98,20 @@ public class TextFormat {
     return new TextFormat(font, this.wrapWidth, this.align, this.antialias);
   }
 
-  /** @deprecated Use {@link Graphics#layoutText(String,TextFormat,float)} and render the wrapped
-   * lines individually. */
+  /** @deprecated Use {@link Graphics#layoutText(String,TextFormat,TextWrap)} and render the
+   * wrapped lines individually. */
   @Deprecated public TextFormat withWrapping(float wrapWidth, Alignment align) {
     return new TextFormat(this.font, wrapWidth, align, this.antialias);
   }
 
-  /** @deprecated Use {@link Graphics#layoutText(String,TextFormat,float)} and render the wrapped
-   * lines individually. */
+  /** @deprecated Use {@link Graphics#layoutText(String,TextFormat,TextWrap)} and render the
+   * wrapped lines individually. */
   @Deprecated public TextFormat withWrapWidth(float wrapWidth) {
     return new TextFormat(this.font, wrapWidth, this.align, this.antialias);
   }
 
-  /** @deprecated Use {@link Graphics#layoutText(String,TextFormat,float)} and render the wrapped
-   * lines individually (aligning them as desired). */
+  /** @deprecated Use {@link Graphics#layoutText(String,TextFormat,TextWrap)} and render the
+   * wrapped lines individually (aligning them as desired). */
   @Deprecated public TextFormat withAlignment(Alignment align) {
     return new TextFormat(this.font, this.wrapWidth, align, this.antialias);
   }
