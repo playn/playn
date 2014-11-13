@@ -45,6 +45,11 @@ public class RoboNet extends NetImpl {
   }
 
   @Override
+  public WebSocket createWebSocket(String url, WebSocket.Listener listener) {
+    return new RoboWebSocket(platform, url, listener);
+  }
+
+  @Override
   protected void execute(BuilderImpl req, Callback<Response> callback) {
     NSMutableURLRequest mreq = new NSMutableURLRequest();
     mreq.setURL(new NSURL(req.url));
