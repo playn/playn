@@ -13,8 +13,6 @@
  */
 package playn.robovm;
 
-import java.util.List;
-
 import org.robovm.apple.corefoundation.CFArray;
 import org.robovm.apple.corefoundation.CFRange;
 import org.robovm.apple.coregraphics.CGAffineTransform;
@@ -26,7 +24,6 @@ import org.robovm.apple.coregraphics.CGRect;
 // import org.robovm.apple.coretext.CTFramesetter;
 import org.robovm.apple.coretext.CTLine;
 import org.robovm.apple.foundation.NSAttributedString;
-import org.robovm.apple.uikit.NSAttributedStringAttribute;
 import org.robovm.apple.uikit.NSAttributedStringAttributes;
 import org.robovm.apple.uikit.UIColor;
 import org.robovm.apple.uikit.UIFont;
@@ -94,7 +91,8 @@ class RoboTextLayout extends AbstractTextLayout {
   }
 
   private final RoboFont font;
-  private final CTLine fillLine;
+  private CTLine fillLine;
+  private int fillColor;
   private CTLine strokeLine; // initialized lazily
   private float strokeWidth;
   private int strokeColor;
@@ -132,7 +130,13 @@ class RoboTextLayout extends AbstractTextLayout {
     paint(bctx, strokeLine, x, y);
   }
 
-  void fill(CGBitmapContext bctx, float x, float y) {
+  void fill(CGBitmapContext bctx, float x, float y, int fillColor) {
+    if (this.fillColor != fillColor){
+      this.fillColor = fillColor;
+      NSAttributedStringAttributes attribs = createAttribs(font);
+      attribs.setForegroundColor(toUIColor(fillColor));
+      fillLine = CTLine.create(new NSAttributedString(text, attribs));
+    }
     paint(bctx, fillLine, x, y);
   }
 

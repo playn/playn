@@ -19,9 +19,7 @@ import java.util.Map;
 
 import org.robovm.apple.coregraphics.CGAffineTransform;
 import org.robovm.apple.coregraphics.CGBitmapContext;
-import org.robovm.apple.coregraphics.CGBitmapInfo;
 import org.robovm.apple.coregraphics.CGBlendMode;
-import org.robovm.apple.coregraphics.CGColor;
 import org.robovm.apple.coregraphics.CGImage;
 import org.robovm.apple.coregraphics.CGInterpolationQuality;
 import org.robovm.apple.coregraphics.CGLineCap;
@@ -47,6 +45,7 @@ public class RoboCanvas extends AbstractCanvasGL<CGBitmapContext> {
 
   private float strokeWidth = 1;
   private int strokeColor = 0xFF000000;
+  private int fillColor = 0xFF000000;
   private CGBitmapContext bctx;
   private final RoboGLContext ctx;
 
@@ -232,7 +231,7 @@ public class RoboCanvas extends AbstractCanvasGL<CGBitmapContext> {
     RoboGradient gradient = currentState().gradient;
     RoboTextLayout ilayout = (RoboTextLayout) layout;
     if (gradient == null) {
-      ilayout.fill(bctx, x, y);
+      ilayout.fill(bctx, x, y, fillColor);
 
     } else {
       // draw our text into a fresh context so we can use it as a mask for the gradient
@@ -242,7 +241,7 @@ public class RoboCanvas extends AbstractCanvasGL<CGBitmapContext> {
       maskContext.scaleCTM(ctx.scale.factor, ctx.scale.factor);
       // fill the text into this temp context in white for use as a mask
       setFillColor(maskContext, 0xFFFFFFFF);
-      ilayout.fill(maskContext, 0, 0);
+      ilayout.fill(maskContext, 0, 0, fillColor);
 
       // now fill the gradient, using our temp context as a mask
       bctx.saveGState();
@@ -298,6 +297,7 @@ public class RoboCanvas extends AbstractCanvasGL<CGBitmapContext> {
 
   @Override
   public Canvas setFillColor(int color) {
+    this.fillColor = color;
     currentState().gradient = null;
     setFillColor(bctx, color);
     return this;
