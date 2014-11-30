@@ -412,9 +412,8 @@ public class RoboPlatform extends AbstractPlatform {
     // wait for the desired interval and then terminate the GL and AL
     // systems
     public static void terminate(RoboPlatform platform) {
-      NSTimer.scheduledTimerWithTimeInterval$target$selector$userInfo$repeats$(
-          platform.config.timeForTermination, new ResourceCleaner(platform), ResourceCleaner.SEL,
-          null, false);
+      NSTimer.createScheduled(platform.config.timeForTermination, new ResourceCleaner(platform),
+          ResourceCleaner.SEL, null, false);
     }
 
     @Callback @BindSelector("cleanRelatedResources:")

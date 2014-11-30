@@ -65,7 +65,7 @@ public class RoboPointer extends PointerImpl {
       // if we have an active touch, we only care about that touch
       if (_active == 0 || handle == _active) {
         _active = handle;
-        CGPoint loc = touch.getLocation(touch.getView());
+        CGPoint loc = touch.getLocationInView(touch.getView());
         // transform the point based on our current scale
         IPoint xloc = platform.graphics().transformTouch((float)loc.x(), (float)loc.y());
         return new Event.Impl(

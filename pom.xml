@@ -49,8 +49,8 @@
     <gwt.version>2.6.1</gwt.version>
     <jbox2d.version>2.2.1.1</jbox2d.version>
     <lwjgl.version>2.9.0</lwjgl.version>
-    <robovm.version>1.0.0-alpha-04</robovm.version>
-    <robovm.maven.version>1.0.0-alpha-04</robovm.maven.version>
+    <robovm.version>1.0.0-SNAPSHOT</robovm.version>
+    <robovm.maven.version>1.0.0-SNAPSHOT</robovm.maven.version>
     <!--
       GWT log levels:
       ERROR, WARN, INFO, TRACE, DEBUG, SPAM, or ALL
@@ -71,7 +71,26 @@
       <id>forplay-legacy</id>
       <url>http://forplay.googlecode.com/svn/mavenrepo</url>
     </repository>
+    <!-- TEMP: remove this after there is a stable release available for Robovm -->
+    <repository>
+      <id>sonatype-snapshots</id>
+      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+    </repository>
   </repositories>
+
+  <!-- TEMP: remove this after there is a stable release available for Robovm -->
+  <pluginRepositories>
+    <pluginRepository>
+      <id>sonatype-plugin-snapshots</id>
+      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+    </pluginRepository>
+  </pluginRepositories>
 
   <!-- Common dependencies for all modules -->
   <dependencies>

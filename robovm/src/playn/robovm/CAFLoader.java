@@ -22,7 +22,6 @@ import java.nio.ByteOrder;
 
 import org.robovm.apple.foundation.NSData;
 import org.robovm.apple.foundation.NSDataReadingOptions;
-import org.robovm.apple.foundation.NSError;
 import org.robovm.apple.foundation.NSRange;
 
 import static playn.robovm.OpenAL.*;
@@ -99,11 +98,7 @@ public class CAFLoader {
 
   public static void load(File path, int bufferId) {
     // mmap (if possible) the audio file for efficient reading/uploading
-    NSError.NSErrorPtr err = new NSError.NSErrorPtr();
-    NSData data = NSData.read(path, READ_OPTS, err);
-    if (err.get() != null) {
-      throw new RuntimeException(err.get().toString());
-    }
+    NSData data = NSData.read(path, READ_OPTS);
 
     // read the CAFF metdata to find out the audio format and the data offset/length
     ByteBuffer buf = data.asByteBuffer().order(ByteOrder.BIG_ENDIAN);

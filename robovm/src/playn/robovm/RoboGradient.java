@@ -72,7 +72,7 @@ public abstract class RoboGradient implements Gradient {
       comps[cc++] = ((color >>  0) & 0xFF) / 255f;
       comps[cc++] = ((color >> 24) & 0xFF) / 255f;
     }
-    cgGradient = CGGradient.create(RoboGraphics.colorSpace, comps, positions, 0 /*TODO: unused*/);
+    cgGradient = CGGradient.create(RoboGraphics.colorSpace, comps, positions);
   }
 
   @Override

@@ -50,7 +50,7 @@ public class RoboTouch extends TouchImpl {
     final Event.Impl[] events = new Event.Impl[touches.size()];
     int idx = 0;
     for (UITouch touch : touches) {
-      CGPoint loc = touch.getLocation(touch.getView());
+      CGPoint loc = touch.getLocationInView(touch.getView());
       // transform the point based on our current scale
       IPoint xloc = platform.graphics().transformTouch((float)loc.x(), (float)loc.y());
       // on iOS the memory address of the UITouch object is the unique id
