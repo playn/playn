@@ -368,13 +368,11 @@ public class RoboPlatform extends AbstractPlatform {
   private void willTerminate () {
     // let the app know that we're terminating
     onExit();
-
     // terminate our lifecycle observers
     for (NSObject obs : lifecycleObservers) {
       NSNotificationCenter.getDefaultCenter().removeObserver(obs);
     }
     lifecycleObservers.clear();
-
     // shutdown the GL and AL systems
     ResourceCleaner.terminate(this);
   }
@@ -399,21 +397,19 @@ public class RoboPlatform extends AbstractPlatform {
     UIApplication.Notifications.observeWillTerminate(new Runnable() {
       public void run () { willTerminate(); }});
   }
-  
+
   private static class ResourceCleaner extends NSObject {
     private final static Selector SEL = Selector.register("cleanRelatedResources:");
     private RoboPlatform platform;
 
     private ResourceCleaner(RoboPlatform platform) {
-      super();
       this.platform = platform;
     }
 
-    // wait for the desired interval and then terminate the GL and AL
-    // systems
+    // wait for the desired interval and then terminate the GL and AL systems
     public static void terminate(RoboPlatform platform) {
       NSTimer.createScheduled(platform.config.timeForTermination, new ResourceCleaner(platform),
-          ResourceCleaner.SEL, null, false);
+                              ResourceCleaner.SEL, null, false);
     }
 
     @Callback @BindSelector("cleanRelatedResources:")
@@ -426,11 +422,9 @@ public class RoboPlatform extends AbstractPlatform {
       }
 
       self.platform = null;
-      // clear out the platform in order to make sure the game creation
-      // flow can be repeated when
+      // clear out the platform in order to make sure the game creation flow can be repeated when
       // it is used as a part of a larger application
       PlayN.setPlatform(null);
     }
   }
-
 }
