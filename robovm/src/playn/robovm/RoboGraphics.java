@@ -19,7 +19,6 @@ import org.robovm.apple.coregraphics.CGColorSpace;
 import org.robovm.apple.coregraphics.CGImageAlphaInfo;
 import org.robovm.apple.coregraphics.CGRect;
 import org.robovm.apple.uikit.UIDevice;
-import org.robovm.apple.uikit.UIDeviceOrientation;
 import org.robovm.apple.uikit.UIScreen;
 import org.robovm.apple.uikit.UIUserInterfaceIdiom;
 import org.robovm.apple.uikit.UIWindow;

@@ -15,8 +15,6 @@
  */
 package playn.ios;
 
-import cli.System.Environment.SpecialFolder;
-import cli.System.Environment;
 import cli.System.IO.File;
 import cli.System.IO.Path;
 

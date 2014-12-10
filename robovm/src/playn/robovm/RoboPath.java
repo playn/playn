@@ -14,7 +14,6 @@
 package playn.robovm;
 
 import org.robovm.apple.coregraphics.CGMutablePath;
-import org.robovm.apple.coregraphics.CGPath;
 
 import playn.core.Path;
 

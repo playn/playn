@@ -22,7 +22,6 @@ import java.nio.IntBuffer;
 import org.robovm.rt.bro.Struct;
 import org.robovm.rt.bro.ptr.BytePtr;
 import playn.core.gl.AbstractGL20;
-import playn.core.gl.GL20;
 
 public class RoboGL20 extends AbstractGL20 {
 

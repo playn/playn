@@ -28,7 +28,6 @@ import org.robovm.apple.foundation.NSSearchPathDirectory;
 import org.robovm.apple.foundation.NSSearchPathDomainMask;
 
 import playn.core.BatchImpl;
-import playn.core.PlayN;
 import playn.core.Storage;
 
 public class RoboStorage implements Storage {

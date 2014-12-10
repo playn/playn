@@ -16,23 +16,10 @@ package playn.robovm;
 import org.robovm.apple.coregraphics.CGBitmapContext;
 import org.robovm.apple.coregraphics.CGImage;
 import org.robovm.apple.coregraphics.CGRect;
-import org.robovm.apple.uikit.UIDeviceOrientation;
 
 import org.robovm.rt.bro.ptr.VoidPtr;
-import pythagoras.f.FloatMath;
-import pythagoras.i.Rectangle;
 
-import playn.core.InternalTransform;
-import playn.core.StockInternalTransform;
-import playn.core.Tint;
-import playn.core.gl.GL20;
 import playn.core.gl.GL20Context;
-import playn.core.gl.GLBuffer;
-import playn.core.gl.GLContext;
-import playn.core.gl.GLProgram;
-import playn.core.gl.GLShader;
-import playn.core.gl.GroupLayerGL;
-import playn.core.gl.IndexedTrisShader;
 import static playn.core.gl.GL20.*;
 
 public class RoboGLContext extends GL20Context {
