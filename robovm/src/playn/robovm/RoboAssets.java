@@ -112,7 +112,7 @@ public class RoboAssets extends AbstractAssets<UIImage> {
       if (!fullPath.exists()) continue;
 
       // platform.log().debug("Loading image: " + fullPath);
-      UIImage img = UIImage.create(fullPath.toString());
+      UIImage img = UIImage.create(fullPath);
       if (img != null) return recv.imageLoaded(img, rsrc.scale);
 
       // note this error if this is the lowest resolution image, but fall back to lower resolution
