@@ -101,10 +101,12 @@ public class RoboNet extends NetImpl {
           @Override
           protected Map<String,List<String>> extractHeaders() {
             Map<String,List<String>> headerMap = new HashMap<String,List<String>>();
-            for (Map.Entry<String,String> entry : headers.entrySet()) {
-              // iOS concatenates all repeated headers into a single header separated by commas,
-              // which is known to be a fucking stupid thing to do, but hey, they're doing it!
-              headerMap.put(entry.getKey(), Collections.singletonList(entry.getValue()));
+            if (headers != null) {
+              for (Map.Entry<String,String> entry : headers.entrySet()) {
+                // iOS concatenates all repeated headers into a single header separated by commas,
+                // which is known to be a fucking stupid thing to do, but hey, they're doing it!
+                headerMap.put(entry.getKey(), Collections.singletonList(entry.getValue()));
+              }
             }
             return headerMap;
           }
