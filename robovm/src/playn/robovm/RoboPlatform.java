@@ -13,27 +13,20 @@
  */
 package playn.robovm;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.robovm.apple.coregraphics.CGRect;
-import org.robovm.apple.foundation.NSNotificationCenter;
 import org.robovm.apple.foundation.NSObject;
 import org.robovm.apple.foundation.NSTimer;
 import org.robovm.apple.foundation.NSURL;
-import org.robovm.apple.glkit.GLKView;
 import org.robovm.apple.glkit.GLKViewDrawableColorFormat;
 import org.robovm.apple.opengles.EAGLContext;
-import org.robovm.apple.opengles.EAGLRenderingAPI;
 import org.robovm.apple.uikit.UIApplication;
 import org.robovm.apple.uikit.UIDevice;
 import org.robovm.apple.uikit.UIInterfaceOrientation;
 import org.robovm.apple.uikit.UIInterfaceOrientationMask;
 import org.robovm.apple.uikit.UIScreen;
-import org.robovm.apple.uikit.UIViewController;
-import org.robovm.apple.uikit.UIWindow;
 import org.robovm.objc.Selector;
 import org.robovm.objc.annotation.BindSelector;
 import org.robovm.rt.bro.annotation.Callback;
@@ -82,13 +75,6 @@ public class RoboPlatform extends AbstractPlatform {
       * application lifecycle. */
     public float timeForTermination = 0.5f;
 
-    /** Indicates that PlayN is to be embedded in a larger iOS app. This disables the default
-      * lifecycle listeners. The main app must call {@link RoboPlatform#activate} when the view
-      * containing the PlayN app is about to be shown, and {@link RoboPlatform#terminate} when the
-      * view goes away. Note that while PlayN is activated, it will automatically listen for and
-      * handle background and foreground notifications, so those need not be performed manually. */
-    public boolean embedded = false;
-
     /** Configures the format of the GL framebuffer. The default is RGBA8888, but one can use
       * RGB565 for higher performance at the cost of lower color fidelity. */
     public GLKViewDrawableColorFormat glBufferFormat = GLKViewDrawableColorFormat.RGBA8888;
@@ -104,74 +90,9 @@ public class RoboPlatform extends AbstractPlatform {
     void didRotate(UIInterfaceOrientation orientation);
   }
 
-  /**
-   * Registers your application using the default configuration.
-   */
-  public static RoboPlatform register(UIApplication app) {
-    return register(app, new Config());
-  }
-
-  /**
-   * Registers your application using the supplied configuration.
-   */
-  public static RoboPlatform register(UIApplication app, Config config) {
-    return register(app, null, config);
-  }
-
-  /**
-   * Registers your application using the supplied configuration and window.
-   *
-   * The window is used for a game integrated as a part of application. An iOS application
-   * typically just works on one screen so that the game has to share the window created by other
-   * controllers (typically created by the story board). If no window is specified, the platform
-   * will create one taking over the whole application.
-   *
-   * Note that PlayN will still install a RootViewController on the supplied UIWindow. If a custom
-   * root view controller is needed, your application should subclass {@link RoboRootViewController}
-   * or replicate its functionality in your root view controller.
-   */
-  public static RoboPlatform register(UIApplication app, UIWindow window, Config config) {
-    RoboPlatform platform = new RoboPlatform(app, window, config);
-    PlayN.setPlatform(platform);
-    return platform;
-  }
-
-  /** Returns the top-level UIWindow. */
-  public UIWindow window() {
-    return mainWindow;
-  }
-
-  /** Returns the controller for the root view. */
-  public UIViewController rootViewController() {
-    return rootViewController;
-  }
-
-  /** Returns the main game view. You can add subviews to this view if you wish to overlay views
-   * onto your game. */
-  public GLKView gameView() {
-    return rootViewController.view;
-  }
-
   /** Configures a listener to be notified when the device rotates. */
   public void setListener(OrientationListener listener) {
     orientListener = listener;
-  }
-
-  /** Manually activates the PlayN platform. This is for use by applications which are embedding
-    * PlayN into a larger iOS app. {@link Config#embedded} must also be true in that case. */
-  public void activate() {
-    if (!config.embedded) throw new IllegalStateException(
-      "Config.embedded must be true to enable manual lifecycle control");
-    registerLifecycleObservers();
-    didBecomeActive();
-  }
-
-  /** Manually terminates the PlayN platform. This is for use by applications which are embedding
-    * PlayN into a larger iOS app. {@link Config#embedded} must also be true in that case. */
-  public void terminate() {
-    if (!config.embedded) throw new IllegalStateException(
-      "Config.embedded must be true to enable manual lifecycle control");
-    willTerminate();
   }
 
   private RoboAudio audio; // lazily initialized
@@ -184,32 +105,23 @@ public class RoboPlatform extends AbstractPlatform {
   private final RoboTouch touch;
   private final RoboAssets assets;
 
+  /** It's used as a guard flag to avoid duplicated entries caused by the twice dispatches of 
+   * GLKViewControllerDelegate.willPause in one cycle. That could be a bug of RoboVM. 
+   * TODO: remove this after we figure out a better solution. **/
+  private boolean paused = false;
   private Game game;
   private OrientationListener orientListener;
-
-  private final UIApplication app;
-  private final UIWindow mainWindow;
-  private final RoboRootViewController rootViewController;
   private final long gameStart = System.nanoTime();
-  private final List<NSObject> lifecycleObservers = new ArrayList<NSObject>();
   private final ExecutorService pool = Executors.newFixedThreadPool(3);
 
   final int osVersion = getOSVersion();
   final Config config;
 
-  protected RoboPlatform(UIApplication app, UIWindow window, Config config) {
+  protected RoboPlatform(CGRect bounds, Config config) {
     super(new RoboLog());
-    this.app = app;
     this.config = config;
-
-    // create our EAGLContext and set up our GL view
-    EAGLContext ctx = new EAGLContext(EAGLRenderingAPI.OpenGLES2);
-    CGRect bounds = UIScreen.getMainScreen().getBounds();
-    mainWindow = (window == null) ? new UIWindow(bounds) : window;
-    rootViewController = new RoboRootViewController(this, ctx, mainWindow);
-    mainWindow.setRootViewController(rootViewController);
-
-    graphics = new RoboGraphics(this, mainWindow);
+    bounds = bounds != null ? bounds : UIScreen.getMainScreen().getBounds();
+    graphics = new RoboGraphics(this, bounds);
     json = new JsonImpl();
     keyboard = new RoboKeyboard(this);
     net = new RoboNet(this);
@@ -217,9 +129,6 @@ public class RoboPlatform extends AbstractPlatform {
     touch = new RoboTouch(this);
     assets = new RoboAssets(this);
     storage = new RoboStorage(this);
-
-    // if we're not in embedded mode, register our lifecycle observers
-    if (!config.embedded) registerLifecycleObservers();
   }
 
   @Override
@@ -300,7 +209,7 @@ public class RoboPlatform extends AbstractPlatform {
 
   @Override
   public void openURL(String url) {
-    if (!app.openURL(new NSURL(url))) {
+    if (!UIApplication.getSharedApplication().openURL(new NSURL(url))) {
       log().warn("Failed to open URL: " + url);
     }
   }
@@ -316,8 +225,6 @@ public class RoboPlatform extends AbstractPlatform {
     this.game = game;
     // initialize the game and start things off
     game.init();
-    // make our main window visible
-    mainWindow.makeKeyAndVisible();
   }
 
   void willRotate(UIInterfaceOrientation toOrient, double duration) {
@@ -345,34 +252,28 @@ public class RoboPlatform extends AbstractPlatform {
     graphics.paint();
   }
 
-  // lifecycle callbacks
-  private void didBecomeActive() {
-    // gameView.onActivated();
-  }
-  private void willEnterForeground() {
+  void willEnterForeground () {
+    if (!paused) return;
+    paused = false;
     invokeLater(new Runnable() {
       public void run() {
         onResume();
       }
     });
   }
-  private void willResignActive () {
-    // gameView.onResignActivation();
-  }
-  private void didEnterBackground () {
+  
+  void didEnterBackground () {
+    if (paused) return;
+    paused = true;
     // we call this directly rather than via invokeLater() because the PlayN thread is already
     // stopped at this point so a) there's no point in worrying about racing with that thread,
     // and b) onPause would never get called, since the PlayN thread is not processing events
     onPause();
   }
-  private void willTerminate () {
+  
+  void willTerminate () {
     // let the app know that we're terminating
     onExit();
-    // terminate our lifecycle observers
-    for (NSObject obs : lifecycleObservers) {
-      NSNotificationCenter.getDefaultCenter().removeObserver(obs);
-    }
-    lifecycleObservers.clear();
     // shutdown the GL and AL systems
     ResourceCleaner.terminate(this);
   }
@@ -381,21 +282,6 @@ public class RoboPlatform extends AbstractPlatform {
     String systemVersion = UIDevice.getCurrentDevice().getSystemVersion();
     int version = Integer.parseInt(systemVersion.split("\\.")[0]);
     return version;
-  }
-
-  private void registerLifecycleObservers() {
-    // observe lifecycle events (we deviate from "standard code style" here to make it easier to
-    // ignore the repeated boilerplate and see the actual important bits)
-    UIApplication.Notifications.observeDidBecomeActive(new Runnable() {
-      public void run () { didBecomeActive(); }});
-    UIApplication.Notifications.observeWillEnterForeground(new Runnable() {
-      public void run () { willEnterForeground(); }});
-    UIApplication.Notifications.observeWillResignActive(new Runnable() {
-      public void run () { willResignActive(); }});
-    UIApplication.Notifications.observeDidEnterBackground(new Runnable() {
-      public void run () { didEnterBackground(); }});
-    UIApplication.Notifications.observeWillTerminate(new Runnable() {
-      public void run () { willTerminate(); }});
   }
 
   private static class ResourceCleaner extends NSObject {

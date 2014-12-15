@@ -21,7 +21,6 @@ import org.robovm.apple.coregraphics.CGRect;
 import org.robovm.apple.uikit.UIDevice;
 import org.robovm.apple.uikit.UIScreen;
 import org.robovm.apple.uikit.UIUserInterfaceIdiom;
-import org.robovm.apple.uikit.UIWindow;
 
 import playn.core.CanvasImage;
 import playn.core.Font;
@@ -58,7 +57,7 @@ public class RoboGraphics extends GraphicsGL {
 
   final RoboGLContext ctx;
 
-  public RoboGraphics(RoboPlatform platform, UIWindow window) {
+  public RoboGraphics(RoboPlatform platform, CGRect bounds) {
     this.platform = platform;
 
     float deviceScale = (float)(/*(platform.osVersion >= 8) ?
@@ -69,7 +68,6 @@ public class RoboGraphics extends GraphicsGL {
     boolean useHalfSize = isPad && platform.config.iPadLikePhone;
     float viewScale = (useHalfSize ? 2 : 1) * deviceScale;
 
-    CGRect bounds = window.getBounds();
     int screenWidth = (int)bounds.getWidth(), screenHeight = (int)bounds.getHeight();
     if (useHalfSize) {
       screenWidth /= 2;
