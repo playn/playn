@@ -96,11 +96,11 @@ public class RoboPlatform extends AbstractPlatform {
    *
    * <p>This basically just sets the root view controller of the supplied window and that view
    * controller manages everything else. If you wish to embed a PlayN game in a larger iOS app, or
-   * to customize PlayN more deeply, create a {@link RoboRootViewController} yourself and include
-   * it in your app wherever you like.
+   * to customize PlayN more deeply, create a {@link RoboViewController} yourself and include it in
+   * your app wherever you like.
    */
   public static RoboPlatform register (UIWindow window, Config config) {
-    RoboRootViewController ctrl = new RoboRootViewController(window.getBounds(), config);
+    RoboViewController ctrl = new RoboViewController(window.getBounds(), config);
     window.setRootViewController(ctrl);
     return ctrl.platform();
   }

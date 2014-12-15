@@ -33,13 +33,18 @@ import org.robovm.rt.bro.annotation.Callback;
 import playn.core.Game;
 import playn.core.PlayN;
 
-public class RoboRootViewController extends GLKViewController implements GLKViewControllerDelegate {
+/**
+ * Manages the main PlayN view as well as all iOS and GL callbacks and lifecycle. This is the root
+ * of the iOS backend. If you want to customize things or embed PlayN, you'll want to understand
+ * what this class does.
+ */
+public class RoboViewController extends GLKViewController implements GLKViewControllerDelegate {
 
   private final GLKView view;
   private final RoboPlatform platform;
 
   /** Creates a game view controller with the given bounds and configuration **/
-  public RoboRootViewController(CGRect bounds, RoboPlatform.Config config) {
+  public RoboViewController(CGRect bounds, RoboPlatform.Config config) {
     EAGLContext ctx = new EAGLContext(EAGLRenderingAPI.OpenGLES2);
     platform = new RoboPlatform(bounds, config);
     view = new GLKView(bounds, ctx) {
@@ -150,7 +155,7 @@ public class RoboRootViewController extends GLKViewController implements GLKView
 
   @Callback @BindSelector("shouldAutorotateToInterfaceOrientation:")
   private static boolean shouldAutorotateToInterfaceOrientation(
-    RoboRootViewController self, Selector sel, UIInterfaceOrientation orientation) {
+    RoboViewController self, Selector sel, UIInterfaceOrientation orientation) {
     return self.shouldAutorotateToInterfaceOrientation(orientation);
   }
 }
