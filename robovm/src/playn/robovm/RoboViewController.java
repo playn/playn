@@ -79,7 +79,7 @@ public class RoboViewController extends GLKViewController implements GLKViewCont
     // view.setDrawableStencilFormat(GLKViewDrawableStencilFormat.None);
     setView(view);
     setDelegate(this);
-    setPreferredFramesPerSecond(60); // TODO
+    setPreferredFramesPerSecond(config.targetFPS);
     addStrongRef(platform);
     PlayN.setPlatform(platform);
   }

@@ -80,6 +80,11 @@ public class RoboPlatform extends AbstractPlatform {
       * RGB565 for higher performance at the cost of lower color fidelity. */
     public GLKViewDrawableColorFormat glBufferFormat = GLKViewDrawableColorFormat.RGBA8888;
 
+    /** The desired frames per second for the app. This controls the frequency of {@code update}
+      * and {@code paint} calls to your app. Safe values are {@code 30} or {@code 0}. I'm not sure
+      * that iOS will honor other arbitrary frame rates. */
+    public int targetFPS = 60;
+
     /** Dictates the name of the temporary file used by {@link RoboStorage}. Configure this if you
       * want to embed multiple games into your application. */
     public String storageFileName = "playn.db";
