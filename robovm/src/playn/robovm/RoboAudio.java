@@ -39,7 +39,7 @@ public class RoboAudio extends AudioImpl {
     super(platform);
     this.platform = platform;
 
-    session = AVAudioSession.getSharedInstance();
+    session = AVAudioSession.sharedInstance();
     session.setActive(true, null); // TODO: options?
 
     oalDevice = alcOpenDevice(null);
