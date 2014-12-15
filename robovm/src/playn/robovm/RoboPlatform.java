@@ -27,6 +27,7 @@ import org.robovm.apple.uikit.UIDevice;
 import org.robovm.apple.uikit.UIInterfaceOrientation;
 import org.robovm.apple.uikit.UIInterfaceOrientationMask;
 import org.robovm.apple.uikit.UIScreen;
+import org.robovm.apple.uikit.UIWindow;
 import org.robovm.objc.Selector;
 import org.robovm.objc.annotation.BindSelector;
 import org.robovm.rt.bro.annotation.Callback;
@@ -90,6 +91,20 @@ public class RoboPlatform extends AbstractPlatform {
     void didRotate(UIInterfaceOrientation orientation);
   }
 
+  /**
+   * Registers the RoboVM platform for operation in {@code window}.
+   *
+   * <p>This basically just sets the root view controller of the supplied window and that view
+   * controller manages everything else. If you wish to embed a PlayN game in a larger iOS app, or
+   * to customize PlayN more deeply, create a {@link RoboRootViewController} yourself and include
+   * it in your app wherever you like.
+   */
+  public static RoboPlatform register (UIWindow window, Config config) {
+    RoboRootViewController ctrl = new RoboRootViewController(window.getBounds(), config);
+    window.setRootViewController(ctrl);
+    return ctrl.platform();
+  }
+
   /** Configures a listener to be notified when the device rotates. */
   public void setListener(OrientationListener listener) {
     orientListener = listener;
@@ -105,9 +120,9 @@ public class RoboPlatform extends AbstractPlatform {
   private final RoboTouch touch;
   private final RoboAssets assets;
 
-  /** It's used as a guard flag to avoid duplicated entries caused by the twice dispatches of 
-   * GLKViewControllerDelegate.willPause in one cycle. That could be a bug of RoboVM. 
-   * TODO: remove this after we figure out a better solution. **/
+  /** Used as a guard flag to avoid duplicated entries caused by the double dispatches of
+    * GLKViewControllerDelegate.willPause in one cycle. That could be a bug of RoboVM.
+    * TODO: remove this after we figure out a better solution. **/
   private boolean paused = false;
   private Game game;
   private OrientationListener orientListener;
@@ -227,12 +242,14 @@ public class RoboPlatform extends AbstractPlatform {
     game.init();
   }
 
+  // NOTE: all of the below callbacks are called by RoboViewController which handles interfacing
+  // with iOS for rotation notifications, game loop callbacks, and app lifecycle events
+
   void willRotate(UIInterfaceOrientation toOrient, double duration) {
     if (orientListener != null) {
       orientListener.willRotate(toOrient, duration);
     }
   }
-
   void didRotate (UIInterfaceOrientation fromOrient) {
     if (orientListener != null) {
       orientListener.didRotate(fromOrient);
@@ -261,7 +278,7 @@ public class RoboPlatform extends AbstractPlatform {
       }
     });
   }
-  
+
   void didEnterBackground () {
     if (paused) return;
     paused = true;
@@ -270,7 +287,7 @@ public class RoboPlatform extends AbstractPlatform {
     // and b) onPause would never get called, since the PlayN thread is not processing events
     onPause();
   }
-  
+
   void willTerminate () {
     // let the app know that we're terminating
     onExit();

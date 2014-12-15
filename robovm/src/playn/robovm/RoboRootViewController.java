@@ -32,51 +32,39 @@ import org.robovm.rt.bro.annotation.Callback;
 
 import playn.core.Game;
 import playn.core.PlayN;
-import playn.robovm.RoboPlatform.Config;
 
-public class RoboRootViewController extends GLKViewController implements GLKViewControllerDelegate  {
+public class RoboRootViewController extends GLKViewController implements GLKViewControllerDelegate {
 
-  public final GLKView view;
+  private final GLKView view;
   private final RoboPlatform platform;
 
-  /** Create a new game view controller with default configuration **/
-  public RoboRootViewController (){
-    this(new Config());
-  }
-  
-  /** Create a game view controller with the given configuration **/
-  public RoboRootViewController (Config config){
-    this(null, config);
-  }
-  
-  /** Create a game view controller with the given bounds and configuration **/
-  public RoboRootViewController (CGRect bounds, Config config) {
+  /** Creates a game view controller with the given bounds and configuration **/
+  public RoboRootViewController(CGRect bounds, RoboPlatform.Config config) {
     EAGLContext ctx = new EAGLContext(EAGLRenderingAPI.OpenGLES2);
-    bounds = bounds != null ? bounds : UIScreen.getMainScreen().getBounds();
     platform = new RoboPlatform(bounds, config);
     view = new GLKView(bounds, ctx) {
       @Method(selector = "touchesBegan:withEvent:")
-      public void touchesBegan (NSSet<UITouch> touches, UIEvent event) {
+      public void touchesBegan(NSSet<UITouch> touches, UIEvent event) {
         platform.touch().onTouchesBegan(touches, event);
         platform.pointer().onTouchesBegan(touches, event);
       }
       @Method(selector = "touchesCancelled:withEvent:")
-      public void touchesCancelled (NSSet<UITouch> touches, UIEvent event) {
+      public void touchesCancelled(NSSet<UITouch> touches, UIEvent event) {
         platform.touch().onTouchesCancelled(touches, event);
         platform.pointer().onTouchesCancelled(touches, event);
       }
       @Method(selector = "touchesEnded:withEvent:")
-      public void touchesEnded (NSSet<UITouch> touches, UIEvent event) {
+      public void touchesEnded(NSSet<UITouch> touches, UIEvent event) {
         platform.touch().onTouchesEnded(touches, event);
         platform.pointer().onTouchesEnded(touches, event);
       }
       @Method(selector = "touchesMoved:withEvent:")
-      public void touchesMoved (NSSet<UITouch> touches, UIEvent event) {
+      public void touchesMoved(NSSet<UITouch> touches, UIEvent event) {
         platform.touch().onTouchesMoved(touches, event);
         platform.pointer().onTouchesMoved(touches, event);
       }
       @Override
-      public void draw (CGRect rect) {
+      public void draw(CGRect rect) {
         platform.paint();
       }
     };
@@ -91,25 +79,25 @@ public class RoboRootViewController extends GLKViewController implements GLKView
     PlayN.setPlatform(platform);
   }
 
-  /** initialize and run the game **/
-  public void run (Game game) {
-    platform.run(game);
+  /** Returns the platform managed by this view controller. */
+  public RoboPlatform platform() {
+    return platform;
   }
 
   @Override // from GLKViewControllerDelegate
-  public void update (GLKViewController self) {
+  public void update(GLKViewController self) {
     platform.update();
   }
 
   @Override // from GLKViewControllerDelegate
-  public void willPause (GLKViewController self, boolean paused) {
+  public void willPause(GLKViewController self, boolean paused) {
     // platform.log().debug("willPause(" + paused + ")");
     if (paused) platform.didEnterBackground();
     else platform.willEnterForeground();
   }
 
   @Override // from ViewController
-  public void viewDidAppear (boolean animated) {
+  public void viewDidAppear(boolean animated) {
     super.viewDidAppear(animated);
     CGRect bounds = getView().getBounds();
     // platform.log().debug("viewDidAppear(" + animated + "): " + bounds);
@@ -118,7 +106,7 @@ public class RoboRootViewController extends GLKViewController implements GLKView
   }
 
   @Override // from ViewController
-  public void viewDidDisappear (boolean animated) {
+  public void viewDidDisappear(boolean animated) {
     super.viewDidDisappear(animated);
     EAGLContext.setCurrentContext(null);
   }
@@ -130,7 +118,7 @@ public class RoboRootViewController extends GLKViewController implements GLKView
   }
 
   @Override // from ViewController
-  public void didRotate (UIInterfaceOrientation fromOrient) {
+  public void didRotate(UIInterfaceOrientation fromOrient) {
     super.didRotate(fromOrient);
     CGRect bounds = getView().getBounds();
     // platform.log().debug("didRotate(" + fromOrient + "): " + bounds);
@@ -139,16 +127,16 @@ public class RoboRootViewController extends GLKViewController implements GLKView
   }
 
   @Override // from ViewController
-  public UIInterfaceOrientationMask getSupportedInterfaceOrientations () {
+  public UIInterfaceOrientationMask getSupportedInterfaceOrientations() {
     return platform.config.orients;
   }
 
   @Override // from ViewController
-  public boolean shouldAutorotate () {
+  public boolean shouldAutorotate() {
     return true;
   }
 
-  public boolean shouldAutorotateToInterfaceOrientation (UIInterfaceOrientation orientation) {
+  public boolean shouldAutorotateToInterfaceOrientation(UIInterfaceOrientation orientation) {
     return true; // TODO
   }
 
@@ -161,7 +149,7 @@ public class RoboRootViewController extends GLKViewController implements GLKView
   }
 
   @Callback @BindSelector("shouldAutorotateToInterfaceOrientation:")
-  private static boolean shouldAutorotateToInterfaceOrientation (
+  private static boolean shouldAutorotateToInterfaceOrientation(
     RoboRootViewController self, Selector sel, UIInterfaceOrientation orientation) {
     return self.shouldAutorotateToInterfaceOrientation(orientation);
   }
