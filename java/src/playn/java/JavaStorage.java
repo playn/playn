@@ -17,12 +17,11 @@ package playn.java;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.prefs.AbstractPreferences;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
-
-import com.google.common.collect.Maps;
 
 import playn.core.BatchImpl;
 import playn.core.Storage;
@@ -152,6 +151,6 @@ class JavaStorage implements Storage {
     @Override protected void flushSpi () throws BackingStoreException {
       throw new BackingStoreException("Not implemented");
     }
-    protected Map<String, String> _values = Maps.newHashMap();
+    protected Map<String, String> _values = new HashMap<String, String>();
   }
 }

@@ -15,6 +15,7 @@ package playn.java;
 
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
+import java.awt.Font;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -22,10 +23,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 
+import java.util.Arrays;
 import javax.imageio.ImageIO;
-
-import com.google.common.base.Charsets;
-import com.google.common.io.Resources;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
 
 import pythagoras.f.MathUtil;
 
@@ -126,12 +127,12 @@ public class JavaAssets extends AbstractAssets<BufferedImage> {
 
   @Override
   public String getTextSync(String path) throws Exception {
-    return Resources.toString(requireResource(path), Charsets.UTF_8);
+    return requireResource(path).readString();
   }
 
   @Override
   public byte[] getBytesSync(String path) throws Exception {
-    return Resources.toByteArray(requireResource(path));
+    return requireResource(path).readBytes();
   }
 
   @Override
@@ -149,7 +150,7 @@ public class JavaAssets extends AbstractAssets<BufferedImage> {
     Exception error = null;
     for (Scale.ScaledResource rsrc : assetScale().getScaledResources(fullPath)) {
       try {
-        BufferedImage image = ImageIO.read(requireResource(rsrc.path));
+        BufferedImage image = requireResource(rsrc.path).readImage();
         // if image is at a higher scale factor than the view, scale to the view display factor
         Scale viewScale = platform.graphics().ctx().scale, imageScale = rsrc.scale;
         float viewImageRatio = viewScale.factor / imageScale.factor;
@@ -176,32 +177,12 @@ public class JavaAssets extends AbstractAssets<BufferedImage> {
     return recv.loadFailed(error != null ? error : new FileNotFoundException(fullPath));
   }
 
-  /**
-   * Attempts to locate the resource at the given path, and returns an input stream. First, the
-   * path prefix is prepended (see {@link #setPathPrefix(String)}) and the the class loader checked.
-   * If not found, then the extra directories, if any, are checked, in order. If the file is not
-   * found in any of the extra directories either, then an exception is thrown.
-   */
-  protected InputStream getAssetStream(String path) throws IOException {
-    InputStream in = getClass().getClassLoader().getResourceAsStream(pathPrefix + path);
-    if (in != null) {
-      return in;
-    }
-    for (File dir : directories) {
-      File f = new File(dir, path);
-      if (f.exists()) {
-        return new FileInputStream(f);
-      }
-    }
-    throw new FileNotFoundException();
-  }
-
   protected Sound getSound(String path, boolean music) {
     Exception err = null;
     for (String suff : SUFFIXES) {
       final String soundPath = path + suff;
       try {
-        return platform.audio().createSound(getAssetStream(soundPath), music);
+        return platform.audio().createSound(requireResource(soundPath), music);
       } catch (Exception e) {
         err = e; // note the error, and loop through and try the next format
       }
@@ -211,23 +192,41 @@ public class JavaAssets extends AbstractAssets<BufferedImage> {
   }
 
   /**
-   * Attempts to locate the resource at the given path, and returns the URL. First, the path prefix
-   * is prepended (see {@link #setPathPrefix(String)}) and the the class loader checked. If not
-   * found, then the extra directories, if any, are checked, in order. If the file is not found in
-   * any of the extra directories either, then an exception is thrown.
+   * Attempts to locate the resource at the given path, and returns a wrapper which allows its data
+   * to be efficiently read.
+   *
+   * <p>First, the path prefix is prepended (see {@link #setPathPrefix(String)}) and the the class
+   * loader checked. If not found, then the extra directories, if any, are checked, in order. If
+   * the file is not found in any of the extra directories either, then an exception is thrown.
    */
-  protected URL requireResource(String path) throws IOException {
+  protected Resource requireResource(String path) throws IOException {
     URL url = getClass().getClassLoader().getResource(pathPrefix + path);
     if (url != null) {
-      return url;
+      return url.getProtocol().equals("file") ?
+        new FileResource(new File(url.getPath())) :
+        new URLResource(url);
     }
     for (File dir : directories) {
       File f = new File(dir, path).getCanonicalFile();
       if (f.exists()) {
-        return f.toURI().toURL();
+        return new FileResource(f);
       }
     }
     throw new FileNotFoundException(path);
+  }
+
+  static byte[] toByteArray(InputStream in) throws IOException {
+    try {
+      byte[] buffer = new byte[512];
+      int size = 0, read = 0;
+      while ((read = in.read(buffer, size, buffer.length-size)) > 0) {
+        size += read;
+        if (size == buffer.length) buffer = Arrays.copyOf(buffer, size+512);
+      }
+      return buffer;
+    } finally {
+      in.close();
+    }
   }
 
   protected BufferedImage scaleImage(BufferedImage image, float viewImageRatio) {
@@ -242,6 +241,65 @@ public class JavaAssets extends AbstractAssets<BufferedImage> {
 
   protected Scale assetScale() {
     return (assetScale != null) ? assetScale : platform.graphics().ctx().scale;
+  }
+
+  abstract static class Resource {
+    public abstract BufferedImage readImage() throws IOException;
+    public abstract InputStream openStream () throws IOException;
+    public AudioInputStream openAudioStream () throws Exception {
+      return AudioSystem.getAudioInputStream(openStream());
+    }
+    public Font createFont () throws Exception {
+      return Font.createFont(Font.TRUETYPE_FONT, openStream());
+    }
+    public byte[] readBytes() throws IOException {
+      return toByteArray(openStream());
+    }
+    public String readString() throws Exception {
+      return new String(readBytes(), "UTF-8");
+    }
+  }
+
+  protected static class URLResource extends Resource {
+    public final URL url;
+    public URLResource(URL url) {
+      this.url = url;
+    }
+    public InputStream openStream () throws IOException {
+      return url.openStream();
+    }
+    public BufferedImage readImage() throws IOException {
+      return ImageIO.read(url);
+    }
+  }
+
+  protected static class FileResource extends Resource {
+    public final File file;
+    public FileResource(File file) {
+      this.file = file;
+    }
+    public InputStream openStream () throws IOException {
+      return new FileInputStream(file);
+    }
+    public BufferedImage readImage() throws IOException {
+      return ImageIO.read(file);
+    }
+    @Override public AudioInputStream openAudioStream () throws Exception {
+      return AudioSystem.getAudioInputStream(file);
+    }
+    @Override public Font createFont () throws Exception {
+      return Font.createFont(Font.TRUETYPE_FONT, file);
+    }
+    @Override public byte[] readBytes() throws IOException {
+      InputStream in = openStream();
+      try {
+        byte[] buffer = new byte[(int)file.length()]; // no >2GB files
+        in.read(buffer);
+        return buffer;
+      } finally {
+        in.close();
+      }
+    }
   }
 
   protected static final String[] SUFFIXES = { ".wav", ".mp3" };

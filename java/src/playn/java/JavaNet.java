@@ -23,8 +23,6 @@ import java.net.URL;
 import java.util.List;
 import java.util.Map;
 
-import com.google.common.io.ByteStreams;
-
 import playn.core.NetImpl;
 import playn.core.util.Callback;
 
@@ -68,7 +66,7 @@ public class JavaNet extends NetImpl {
             int code = conn.getResponseCode();
 
             InputStream stream = code >= 400 ? conn.getErrorStream() : conn.getInputStream();
-            byte[] payload = stream == null ? new byte[0] : ByteStreams.toByteArray(stream);
+            byte[] payload = stream == null ? new byte[0] : JavaAssets.toByteArray(stream);
 
             String encoding = conn.getContentEncoding();
             if (encoding == null) encoding = UTF8;

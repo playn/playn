@@ -82,9 +82,7 @@ public class JavaGraphics extends GraphicsGL {
    */
   public void registerFont(String name, String path) {
     try {
-      java.awt.Font font = java.awt.Font.createFont(
-        java.awt.Font.TRUETYPE_FONT, ((JavaAssets) assets()).getAssetStream(path));
-      _fonts.put(name, font);
+      _fonts.put(name, ((JavaAssets) assets()).requireResource(path).createFont());
     } catch (Exception e) {
       platform.reportError("Failed to load font [name=" + name + ", path=" + path + "]", e);
     }

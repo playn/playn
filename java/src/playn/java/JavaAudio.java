@@ -38,12 +38,12 @@ public class JavaAudio extends AudioImpl {
    * audio clips; if false, the default Java clip implementation is used which cannot handle long
    * audio clips.
    */
-  public JavaSound createSound(final InputStream in, final boolean music) {
+  public JavaSound createSound(final JavaAssets.Resource rsrc, final boolean music) {
     final JavaSound sound = new JavaSound();
     ((JavaPlatform) platform).invokeAsync(new Runnable() {
       public void run () {
         try {
-          AudioInputStream ais = AudioSystem.getAudioInputStream(in);
+          AudioInputStream ais = rsrc.openAudioStream();
           Clip clip = AudioSystem.getClip();
           if (music) {
             clip = new BigClip(clip);
