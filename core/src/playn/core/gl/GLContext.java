@@ -336,13 +336,13 @@ public abstract class GLContext {
   }
 
   /**
-   * Returns a (created on demand, then cached) 4x4 image used when filling solid color quads or
-   * triangles. We use a 4x4 rather than a 1x1 to avoid aliasing at non-integral scale factors.
+   * Returns a (created on demand, then cached) image used when filling solid color quads or
+   * triangles.
    */
   Image fillImage() {
     if (fillImage == null) {
-      CanvasImage image = platform.graphics().createImage(4, 4);
-      image.canvas().setFillColor(0xFFFFFFFF).fillRect(0, 0, 4, 4);
+      CanvasImage image = platform.graphics().createImage(1, 1);
+      image.canvas().setFillColor(0xFFFFFFFF).fillRect(0, 0, image.width(), image.height());
       fillImage = image;
     }
     return fillImage;
