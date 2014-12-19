@@ -221,7 +221,12 @@ public class JavaAssets extends AbstractAssets<BufferedImage> {
       int size = 0, read = 0;
       while ((read = in.read(buffer, size, buffer.length-size)) > 0) {
         size += read;
+        // TODO maybe (size*2) instead of (size+512) ?
         if (size == buffer.length) buffer = Arrays.copyOf(buffer, size+512);
+      }
+      // we don't need the zeros at the end of buffer
+      if (size < buffer.length) {
+        buffer = Arrays.copyOf(buffer, size);
       }
       return buffer;
     } finally {
