@@ -245,11 +245,11 @@ public class JavaAssets extends AbstractAssets<BufferedImage> {
 
   abstract static class Resource {
     public abstract BufferedImage readImage() throws IOException;
-    public abstract InputStream openStream () throws IOException;
-    public AudioInputStream openAudioStream () throws Exception {
+    public abstract InputStream openStream() throws IOException;
+    public AudioInputStream openAudioStream() throws Exception {
       return AudioSystem.getAudioInputStream(openStream());
     }
-    public Font createFont () throws Exception {
+    public Font createFont() throws Exception {
       return Font.createFont(Font.TRUETYPE_FONT, openStream());
     }
     public byte[] readBytes() throws IOException {
@@ -265,7 +265,7 @@ public class JavaAssets extends AbstractAssets<BufferedImage> {
     public URLResource(URL url) {
       this.url = url;
     }
-    public InputStream openStream () throws IOException {
+    public InputStream openStream() throws IOException {
       return url.openStream();
     }
     public BufferedImage readImage() throws IOException {
@@ -278,16 +278,16 @@ public class JavaAssets extends AbstractAssets<BufferedImage> {
     public FileResource(File file) {
       this.file = file;
     }
-    public InputStream openStream () throws IOException {
+    public InputStream openStream() throws IOException {
       return new FileInputStream(file);
     }
     public BufferedImage readImage() throws IOException {
       return ImageIO.read(file);
     }
-    @Override public AudioInputStream openAudioStream () throws Exception {
+    @Override public AudioInputStream openAudioStream() throws Exception {
       return AudioSystem.getAudioInputStream(file);
     }
-    @Override public Font createFont () throws Exception {
+    @Override public Font createFont() throws Exception {
       return Font.createFont(Font.TRUETYPE_FONT, file);
     }
     @Override public byte[] readBytes() throws IOException {
