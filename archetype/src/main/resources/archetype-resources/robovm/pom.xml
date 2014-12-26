@@ -9,7 +9,7 @@
     <version>${version}</version>
   </parent>
 
-  <artifactId>${artifactId}-java</artifactId>
+  <artifactId>${artifactId}-robovm</artifactId>
   <packaging>jar</packaging>
   <name>${JavaGameClassName} RoboVM</name>
 
