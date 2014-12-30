@@ -18,14 +18,17 @@ package playn.core;
 /**
  * Simple PlayN logging interface.
  */
-public interface Log {
+public abstract class Log {
+
+  private Collector collector;
+  private Level minLevel = Level.DEBUG;
 
   /** Tags a log message with a level. */
-  enum Level { DEBUG, INFO, WARN, ERROR }
+  public static enum Level { DEBUG, INFO, WARN, ERROR }
 
   /** Allows for collection of log messages (in addition to standard logging).
-   * See {@link #setCollector}. */
-  interface Collector {
+    * See {@link #setCollector}. */
+  public static interface Collector {
     /**
      * Called when a message is logged.
      *
@@ -41,72 +44,88 @@ public interface Log {
    * bug reports, for example) all messages logged via the PlayN logging system. This will include
    * errors logged internally by PlayN code.
    */
-  void setCollector(Collector collector);
+  public void setCollector (Collector collector) {
+    this.collector = collector;
+  }
 
   /**
    * Configures the minimum log level that will be logged. Messages at a level lower than
    * {@code level} will be suppressed. Note that all messages are still passed to any registered
    * {@link Collector}, but suppressed messages are not sent to the platform logging system.
    */
-  void setMinLevel(Level level);
+  public void setMinLevel (Level level) {
+    assert level != null;
+    minLevel = level;
+  }
 
-  /**
-   * An debug message.
-   *
-   * @param msg the message to display
-   */
-  void debug(String msg);
+  /** Logs {@code msg} at the debug level. */
+  public void debug (String msg) {
+    debug(msg, (Throwable)null);
+  }
 
-  /**
-   * An debug message.
-   *
-   * @param msg the message to display
-   * @param e the exception to log
-   */
-  void debug(String msg, Throwable e);
+  /** Logs {@code msg} at the debug level. */
+  public void debug (String msg, Object... args) {
+    debug(format(msg, args), (Throwable)null);
+  }
 
-  /**
-   * An informational message.
-   *
-   * @param msg the message to display
-   */
-  void info(String msg);
+  /** Logs {@code msg} and {@code e} at the debug level. */
+  public void debug (String msg, Throwable e) {
+    log(Level.DEBUG, msg, e);
+  }
 
-  /**
-   * /** An info message.
-   *
-   * @param msg the message to display
-   * @param e the exception to log
-   */
-  void info(String msg, Throwable e);
+  /** Logs {@code msg} at the info level. */
+  public void info (String msg) {
+    info(msg, (Throwable)null);
+  }
 
-  /**
-   * An warning message.
-   *
-   * @param msg the message to display
-   */
-  void warn(String msg);
+  /** Logs {@code msg} at the info level. */
+  public void info (String msg, Object... args) {
+    info(format(msg, args), (Throwable)null);
+  }
 
-  /**
-   * An warning message.
-   *
-   * @param msg the message to display
-   * @param e the exception to log
-   */
-  void warn(String msg, Throwable e);
+  /** Logs {@code msg} and {@code e} at the info level. */
+  public void info (String msg, Throwable e) {
+    log(Level.INFO, msg, e);
+  }
 
-  /**
-   * An error message.
-   *
-   * @param msg the message to display
-   */
-  void error(String msg);
+  /** Logs {@code msg} at the warn level. */
+  public void warn (String msg) {
+    warn(msg, (Throwable)null);
+  }
 
-  /**
-   * An error message.
-   *
-   * @param msg the message to display
-   * @param e the exception to log
-   */
-  void error(String msg, Throwable e);
+  /** Logs {@code msg} at the warn level. */
+  public void warn (String msg, Object... args) {
+    warn(format(msg, args), (Throwable)null);
+  }
+
+  /** Logs {@code msg} and {@code e} at the warn level. */
+  public void warn (String msg, Throwable e) {
+    log(Level.WARN, msg, e);
+  }
+
+  /** Logs {@code msg} at the error level. */
+  public void error (String msg) {
+    error(msg, (Throwable)null);
+  }
+
+  /** Logs {@code msg} at the error level. */
+  public void error (String msg, Object... args) {
+    error(format(msg, args), (Throwable)null);
+  }
+
+  /** Logs {@code msg} and {@code e} at the error level. */
+  public void error (String msg, Throwable e) {
+    log(Level.ERROR, msg, e);
+  }
+
+  protected String format (String msg, Object[] args) {
+    return msg; // TODO
+  }
+
+  protected void log (Level level, String msg, Throwable e) {
+    if (collector != null) collector.logged(level, msg, e);
+    if (level.ordinal() >= minLevel.ordinal()) logImpl(level, msg, e);
+  }
+
+  protected abstract void logImpl (Level level, String msg, Throwable e);
 }

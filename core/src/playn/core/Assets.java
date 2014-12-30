@@ -15,34 +15,54 @@
  */
 package playn.core;
 
-import playn.core.util.Callback;
+import react.RFuture;
+import react.RPromise;
 
 /**
  * Fetches and returns assets.
  */
-public interface Assets {
+public abstract class Assets {
 
   /**
    * Synchronously loads and returns an image. The calling thread will block while the image is
    * loaded from disk and decoded. When this call returns, the image's width and height will be
-   * valid, and the image can be immediately rendered via layers and into canvases.
+   * valid, and the image can be immediately converted to a texture and drawn into a canvas.
    *
    * @param path the path to the image asset.
    * @throws UnsupportedOperationException on platforms that cannot support synchronous asset
-   * loading (e.g. HTML5 and Flash).
+   * loading (HTML).
    */
-  Image getImageSync(String path);
+  public Image getImageSync (String path) {
+    ImageImpl image = createImage(0, 0);
+    try {
+      image.succeed(load(path));
+    } catch (Exception e) {
+      image.fail(e);
+    }
+    return image;
+  }
 
   /**
    * Asynchronously loads and returns an image. The calling thread will not block. The returned
-   * image will not be immediately usable, will not report valid width and height and cannot be
-   * immediately rendered into a canvas. The image can be added to an image layer and it will begin
-   * rendering as soon as it is loaded. Add a callback to the image to be notified when its loading
-   * completes (or fails).
+   * image will not be immediately usable, will not report valid width and height, and cannot be
+   * immediately rendered into a canvas or converted into a texture. Use {@link Image#state} to be
+   * notified when loading succeeds or fails.
    *
    * @param path the path to the image asset.
    */
-  Image getImage(String path);
+  public Image getImage (final String path) {
+    final ImageImpl image = createImage(0, 0);
+    plat.invokeAsync(new Runnable() {
+      public void run () {
+        try {
+          image.succeed(load(path));
+        } catch (Exception e) {
+          image.fail(e);
+        }
+      }
+    });
+    return image;
+  }
 
   /**
    * Asynchronously loads and returns the image at the specified URL. The width and height of the
@@ -50,7 +70,9 @@ public interface Assets {
    * spawns a new thread for each loaded image. Thus, attempts to load large numbers of remote
    * images simultaneously may result in poor performance.
    */
-  Image getRemoteImage(String url);
+  public Image getRemoteImage (String url) {
+    return getRemoteImage(url, 0, 0);
+  }
 
   /**
    * Asynchronously loads and returns the image at the specified URL. The width and height of the
@@ -58,7 +80,13 @@ public interface Assets {
    * <em>Note:</em> on non-HTML platforms, this spawns a new thread for each loaded image. Thus,
    * attempts to load large numbers of remote images simultaneously may result in poor performance.
    */
-  Image getRemoteImage(String url, float width, float height);
+  public Image getRemoteImage (String url, int width, int height) {
+    Exception error = new Exception(
+      "Remote image loading not yet supported: " + url + "@" + width + "x" + height);
+    ImageImpl image = createImage(width, height);
+    image.fail(error);
+    return image;
+  }
 
   /**
    * Asynchronously loads and returns a short sound effect.
@@ -69,7 +97,7 @@ public interface Assets {
    * @param path the path to the sound resource. NOTE: this should not include a file extension,
    * PlayN will automatically add {@code .mp3}, (or {@code .caf} on iOS).
    */
-  Sound getSound(String path);
+  public abstract Sound getSound (String path);
 
   /**
    * Asynchronously loads and returns a music resource. On some platforms, the backend will use a
@@ -82,39 +110,98 @@ public interface Assets {
    * @param path the path to the sound resource. NOTE: this should not include a file extension,
    * PlayN will automatically add {@code .mp3}, (or {@code .caf} on iOS).
    */
-  Sound getMusic(String path);
+  public Sound getMusic (String path) {
+    return getSound(path);
+  }
 
   /**
-   * Returns a text asset, encoded in UTF-8.
+   * Loads and returns a UTF-8 encoded text asset.
    *
    * @param path the path to the text asset.
    * @throws Exception if there is an error loading the text (for example, if it does not exist).
    * @throws UnsupportedOperationException on platforms that cannot support synchronous asset
    * loading (e.g. HTML5 and Flash).
    */
-  String getTextSync(String path) throws Exception;
+  public abstract String getTextSync (String path) throws Exception;
 
   /**
-   * Calls back with a text asset, encoded in UTF-8.
+   * Loads UTF-8 encoded text asynchronously. The returned state instance provides a means to
+   * listen for the arrival of the text.
    *
    * @param path the path to the text asset.
    */
-  void getText(String path, Callback<String> callback);
+  public RFuture<String> getText (final String path) {
+    final RPromise<String> result = plat.deferredPromise();
+    plat.invokeAsync(new Runnable() {
+      public void run () {
+        try {
+          result.succeed(getTextSync(path));
+        } catch (Throwable t) {
+          result.fail(t);
+        }
+      }
+    });
+    return result;
+  }
 
   /**
-   * Returns the raw bytes of the asset - useful for custom binary formatted files.
+   * Loads and returns the raw bytes of the asset - useful for custom binary formatted files.
    *
    * @param path the path to the text asset.
    * @throws Exception if there is an error loading the data (for example, if it does not exist).
    * @throws UnsupportedOperationException on platforms that cannot support synchronous asset
    * loading (e.g. HTML5 and Flash).
    */
-  byte[] getBytesSync(String path) throws Exception;
+  public abstract byte[] getBytesSync (String path) throws Exception;
 
   /**
-   * Calls back with the bytes of a binary asset - useful for custom binary formatted files.
+   * Loads binary data asynchronously. The returned state instance provides a means to listen for
+   * the arrival of the data.
    *
    * @param path the path to the binary asset.
    */
-  void getBytes(String path, Callback<byte[]> callback);
+  public RFuture<byte[]> getBytes (final String path) {
+    final RPromise<byte[]> result = plat.deferredPromise();
+    plat.invokeAsync(new Runnable() {
+      public void run () {
+        try {
+          result.succeed(getBytesSync(path));
+        } catch (Throwable t) {
+          result.fail(t);
+        }
+      }
+    });
+    return result;
+  }
+
+  protected final Platform plat;
+
+  protected Assets (Platform plat) {
+    this.plat = plat;
+  }
+
+  /**
+   * Synchronously loads image data at {@code path}.
+   */
+  protected abstract ImageImpl.Data load (String path) throws Exception;
+
+  /**
+   * Creates an image with the specified width and height.
+   */
+  protected abstract ImageImpl createImage (int rawWidth, int rawHeight);
+
+  /**
+   * Normalizes the path, by removing {@code foo/..} pairs until the path contains no {@code ..}s.
+   * For example:
+   * {@code foo/bar/../baz/bif/../bonk.png} becomes {@code foo/baz/bonk.png} and
+   * {@code foo/bar/baz/../../bing.png} becomes {@code foo/bing.png}.
+   */
+  protected static String normalizePath (String path) {
+    int pathLen;
+    do {
+      pathLen = path.length();
+      path = path.replaceAll("[^/]+/\\.\\./", "");
+    } while (path.length() != pathLen);
+    return path;
+  }
 }

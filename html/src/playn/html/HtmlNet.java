@@ -27,7 +27,7 @@ import com.google.gwt.xhr.client.XMLHttpRequest;
 import playn.core.NetImpl;
 import playn.core.util.Callback;
 
-public class HtmlNet extends NetImpl {
+public class HtmlNet extends Net {
 
   public HtmlNet(HtmlPlatform platform) {
     super(platform);
@@ -50,9 +50,12 @@ public class HtmlNet extends NetImpl {
         @Override
         public void onReadyStateChange(final XMLHttpRequest xhr) {
           if (xhr.getReadyState() == XMLHttpRequest.DONE) {
-            callback.onSuccess(new StringResponse(xhr.getStatus(), xhr.getResponseText()) {
-              @Override
-              protected Map<String,List<String>> extractHeaders() {
+            final String text = xhr.getResponseText();
+            callback.onSuccess(new Response(xhr.getStatus()) {
+              @Override public String payloadString() {
+                return text;
+              }
+              @Override protected Map<String,List<String>> extractHeaders() {
                 Map<String,List<String>> headers = new HashMap<String,List<String>>();
                 String block = xhr.getAllResponseHeaders();
                 for (String line : block.split("\r\n")) {

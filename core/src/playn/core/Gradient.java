@@ -16,10 +16,45 @@
 package playn.core;
 
 /**
- * A gradient fill pattern created by
- * {@link Graphics#createLinearGradient(float, float, float, float, int[], float[])}
- * or {@link Graphics#createRadialGradient(float, float, float, int[], float[])}
- * .
+ * A gradient fill pattern created by {@link Graphics#createGradient}.
  */
-public interface Gradient {
+public abstract class Gradient {
+
+  /** Used to create gradients. */
+  public static abstract class Config {
+    public final int[] colors;
+    public final float[] positions;
+
+    protected Config (int[] colors, float[] positions) {
+      this.colors = colors;
+      this.positions = positions;
+    }
+  }
+
+  /** Creates a linear gradient fill pattern. {@code (x0, y0)} and {@code (x1, y1)} specify the
+    * start and end positions, while {@code (colors, positions)} specifies the color stops. */
+  public static class Linear extends Config {
+    public final float x0, y0, x1, y1;
+
+    public Linear (float x0, float y0, float x1, float y1, int[] colors, float[] positions) {
+      super(colors, positions);
+      this.x0 = x0;
+      this.y0 = y0;
+      this.x1 = x1;
+      this.y1 = y1;
+    }
+  }
+
+  /** Creates a radial gradient fill pattern. {@code (x, y, r)} specifies the circle covered by
+    * this gradient, while {@code (colors, positions)} specifies the list of color stops. */
+  public static class Radial extends Config {
+    public final float x, y, r;
+
+    public Radial (float x, float y, float r, int[] colors, float[] positions) {
+      super(colors, positions);
+      this.x = x;
+      this.y = y;
+      this.r = r;
+    }
+  }
 }

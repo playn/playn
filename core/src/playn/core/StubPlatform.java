@@ -18,8 +18,10 @@ package playn.core;
 import java.util.HashMap;
 import java.util.Map;
 
+import react.RFuture;
+import react.Slot;
+
 import playn.core.json.JsonImpl;
-import playn.core.util.Callback;
 
 /**
  * A stub implementation of {@link Platform} that provides implementations of those services that
@@ -30,7 +32,6 @@ import playn.core.util.Callback;
  * <p> The services that are implemented are:
  * <ul><li> {@link #type} - reports {@link Platform.Type#STUB}
  * <li> {@link #time} - returns current time
- * <li> {@link #random} - returns {@link Math#random}
  * <li> {@link #invokeLater} - invokes the supplied runnable immediately on the calling thread
  * <li> {@link #setLifecycleListener} - tracks the supplied listener, never generates events
  * <li> {@link #log} - writes logs to {@code stderr}
@@ -42,150 +43,117 @@ import playn.core.util.Callback;
  * <li> {@link #keyboard} - allows listener registration, never generates events
  * </ul>
  */
-public class StubPlatform extends AbstractPlatform {
+public class StubPlatform extends Platform {
 
   private Storage storage = new Storage() {
     private final Map<String,String> _data = new HashMap<String,String>();
 
-    @Override public void setItem(String key, String data) throws RuntimeException {
+    @Override public void setItem (String key, String data) throws RuntimeException {
       _data.put(key, data);
     }
-    @Override public void removeItem(String key) {
+    @Override public void removeItem (String key) {
       _data.remove(key);
     }
-    @Override public String getItem(String key) {
+    @Override public String getItem (String key) {
       return _data.get(key);
     }
-    @Override public Batch startBatch() {
+    @Override public Batch startBatch () {
       return new BatchImpl(this);
     }
-    @Override public Iterable<String> keys() {
+    @Override public Iterable<String> keys () {
       return _data.keySet();
     }
-    @Override public boolean isPersisted() {
+    @Override public boolean isPersisted () {
       return true;
     }
   };
 
-  private Keyboard keyboard = new KeyboardImpl() {
-    @Override public boolean hasHardwareKeyboard() { return false; }
-    @Override public void getText(Keyboard.TextType textType, String label, String initialValue,
-                                  Callback<String> callback) {
-      callback.onSuccess(null);
+  private Keyboard keyboard = new Keyboard() {
+    @Override public RFuture<String> getText (Keyboard.TextType textType, String label, String initialValue) {
+      return RFuture.success(null);
     }
   };
 
-  private Touch touch = new TouchStub();
-  private Mouse mouse = new MouseStub();
+  private Touch touch = new Touch();
+  private Mouse mouse = new Mouse();
   private Json json = new JsonImpl();
-  private Pointer pointer = new PointerImpl() {};
+  private Log log = new Log() {
+    @Override
+    protected void logImpl (Level level, String msg, Throwable e) {
+      String prefix;
+      switch (level) {
+      default:
+      case DEBUG: prefix = "D: "; break;
+      case INFO: prefix = ""; break;
+      case WARN: prefix = "W: "; break;
+      case ERROR: prefix = "E: "; break;
+      }
+      System.err.println(prefix + msg);
+      if (e != null)
+      e.printStackTrace(System.err);
+    }
+  };
   private final long start = System.currentTimeMillis();
 
-  public StubPlatform() {
-    super(new LogImpl() {
-      @Override
-      protected void logImpl(Level level, String msg, Throwable e) {
-        String prefix;
-        switch (level) {
-        default:
-        case DEBUG: prefix = "D: "; break;
-        case INFO: prefix = ""; break;
-        case WARN: prefix = "W: "; break;
-        case ERROR: prefix = "E: "; break;
-        }
-        System.err.println(prefix + msg);
-        if (e != null)
-          e.printStackTrace(System.err);
-      }
-    });
-  }
-
-  @Override
-  public void run(Game game) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public Platform.Type type() {
+  @Override public Platform.Type type () {
     return Platform.Type.STUB;
   }
 
-  @Override
-  public double time() {
-    return (double) System.currentTimeMillis();
+  @Override public double time () {
+    return (double)System.currentTimeMillis();
   }
 
-  @Override
-  public int tick() {
+  @Override public int tick () {
     return (int)(System.currentTimeMillis() - start);
   }
 
-  @Override
-  public float random() {
-    return (float) Math.random();
+  @Override public void invokeLater (Slot<Platform> action) {
+    action.onEmit(this); // now is later!
   }
 
-  @Override
-  public void openURL(String url) {
+  @Override public void start () {} // noop!
+
+  @Override public void openURL (String url) {
     throw new UnsupportedOperationException();
   }
 
-  @Override
-  public void setPropagateEvents(boolean propagate) {
-  }
-
-  @Override
-  public void invokeLater(Runnable runnable) {
-    runnable.run();
-  }
-
-  @Override
-  public Audio audio() {
+  @Override public Audio audio () {
     throw new UnsupportedOperationException();
   }
 
-  @Override
-  public Graphics graphics() {
+  @Override public Graphics graphics () {
     throw new UnsupportedOperationException();
   }
 
-  @Override
-  public Assets assets() {
+  @Override public Assets assets () {
     throw new UnsupportedOperationException();
   }
 
-  @Override
-  public Json json() {
+  @Override public Json json () {
     return json;
   }
 
-  @Override
-  public Keyboard keyboard() {
+  @Override public Log log () {
+    return log;
+  }
+
+  @Override public Keyboard keyboard () {
     return keyboard;
   }
 
-  @Override
-  public Net net() {
+  @Override public Net net () {
     throw new UnsupportedOperationException();
   }
 
-  @Override
-  public Pointer pointer() {
-    return pointer;
-  }
-
-  @Override
-  public Mouse mouse() {
+  @Override public Mouse mouse () {
     return mouse;
   }
 
-  @Override
-  public Touch touch() {
+  @Override public Touch touch () {
     return touch;
   }
 
-  @Override
-  public Storage storage() {
+  @Override public Storage storage () {
     return storage;
   }
 }

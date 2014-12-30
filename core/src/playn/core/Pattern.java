@@ -18,11 +18,16 @@ package playn.core;
 /**
  * A bitmap fill pattern created by {@link Image#toPattern}.
  */
-public interface Pattern {
+public abstract class Pattern {
 
   /** Whether this pattern repeats in the x-direction. */
-  boolean repeatX();
+  public final boolean repeatX;
 
   /** Whether this pattern repeats in the y-direction. */
-  boolean repeatY();
+  public final boolean repeatY;
+
+  protected Pattern (boolean repeatX, boolean repeatY) {
+    this.repeatX = repeatX;
+    this.repeatY = repeatY;
+  }
 }

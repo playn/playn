@@ -15,138 +15,234 @@
  */
 package playn.core;
 
-import playn.core.gl.GL20;
-import playn.core.gl.GLContext;
+import pythagoras.f.Dimension;
+import pythagoras.f.IDimension;
+import react.Function;
+import react.RFuture;
+import react.UnitSlot;
+
+import static playn.core.GL20.*;
 
 /**
- * Main 2D graphics interface. This interface can be used to create and load
- * graphics objects used with {@link Canvas}.
+ * Provides access to graphics information and services.
  */
-public interface Graphics {
+public abstract class Graphics {
+
+  private final Platform plat;
+  protected final Dimension viewSizeM = new Dimension();
+  protected int viewPixelWidth, viewPixelHeight;
+  protected int minFilter = GL_LINEAR, magFilter = GL_LINEAR;
+  private Texture colorTex; // created lazily
+
+  /** The filter modes used when converting images to textures. */
+  public static enum Filter { LINEAR, NEAREST }
+
+  /** Provides access to GL services. */
+  public final GL20 gl;
+
+  /** The display scale factor. This will be {@link Scale#ONE} except on HiDPI devices that have
+    * been configured to use HiDPI mode. */
+  public final Scale scale;
+
+  /** The current size of the graphics viewport. */
+  public final IDimension viewSize = viewSizeM;
+
+  /** The render target for the default framebuffer. */
+  public RenderTarget defaultRenderTarget = new RenderTarget(this) {
+    public int id () { return gl.defaultFramebuffer(); }
+    public int width () { return viewPixelWidth; }
+    public int height () { return viewPixelHeight; }
+    public void close () {} // disable normal destroy-on-close behavior
+  };
 
   /**
-   * Gets the width of the drawable surface, in pixels.
+   * Returns the size of the screen in display units. On some platforms (like the desktop) the
+   * screen size may be larger than the view size.
    */
-  int width();
+  public abstract IDimension screenSize ();
 
   /**
-   * Gets the height of the drawable surface, in pixels.
+   * Creates a {@link Canvas} with the specified display unit size.
    */
-  int height();
+  public abstract Canvas createCanvas (float width, float height);
+
+  /** See {@link #createCanvas(float,float)}. */
+  public Canvas createCanvas (IDimension size) {
+    return createCanvas(size.width(), size.height());
+  }
 
   /**
-   * Gets the height of the available screen real-estate, in pixels.
-   */
-  int screenHeight();
-
-  /**
-   * Gets the width of the available screen real-estate, in pixels.
-   */
-  int screenWidth();
-
-  /**
-   * Returns the display scale factor. This will be 1 except on HiDPI devices that have been
-   * configured to use HiDPI mode, where it will probably be 2, but could be some other scale
-   * depending on how things were configured when initializing the platform.
-   */
-  float scaleFactor();
-
-  /**
-   * Returns the root of the scene graph. When layers are added to this layer, they become visible
-   * on the screen.
-   */
-  GroupLayer rootLayer();
-
-  /**
-   * Returns the GL context on platforms that use GL, null otherwise. This is used for creating
-   * custom shaders.
-   */
-  GLContext ctx();
-
-  /**
-   * Returns a reference to the GL context. <b>WARNING</b>: this is an experimental, not well
-   * tested feature. It works on the Java, HTML and Android backends. It may change completely.
-   * Consider yourself warned.
-   */
-  GL20 gl20();
-
-  /**
-   * Creates a group layer.
-   */
-  GroupLayer createGroupLayer();
-
-  /**
-   * Creates a clipped group layer, with the initial clipping size.
-   */
-  GroupLayer.Clipped createGroupLayer(float width, float height);
-
-  /**
-   * Creates an immediate layer that is clipped to the specified rectangular region.
+   * Configures the filter functions to use when creating textures.
    *
-   * @param width the horizontal extent of the layer's drawable region.
-   * @param height the vertical extent of the layer's drawable region.
+   * @param minFilter the scaling to use when rendering textures that are scaled down.
+   * @param magFilter the scaling to use when rendering textures that are scaled up.
    */
-  ImmediateLayer.Clipped createImmediateLayer(
-      int width, int height, ImmediateLayer.Renderer renderer);
+  public void setTextureFilter (Filter minFilter, Filter magFilter) {
+    this.minFilter = toGL(minFilter);
+    this.magFilter = toGL(magFilter);
+  }
 
   /**
-   * Creates an unclipped immediate layer. This layer may draw anywhere on the framebuffer, though
-   * its rendering operations will be transformed appropriately, based on the layer's current
-   * transform.
+   * Creates a managed texture with the contents if {@code image}, with no mipmaps.
+   * See {@link #createTexture(Image,boolean,boolean)}.
    */
-  ImmediateLayer createImmediateLayer(ImmediateLayer.Renderer renderer);
+  public Texture createTexture (Image image) {
+    return createTexture(image, true, false);
+  }
 
   /**
-   * Creates an image layer with no configured image. Configure the image like so:
-   * {@code createImageLayer().setImage(image)}.
+   * Uploads {@code image}'s bitmap data to the GPU and returns a handle to the texture. The
+   * current filter parameters (per {@link #setTextureFilter}) will be used for the texture.
+   *
+   * @param managed whether the texture will be reference counted. If the texture will be used in
+   * an {@code ImageLayer}, it should be reference counted unless you are doing something special.
+   * Otherwise you can decide whether you want to use the reference counting mechanism or not.
+   * @param mipmaps whether the created texture should have mipmaps generated.
+   *
+   * @throws IllegalStateException if {@code image} is not fully loaded.
    */
-  ImageLayer createImageLayer();
+  public Texture createTexture (Image image, boolean managed, boolean mipmaps) {
+    if (!image.state.isCompleteNow()) throw new IllegalStateException(
+      "Cannot create texture from unready image.");
+
+    Texture tex = new Texture(this, createTexture(mipmaps), managed, mipmaps,
+                              image.pixelWidth(), image.pixelHeight(),
+                              image.scale(), image.width(), image.height());
+    upload(image, tex);
+    return tex;
+  }
 
   /**
-   * Creates an image layer with the supplied image.
+   * Returns a future which will deliver a texture for {@code image} once its loading has
+   * completed. Uses {@link #createTexture(Image)} to create texture.
    */
-  ImageLayer createImageLayer(Image image);
+  public RFuture<Texture> createTextureAsync (Image image) {
+    return image.state.map(new Function<Image,Texture>() {
+      public Texture apply (Image image) { return createTexture(image); }
+    });
+  }
 
   /**
-   * Creates an image that can be painted using the {@link Canvas} interface.
+   * Returns a future which will deliver a texture for {@code image} once its loading has
+   * completed. Uses {@link #createTexture(Image,boolean,boolean)} to create texture.
    */
-  CanvasImage createImage(float width, float height);
+  public RFuture<Texture> createTextureAsync (Image image, final boolean managed,
+                                              final boolean mipmaps) {
+    return image.state.map(new Function<Image,Texture>() {
+      public Texture apply (Image image) { return createTexture(image, managed, mipmaps); }
+    });
+  }
 
   /**
-   * Creates an image that can be rendered into using the {@link Surface} interface.
+   * Creates an empty texture into which one can render. The supplied width and height are in
+   * display units and will be converted to pixels based on the current scale factor.
+   *
+   * @param managed whether the texture will be reference counted. If the texture will be used in
+   * an {@code ImageLayer}, it should be reference counted unless you are doing something special.
+   * Otherwise you can decide whether you want to use the reference counting mechanism or not.
+   * @param mipmaps whether the created texture should have mipmaps generated.
    */
-  SurfaceImage createSurface(float width, float height);
+  public Texture createTexture (float width, float height, boolean managed, boolean mipmaps) {
+    int pixWidth = scale.invScaledCeil(width), pixHeight = scale.invScaledCeil(height);
+    int id = createTexture(mipmaps);
+    gl.glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, pixWidth, pixHeight,
+                    0, GL_RGBA, GL_UNSIGNED_BYTE, null);
+    return new Texture(this, id, managed, mipmaps, pixWidth, pixHeight, scale, width, height);
+  }
+
+  /** See {@link #createTexture(float,float,boolean,boolean)}. */
+  public Texture createTexture (IDimension size, boolean managed, boolean mipmaps) {
+    return createTexture(size.width(), size.height(), managed, mipmaps);
+  }
 
   /**
-   * Creates a linear gradient fill pattern. (x0, y0) and (x1, y1) specify the
-   * start and end positions, while (colors, positions) specifies the list of
-   * color stops.
+   * Creates a gradient fill pattern.
    */
-  Gradient createLinearGradient(float x0, float y0, float x1, float y1,
-      int colors[], float positions[]);
-
-  /**
-   * Creates a radial gradient fill pattern. (x0, y0, r) specifies the circle
-   * covered by this gradient, while (colors, positions) specifies the list of
-   * color stops.
-   */
-  Gradient createRadialGradient(float x, float y, float r, int colors[],
-      float positions[]);
+  public abstract Gradient createGradient (Gradient.Config config);
 
   /**
    * Creates a font with the specified configuration.
    */
-  Font createFont(String name, Font.Style style, float size);
+  public abstract Font createFont (Font.Config config);
 
   /**
    * Lays out a single line of text using the specified format. The text may subsequently be
-   * rendered on a canvas via {@link Canvas#fillText(TextLayout,float,float)}.
+   * rendered on a canvas via {@link Canvas#fillText (TextLayout,float,float)}.
    */
-  TextLayout layoutText(String text, TextFormat format);
+  public abstract TextLayout layoutText (String text, TextFormat format);
 
   /**
    * Lays out multiple lines of text using the specified format and wrap configuration. The text
-   * may subsequently be rendered on a canvas via {@link Canvas#fillText(TextLayout,float,float)}.
+   * may subsequently be rendered on a canvas via {@link Canvas#fillText (TextLayout,float,float)}.
    */
-  TextLayout[] layoutText(String text, TextFormat format, TextWrap wrap);
+  public abstract TextLayout[] layoutText (String text, TextFormat format, TextWrap wrap);
+
+  /**
+   * Queues the supplied graphics resource for destruction on the next frame tick. This is
+   * generally called from finalizers of graphics resource objects which discover that they are
+   * being garbage collected, but their GPU resources have not yet been freed.
+   */
+  public void queueForDestroy (final Disposable resource) {
+    plat.frame.connect(new UnitSlot() {
+      public void onEmit () { resource.close(); }
+    }).once();
+  }
+
+  Texture colorTex () {
+    if (colorTex == null) {
+      Canvas canvas = createCanvas(1, 1);
+      canvas.setFillColor(0xFFFFFFFF).fillRect(0, 0, canvas.width, canvas.height);
+      colorTex = createTexture(canvas.image, false, false);
+    }
+    return colorTex;
+  }
+
+  protected Graphics (Platform plat, GL20 gl, Scale scale) {
+    this.plat = plat;
+    this.gl = gl;
+    this.scale = scale;
+  }
+
+  /**
+   * Informs the graphics system that the main viewport size has changed. The supplied size should
+   * be in physical pixels.
+   */
+  protected void viewSizeChanged (int viewWidth, int viewHeight) {
+    viewPixelWidth = viewWidth;
+    viewPixelHeight = viewHeight;
+    viewSizeM.width = scale.invScaled(viewWidth);
+    viewSizeM.height = scale.invScaled(viewHeight);
+    // TODO: allow listening for view size change?
+  }
+
+  private int createTexture (boolean mipmaps) {
+    int id = gl.glGenTexture();
+    gl.glBindTexture(GL_TEXTURE_2D, id);
+    gl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, magFilter);
+    gl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, mipmapify(minFilter, mipmaps));
+    gl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    gl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    return id;
+  }
+
+  protected abstract void upload (Image image, Texture tex);
+
+  protected static int toGL (Filter filter) {
+    switch (filter) {
+    default:
+    case  LINEAR: return GL_LINEAR;
+    case NEAREST: return GL_NEAREST;
+    }
+  }
+
+  protected static int mipmapify (int filter, boolean mipmaps) {
+    if (!mipmaps) return filter;
+    // we don't do trilinear filtering (i.e. GL_LINEAR_MIPMAP_LINEAR);
+    // it's expensive and not super useful when only rendering in 2D
+    switch (filter) {
+    case GL_NEAREST: return GL_NEAREST_MIPMAP_NEAREST;
+    case GL_LINEAR:  return GL_LINEAR_MIPMAP_NEAREST;
+    default: return filter;
+    }
+  }
 }

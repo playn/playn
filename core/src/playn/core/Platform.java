@@ -1,7 +1,7 @@
 /**
- * Copyright 2010 The PlayN Authors
+ * Copyright 2010-2015 The PlayN Authors
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0  (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -15,54 +15,157 @@
  */
 package playn.core;
 
+import react.RPromise;
+import react.Signal;
+import react.Slot;
+import react.UnitSlot;
+
 /**
- * Generic platform interface. New platforms are defined as implementations of this interface.
+ * Provides access to all PlayN cross-platform services.
  */
-public interface Platform {
+public abstract class Platform {
 
-  enum Type { JAVA, HTML, ANDROID, IOS, FLASH, STUB }
+  /** Defines the lifecycle events. */
+  public static enum Lifecycle { PAUSE, RESUME, EXIT };
 
-  Platform.Type type();
+  /** A signal emitted with lifecycle events. */
+  public Signal<Lifecycle> lifecycle = Signal.create();
 
-  void run(Game game);
+  /** This signal will be emitted at the start of every frame after the platform is {@link
+    * #start}ed. Games should connect to it to drive their main loop. */
+  public Signal<Platform> frame = Signal.create();
 
-  void reportError(String message, Throwable cause);
+  /** Used by {@link #reportError}. */
+  public static class Error {
+    public final String message;
+    public final Throwable cause;
+    public Error (String message, Throwable cause) {
+      this.message = message;
+      this.cause = cause;
+    }
+  }
 
-  double time();
+  /** Any errors reported via {@link #reportError} will be emitted to this signal in addition to
+    * being logged. Games can connect to this signal if they wish to capture and record platform
+    * errors. */
+  public Signal<Error> errors = Signal.create();
 
-  int tick();
+  /** Enumerates the supported platform types. */
+  public static enum Type { JAVA, HTML, ANDROID, IOS, STUB }
 
-  float random();
+  /** Returns the platform {@link Platform.Type}. */
+  public abstract Platform.Type type ();
 
-  void openURL(String url);
+  /** Returns the current time, as a double value in millis since January 1, 1970, 00:00:00 GMT.
+    * This is equivalent to the standard JRE {@code new Date().getTime();}, but is terser and
+    * avoids the use of {@code long}, which is best avoided when translating to JavaScript. */
+  public abstract double time ();
 
-  void invokeLater(Runnable runnable);
+  /** Returns the number of milliseconds that have elapsed since the game started. */
+  public abstract int tick ();
 
-  void setLifecycleListener(PlayN.LifecycleListener listener);
+  /** Opens the given URL in the default browser. */
+  public abstract void openURL (String url);
 
-  void setErrorReporter(PlayN.ErrorReporter reporter);
+  /**
+   * Queues the supplied runnable for invocation on the game thread prior to the next frame. Note:
+   * this uses {@link #invokeLater(UnitSlot)} so feel free to cut out the middle man.
+   */
+  public void invokeLater (final Runnable runnable) {
+    invokeLater(new UnitSlot() { public void onEmit () { runnable.run(); }});
+  }
 
-  void setPropagateEvents(boolean propagate);
+  /**
+   * Connects {@code action} to the {@link #frame} signal at a high priority and for a single
+   * execution. This ensures that it runs before the game's normal callbacks.
+   */
+  public void invokeLater (Slot<Platform> action) {
+    frame.connect(action).atPrio(Short.MAX_VALUE).once();
+  }
 
-  Audio audio();
+  /**
+   * Creates a promise which defers notification of success or failure to the game thread,
+   * regardless of what thread on which it is completed. Note that even if it is completed on the
+   * game thread, it will still defer completion until the next frame.
+   */
+  public <T> RPromise<T> deferredPromise () {
+    return new RPromise<T>() {
+      @Override public void succeed (final T value) {
+        invokeLater(new UnitSlot() { public void onEmit () { superSucceed(value); }});
+      }
+      @Override public void fail (final Throwable cause) {
+        invokeLater(new UnitSlot() { public void onEmit () { superFail(cause); }});
+      }
+      private void superSucceed (T value) { super.succeed(value); }
+      private void superFail (Throwable cause) { super.fail(cause); }
+    };
+  }
 
-  Graphics graphics();
+  /**
+   * Returns whether this platform supports async (background) operations.
+   * HTML doesn't, most other platforms do.
+   */
+  public boolean isAsyncSupported  () {
+    return false;
+  }
 
-  Assets assets();
+  /**
+   * Invokes the supplied action on a separate thread.
+   * @throws UnsupportedOperationException if the platform does not support async operations.
+   */
+  public void invokeAsync (Runnable action) {
+    throw new UnsupportedOperationException();
+  }
 
-  Json json();
+  /**
+   * Called when a backend (or other framework code) encounters an exception that it can recover
+   * from, but which it would like to report in some orderly fashion. <em>NOTE:</em> this method
+   * may be called from threads other than the main PlayN thread.
+   */
+  public void reportError (String message, Throwable cause) {
+    errors.emit(new Error(message, cause));
+    log().warn(message, cause);
+  }
 
-  Keyboard keyboard();
+  /** Starts the main game loop.
+    * This must be called by the game's bootstrap code to get the party started. */
+  public abstract void start ();
 
-  Log log();
+  /** Returns the {@link Assets} service. */
+  public abstract Assets assets ();
 
-  Net net();
+  /** Returns the {@link Audio} service. */
+  public abstract Audio audio ();
 
-  Pointer pointer();
+  /** Returns the {@link Graphics} service. */
+  public abstract Graphics graphics ();
 
-  Mouse mouse();
+  /** Returns the {@link Json} service. */
+  public abstract Json json ();
 
-  Touch touch();
+  /** Returns the {@link Keyboard} input service. */
+  public abstract Keyboard keyboard ();
 
-  Storage storage();
+  /** Returns the {@link Log} service. */
+  public abstract Log log ();
+
+  /** Returns the {@link Mouse} input service. */
+  public abstract Mouse mouse ();
+
+  /** Returns the {@link Net} service. */
+  public abstract Net net ();
+
+  /** Returns the {@link Pointer} service. */
+  public Pointer pointer () {
+    if (pointer == null) pointer = new Pointer(this);
+    return pointer;
+  }
+  // pointer is created on demand
+  private Pointer pointer;
+
+  /** Returns the {@link Storage} storage service. */
+  public abstract Storage storage ();
+
+  /** Returns the {@link Touch} input service. */
+  public abstract Touch touch ();
 }

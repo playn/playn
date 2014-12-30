@@ -15,6 +15,9 @@
  */
 package playn.core;
 
-public interface Audio {
+/**
+ * Provides audio services, of which there are presently none. See {@link Sound}.
+ */
+public abstract class Audio {
 
 }

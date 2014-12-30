@@ -11,3 +11,18 @@
  * express or implied. See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package playn.core;
+
+/**
+ * Indicates that this instance should be closed when no longer needed to free up resources.
+ *
+ * <p>We'd just use {@link AutoCloseable} directly except that it annoyingly declares {@code close}
+ * to throw an arbitrary exception which makes life annoying for callers. Because we extend
+ * auto-closeable a disposable can be used anywhere an auto-closeable can, we're just less
+ * burdensome.
+ */
+public interface Disposable extends AutoCloseable {
+
+  /** Disposes this resource. */
+  void close ();
+}

@@ -15,337 +15,176 @@
  */
 package playn.core;
 
+import react.Signal;
+import react.Slot;
+
 /**
- * Input-device interface for mouse events. This interface is for mice and
- * supports buttons and the scroll wheel.
+ * Provides access to mouse input.
  */
-public interface Mouse {
-  /** Used by {@link ButtonEvent} to indicate that the left button is pressed. */
-  int BUTTON_LEFT = 0;
-  /** Used by {@link ButtonEvent} to indicate that the middle button is pressed. */
-  int BUTTON_MIDDLE = 1;
-  /** Used by {@link ButtonEvent} to indicate that the right button is pressed. */
-  int BUTTON_RIGHT = 2;
+public class Mouse {
 
-  /** An event dispatched when a button is pressed. */
-  interface ButtonEvent extends Events.Position {
-    /**
-     * The id of the button associated with this event, one of {@link #BUTTON_LEFT}, {@link
-     * #BUTTON_MIDDLE}, or {@link #BUTTON_RIGHT}.
-     */
-    int button();
+  /** The base class for all mouse events. */
+  public static class Event extends playn.core.Event.XY {
 
-    class Impl extends Events.Position.Impl implements ButtonEvent {
-      private int button;
+    protected Event (int flags, double time, float x, float y) {
+      super(flags, time, x, y);
+    }
+  }
 
-      public Impl(Events.Flags flags, double time, float x, float y, int button) {
-        super(null, flags, time, x, y);
-        this.button = button;
-      }
+  /** The event dispatched for mouse input. */
+  public static class ButtonEvent extends Event {
 
-      @Override
-      public int button() {
-        return button;
-      }
+    /** Enumerates the supported mouse buttons. */
+    public static enum Id { LEFT, RIGHT, MIDDLE, X1, X2 }
 
-      @Override
-      public ButtonEvent.Impl localize(Layer hit) {
-        return new ButtonEvent.Impl(hit, flags(), time(), x(), y(), button);
-      }
+    /** The id of the button associated with this event. */
+    public final Id button;
 
-      protected Impl(Layer hit, Events.Flags flags, double time, float x, float y, int button) {
-        super(hit, flags, time, x, y);
-        this.button = button;
-      }
+    /** True if the button was just pressed, false if it was just released. */
+    public boolean down;
 
-      @Override
-      protected String name() {
-        return "ButtonEvent";
-      }
+    public ButtonEvent (int flags, double time, float x, float y, Id button, boolean down) {
+      super(flags, time, x, y);
+      this.button = button;
+      this.down = down;
+    }
 
-      @Override
-      protected void addFields(StringBuilder builder) {
-        super.addFields(builder);
-        builder.append(", button=").append(button);
-      }
+    @Override protected String name () {
+      return "Button";
+    }
+
+    @Override protected void addFields (StringBuilder builder) {
+      super.addFields(builder);
+      builder.append(", id=").append(button).append(", down=").append(down);
     }
   }
 
   /** An event dispatched when the mouse is moved. */
-  interface MotionEvent extends Events.Position {
-    /**
-     * The x-coordinate associated with this event.
-     */
-    float dx();
+  public static class MotionEvent extends Event {
 
-    /**
-     * The y-coordinate associated with this event.
-     */
-    float dy();
+    /** The amount by which the mouse moved on the x axis. */
+    public final float dx;
 
-    class Impl extends Events.Position.Impl implements MotionEvent {
-      private final float dx, dy;
+    /** The amount by which the mouse moved on the y axis. */
+    public final float dy;
 
-      public Impl(Events.Flags flags, double time, float x, float y, float dx, float dy) {
-        super(flags, time, x, y);
-        this.dx = dx;
-        this.dy = dy;
-      }
+    public MotionEvent (int flags, double time, float x, float y, float dx, float dy) {
+      super(flags, time, x, y);
+      this.dx = dx;
+      this.dy = dy;
+    }
 
-      @Override
-      public float dx() {
-        return dx;
-      }
+    @Override protected String name () {
+      return "MotionEvent";
+    }
 
-      @Override
-      public float dy() {
-        return dy;
-      }
-
-      @Override
-      public MotionEvent.Impl localize(Layer hit) {
-        return new MotionEvent.Impl(hit, flags(), time(), x(), y(), dx(), dy());
-      }
-
-      protected Impl(Layer hit, Events.Flags flags, double time, float x, float y,
-                     float dx, float dy) {
-        super(hit, flags, time, x, y);
-        this.dx = dx;
-        this.dy = dy;
-      }
-
-      @Override
-      protected String name() {
-        return "MotionEvent";
-      }
+    @Override protected void addFields (StringBuilder builder) {
+      super.addFields(builder);
+      builder.append(", dx=").append(dx).append(", dy=").append(dy);
     }
   }
 
   /** An event dispatched when the mouse wheel is scrolled. */
-  interface WheelEvent extends Events.Position {
-    /**
-     * The velocity of the scroll wheel. Negative velocity corresponds to scrolling north/up. Each
-     * scroll 'click' is 1 velocity.
-     */
-    float velocity();
+  public static class WheelEvent extends Event {
 
-    class Impl extends Events.Position.Impl implements WheelEvent {
-      private float velocity;
+    /** The velocity of the scroll wheel. Negative velocity corresponds to scrolling north/up. Each
+      * scroll 'click' is 1 velocity. */
+    public final float velocity;
 
-      public Impl(Events.Flags flags, double time, float x, float y, float velocity) {
-        super(flags, time, x, y);
-        this.velocity = velocity;
-      }
+    public WheelEvent (int flags, double time, float x, float y, float velocity) {
+      super(flags, time, x, y);
+      this.velocity = velocity;
+    }
 
-      @Override
-      public float velocity() {
-        return velocity;
-      }
+    @Override protected String name () {
+      return "Wheel";
+    }
 
-      @Override
-      protected String name() {
-        return "WheelEvent";
-      }
-
-      protected Impl(Layer hit, Events.Flags flags, double time, float x, float y, float velocity) {
-        super(hit, flags, time, x, y);
-        this.velocity = velocity;
-      }
-
-      @Override
-      public WheelEvent.Impl localize (Layer hit) {
-        return new WheelEvent.Impl(hit, flags(), time(), x(), y(), velocity);
-      }
-
-      @Override
-      protected void addFields(StringBuilder builder) {
-        super.addFields(builder);
-        builder.append(", velocity=").append(velocity);
-      }
+    @Override protected void addFields (StringBuilder builder) {
+      super.addFields(builder);
+      builder.append(", velocity=").append(velocity);
     }
   }
 
-  /** An interface for listening to all mouse events. */
-  interface Listener {
-    /**
-     * Called when the mouse is pressed.
-     *
-     * @param event provides mouse position, button and other metadata.
-     */
-    void onMouseDown(ButtonEvent event);
-
-    /**
-     * Called when the mouse is released.
-     *
-     * @param event provides mouse position, button and other metadata.
-     */
-    void onMouseUp(ButtonEvent event);
-
-    /**
-     * Called when the mouse is moved.
-     *
-     * @param event provides mouse position and other metadata.
-     */
-    void onMouseMove(MotionEvent event);
-
-    /**
-     * Called when mouse wheel scroll occurs.
-     * <p>
-     * Negative velocity corresponds to scrolling north/up.
-     * Positive velocity corresponds to scrolling south/down.
-     * Each scroll 'click' is 1 velocity.
-     *
-     * @param event provides wheel velocity and other metadata.
-     */
-    void onMouseWheelScroll(WheelEvent event);
+  /** A slot which only dispatches on {@link ButtonEvent}s. */
+  public static abstract class ButtonSlot extends Slot<Event> {
+    public void onEmit (Event event) {
+      if (event instanceof ButtonEvent) onEmit((ButtonEvent)event);
+    }
+    public abstract void onEmit (ButtonEvent event);
   }
 
-  /** An interface for listening to mouse events that interact with a single layer.
-   * See {@link Layer#addListener(Mouse.LayerListener)}. */
-  interface LayerListener {
-    /**
-     * Called when the mouse is pressed.
-     *
-     * @param event provides mouse position, button and other metadata.
-     */
-    void onMouseDown(ButtonEvent event);
-
-    /**
-     * Called when the mouse is released.
-     *
-     * @param event provides mouse position, button and other metadata.
-     */
-    void onMouseUp(ButtonEvent event);
-
-    /**
-     * Called when the mouse button is pressed on a layer and is subsequently moved (dragged). This
-     * event is dispatched to the layer that was "hit" when the mouse button was first pressed.
-     *
-     * @param event provides mouse position and other metadata.
-     */
-    void onMouseDrag(MotionEvent event);
-
-    /**
-     * Called when the mouse is moved and is not currently engaged in a drag (see {@link
-     * #onMouseDrag}. The event is dispatched to the layer which is intersected by the mouse
-     * coordinates.
-     *
-     * @param event provides mouse position and other metadata.
-     */
-    void onMouseMove(MotionEvent event);
-
-    /**
-     * Called when the mouse enters a {@link Layer}.
-     *
-     * Note: MotionEvent is first dispatched to {@link #onMouseDrag} or {@link #onMouseMove}, then
-     *       to {@link #onMouseOut} and finally to {@link #onMouseOver}. These three events share a
-     *       single preventDefault state.
-     *
-     * @param event provides mouse position and other metadata.
-     */
-    void onMouseOver(MotionEvent event);
-
-    /**
-     * Called when the mouse leaves a {@link Layer}.
-     *
-     * Note: MotionEvent is first dispatched to {@link #onMouseDrag} or {@link #onMouseMove}, then
-     * to {@link #onMouseOut} and finally to {@link #onMouseOver}. These three events share a
-     * single preventDefault state.
-     *
-     * @param event provides mouse position and other metadata.
-     */
-    void onMouseOut(MotionEvent event);
-
-    /**
-     * Called when mouse wheel scroll occurs while the mouse is hovered over the listening layer,
-     * or while the layer is active due to having been previously hit by a mouse click which has
-     * not yet been released.
-     *
-     * <p> Negative velocity corresponds to scrolling north/up. Positive velocity corresponds to
-     * scrolling south/down. Each scroll 'click' is 1 velocity. </p>
-     *
-     * @param event provides wheel velocity and other metadata.
-     */
-    void onMouseWheelScroll(WheelEvent event);
+  /** A slot which only dispatches on {@link MotionEvent}s. */
+  public static abstract class MotionSlot extends Slot<Event> {
+    public void onEmit (Event event) {
+      if (event instanceof MotionEvent) onEmit((MotionEvent)event);
+    }
+    public abstract void onEmit (MotionEvent event);
   }
 
-  /** A {@link Listener} implementation with NOOP stubs provided for each method. */
-  class Adapter implements Listener {
-    @Override
-    public void onMouseDown(ButtonEvent event) { /* NOOP! */ }
-    @Override
-    public void onMouseUp(ButtonEvent event) { /* NOOP! */ }
-    @Override
-    public void onMouseMove(MotionEvent event) { /* NOOP! */ }
-    @Override
-    public void onMouseWheelScroll(WheelEvent event) { /* NOOP! */ }
+  /** A slot which only dispatches on {@link WheelEvent}s. */
+  public static abstract class WheelSlot extends Slot<Event> {
+    public void onEmit (Event event) {
+      if (event instanceof WheelEvent) onEmit((WheelEvent)event);
+    }
+    public abstract void onEmit (WheelEvent event);
   }
 
-  /** A {@link LayerListener} implementation with NOOP stubs provided for each method. */
-  class LayerAdapter implements LayerListener {
-    @Override
-    public void onMouseDown(ButtonEvent event) { /* NOOP! */ }
-    @Override
-    public void onMouseUp(ButtonEvent event) { /* NOOP! */ }
-    @Override
-    public void onMouseDrag(MotionEvent event) { /* NOOP! */ }
-    @Override
-    public void onMouseMove(MotionEvent event) { /* NOOP! */ }
-    @Override
-    public void onMouseOver(MotionEvent event) { /* NOOP! */ }
-    @Override
-    public void onMouseOut(MotionEvent event) { /* NOOP! */ }
-    @Override
-    public void onMouseWheelScroll(WheelEvent event) { /* NOOP! */ }
-  }
+  /** A signal which emits mouse events. */
+  public Signal<Event> events = Signal.create();
 
   /**
    * Returns true if the underlying platform supports mouse interaction. If this method returns
    * false, listeners may still be registered with this service but they will never be notified.
    */
-  boolean hasMouse();
+  public boolean isSupported () {
+    return false;
+  }
 
   /**
    * Returns true if mouse interaction is enabled, false if not. Interaction is enabled by default.
    * See {@link #setEnabled}.
    */
-  boolean isEnabled();
+  public boolean isEnabled () {
+    return enabled;
+  }
 
   /**
    * Allows mouse interaction to be temporarily disabled. No mouse events will be dispatched whilst
    * this big switch is in the off position.
    */
-  void setEnabled(boolean enabled);
-
-  /**
-   * Returns the currently configured global mouse listener, or null.
-   */
-  Listener listener ();
-
-  /**
-   * Sets the listener that will receive mouse events. Setting the listener to
-   * {@code null} will cause mouse events to stop being fired.
-   */
-  void setListener(Listener listener);
-
-  /**
-   * Lock the mouse, i.e. receive mouse events even when the mouse pointer leaves the window.
-   */
-  void lock();
-
-  /**
-   * Unlock the mouse.
-   */
-  void unlock();
-
-  /**
-   * True if the mouse is locked.
-   */
-  boolean isLocked();
+  public void setEnabled (boolean enabled) {
+    this.enabled = enabled;
+  }
 
   /**
    * True if lock has a chance of success on this platform (the user may still block it, or
    * detection may be broken for some browsers).
    */
-  boolean isLockSupported();
+  public boolean isLockSupported () {
+    return false;
+  }
+
+  /**
+   * True if the mouse is locked.
+   */
+  public boolean isLocked () {
+    return false;
+  }
+
+  /**
+   * Lock the mouse, i.e. receive mouse events even when the mouse pointer leaves the window.
+   */
+  public void lock () {
+    // noop
+  }
+
+  /**
+   * Unlock the mouse.
+   */
+  public void unlock () {
+    // noop
+  }
+
+  private boolean enabled = true;
 }

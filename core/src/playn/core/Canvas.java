@@ -16,24 +16,15 @@
 package playn.core;
 
 /**
- * A 2d drawing canvas.
- *
- * <p>
- * Colors are specified as integer ARGB values, with alpha in the
- * most-significant byte.
- * </p>
- *
- * <p>
- * All methods that modify the Canvas return it to allow calls to be chained.
- * </p>
+ * A 2D drawing canvas. Rendering is performed by the CPU into a bitmap.
  */
-public interface Canvas {
+public abstract class Canvas {
 
   /**
    * Values that may be used with
    * {@link Canvas#setCompositeOperation(Composite)}.
    */
-  enum Composite {
+  public static enum Composite {
     /**
      * A (B is ignored). Display the source image instead of the destination
      * image.
@@ -126,117 +117,114 @@ public interface Canvas {
   /**
    * Values that may be used with {@link Canvas#setLineCap(LineCap)}.
    */
-  enum LineCap {
+  public static enum LineCap {
     BUTT, ROUND, SQUARE
   }
 
   /**
    * Values that may be used with {@link Canvas#setLineJoin(LineJoin)}.
    */
-  enum LineJoin {
+  public static enum LineJoin {
     BEVEL, MITER, ROUND
   }
 
-  /**
-   * Clears the entire canvas to rgba(0, 0, 0, 0).
-   */
-  Canvas clear();
+  /** The image that underlies this canvas. */
+  public final Image image;
+
+  /** The width of this canvas. */
+  public final float width;
+
+  /** The height of this canvas. */
+  public final float height;
 
   /**
-   * Clears the specified region to rgba(0, 0, 0, 0).
+   * Returns a snapshot of the image that backs this canvas which is no longer mutable. Subsequent
+   * changes to this canvas will not be reflected in the returned image. If you are going to render
+   * a canvas image into another canvas image a lot, using a snapshot can improve performance.
    */
-  Canvas clearRect(float x, float y, float width, float height);
+  public abstract Image snapshot ();
+
+  /** Clears the entire canvas to {@code rgba(0, 0, 0, 0)}. */
+  public abstract Canvas clear ();
+
+  /** Clears the specified region to {@code rgba (0, 0, 0, 0)}. */
+  public abstract Canvas clearRect (float x, float y, float width, float height);
+
+  /** Intersects the current clip with the specified path. */
+  public abstract Canvas clip (Path clipPath);
+
+  /** Intersects the current clip with the supplied rectangle. */
+  public abstract Canvas clipRect (float x, float y, float width, float height);
+
+  /** Creates a path object. */
+  public abstract Path createPath ();
 
   /**
-   * Intersects the current clip with the specified path.
+   * Draws an image at the specified location {@code (x, y)}.
    */
-  Canvas clip(Path clipPath);
+  public Canvas drawImage (Image image, float x, float y) {
+    return drawImage(image, x, y, image.width(), image.height());
+  }
 
   /**
-   * Intersects the current clip with the supplied rectangle.
+   * Draws an image centered at the specified location. Subtracts {@code image.width/2} from x
+   * and {@code image.height/2} from y.
    */
-  Canvas clipRect(float x, float y, float width, float height);
+  public Canvas drawImageCentered (Image image, float x, float y) {
+    return drawImage(image, x - image.width()/2, y - image.height()/2);
+  }
 
   /**
-   * Creates a path object.
+   * Draws a scaled image at the specified location {@code (x, y)} size {@code (w x h)}.
    */
-  Path createPath();
+  public Canvas drawImage (Image image, float x, float y, float w, float h) {
+    ((ImageImpl)image).draw(gc(), x, y, w, h);
+    isDirty = true;
+    return this;
+  }
 
   /**
-   * Draws an image at the specified location.
+   * Draws a subregion of an image ({@code (sw x sh) @ (sx, sy)} at the specified
+   * size {@code (dw x dh)} and location {@code (dx, dy)}.
    *
-   * @param dx the destination x
-   * @param dy the destination y
+   * TODO (jgw): Document whether out-of-bounds source coordinates clamp, repeat, or do nothing.
    */
-  Canvas drawImage(Image image, float dx, float dy);
-
-  /**
-   * Draws an image, centered at the specified location.  Simply
-   * subtracts image.width/2 from dx and image.height/2 from dy.
-   *
-   * @param image the image to draw
-   * @param dx destination x
-   * @param dy destination y
-   */
-  Canvas drawImageCentered(Image image, float dx, float dy);
-
-  /**
-   * Draws a scaled image at the specified location.
-   *
-   * @param dx the destination x
-   * @param dy the destination y
-   * @param dw the destination width
-   * @param dh the destination height
-   */
-  Canvas drawImage(Image image, float dx, float dy, float dw, float dh);
-
-  /**
-   * Draws a scaled subset of an image at the specified location.
-   *
-   * TODO(jgw): Document whether out-of-bounds source coordinates clamp, repeat,
-   * or do nothing.
-   *
-   * @param dx the destination x
-   * @param dy the destination y
-   * @param dw the destination width
-   * @param dh the destination height
-   * @param sx the source x
-   * @param sy the source y
-   * @param sw the source width
-   * @param sh the source height
-   */
-  Canvas drawImage(Image image, float dx, float dy, float dw, float dh, float sx, float sy,
-      float sw, float sh);
+  public Canvas drawImage (Image image, float dx, float dy, float dw, float dh,
+                           float sx, float sy, float sw, float sh) {
+    ((ImageImpl)image).draw(gc(), dx, dy, dw, dh, sx, sy, sw, sh);
+    isDirty = true;
+    return this;
+  }
 
   /**
    * Draws a line between the two specified points.
    */
-  Canvas drawLine(float x0, float y0, float x1, float y1);
+  public abstract Canvas drawLine (float x0, float y0, float x1, float y1);
 
   /**
    * Draws a single point at the specified location.
    */
-  Canvas drawPoint(float x, float y);
+  public abstract Canvas drawPoint (float x, float y);
 
   /**
    * Draws text at the specified location. The text will be drawn in the current fill color.
    */
-  Canvas drawText(String text, float x, float y);
+  public abstract Canvas drawText (String text, float x, float y);
 
   /**
    * Fills a circle at the specified center and radius.
    */
-  Canvas fillCircle(float x, float y, float radius);
+  public abstract Canvas fillCircle (float x, float y, float radius);
 
   /**
    * Fills the specified path.
    */
-  Canvas fillPath(Path path);
+  public abstract Canvas fillPath (Path path);
 
   /**
    * Fills the specified rectangle.
    */
-  Canvas fillRect(float x, float y, float width, float height);
+  public abstract Canvas fillRect (float x, float y, float width, float height);
 
   /**
    * Fills the specified rounded rectangle.
@@ -247,29 +235,24 @@ public interface Canvas {
    * @param height the width of the rounded rectangle.
    * @param radius the radius of the circle to use for the corner.
    */
-  Canvas fillRoundRect(float x, float y, float width, float height, float radius);
+  public abstract Canvas fillRoundRect (float x, float y, float width, float height, float radius);
 
   /**
    * Fills the text at the specified location. The text will use the current fill color.
    */
-  Canvas fillText(TextLayout text, float x, float y);
-
-  /**
-   * The height of this canvas.
-   */
-  float height();
+  public abstract Canvas fillText (TextLayout text, float x, float y);
 
   /**
    * Restores the canvas's previous state.
    *
-   * @see #save()
+   * @see #save ()
    */
-  Canvas restore();
+  public abstract Canvas restore ();
 
   /**
    * Rotates the current transformation matrix by the specified angle in radians.
    */
-  Canvas rotate(float radians);
+  public abstract Canvas rotate (float radians);
 
   /**
    * The save and restore methods preserve and restore the state of the canvas,
@@ -288,12 +271,12 @@ public interface Canvas {
    * <li>composite operation</li>
    * </ul>
    */
-  Canvas save();
+  public abstract Canvas save ();
 
   /**
    * Scales the current transformation matrix by the specified amount.
    */
-  Canvas scale(float x, float y);
+  public abstract Canvas scale (float x, float y);
 
   /**
    * Set the global alpha value to be used for all painting.
@@ -302,70 +285,70 @@ public interface Canvas {
    *
    * @param alpha alpha value in range [0,1] where 0 is transparent and 1 is opaque
    */
-  Canvas setAlpha(float alpha);
+  public abstract Canvas setAlpha (float alpha);
 
   /**
    * Sets the Porter-Duff composite operation to be used for all painting.
    */
-  Canvas setCompositeOperation(Composite composite);
+  public abstract Canvas setCompositeOperation (Composite composite);
 
   /**
    * Sets the color to be used for fill operations. This replaces any existing
    * fill gradient or pattern.
    */
-  Canvas setFillColor(int color);
+  public abstract Canvas setFillColor (int color);
 
   /**
    * Sets the gradient to be used for fill operations. This replaces any
    * existing fill color or pattern.
    */
-  Canvas setFillGradient(Gradient gradient);
+  public abstract Canvas setFillGradient (Gradient gradient);
 
   /**
    * Sets the pattern to be used for fill operations. This replaces any existing
    * fill color or gradient.
    */
-  Canvas setFillPattern(Pattern pattern);
+  public abstract Canvas setFillPattern (Pattern pattern);
 
   /**
    * Sets the line-cap mode for strokes.
    */
-  Canvas setLineCap(LineCap cap);
+  public abstract Canvas setLineCap (LineCap cap);
 
   /**
    * Sets the line-join mode for strokes.
    */
-  Canvas setLineJoin(LineJoin join);
+  public abstract Canvas setLineJoin (LineJoin join);
 
   /**
    * Sets the miter limit for strokes.
    */
-  Canvas setMiterLimit(float miter);
+  public abstract Canvas setMiterLimit (float miter);
 
   /**
    * Sets the color for strokes.
    */
-  Canvas setStrokeColor(int color);
+  public abstract Canvas setStrokeColor (int color);
 
   /**
    * Sets the width for strokes, in pixels.
    */
-  Canvas setStrokeWidth(float strokeWidth);
+  public abstract Canvas setStrokeWidth (float strokeWidth);
 
   /**
    * Strokes a circle at the specified center and radius.
    */
-  Canvas strokeCircle(float x, float y, float radius);
+  public abstract Canvas strokeCircle (float x, float y, float radius);
 
   /**
    * Strokes the specified path.
    */
-  Canvas strokePath(Path path);
+  public abstract Canvas strokePath (Path path);
 
   /**
    * Strokes the specified rectangle.
    */
-  Canvas strokeRect(float x, float y, float width, float height);
+  public abstract Canvas strokeRect (float x, float y, float width, float height);
 
   /**
    * Strokes the specified rounded rectangle.
@@ -376,26 +359,34 @@ public interface Canvas {
    * @param height the width of the rounded rectangle.
    * @param radius the radius of the circle to use for the corner.
    */
-  Canvas strokeRoundRect(float x, float y, float width, float height, float radius);
+  public abstract Canvas strokeRoundRect (float x, float y, float width, float height,
+                                          float radius);
 
   /**
    * Strokes the text at the specified location. The text will use the current stroke configuration
-   * (color, width, etc.).
+   *  (color, width, etc.).
    */
-  Canvas strokeText(TextLayout text, float x, float y);
+  public abstract Canvas strokeText (TextLayout text, float x, float y);
 
   /**
    * Multiplies the current transformation matrix by the given matrix.
    */
-  Canvas transform(float m11, float m12, float m21, float m22, float dx, float dy);
+  public abstract Canvas transform (float m11, float m12, float m21, float m22, float dx, float dy);
 
   /**
    * Translates the current transformation matrix by the given amount.
    */
-  Canvas translate(float x, float y);
+  public abstract Canvas translate (float x, float y);
 
-  /**
-   * The width of this canvas.
-   */
-  float width();
+  /** Used to track modifications to our underlying image. */
+  protected boolean isDirty;
+
+  protected Canvas (Image image) {
+    this.image = image;
+    this.width = image.width();
+    this.height = image.height();
+  }
+
+  /** Returns the platform dependent graphics context for this canvas. */
+  protected abstract Object gc ();
 }

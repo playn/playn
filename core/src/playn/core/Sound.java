@@ -13,62 +13,23 @@
  */
 package playn.core;
 
-import playn.core.util.Callback;
+import react.RFuture;
 
 /**
- * A sound.
+ * A single sound asset, which can be played, looped, etc.
  */
-public interface Sound {
-
-  /** A sound that does nothing. Useful for optionally playing sound or no sound. */
-  public static class Silence implements Sound {
-    @Override
-    public boolean prepare() {
-      return false;
-    }
-    @Override
-    public boolean play() {
-      return false;
-    }
-    @Override
-    public void stop() {
-    }
-    @Override
-    public void setLooping(boolean looping) {
-    }
-    @Override
-    public float volume() {
-      return 0;
-    }
-    @Override
-    public void setVolume(float volume) {
-    }
-    @Override
-    public boolean isPlaying() {
-      return false;
-    }
-    @Override
-    public void release() {
-    }
-    @Override
-    public void addCallback(Callback<? super Sound> callback) {
-      callback.onSuccess(this);
-    }
-  }
+public class Sound {
 
   /** Represents a sound that failed to load. Reports the supplied error to all listeners. */
-  public static class Error extends Silence {
-    private final Exception error;
-
+  public static class Error extends Sound {
     public Error (Exception error) {
-      this.error = error;
-    }
-
-    @Override
-    public void addCallback(Callback<? super Sound> callback) {
-      callback.onFailure(error);
+      super(RFuture.<Sound>failure(error));
     }
   }
+
+  /** Reports the asynchronous loading of this sound. This will be completed with success or
+    * failure when the sound's asynchronous load completes. */
+  public final RFuture<Sound> state;
 
   /**
    * Prepares this sound to be played by preloading it into audio buffers. This expresses a desire
@@ -77,7 +38,9 @@ public interface Sound {
    *
    * @return {@literal true} if preloading occurred, false if unsupported or preloading failed
    */
-  boolean prepare();
+  public boolean prepare() {
+    return false;
+  }
 
   /**
    * If possible, begin playback of this audio stream. The audio system will make best efforts to
@@ -88,50 +51,58 @@ public interface Sound {
    *
    * @return {@literal true} if it's likely that audio playback will proceed
    */
-  boolean play();
+  public boolean play() {
+    return false;
+  }
 
   /**
    * Stop playback of the current audio stream as soon as possible, and reset the sound position to
    * its starting position, such that a subsequent call to {@link #play()} will cause the audio file
    * to being playback from the beginning of the audio stream.
    */
-  void stop();
+  public void stop() {}
 
   /**
    * Set whether audio stream playback should be looped indefinitely or not.
    *
    * @param looping {@literal true} if the audio stream should be looped indefinitely
    */
-  void setLooping(boolean looping);
+  public void setLooping(boolean looping) {}
 
   /**
    * @return the current volume of this sound, a value between {@literal 0.0} and {@literal 1.0}.
    */
-  float volume();
+  public float volume() {
+    return 0;
+  }
 
   /**
    * @param volume new volume between {@literal 0.0} and {@literal 1.0}
    */
-  void setVolume(float volume);
+  public void setVolume(float volume) {}
 
   /**
    * Determine whether this audio stream is currently playing.
    *
    * @return {@literal true} if the audio stream is currently playing
    */
-  boolean isPlaying();
+  public boolean isPlaying() {
+    return false;
+  }
 
   /**
    * Releases resources used by this sound. It will no longer be usable after release. This will
    * also happen automatically when this sound is garbage collected, but one may need to manually
    * release sounds sooner to avoid running out of audio resources.
    */
-  void release();
+  public void release() {}
 
-  /**
-   * Adds a callback to be notified when this sound has loaded. If the sound is
-   * already loaded the callback will be notified immediately. The callback is
-   * discarded once the sound is loaded.
-   */
-  void addCallback(Callback<? super Sound> callback);
+  /** Creates the sound of silence. */
+  public Sound () {
+    this.state = RFuture.success(this);
+  }
+
+  protected Sound (RFuture<Sound> state) {
+    this.state = state;
+  }
 }
