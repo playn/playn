@@ -15,92 +15,46 @@
  */
 package playn.java;
 
-import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Deque;
 import java.util.List;
+import java.util.concurrent.ConcurrentLinkedDeque;
 
-import playn.core.Events;
+import playn.core.Event;
 import playn.core.Key;
 
-public abstract class JavaKeyboard implements playn.core.Keyboard {
+public abstract class JavaKeyboard extends playn.core.Keyboard {
 
-  private Listener[] listeners = {null};
-  private final List<Queued<?>> queue = Collections.synchronizedList(new ArrayList<Queued<?>>());
-
-  protected final Dispatcher<Event> down = new Dispatcher<Event>() {
-    public void send (Listener l, Event e) { l.onKeyDown(e); }
-  };
-  protected final Dispatcher<Event> up = new Dispatcher<Event>() {
-    public void send (Listener l, Event e) { l.onKeyUp(e); }
-  };
-  protected final Dispatcher<TypedEvent> typed = new Dispatcher<TypedEvent>() {
-    public void send (Listener l, TypedEvent e) { l.onKeyTyped(e); }
-  };
+  private final Deque<Event> queue = new ConcurrentLinkedDeque<>();
+  private final JavaPlatform plat;
 
   /** Posts a key event received from elsewhere (i.e. a native UI component). This is useful for
-   * applications that are using GL in Canvas mode and sharing keyboard focus with other (non-GL)
-   * components. The event will be queued and dispatched on the next frame, after GL keyboard
-   * events.
-   *
-   * <p><em>Note</em>: the resulting event will be sent with time = 0, since the GL event time is
-   * inaccessible and platform dependent.</p>
-   *
-   * @param key the key that was pressed or released, or null for a char typed event
-   * @param pressed whether the key was pressed or released, ignored if key is null
-   * @param typedCh the character that was typed, ignored if key is not null
-   */
-  public void post(Key key, boolean pressed, char typedCh) {
-    queue.add(
-      key == null ?
-      new Queued<TypedEvent>(new TypedEvent.Impl(new Events.Flags.Impl(), 0, typedCh), typed) :
-      new Queued<Event>(new Event.Impl(new Events.Flags.Impl(), 0, key), pressed ? down : up));
+    * applications that are using GL in Canvas mode and sharing keyboard focus with other (non-GL)
+    * components. The event will be queued and dispatched on the next frame, after GL keyboard
+    * events.
+    *
+    * <p><em>Note</em>: the resulting event will be sent with time = 0, since the GL event time is
+    * inaccessible and platform dependent.</p>
+    *
+    * @param key the key that was pressed or released, or null for a char typed event
+    * @param pressed whether the key was pressed or released, ignored if key is null
+    * @param typedCh the character that was typed, ignored if key is not null
+    */
+  public void post (Key key, boolean pressed, char typedCh) {
+    queue.add(key == null ? new TypedEvent(0, 0, typedCh) : new KeyEvent(0, 0, key, pressed));
   }
 
-  @Override
-  public Listener listener() {
-    return listeners[0];
+  public JavaKeyboard(JavaPlatform plat) {
+    this.plat = plat;
   }
 
-  @Override
-  public void setListener(Listener listener) {
-    listeners[0] = listener;
-  }
-
-  @Override
-  public boolean hasHardwareKeyboard() {
+  @Override public boolean hasHardwareKeyboard() {
     return true;
   }
 
-  void init(Listener platformListener) {
-    // let our friend the touch emulator have key messages too
-    if (platformListener !=null)
-      listeners = new Listener[] { listeners[0], platformListener };
-  }
+  abstract void init ();
 
   void update() {
-    while (!queue.isEmpty())
-      queue.remove(0).dispatch();
-  }
-
-  protected <E extends Events.Input> void dispatch (E e, Dispatcher<E> d) {
-    for (Listener l : listeners) if (l != null) d.send(l, e);
-  }
-
-  protected interface Dispatcher<E extends Events.Input> {
-    void send (Listener l, E e);
-  }
-
-  protected class Queued<E extends Events.Input> {
-    final E event;
-    final Dispatcher<E> dispatcher;
-
-    Queued (E event, Dispatcher<E> dispatcher) {
-      this.event = event;
-      this.dispatcher = dispatcher;
-    }
-
-    void dispatch () {
-      JavaKeyboard.this.dispatch(event, dispatcher);
-    }
+    Event event;
+    while ((event = queue.poll()) != null) events.emit(event);
   }
 }

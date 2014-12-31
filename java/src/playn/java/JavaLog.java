@@ -15,23 +15,20 @@
  */
 package playn.java;
 
-import playn.core.LogImpl;
+import playn.core.Log;
 
-class JavaLog extends LogImpl {
+class JavaLog extends Log {
 
-  @Override
-  protected void logImpl(Level level, String msg, Throwable e) {
+  @Override protected void logImpl (Level level, String msg, Throwable e) {
     switch (level) {
     default:
       System.out.println(msg);
-      if (e != null)
-        e.printStackTrace(System.out);
+      if (e != null) e.printStackTrace(System.out);
       break;
     case WARN:
     case ERROR:
       System.err.println(msg);
-      if (e != null)
-        e.printStackTrace(System.err);
+      if (e != null) e.printStackTrace(System.err);
       break;
     }
   }

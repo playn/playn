@@ -26,21 +26,17 @@ import java.util.concurrent.TimeUnit;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.opengl.Display;
 
-import playn.core.AbstractPlatform;
-import playn.core.Game;
-import playn.core.Json;
-import playn.core.Key;
-import playn.core.Keyboard;
-import playn.core.Mouse;
-import playn.core.Net;
-import playn.core.PlayN;
-import playn.core.Storage;
-import playn.core.Touch;
-import playn.core.TouchImpl;
-import playn.core.TouchStub;
+import playn.core.*;
 import playn.core.json.JsonImpl;
+import react.Slot;
 
-public class JavaPlatform extends AbstractPlatform {
+/**
+ * Implements the PlayN platform for Java, based on LWJGL. Due to the way LWJGL works, a game must
+ * call {@link #init}, then perform any of its own initialization that requires access to GL
+ * resources, and then call {@link #start} to start the game loop. The {@link #start} call does not
+ * return until the game exits.
+ */
+public class JavaPlatform extends Platform {
 
   /** Defines JavaPlatform configurable parameters. */
   public static class Config {
@@ -88,33 +84,6 @@ public class JavaPlatform extends AbstractPlatform {
     public boolean truePause;
   }
 
-  /**
-   * Registers the Java platform with a default configuration.
-   */
-  public static JavaPlatform register() {
-    return register(new Config());
-  }
-
-  /**
-   * Registers the Java platform with the specified configuration.
-   */
-  public static JavaPlatform register(Config config) {
-    // guard against multiple-registration (only in headless mode because this can happen when
-    // running tests in Maven; in non-headless mode, we want to fail rather than silently ignore
-    // erroneous repeated registration)
-    if (config.headless && testInstance != null) {
-      return testInstance;
-    }
-    JavaPlatform instance = new JavaPlatform(config);
-    if (config.headless) {
-      testInstance = instance;
-    }
-    PlayN.setPlatform(instance);
-    return instance;
-  }
-
-  private static JavaPlatform testInstance;
-
   private static float getDefaultScaleFactor() {
     String sfprop = System.getProperty("playn.scaleFactor", "1");
     try {
@@ -125,60 +94,49 @@ public class JavaPlatform extends AbstractPlatform {
     }
   }
 
-  public final boolean convertImagesOnLoad;
+  final Config config;
 
-  private final Config config;
+  private final JavaLog log = new JavaLog();
   private final JavaAudio audio = new JavaAudio(this);
   private final JavaNet net = new JavaNet(this);
   private final JavaStorage storage;
   private final JsonImpl json = new JsonImpl();
   private final JavaKeyboard keyboard;
-  private final JavaPointer pointer = new JavaPointer();
-  private final TouchImpl touch;
+  private final Touch touch;
   private final JavaGraphics graphics;
   private final JavaMouse mouse;
   private final JavaAssets assets = new JavaAssets(this);
-  private final Keyboard.Listener keyListener;
   private boolean active = true;
 
   private final ExecutorService _exec = Executors.newFixedThreadPool(4);
   private final long start = System.nanoTime();
 
-  public JavaPlatform(Config config) {
-    super(new JavaLog());
+  public JavaPlatform(final Config config) {
     this.config = config;
     if (!config.headless) {
       unpackNatives();
     }
-    graphics = createGraphics(config);
+    graphics = createGraphics();
     keyboard = createKeyboard();
-    storage = new JavaStorage(this, config);
-    touch = createTouch(config);
-    if (touch instanceof JavaEmulatedTouch) {
-      mouse = ((JavaEmulatedTouch)touch).createMouse(this);
-    } else {
-      mouse = createMouse();
-    }
+    mouse = createMouse();
+    touch = createTouch(keyboard, mouse);
+    storage = new JavaStorage(this);
 
-    if (touch instanceof JavaEmulatedTouch || config.activationKey != null) {
-      final Key pivotKey = (touch instanceof JavaEmulatedTouch) ? config.pivotKey : null;
-      final Key activationKey = config.activationKey;
-      keyListener = new Keyboard.Adapter() {
-        @Override public void onKeyUp (playn.core.Keyboard.Event event) {
-          if (event.key() == pivotKey)
-            ((JavaEmulatedTouch)touch).updatePivot();
-          else if (event.key() == activationKey)
-            toggleActivation();
+    if (config.activationKey != null) {
+      keyboard.events.connect(new Slot<Keyboard.Event>() {
+        public void onEmit (Keyboard.Event event) {
+          if (event instanceof Keyboard.KeyEvent) {
+            Keyboard.KeyEvent kevent = (Keyboard.KeyEvent)event;
+            if (kevent.key == config.activationKey && kevent.down) {
+              toggleActivation();
+            }
+          }
         }
-      };
-    } else {
-      keyListener = null;
+      });
     }
-
     if (!config.headless) {
       setTitle(config.appName);
     }
-    convertImagesOnLoad = config.convertImagesOnLoad;
   }
 
   /**
@@ -188,6 +146,25 @@ public class JavaPlatform extends AbstractPlatform {
    */
   public void setTitle(String title) {
     Display.setTitle(title);
+  }
+
+  /**
+   * Initializes the LWJGL subsystems. This must be called before calling {@link #start}.
+   */
+  public void init () {
+    // set our starting display mode before we create our display
+    graphics.preInit();
+
+    if (!config.headless) {
+      try {
+        Display.create();
+      } catch (LWJGLException e) {
+        throw new RuntimeException(e);
+      }
+    }
+
+    keyboard.init();
+    mouse.init();
   }
 
   @Override
@@ -216,6 +193,11 @@ public class JavaPlatform extends AbstractPlatform {
   }
 
   @Override
+  public Log log() {
+    return log;
+  }
+
+  @Override
   public Keyboard keyboard() {
     return keyboard;
   }
@@ -223,11 +205,6 @@ public class JavaPlatform extends AbstractPlatform {
   @Override
   public Net net() {
     return net;
-  }
-
-  @Override
-  public JavaPointer pointer() {
-    return pointer;
   }
 
   @Override
@@ -251,11 +228,6 @@ public class JavaPlatform extends AbstractPlatform {
   }
 
   @Override
-  public float random() {
-    return (float) Math.random();
-  }
-
-  @Override
   public double time() {
     return System.currentTimeMillis();
   }
@@ -275,72 +247,41 @@ public class JavaPlatform extends AbstractPlatform {
   }
 
   @Override
-  public void setPropagateEvents(boolean propagate) {
-    mouse.setPropagateEvents(propagate);
-    touch.setPropagateEvents(propagate);
-    pointer.setPropagateEvents(propagate);
-  }
-
-  @Override
-  public void run(final Game game) {
-    if (!config.headless) {
-      try {
-        Display.create();
-      } catch (LWJGLException e) {
-        throw new RuntimeException(e);
-      }
-    }
-    init(game);
-
+  public void start() {
     boolean wasActive = Display.isActive();
     while (!Display.isCloseRequested()) {
-      // Notify the app if lose or regain focus (treat said as pause/resume).
+      // notify the app if lose or regain focus (treat said as pause/resume)
       boolean newActive = Display.isActive();
       if (wasActive != newActive) {
-        if (wasActive)
-          onPause();
-        else
-          onResume();
+        lifecycle.emit(wasActive ? Lifecycle.PAUSE : Lifecycle.RESUME);
         wasActive = newActive;
       }
-      // Process frame, if we don't need to provide true pausing
-      if (newActive || !config.truePause)
-        processFrame(game);
+      // process frame, if we don't need to provide true pausing
+      if (newActive || !config.truePause) processFrame();
       Display.update();
-      // Sleep until it's time for the next frame.
+      // sleep until it's time for the next frame
       Display.sync(60);
     }
 
     shutdown();
   }
 
-  protected JavaGraphics createGraphics(Config config) {
-    return new JavaGraphics(this, config);
+  protected JavaGraphics createGraphics() {
+    return new JavaGraphics(this);
   }
-  protected TouchImpl createTouch(Config config) {
-    if (config.emulateTouch) {
-      return new JavaEmulatedTouch();
-    } else {
-      return new TouchStub();
-    }
+  protected JavaTouch createTouch(Keyboard keyboard, Mouse mouse) {
+    return new JavaTouch(this, keyboard, mouse);
   }
   protected JavaMouse createMouse() {
     return new JavaLWJGLMouse(this);
   }
   protected JavaKeyboard createKeyboard() {
-    return new JavaLWJGLKeyboard();
-  }
-
-  protected void init(Game game) {
-    graphics.init();
-    mouse.init();
-    keyboard.init(keyListener);
-    game.init();
+    return new JavaLWJGLKeyboard(this);
   }
 
   protected void shutdown() {
     // let the game run any of its exit hooks
-    onExit();
+    lifecycle.emit(Lifecycle.EXIT);
 
     // shutdown our thread pool
     try {
@@ -354,19 +295,12 @@ public class JavaPlatform extends AbstractPlatform {
     System.exit(0);
   }
 
-  protected void processFrame(Game game) {
-    // Event handling.
+  protected void processFrame() {
+    // event handling
     mouse.update();
     keyboard.update();
-    pointer.update();
-
-    // Execute any pending runnables.
-    runQueue.execute();
-
-    // Run the game loop, render the scene graph, and update the display.
-    game.tick(tick());
-    if (active)
-      graphics.paint();
+    // emit a frame signal
+    frame.emit(this);
   }
 
   protected void toggleActivation () {

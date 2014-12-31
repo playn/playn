@@ -16,35 +16,14 @@
 package playn.java;
 
 import java.awt.TexturePaint;
+import playn.core.Pattern;
 
-import playn.core.gl.AbstractImageGL;
-import playn.core.gl.GLPattern;
+class JavaPattern extends Pattern {
 
-class JavaPattern implements GLPattern {
-
-  private final AbstractImageGL<?> image;
-  private final boolean repeatX, repeatY;
   final TexturePaint paint;
 
-  JavaPattern(AbstractImageGL<?> image, boolean repeatX, boolean repeatY, TexturePaint paint) {
-    this.image = image;
-    this.repeatX = repeatX;
-    this.repeatY = repeatY;
+  public JavaPattern (boolean repeatX, boolean repeatY, TexturePaint paint) {
+    super(repeatX, repeatY);
     this.paint = paint;
-  }
-
-  @Override
-  public boolean repeatX() {
-    return repeatX;
-  }
-
-  @Override
-  public boolean repeatY() {
-    return repeatY;
-  }
-
-  @Override
-  public AbstractImageGL<?> image() {
-    return image;
   }
 }

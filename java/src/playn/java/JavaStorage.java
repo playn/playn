@@ -31,18 +31,18 @@ import playn.core.Storage;
  */
 class JavaStorage implements Storage {
 
-  private final JavaPlatform platform;
+  private final JavaPlatform plat;
   private final Preferences preferences;
   private boolean isPersisted;
 
-  JavaStorage(JavaPlatform platform, JavaPlatform.Config config) {
-    this.platform = platform;
+  JavaStorage(JavaPlatform plat) {
+    this.plat = plat;
     Preferences prefs = null;
     try {
-      isPersisted = Preferences.userRoot().nodeExists(config.storageFileName);
-      prefs = Preferences.userRoot().node(config.storageFileName);
+      isPersisted = Preferences.userRoot().nodeExists(plat.config.storageFileName);
+      prefs = Preferences.userRoot().node(plat.config.storageFileName);
     } catch (Exception e) {
-      platform.log().warn("Couldn't open Preferences: " + e.getMessage());
+      plat.log().warn("Couldn't open Preferences: " + e.getMessage());
       isPersisted = false;
       prefs = new MemoryPreferences();
     }
@@ -87,7 +87,7 @@ class JavaStorage implements Storage {
     try {
       return Arrays.asList(preferences.keys());
     } catch (Exception e) {
-      platform.log().warn("Error reading preferences: " + e.getMessage());
+      plat.log().warn("Error reading preferences: " + e.getMessage());
       return Collections.emptyList();
     }
   }
@@ -103,7 +103,7 @@ class JavaStorage implements Storage {
       preferences.flush();
       isPersisted = true;
     } catch (Exception e) {
-      platform.log().info("Error persisting properties: " + e.getMessage());
+      plat.log().info("Error persisting properties: " + e.getMessage());
       isPersisted = false;
     }
   }

@@ -20,14 +20,16 @@ import java.io.InputStream;
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
-import playn.core.AudioImpl;
-
 import javax.sound.sampled.Clip;
 
-public class JavaAudio extends AudioImpl {
+import playn.core.Audio;
 
-  public JavaAudio(JavaPlatform platform) {
-    super(platform);
+public class JavaAudio extends Audio {
+
+  private final JavaPlatform plat;
+
+  public JavaAudio(JavaPlatform plat) {
+    this.plat = plat;
   }
 
   /**
@@ -39,8 +41,8 @@ public class JavaAudio extends AudioImpl {
    * audio clips.
    */
   public JavaSound createSound(final JavaAssets.Resource rsrc, final boolean music) {
-    final JavaSound sound = new JavaSound();
-    ((JavaPlatform) platform).invokeAsync(new Runnable() {
+    final JavaSound sound = new JavaSound(plat);
+    plat.invokeAsync(new Runnable() {
       public void run () {
         try {
           AudioInputStream ais = rsrc.openAudioStream();
@@ -62,9 +64,9 @@ public class JavaAudio extends AudioImpl {
             ais = AudioSystem.getAudioInputStream(decodedFormat, ais);
           }
           clip.open(ais);
-          dispatchLoaded(sound, clip);
+          sound.succeed(clip);
         } catch (Exception e) {
-          dispatchLoadError(sound, e);
+          sound.fail(e);
         }
       }
     });

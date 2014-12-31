@@ -15,26 +15,29 @@
  */
 package playn.java;
 
-import pythagoras.f.MathUtil;
-
-import playn.core.Canvas;
-import playn.core.Gradient;
-import playn.core.Path;
-import playn.core.Pattern;
-import playn.core.TextLayout;
-import playn.core.gl.AbstractCanvasGL;
-
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.RoundRectangle2D;
+import java.awt.image.BufferedImage;
+import java.awt.image.ColorModel;
+import java.awt.image.WritableRaster;
 import java.util.Deque;
 import java.util.LinkedList;
 
-class JavaCanvas extends AbstractCanvasGL<Graphics2D> {
+import playn.core.Canvas;
+import playn.core.Gradient;
+import playn.core.Image;
+import playn.core.Path;
+import playn.core.Pattern;
+import playn.core.TextLayout;
+import pythagoras.f.MathUtil;
+
+class JavaCanvas extends Canvas {
 
   final Graphics2D gfx;
   private Deque<JavaCanvasState> stateStack = new LinkedList<JavaCanvasState>();
@@ -44,9 +47,13 @@ class JavaCanvas extends AbstractCanvasGL<Graphics2D> {
   private Rectangle2D.Float rect = new Rectangle2D.Float();
   private RoundRectangle2D.Float roundRect = new RoundRectangle2D.Float();
 
-  JavaCanvas(Graphics2D graphics, float width, float height) {
-    super(width, height);
-    this.gfx = graphics;
+  JavaCanvas(JavaImage image) {
+    super(image);
+
+    gfx = image.bufferedImage().createGraphics();
+    gfx.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+    float scale = image.scale().factor;
+    gfx.scale(scale, scale);
 
     // push default state
     stateStack.push(new JavaCanvasState());
@@ -57,6 +64,16 @@ class JavaCanvas extends AbstractCanvasGL<Graphics2D> {
 
   public float alpha() {
     return currentState().alpha;
+  }
+
+  @Override
+  public Image snapshot() {
+    BufferedImage bmp = ((JavaImage)image).bufferedImage();
+    ColorModel cm = bmp.getColorModel();
+    boolean isAlphaPremultiplied = bmp.isAlphaPremultiplied();
+    WritableRaster raster = bmp.copyData(null);
+    BufferedImage snap = new BufferedImage(cm, raster, isAlphaPremultiplied, null);
+    return new JavaImage(image.scale(), snap);
   }
 
   @Override

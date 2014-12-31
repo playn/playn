@@ -36,7 +36,6 @@ import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
 import org.lwjgl.opengl.GL41;
-import playn.core.gl.AbstractGL20;
 
 /**
  * An implementation of the {@link GL20} interface based on Jogl. Note that Jogl
@@ -47,7 +46,7 @@ import playn.core.gl.AbstractGL20;
  *
  * @author mzechner
  */
-final class JavaGL20 extends AbstractGL20 {
+final class JavaGL20 extends playn.core.GL20 {
 
   public JavaGL20() {
     super(new Buffers() {
@@ -55,10 +54,15 @@ final class JavaGL20 extends AbstractGL20 {
         return BufferUtils.createByteBuffer(size);
       }
     });
+    checkErrors = Boolean.getBoolean("playn.glerrors");
   }
 
   public void glActiveTexture(int texture) {
     GL13.glActiveTexture(texture);
+  }
+
+  @Override public int defaultFramebuffer () {
+    return 0;
   }
 
   @Override

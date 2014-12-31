@@ -30,18 +30,18 @@ import javax.sound.sampled.AudioSystem;
 
 import pythagoras.f.MathUtil;
 
-import playn.core.AbstractAssets;
-import playn.core.AsyncImage;
+import playn.core.Assets;
 import playn.core.Image;
+import playn.core.ImageImpl;
+import playn.core.Scale;
 import playn.core.Sound;
-import playn.core.gl.Scale;
 
 /**
  * Loads Java assets via the classpath.
  */
-public class JavaAssets extends AbstractAssets<BufferedImage> {
+public class JavaAssets extends Assets {
 
-  private final JavaPlatform platform;
+  private final JavaPlatform plat;
   private File[] directories = {};
 
   private String pathPrefix = "assets/";
@@ -50,9 +50,9 @@ public class JavaAssets extends AbstractAssets<BufferedImage> {
   /**
    * Creates a new java assets.
    */
-  public JavaAssets(JavaPlatform platform) {
-    super(platform);
-    this.platform = platform;
+  public JavaAssets(JavaPlatform plat) {
+    super(plat);
+    this.plat = plat;
   }
 
   /**
@@ -100,15 +100,15 @@ public class JavaAssets extends AbstractAssets<BufferedImage> {
     this.assetScale = new Scale(scaleFactor);
   }
 
-  @Override
-  public Image getRemoteImage(final String url, float width, float height) {
-    final JavaAsyncImage image = platform.graphics().createAsyncImage(width, height);
-    platform.invokeAsync(new Runnable() {
+  @Override public Image getRemoteImage(final String url, int width, int height) {
+    final JavaImage image = new JavaImage(plat, width, height);
+    plat.invokeAsync(new Runnable() {
       public void run () {
         try {
-          setImageLater(image, ImageIO.read(new URL(url)), Scale.ONE);
+          BufferedImage bmp = ImageIO.read(new URL(url));
+          image.succeed(new ImageImpl.Data(Scale.ONE, bmp, bmp.getWidth(), bmp.getHeight()));
         } catch (Exception error) {
-          setErrorLater(image, error);
+          image.fail(error);
         }
       }
     });
@@ -135,59 +135,17 @@ public class JavaAssets extends AbstractAssets<BufferedImage> {
     return requireResource(path).readBytes();
   }
 
-  @Override
-  protected Image createStaticImage(BufferedImage bufimg, Scale scale) {
-    return platform.graphics().createStaticImage(bufimg, scale);
-  }
-
-  @Override
-  protected AsyncImage<BufferedImage> createAsyncImage(float width, float height) {
-    return platform.graphics().createAsyncImage(width, height);
-  }
-
-  @Override
-  protected Image loadImage(String fullPath, ImageReceiver<BufferedImage> recv) {
-    Exception error = null;
-    for (Scale.ScaledResource rsrc : assetScale().getScaledResources(fullPath)) {
-      try {
-        BufferedImage image = requireResource(rsrc.path).readImage();
-        // if image is at a higher scale factor than the view, scale to the view display factor
-        Scale viewScale = platform.graphics().ctx().scale, imageScale = rsrc.scale;
-        float viewImageRatio = viewScale.factor / imageScale.factor;
-        if (viewImageRatio < 1) {
-          image = scaleImage(image, viewImageRatio);
-          imageScale = viewScale;
-        }
-        if (platform.convertImagesOnLoad) {
-          BufferedImage convertedImage = JavaGLContext.convertImage(image);
-          if (convertedImage != image) {
-            platform.log().debug("Converted image: " + fullPath + " [type=" + image.getType() + "]");
-            image = convertedImage;
-          }
-        }
-        return recv.imageLoaded(image, imageScale);
-      } catch (FileNotFoundException fnfe) {
-        error = fnfe; // keep going, checking for lower resolution images
-      } catch (Exception e) {
-        error = e;
-        break; // the image was broken not missing, stop here
-      }
-    }
-    platform.log().warn("Could not load image: " + fullPath + " [error=" + error + "]");
-    return recv.loadFailed(error != null ? error : new FileNotFoundException(fullPath));
-  }
-
   protected Sound getSound(String path, boolean music) {
     Exception err = null;
     for (String suff : SUFFIXES) {
       final String soundPath = path + suff;
       try {
-        return platform.audio().createSound(requireResource(soundPath), music);
+        return plat.audio().createSound(requireResource(soundPath), music);
       } catch (Exception e) {
         err = e; // note the error, and loop through and try the next format
       }
     }
-    platform.log().warn("Sound load error " + path + ": " + err);
+    plat.log().warn("Sound load error " + path + ": " + err);
     return new Sound.Error(err);
   }
 
@@ -244,7 +202,7 @@ public class JavaAssets extends AbstractAssets<BufferedImage> {
   }
 
   protected Scale assetScale() {
-    return (assetScale != null) ? assetScale : platform.graphics().ctx().scale;
+    return (assetScale != null) ? assetScale : plat.graphics().scale;
   }
 
   abstract static class Resource {
@@ -304,6 +262,38 @@ public class JavaAssets extends AbstractAssets<BufferedImage> {
         in.close();
       }
     }
+  }
+
+  @Override protected ImageImpl.Data load (String path) throws Exception {
+    Exception error = null;
+    for (Scale.ScaledResource rsrc : assetScale().getScaledResources(path)) {
+      try {
+        BufferedImage image = requireResource(rsrc.path).readImage();
+        // if image is at a higher scale factor than the view, scale to the view display factor
+        Scale viewScale = plat.graphics().scale, imageScale = rsrc.scale;
+        float viewImageRatio = viewScale.factor / imageScale.factor;
+        if (viewImageRatio < 1) {
+          image = scaleImage(image, viewImageRatio);
+          imageScale = viewScale;
+        }
+        if (plat.config.convertImagesOnLoad) {
+          BufferedImage convertedImage = JavaGraphics.convertImage(image);
+          if (convertedImage != image) {
+            plat.log().debug("Converted image: " + path + " [type=" + image.getType() + "]");
+            image = convertedImage;
+          }
+        }
+        return new ImageImpl.Data(imageScale, image, image.getWidth(), image.getHeight());
+      } catch (FileNotFoundException fnfe) {
+        error = fnfe; // keep going, checking for lower resolution images
+      }
+    }
+    plat.log().warn("Could not load image: " + path + " [error=" + error + "]");
+    throw error != null ? error : new FileNotFoundException(path);
+  }
+
+  @Override protected ImageImpl createImage (int rawWidth, int rawHeight) {
+    return new JavaImage(plat, rawWidth, rawHeight);
   }
 
   protected static final String[] SUFFIXES = { ".wav", ".mp3" };

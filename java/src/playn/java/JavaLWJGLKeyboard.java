@@ -21,49 +21,46 @@ import javax.swing.JOptionPane;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.input.Keyboard;
 
-import playn.core.Events;
+import playn.core.Event;
 import playn.core.Key;
-import playn.core.util.Callback;
+import react.RFuture;
 
 public class JavaLWJGLKeyboard extends JavaKeyboard {
 
   // TODO: set this from somewhere?
   private JFrame frame;
 
-  @Override
-  public void getText(TextType textType, String label, String initVal, Callback<String> callback) {
-    Object result = JOptionPane.showInputDialog(
-      frame, label, "", JOptionPane.QUESTION_MESSAGE, null, null, initVal);
-    callback.onSuccess((String) result);
+  public JavaLWJGLKeyboard (JavaPlatform plat) {
+    super(plat);
   }
 
-  @Override
-  void init(Listener platformListener) {
+  @Override public RFuture<String> getText(TextType textType, String label, String initVal) {
+    Object result = JOptionPane.showInputDialog(
+      frame, label, "", JOptionPane.QUESTION_MESSAGE, null, null, initVal);
+    return RFuture.success((String)result);
+  }
+
+  @Override void init() {
     try {
       Keyboard.create();
     } catch (LWJGLException e) {
       throw new RuntimeException(e);
     }
-    super.init(platformListener);
   }
 
-  @Override
-  void update() {
+  @Override void update() {
     while (Keyboard.next()) {
       double time = (double) (Keyboard.getEventNanoseconds() / 1000);
       int keyCode = Keyboard.getEventKey();
 
       if (Keyboard.getEventKeyState()) {
         Key key = translateKey(keyCode);
-        if (key != null)
-          dispatch(new Event.Impl(new Events.Flags.Impl(), time, key), down);
+        if (key != null) events.emit(new KeyEvent(0, time, key, true));
         char keyChar = Keyboard.getEventCharacter();
-        if (!Character.isISOControl(keyChar))
-          dispatch(new TypedEvent.Impl(new Events.Flags.Impl(), time, keyChar), typed);
+        if (!Character.isISOControl(keyChar)) events.emit(new TypedEvent(0, time, keyChar));
       } else {
         Key key = translateKey(keyCode);
-        if (key != null)
-          dispatch(new Event.Impl(new Events.Flags.Impl(), time, key), up);
+        if (key != null) events.emit(new KeyEvent(0, time, key, false));
       }
     }
     super.update();

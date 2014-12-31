@@ -17,10 +17,13 @@ import javax.sound.sampled.Clip;
 import javax.sound.sampled.FloatControl;
 
 import pythagoras.f.FloatMath;
+import playn.core.SoundImpl;
 
-import playn.core.AbstractSound;
+class JavaSound extends SoundImpl<Clip> {
 
-class JavaSound extends AbstractSound<Clip> {
+  public JavaSound (JavaPlatform plat) {
+    super(plat);
+  }
 
   @Override
   protected boolean playingImpl() {

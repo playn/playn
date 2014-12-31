@@ -15,13 +15,11 @@
  */
 package playn.java;
 
-import static playn.core.PlayN.*;
 import static org.junit.Assert.*;
 
 import org.junit.Test;
 
 import playn.core.Json;
-import playn.tests.AbstractPlayNTest;
 
 public class JavaJsonTest extends AbstractPlayNTest {
 
@@ -30,7 +28,7 @@ public class JavaJsonTest extends AbstractPlayNTest {
    */
   @Test
   public void testMissingKey() {
-    Json.Object o = json().parse("{\"array\":[]}");
+    Json.Object o = plat.json().parse("{\"array\":[]}");
     assertNull(o.getArray("notthere"));
     assertNull(o.getObject("notthere"));
 

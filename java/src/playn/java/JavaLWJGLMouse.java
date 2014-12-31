@@ -23,8 +23,8 @@ import pythagoras.f.Point;
 
 class JavaLWJGLMouse extends JavaMouse {
 
-  public JavaLWJGLMouse(JavaPlatform platform) {
-    super(platform);
+  public JavaLWJGLMouse(JavaPlatform plat) {
+    super(plat);
   }
 
   @Override
@@ -60,12 +60,12 @@ class JavaLWJGLMouse extends JavaMouse {
   void update() {
     while (Mouse.next()) {
       double time = (double) (Mouse.getEventNanoseconds() / 1000000);
-      int btn = getButton(Mouse.getEventButton());
+      ButtonEvent.Id btn = getButton(Mouse.getEventButton());
       Point m = new Point(Mouse.getEventX(), Display.getHeight() - Mouse.getEventY() - 1);
-      platform.graphics().transformMouse(m);
+      plat.graphics().transformMouse(m);
 
       int dx = Mouse.getEventDX(), dy = -Mouse.getEventDY();
-      if (btn != -1) {
+      if (btn != null) {
         if (Mouse.getEventButtonState()) {
           onMouseDown(time, m.x, m.y, btn);
         } else {
@@ -80,12 +80,12 @@ class JavaLWJGLMouse extends JavaMouse {
     }
   }
 
-  private static int getButton(int lwjglButton) {
+  private static ButtonEvent.Id getButton(int lwjglButton) {
     switch (lwjglButton) {
-    case 0:  return BUTTON_LEFT;
-    case 2:  return BUTTON_MIDDLE;
-    case 1:  return BUTTON_RIGHT;
-    default: return lwjglButton;
+    case 0:  return ButtonEvent.Id.LEFT;
+    case 2:  return ButtonEvent.Id.MIDDLE;
+    case 1:  return ButtonEvent.Id.RIGHT;
+    default: return null;
     }
   }
 }

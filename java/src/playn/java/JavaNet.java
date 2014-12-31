@@ -23,23 +23,27 @@ import java.net.URL;
 import java.util.List;
 import java.util.Map;
 
-import playn.core.NetImpl;
-import playn.core.util.Callback;
+import playn.core.Net;
+import react.RFuture;
+import react.RPromise;
 
-public class JavaNet extends NetImpl {
+public class JavaNet extends Net {
 
-  public JavaNet(JavaPlatform platform) {
-    super(platform);
+  private final JavaPlatform plat;
+
+  public JavaNet(JavaPlatform plat) {
+    this.plat = plat;
   }
 
   @Override
   public WebSocket createWebSocket(String url, WebSocket.Listener listener) {
-    return new JavaWebSocket(platform, url, listener);
+    return new JavaWebSocket(plat, url, listener);
   }
 
   @Override
-  protected void execute(final BuilderImpl req, final Callback<Response> callback) {
-    platform.invokeAsync(new Runnable() {
+  protected RFuture<Response> execute(final Builder req) {
+    final RPromise<Response> result = plat.deferredPromise();
+    plat.invokeAsync(new Runnable() {
       @Override
       public void run() {
         try {
@@ -71,9 +75,8 @@ public class JavaNet extends NetImpl {
             String encoding = conn.getContentEncoding();
             if (encoding == null) encoding = UTF8;
 
-            platform.notifySuccess(callback, new BinaryResponse(code, payload, encoding) {
-              @Override
-              protected Map<String,List<String>> extractHeaders() {
+            result.succeed(new Response.Binary(code, payload, encoding) {
+              @Override protected Map<String,List<String>> extractHeaders() {
                 return conn.getHeaderFields();
               }
             });
@@ -82,9 +85,9 @@ public class JavaNet extends NetImpl {
           }
 
         } catch (MalformedURLException e) {
-          platform.notifyFailure(callback, e);
+          result.fail(e);
         } catch (IOException e) {
-          platform.notifyFailure(callback, e);
+          result.fail(e);
         }
       }
       @Override
@@ -92,6 +95,7 @@ public class JavaNet extends NetImpl {
         return "JavaNet." + req.method().toLowerCase() + "(" + req.url + ")";
       }
     });
+    return result;
   }
 
   // Super-simple url-cleanup: assumes it either starts with "http", or that

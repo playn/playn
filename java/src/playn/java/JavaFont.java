@@ -18,17 +18,17 @@ package playn.java;
 import java.util.HashMap;
 import java.util.Map;
 
-import playn.core.AbstractFont;
+import playn.core.Font;
 
-class JavaFont extends AbstractFont {
+class JavaFont extends Font {
 
   public final java.awt.Font jfont;
 
-  public JavaFont(JavaGraphics graphics, String name, Style style, float size, java.awt.Font jfont) {
-    super(graphics, name, style, size);
+  public JavaFont(Config config, java.awt.Font jfont) {
+    super(config);
     // the Font constructor takes only integer size, so we instantiate it at an arbitrary size (and
     // style) and derive a font of the desired (floating point) size (and style)
-    this.jfont = jfont.deriveFont(TO_JAVA_STYLE.get(style), size);
+    this.jfont = jfont.deriveFont(TO_JAVA_STYLE.get(config.style), config.size);
   }
 
   protected static final Map<Style,Integer> TO_JAVA_STYLE = new HashMap<Style,Integer>();

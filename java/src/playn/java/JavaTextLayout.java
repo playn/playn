@@ -28,11 +28,10 @@ import java.util.List;
 
 import pythagoras.f.Rectangle;
 
-import playn.core.AbstractTextLayout;
 import playn.core.TextFormat;
 import playn.core.TextWrap;
 
-class JavaTextLayout extends AbstractTextLayout {
+class JavaTextLayout extends playn.core.TextLayout {
 
   public static JavaTextLayout layoutText(JavaGraphics gfx, String text, TextFormat format) {
     // we do some fiddling to work around the fact that TextLayout chokes on the empty string
@@ -81,7 +80,7 @@ class JavaTextLayout extends AbstractTextLayout {
   private final TextLayout layout;
 
   JavaTextLayout(String text, TextFormat format, TextLayout layout) {
-    super(text, format, computeBounds(layout));
+    super(text, format, computeBounds(layout), layout.getAscent()+layout.getDescent());
     this.layout = layout;
   }
 

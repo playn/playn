@@ -22,22 +22,22 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 
+import playn.core.Image;
+import playn.core.ImageImpl;
+import playn.core.Pattern;
+import playn.core.Scale;
 import pythagoras.f.MathUtil;
 
-import playn.core.Image;
-import playn.core.Pattern;
-import playn.core.gl.AbstractImageGL;
-import playn.core.gl.GLContext;
-import playn.core.gl.ImageGL;
-import playn.core.gl.Scale;
-
-public abstract class JavaImage extends ImageGL<Graphics2D> {
+public class JavaImage extends ImageImpl {
 
   protected BufferedImage img;
 
-  public JavaImage(GLContext ctx, BufferedImage img, Scale scale) {
-    super(ctx, scale);
-    this.img = img;
+  public JavaImage (Scale scale, BufferedImage img) {
+    super(scale, img.getWidth(), img.getHeight(), img);
+  }
+
+  public JavaImage (JavaPlatform plat, int preWidth, int preHeight) {
+    super(plat, Scale.ONE, preWidth, preHeight);
   }
 
   /**
@@ -48,26 +48,10 @@ public abstract class JavaImage extends ImageGL<Graphics2D> {
     return img;
   }
 
-  @Override
-  public float width() {
-    return scale.invScaled(img.getWidth());
-  }
-
-  @Override
-  public float height() {
-    return scale.invScaled(img.getHeight());
-  }
-
-  @Override
-  public boolean isReady() {
-    return (img != null);
-  }
-
-  @Override
-  public Pattern toPattern() {
-    assert isReady() : "Cannot generate a pattern from unready image.";
+  @Override public Pattern toPattern (boolean repeatX, boolean repeatY) {
+    assert img != null : "Cannot generate a pattern from unready image.";
     Rectangle2D rect = new Rectangle2D.Float(0, 0, width(), height());
-    return new JavaPattern(this, repeatX, repeatY, new TexturePaint(img, rect));
+    return new JavaPattern(repeatX, repeatY, new TexturePaint(img, rect));
   }
 
   @Override
@@ -77,51 +61,68 @@ public abstract class JavaImage extends ImageGL<Graphics2D> {
   }
 
   @Override
-  public Image transform(BitmapTransformer xform) {
-    return new JavaStaticImage(ctx, ((JavaBitmapTransformer) xform).transform(img), scale);
+  public void setRgb(int startX, int startY, int width, int height, int[] rgbArray, int offset,
+                     int scanSize) {
+    img.setRGB(startX, startY, width, height, rgbArray, offset, scanSize);
   }
 
   @Override
-  public void draw(Graphics2D gfx, float x, float y, float w, float h) {
+  public Image transform(BitmapTransformer xform) {
+    return new JavaImage(scale, ((JavaBitmapTransformer) xform).transform(img));
+  }
+
+  @Override public void draw (Object ctx, float x, float y, float w, float h) {
     // using img.getWidth/Height here accounts for ctx.scale.factor
     AffineTransform tx = new AffineTransform(w / img.getWidth(), 0f, 0f,
                                              h / img.getHeight(), x, y);
-    gfx.drawImage(img, tx, null);
+    ((Graphics2D)ctx).drawImage(img, tx, null);
   }
 
-  @Override
-  public void draw(Graphics2D gfx, float dx, float dy, float dw, float dh,
-                   float sx, float sy, float sw, float sh) {
+  @Override public void draw (Object ctx, float dx, float dy, float dw, float dh,
+                       float sx, float sy, float sw, float sh) {
     // adjust our source rect to account for the scale factor
-    sx *= scale.factor;
-    sy *= scale.factor;
-    sw *= scale.factor;
-    sh *= scale.factor;
+    float f = scale().factor;
+    sx *= f; sy *= f; sw *= f; sh *= f;
     // now render the image through a clip and with a scaling transform, so that only the desired
     // source rect is rendered, and is rendered into the desired target region
     float scaleX = dw/sw, scaleY = dh/sh;
+    Graphics2D gfx = (Graphics2D)ctx;
     Shape oclip = gfx.getClip();
     gfx.clipRect(MathUtil.ifloor(dx), MathUtil.ifloor(dy), MathUtil.iceil(dw), MathUtil.iceil(dh));
-    gfx.drawImage(img, new AffineTransform(scaleX, 0f, 0f, scaleY,
-                                           dx-sx*scaleX, dy-sy*scaleY), null);
+    gfx.drawImage(img, new AffineTransform(scaleX, 0f, 0f, scaleY, dx-sx*scaleX, dy-sy*scaleY),
+                  null);
     gfx.setClip(oclip);
   }
 
-  @Override
-  protected Pattern toSubPattern(AbstractImageGL<?> image, boolean repeatX, boolean repeatY,
-                                 float x, float y, float width, float height) {
-    assert isReady() : "Cannot generate a pattern from unready image.";
-    // we have to account for the scale factor when extracting our subimage
-    BufferedImage subImage = img.getSubimage(
-      scale.scaledFloor(x), scale.scaledFloor(y),
-      scale.scaledCeil(width), scale.scaledCeil(height));
-    Rectangle2D rect = new Rectangle2D.Float(0, 0, width, height);
-    return new JavaPattern(image, repeatX, repeatY, new TexturePaint(subImage, rect));
+  // @Override
+  // protected Pattern toSubPattern(AbstractImageGL<?> image, boolean repeatX, boolean repeatY,
+  //                                float x, float y, float width, float height) {
+  //   assert isReady() : "Cannot generate a pattern from unready image.";
+  //   // we have to account for the scale factor when extracting our subimage
+  //   BufferedImage subImage = img.getSubimage(
+  //     scale.scaledFloor(x), scale.scaledFloor(y),
+  //     scale.scaledCeil(width), scale.scaledCeil(height));
+  //   Rectangle2D rect = new Rectangle2D.Float(0, 0, width, height);
+  //   return new JavaPattern(image, repeatX, repeatY, new TexturePaint(subImage, rect));
+  // }
+
+  protected void setBitmap (Object bitmap) {
+    img = (BufferedImage)bitmap;
   }
 
-  @Override
-  protected void updateTexture(int tex) {
-    assert img != null;
-    ((JavaGLContext) ctx).updateTexture(tex, img);
+  protected Object createErrorBitmap (int rawWidth, int rawHeight) {
+    BufferedImage img = new BufferedImage(rawWidth, rawHeight, BufferedImage.TYPE_INT_ARGB_PRE);
+    Graphics2D g = img.createGraphics();
+    try {
+      g.setColor(java.awt.Color.red);
+      for (int yy = 0; yy <= rawHeight/15; yy++) {
+        for (int xx = 0; xx <= rawWidth/45; xx++) {
+          g.drawString("ERROR", xx*45, yy*15);
+        }
+      }
+    } finally {
+      g.dispose();
+    }
+    return img;
   }
 }

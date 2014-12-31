@@ -15,42 +15,33 @@
  */
 package playn.java;
 
-import playn.core.Events;
-import playn.core.MouseImpl;
+import playn.core.Mouse;
 
-abstract class JavaMouse extends MouseImpl {
+abstract class JavaMouse extends Mouse {
 
-  protected final JavaPlatform platform;
-  private final JavaPointer pointer;
+  protected final JavaPlatform plat;
 
-  public JavaMouse(JavaPlatform platform) {
-    this.platform = platform;
-    this.pointer = platform.pointer();
-    assert pointer != null; // catch init ordering fiddly biz
+  public JavaMouse(JavaPlatform plat) {
+    this.plat = plat;
   }
 
   abstract void init();
   abstract void update();
 
-  protected void onMouseDown(double time, float x, float y, int btn) {
-    onMouseDown(new ButtonEvent.Impl(new Events.Flags.Impl(), time, x, y, btn));
-    if (btn == 0)
-      pointer.onMouseDown(time, x, y);
+  protected void onMouseDown (double time, float x, float y, ButtonEvent.Id btn) {
+    events.emit(new ButtonEvent(0, time, x, y, btn, true));
   }
 
-  protected void onMouseUp(double time, float x, float y, int btn) {
-    onMouseUp(new ButtonEvent.Impl(new Events.Flags.Impl(), time, x, y, btn));
-    if (btn == 0)
-      pointer.onMouseUp(time, x, y);
+  protected void onMouseUp (double time, float x, float y, ButtonEvent.Id btn) {
+    events.emit(new ButtonEvent(0, time, x, y, btn, false));
   }
 
-  protected void onMouseMove(double time, float x, float y, float dx, float dy) {
-    onMouseMove(new MotionEvent.Impl(new Events.Flags.Impl(), time, x, y, dx, dy));
-    pointer.onMouseMove(time, x, y);
+  protected void onMouseMove (double time, float x, float y, float dx, float dy) {
+    events.emit(new MotionEvent(0, time, x, y, dx, dy));
   }
 
-  protected void onMouseWheelScroll(double time, float x, float y, int delta) {
-    onMouseWheelScroll(new WheelEvent.Impl(new Events.Flags.Impl(), time, x, y, delta));
+  protected void onMouseWheelScroll (double time, float x, float y, int delta) {
+    events.emit(new WheelEvent(0, time, x, y, delta));
   }
 }
 

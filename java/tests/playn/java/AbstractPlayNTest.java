@@ -1,5 +1,5 @@
 /**
- * Copyright 2012 The PlayN Authors
+ * Copyright 2010 The PlayN Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
@@ -15,21 +15,20 @@
  */
 package playn.java;
 
-import java.awt.image.BufferedImage;
+import playn.java.JavaPlatform;
 
-import playn.core.Image;
-import playn.core.gl.GLContext;
-import playn.core.gl.Scale;
-import playn.core.util.Callback;
+import org.junit.BeforeClass;
+import org.junit.Ignore;
 
-public class JavaStaticImage extends JavaImage {
+@Ignore("JUnit should ignore this by default, but it doesn't")
+public abstract class AbstractPlayNTest {
 
-  public JavaStaticImage(GLContext ctx, final BufferedImage img, Scale scale) {
-    super(ctx, img, scale);
-  }
+  public static JavaPlatform plat;
 
-  @Override
-  public void addCallback(Callback<? super Image> callback) {
-    callback.onSuccess(this); // we're always ready
+  @BeforeClass
+  public static void initializePlatform() {
+    JavaPlatform.Config config = new JavaPlatform.Config();
+    config.headless = true;
+    plat = new JavaPlatform(config);
   }
 }

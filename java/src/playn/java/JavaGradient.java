@@ -23,20 +23,19 @@ import java.awt.geom.Point2D;
 
 import playn.core.Gradient;
 
-class JavaGradient implements Gradient {
+class JavaGradient extends Gradient {
 
-  static JavaGradient createLinear(float x0, float y0, float x1, float y1, float[] positions, int[] colors) {
-    Point2D.Float start = new Point2D.Float(x0, y0);
-    Point2D.Float end = new Point2D.Float(x1, y1);
-    Color[] javaColors = convertColors(colors);
-    LinearGradientPaint p = new LinearGradientPaint(start, end, positions, javaColors);
-    return new JavaGradient(p);
+  static JavaGradient create(Linear cfg) {
+    Point2D.Float start = new Point2D.Float(cfg.x0, cfg.y0);
+    Point2D.Float end = new Point2D.Float(cfg.x1, cfg.y1);
+    Color[] javaColors = convertColors(cfg.colors);
+    return new JavaGradient(new LinearGradientPaint(start, end, cfg.positions, javaColors));
   }
 
-  static JavaGradient createRadial(float x, float y, float r, float[] positions, int[] colors) {
-    Point2D.Float center = new Point2D.Float(x, y);
-    RadialGradientPaint p = new RadialGradientPaint(center, r, positions, convertColors(colors));
-    return new JavaGradient(p);
+  static JavaGradient create(Radial cfg) {
+    Point2D.Float center = new Point2D.Float(cfg.x, cfg.y);
+    Color[] javaColors = convertColors(cfg.colors);
+    return new JavaGradient(new RadialGradientPaint(center, cfg.r, cfg.positions, javaColors));
   }
 
   private static Color[] convertColors(int[] colors) {
