@@ -18,11 +18,9 @@ package playn.tests.core;
 import java.util.ArrayList;
 import java.util.List;
 
-import static playn.core.PlayN.*;
-import playn.core.CanvasImage;
-import playn.core.ImageLayer;
-import playn.core.TextFormat;
-import playn.core.TextLayout;
+import playn.core.*;
+import playn.scene.*;
+import react.Slot;
 
 /**
  * Tests pause/resume notifications.
@@ -32,47 +30,44 @@ public class PauseResumeTest extends Test {
   private final List<String> notifications = new ArrayList<String>();
   private ImageLayer layer;
 
-  @Override
-  public String getName() {
+  public PauseResumeTest (TestsGame game) {
+    super(game);
+  }
+
+  @Override public String getName() {
     return "PauseResumeTest";
   }
 
-  @Override
-  public String getDescription() {
+  @Override public String getDescription() {
     return "Tests pause/resume notifications.";
   }
 
-  @Override
-  public void init() {
-    setLifecycleListener(new LifecycleListener() {
-      private double start = currentTime();
+  @Override public void init() {
+    conns.add(game.plat.lifecycle.connect(new Slot<Platform.Lifecycle>() {
+      private double start = game.plat.time();
       private int elapsed() {
-        return (int)Math.round((currentTime() - start)/1000);
+        return (int)Math.round((game.plat.time() - start)/1000);
       }
 
-      @Override
-      public void onPause() {
-        log().info("Paused " + elapsed());
-        notifications.add("Paused at " + elapsed() + "s");
+      public void onEmit (Platform.Lifecycle event) {
+        switch (event) {
+        case PAUSE:
+          game.log.info("Paused " + elapsed());
+          notifications.add("Paused at " + elapsed() + "s");
+          break;
+        case RESUME:
+          game.log.info("Resumed " + elapsed());
+          notifications.add("Resumed at " + elapsed() + "s");
+          updateDisplay();
+          break;
+        default:
+          break; // nada
+        }
       }
-      @Override
-      public void onResume() {
-        log().info("Resumed " + elapsed());
-        notifications.add("Resumed at " + elapsed() + "s");
-        updateDisplay();
-      }
-      @Override
-      public void onExit() {} // nada
-    });
+    }));
 
-    layer = graphics().createImageLayer();
+    game.rootLayer.addAt(layer = new ImageLayer(), 15, 15);
     updateDisplay();
-    graphics().rootLayer().addAt(layer, 15, 15);
-  }
-
-  @Override
-  public void dispose() {
-    setLifecycleListener(null);
   }
 
   protected void updateDisplay() {
@@ -84,10 +79,9 @@ public class PauseResumeTest extends Test {
       for (String note : notifications)
         buf.append(note).append("\n");
     }
-    TextLayout layout = graphics().layoutText(buf.toString(), new TextFormat());
-    CanvasImage image = graphics().createImage(layout.width(), layout.height());
-    image.canvas().setFillColor(0xFF000000);
-    image.canvas().fillText(layout, 0, 0);
-    layer.setImage(image);
+    TextLayout layout = game.graphics.layoutText(buf.toString(), new TextFormat());
+    Canvas canvas = game.graphics.createCanvas(layout.size);
+    canvas.setFillColor(0xFF000000).fillText(layout, 0, 0);
+    layer.setTexture(game.graphics.createTexture(canvas.image));
   }
 }

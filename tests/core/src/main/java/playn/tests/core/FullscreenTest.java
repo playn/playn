@@ -15,9 +15,8 @@
  */
 package playn.tests.core;
 
-import playn.core.ImageLayer;
-
-import static playn.core.PlayN.*;
+import playn.core.*;
+import playn.scene.*;
 
 public class FullscreenTest extends Test {
   private static Host host;
@@ -39,17 +38,19 @@ public class FullscreenTest extends Test {
     void setMode (Mode mode);
   }
 
+  public FullscreenTest (TestsGame game) {
+    super(game);
+  }
+
   @Override public void init () {
     final float spacing = 5;
     float y = spacing, x = spacing, nextX = spacing;
     for (final Mode mode : host.enumerateModes()) {
       ImageLayer button = createButton(mode.toString(), new Runnable() {
-        @Override public void run () {
-          host.setMode(mode);
-        }
+        @Override public void run () { host.setMode(mode); }
       });
-      graphics().rootLayer().add(button);
-      if (y + button.height() + spacing >= graphics().height()) {
+      game.rootLayer.add(button);
+      if (y + button.height() + spacing >= game.graphics.viewSize.height()) {
         x = nextX + spacing;
         y = spacing;
       }

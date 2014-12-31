@@ -17,106 +17,98 @@ package playn.tests.core;
 
 import pythagoras.f.FloatMath;
 import pythagoras.f.Vector;
+import react.RFuture;
+import react.Slot;
 
-import playn.core.Image;
-import playn.core.ImageLayer;
-import playn.core.Touch;
-import playn.core.Layer;
-import playn.core.Pointer;
-import static playn.core.PlayN.*;
+import playn.core.*;
+import playn.scene.*;
 
 class LayerClickTest extends Test {
 
-  @Override
-  public String getName() {
+  public LayerClickTest (TestsGame game) {
+    super(game);
+  }
+
+  @Override public String getName() {
     return "LayerClickTest";
   }
 
-  @Override
-  public String getDescription() {
+  @Override public String getDescription() {
     return "Tests the hit testing and click/touch processing provided for layers.";
   }
 
-  @Override
-  public void init() {
-    Image orange = assets().getImage("images/orange.png");
-    Image mdb = assets().getRemoteImage("https://graph.facebook.com/samskivert/picture");
+  @Override public void init() {
+    Image orange = game.assets.getImage("images/orange.png");
+    RFuture<Texture> ortex = game.graphics.createTextureAsync(orange);
 
-    final ImageLayer layer1 = graphics().createImageLayer(orange);
-    layer1.setScale(2);
-    layer1.setRotation(FloatMath.PI/8);
-    layer1.setTranslation(50, 50);
-    graphics().rootLayer().add(layer1);
-    if (touch().hasTouch()) {
-      layer1.addListener((Touch.LayerListener)new Mover(layer1));
-    } else {
-      layer1.addListener((Pointer.Listener)new Mover(layer1));
-    }
+    ImageLayer l1 = new ImageLayer(ortex);
+    game.rootLayer.add(l1.setScale(2).setRotation(FloatMath.PI/8).setTranslation(50, 50));
+    // if (touch().hasTouch()) {
+    //   l1.addListener((Touch.LayerListener)new Mover(l1));
+    // } else {
+    //   l1.addListener((Pointer.Listener)new Mover(l1));
+    // }
 
-    final ImageLayer layer2 = graphics().createImageLayer(orange);
-    layer2.setScale(1.5f);
-    layer2.setRotation(FloatMath.PI/4);
-    layer2.setTranslation(150, 50);
-    graphics().rootLayer().add(layer2);
-    if (touch().hasTouch()) {
-      layer2.addListener((Touch.LayerListener)new Mover(layer2));
-    } else {
-      layer2.addListener((Pointer.Listener)new Mover(layer2));
-    }
+    ImageLayer l2 = new ImageLayer(ortex);
+    game.rootLayer.add(l2.setScale(1.5f).setRotation(FloatMath.PI/4).setTranslation(150, 50));
+    // if (touch().hasTouch()) {
+    //   l2.addListener((Touch.LayerListener)new Mover(l2));
+    // } else {
+    //   l2.addListener((Pointer.Listener)new Mover(l2));
+    // }
 
-    final ImageLayer layer3 = graphics().createImageLayer(mdb);
-    layer3.setRotation(-FloatMath.PI/4);
-    layer3.setTranslation(50, 150);
-    graphics().rootLayer().add(layer3);
-    if (touch().hasTouch()) {
-      layer3.addListener((Touch.LayerListener)new Mover(layer3));
-    } else {
-      layer3.addListener((Pointer.Listener)new Mover(layer3));
-    }
+    Image mdb = game.assets.getRemoteImage("https://graph.facebook.com/samskivert/picture");
+    final ImageLayer l3 = new ImageLayer(game.graphics.createTextureAsync(mdb));
+    game.rootLayer.add(l3.setRotation(-FloatMath.PI/4).setTranslation(50, 150));
+    // if (touch().hasTouch()) {
+    //   l3.addListener((Touch.LayerListener)new Mover(l3));
+    // } else {
+    //   l3.addListener((Pointer.Listener)new Mover(l3));
+    // }
   }
 
-  protected static class Mover implements Pointer.Listener, Touch.LayerListener {
-    private final Layer layer;
+  // protected static class Mover implements Pointer.Listener, Touch.LayerListener {
+  //   private final Layer layer;
 
-    public Mover (Layer layer) {
-      this.layer = layer;
-    }
+  //   public Mover (Layer layer) {
+  //     this.layer = layer;
+  //   }
 
-    public void onTouchStart(Touch.Event event) {
-      onStart(event.x(), event.y());
-    }
-    public void onTouchMove(Touch.Event event) {
-      onMove(event.x(), event.y());
-    }
-    public void onTouchEnd(Touch.Event event) {
-      // nada
-    }
-    public void onTouchCancel(Touch.Event event) {
-      // nada
-    }
+  //   public void onTouchStart(Touch.Event event) {
+  //     onStart(event.x(), event.y());
+  //   }
+  //   public void onTouchMove(Touch.Event event) {
+  //     onMove(event.x(), event.y());
+  //   }
+  //   public void onTouchEnd(Touch.Event event) {
+  //     // nada
+  //   }
+  //   public void onTouchCancel(Touch.Event event) {
+  //     // nada
+  //   }
 
-    public void onPointerStart(Pointer.Event event) {
-      onStart(event.x(), event.y());
-    }
-    public void onPointerDrag(Pointer.Event event) {
-      onMove(event.x(), event.y());
-    }
-    public void onPointerEnd(Pointer.Event event) {
-      // nada
-    }
-    public void onPointerCancel(Pointer.Event event) {
-      // nada
-    }
+  //   public void onPointerStart(Pointer.Event event) {
+  //     onStart(event.x(), event.y());
+  //   }
+  //   public void onPointerDrag(Pointer.Event event) {
+  //     onMove(event.x(), event.y());
+  //   }
+  //   public void onPointerEnd(Pointer.Event event) {
+  //     // nada
+  //   }
+  //   public void onPointerCancel(Pointer.Event event) {
+  //     // nada
+  //   }
 
-    protected void onStart(float x, float y) {
-      _lstart = layer.transform().translation();
-      _pstart = new Vector(x, y);
-    }
-    protected void onMove(float x, float y) {
-      Vector delta = new Vector(x, y).subtractLocal(_pstart);
-      layer.setTranslation(_lstart.x + delta.x, _lstart.y + delta.y);
-    }
+  //   protected void onStart(float x, float y) {
+  //     _lstart = layer.transform().translation();
+  //     _pstart = new Vector(x, y);
+  //   }
+  //   protected void onMove(float x, float y) {
+  //     Vector delta = new Vector(x, y).subtractLocal(_pstart);
+  //     layer.setTranslation(_lstart.x + delta.x, _lstart.y + delta.y);
+  //   }
 
-    protected Vector _lstart, _pstart;
-  }
+  //   protected Vector _lstart, _pstart;
+  // }
 }

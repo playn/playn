@@ -15,47 +15,36 @@
  */
 package playn.tests.core;
 
-import playn.core.CanvasImage;
-import playn.core.GroupLayer;
-import playn.core.ImageLayer;
-import static playn.core.PlayN.*;
+import playn.core.*;
+import playn.scene.*;
 
 public class DepthTest extends Test {
-  @Override
-  public String getName() {
+
+  public DepthTest (TestsGame game) {
+    super(game);
+  }
+
+  @Override public String getName() {
     return "DepthTest";
   }
 
-  @Override
-  public String getDescription() {
+  @Override public String getDescription() {
     return "Tests that layers added with non-zero depth are inserted/rendered in proper order.";
   }
 
-  @Override
-  public void init() {
-    GroupLayer rootLayer = graphics().rootLayer();
-
-    CanvasImage image = graphics().createImage(250, 25);
-    image.canvas().drawText(rootLayer.getClass().getName(), 0, 15);
-    ImageLayer info = graphics().createImageLayer(image);
-    info.setTranslation(5, 5);
-    rootLayer.add(info);
-
+  @Override public void init() {
     int[] depths = { 0, -1, 1, 3, 2, -4, -3, 4, -2 };
     int[] fills = { 0xFF99CCFF, 0xFFFFFF33, 0xFF9933FF, 0xFF999999, 0xFFFF0033,
                     0xFF00CC00, 0xFFFF9900, 0xFF0066FF, 0x0FFCC6666 };
     int width = 200, height = 200;
     for (int ii = 0; ii < depths.length; ii++) {
       int depth = depths[ii];
-      image = graphics().createImage(width, height);
-      image.canvas().setFillColor(fills[ii]);
-      image.canvas().fillRect(0, 0, width, height);
-      image.canvas().setFillColor(0xFF000000);
-      image.canvas().drawText(depth + "/" + ii, 5, 15);
-      ImageLayer layer = graphics().createImageLayer(image);
-      layer.setDepth(depth);
-      layer.setTranslation(225-50*depth, 125+25*depth);
-      rootLayer.add(layer);
+      Canvas canvas = game.graphics.createCanvas(width, height);
+      canvas.setFillColor(fills[ii]).fillRect(0, 0, width, height);
+      canvas.setFillColor(0xFF000000).drawText(depth + "/" + ii, 5, 15);
+      ImageLayer layer = new ImageLayer(game.graphics.createTexture(canvas.image));
+      layer.setDepth(depth).setTranslation(225-50*depth, 125+25*depth);
+      game.rootLayer.add(layer);
     }
   }
 }

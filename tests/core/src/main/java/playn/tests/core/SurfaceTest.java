@@ -4,65 +4,63 @@
 package playn.tests.core;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import pythagoras.f.FloatMath;
 import pythagoras.f.Rectangle;
+import react.RFuture;
+import react.Slot;
+import react.UnitSlot;
 
-import playn.core.AssetWatcher;
-import playn.core.GroupLayer;
-import playn.core.Image;
-import playn.core.ImageLayer;
-import playn.core.ImmediateLayer;
-import playn.core.Pattern;
-import playn.core.Surface;
-import playn.core.SurfaceImage;
-import static playn.core.PlayN.*;
+import playn.core.*;
+import playn.scene.*;
 
 public class SurfaceTest extends Test {
 
-  private List<ImageLayer> dots = new ArrayList<ImageLayer>();
-  private SurfaceImage paintUpped;
-  private Rectangle dotBox;
-  private int elapsed;
+  private SurfaceTexture paintUpped;
 
-  @Override
-  public String getName() {
+  public SurfaceTest (TestsGame game) {
+    super(game);
+  }
+
+  @Override public String getName() {
     return "SurfaceTest";
   }
 
-  @Override
-  public String getDescription() {
+  @Override public String getDescription() {
     return "Tests various Surface rendering features.";
   }
 
-  @Override
-  public void init() {
-    final Image tile = assets().getImage("images/tile.png");
-    final Image orange = assets().getImage("images/orange.png");
-    AssetWatcher watcher = new AssetWatcher(new AssetWatcher.Listener() {
-      @Override public void done() {
-        addTests(orange, tile);
-      }
-      @Override public void error(Throwable err) {
-        addDescrip("Error: " + err.getMessage(), 10, errY, graphics().width()-20);
+  @Override public void init() {
+    final Image tile = game.assets.getImage("images/tile.png");
+    final Image orange = game.assets.getImage("images/orange.png");
+    Slot<Throwable> onError = new Slot<Throwable>() {
+      float errY = 0;
+      public void onEmit (Throwable err) {
+        addDescrip("Error: " + err.getMessage(), 10, errY, game.graphics.viewSize.width()-20);
         errY += 30;
       }
-      private float errY = 10;
+    };
+    tile.state.onFailure(onError);
+    orange.state.onFailure(onError);
+    RFuture.collect(Arrays.asList(tile.state, orange.state)).onSuccess(new UnitSlot() {
+      public void onEmit () { addTests(orange, tile); }
     });
-    watcher.add(tile);
-    watcher.add(orange);
-    watcher.start();
   }
 
   @Override
   public void dispose() {
-    dots.clear();
+    super.dispose();
+    paintUpped.close();
     paintUpped = null;
   }
 
   protected void addTests (final Image orange, Image tile) {
-    final Pattern pattern = tile.toPattern();
+    final Pattern pattern = tile.toPattern(true, true);
+
+    final Texture otex = game.graphics.createTexture(orange);
+    otex.setRepeat(true, true);
 
     // make samples big enough to force a buffer size increase
     final int samples = 128, hsamples = samples/2;
@@ -75,16 +73,16 @@ public class SurfaceTest extends Test {
     float ygap = 20, ypos = 10;
 
     // draw some wide lines
-    ypos = ygap + addTest(10, ypos, new ImmediateLayer.Renderer() {
-      public void render (Surface surf) {
+    ypos = ygap + addTest(10, ypos, new Layer() {
+      protected void paintImpl (Surface surf) {
         drawLine(surf, 0, 0, 50, 50, 15);
         drawLine(surf, 70, 50, 120, 0, 10);
         drawLine(surf, 0, 70, 120, 120, 10);
       }
     }, 120, 120, "drawLine with width");
 
-    ypos = ygap + addTest(20, ypos, new ImmediateLayer.Renderer() {
-      public void render (Surface surf) {
+    ypos = ygap + addTest(20, ypos, new Layer() {
+      protected void paintImpl (Surface surf) {
         surf.setFillColor(0xFF0000FF).fillRect(0, 0, 100, 25);
         // these two alpha fills should look the same
         surf.setFillColor(0x80FF0000).fillRect(0, 0, 50, 25);
@@ -92,27 +90,28 @@ public class SurfaceTest extends Test {
       }
     }, 100, 25, "left and right half both same color");
 
-    ypos = ygap + addTest(20, ypos, new ImmediateLayer.Renderer() {
-      public void render (Surface surf) {
+    ypos = ygap + addTest(20, ypos, new Layer() {
+      protected void paintImpl (Surface surf) {
         surf.setFillColor(0xFF0000FF).fillRect(0, 0, 100, 50);
         surf.setAlpha(0.5f);
-        surf.drawImage(orange, 55, 5);
+        surf.draw(otex, 55, 5);
         surf.fillRect(0, 50, 50, 50);
-        surf.drawImage(orange, 55, 55);
+        surf.draw(otex, 55, 55);
         surf.setAlpha(1f);
       }
     }, 100, 100, "fillRect and drawImage at 50% alpha");
 
     ypos = 10;
 
-    ypos = ygap + addTest(160, ypos, new ImmediateLayer.Renderer() {
-      public void render (Surface surf) {
+    ypos = ygap + addTest(160, ypos, new Layer() {
+      protected void paintImpl (Surface surf) {
         // fill some shapes with patterns
-        surf.setFillPattern(pattern).fillRect(10, 0, 100, 100);
+        surf.setFillPattern(otex).fillRect(10, 0, 100, 100);
         // use same fill pattern for the triangles
         surf.translate(0, 160);
+        // TODO: triangles
         // render a sliding window of half of our triangles to test the slice rendering
-        surf.fillTriangles(verts, offset*4, (hsamples+1)*4, indices, offset*6, hsamples*6, offset*2);
+        // surf.fillTriangles(verts, offset*4, (hsamples+1)*4, indices, offset*6, hsamples*6, offset*2);
         offset += doff;
         if (offset == 0) doff = 1;
         else if (offset == hsamples) doff = -1;
@@ -120,89 +119,83 @@ public class SurfaceTest extends Test {
       private int offset = 0, doff = 1;
     }, 120, 210, "ImmediateLayer patterned fillRect, fillTriangles");
 
-    SurfaceImage patted = graphics().createSurface(100, 100);
-    patted.surface().setFillPattern(pattern).fillRect(0, 0, 100, 100);
-    ypos = ygap + addTest(170, ypos, graphics().createImageLayer(patted),
+    SurfaceTexture patted = game.createSurface(100, 100);
+    patted.begin().setFillPattern(otex).fillRect(0, 0, 100, 100);
+    patted.end().close();
+    ypos = ygap + addTest(170, ypos, new ImageLayer(patted.texture),
                           "SurfaceImage patterned fillRect");
 
     ypos = 10;
 
     // fill a patterned quad in a clipped group layer
     final int twidth = 150, theight = 75;
-    GroupLayer group = graphics().createGroupLayer();
+    GroupLayer group = new GroupLayer();
     ypos = ygap + addTest(315, 10, group, twidth, theight,
                           "Clipped pattern should not exceed grey rectangle");
-    group.add(graphics().createImmediateLayer(new ImmediateLayer.Renderer() {
-      public void render (Surface surf) {
+    group.add(new ClippedLayer(twidth, theight) {
+      protected void paintClipped (Surface surf) {
+        surf.setFillPattern(otex).fillRect(-10, -10, twidth+20, theight+20);
+      }
+    });
+    group.add(new Layer() {
+      protected void paintImpl (Surface surf) {
         surf.setFillColor(0xFFCCCCCC).fillRect(0, 0, twidth, theight);
       }
-    }));
-    group.add(graphics().createImmediateLayer(twidth, theight, new ImmediateLayer.Renderer() {
-      public void render (Surface surf) {
-        surf.setFillPattern(pattern).fillRect(-10, -10, twidth+20, theight+20);
-      }
-    }));
+    });
 
     // draw some randomly jiggling dots inside a bounded region
-    dotBox = new Rectangle(315, ypos, 200, 100);
-    ypos = ygap + addTest(dotBox.x, dotBox.y, new ImmediateLayer.Renderer() {
-      public void render (Surface surf) {
+    final List<ImageLayer> dots = new ArrayList<ImageLayer>();
+    final Rectangle dotBox = new Rectangle(315, ypos, 200, 100);
+    ypos = ygap + addTest(dotBox.x, dotBox.y, new Layer() {
+      protected void paintImpl (Surface surf) {
         surf.setFillColor(0xFFCCCCCC).fillRect(0, 0, dotBox.width, dotBox.height);
       }
     }, dotBox.width, dotBox.height, "Randomly positioned SurfaceImages");
     for (int ii = 0; ii < 10; ii++) {
-      SurfaceImage dot = graphics().createSurface(10, 10);
-      dot.surface().setFillColor(0xFFFF0000);
-      dot.surface().fillRect(0, 0, 5, 5);
-      dot.surface().fillRect(5, 5, 5, 5);
-      dot.surface().setFillColor(0xFF0000FF);
-      dot.surface().fillRect(5, 0, 5, 5);
-      dot.surface().fillRect(0, 5, 5, 5);
-      ImageLayer dotl = graphics().createImageLayer(dot);
-      dotl.setTranslation(dotBox.x + random()*(dotBox.width-10),
-                          dotBox.y + random()*(dotBox.height-10));
+      SurfaceTexture dot = game.createSurface(10, 10);
+      dot.begin().setFillColor(0xFFFF0000).fillRect(0, 0, 5, 5).fillRect(5, 5, 5, 5).
+        setFillColor(0xFF0000FF).fillRect(5, 0, 5, 5).fillRect(0, 5, 5, 5);
+      dot.end().close();
+      ImageLayer dotl = new ImageLayer(dot.texture);
+      dotl.setTranslation(dotBox.x + (float)Math.random()*(dotBox.width-10),
+                          dotBox.y + (float)Math.random()*(dotBox.height-10));
       dots.add(dotl);
 
       // System.err.println("Created dot at " + dotl.transform());
-      graphics().rootLayer().add(dotl);
+      game.rootLayer.add(dotl);
     }
 
     // add a surface layer that is updated on every call to paint (a bad practice, but one that
     // should actually work)
-    paintUpped = graphics().createSurface(100, 100);
-    ypos = ygap + addTest(315, ypos, graphics().createImageLayer(paintUpped),
+    paintUpped = game.createSurface(100, 100);
+    ypos = ygap + addTest(315, ypos, new ImageLayer(paintUpped.texture),
                           "SurfaceImage updated in paint()");
-  }
 
-  protected float addTest(float lx, float ly, ImmediateLayer.Renderer renderer,
-                          float lwidth, float lheight, String descrip) {
-    return addTest(lx, ly, graphics().createImmediateLayer(renderer), lwidth, lheight, descrip);
-  }
+    conns.add(game.paint.connect(new Slot<TestsGame>() {
+      public void onEmit (TestsGame game) {
+        for (ImageLayer dot : dots) {
+          if (Math.random() > 0.95) {
+            dot.setTranslation(dotBox.x + (float)Math.random()*(dotBox.width-10),
+                               dotBox.y + (float)Math.random()*(dotBox.height-10));
+          }
+        }
 
-  @Override
-  public void update(int delta) {
-    elapsed += delta;
-  }
-
-  @Override
-  public void paint(float alpha) {
-    for (ImageLayer dot : dots) {
-      if (random() > 0.95) {
-        dot.setTranslation(dotBox.x + random()*(dotBox.width-10),
-                           dotBox.y + random()*(dotBox.height-10));
+        float now = game.paintTick/1000f;
+        float sin = Math.abs(FloatMath.sin(now)), cos = Math.abs(FloatMath.cos(now));
+        int sinColor = (int)(sin * 255), cosColor = (int)(cos * 255);
+        int c1 = (0xFF << 24) | (sinColor << 16) | (cosColor << 8);
+        int c2 = (0xFF << 24) | (cosColor << 16) | (sinColor << 8);
+        paintUpped.begin().clear().
+          setFillColor(c1).fillRect(0, 0, 50, 50).
+          setFillColor(c2).fillRect(50, 50, 50, 50);
+        paintUpped.end();
       }
-    }
+    }));
+  }
 
-    if (paintUpped != null) {
-      float now = (elapsed + UPDATE_RATE*alpha)/1000;
-      float sin = Math.abs(FloatMath.sin(now)), cos = Math.abs(FloatMath.cos(now));
-      int sinColor = (int)(sin * 255), cosColor = (int)(cos * 255);
-      int c1 = (0xFF << 24) | (sinColor << 16) | (cosColor << 8);
-      int c2 = (0xFF << 24) | (cosColor << 16) | (sinColor << 8);
-      paintUpped.surface().clear();
-      paintUpped.surface().setFillColor(c1).fillRect(0, 0, 50, 50);
-      paintUpped.surface().setFillColor(c2).fillRect(50, 50, 50, 50);
-    }
+  protected float addTest(float lx, float ly, Layer layer,
+                          float lwidth, float lheight, String descrip) {
+    return addTest(lx, ly, layer, lwidth, lheight, descrip);
   }
 
   void drawLine(Surface surf, float x1, float y1, float x2, float y2, float width) {

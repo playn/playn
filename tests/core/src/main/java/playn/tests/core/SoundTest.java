@@ -6,17 +6,18 @@ package playn.tests.core;
 import java.util.ArrayList;
 import java.util.List;
 
-import playn.core.CanvasImage;
-import playn.core.Sound;
-import playn.core.TextLayout;
-import playn.core.util.Callback;
-import playn.core.TextWrap;
-import static playn.core.PlayN.*;
+import playn.core.*;
+import playn.scene.*;
+import react.Slot;
 
 /**
  * Tests sound playback support.
  */
 public class SoundTest extends Test {
+
+  public SoundTest (TestsGame game) {
+    super(game);
+  }
 
   @Override
   public String getName() {
@@ -28,46 +29,42 @@ public class SoundTest extends Test {
     return "Tests playing and looping sounds.";
   }
 
-  @Override
-  public void init() {
+  @Override public void init() {
     float x = 50;
+    final CanvasLayer actions = new CanvasLayer(game.graphics, 300, 300);
 
     final Sound fanfare = loadSound("sounds/fanfare");
     x = addButton("Play Fanfare", new Runnable() {
       public void run() {
         fanfare.play();
-        addAction("Played Fanfare.");
+        addAction(actions, "Played Fanfare.");
       }
     }, x, 100);
 
     Sound lfanfare = loadSound("sounds/fanfare");
     lfanfare.setLooping(true);
-    x = addLoopButtons("Fanfare", lfanfare, x);
+    x = addLoopButtons(actions, "Fanfare", lfanfare, x);
 
     Sound bling = loadSound("sounds/bling");
     bling.setLooping(true);
-    x = addLoopButtons("Bling", bling, x);
+    x = addLoopButtons(actions, "Bling", bling, x);
 
-    graphics().rootLayer().addAt(graphics().createImageLayer(_actionsImage), 50, 150);
+    game.rootLayer.addAt(actions, 50, 150);
   }
 
   protected Sound loadSound(final String path) {
-    Sound sound = assets().getSound(path);
-    sound.addCallback(new Callback<Sound>() {
-      public void onSuccess(Sound sound) {} // noop
-      public void onFailure(Throwable cause) {
-        log().warn("Sound loading error: " + path, cause);
-      }
-    });
+    Sound sound = game.assets.getSound(path);
+    sound.state.onFailure(logFailure("Sound loading error: " + path));
     return sound;
   }
 
-  protected float addLoopButtons(final String name, final Sound sound, float x) {
+  protected float addLoopButtons(final CanvasLayer actions, final String name, final Sound sound,
+                                 float x) {
     x = addButton("Loop " + name, new Runnable() {
       public void run() {
         if (!sound.isPlaying()) {
           sound.play();
-          addAction("Starting looping " + name + ".");
+          addAction(actions, "Starting looping " + name + ".");
         }
       }
     }, x, 100);
@@ -75,32 +72,35 @@ public class SoundTest extends Test {
       public void run() {
         if (sound.isPlaying()) {
           sound.stop();
-          addAction("Stopped looping " + name + ".");
+          addAction(actions, "Stopped looping " + name + ".");
         }
       }
     }, x, 100);
     return x;
   }
 
-  protected void addAction(String action) {
+  protected void addAction(CanvasLayer actions, String action) {
     _actions.add(0, action);
     if (_actions.size() > 10)
       _actions.subList(10, _actions.size()).clear();
-    _actionsImage.canvas().clear();
+
+    Canvas canvas = actions.begin();
+    canvas.clear();
     StringBuilder buf = new StringBuilder();
     for (String a : _actions) {
       if (buf.length() > 0) buf.append("\n");
       buf.append(a);
     }
-    _actionsImage.canvas().setFillColor(0xFF000000);
+    canvas.setFillColor(0xFF000000);
 
     float y = 0;
-    for (TextLayout layout : graphics().layoutText(buf.toString(), TEXT_FMT, new TextWrap(300))) {
-      _actionsImage.canvas().fillText(layout, 0, y);
+    for (TextLayout layout : game.graphics.layoutText(
+      buf.toString(), TEXT_FMT, new TextWrap(300))) {
+      canvas.fillText(layout, 0, y);
       y += layout.ascent() + layout.descent() + layout.leading();
     }
+    actions.end();
   }
 
   protected final List<String> _actions = new ArrayList<String>();
-  protected final CanvasImage _actionsImage = graphics().createImage(300, 300);
 }

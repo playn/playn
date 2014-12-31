@@ -15,15 +15,14 @@
  */
 package playn.tests.core;
 
-import playn.core.CanvasImage;
-import playn.core.Font;
-import playn.core.TextFormat;
-import playn.core.TextLayout;
-import playn.core.TextWrap;
-import playn.core.util.TextBlock;
-import static playn.core.PlayN.graphics;
+import playn.core.*;
+import playn.scene.*;
 
 public class ScaledTextTest extends Test {
+
+  public ScaledTextTest (TestsGame game) {
+    super(game);
+  }
 
   @Override
   public String getName() {
@@ -35,34 +34,30 @@ public class ScaledTextTest extends Test {
     return "Tests that text rendering to scaled Canvas works properly.";
   }
 
-  @Override
-  public void init() {
+  @Override public void init() {
     String text = "The quick brown fox jumped over the lazy dog.";
-    TextFormat format = new TextFormat().
-      withFont(graphics().createFont("Helvetica", Font.Style.PLAIN, 18));
-    TextBlock block = new TextBlock(graphics().layoutText(text, format, new TextWrap(100)));
+    TextFormat format = new TextFormat().withFont(game.graphics, "Helvetica", 18);
+    TextBlock block = new TextBlock(game.graphics.layoutText(text, format, new TextWrap(100)));
 
     float x = 5;
     for (float scale : new float[] { 1f, 2f, 3f }) {
       float swidth = block.bounds.width() * scale, sheight = block.bounds.height() * scale;
-      CanvasImage image = graphics().createImage(swidth, sheight);
-      image.canvas().setStrokeColor(0xFFFFCCCC).strokeRect(0, 0, swidth-0.5f, sheight-0.5f);
-      image.canvas().scale(scale, scale);
-      image.canvas().setFillColor(0xFF000000);
-      block.fill(image.canvas(), TextBlock.Align.RIGHT, 0, 0);
-      graphics().rootLayer().addAt(graphics().createImageLayer(image), x, 5);
-      addInfo(image, x + swidth/2, sheight + 10);
+      Canvas canvas = game.graphics.createCanvas(swidth, sheight);
+      canvas.setStrokeColor(0xFFFFCCCC).strokeRect(0, 0, swidth-0.5f, sheight-0.5f);
+      canvas.scale(scale, scale);
+      canvas.setFillColor(0xFF000000);
+      block.fill(canvas, TextBlock.Align.RIGHT, 0, 0);
+      game.rootLayer.addAt(new ImageLayer(game.graphics, canvas.image), x, 5);
+      addInfo(canvas, x + swidth/2, sheight + 10);
       x += swidth + 5;
     }
   }
 
-  protected void addInfo (CanvasImage image, float cx, float y) {
-    TextLayout ilayout = graphics().layoutText(image.width() + "x" + image.height(), infoFormat);
-    CanvasImage iimage = graphics().createImage(ilayout.width(), ilayout.height());
-    iimage.canvas().setFillColor(0xFF000000).fillText(ilayout, 0, 0);
-    graphics().rootLayer().addAt(graphics().createImageLayer(iimage), cx - iimage.width()/2, y);
+  protected void addInfo (Canvas canvas, float cx, float y) {
+    TextFormat infoFormat = new TextFormat().withFont(game.graphics, "Helvetica", 12);
+    TextLayout ilayout = game.graphics.layoutText(canvas.width + "x" + canvas.height, infoFormat);
+    Canvas iimage = game.graphics.createCanvas(ilayout.size);
+    iimage.setFillColor(0xFF000000).fillText(ilayout, 0, 0);
+    game.rootLayer.addAt(new ImageLayer(game.graphics, iimage.image), cx - iimage.width/2, y);
   }
-
-  protected final TextFormat infoFormat = new TextFormat().
-    withFont(graphics().createFont("Helvetica", Font.Style.PLAIN, 12));
 }

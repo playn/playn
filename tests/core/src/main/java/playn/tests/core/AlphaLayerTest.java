@@ -16,18 +16,18 @@
 
 package playn.tests.core;
 
-import playn.core.CanvasImage;
-import playn.core.Color;
-import playn.core.GroupLayer;
-import playn.core.Image;
-import playn.core.SurfaceImage;
-import playn.core.util.Callback;
-import static playn.core.PlayN.*;
+import playn.core.*;
+import playn.scene.*;
+import react.Slot;
 
 public class AlphaLayerTest extends Test {
 
   static float width = 100, height = 100;
   static int offset = 5;
+
+  public AlphaLayerTest (TestsGame game) {
+    super(game);
+  }
 
   @Override
   public String getName() {
@@ -39,114 +39,85 @@ public class AlphaLayerTest extends Test {
     return "Test that alpha works the same on all layer types and that alpha is 'additive'.";
   }
 
-  @Override
-  public void init() {
-    final GroupLayer rootLayer = graphics().rootLayer();
+  @Override public void init() {
+    final GroupLayer rootLayer = game.rootLayer;
     final float fullWidth = 6*width, fullHeight = 3*height;
 
     // add a half white, half blue background
-    SurfaceImage bg = graphics().createSurface(fullWidth, fullHeight);
-    bg.surface().setFillColor(Color.rgb(255, 255, 255));
-    bg.surface().fillRect(0, 0, fullWidth, fullHeight);
-    bg.surface().setFillColor(Color.rgb(0, 0, 255));
-    bg.surface().fillRect(0, 2*height, fullWidth, height);
-    rootLayer.add(graphics().createImageLayer(bg));
+    SurfaceTexture bg = game.createSurface(fullWidth, fullHeight);
+    Surface bgs = bg.begin();
+    bgs.setFillColor(Color.rgb(255, 255, 255)).fillRect(0, 0, fullWidth, fullHeight);
+    bgs.setFillColor(Color.rgb(0, 0, 255)).fillRect(0, 2*height, fullWidth, height);
+    bg.end().close();
+    rootLayer.add(new ImageLayer(bg.texture));
 
     addDescrip("all layers contained in group layer with a=0.5\n" +
                "thus, fully composited a=0.25", offset, fullHeight+5, fullWidth);
 
     // add a 50% transparent group layer
-    final GroupLayer groupLayer = graphics().createGroupLayer();
+    final GroupLayer groupLayer = new GroupLayer();
     groupLayer.setAlpha(0.5f);
     rootLayer.add(groupLayer);
 
-    assets().getImage("images/alphalayertest.png").addCallback(new Callback<Image>() {
-      @Override
-      public void onSuccess(Image image) {
-        // add the layers over the white background
-        float x = offset;
+    game.assets.getImage("images/alphalayertest.png").state.onSuccess(new Slot<Image>() {
+      public void onEmit(Image image) {
+        Texture imtex = game.graphics.createTexture(image);
+        float x = offset, y0 = offset, y1 = offset+height, y2 = offset+2*height;
 
-        groupLayer.addAt(graphics().createImageLayer(image).setAlpha(0.5f), x, offset);
-        addDescrip("image\nimg layer a=0.5", x, offset + height, width);
+        // add the layers over a white background, then again over blue
+        groupLayer.addAt(new ImageLayer(imtex).setAlpha(0.5f), x, y0);
+        addDescrip("image\nimg layer a=0.5", x, y1, width);
+        groupLayer.addAt(new ImageLayer(imtex).setAlpha(0.5f), x, y2);
         x += width;
 
-        SurfaceImage surf1 = graphics().createSurface(image.width(), image.height());
-        surf1.surface().setAlpha(0.5f).drawImage(image, 0, 0);
-        groupLayer.addAt(graphics().createImageLayer(surf1), x, offset);
-        addDescrip("surface a=0.5\nimg layer a=1", x, offset + height, width);
+        SurfaceTexture surf1 = game.createSurface(image.width(), image.height());
+        surf1.begin().setAlpha(0.5f).draw(imtex, 0, 0);
+        surf1.end().close();
+        groupLayer.addAt(new ImageLayer(surf1.texture), x, y0);
+        addDescrip("surface a=0.5\nimg layer a=1", x, y1, width);
+        groupLayer.addAt(new ImageLayer(surf1.texture), x, y2);
         x += width;
 
-        SurfaceImage surf2 = graphics().createSurface(image.width(), image.height());
-        surf2.surface().drawImage(image, 0, 0);
-        groupLayer.addAt(graphics().createImageLayer(surf2).setAlpha(0.5f), x, offset);
-        addDescrip("surface a=1\nimg layer a=0.5", x, offset + height, width);
+        SurfaceTexture surf2 = game.createSurface(image.width(), image.height());
+        surf2.begin().draw(imtex, 0, 0);
+        surf2.end().close();
+        groupLayer.addAt(new ImageLayer(surf2.texture).setAlpha(0.5f), x, y0);
+        addDescrip("surface a=1\nimg layer a=0.5", x, y1, width);
+        groupLayer.addAt(new ImageLayer(surf2.texture).setAlpha(0.5f), x, y2);
         x += width;
 
-        CanvasImage canvas1 = graphics().createImage(image.width(), image.height());
-        canvas1.canvas().drawImage(image, 0, 0);
-        groupLayer.addAt(graphics().createImageLayer(canvas1).setAlpha(0.5f), x, offset);
-        addDescrip("canvas a=1\nimg layer a=0.5", x, offset + height, width);
+        Canvas canvas1 = game.graphics.createCanvas(image.width(), image.height());
+        canvas1.drawImage(image, 0, 0);
+        Texture cantex1 = game.graphics.createTexture(canvas1.image);
+        groupLayer.addAt(new ImageLayer(cantex1).setAlpha(0.5f), x, y0);
+        addDescrip("canvas a=1\nimg layer a=0.5", x, y1, width);
+        groupLayer.addAt(new ImageLayer(cantex1).setAlpha(0.5f), x, y2);
         x += width;
 
-        CanvasImage canvas2 = graphics().createImage(image.width(), image.height());
-        canvas2.canvas().setAlpha(0.5f).drawImage(image, 0, 0);
-        groupLayer.addAt(graphics().createImageLayer(canvas2), x, offset);
-        addDescrip("canvas a=0.5\nimg layer a=1", x, offset + height, width);
+        Canvas canvas2 = game.graphics.createCanvas(image.width(), image.height());
+        canvas2.setAlpha(0.5f).drawImage(image, 0, 0);
+        Texture cantex2 = game.graphics.createTexture(canvas2.image);
+        groupLayer.addAt(new ImageLayer(cantex2), x, y0);
+        addDescrip("canvas a=0.5\nimg layer a=1", x, y1, width);
+        groupLayer.addAt(new ImageLayer(cantex2), x, y2);
         x += width;
-
-        // add the same layers over the blue background
-        x = offset;
-
-        groupLayer.addAt(graphics().createImageLayer(image).setAlpha(0.5f), x, offset + 2 * height);
-        x += width;
-
-        SurfaceImage surf1b = graphics().createSurface(image.width(), image.height());
-        surf1b.surface().setAlpha(0.5f).drawImage(image, 0, 0);
-        groupLayer.addAt(graphics().createImageLayer(surf1b), x, offset + 2 * height);
-        x += width;
-
-        SurfaceImage surf2b = graphics().createSurface(image.width(), image.height());
-        surf2b.surface().drawImage(image, 0, 0);
-        groupLayer.addAt(graphics().createImageLayer(surf2b).setAlpha(0.5f), x, offset + 2 * height);
-        x += width;
-
-        CanvasImage canvas1b = graphics().createImage(image.width(), image.height());
-        canvas1b.canvas().drawImage(image, 0, 0);
-        groupLayer.addAt(graphics().createImageLayer(canvas1b).setAlpha(0.5f),
-                         x, offset + 2 * height);
-        x += width;
-
-        CanvasImage canvas2b = graphics().createImage(image.width(), image.height());
-        canvas2b.canvas().setAlpha(0.5f).drawImage(image, 0, 0);
-        groupLayer.addAt(graphics().createImageLayer(canvas2b), x, offset + 2 * height);
 
         // add some copies of the image at 1, 0.5, 0.25 and 0.125 alpha
         x = offset + width;
         for (float alpha : new float[] { 1, 1/2f, 1/4f, 1/8f }) {
           float y = fullHeight+50;
-          rootLayer.addAt(graphics().createImageLayer(image).setAlpha(alpha), x, y);
+          rootLayer.addAt(new ImageLayer(imtex).setAlpha(alpha), x, y);
           addDescrip("image a=" + alpha, x, y+height/2, width/2);
           x += width;
         }
       }
-
-      @Override
-      public void onFailure(Throwable err) {
-        log().error("Error loading image", err);
-      }
     });
 
     // add ground truth of 25% opaque image
-    assets().getImage("images/alphalayertest_expected.png").addCallback(new Callback<Image>() {
-      @Override
-      public void onSuccess(Image image) {
-        rootLayer.addAt(graphics().createImageLayer(image), 5*width, 0);
+    game.assets.getImage("images/alphalayertest_expected.png").state.onSuccess(new Slot<Image>() {
+      public void onEmit (Image image) {
+        rootLayer.addAt(new ImageLayer(game.graphics, image), 5*width, 0);
         addDescrip("ground truth", 5*width, offset+height, width);
-      }
-
-      @Override
-      public void onFailure(Throwable err) {
-        log().error("Error loading image", err);
       }
     });
   }

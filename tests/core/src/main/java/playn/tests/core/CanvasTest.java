@@ -17,64 +17,58 @@ package playn.tests.core;
 
 import pythagoras.f.FloatMath;
 
-import playn.core.Canvas;
-import playn.core.CanvasImage;
-import playn.core.Image;
-import playn.core.Font;
-import playn.core.ImageLayer;
-import playn.core.Layer;
-import playn.core.Path;
-import playn.core.util.Callback;
-import playn.core.TextFormat;
-import playn.core.TextLayout;
-import static playn.core.PlayN.*;
+import playn.core.*;
+import playn.scene.*;
+import react.Slot;
+import static playn.tests.core.TestsGame.game;
 
 public class CanvasTest extends Test {
 
   private final static float GAP = 10;
   private float nextX, nextY, maxY;
 
-  private CanvasImage timeImg;
+  private Canvas timeImg;
+  private Texture timeTex;
   private ImageLayer tileLayer;
-  private float elapsedMillis;
   private int lastSecs;
 
-  @Override
-  public String getName() {
+  public CanvasTest (TestsGame game) {
+    super(game);
+  }
+
+  @Override public String getName() {
     return "CanvasTest";
   }
 
-  @Override
-  public String getDescription() {
+  @Override public String getDescription() {
     return "Tests various Canvas rendering features.";
   }
 
-  @Override
-  public void init() {
+  @Override public void init() {
     nextX = nextY = GAP;
     lastSecs = -1;
 
     addTestCanvas("radial fill gradient", 100, 100, new Drawer() {
       public void draw(Canvas canvas) {
-        canvas.setFillGradient(graphics().createRadialGradient(
-                                 0, 0, 50, new int[] { 0xFFFF0000, 0xFF00FF00 },
-                                 new float[] { 0, 1 }));
+        Gradient.Config cfg = new Gradient.Radial(
+          0, 0, 50, new int[] { 0xFFFF0000, 0xFF00FF00 }, new float[] { 0, 1 });
+        canvas.setFillGradient(game.graphics.createGradient(cfg));
         canvas.fillRect(0, 0, 100, 100);
       }
     });
 
     addTestCanvas("linear fill gradient", 100, 100, new Drawer() {
       public void draw(Canvas canvas) {
-        canvas.setFillGradient(graphics().createLinearGradient(
-                                 0, 0, 100, 100, new int[] { 0xFF0000FF, 0xFF00FF00 },
-                                 new float[] { 0, 1 }));
+        Gradient.Config cfg = new Gradient.Linear(
+          0, 0, 100, 100, new int[] { 0xFF0000FF, 0xFF00FF00 }, new float[] { 0, 1 });
+        canvas.setFillGradient(game.graphics.createGradient(cfg));
         canvas.fillRect(0, 0, 100, 100);
       }
     });
 
     addTestCanvas("image fill pattern", 100, 100, "images/tile.png", new ImageDrawer() {
       public void draw(Canvas canvas, Image tile) {
-        canvas.setFillPattern(tile.toPattern());
+        canvas.setFillPattern(tile.toPattern(true, true));
         canvas.fillRect(0, 0, 100, 100);
       }
     });
@@ -111,21 +105,25 @@ public class CanvasTest extends Test {
       }
     });
 
-    CanvasImage repimg = createCanvasImage(30, 30, new Drawer() {
+    Canvas repcan = createCanvas(30, 30, new Drawer() {
       public void draw(Canvas canvas) {
-        canvas.setFillColor(0xFF99CCFF);
-        canvas.fillCircle(15, 15, 15);
-        canvas.setStrokeColor(0xFF000000);
-        canvas.strokeRect(0, 0, 30, 30);
+        canvas.setFillColor(0xFF99CCFF).fillCircle(15, 15, 15);
+        canvas.setStrokeColor(0xFF000000).strokeRect(0, 0, 30, 30);
       }
     });
-    repimg.setRepeat(true, true);
-    ImageLayer layer = graphics().createImageLayer(repimg);
-    layer.setSize(100, 100);
-    addTestLayer("ImageLayer repeat x/y", 100, 100, layer);
+    Texture reptex = game.graphics.createTexture(repcan.image);
+    reptex.setRepeat(true, true);
+    addTestLayer("ImageLayer repeat x/y", 100, 100, new ImageLayer(reptex).setSize(100, 100));
 
-    timeImg = graphics().createImage(100, 100);
-    addTestLayer("updated canvas", 100, 100, graphics().createImageLayer(timeImg));
+    timeImg = game.graphics.createCanvas(100, 100);
+    timeTex = game.graphics.createTexture(timeImg.image);
+    addTestLayer("updated canvas", 100, 100, new ImageLayer(timeTex));
+
+    final Gradient linear = game.graphics.createGradient(new Gradient.Linear(
+      0, 0, 100, 100, new int[] { 0xFF0000FF, 0xFF00FF00 }, new float[] { 0, 1 }));
+    final float dotRadius = 40;
+    final Gradient radial = game.graphics.createGradient(new Gradient.Radial(
+      100/3f, 100/2.5f, dotRadius, new int[] { 0xFFFFFFFF, 0xFFCC66FF }, new float[] { 0, 1 }));
 
     addTestCanvas("filled bezier path", 100, 100, new Drawer() {
       public void draw(Canvas canvas) {
@@ -141,30 +139,23 @@ public class CanvasTest extends Test {
         path.lineTo(0, 10);
         path.bezierTo(0, 5, 5, 0, 10, 0);
         path.close();
-        canvas.setFillGradient(graphics().createLinearGradient(
-                                 0, 0, 100, 100, new int[] { 0xFF0000FF, 0xFF00FF00 },
-                                 new float[] { 0, 1 }));
-        canvas.fillPath(path);
+        canvas.setFillGradient(linear).fillPath(path);
       }
     });
 
     addTestCanvas("gradient round rect", 100, 100, new Drawer() {
       public void draw(Canvas canvas) {
         // draw a rounded rect directly
-        canvas.setFillGradient(graphics().createLinearGradient(
-                                 0, 0, 100, 100, new int[] { 0xFF0000FF, 0xFF00FF00 },
-                                 new float[] { 0, 1 }));
-        canvas.fillRoundRect(0, 0, 100, 100, 10);
+        canvas.setFillGradient(linear).fillRoundRect(0, 0, 100, 100, 10);
       }
     });
 
     addTestCanvas("gradient filled text", 100, 100, new Drawer() {
       public void draw(Canvas canvas) {
         // draw a rounded rect directly
-        canvas.setFillGradient(graphics().createLinearGradient(
-                                 0, 0, 100, 100, new int[] { 0xFF0000FF, 0xFF00FF00 },
-                                 new float[] { 0, 1 }));
-        TextLayout capF = graphics().layoutText("F", new TextFormat().withFont(F_FONT.derive(96)));
+        canvas.setFillGradient(linear);
+        TextLayout capF = game.graphics.layoutText("F", new TextFormat().withFont(
+          F_FONT.derive(game.graphics, 96)));
         canvas.fillText(capF, 15, 5);
       }
     });
@@ -172,25 +163,17 @@ public class CanvasTest extends Test {
     addTestCanvas("nested round rect", 100, 100, new Drawer() {
       public void draw(Canvas canvas) {
         // demonstrates a bug (now worked around) in Android round-rect drawing
-        canvas.setFillColor(0xFFFFCC99);
-        canvas.fillRoundRect(0, 0, 98.32f, 29.5f, 12f);
-        canvas.setFillColor(0xFF99CCFF);
-        canvas.fillRoundRect(3, 3, 92.32f, 23.5f, 9.5f);
+        canvas.setFillColor(0xFFFFCC99).fillRoundRect(0, 0, 98.32f, 29.5f, 12f);
+        canvas.setFillColor(0xFF99CCFF).fillRoundRect(3, 3, 92.32f, 23.5f, 9.5f);
       }
     });
 
     addTestCanvas("android fill/stroke bug", 100, 100, new Drawer() {
       public void draw(Canvas canvas) {
-        float dotRadius = 40;
         canvas.save();
-        canvas.setFillGradient(graphics().createRadialGradient(
-                                 100 / 3, 100 / 2.5f, dotRadius,
-                                 new int[] { 0xFFFFFFFF, 0xFFCC66FF }, new float[] { 0f, 1f }));
-        canvas.fillCircle(50, 50, dotRadius);
+        canvas.setFillGradient(radial).fillCircle(50, 50, dotRadius);
         canvas.restore();
-        canvas.setStrokeColor(0xFF000000);
-        canvas.setStrokeWidth(1.5f);
-        canvas.strokeCircle(50, 50, dotRadius);
+        canvas.setStrokeColor(0xFF000000).setStrokeWidth(1.5f).strokeCircle(50, 50, dotRadius);
       }
     });
 
@@ -198,7 +181,7 @@ public class CanvasTest extends Test {
       public void draw(Canvas canvas) {
         canvas.setFillColor(0xFFCCCCCC).fillRect(0, 0, 50, 50);
         canvas.setFillColor(0xFFCCCCCC).fillRect(50, 50, 50, 50);
-        TextLayout capF = graphics().layoutText("F", new TextFormat().withFont(F_FONT));
+        TextLayout capF = game.graphics.layoutText("F", new TextFormat().withFont(F_FONT));
         float theta = -FloatMath.PI/4, tsin = FloatMath.sin(theta), tcos = FloatMath.cos(theta);
         canvas.setFillColor(0xFF000000).fillText(capF, 0, 0);
         canvas.transform(tcos, -tsin, tsin, tcos, 50, 50);
@@ -239,34 +222,30 @@ public class CanvasTest extends Test {
       }
     });
 
-    Image tileimg = assets().getImage("images/tile.png");
-    tileimg.setRepeat(true, true);
-    addTestLayer("img layer anim setWidth", 100, 100,
-                 tileLayer = graphics().createImageLayer(tileimg));
-    tileLayer.setSize(0, 100);
-  }
+    game.assets.getImage("images/tile.png").state.onSuccess(new Slot<Image>() {
+      public void onEmit (Image tileImg) {
+        Texture tileTex = game.graphics.createTexture(tileImg);
+        tileTex.setRepeat(true, true);
+        tileLayer = new ImageLayer(tileTex);
+        addTestLayer("img layer anim setWidth", 100, 100, tileLayer.setSize(0, 100));
+      }
+    });
 
-  @Override
-  public void update(int delta) {
-    super.update(delta);
-    elapsedMillis += delta;
-  }
+    game.paint.connect(new Slot<TestsGame>() {
+      public void onEmit (TestsGame game) {
+        int curSecs = game.paintTick/1000;
+        if (curSecs != lastSecs) {
+          timeImg.clear();
+          timeImg.setStrokeColor(0xFF000000).strokeRect(0, 0, 100, 100);
+          timeImg.drawText(""+curSecs, 40, 55);
+          lastSecs = curSecs;
+          // TODO: flish timeImg.image to timeTex
+        }
 
-  @Override
-  public void paint(float delta) {
-    super.paint(delta);
-
-    int curSecs = (int)(elapsedMillis/1000);
-    if (curSecs != lastSecs) {
-      timeImg.canvas().clear();
-      timeImg.canvas().setStrokeColor(0xFF000000);
-      timeImg.canvas().strokeRect(0, 0, 100, 100);
-      timeImg.canvas().drawText(""+curSecs, 40, 55);
-      lastSecs = curSecs;
-    }
-
-    // round the width so that it goes to zero sometimes (which should be fine)
-    tileLayer.setWidth(Math.round(Math.abs(FloatMath.sin(elapsedMillis/2)) * 100));
+        // round the width so that it goes to zero sometimes (which should be fine)
+        tileLayer.width = Math.round(Math.abs(FloatMath.sin(game.paintTick/2f)) * 100);
+      }
+    });
   }
 
   private interface Drawer {
@@ -274,29 +253,29 @@ public class CanvasTest extends Test {
   }
 
   private void addTestCanvas(String descrip, int width, int height, Drawer drawer) {
-    CanvasImage image = createCanvasImage(width, height, drawer);
-    addTestLayer(descrip, width, height, graphics().createImageLayer(image));
+    Canvas canvas = createCanvas(width, height, drawer);
+    addTestLayer(descrip, width, height, new ImageLayer(game.graphics, canvas.image));
   }
 
-  private CanvasImage createCanvasImage(int width, int height, final Drawer drawer) {
-    final CanvasImage image = graphics().createImage(width, height);
-    drawer.draw(image.canvas());
-    return image;
+  private Canvas createCanvas(int width, int height, final Drawer drawer) {
+    final Canvas canvas = game.graphics.createCanvas(width, height);
+    drawer.draw(canvas);
+    return canvas;
   }
 
   private void addTestLayer(String descrip, int width, int height, Layer layer) {
     // if this layer won't fit in this row, wrap down to the next
-    if (nextX + width > graphics().width()) {
+    if (nextX + width > game.graphics.viewSize.width()) {
       nextY += (maxY + GAP);
       nextX = GAP;
       maxY = 0;
     }
 
     // add the layer and its description below
-    graphics().rootLayer().addAt(layer, nextX, nextY);
+    game.rootLayer.addAt(layer, nextX, nextY);
     ImageLayer dlayer = createDescripLayer(descrip, width);
-    graphics().rootLayer().addAt(dlayer, nextX + Math.round((width-dlayer.width())/2),
-                                 nextY + height + 2);
+    game.rootLayer.addAt(dlayer, nextX + Math.round((width-dlayer.width())/2),
+                         nextY + height + 2);
 
     // update our positioning info
     nextX += (width + GAP);
@@ -309,17 +288,15 @@ public class CanvasTest extends Test {
 
   private void addTestCanvas(String descrip, int width, int height, String imagePath,
                              final ImageDrawer drawer) {
-    final CanvasImage target = graphics().createImage(width, height);
-    assets().getImage(imagePath).addCallback(new Callback<Image>() {
-      public void onSuccess(Image image) {
-        drawer.draw(target.canvas(), image);
-      }
-      public void onFailure(Throwable err) {
-        System.err.println("Oops! " + err);
+    final Canvas target = game.graphics.createCanvas(width, height);
+    game.assets.getImage(imagePath).state.onSuccess(new Slot<Image>() {
+      public void onEmit (Image image) {
+        drawer.draw(target, image);
       }
     });
-    addTestLayer(descrip, width, height, graphics().createImageLayer(target));
+    addTestLayer(descrip, width, height, new ImageLayer(game.graphics, target.image));
   }
 
-  private Font F_FONT = graphics().createFont("Helvetica", Font.Style.BOLD, 48);
+  private Font F_FONT = TestsGame.game.graphics.createFont(
+    new Font.Config("Helvetica", Font.Style.BOLD, 48));
 }

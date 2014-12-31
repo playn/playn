@@ -18,23 +18,11 @@ package playn.tests.core;
 import pythagoras.f.IRectangle;
 import pythagoras.f.Rectangle;
 
-import playn.core.Canvas;
-import playn.core.CanvasImage;
-import playn.core.Font.Style;
-import playn.core.Image;
-import playn.core.ImageLayer;
-import playn.core.Keyboard.TextType;
-import playn.core.Pointer.Event;
-import playn.core.Pointer;
-import playn.core.TextFormat;
-import playn.core.TextLayout;
-import playn.core.TextWrap;
-import playn.core.util.Callback;
-import playn.core.util.TextBlock;
-import static playn.core.PlayN.graphics;
-import static playn.core.PlayN.keyboard;
+import playn.core.*;
+import playn.scene.*;
 
 public class TextTest extends Test {
+
   private class NToggle<T> extends TestsGame.NToggle<T> {
     public NToggle(String name, T...values) {
       super(name, values);
@@ -45,39 +33,33 @@ public class TextTest extends Test {
     }
   }
 
-  public class Toggle extends NToggle<Boolean> {
-    public Toggle(String name) {
-      super(name, Boolean.FALSE, Boolean.TRUE);
-    }
-  }
-
-  NToggle<Style> style;
+  NToggle<Font.Style> style;
   NToggle<String> draw;
   NToggle<String> effect;
   NToggle<TextBlock.Align> align;
   NToggle<String> font;
   NToggle<Integer> wrap;
-  Toggle lineBounds;
+  TestsGame.Toggle lineBounds;
   final float outlineWidth = 2;
   String sample = "The quick brown fox\njumped over the lazy dog.\nEvery good boy deserves fudge.";
   ImageLayer text;
   Rectangle row;
 
-  @Override
-  public String getName() {
+  public TextTest (TestsGame game) {
+    super(game);
+  }
+
+  @Override public String getName() {
     return "TextTest";
   }
 
-  @Override
-  public String getDescription() {
+  @Override public String getDescription() {
     return "Tests various text rendering features.";
   }
 
-  @Override
-  public void init() {
+  @Override public void init() {
     row = new Rectangle(5, 5, 0, 0);
-    addToRow((style = new NToggle<Style>(
-        "Style", Style.PLAIN, Style.BOLD, Style.ITALIC, Style.BOLD_ITALIC)).layer);
+    addToRow((style = new NToggle<Font.Style>("Style", Font.Style.values())).layer);
     addToRow((draw = new NToggle<String>("Draw", "Fill", "Stroke")).layer);
     addToRow((effect = new NToggle<String>(
         "Effect", "None", "ShadowUL", "ShadowLR", "Outline")).layer);
@@ -86,41 +68,41 @@ public class TextTest extends Test {
         "Align", TextBlock.Align.LEFT, TextBlock.Align.CENTER, TextBlock.Align.RIGHT)).layer);
     addToRow((font = new NToggle<String>("Font", "Times New Roman", "Helvetica")).layer);
 
-    class SetText extends Pointer.Adapter implements Callback<String> {
-      final ImageLayer layer = graphics().createImageLayer(TestsGame.makeButtonImage("Set Text"));{
-        layer.addListener(this);
-      }
-      @Override public void onPointerEnd(Event event) {
-        keyboard().getText(TextType.DEFAULT, "Test text", sample.replace("\n", "\\n"), this);
-      }
-      public void onSuccess(String result) {
-        if (result == null) return;
-        // parse \n to allow testing line breaks
-        sample = result.replace("\\n", "\n");
-        update();
-      }
-      public void onFailure(Throwable cause) {}
-    }
-    addToRow(new SetText().layer);
-    addToRow((lineBounds = new Toggle("Lines")).layer);
+    // class SetText extends Pointer.Adapter implements Callback<String> {
+    //   final ImageLayer layer = graphics().createImageLayer(TestsGame.makeButtonImage("Set Text"));{
+    //     layer.addListener(this);
+    //   }
+    //   @Override public void onPointerEnd(Event event) {
+    //     keyboard().getText(TextType.DEFAULT, "Test text", sample.replace("\n", "\\n"), this);
+    //   }
+    //   public void onSuccess(String result) {
+    //     if (result == null) return;
+    //     // parse \n to allow testing line breaks
+    //     sample = result.replace("\\n", "\n");
+    //     update();
+    //   }
+    //   public void onFailure(Throwable cause) {}
+    // }
+    // addToRow(new SetText().layer);
+    addToRow((lineBounds = new TestsGame.Toggle("Lines")).layer);
 
     // test laying out the empty string
-    TextLayout layout = graphics().layoutText("", new TextFormat());
-    ImageLayer empty = graphics().createImageLayer(makeLabel(
-      "Empty string size " + layout.width() + "x" + layout.height()));
+    TextLayout layout = game.graphics.layoutText("", new TextFormat());
+    ImageLayer empty = new ImageLayer(makeLabel(
+      "Empty string size " + layout.size.width() + "x" + layout.size.height()));
     newRow();
     addToRow(empty);
 
     newRow();
 
-    addToRow((text = graphics().createImageLayer(makeTextImage())));
+    addToRow((text = new ImageLayer(makeTextImage())));
   }
 
   protected void addToRow (ImageLayer layer) {
-    graphics().rootLayer().add(layer.setTranslation(row.x + row.width, row.y));
+    game.rootLayer.add(layer.setTranslation(row.x + row.width, row.y));
     row.width += layer.width() + 45;
     row.height = Math.max(row.height, layer.height());
-    if (row.width > graphics().width() * .6f) newRow();
+    if (row.width > game.graphics.viewSize.width() * .6f) newRow();
   }
 
   protected void newRow () {
@@ -131,28 +113,30 @@ public class TextTest extends Test {
 
   protected void update() {
     if (text == null) return;
-    text.setImage(makeTextImage());
+    text.setTexture(makeTextImage());
   }
 
-  protected Image makeLabel(String label) {
-    TextLayout layout = graphics().layoutText(label, new TextFormat());
-    CanvasImage image = graphics().createImage(layout.width(), layout.height());
-    image.canvas().setFillColor(0xFF000000);
-    image.canvas().fillText(layout, 0, 0);
-    return image;
+  protected Texture makeLabel(String label) {
+    TextLayout layout = game.graphics.layoutText(label, new TextFormat());
+    Canvas canvas = game.graphics.createCanvas(layout.size);
+    canvas.setFillColor(0xFF000000).fillText(layout, 0, 0);
+    return game.graphics.createTexture(canvas.image);
   }
 
-  protected Image makeTextImage() {
-    TextFormat format = new TextFormat(graphics().createFont(font.value(), style.value(), 24), true);
-    float wrapWidth = wrap.value() == 0 ? Float.MAX_VALUE : graphics().width()*wrap.value()/100;
-    TextBlock block = new TextBlock(graphics().layoutText(sample, format, new TextWrap(wrapWidth)));
+  protected Texture makeTextImage() {
+    TextFormat format = new TextFormat(
+      game.graphics.createFont(new Font.Config(font.value(), style.value(), 24)), true);
+    float wrapWidth = wrap.value() == 0 ?
+      Float.MAX_VALUE : game.graphics.viewSize.width()*wrap.value()/100;
+    TextBlock block = new TextBlock(
+      game.graphics.layoutText(sample, format, new TextWrap(wrapWidth)));
     float awidth = adjustWidth(block.bounds.width()), aheight = adjustHeight(block.bounds.height());
-    float pad = TextBlock.pad();
-    CanvasImage image = graphics().createImage(awidth+2*pad, aheight+2*pad);
-    image.canvas().translate(pad, pad);
-    image.canvas().setStrokeColor(0xFFFFCCCC).strokeRect(0, 0, awidth, aheight);
-    render(image.canvas(), block, align.value(), lineBounds.value());
-    return image;
+    float pad = 1/game.graphics.scale.factor;
+    Canvas canvas = game.graphics.createCanvas(awidth+2*pad, aheight+2*pad);
+    canvas.translate(pad, pad);
+    canvas.setStrokeColor(0xFFFFCCCC).strokeRect(0, 0, awidth, aheight);
+    render(canvas, block, align.value(), lineBounds.value());
+    return game.graphics.createTexture(canvas.image);
   }
 
   protected float adjustDim (float value) {
@@ -176,9 +160,9 @@ public class TextTest extends Test {
     float sy = y + block.bounds.y();
     for (TextLayout layout : block.lines) {
       float sx = x + block.bounds.x() + align.getX(
-        layout.width(), block.bounds.width()-block.bounds.x());
+        layout.size.width(), block.bounds.width()-block.bounds.x());
       if (showBounds) {
-        IRectangle lbounds = layout.bounds();
+        IRectangle lbounds = layout.bounds;
         canvas.setStrokeColor(0xFFFFCCCC).setStrokeWidth(1);
         canvas.strokeRect(sx+lbounds.x(), sy+lbounds.y(), lbounds.width(), lbounds.height());
       }

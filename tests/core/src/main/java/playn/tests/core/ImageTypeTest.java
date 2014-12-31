@@ -16,14 +16,9 @@
 
 package playn.tests.core;
 
-import playn.core.CanvasImage;
-import playn.core.Color;
-import playn.core.GroupLayer;
-import playn.core.Image;
-import playn.core.ImageLayer;
-import playn.core.util.Callback;
-import playn.core.SurfaceImage;
-import static playn.core.PlayN.*;
+import playn.core.*;
+import playn.scene.*;
+import react.Slot;
 
 public class ImageTypeTest extends Test {
   GroupLayer rootLayer;
@@ -34,18 +29,9 @@ public class ImageTypeTest extends Test {
   static String imageSrc = "images/imagetypetest.png";
   static String imageGroundTruthSrc = "images/imagetypetest_expected.png";
 
-  Image image1;
-
-  ImageLayer imageLayer1;
-  ImageLayer surfaceLayer1;
-  ImageLayer canvasLayer1;
-
-  ImageLayer imageLayer2;
-  ImageLayer surfaceLayer2;
-  ImageLayer canvasLayer2;
-
-  Image imageGroundTruth;
-  ImageLayer groundTruthLayer;
+  public ImageTypeTest (TestsGame game) {
+    super(game);
+  }
 
   @Override
   public String getName() {
@@ -57,67 +43,41 @@ public class ImageTypeTest extends Test {
     return "Test that image types display the same. Left-to-right: ImageLayer, SurfaceImage, CanvasImage, ground truth (expected).";
   }
 
-  @Override
-  public void init() {
-    rootLayer = graphics().rootLayer();
-
+  @Override public void init() {
     // add a half white, half blue background
-    SurfaceImage bg = graphics().createSurface((int) (4 * width), (int) (4 * height));
-    bg.surface().setFillColor(Color.rgb(255, 255, 255));
-    bg.surface().fillRect(0, 0, bg.surface().width(), bg.surface().height());
-    bg.surface().setFillColor(Color.rgb(0, 0, 255));
-    bg.surface().fillRect(0, bg.surface().width() / 2,
-                          bg.surface().width(), bg.surface().height() / 2);
-    rootLayer.add(graphics().createImageLayer(bg));
+    float bwidth = 4*width, bheight = 4*height;
+    SurfaceTexture bg = game.createSurface(bwidth, bheight);
+    bg.begin().
+      setFillColor(Color.rgb(255, 255, 255)).fillRect(0, 0, bwidth, bheight).
+      setFillColor(Color.rgb(0, 0, 255)).fillRect(0, bwidth/2, bwidth, bheight/2);
+    bg.end().close();
+    rootLayer.add(new ImageLayer(bg.texture));
 
-    image1 = assets().getImage(imageSrc);
-    image1.addCallback(new Callback<Image>() {
-      @Override
-      public void onSuccess(Image image) {
+    game.assets.getImage(imageSrc).state.onSuccess(new Slot<Image>() {
+      public void onEmit (Image image) {
         // once the image loads, create our layers
-        imageLayer1 = graphics().createImageLayer(image);
-        SurfaceImage surface1 = graphics().createSurface(image.width(), image.height());
-        surface1.surface().drawImage(image, 0, 0);
-        surfaceLayer1 = graphics().createImageLayer(surface1);
-        CanvasImage canvas1 = graphics().createImage(image.width(), image.height());
-        canvas1.canvas().drawImage(image, 0, 0);
-        canvasLayer1 = graphics().createImageLayer(canvas1);
-        imageLayer2 = graphics().createImageLayer(image);
-        SurfaceImage surface2 = graphics().createSurface(image.width(), image.height());
-        surface2.surface().drawImage(image, 0, 0);
-        surfaceLayer2 = graphics().createImageLayer(surface2);
-        CanvasImage canvas2 = graphics().createImage(image.width(), image.height());
-        canvas2.canvas().drawImage(image, 0, 0);
-        canvasLayer2 = graphics().createImageLayer(canvas2);
+        Texture imtex = game.graphics.createTexture(image);
+        game.rootLayer.addAt(new ImageLayer(imtex), offset, offset);
+        game.rootLayer.addAt(new ImageLayer(imtex), offset, offset + 2*height);
 
-        // add layers to the rootLayer
-        rootLayer.addAt(imageLayer1, offset, offset);
-        rootLayer.addAt(surfaceLayer1, offset + width, offset);
-        rootLayer.addAt(canvasLayer1, offset + 2 * width, offset);
+        SurfaceTexture surf = game.createSurface(image.width(), image.height());
+        surf.begin().draw(imtex, 0, 0);
+        surf.end().close();
+        game.rootLayer.addAt(new ImageLayer(surf.texture), offset + width, offset);
+        game.rootLayer.addAt(new ImageLayer(surf.texture), offset + width, offset + 2*height);
 
-        rootLayer.addAt(imageLayer2, offset, offset + 2 * height);
-        rootLayer.addAt(surfaceLayer2, offset + width, offset + 2 * height);
-        rootLayer.addAt(canvasLayer2, offset + 2 * width, offset + 2 * height);
-      }
-
-      @Override
-      public void onFailure(Throwable err) {
-        log().error("Error loading image", err);
+        Canvas canvas = game.graphics.createCanvas(image.width(), image.height());
+        canvas.drawImage(image, 0, 0);
+        Texture cantex = game.graphics.createTexture(canvas.image);
+        rootLayer.addAt(new ImageLayer(cantex), offset + 2*width, offset);
+        rootLayer.addAt(new ImageLayer(cantex), offset + 2*width, offset + 2*height);
       }
     });
 
     // add ground truth image
-    imageGroundTruth = assets().getImage(imageGroundTruthSrc);
-    imageGroundTruth.addCallback(new Callback<Image>() {
-      @Override
-      public void onSuccess(Image image) {
-        groundTruthLayer = graphics().createImageLayer(image);
-        rootLayer.addAt(groundTruthLayer, 3 * width, 0);
-      }
-
-      @Override
-      public void onFailure(Throwable err) {
-        log().error("Error loading image", err);
+    game.assets.getImage(imageGroundTruthSrc).state.onSuccess(new Slot<Image>() {
+      public void onEmit (Image image) {
+        game.rootLayer.addAt(new ImageLayer(game.graphics, image), 3 * width, 0);
       }
     });
   }

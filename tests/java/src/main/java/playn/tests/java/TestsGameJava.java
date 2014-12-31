@@ -15,9 +15,7 @@
  */
 package playn.tests.java;
 
-import playn.core.PlayN;
 import playn.java.JavaPlatform;
-
 import playn.tests.core.TestsGame;
 
 public class TestsGameJava {
@@ -31,13 +29,16 @@ public class TestsGameJava {
     }
     config.width = 800;
     config.height = 600;
-    JavaPlatform platform = JavaPlatform.register(config);
-    platform.setTitle("Tests");
+    JavaPlatform plat = new JavaPlatform(config);
+    plat.setTitle("Tests");
     // let the caller know that we accept some args
-    platform.log().info("Usage: TestsGameJava [@Nx] [test#]");
-    platform.log().info("  [@Nx] specifies a scale factor: @2x, @1.5x");
-    platform.log().info("  [test#] specifies a test to launch directly: test0, test12 ");
+    plat.log().info("Usage: TestsGameJava [@Nx] [test#]");
+    plat.log().info("  [@Nx] specifies a scale factor: @2x, @1.5x");
+    plat.log().info("  [test#] specifies a test to launch directly: test0, test12 ");
     TestsGame.args = args;
-    PlayN.run(new TestsGame());
+    plat.init();
+    TestsGame game = new TestsGame(plat);
+    game.init();
+    plat.start();
   }
 }

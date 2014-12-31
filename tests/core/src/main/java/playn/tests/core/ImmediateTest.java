@@ -15,48 +15,45 @@
  */
 package playn.tests.core;
 
-import playn.core.GroupLayer;
-import playn.core.CanvasImage;
-import playn.core.ImmediateLayer;
-import playn.core.Surface;
-import static playn.core.PlayN.*;
-
 import pythagoras.f.FloatMath;
+
+import playn.core.*;
+import playn.scene.*;
+import react.Slot;
 
 public class ImmediateTest extends Test {
 
   private float elapsed, rotation;
 
-  @Override
-  public String getName() {
+  public ImmediateTest (TestsGame game) {
+    super(game);
+  }
+
+  @Override public String getName() {
     return "ImmediateTest";
   }
 
-  @Override
-  public String getDescription() {
+  @Override public String getDescription() {
     return "Tests rendering of immediate layers with and without clipping. Clipped blue layer " +
       "should not overdraw one pixel black line that circumscribes it.";
   }
 
-  @Override
-  public void init() {
-    GroupLayer rootLayer = graphics().rootLayer();
+  @Override public void init() {
+    Canvas circle = game.graphics.createCanvas(100, 100);
+    circle.setFillColor(0xFFCC99FF).fillCircle(50, 50, 50);
+    final Texture cirtex = game.graphics.createTexture(circle.image);
 
-    final CanvasImage circle = graphics().createImage(100, 100);
-    circle.canvas().setFillColor(0xFFCC99FF);
-    circle.canvas().fillCircle(50, 50, 50);
-
-    final CanvasImage sausage = graphics().createImage(100, 50);
-    sausage.canvas().setFillGradient(graphics().createLinearGradient(
-                                       0, 0, 100, 100, new int[] { 0xFF0000FF, 0xFF00FF00 },
-                                       new float[] { 0, 1 }));
-    sausage.canvas().fillRoundRect(0, 0, 100, 50, 10);
+    Canvas sausage = game.graphics.createCanvas(100, 50);
+    Gradient linear = game.graphics.createGradient(new Gradient.Linear(
+      0, 0, 100, 100, new int[] { 0xFF0000FF, 0xFF00FF00 }, new float[] { 0, 1 }));
+    sausage.setFillGradient(linear).fillRoundRect(0, 0, 100, 50, 10);
+    final Texture saustex = game.graphics.createTexture(sausage.image);
 
     // add an unclipped layer which will draw our background and outlines
-    rootLayer.add(graphics().createImmediateLayer(new ImmediateLayer.Renderer() {
-      public void render (Surface surf) {
-        surf.setFillColor(0xFFFFCC99);
-        surf.fillRect(0, 0, graphics().width(), graphics().height());
+    game.rootLayer.add(new Layer() {
+      @Override protected void paintImpl (Surface surf) {
+        surf.setFillColor(0xFFFFCC99).fillRect(
+          0, 0, game.graphics.viewSize.width(), game.graphics.viewSize.height());
 
         // fill a rect that will be covered except for one pixel by the clipped immediate layers
         surf.setFillColor(0xFF000000);
@@ -64,48 +61,44 @@ public class ImmediateTest extends Test {
         surf.fillRect(259, 29, 102, 102);
         surf.fillRect(259, 159, 102, 102);
       }
-    }));
+    });
 
     // add a clipped layer that will clip a fill and image draw
-    ImmediateLayer ilayer = graphics().createImmediateLayer(200, 200, new ImmediateLayer.Renderer() {
-      public void render (Surface surf) {
+    ClippedLayer clayer = new ClippedLayer(200, 200) {
+      protected void paintClipped (Surface surf) {
         // this fill should be clipped to our bounds
         surf.setFillColor(0xFF99CCFF);
         surf.fillRect(-50, -50, 300, 300);
         // and this image should be clipped to our bounds
-        surf.drawImage(circle, 125, -25);
+        surf.draw(cirtex, 125, -25);
       }
-    });
+    };
     // adjust the origin to ensure that is accounted for in the clipping
-    ilayer.setOrigin(100, 100);
-    rootLayer.addAt(ilayer, 130, 130);
+    game.rootLayer.addAt(clayer.setOrigin(100, 100), 130, 130);
 
     // add a clipped layer that draws an image through a rotation transform
-    rootLayer.addAt(graphics().createImmediateLayer(100, 100, new ImmediateLayer.Renderer() {
-      public void render (Surface surf) {
-        surf.setFillColor(0xFF99CCFF);
-        surf.fillRect(0, 0, 100, 100);
-        surf.translate(50, 50);
-        surf.rotate(rotation);
-        surf.translate(-50, -50);
-        surf.drawImage(sausage, 0, 25);
+    game.rootLayer.addAt(new ClippedLayer(100, 100) {
+      protected void paintClipped (Surface surf) {
+        surf.setFillColor(0xFF99CCFF).fillRect(0, 0, 100, 100);
+        surf.translate(50, 50).rotate(rotation).translate(-50, -50);
+        surf.draw(saustex, 0, 25);
       }
-    }), 260, 30);
+    }, 260, 30);
 
     // add a clipped layer that draws an image through a translation transform
-    rootLayer.addAt(graphics().createImmediateLayer(100, 100, new ImmediateLayer.Renderer() {
-      public void render (Surface surf) {
-        surf.setFillColor(0xFF99CCFF);
-        surf.fillRect(0, 0, 100, 100);
+    game.rootLayer.addAt(new ClippedLayer(100, 100) {
+      protected void paintClipped (Surface surf) {
+        surf.setFillColor(0xFF99CCFF).fillRect(0, 0, 100, 100);
         surf.translate(FloatMath.sin(elapsed) * 50, FloatMath.cos(elapsed) * 50 + 25);
-        surf.drawImage(sausage, 0, 0);
+        surf.draw(saustex, 0, 0);
       }
-    }), 260, 160);
-  }
+    }, 260, 160);
 
-  @Override
-  public void update(int delta) {
-    elapsed += delta/1000f;
-    rotation = elapsed * FloatMath.PI/2;
+    conns.add(game.paint.connect(new Slot<TestsGame>() {
+      public void onEmit (TestsGame game) {
+        elapsed = game.paintTick/1000f;
+        rotation = elapsed * FloatMath.PI/2;
+      }
+    }));
   }
 }

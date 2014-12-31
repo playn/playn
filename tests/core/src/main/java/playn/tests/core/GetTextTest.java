@@ -15,42 +15,39 @@
  */
 package playn.tests.core;
 
-import playn.core.ImageLayer;
-import playn.core.Keyboard;
-import playn.core.util.Callback;
-import static playn.core.PlayN.*;
+import playn.core.*;
+import playn.scene.*;
+import react.Slot;
 
 class GetTextTest extends Test {
 
-  @Override
-  public String getName() {
+  public GetTextTest (TestsGame game) {
+    super(game);
+  }
+
+  @Override public String getName() {
     return "GetTextTest";
   }
 
-  @Override
-  public String getDescription() {
+  @Override public String getDescription() {
     return "Tests mobile text entry support.";
   }
 
-  @Override
-  public void init() {
+  @Override public void init() {
     String instructions = "Click one of the buttons below to display the text entry UI.";
-    ImageLayer instLayer = graphics().createImageLayer(formatText(instructions, false));
-    graphics().rootLayer().addAt(instLayer, 50, 50);
+    ImageLayer instLayer = new ImageLayer(formatText(instructions, false));
+    game.rootLayer.addAt(instLayer, 50, 50);
 
-    String last = storage().getItem("last_text");
+    String last = game.storage.getItem("last_text");
     if (last == null) last = "...";
 
-    final ImageLayer outputLayer = graphics().createImageLayer(formatText(last, false));
-    graphics().rootLayer().addAt(outputLayer, 50, 150);
+    final ImageLayer outputLayer = new ImageLayer(formatText(last, false));
+    game.rootLayer.addAt(outputLayer, 50, 150);
 
-    final Callback<String> onGotText = new Callback<String>() {
-      public void onSuccess(String text) {
-        outputLayer.setImage(formatText(text == null ? "canceled" : text, false));
-        if (text != null) storage().setItem("last_text", text);
-      }
-      public void onFailure(Throwable cause) {
-        outputLayer.setImage(formatText(cause.getMessage(), false));
+    final Slot<String> onGotText = new Slot<String>() {
+      public void onEmit(String text) {
+        outputLayer.setTexture(formatText(text == null ? "canceled" : text, false));
+        if (text != null) game.storage.setItem("last_text", text);
       }
     };
 
@@ -58,10 +55,11 @@ class GetTextTest extends Test {
     for (final Keyboard.TextType type : Keyboard.TextType.values()) {
       ImageLayer button = createButton(type.toString(), new Runnable() {
         public void run() {
-          keyboard().getText(Keyboard.TextType.DEFAULT, "Enter " + type + " text:", "", onGotText);
+          game.keyboard.getText(Keyboard.TextType.DEFAULT, "Enter " + type + " text:", "").
+            onSuccess(onGotText);
         }
       });
-      graphics().rootLayer().addAt(button, x, 100);
+      game.rootLayer.addAt(button, x, 100);
       x += button.width() + 10;
     }
   }

@@ -16,51 +16,55 @@
 package playn.tests.core;
 
 import pythagoras.f.FloatMath;
+import react.Connection;
+import react.Slot;
 
-import playn.core.Canvas;
-import playn.core.CanvasImage;
-import static playn.core.PlayN.*;
+import playn.core.*;
+import playn.scene.*;
 
 public class CanvasStressTest extends Test {
 
-  private Canvas canvas;
-  private int noSegs = 30;
-  private int direction = 1;
+  public CanvasStressTest (TestsGame game) {
+    super(game);
+  }
 
-  @Override
-  public String getName() {
+  @Override public String getName() {
     return "Canvas Stress Test";
   }
 
-  @Override
-  public String getDescription() {
+  @Override public String getDescription() {
     return "Animates a full-screen sized canvas, forcing a massive reupload of image data to " +
       "the GPU on every frame.";
   }
 
-  @Override
-  public void init() {
-    CanvasImage canvasImage = graphics().createImage(graphics().width(), graphics().height());
-    canvas = canvasImage.canvas();
-    graphics().rootLayer().add(graphics().createImageLayer(canvasImage));
-  }
+  @Override public void init() {
+    final Canvas canvas = game.graphics.createCanvas(game.graphics.viewSize);
+    final Texture canvasTex = game.graphics.createTexture(canvas.image);
+    game.rootLayer.add(new ImageLayer(canvasTex));
 
-  @Override
-  public void update(int delta) {
-    canvas.clear();
-    canvas.setStrokeWidth(3);
-    canvas.setStrokeColor(0x88ff0000);
+    conns.add(game.update.connect(new Slot<TestsGame>() {
+      private int noSegs = 30;
+      private int direction = 1;
 
-    noSegs += direction;
-    if (noSegs > 50) direction = -1;
-    if (noSegs < 20) direction = 1;
+      public void onEmit (TestsGame game) {
+        canvas.clear();
+        canvas.setStrokeWidth(3);
+        canvas.setStrokeColor(0x88ff0000);
 
-    final float r = 100;
-    for (int ii = 0; ii < noSegs; ii++) {
-      float angle = 2*FloatMath.PI * ii / noSegs;
-      float x = (r * FloatMath.cos(angle)) + graphics().width() / 2;
-      float y = (r * FloatMath.sin(angle)) + graphics().height() /2;
-      canvas.strokeCircle(x, y, 100);
-    }
+        noSegs += direction;
+        if (noSegs > 50) direction = -1;
+        if (noSegs < 20) direction = 1;
+
+        final float r = 100;
+        for (int ii = 0; ii < noSegs; ii++) {
+          float angle = 2*FloatMath.PI * ii / noSegs;
+          float x = (r * FloatMath.cos(angle)) + game.graphics.viewSize.width() / 2;
+          float y = (r * FloatMath.sin(angle)) + game.graphics.viewSize.height() /2;
+          canvas.strokeCircle(x, y, 100);
+        }
+
+        // TODO: update canvasTex with canvas.image
+      }
+    }));
   }
 }

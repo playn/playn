@@ -17,22 +17,17 @@ package playn.tests.core;
 
 import pythagoras.f.FloatMath;
 
-import playn.core.CanvasImage;
-import playn.core.GroupLayer;
-import playn.core.ImageLayer;
-import playn.core.ImmediateLayer;
-import playn.core.Layer;
-import playn.core.Surface;
-import playn.core.SurfaceImage;
-import static playn.core.PlayN.graphics;
+import playn.core.*;
+import playn.scene.*;
+import react.Slot;
 
 public class ClippedGroupTest extends Test {
 
   private float elapsed;
-  private GroupLayer.Clipped g1, g2, g3, g4, g5;
-  private ImageLayer i1;
-  private GroupLayer inner, g5Inner;
-  private ImageLayer s1;
+
+  public ClippedGroupTest (TestsGame game) {
+    super(game);
+  }
 
   @Override
   public String getName() {
@@ -44,19 +39,54 @@ public class ClippedGroupTest extends Test {
     return "Tests clipping of children in group layers.";
   }
 
-  @Override
-  public void init() {
-    GroupLayer rootLayer = graphics().rootLayer();
+  @Override public void init () {
+    final float iwidth = 100, iheight = 50;
+    final Canvas img = game.graphics.createCanvas(iwidth, iheight);
+    Gradient linear = game.graphics.createGradient(new Gradient.Linear(
+      0, 0, 100, 100, new int[] { 0xFF0000FF, 0xFF00FF00 }, new float[] { 0, 1 }));
+    img.setFillGradient(linear).fillRoundRect(0, 0, 100, 50, 10);
+    final Texture tex = game.graphics.createTexture(img.image);
 
-    final CanvasImage img = graphics().createImage(100, 50);
-    img.canvas().setFillGradient(graphics().createLinearGradient(
-                                   0, 0, 100, 100, new int[] { 0xFF0000FF, 0xFF00FF00 },
-                                   new float[] { 0, 1 }));
-    img.canvas().fillRoundRect(0, 0, 100, 50, 10);
+    // create a group layer with a static clip, and a rotating image inside
+    final GroupLayer g1 = new GroupLayer(100, 100);
+    // test the origin not being at zero/zero
+    g1.setOrigin(50, 0);
+    final ImageLayer i1 = new ImageLayer(tex);
+    i1.setOrigin(i1.width()/2, i1.height()/2);
+    g1.addAt(i1, 50, 50);
 
-    // create an immediate layer that draws the boundaries of our clipped group layers
-    rootLayer.add(graphics().createImmediateLayer(new ImmediateLayer.Renderer() {
-      public void render(Surface surf) {
+    // static image inside and animated clipped width
+    final GroupLayer g2 = new GroupLayer(100, 100);
+    g2.setOrigin(50, 50);
+    g2.addAt(new ImageLayer(tex), (100 - iwidth)/2, (100 - iheight)/2);
+
+    // nest a group layer inside with an animated origin
+    final GroupLayer inner = new GroupLayer();
+    inner.addAt(new ImageLayer(tex), (100 - iwidth)/2, (100 - iheight)/2);
+    final GroupLayer g3 = new GroupLayer(100, 100);
+    g3.add(inner);
+
+    // create a group layer with a static clip, and a rotating surface image inside
+    final GroupLayer g4 = new GroupLayer(100, 100);
+    SurfaceTexture si = game.createSurface(100, 50);
+    si.begin().setFillColor(0xFF99CCFF).fillRect(0, 0, 100, 50);
+    si.end().close();
+    final ImageLayer s1 = new ImageLayer(si.texture);
+    s1.setOrigin(s1.width()/2, s1.height()/2);
+    g4.addAt(s1, 50, 50);
+
+    // put a large clipped group inside a small one
+    final GroupLayer g5Inner = new GroupLayer(150, 150);
+    g5Inner.addAt(new ImageLayer(tex).setScale(2), -iwidth, -iheight);
+    g5Inner.addAt(new ImageLayer(tex).setScale(2), -iwidth, iheight);
+    g5Inner.addAt(new ImageLayer(tex).setScale(2), iwidth, -iheight);
+    g5Inner.addAt(new ImageLayer(tex).setScale(2), iwidth, iheight);
+    final GroupLayer g5 = new GroupLayer(100, 100);
+    g5.addAt(g5Inner, -25, -25);
+
+    // create a layer that draws the boundaries of our clipped group layers
+    game.rootLayer.add(new Layer() {
+      @Override protected void paintImpl (Surface surf) {
         // draw the border of our various clipped groups
         surf.setFillColor(0xFF000000);
         outline(surf, g1);
@@ -65,8 +95,8 @@ public class ClippedGroupTest extends Test {
         outline(surf, g4);
         outline(surf, g5);
       }
-      protected void outline (Surface surf, Layer.HasSize ly) {
-        drawRect(surf, ly.tx() - ly.originX(), ly.ty() - ly.originY(), ly.width(), ly.height());
+      protected void outline (Surface surf, GroupLayer gl) {
+        drawRect(surf, gl.tx() - gl.originX(), gl.ty() - gl.originY(), gl.width(), gl.height());
       }
       protected void drawRect(Surface surf, float x, float y, float w, float h) {
         float left = x-1, top = y-1, right = x+w+2, bot = y+h+2;
@@ -75,64 +105,30 @@ public class ClippedGroupTest extends Test {
         surf.drawLine(left, top, left, bot, 1);
         surf.drawLine(left, bot, right, bot, 1);
       }
+    });
+    game.rootLayer.addAt(g1, 75, 25);
+    game.rootLayer.addAt(g2, 200, 75);
+    game.rootLayer.addAt(g3, 275, 25);
+    game.rootLayer.addAt(g4, 400, 25);
+    game.rootLayer.addAt(g5, 525, 25);
+
+    conns.add(game.paint.connect(new Slot<TestsGame>() {
+      public void onEmit (TestsGame game) {
+        float elapsed = game.paintTick/1000f;
+        i1.setRotation(elapsed * FloatMath.PI/2);
+        s1.setRotation(elapsed * FloatMath.PI/2);
+        g2.setWidth(Math.round(Math.abs(100 * FloatMath.sin(elapsed))));
+        inner.setOrigin(FloatMath.sin(elapsed * 2f) * 50, FloatMath.cos(elapsed * 2f) * 50);
+        float cycle = elapsed / (FloatMath.PI * 2);
+        if (FloatMath.ifloor(cycle) % 2 == 0) {
+          // go in a circle without going out of bounds
+          g5Inner.setTranslation(-25 + 50 * FloatMath.cos(elapsed),
+                                 -25 + 50 * FloatMath.sin(elapsed));
+        } else {
+          // go out of bounds on right and left
+          g5Inner.setTranslation(25 + 250 * FloatMath.cos(elapsed + FloatMath.PI/2), -25);
+        }
+      }
     }));
-
-    // create a group layer with a static clip, and a rotating image inside
-    g1 = graphics().createGroupLayer(100, 100);
-    // test the origin not being at zero/zero
-    g1.setOrigin(50, 0);
-    i1 = graphics().createImageLayer(img);
-    i1.setOrigin(i1.width()/2, i1.height()/2);
-    g1.addAt(i1, 50, 50);
-    rootLayer.addAt(g1, 75, 25);
-
-    // static image inside and animated clipped width
-    g2 = graphics().createGroupLayer(100, 100);
-    g2.setOrigin(50, 50);
-    g2.addAt(graphics().createImageLayer(img), (100 - img.width())/2, (100 - img.height())/2);
-    rootLayer.addAt(g2, 200, 75);
-
-    // nest a group layer inside with an animated origin
-    inner = graphics().createGroupLayer();
-    inner.addAt(graphics().createImageLayer(img), (100 - img.width())/2, (100 - img.height())/2);
-    g3 = graphics().createGroupLayer(100, 100);
-    g3.add(inner);
-    rootLayer.addAt(g3, 275, 25);
-
-    // create a group layer with a static clip, and a rotating surface image inside
-    g4 = graphics().createGroupLayer(100, 100);
-    SurfaceImage si = graphics().createSurface(100, 50);
-    si.surface().setFillColor(0xFF99CCFF).fillRect(0, 0, 100, 50);
-    s1 = graphics().createImageLayer(si);
-    s1.setOrigin(s1.width()/2, s1.height()/2);
-    g4.addAt(s1, 50, 50);
-    rootLayer.addAt(g4, 400, 25);
-
-    // put a large clipped group inside a small one
-    g5Inner = graphics().createGroupLayer(150, 150);
-    g5Inner.addAt(graphics().createImageLayer(img).setScale(2), -img.width(), -img.height());
-    g5Inner.addAt(graphics().createImageLayer(img).setScale(2), -img.width(), img.height());
-    g5Inner.addAt(graphics().createImageLayer(img).setScale(2), img.width(), -img.height());
-    g5Inner.addAt(graphics().createImageLayer(img).setScale(2), img.width(), img.height());
-    g5 = graphics().createGroupLayer(100, 100);
-    g5.addAt(g5Inner, -25, -25);
-    rootLayer.addAt(g5, 525, 25);
-  }
-
-  @Override
-  public void update(int delta) {
-    elapsed += delta/1000f;
-    i1.setRotation(elapsed * FloatMath.PI/2);
-    s1.setRotation(elapsed * FloatMath.PI/2);
-    g2.setWidth(Math.round(Math.abs(100 * FloatMath.sin(elapsed))));
-    inner.setOrigin(FloatMath.sin(elapsed * 2f) * 50, FloatMath.cos(elapsed * 2f) * 50);
-    float cycle = elapsed / (FloatMath.PI * 2);
-    if (FloatMath.ifloor(cycle) % 2 == 0) {
-      // go in a circle without going out of bounds
-      g5Inner.setTranslation(-25 + 50 * FloatMath.cos(elapsed), -25 + 50 * FloatMath.sin(elapsed));
-    } else {
-      // go out of bounds on right and left
-      g5Inner.setTranslation(25 + 250 * FloatMath.cos(elapsed + FloatMath.PI/2), -25);
-    }
   }
 }

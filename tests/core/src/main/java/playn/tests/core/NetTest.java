@@ -17,13 +17,12 @@ package playn.tests.core;
 
 import java.nio.ByteBuffer;
 
-import playn.core.ImageLayer;
-import playn.core.Keyboard;
-import playn.core.Net;
-import playn.core.Platform;
-import playn.core.util.Callback;
-import playn.core.util.TextBlock;
-import static playn.core.PlayN.*;
+import react.RFuture;
+import react.Slot;
+
+import playn.core.*;
+import playn.scene.*;
+import static playn.tests.core.TestsGame.game;
 
 public class NetTest extends Test {
 
@@ -31,20 +30,21 @@ public class NetTest extends Test {
   private String lastPostURL;
   private Net.WebSocket _websock;
 
-  @Override
-  public String getName() {
+  public NetTest (TestsGame game) {
+    super(game);
+  }
+
+  @Override public String getName() {
     return "NetTest";
   }
 
-  @Override
-  public String getDescription() {
+  @Override public String getDescription() {
     return "Tests network support.";
   }
 
-  @Override
-  public void init() {
-    output = graphics().createImageLayer();
-    graphics().rootLayer().addAt(output, 10, 60);
+  @Override public void init() {
+    output = new ImageLayer();
+    game.rootLayer.addAt(output, 10, 60);
     displayText("HTTP response shown here.");
 
     float x = 10;
@@ -56,7 +56,7 @@ public class NetTest extends Test {
 
     x = addButton("Enter URL", new Runnable() {
       public void run () {
-        getText("Enter URL:", new TextCB() {
+        getText("Enter URL:").onSuccess(new TextCB() {
           @Override protected void gotText (String url) {
             loadURL(url);
           }
@@ -66,15 +66,15 @@ public class NetTest extends Test {
 
     x = addButton("Post Test", new Runnable() {
       public void run () {
-        getText("Enter POST body:", new TextCB() {
+        getText("Enter POST body:").onSuccess(new TextCB() {
           @Override protected void gotText(String data) {
-            Net.Builder b = net().req("http://www.posttestserver.com/post.php").setPayload(data);
+            Net.Builder b = game.net.req("http://www.posttestserver.com/post.php").setPayload(data);
             // don't add the header on HTML because it causes CORS freakoutery
-            if (platformType() != Platform.Type.HTML) {
+            if (game.plat.type() != Platform.Type.HTML) {
               b.addHeader("playn-test", "we love to test!");
             }
-            b.execute(new Callback<Net.Response>() {
-              public void onSuccess (Net.Response rsp) {
+            b.execute().onFailure(displayError).onSuccess(new Slot<Net.Response>() {
+              public void onEmit (Net.Response rsp) {
                 String[] lines = rsp.payloadString().split("[\r\n]+");
                 String urlPre = "View it at ";
                 for (String line : lines) {
@@ -84,10 +84,7 @@ public class NetTest extends Test {
                     break;
                   }
                 }
-                displayResult(rsp);
-              }
-              public void onFailure (Throwable cause) {
-                displayText(cause.toString());
+                displayResult.onEmit(rsp);
               }
             });
           }
@@ -98,14 +95,14 @@ public class NetTest extends Test {
     x = addButton("Fetch Posted Body", new Runnable() {
       public void run () {
         if (lastPostURL == null) displayText("Click 'Post Test' to post some data first.");
-        else net().req(lastPostURL).execute(displayer);
+        else game.net.req(lastPostURL).execute().onFailure(displayError).onSuccess(displayResult);
       }
     }, x, 10);
 
     x = addButton("WS Connect", new Runnable() {
       public void run () {
         if (_websock != null) displayText("Already connected.");
-        _websock = net().createWebSocket("ws://echo.websocket.org", new Net.WebSocket.Listener() {
+        _websock = game.net.createWebSocket("ws://echo.websocket.org", new Net.WebSocket.Listener() {
           public void onOpen() {
             displayText("WebSocket connected.");
           }
@@ -131,7 +128,7 @@ public class NetTest extends Test {
     x = addButton("WS Send", new Runnable() {
       public void run () {
         if (_websock == null) displayText("WebSocket not open.");
-        else getText("Enter message:", new TextCB() {
+        else getText("Enter message:").onSuccess(new TextCB() {
           @Override protected void gotText(String msg) {
             if (_websock == null) displayText("WebSocket disappeared.");
             else {
@@ -151,58 +148,55 @@ public class NetTest extends Test {
     }, x, 10);
   }
 
-  protected void getText (String label, TextCB callback) {
-    keyboard().getText(Keyboard.TextType.DEFAULT, label, "", callback);
+  protected RFuture<String> getText (String label) {
+    return game.keyboard.getText(Keyboard.TextType.DEFAULT, label, "");
   }
 
   protected void loadURL (String url) {
     displayText("Loading: " + url);
     try {
-      net().req(url).execute(displayer);
+      game.net.req(url).execute().onSuccess(displayResult).onFailure(displayError);
     } catch (Exception e) {
       displayText(e.toString());
     }
   }
 
-  protected void displayResult (Net.Response rsp) {
-    StringBuilder buf = new StringBuilder();
-    buf.append("Response code: ").append(rsp.responseCode());
-    buf.append("\n\nHeaders:\n");
-    for (String header : rsp.headerNames()) {
-      buf.append(header).append(":");
-      int vv = 0;
-      for (String value : rsp.headers(header)) {
-        if (vv++ > 0) buf.append(",");
-        buf.append(" ").append(value);
-      }
-      buf.append("\n");
-    }
-    buf.append("\nBody:\n");
-    String payload = rsp.payloadString();
-    if (payload.length() > 1024) payload = payload.substring(0, 1024) + "...";
-    buf.append(payload);
-    displayText(buf.toString());
-  }
-
   protected void displayText (String text) {
-    output.setImage(wrapText(text, graphics().width()-20, TextBlock.Align.LEFT));
+    output.setTexture(wrapText(text, game.graphics.viewSize.width()-20, TextBlock.Align.LEFT));
   }
 
-  private Callback<Net.Response> displayer = new Callback<Net.Response>() {
-    public void onSuccess (Net.Response rsp) {
-      displayResult(rsp);
-    }
-    public void onFailure (Throwable cause) {
-    displayText(cause.toString());
+  protected final Slot<Net.Response> displayResult = new Slot<Net.Response>() {
+    public void onEmit (Net.Response rsp) {
+      StringBuilder buf = new StringBuilder();
+      buf.append("Response code: ").append(rsp.responseCode());
+      buf.append("\n\nHeaders:\n");
+      for (String header : rsp.headerNames()) {
+        buf.append(header).append(":");
+        int vv = 0;
+        for (String value : rsp.headers(header)) {
+          if (vv++ > 0) buf.append(",");
+          buf.append(" ").append(value);
+        }
+        buf.append("\n");
+      }
+      buf.append("\nBody:\n");
+      String payload = rsp.payloadString();
+      if (payload.length() > 1024) payload = payload.substring(0, 1024) + "...";
+      buf.append(payload);
+      displayText(buf.toString());
     }
   };
 
-  private abstract class TextCB implements Callback<String> {
-    public void onSuccess(String text) {
-      if (text != null && text.length() > 0) gotText(text);
+  protected final Slot<Throwable> displayError = new Slot<Throwable>() {
+    public void onEmit (Throwable error) {
+      displayText(error.toString());
     }
-    public void onFailure (Throwable cause) {
-      displayText(cause.toString());
+  };
+
+
+  private abstract class TextCB extends Slot<String> {
+    public void onEmit(String text) {
+      if (text != null && text.length() > 0) gotText(text);
     }
     protected abstract void gotText(String text);
   }
