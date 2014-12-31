@@ -30,6 +30,7 @@
     <module>android</module>
     <module>archetype</module>
     <module>core</module>
+    <module>scene</module>
     <module>html</module>
     <module>ios</module>
     <module>java</module>

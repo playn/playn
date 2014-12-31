@@ -13,40 +13,80 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package playn.core;
+package playn.scene;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
+import pythagoras.f.AffineTransform;
+import pythagoras.f.Point;
+import pythagoras.f.Vector;
+import pythagoras.util.NoninvertibleTransformException;
+
+import playn.core.Surface;
+import playn.core.QuadBatch;
 
 /**
  * GroupLayer creates a Layer hierarchy by maintaining an ordered group of child Layers.
  */
-public interface GroupLayer extends Layer {
+public class GroupLayer extends ClippedLayer implements Iterable<Layer> {
 
-  /** A clipped group layer. */
-  interface Clipped extends GroupLayer, HasSize {
-    /** Updates the size of this group layer, and hence its clipping rectangle. */
-    void setSize(float width, float height);
+  private final List<Layer> children = new ArrayList<>();
+  private final AffineTransform paintTx = new AffineTransform();
 
-    /** Updates the width of this group layer, and hence its clipping rectangle. */
-    void setWidth(float width);
+  /** Creates an unclipped group layer. Unclipped groups have no defined size. */
+  public GroupLayer () {
+    super(0, 0);
+  }
 
-    /** Updates the height of this group layer, and hence its clipping rectangle. */
-    void setHeight(float height);
+  /** Creates a clipped group layer with the specified size. */
+  public GroupLayer (float width, float height) {
+    super(width, height);
+  }
+
+  /** Returns whether this group has any child layers. */
+  public boolean isEmpty () { return children.isEmpty(); }
+
+  /** Returns the number of child layers in this group. */
+  public int children() {
+    return children.size();
   }
 
   /**
-   * Returns the layer at the specified index.
-   * <p>
-   * Layers are ordered in terms of their depth and will be returned in this order, with 0 being the
-   * layer on bottom.
+   * Returns the layer at the specified index. Layers are ordered in terms of their depth and will
+   * be returned in this order, with 0 being the layer on bottom.
    */
-  Layer get(int index);
+  public Layer childAt(int index) {
+    return children.get(index);
+  }
 
   /**
-   * Adds a layer to the bottom of the group.
-   * <p>
-   * Because the {@link Layer} hierarchy is a tree, if the {@link Layer} is already a child of
-   * another {@link GroupLayer}, it will be removed before being added to this {@link GroupLayer}.
+   * Adds a layer to the bottom of the group. Because the {@link Layer} hierarchy is a tree, if
+   * {@code child} is already a child of another {@link GroupLayer}, it will be removed before
+   * being added to this {@link GroupLayer}.
    */
-  void add(Layer layer);
+  public void add(Layer child) {
+    // optimization if we're requested to add a child that's already added
+    GroupLayer parent = child.parent();
+    if (parent == this) return; // findChild(child, child.depth());
+
+    // if this child has equal or greater depth to the last child, we can append directly and avoid
+    // a log(N) search; this is helpful when all children have the same depth
+    int count = children.size(), index;
+    if (count == 0 || children.get(count-1).depth() <= child.depth()) index = count;
+    // otherwise find the appropriate insertion point via binary search
+    else index = findInsertion(child.depth());
+
+    // remove the child from any existing parent, preventing multiple parents
+    if (parent != null) child.parent().remove(child);
+    children.add(index, child);
+    child.setParent(this);
+    child.onAdd();
+
+    // if this child is active, we need to become active
+    if (child.interactive()) setInteractive(true);
+  }
 
   /**
    * Adds the supplied layer to this group layer, adjusting its translation (relative to this group
@@ -57,29 +97,172 @@ public interface GroupLayer extends Layer {
    * }</pre>
    * but is such a common operation that this helper method is provided.
    */
-  void addAt(Layer layer, float tx, float ty);
+  public void addAt(Layer child, float tx, float ty) {
+    child.setTranslation(tx, ty);
+    add(child);
+  }
 
   /**
    * Removes a layer from the group.
    */
-  void remove(Layer layer);
+  public void remove(Layer child) {
+    int index = findChild(child, child.depth());
+    if (index < 0) {
+      throw new UnsupportedOperationException(
+        "Could not remove Layer because it is not a child of the GroupLayer");
+    }
+    remove(index);
+  }
 
   /**
    * Removes all child layers from this group.
    */
-  void removeAll();
+  public void removeAll() {
+    while (!children.isEmpty()) remove(children.size()-1);
+  }
 
   /**
    * Removes and destroys all child layers from this group.
    */
-  void destroyAll();
+  public void destroyAll() {
+    Layer[] toDestroy = children.toArray(new Layer[children.size()]);
+    // remove all of the children efficiently
+    removeAll();
+    // now that the children have been detached, destroy them
+    for (Layer child : toDestroy) child.destroy();
+  }
 
-  /**
-   * Returns the number of layers in this group.
-   */
-  int size();
+  @Override public Iterator<Layer> iterator () {
+    return children.iterator();
+  }
 
-  /** @deprecated Use {@link #removeAll}. */
-  @Deprecated
-  void clear();
+  @Override public void destroy() {
+    super.destroy();
+    destroyAll();
+  }
+
+  @Override public Layer hitTestDefault(Point point) {
+    float x = point.x, y = point.y;
+    boolean sawInteractiveChild = false;
+    // we check back to front as children are ordered "lowest" first
+    for (int ii = children.size()-1; ii >= 0; ii--) {
+      Layer child = children.get(ii);
+      if (!child.interactive()) continue; // ignore non-interactive children
+      sawInteractiveChild = true; // note that we saw an interactive child
+      if (!child.visible()) continue; // ignore invisible children
+      try {
+        // transform the point into the child's coordinate system
+        child.transform().inverseTransform(point.set(x, y), point);
+        point.x += child.originX();
+        point.y += child.originY();
+        Layer l = child.hitTest(point);
+        if (l != null)
+          return l;
+      } catch (NoninvertibleTransformException nte) {
+        // Degenerate transform means no hit
+        continue;
+      }
+    }
+    // if we saw no interactive children and we don't have listeners registered directly on this
+    // group, clear our own interactive flag; this lazily deactivates this group after its
+    // interactive children have been deactivated or removed
+    if (!sawInteractiveChild && !hasInteractors()) setInteractive(false);
+    return null;
+  }
+
+  @Override protected void paintClipped (Surface surf) {
+    // save our current transform and restore it before painting each child
+    paintTx.set(surf.tx());
+    // iterate manually to avoid creating an Iterator as garbage, this is inner-loop territory
+    List<Layer> children = this.children;
+    for (int ii = 0, ll = children.size(); ii < ll; ii++) {
+      surf.tx().set(paintTx);
+      children.get(ii).paint(surf);
+    }
+  }
+
+  int depthChanged(Layer child, float oldDepth) {
+    // locate the child whose depth changed
+    int oldIndex = findChild(child, oldDepth);
+
+    // fast path for depth changes that don't change ordering
+    float newDepth = child.depth();
+    boolean leftCorrect = (oldIndex == 0 || children.get(oldIndex-1).depth() <= newDepth);
+    boolean rightCorrect = (oldIndex == children.size()-1 ||
+                            children.get(oldIndex+1).depth() >= newDepth);
+    if (leftCorrect && rightCorrect) {
+      return oldIndex;
+    }
+
+    // it would be great if we could move an element from one place in an ArrayList to another
+    // (portably), but instead we have to remove and re-add
+    children.remove(oldIndex);
+    int newIndex = findInsertion(newDepth);
+    children.add(newIndex, child);
+    return newIndex;
+  }
+
+  @Override void onAdd() {
+    super.onAdd();
+    for (int ii = 0, ll = children.size(); ii < ll; ii++) {
+      children.get(ii).onAdd();
+    }
+  }
+
+  @Override void onRemove() {
+    super.onRemove();
+    for (int ii = 0, ll = children.size(); ii < ll; ii++) {
+      children.get(ii).onRemove();
+    }
+  }
+
+  private void remove(int index) {
+    Layer child = children.remove(index);
+    child.onRemove();
+    child.setParent(null);
+  }
+
+  // uses depth to improve upon a full linear search
+  private int findChild(Layer child, float depth) {
+    // findInsertion will find us some element with the same depth as the to-be-removed child
+    int startIdx = findInsertion(depth);
+    // search down for our child
+    for (int ii = startIdx-1; ii >= 0; ii--) {
+      Layer c = children.get(ii);
+      if (c == child) {
+        return ii;
+      }
+      if (c.depth() != depth) {
+        break;
+      }
+    }
+    // search up for our child
+    for (int ii = startIdx, ll = children.size(); ii < ll; ii++) {
+      Layer c = children.get(ii);
+      if (c == child) {
+        return ii;
+      }
+      if (c.depth() != depth) {
+        break;
+      }
+    }
+    return -1;
+  }
+
+  // who says you never have to write binary search?
+  private int findInsertion(float depth) {
+    int low = 0, high = children.size()-1;
+    while (low <= high) {
+      int mid = (low + high) >>> 1;
+      float midDepth = children.get(mid).depth();
+      if (depth > midDepth) {
+        low = mid + 1;
+      } else if (depth < midDepth) {
+        high = mid - 1;
+      } else {
+        return mid;
+      }
+    }
+    return low;
+  }
 }

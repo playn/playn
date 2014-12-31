@@ -13,14 +13,17 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package playn.core;
+package playn.scene;
 
+import pythagoras.f.AffineTransform;
+import pythagoras.f.FloatMath;
 import pythagoras.f.IPoint;
+import pythagoras.f.MathUtil;
 import pythagoras.f.Point;
-import pythagoras.f.Transform;
+import pythagoras.f.XY;
 import pythagoras.util.NoninvertibleTransformException;
 
-import playn.core.gl.GLShader;
+import playn.core.*;
 
 /**
  * Layer is the base element for all rendering in PlayN
@@ -36,10 +39,10 @@ import playn.core.gl.GLShader;
  * TODO: clipping (?), transform-origin: allow explicit
  * "center, top-left, bottom-right" like CSS transform-origin?
  */
-public interface Layer {
+public abstract class Layer {
 
   /** Used to customize a layer's hit testing mechanism. */
-  interface HitTester {
+  public interface HitTester {
     /** Returns {@code layer}, or a child of {@code layer} if the supplied coordinate (which is in
      * {@code layer}'s coordinate system) hits {@code layer}, or one of its children. This allows a
      * layer to customize the default hit testing approach, which is to simply check whether the
@@ -47,22 +50,37 @@ public interface Layer {
     Layer hitTest (Layer layer, Point p);
   }
 
+  /** Creates an unclipped layer. The {@link #paint} method must be overridden by the creator. */
+  public Layer() {
+    setFlag(Flag.VISIBLE, true);
+  }
+
   /**
    * Destroys this layer, removing it from its parent layer. Any resources associated with this
    * layer are freed, and it cannot be reused after being destroyed. Destroying a layer that has
    * children will destroy them as well.
    */
-  void destroy();
+  public void destroy() {
+    if (parent() != null) {
+      parent().remove(this);
+    }
+    setFlag(Flag.DESTROYED, true);
+    setBatch(null);
+  }
 
   /**
    * Whether this layer has been destroyed. If true, the layer can no longer be used.
    */
-  boolean destroyed();
+  public boolean destroyed() {
+    return isSet(Flag.DESTROYED);
+  }
 
   /**
    * Returns the parent that contains this layer, or {@code null}.
    */
-  GroupLayer parent();
+  public GroupLayer parent() {
+    return parent;
+  }
 
   /**
    * Returns the layer's current transformation matrix. If any changes have been made to the
@@ -76,12 +94,24 @@ public interface Layer {
    * other methods. Also do not expect {@link #scaleX}, {@link #scaleY}, or {@link #rotation} to
    * reflect the direct changes you've made to the transform matrix. They will not. </p>
    */
-  Transform transform();
+  public AffineTransform transform() {
+    if (isSet(Flag.XFDIRTY)) {
+      float sina = FloatMath.sin(rotation), cosa = FloatMath.cos(rotation);
+      float m00 =  cosa * scaleX, m01 = sina * scaleY;
+      float m10 = -sina * scaleX, m11 = cosa * scaleY;
+      float tx = transform.tx(), ty = transform.ty();
+      transform.setTransform(m00, m01, m10, m11, tx, ty);
+      setFlag(Flag.XFDIRTY, false);
+    }
+    return transform;
+  }
 
   /**
    * Returns true if this layer is visible (i.e. it is being rendered).
    */
-  boolean visible();
+  public boolean visible() {
+    return isSet(Flag.VISIBLE);
+  }
 
   /**
    * Configures this layer's visibility: if true, it will be rendered as normal, if false it and
@@ -89,14 +119,19 @@ public interface Layer {
    *
    * @return a reference to this layer for call chaining.
    */
-  Layer setVisible(boolean visible);
+  public Layer setVisible(boolean visible) {
+    setFlag(Flag.VISIBLE, visible);
+    return this;
+  }
 
   /**
    * Returns true if this layer reacts to clicks and touches. If a layer is interactive, it will
    * respond to {@link #hitTest}, which forms the basis for the click and touch processing provided
    * by the various {@code addListener} methods.
    */
-  boolean interactive();
+  public boolean interactive() {
+    return isSet(Flag.INTERACTIVE);
+  }
 
   /**
    * Configures this layer as reactive to clicks and touches, or not. Note that a layer's
@@ -108,7 +143,15 @@ public interface Layer {
    *
    * @return a reference to this layer for call chaining.
    */
-  Layer setInteractive(boolean interactive);
+  public Layer setInteractive(boolean interactive) {
+    if (interactive() != interactive) {
+      // if we're being made interactive, active our parent as well, if we have one
+      if (interactive && parent != null)
+        parent.setInteractive(interactive);
+      setFlag(Flag.INTERACTIVE, interactive);
+    }
+    return this;
+  }
 
   /**
    * Return the global alpha value for this layer.
@@ -121,7 +164,9 @@ public interface Layer {
    *
    * @return alpha in range [0,1] where 0 is transparent and 1 is opaque
    */
-  float alpha();
+  public float alpha() {
+    return alpha;
+  }
 
   /**
    * Sets the alpha component of this layer's current tint. Note that this value will be quantized
@@ -133,10 +178,17 @@ public interface Layer {
    *
    * @return a reference to this layer for call chaining.
    */
-  Layer setAlpha(float alpha);
+  public Layer setAlpha(float alpha) {
+    this.alpha = alpha;
+    int ialpha = (int)(0xFF * MathUtil.clamp(alpha, 0, 1));
+    this.tint = (ialpha << 24) | (tint & 0xFFFFFF);
+    return this;
+  }
 
   /** Returns the current tint for this layer, as {@code ARGB}. */
-  int tint();
+  public int tint() {
+    return tint;
+  }
 
   /**
    * Sets the tint for this layer, as {@code ARGB}.
@@ -154,17 +206,25 @@ public interface Layer {
    *
    * @return a reference to this layer for call chaining.
    */
-  Layer setTint(int tint);
+  public Layer setTint(int tint) {
+    this.tint = tint;
+    this.alpha = ((tint >> 24) & 0xFF) / 255f;
+    return this;
+  }
 
   /**
    * Returns the x-component of the layer's origin.
    */
-  float originX();
+  public float originX() {
+    return originX;
+  }
 
   /**
    * Returns the y-component of the layer's origin.
    */
-  float originY();
+  public float originY() {
+    return originY;
+  }
 
   /**
    * Sets the origin of the layer.
@@ -176,12 +236,18 @@ public interface Layer {
    *
    * @return a reference to this layer for call chaining.
    */
-  Layer setOrigin(float x, float y);
+  public Layer setOrigin(float x, float y) {
+    this.originX = x;
+    this.originY = y;
+    return this;
+  }
 
   /**
    * Returns this layer's current depth.
    */
-  float depth();
+  public float depth() {
+    return depth;
+  }
 
   /**
    * Sets the depth of this layer.
@@ -190,17 +256,28 @@ public interface Layer {
    *
    * @return a reference to this layer for call chaining.
    */
-  Layer setDepth(float depth);
+  public Layer setDepth(float depth) {
+    float oldDepth = this.depth;
+    if (depth != oldDepth) {
+      this.depth = depth;
+      if (parent != null) parent.depthChanged(this, oldDepth);
+    }
+    return this;
+  }
 
   /**
    * Returns this layer's current translation in the x direction.
    */
-  float tx();
+  public float tx() {
+    return transform.tx();
+  }
 
   /**
    * Returns this layer's current translation in the y direction.
    */
-  float ty();
+  public float ty() {
+    return transform.ty();
+  }
 
   /**
    * Sets the x translation of this layer.
@@ -215,7 +292,10 @@ public interface Layer {
    *
    * @return a reference to this layer for call chaining.
    */
-  Layer setTx(float tx);
+  public Layer setTx(float x) {
+    transform.setTx(x);
+    return this;
+  }
 
   /**
    * Sets the y translation of this layer.
@@ -230,7 +310,10 @@ public interface Layer {
    *
    * @return a reference to this layer for call chaining.
    */
-  Layer setTy(float ty);
+  public Layer setTy(float y) {
+    transform.setTy(y);
+    return this;
+  }
 
   /**
    * Sets the x and y translation of this layer.
@@ -246,7 +329,10 @@ public interface Layer {
    *
    * @return a reference to this layer for call chaining.
    */
-  Layer setTranslation(float x, float y);
+  public Layer setTranslation(float x, float y) {
+    transform.setTranslation(x, y);
+    return this;
+  }
 
   /**
    * Returns this layer's current scale in the x direction. <em>Note:</em> this is the most recent
@@ -256,7 +342,9 @@ public interface Layer {
    * affine transform matrix. This also means that if you change the scale directly on the {@link
    * #transform} that scale <em>will not</em> be returned by this method.
    */
-  float scaleX();
+  public float scaleX() {
+    return scaleX;
+  }
 
   /**
    * Returns this layer's current scale in the y direction. <em>Note:</em> this is the most recent
@@ -266,7 +354,9 @@ public interface Layer {
    * affine transform matrix. This also means that if you change the scale directly on the {@link
    * #transform} that scale <em>will not</em> be returned by this method.
    */
-  float scaleY();
+  public float scaleY() {
+    return scaleY;
+  }
 
   /**
    * Sets the current x and y scale of this layer to {@code scale}.. Note that a scale of {@code 1}
@@ -281,7 +371,9 @@ public interface Layer {
    * @param scale non-zero scale value
    * @return a reference to this layer for call chaining.
    */
-  Layer setScale(float scale);
+  public Layer setScale(float s) {
+    return setScale(s, s);
+  }
 
   /**
    * Sets the current x scale of this layer. Note that a scale of {@code 1} is equivalent to no
@@ -296,7 +388,13 @@ public interface Layer {
    * @param scaleX non-zero scale value
    * @return a reference to this layer for call chaining.
    */
-  Layer setScaleX(float scaleX);
+  public Layer setScaleX(float sx) {
+    if (scaleX != sx) {
+      scaleX = sx;
+      setFlag(Flag.XFDIRTY, true);
+    }
+    return this;
+  }
 
   /**
    * Sets the current y scale of this layer. Note that a scale of {@code 1} is equivalent to no
@@ -311,7 +409,13 @@ public interface Layer {
    * @param scaleY non-zero scale value
    * @return a reference to this layer for call chaining.
    */
-  Layer setScaleY(float scaleY);
+  public Layer setScaleY(float sy) {
+    if (scaleY != sy) {
+      scaleY = sy;
+      setFlag(Flag.XFDIRTY, true);
+    }
+    return this;
+  }
 
   /**
    * Sets the current x and y scale of this layer. Note that a scale of {@code 1} is equivalent to
@@ -328,7 +432,14 @@ public interface Layer {
    *
    * @return a reference to this layer for call chaining.
    */
-  Layer setScale(float scaleX, float scaleY);
+  public Layer setScale(float sx, float sy) {
+    if (sx != scaleX || sy != scaleY) {
+      scaleX = sx;
+      scaleY = sy;
+      setFlag(Flag.XFDIRTY, true);
+    }
+    return this;
+  }
 
   /**
    * Returns this layer's current rotation. <em>Note:</em> this is the most recent value supplied
@@ -338,7 +449,9 @@ public interface Layer {
    * also means that if you change the scale directly on the {@link #transform} that rotation
    * <em>will not</em> be returned by this method.
    */
-  float rotation();
+  public float rotation() {
+    return rotation;
+  }
 
   /**
    * Sets the current rotation of this layer, in radians. The rotation is done around the currently
@@ -354,7 +467,37 @@ public interface Layer {
    *
    * @return a reference to this layer for call chaining.
    */
-  Layer setRotation(float angle);
+  public Layer setRotation(float angle) {
+    if (rotation != angle) {
+      rotation = angle;
+      setFlag(Flag.XFDIRTY, true);
+    }
+    return this;
+  }
+
+  /** Returns the width of the layer.
+    * NOTE: not all layers know their size. Those that don't return 0. */
+  public float width () {
+    return 0;
+  }
+
+  /** Returns the height of the layer.
+    * NOTE: not all layers know their size. Those that don't return 0. */
+  public float height () {
+    return 0;
+  }
+
+  /** Returns the width of the layer multiplied by its x scale.
+    * NOTE: not all layers know their size. Those that don't return 0. */
+  public float scaledWidth () {
+    return scaleX() * width();
+  }
+
+  /** Returns the height of the layer multiplied by its y scale.
+    * NOTE: not all layers know their size. Those that don't return 0. */
+  public float scaledHeight () {
+    return scaleX() * height();
+  }
 
   /**
    * Tests whether the supplied (layer relative) point "hits" this layer or any of its children. By
@@ -368,14 +511,18 @@ public interface Layer {
    * @return this layer if it was the hit layer, a child of this layer if a child of this layer was
    * hit, or null if neither this layer, nor its children were hit.
    */
-  Layer hitTest(Point p);
+  public Layer hitTest(Point p) {
+    return (hitTester == null) ? hitTestDefault(p) : hitTester.hitTest(this, p);
+  }
 
   /**
    * Like {@link #hitTest} except that it ignores a configured {@link HitTester}. This allows one
    * to configure a hit tester which checks custom properties and then falls back on the default
    * hit testing implementation.
    */
-  Layer hitTestDefault(Point p);
+  public Layer hitTestDefault(Point p) {
+    return (p.x >= 0 && p.y >= 0 && p.x < width() && p.y < height()) ? this : null;
+  }
 
   /**
    * Configures a custom hit tester for this layer. May also be called with null to clear out any
@@ -383,279 +530,239 @@ public interface Layer {
    *
    * @return a reference to this layer for call chaining.
    */
-  Layer setHitTester(HitTester tester);
+  public Layer setHitTester (HitTester tester) {
+    hitTester = tester;
+    return this;
+  }
 
   /**
-   * Registers a listener with this layer that will be notified if a click/touch event happens
-   * within its bounds. Events dispatched to this listener will have their {@code localX} and
-   * {@code localY} values set to the coordinates of the click/touch as transformed into this
-   * layer's coordinate system. {@code x} and {@code y} will always contain the screen (global)
-   * coordinates of the click/touch.
-   *
-   * <p>When a listener is added, the layer and all of its parents are marked as interactive.
-   * Interactive layers intercept touches/clicks. When all listeners are disconnected (including
-   * Mouse and Touch listeners), the layer will be marked non-interactive. Its parents are lazily
-   * marked non-interactive as it is discovered that they have no interactive children. Thus if you
-   * require that a layer continue to intercept click/touch events to prevent them from being
-   * dispatched to layers "below" it, you must register a NOOP listener on the layer, or manually
-   * call {@link #setInteractive} after removing the last listener.</p>
-   */
-  Connection addListener(Pointer.Listener pointerListener);
-
-  /**
-   * Registers a listener with this layer that will be notified if a mouse event happens within its
-   * bounds. Events dispatched to this listener will have their {@code localX} and {@code localY}
-   * values set to the coordinates of the mouse as transformed into this layer's coordinate system.
-   * {@code x} and {@code y} will always contain the screen (global) coordinates of the mouse.
-   *
-   * <p>When a listener is added, the layer and all of its parents are marked as interactive.
-   * Interactive layers intercept mice events. When all listeners are disconnected (including
-   * Pointer and Touch listeners), the layer will be marked non-interactive. Its parents are lazily
-   * marked non-interactive as it is discovered that they have no interactive children. Thus if you
-   * require that a layer continue to intercept mouse events to prevent them from being dispatched
-   * to layers "below" it, you must register a NOOP listener on the layer, or manually call {@link
-   * #setInteractive} after removing the last listener.</p>
-   */
-  Connection addListener(Mouse.LayerListener mouseListener);
-
-  /**
-   * Registers a listener with this layer that will be notified if a touch event happens within its
-   * bounds. Events dispatched to this listener will have their {@code localX} and {@code localY}
-   * values set to the coordinates of the touch as transformed into this layer's coordinate system.
-   * {@code x} and {@code y} will always contain the screen (global) coordinates of the touch.
-   *
-   * <p>When a listener is added, the layer and all of its parents are marked as interactive.
-   * Interactive layers intercept touches/clicks. When all listeners are disconnected (including
-   * Mouse and Touch listeners), the layer will be marked non-interactive. Its parents are lazily
-   * marked non-interactive as it is discovered that they have no interactive children. Thus if you
-   * require that a layer continue to intercept click/touch events to prevent them from being
-   * dispatched to layers "below" it, you must register a NOOP listener on the layer, or manually
-   * call {@link #setInteractive} after removing the last listener.</p>
-   */
-  Connection addListener(Touch.LayerListener touchListener);
-
-  /**
-   * Configures a custom shader for use when rendering this layer (and its children). Passing null
-   * will cause the default shader to be used. Configuring a shader on a group layer will cause
-   * that shader to be used when rendering the group layer's children, unless the child has a
-   * custom shader configured itself.
+   * Configures a custom batch (i.e. shader) for use when rendering this layer (and its children).
+   * Passing null will cause the default batch to be used. Configuring a batch on a group layer
+   * will cause that shader to be used when rendering the group layer's children, unless the child
+   * has a custom batch configured itself.
    *
    * @return a reference to this layer for call chaining.
    */
-  Layer setShader(GLShader shader);
-
-  /**
-   * Interface for {@link Layer}s containing explicit sizes.
-   */
-  interface HasSize extends Layer {
-    /** Returns the width of the layer. */
-    float width();
-
-    /** Returns the height of the layer. */
-    float height();
-
-    /** Returns the width of the layer after applying scale. */
-    float scaledWidth();
-
-    /** Returns the height of the layer after applying scale. */
-    float scaledHeight();
+  public Layer setBatch (QuadBatch batch) {
+    this.batch = batch;
+    return this;
   }
 
   /**
-   * Utility class for transforming coordinates between {@link Layer}s.
+   * Renders this layer to {@code surf}, including its children.
    */
-  static class Util {
-    /**
-     * Converts the supplied point from coordinates relative to the specified
-     * layer to screen coordinates. The results are stored into {@code into},
-     * which is returned for convenience.
-     */
-    public static Point layerToScreen(Layer layer, IPoint point, Point into) {
-      return layerToParent(layer, null, point, into);
-    }
+  public final void paint (Surface surf) {
+    if (!visible()) return;
 
-    /**
-     * Converts the supplied point from coordinates relative to the specified
-     * layer to screen coordinates.
-     */
-    public static Point layerToScreen(Layer layer, float x, float y) {
-      Point into = new Point(x, y);
-      return layerToScreen(layer, into, into);
-    }
-
-    /**
-     * Converts the supplied point from coordinates relative to the specified
-     * child layer to coordinates relative to the specified parent layer. The
-     * results are stored into {@code into}, which is returned for convenience.
-     */
-    public static Point layerToParent(Layer layer, Layer parent, IPoint point, Point into) {
-      into.set(point);
-      while (layer != parent) {
-        if (layer == null) {
-          throw new IllegalArgumentException(
-              "Failed to find parent, perhaps you passed parent, layer instead of "
-                  + "layer, parent?");
-        }
-        into.x -= layer.originX();
-        into.y -= layer.originY();
-        layer.transform().transform(into, into);
-        layer = layer.parent();
-      }
-      return into;
-    }
-
-    /**
-     * Converts the supplied point from coordinates relative to the specified
-     * child layer to coordinates relative to the specified parent layer.
-     */
-    public static Point layerToParent(Layer layer, Layer parent, float x, float y) {
-      Point into = new Point(x, y);
-      return layerToParent(layer, parent, into, into);
-    }
-
-    /**
-     * Converts the supplied point from screen coordinates to coordinates
-     * relative to the specified layer. The results are stored into {@code into}
-     * , which is returned for convenience.
-     */
-    public static Point screenToLayer(Layer layer, IPoint point, Point into) {
-      Layer parent = layer.parent();
-      IPoint cur = (parent == null) ? point : screenToLayer(parent, point, into);
-      return parentToLayer(layer, cur, into);
-    }
-
-    /**
-     * Converts the supplied point from screen coordinates to coordinates
-     * relative to the specified layer.
-     */
-    public static Point screenToLayer(Layer layer, float x, float y) {
-        Point into = new Point(x, y);
-        return screenToLayer(layer, into, into);
-    }
-
-    /**
-     * Converts the supplied point from coordinates relative to its parent
-     * to coordinates relative to the specified layer. The results are stored
-     * into {@code into}, which is returned for convenience.
-     */
-    public static Point parentToLayer(Layer layer, IPoint point, Point into) {
-      layer.transform().inverseTransform(point, into);
-      into.x += layer.originX();
-      into.y += layer.originY();
-      return into;
-    }
-
-    /**
-     * Converts the supplied point from coordinates relative to the specified parent to coordinates
-     * relative to the specified child layer. The results are stored into {@code into}, which is
-     * returned for convenience.
-     */
-    public static Point parentToLayer(Layer parent, Layer layer, IPoint point, Point into) {
-      Layer immediateParent = layer.parent();
-      if (immediateParent != parent)
-        point = parentToLayer(parent, immediateParent, point, into);
-      parentToLayer(layer, point, into);
-      return into;
-    }
-
-    /**
-     * Returns true if a {@link IPoint} on the screen touches a {@link Layer.HasSize}.
-     */
-    public static boolean hitTest(Layer.HasSize layer, IPoint point) {
-      return hitTest(layer, point.x(), point.y());
-    }
-
-    /**
-     * Returns true if a {@link Events.Position} touches a {@link Layer.HasSize}.
-     */
-    public static boolean hitTest(Layer.HasSize layer, Events.Position position) {
-      return hitTest(layer, position.x(), position.y());
-    }
-
-    /**
-     * Returns true if a coordinate on the screen touches a {@link Layer.HasSize}.
-     */
-    public static boolean hitTest(Layer.HasSize layer, float x, float y) {
-      Point point = screenToLayer(layer, x, y);
-      return (
-          point.x() >= 0 &&  point.y() >= 0 &&
-          point.x() <= layer.width() && point.y() <= layer.height());
-    }
-
-    /**
-     * Gets the layer underneath the given screen coordinates, ignoring hit testers. This is
-     * useful for inspecting the scene graph for debugging purposes, and is not intended for use
-     * is shipped code. The layer returned is the one that has a size and is the deepest within
-     * the graph and contains the coordinate.
-     */
-    public static Layer.HasSize layerUnderPoint (float x, float y) {
-      GroupLayer root = PlayN.graphics().rootLayer();
-      Point p = new Point(x, y);
-      root.transform().inverseTransform(p, p);
-      p.x += root.originX();
-      p.y += root.originY();
-      return layerUnderPoint(root, p);
-    }
-
-    /**
-     * Returns the index of the given layer within its parent, or -1 if the parent is null.
-     */
-    public static int indexInParent (Layer layer) {
-      GroupLayer parent = layer.parent();
-      if (parent == null) {
-        return -1;
-      }
-      for (int ii = parent.size()-1; ii >= 0; ii--) {
-        if (parent.get(ii) == layer) {
-          return ii;
-        }
-      }
-      throw new AssertionError();
-    }
-
-    /**
-     * Returns the depth of the given layer in its local scene graph. A root layer (one with null
-     * parent) will always return 0.
-     */
-    public static int graphDepth (Layer layer) {
-      int depth = -1;
-      while (layer != null) {
-        layer = layer.parent();
-        depth++;
-      }
-      return depth;
-    }
-
-    /**
-     * Performs the recursion for {@link layerUnderPoint(float, float)}.
-     */
-    protected static Layer.HasSize layerUnderPoint (Layer layer, Point pt) {
-      float x = pt.x, y = pt.y;
-      if (layer instanceof GroupLayer) {
-        GroupLayer gl = (GroupLayer)layer;
-        for (int ii = gl.size()-1; ii >= 0; ii--) {
-          Layer child = gl.get(ii);
-          if (!child.visible()) continue; // ignore invisible children
-          try {
-            // transform the point into the child's coordinate system
-            child.transform().inverseTransform(pt.set(x, y), pt);
-            pt.x += child.originX();
-            pt.y += child.originY();
-            Layer.HasSize l = layerUnderPoint(child, pt);
-            if (l != null)
-              return l;
-          } catch (NoninvertibleTransformException nte) {
-            continue;
-          }
-        }
-      }
-      if (layer instanceof Layer.HasSize) {
-        Layer.HasSize sl = (Layer.HasSize)layer;
-        if (x >= 0 && x < sl.width() && y >= 0 && y < sl.height()) {
-          return sl;
-        }
-      }
-      return null;
+    int otint = surf.combineTint(tint);
+    QuadBatch obatch = surf.pushBatch(batch);
+    surf.concatenate(transform(), originX, originY);
+    try {
+      paintImpl(surf);
+    } finally {
+      surf.popBatch(obatch);
+      surf.setTint(otint);
     }
   }
+
+  /**
+   * Implements the actual rendering of this layer. The surface will be fully prepared for this
+   * layer's rendering prior to calling this method: the layer transform will have been
+   * concatenated with the surface transform, the layer's tint will have been applied, and any
+   * custom batch will have been pushed onto the layer.
+   */
+  protected abstract void paintImpl (Surface surf);
+
+  // /**
+  //  * Registers a listener with this layer that will be notified if a click/touch event happens
+  //  * within its bounds. Events dispatched to this listener will have their {@code localX} and
+  //  * {@code localY} values set to the coordinates of the click/touch as transformed into this
+  //  * layer's coordinate system. {@code x} and {@code y} will always contain the screen (global)
+  //  * coordinates of the click/touch.
+  //  *
+  //  * <p>When a listener is added, the layer and all of its parents are marked as interactive.
+  //  * Interactive layers intercept touches/clicks. When all listeners are disconnected (including
+  //  * Mouse and Touch listeners), the layer will be marked non-interactive. Its parents are lazily
+  //  * marked non-interactive as it is discovered that they have no interactive children. Thus if you
+  //  * require that a layer continue to intercept click/touch events to prevent them from being
+  //  * dispatched to layers "below" it, you must register a NOOP listener on the layer, or manually
+  //  * call {@link #setInteractive} after removing the last listener.</p>
+  //  */
+  // public AutoCloseable addListener(Pointer.Listener listener) {
+  //   return addInteractor(Pointer.Listener.class, listener);
+  // }
+
+  // /**
+  //  * Registers a listener with this layer that will be notified if a mouse event happens within its
+  //  * bounds. Events dispatched to this listener will have their {@code localX} and {@code localY}
+  //  * values set to the coordinates of the mouse as transformed into this layer's coordinate system.
+  //  * {@code x} and {@code y} will always contain the screen (global) coordinates of the mouse.
+  //  *
+  //  * <p>When a listener is added, the layer and all of its parents are marked as interactive.
+  //  * Interactive layers intercept mice events. When all listeners are disconnected (including
+  //  * Pointer and Touch listeners), the layer will be marked non-interactive. Its parents are lazily
+  //  * marked non-interactive as it is discovered that they have no interactive children. Thus if you
+  //  * require that a layer continue to intercept mouse events to prevent them from being dispatched
+  //  * to layers "below" it, you must register a NOOP listener on the layer, or manually call {@link
+  //  * #setInteractive} after removing the last listener.</p>
+  //  */
+  // public AutoCloseable addListener(Mouse.LayerListener listener) {
+  //   return addInteractor(Mouse.LayerListener.class, listener);
+  // }
+
+  // /**
+  //  * Registers a listener with this layer that will be notified if a touch event happens within its
+  //  * bounds. Events dispatched to this listener will have their {@code localX} and {@code localY}
+  //  * values set to the coordinates of the touch as transformed into this layer's coordinate system.
+  //  * {@code x} and {@code y} will always contain the screen (global) coordinates of the touch.
+  //  *
+  //  * <p>When a listener is added, the layer and all of its parents are marked as interactive.
+  //  * Interactive layers intercept touches/clicks. When all listeners are disconnected (including
+  //  * Mouse and Touch listeners), the layer will be marked non-interactive. Its parents are lazily
+  //  * marked non-interactive as it is discovered that they have no interactive children. Thus if you
+  //  * require that a layer continue to intercept click/touch events to prevent them from being
+  //  * dispatched to layers "below" it, you must register a NOOP listener on the layer, or manually
+  //  * call {@link #setInteractive} after removing the last listener.</p>
+  //  */
+  // public AutoCloseable addListener(Touch.LayerListener listener) {
+  //   return addInteractor(Touch.LayerListener.class, listener);
+  // }
+
+  @Override
+  public String toString () {
+    String cname = getClass().getName();
+    StringBuilder bldr = new StringBuilder(cname.substring(cname.lastIndexOf(".")+1));
+    bldr.append(" [hashCode=").append(hashCode());
+    bldr.append(", tx=").append(transform());
+    if (hitTester != null) bldr.append(", hitTester=").append(hitTester);
+    return bldr.toString();
+  }
+
+  private float clipWidth, clipHeight;
+
+  // these values are cached in the layer to make the getters return sane values rather than have
+  // to extract the values from the affine transform matrix (which is expensive, doesn't preserve
+  // sign, and wraps rotation around at pi)
+  private float scaleX = 1,  scaleY = 1, rotation = 0;
+  private final AffineTransform transform = new AffineTransform();
+
+  private GroupLayer parent;
+  protected QuadBatch batch;
+
+  // protected Interactor<?> rootInteractor;
+  protected HitTester hitTester;
+
+  protected float originX, originY;
+  protected int tint = Tint.NOOP_TINT;
+  // we keep a copy of alpha as a float so that we can return the exact alpha passed to setAlpha()
+  // from alpha() to avoid funny business in clients due to the quantization; the actual alpha as
+  // rendered by the shader will be quantized, but the eye won't know the difference
+  protected float alpha = 1;
+  protected float depth;
+  protected int flags;
+
+  // /** Used to dispatch pointer/touch/mouse events to layers. */
+  // interface Interaction<L, E> {
+  //   void interact(L listener, E argument);
+  // }
+
+  // protected static class Interactor<L> {
+  //   final Class<L> listenerType;
+  //   final L listener;
+  //   Interactor<?> next;
+
+  //   Interactor(Class<L> listenerType, L listener, Interactor<?> next) {
+  //     this.listenerType = listenerType;
+  //     this.listener = listener;
+  //     this.next = next;
+  //   }
+  // }
+
+  protected static enum Flag {
+    DESTROYED(1 << 0),
+    VISIBLE(1 << 1),
+    INTERACTIVE(1 << 2),
+    XFDIRTY(1 << 3);
+
+    public final int bitmask;
+
+    Flag(int bitmask) {
+      this.bitmask = bitmask;
+    }
+  }
+
+  void onAdd() {
+    if (destroyed()) throw new IllegalStateException("Illegal to use destroyed layer: " + this);
+  }
+
+  void onRemove() {
+  }
+
+  void setParent(GroupLayer parent) {
+    this.parent = parent;
+  }
+
+  protected boolean isSet(Flag flag) {
+    return (flags & flag.bitmask) != 0;
+  }
+
+  protected void setFlag(Flag flag, boolean active) {
+    if (active) {
+      flags |= flag.bitmask;
+    } else {
+      flags &= ~flag.bitmask;
+    }
+  }
+
+  // <L, E> void interact(Class<L> listenerType, Interaction<L, E> interaction, E argument) {
+  //   interact(listenerType, interaction, rootInteractor, argument);
+  // }
+
+  boolean hasInteractors() {
+    // return rootInteractor != null;
+    return false;
+  }
+
+  // // dispatch interactions recursively, so as to dispatch in the order they were added; we assume
+  // // one will not have such a large number of listeners registered on a single layer that this will
+  // // blow the stack; note that this also avoids issues with interactor modifications during
+  // // dispatch: we essentially build a list of interactors to which to dispatch on the stack, before
+  // // dispatching to any interactors; if an interactor is added or removed during dispatch, it
+  // // neither affects, nor conflicts with, the current dispatch
+  // private <L, E> void interact(Class<L> type, Interaction<L, E> interaction,
+  //                              Interactor<?> current, E argument) {
+  //   if (current == null)
+  //     return;
+  //   interact(type, interaction, current.next, argument);
+  //   if (current.listenerType == type) {
+  //     @SuppressWarnings("unchecked") L listener = (L)current.listener;
+  //     interaction.interact(listener, argument);
+  //   }
+  // }
+
+  // private <L> AutoCloseable addInteractor(Class<L> listenerType, L listener) {
+  //   final Interactor<L> newint = new Interactor<L>(listenerType, listener, rootInteractor);
+  //   rootInteractor = newint;
+  //   // note that we (and our parents) are now interactive
+  //   setInteractive(true);
+  //   return new AutoCloseable() {
+  //     public void close() {
+  //       rootInteractor = removeInteractor(rootInteractor, newint);
+  //       // if we have no more interactors, become non-interactive. But not if we're a
+  //       // GroupLayer; we may be interactive for the sake of our children. In that case,
+  //       // we'll lazily realize and deal with it later
+  //       if (rootInteractor == null && !(Layer.this instanceof GroupLayer))
+  //         setInteractive(false);
+  //     }
+  //   };
+  // }
+
+  // private Interactor<?> removeInteractor(Interactor<?> current, Interactor<?> target) {
+  //   if (current == null)
+  //     return null;
+  //   if (current == target)
+  //     return current.next;
+  //   current.next = removeInteractor(current.next, target);
+  //   return current;
+  // }
 }

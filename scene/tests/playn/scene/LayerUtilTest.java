@@ -1,4 +1,19 @@
-package playn.core;
+/**
+ * Copyright 2010 The PlayN Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ */
+package playn.scene;
 
 import org.junit.Test;
 
@@ -12,9 +27,9 @@ public class LayerUtilTest {
   static float tol = 0.001f; // tolerance for floating point equality checks
 
   @Test public void testTransformWithScale() {
-    TestGroupLayer root = new TestGroupLayer();
-    TestGroupLayer middle = new TestGroupLayer();
-    TestLayer child = new TestLayer();
+    GroupLayer root = new GroupLayer();
+    GroupLayer middle = new GroupLayer();
+    Layer child = new ImageLayer();
     root.add(middle);
     middle.add(child);
 
@@ -22,22 +37,22 @@ public class LayerUtilTest {
     Point point = new Point(100f, 100f);
 
     Point pointOnChild = new Point(0f, 0f);
-    Layer.Util.screenToLayer(child, point, pointOnChild);
+    LayerUtil.screenToLayer(child, point, pointOnChild);
     assertEquals(point.x() * 0.5, pointOnChild.x(), tol);
     assertEquals(point.y() * 10, pointOnChild.y(), tol);
 
     Point pointOnParent = new Point(0f, 0f);
-    Layer.Util.layerToScreen(child, pointOnChild, pointOnParent);
+    LayerUtil.layerToScreen(child, pointOnChild, pointOnParent);
     assertEquals(point.x(), pointOnParent.x(), tol);
     assertEquals(point.y(), pointOnParent.y(), tol);
 
-    root.clear();
+    root.removeAll();
   }
 
   @Test public void testTransformWithTrans() {
-    TestGroupLayer root = new TestGroupLayer();
-    TestGroupLayer middle = new TestGroupLayer();
-    TestLayer child = new TestLayer();
+    GroupLayer root = new GroupLayer();
+    GroupLayer middle = new GroupLayer();
+    Layer child = new ImageLayer();
     root.add(middle);
     middle.add(child);
 
@@ -45,22 +60,22 @@ public class LayerUtilTest {
     Point point = new Point(100f, 100f);
 
     Point pointOnChild = new Point(0f, 0f);
-    Layer.Util.screenToLayer(child, point, pointOnChild);
+    LayerUtil.screenToLayer(child, point, pointOnChild);
     assertEquals(point.x() - 10, pointOnChild.x(), tol);
     assertEquals(point.y() + 10, pointOnChild.y(), tol);
 
     Point pointOnParent = new Point(0f, 0f);
-    Layer.Util.layerToScreen(child, pointOnChild, pointOnParent);
+    LayerUtil.layerToScreen(child, pointOnChild, pointOnParent);
     assertEquals(point.x(), pointOnParent.x(), tol);
     assertEquals(point.y(), pointOnParent.y(), tol);
 
-    root.clear();
+    root.removeAll();
   }
 
   @Test public void testTransformWithRot() {
-    TestGroupLayer root = new TestGroupLayer();
-    TestGroupLayer middle = new TestGroupLayer();
-    TestLayer child = new TestLayer();
+    GroupLayer root = new GroupLayer();
+    GroupLayer middle = new GroupLayer();
+    Layer child = new ImageLayer();
     root.add(middle);
     middle.add(child);
 
@@ -68,22 +83,22 @@ public class LayerUtilTest {
     Point point = new Point(100f, 100f);
 
     Point pointOnChild = new Point(0f, 0f);
-    Layer.Util.screenToLayer(child, point, pointOnChild);
+    LayerUtil.screenToLayer(child, point, pointOnChild);
     assertEquals(141.421356, pointOnChild.x(), tol);
     assertEquals(0, pointOnChild.y(), tol);
 
     Point pointOnParent = new Point(0f, 0f);
-    Layer.Util.layerToScreen(child, pointOnChild, pointOnParent);
+    LayerUtil.layerToScreen(child, pointOnChild, pointOnParent);
     assertEquals(point.x(), pointOnParent.x(), tol);
     assertEquals(point.y(), pointOnParent.y(), tol);
 
-    root.clear();
+    root.removeAll();
   }
 
   @Test public void testTransformWithScaleRotTrans() {
-    TestGroupLayer root = new TestGroupLayer();
-    TestGroupLayer middle = new TestGroupLayer();
-    TestLayer child = new TestLayer();
+    GroupLayer root = new GroupLayer();
+    GroupLayer middle = new GroupLayer();
+    Layer child = new ImageLayer();
     root.add(middle);
     middle.add(child);
 
@@ -93,51 +108,12 @@ public class LayerUtilTest {
     Point point = new Point(100f, 100f);
 
     Point pointOnChild = new Point(0f, 0f);
-    Layer.Util.screenToLayer(child, point, pointOnChild);
+    LayerUtil.screenToLayer(child, point, pointOnChild);
     Point pointOnParent = new Point(0f, 0f);
-    Layer.Util.layerToScreen(child, pointOnChild, pointOnParent);
+    LayerUtil.layerToScreen(child, pointOnChild, pointOnParent);
     assertEquals(point.x(), pointOnParent.x(), tol);
     assertEquals(point.y(), pointOnParent.y(), tol);
 
-    root.clear();
-  }
-
-  protected static class TestLayer extends AbstractLayer {
-  }
-
-  protected static class TestGroupLayer extends AbstractLayer implements GroupLayer {
-    public final GroupLayerImpl<AbstractLayer> impl = new GroupLayerImpl<AbstractLayer>();
-    @Override
-    public Layer get(int index) {
-      return impl.children.get(index);
-    }
-    @Override
-    public void add(Layer layer) {
-      impl.add(this, (AbstractLayer)layer);
-    }
-    @Override
-    public void remove(Layer layer) {
-      impl.remove(this, (AbstractLayer)layer);
-    }
-    @Deprecated @Override
-    public void clear() {
-      removeAll();
-    }
-    @Override
-    public void removeAll() {
-      impl.removeAll(this);
-    }
-    @Override
-    public void destroyAll() {
-      impl.destroyAll(this);
-    }
-    @Override
-    public int size() {
-      return impl.children.size();
-    }
-    @Override
-    public void addAt (Layer layer, float tx, float ty) {
-      impl.addAt(this, layer, tx, ty);
-    }
+    root.removeAll();
   }
 }
