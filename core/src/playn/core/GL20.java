@@ -683,42 +683,42 @@ public abstract class GL20 {
     glUniform1iv(location, count, bufs.intBuffer);
   }
   public void glUniform2fv(int location, int count, float[] v, int offset) {
-    bufs.setFloatBuffer(v, offset, count);
+    bufs.setFloatBuffer(v, 2*offset, 2*count);
     glUniform2fv(location, count, bufs.floatBuffer);
   }
   public void glUniform2iv(int location, int count, int[] v, int offset) {
-    bufs.setIntBuffer(v, offset, count);
+    bufs.setIntBuffer(v, 2*offset, 2*count);
     glUniform2iv(location, count, bufs.intBuffer);
   }
   public void glUniform3fv(int location, int count, float[] v, int offset) {
-    bufs.setFloatBuffer(v, offset, count);
+    bufs.setFloatBuffer(v, 3*offset, 3*count);
     glUniform3fv(location, count, bufs.floatBuffer);
   }
   public void glUniform3iv(int location, int count, int[] v, int offset) {
-    bufs.setIntBuffer(v, offset, count);
+    bufs.setIntBuffer(v, 3*offset, 3*count);
     glUniform3iv(location, count, bufs.intBuffer);
   }
   public void glUniform4fv(int location, int count, float[] v, int offset) {
-    bufs.setFloatBuffer(v, offset, count);
+    bufs.setFloatBuffer(v, 4*offset, 4*count);
     glUniform4fv(location, count, bufs.floatBuffer);
   }
   public void glUniform4iv(int location, int count, int[] v, int offset) {
-    bufs.setIntBuffer(v, offset, count);
+    bufs.setIntBuffer(v, 4*offset, 4*count);
     glUniform4iv(location, count, bufs.intBuffer);
   }
   public void glUniformMatrix2fv(int location, int count, boolean transpose,
                                  float[] value, int offset) {
-    bufs.setFloatBuffer(value, offset, 2*2*count);
+    bufs.setFloatBuffer(value, 2*2*offset, 2*2*count);
     glUniformMatrix2fv(location, count, transpose, bufs.floatBuffer);
   }
   public void glUniformMatrix3fv(int location, int count, boolean transpose,
                                  float[] value, int offset) {
-    bufs.setFloatBuffer(value, offset, 3*3*count);
+    bufs.setFloatBuffer(value, 2*2*offset, 3*3*count);
     glUniformMatrix3fv(location, count, transpose, bufs.floatBuffer);
   }
   public void glUniformMatrix4fv(int location, int count, boolean transpose,
                                  float[] value, int offset) {
-    bufs.setFloatBuffer(value, offset, 4*4*count);
+    bufs.setFloatBuffer(value, 4*4*offset, 4*4*count);
     glUniformMatrix4fv(location, count, transpose, bufs.floatBuffer);
   }
   public void glVertexAttrib1fv(int indx, float[] values, int offset) {
