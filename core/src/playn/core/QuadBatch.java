@@ -44,7 +44,7 @@ public abstract class QuadBatch extends GLBatch {
     * {@code sx, sy, sw, sh} define region of the texture which will be displayed in the quad.
     * {@code dx, dy, dw, dh} define the size and position of the quad. */
   public void add (Texture tex, int tint, AffineTransform xf,
-                   float sx, float sy, float sw, float sh, float dx, float dy, float dw, float dh) {
+                   float dx, float dy, float dw, float dh, float sx, float sy, float sw, float sh) {
     setTexture(tex);
     float texWidth = tex.displayWidth, texHeight = tex.displayHeight;
     add(tint, xf, dx, dy, dw, dh, sx/texWidth, sy/texHeight, (sx+sw)/texWidth, (sy+sh)/texHeight);
