@@ -118,28 +118,28 @@ public class TestsGame extends SceneGame<TestsGame> {
 
     tests = new Test[] {
       new CanvasTest(this),
-      // new SurfaceTest(this),
-      // new SubImageTest(this),
-      // new ClippedGroupTest(this),
-      // new CanvasStressTest(this),
-      // new PauseResumeTest(this),
-      // new ImmediateTest(this),
-      // new TextTest(this),
-      // new ScaledTextTest(this),
-      // new GetTextTest(this),
-      // new ImageTypeTest(this),
-      // new AlphaLayerTest(this),
-      // new ImageScalingTest(this),
-      // new DepthTest(this),
-      // new ClearBackgroundTest(this),
-      // new LayerClickTest(this),
-      // new PointerMouseTouchTest(this),
-      // new MouseWheelTest(this),
-      // new ShaderTest(this),
-      // new SoundTest(this),
-      // new NetTest(this),
-      // new FullscreenTest(this),
-      // /*new YourTest(this),*/
+      new SurfaceTest(this),
+      new SubImageTest(this),
+      new ClippedGroupTest(this),
+      new CanvasStressTest(this),
+      new PauseResumeTest(this),
+      new ImmediateTest(this),
+      new TextTest(this),
+      new ScaledTextTest(this),
+      new GetTextTest(this),
+      new ImageTypeTest(this),
+      new AlphaLayerTest(this),
+      new ImageScalingTest(this),
+      new DepthTest(this),
+      new ClearBackgroundTest(this),
+      new LayerClickTest(this),
+      new PointerMouseTouchTest(this),
+      new MouseWheelTest(this),
+      new ShaderTest(this),
+      new SoundTest(this),
+      new NetTest(this),
+      new FullscreenTest(this),
+      /*new YourTest(this),*/
     };
   }
 
@@ -207,27 +207,27 @@ public class TestsGame extends SceneGame<TestsGame> {
     rootLayer.destroyAll();
     rootLayer.add(createWhiteBackground());
 
-    // float gap = 20, x = gap, y = gap, maxHeight = 0;
+    float gap = 20, x = gap, y = gap, maxHeight = 0;
 
-    // String info = "Renderer: gl (batch=" + defaultBatch + ")";
-    // Texture infoTex = tests[0].formatText(info, false);
-    // rootLayer.addAt(new ImageLayer(infoTex), x, y);
-    // y += infoTex.displayHeight + gap;
+    String info = "Renderer: gl (batch=" + defaultBatch + ")";
+    Texture infoTex = tests[0].formatText(info, false);
+    rootLayer.addAt(new ImageLayer(infoTex), x, y);
+    y += infoTex.displayHeight + gap;
 
-    // for (Test test : tests) {
-    //   if (!test.available()) {
-    //     continue;
-    //   }
-    //   ImageLayer button = createButton(test);
-    //   if (x + button.width() > graphics.viewSize.width() - gap) {
-    //     x = gap;
-    //     y += maxHeight + gap;
-    //     maxHeight = 0;
-    //   }
-    //   maxHeight = Math.max(maxHeight, button.height());
-    //   rootLayer.addAt(button, x, y);
-    //   x += button.width() + gap;
-    // }
+    for (Test test : tests) {
+      if (!test.available()) {
+        continue;
+      }
+      ImageLayer button = createButton(test);
+      if (x + button.width() > graphics.viewSize.width() - gap) {
+        x = gap;
+        y += maxHeight + gap;
+        maxHeight = 0;
+      }
+      maxHeight = Math.max(maxHeight, button.height());
+      rootLayer.addAt(button, x, y);
+      x += button.width() + gap;
+    }
   }
 
   ImageLayer createButton (final Test test) {
