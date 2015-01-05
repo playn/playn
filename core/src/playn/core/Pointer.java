@@ -18,7 +18,8 @@ import react.Slot;
 
 /**
  * Abstracts over {@link Mouse} and {@link Touch} input, providing a least-common-denominator API
- * which tracks a single "pointer" with simple interactions.
+ * which tracks a single "pointer" with simple interactions. If you want global pointer events,
+ * you have to create an instance of this class yourself.
  */
 public class Pointer {
 
@@ -26,7 +27,7 @@ public class Pointer {
   public static class Event extends playn.core.Event.XY {
 
     /** Enumerates the different kinds of pointer event. */
-    public static enum Kind { START, MOVE, END, CANCEL };
+    public static enum Kind { START, DRAG, END, CANCEL };
     // NOTE: this enum must match Touch.Event.Kind exactly
 
     /** Whether this event represents a start, move, etc. */
@@ -48,17 +49,23 @@ public class Pointer {
   }
 
   private final Platform plat;
-  private boolean enabled = true;
+
+  /** Allows pointer interaction to be temporarily disabled.
+    * No pointer events will be dispatched whilst this big switch is in the off position. */
+  public boolean enabled = true;
+
+  /** A signal which emits pointer events. */
+  public Signal<Event> events = Signal.create();
 
   public Pointer (Platform plat) {
     this.plat = plat;
 
     // listen for mouse events and convert them to pointer events
-    plat.mouse().events.connect(new Slot<Mouse.Event>() {
+    plat.input().mouseEvents.connect(new Slot<Mouse.Event>() {
       private boolean dragging;
       @Override public void onEmit (Mouse.Event event) {
         if (event instanceof Mouse.MotionEvent) {
-          if (dragging) forward(Event.Kind.MOVE, event);
+          if (dragging) forward(Event.Kind.DRAG, event);
         } else if (event instanceof Mouse.ButtonEvent) {
           Mouse.ButtonEvent bevent = (Mouse.ButtonEvent)event;
           if (bevent.button == Mouse.ButtonEvent.Id.LEFT) {
@@ -70,7 +77,7 @@ public class Pointer {
     });
 
     // listen for touch events and convert them to pointer events
-    plat.touch().events.connect(new Slot<Touch.Event[]>() {
+    plat.input().touchEvents.connect(new Slot<Touch.Event[]>() {
       private int active = -1;
       @Override public void onEmit (Touch.Event[] events) {
         for (Touch.Event event : events) {
@@ -81,25 +88,6 @@ public class Pointer {
         }
       }
     });
-  }
-
-  /** A signal which emits pointer events. */
-  public Signal<Event> events = Signal.create();
-
-  /**
-   * Returns true if pointer interaction is enabled, false if not. Interaction is enabled by
-   * default. See {@link #setEnabled}.
-   */
-  public boolean isEnabled () {
-    return enabled;
-  }
-
-  /**
-   * Allows pointer interaction to be temporarily disabled. No pointer events will be dispatched
-   * whilst this big switch is in the off position.
-   */
-  public void setEnabled (boolean enabled) {
-    this.enabled = enabled;
   }
 
   protected void forward (Event.Kind kind, playn.core.Event.XY source) {

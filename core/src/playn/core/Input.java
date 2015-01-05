@@ -13,89 +13,81 @@
  */
 package playn.core;
 
-/** Provides information about user input: mouse, touch, and keyboard. */
-public abstract class Input {
+import react.RFuture;
+import react.Signal;
 
-  /** Used by {@link ButtonEvent} to indicate that the left button is pressed. */
-  public static final int BUTTON_LEFT = 0;
-  /** Used by {@link ButtonEvent} to indicate that the middle button is pressed. */
-  public static final int BUTTON_MIDDLE = 1;
-  /** Used by {@link ButtonEvent} to indicate that the right button is pressed. */
-  public static final int BUTTON_RIGHT = 2;
+/**
+ * Provides information about user input: mouse, touch, and keyboard. This class provides the
+ * platform-specific code, and events are dispatched via the platform-independent {@link Mouse},
+ * {@link Touch} and {@link Keyboard} classes.
+ */
+public class Input {
 
-  /** A flag indicating that the default OS behavior for an event should be prevented. */
-  public static final int F_PREVENT_DEFAULT = 1 << 0;
+  /** Enables or disables mouse interaction.
+    * No mouse events will be dispatched whilst this big switch is in the off position. */
+  public boolean mouseEnabled = true;
 
-  /** The base for all input events. */
-  public static class Event {
-    private int flags;
+  /** Enables or disables touch interaction.
+    * No touch events will be dispatched whilst this big switch is in the off position. */
+  public boolean touchEnabled = true;
 
-    /**
-     * The time at which this event was generated, in milliseconds. This time's magnitude is not
-     * portable (i.e. may not be the same across backends), clients must interpret it as only a
-     * monotonically increasing value.
-     */
-    public final double time;
+  /** Enables or disables keyboard interaction.
+    * No keyboard events will be dispatched whilst this big switch is in the off position. */
+  public boolean keyboardEnabled = true;
 
-    /** Returns whether the {@code flag} bit is set. */
-    public boolean isSet (int flag) {
-      return (flags & flag) != 0;
-    }
+  /** A signal which emits mouse events. */
+  public Signal<Mouse.Event> mouseEvents = Signal.create();
 
-    /** Sets the {@code flag} bit. */
-    public void setFlag (int flag) {
-      flags |= flag;
-    }
+  /** A signal via which touch events are emitted. */
+  public Signal<Touch.Event[]> touchEvents = Signal.create();
 
-    /** Clears the {@code flag} bit. */
-    public void clearFlag (int flag) {
-      flags &= ~flag;
-    }
+  /** A signal via which keyboard events are emitted. */
+  public Signal<Keyboard.Event> keyboardEvents = Signal.create();
 
-    // TODO(mdb): a mechanism to determine which modifier keys are pressed, if any
+  /** Returns true if this platform has mouse input. */
+  public boolean hasMouse () { return false; }
 
-    @Override public String toString () {
-      StringBuilder builder = new StringBuilder(name()).append('[');
-      addFields(builder);
-      return builder.append(']').toString();
-    }
+  /** Returns true if this platform has touch input. */
+  public boolean hasTouch () { return false; }
 
-    protected Event (int flags, double time) {
-      this.flags = flags;
-      this.time = time;
-    }
+  /**
+   * Returns true if this device has a hardware keyboard, false if not. Devices that lack a
+   * hardware keyboard will generally not generate keyboard events. Older Android devices that
+   * support four hardware buttons are an exception. Use {@link #getText} for text entry on a
+   * non-hardware-keyboard having device.
+   */
+  public boolean hasHardwareKeyboard () { return false; }
 
-    protected String name () {
-      return "Event";
-    }
+  /**
+   * Returns true if this platform supports mouse locking. The user may still block it when it is
+   * requested, or detection may be broken for some browsers.
+   */
+  public boolean hasMouseLock () { return false; }
 
-    protected void addFields (StringBuilder builder) {
-      builder.append("time=").append(time).append(", flags=").append(flags);
-    }
-  }
+  /**
+   * Returns whether the mouse is currently locked.
+   */
+  public boolean isMouseLocked () { return false; }
 
-  /** The base for all events with a screen position. */
-  public static class EventXY extends Event {
+  /**
+   * Lock or unlock the mouse. When the mouse is locked, mouse events are still received even when
+   * the pointer leaves the game window.
+   */
+  public void setMouseLocked (boolean locked) {} // noop!
 
-    /** The screen x-coordinate associated with this event. */
-    public final float x;
-
-    /** The screen y-coordinate associated with this event. */
-    public final float y;
-
-    protected EventXY (int flags, double time, float x, float y) {
-      super(flags, time);
-      this.x = x;
-      this.y = y;
-    }
-
-    @Override protected String name () {
-      return "EventXY";
-    }
-
-    @Override protected void addFields (StringBuilder builder) {
-      super.addFields(builder);
-      builder.append(", x=").append(x).append(", y=").append(y);
-    }
+  /**
+   * Requests a line of text from the user. On platforms that have only a virtual keyboard, this
+   * will display a text entry interface, obtain the line of text, and dismiss the text entry
+   * interface when finished.
+   *
+   * @param textType the expected type of text. On mobile devices this hint may be used to display a
+   * keyboard customized to the particular type of text.
+   * @param label a label to display over the text entry interface, may be null.
+   * @param initialValue the initial value to display in the text input field, may be null.
+   * @return a future which provides the text when it becomes available. If the user cancels the
+   * text entry process, null is supplied. Otherwise the entered text is supplied.
+   */
+  public RFuture<String> getText (Keyboard.TextType textType, String label, String initialValue) {
+    return RFuture.failure(new Exception("getText not supported"));
   }
 }

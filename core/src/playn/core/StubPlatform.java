@@ -18,10 +18,8 @@ package playn.core;
 import java.util.HashMap;
 import java.util.Map;
 
-import react.RFuture;
-import react.Slot;
-
 import playn.core.json.JsonImpl;
+import react.Slot;
 
 /**
  * A stub implementation of {@link Platform} that provides implementations of those services that
@@ -34,13 +32,10 @@ import playn.core.json.JsonImpl;
  * <li> {@link #time} - returns current time
  * <li> {@link #invokeLater} - invokes the supplied runnable immediately on the calling thread
  * <li> {@link #setLifecycleListener} - tracks the supplied listener, never generates events
+ * <li> {@link #input} - allows listener registration, never generates events
  * <li> {@link #log} - writes logs to {@code stderr}
- * <li> {@link #storage} - maintains an in-memory storage map
  * <li> {@link #json} - provides full JSON parsing and formatting
- * <li> {@link #pointer} - allows listener registration, never generates events
- * <li> {@link #mouse} - allows listener registration, never generates events
- * <li> {@link #touch} - allows listener registration, never generates events
- * <li> {@link #keyboard} - allows listener registration, never generates events
+ * <li> {@link #storage} - maintains an in-memory storage map
  * </ul>
  */
 public class StubPlatform extends Platform {
@@ -68,14 +63,7 @@ public class StubPlatform extends Platform {
     }
   };
 
-  private Keyboard keyboard = new Keyboard() {
-    @Override public RFuture<String> getText (Keyboard.TextType textType, String label, String initialValue) {
-      return RFuture.success(null);
-    }
-  };
-
-  private Touch touch = new Touch();
-  private Mouse mouse = new Mouse();
+  private Input input = new Input();
   private Json json = new JsonImpl();
   private Log log = new Log() {
     @Override
@@ -102,7 +90,6 @@ public class StubPlatform extends Platform {
   @Override public double time () {
     return (double)System.currentTimeMillis();
   }
-
   @Override public int tick () {
     return (int)(System.currentTimeMillis() - start);
   }
@@ -111,49 +98,16 @@ public class StubPlatform extends Platform {
     action.onEmit(this); // now is later!
   }
 
+  @Override public void openURL (String url) { throw new UnsupportedOperationException(); }
   @Override public void start () {} // noop!
 
-  @Override public void openURL (String url) {
-    throw new UnsupportedOperationException();
-  }
+  @Override public Assets assets () { throw new UnsupportedOperationException(); }
+  @Override public Audio audio () { throw new UnsupportedOperationException(); }
+  @Override public Graphics graphics () { throw new UnsupportedOperationException(); }
+  @Override public Net net () { throw new UnsupportedOperationException(); }
 
-  @Override public Audio audio () {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override public Graphics graphics () {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override public Assets assets () {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override public Json json () {
-    return json;
-  }
-
-  @Override public Log log () {
-    return log;
-  }
-
-  @Override public Keyboard keyboard () {
-    return keyboard;
-  }
-
-  @Override public Net net () {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override public Mouse mouse () {
-    return mouse;
-  }
-
-  @Override public Touch touch () {
-    return touch;
-  }
-
-  @Override public Storage storage () {
-    return storage;
-  }
+  @Override public Input input () { return input; }
+  @Override public Json json () { return json; }
+  @Override public Log log () { return log; }
+  @Override public Storage storage () { return storage; }
 }

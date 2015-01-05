@@ -19,7 +19,7 @@ import react.Signal;
 import react.Slot;
 
 /**
- * Provides access to mouse input.
+ * Defines and dispatches mouse events.
  */
 public class Mouse {
 
@@ -129,62 +129,4 @@ public class Mouse {
     }
     public abstract void onEmit (WheelEvent event);
   }
-
-  /** A signal which emits mouse events. */
-  public Signal<Event> events = Signal.create();
-
-  /**
-   * Returns true if the underlying platform supports mouse interaction. If this method returns
-   * false, listeners may still be registered with this service but they will never be notified.
-   */
-  public boolean isSupported () {
-    return false;
-  }
-
-  /**
-   * Returns true if mouse interaction is enabled, false if not. Interaction is enabled by default.
-   * See {@link #setEnabled}.
-   */
-  public boolean isEnabled () {
-    return enabled;
-  }
-
-  /**
-   * Allows mouse interaction to be temporarily disabled. No mouse events will be dispatched whilst
-   * this big switch is in the off position.
-   */
-  public void setEnabled (boolean enabled) {
-    this.enabled = enabled;
-  }
-
-  /**
-   * True if lock has a chance of success on this platform (the user may still block it, or
-   * detection may be broken for some browsers).
-   */
-  public boolean isLockSupported () {
-    return false;
-  }
-
-  /**
-   * True if the mouse is locked.
-   */
-  public boolean isLocked () {
-    return false;
-  }
-
-  /**
-   * Lock the mouse, i.e. receive mouse events even when the mouse pointer leaves the window.
-   */
-  public void lock () {
-    // noop
-  }
-
-  /**
-   * Unlock the mouse.
-   */
-  public void unlock () {
-    // noop
-  }
-
-  private boolean enabled = true;
 }

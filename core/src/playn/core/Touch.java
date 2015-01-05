@@ -18,7 +18,7 @@ package playn.core;
 import react.Signal;
 
 /**
- * Input-device interface for touch and multi-touch events.
+ * Defines and dispatches touch events.
  */
 public class Touch {
 
@@ -67,33 +67,4 @@ public class Touch {
         append(", pressure=").append(pressure).append(", size=").append(size);
     }
   }
-
-  /** A signal via which touch events are emitted. */
-  public Signal<Event[]> events = Signal.create();
-
-  /**
-   * Returns true if the underlying platform supports touch interaction. If this method returns
-   * false, listeners may still be registered with this service but they will never be notified.
-   */
-  public boolean isSupported () {
-    return false;
-  }
-
-  /**
-   * Returns true if touch interaction is enabled, false if not. Interaction is enabled by default.
-   * See {@link #setEnabled}.
-   */
-  public boolean isEnabled () {
-    return enabled;
-  }
-
-  /**
-   * Allows touch interaction to be temporarily disabled. No touch events will be dispatched whilst
-   * this big switch is in the off position.
-   */
-  public void setEnabled (boolean enabled) {
-    this.enabled = enabled;
-  }
-
-  private boolean enabled = true;
 }

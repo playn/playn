@@ -67,6 +67,34 @@ public abstract class Platform {
   /** Opens the given URL in the default browser. */
   public abstract void openURL (String url);
 
+  /** Starts the main game loop.
+    * This must be called by the game's bootstrap code to get the party started. */
+  public abstract void start ();
+
+  /** Returns the {@link Assets} service. */
+  public abstract Assets assets ();
+
+  /** Returns the {@link Audio} service. */
+  public abstract Audio audio ();
+
+  /** Returns the {@link Graphics} service. */
+  public abstract Graphics graphics ();
+
+  /** Returns the {@link Input} service. */
+  public abstract Input input ();
+
+  /** Returns the {@link Json} service. */
+  public abstract Json json ();
+
+  /** Returns the {@link Log} service. */
+  public abstract Log log ();
+
+  /** Returns the {@link Net} service. */
+  public abstract Net net ();
+
+  /** Returns the {@link Storage} storage service. */
+  public abstract Storage storage ();
+
   /**
    * Queues the supplied runnable for invocation on the game thread prior to the next frame. Note:
    * this uses {@link #invokeLater(UnitSlot)} so feel free to cut out the middle man.
@@ -130,46 +158,4 @@ public abstract class Platform {
     errors.emit(new Error(message, cause));
     log().warn(message, cause);
   }
-
-  /** Starts the main game loop.
-    * This must be called by the game's bootstrap code to get the party started. */
-  public abstract void start ();
-
-  /** Returns the {@link Assets} service. */
-  public abstract Assets assets ();
-
-  /** Returns the {@link Audio} service. */
-  public abstract Audio audio ();
-
-  /** Returns the {@link Graphics} service. */
-  public abstract Graphics graphics ();
-
-  /** Returns the {@link Json} service. */
-  public abstract Json json ();
-
-  /** Returns the {@link Keyboard} input service. */
-  public abstract Keyboard keyboard ();
-
-  /** Returns the {@link Log} service. */
-  public abstract Log log ();
-
-  /** Returns the {@link Mouse} input service. */
-  public abstract Mouse mouse ();
-
-  /** Returns the {@link Net} service. */
-  public abstract Net net ();
-
-  /** Returns the {@link Pointer} service. */
-  public Pointer pointer () {
-    if (pointer == null) pointer = new Pointer(this);
-    return pointer;
-  }
-  // pointer is created on demand
-  private Pointer pointer;
-
-  /** Returns the {@link Storage} storage service. */
-  public abstract Storage storage ();
-
-  /** Returns the {@link Touch} input service. */
-  public abstract Touch touch ();
 }
