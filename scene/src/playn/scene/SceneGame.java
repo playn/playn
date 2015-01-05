@@ -47,11 +47,13 @@ public abstract class SceneGame<G extends SceneGame> extends Game<G> {
    * Renders the main scene graph into the OpenGL frame buffer.
    */
   protected void paintScene () {
+    viewSurf.saveTx();
     viewSurf.beginBatch(defaultBatch);
     try {
       rootLayer.paint(viewSurf);
     } finally {
       viewSurf.endBatch();
+      viewSurf.restoreTx();
     }
   }
 
