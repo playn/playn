@@ -166,7 +166,7 @@ public class GroupLayer extends ClippedLayer implements Iterable<Layer> {
     // if we saw no interactive children and we don't have listeners registered directly on this
     // group, clear our own interactive flag; this lazily deactivates this group after its
     // interactive children have been deactivated or removed
-    if (!sawInteractiveChild && !hasInteractors()) setInteractive(false);
+    if (!sawInteractiveChild && !hasEventListeners()) setInteractive(false);
     return null;
   }
 
@@ -215,6 +215,11 @@ public class GroupLayer extends ClippedLayer implements Iterable<Layer> {
       children.get(ii).onRemove();
     }
   }
+
+  // group layers do not deactivate when their last event listener is removed; they may still have
+  // interactive children to which events need to be dispatched; when a hit test is performed on a
+  // group layer and it discovers that it has no interactive children, it will deactivate itself
+  @Override protected boolean deactivateOnNoListeners () { return false; }
 
   private void remove(int index) {
     Layer child = children.remove(index);

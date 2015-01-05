@@ -24,20 +24,15 @@ import pythagoras.f.XY;
 import pythagoras.util.NoninvertibleTransformException;
 
 import playn.core.*;
+import react.Signal;
 
 /**
- * Layer is the base element for all rendering in PlayN
- * <p>
- * Each layer has a transformation matrix {@link #transform()} and several other associated
- * properties which can be manipulated directly (changes take effect automatically on the next
- * rendered frame).
- * <p>
- * The root of the layer hierarchy is the {@link Graphics#rootLayer() rootLayer} . All coordinates
- * in a layer are transformed by the layer's transformation matrix, and each child layer is
- * positioned by the transformation matrix of it's parent.
- * <p>
- * TODO: clipping (?), transform-origin: allow explicit
- * "center, top-left, bottom-right" like CSS transform-origin?
+ * A layer is a node in the scene graph. It has a transformation matrix and other properties which
+ * can be manipulated directly and which "take effect" the next time the layer is {@link #paint}ed.
+ *
+ * <p>Everything can be accomplished by extending {@link Layer} and overriding {@link #paintImpl}.
+ * However, {@link GroupLayer}, {@link ImageLayer}, {@link ClippedLayer} etc. are provided to make
+ * it easy to implement common use cases "out of the box".
  */
 public abstract class Layer {
 
@@ -56,16 +51,89 @@ public abstract class Layer {
   }
 
   /**
-   * Destroys this layer, removing it from its parent layer. Any resources associated with this
-   * layer are freed, and it cannot be reused after being destroyed. Destroying a layer that has
-   * children will destroy them as well.
+   * Returns the parent that contains this layer, or {@code null}.
    */
-  public void destroy() {
-    if (parent() != null) {
-      parent().remove(this);
+  public GroupLayer parent() {
+    return parent;
+  }
+
+  /**
+   * Returns a signal via which events may be dispatched "on" this layer. The {@link Dispatcher}
+   * mechanism uses this to dispatch (and listen for) mouse, pointer and touch events to the layers
+   * affected by them. A game can also use this to dispatch any other kinds of events on a
+   * per-layer basis, with the caveat that all listeners are notified of every event and each must
+   * do a type test on the event to determine whether it matches.
+   *
+   * <p>Also, any layer that has one or more listeners on its events signal is marked as {@link
+   * #interactive}. Further, any {@link GroupLayer} which has one or more interactive children is
+   * also marked as interactive. This allows {@link Dispatcher}s to be more efficient in their
+   * dispatching of UI events.
+   */
+  public Signal<Object> events () {
+    if (events == null) events = new Signal<Object>() {
+      @Override protected void connectionAdded () {
+        setInteractive(true);
+      }
+      @Override protected void connectionRemoved () {
+        if (!hasConnections() && deactivateOnNoListeners()) setInteractive(false);
+      }
+    };
+    return events;
+  }
+
+  /** Returns true if {@link #events} has at least one listener. Use this instead of calling {@link
+    * Signal#hasConnections} on {@code events} because {@code events} is created lazily this method
+    * avoids creating it unnecessarily. */
+  public boolean hasEventListeners () {
+    return events != null && events.hasConnections();
+  }
+
+  /**
+   * Returns true if this layer reacts to clicks and touches. If a layer is interactive, it will
+   * respond to {@link #hitTest}, which forms the basis for the click and touch processing provided
+   * by the {@code Dispatcher}s.
+   */
+  public boolean interactive() {
+    return isSet(Flag.INTERACTIVE);
+  }
+
+  /**
+   * Configures this layer as reactive to clicks and touches, or not. You usually don't have to do
+   * this automatically because a layer is automatically marked as interactive (along with all of
+   * its parents) when a listener is added to its {@link #events} signal.
+   *
+   * <p>A {@link GroupLayer} will be made non-interactive automatically if an event is dispatched
+   * to it and it discovers that it no longer has any interactive children. Manual management of
+   * interactivity is thus generally only useful for "leaf" nodes in the scene graph.
+   *
+   * @return a reference to this layer for call chaining.
+   */
+  public Layer setInteractive(boolean interactive) {
+    if (interactive() != interactive) {
+      // if we're being made interactive, active our parent as well, if we have one
+      if (interactive && parent != null)
+        parent.setInteractive(interactive);
+      setFlag(Flag.INTERACTIVE, interactive);
     }
-    setFlag(Flag.DESTROYED, true);
-    setBatch(null);
+    return this;
+  }
+
+  /**
+   * Returns true if this layer is visible (i.e. it is being rendered).
+   */
+  public boolean visible() {
+    return isSet(Flag.VISIBLE);
+  }
+
+  /**
+   * Configures this layer's visibility: if true, it will be rendered as normal, if false it and
+   * its children will not be rendered.
+   *
+   * @return a reference to this layer for call chaining.
+   */
+  public Layer setVisible(boolean visible) {
+    setFlag(Flag.VISIBLE, visible);
+    return this;
   }
 
   /**
@@ -76,10 +144,16 @@ public abstract class Layer {
   }
 
   /**
-   * Returns the parent that contains this layer, or {@code null}.
+   * Destroys this layer, removing it from its parent layer. Any resources associated with this
+   * layer are freed, and it cannot be reused after being destroyed. Destroying a layer that has
+   * children will destroy them as well.
    */
-  public GroupLayer parent() {
-    return parent;
+  public void destroy() {
+    if (parent() != null) {
+      parent().remove(this);
+    }
+    setFlag(Flag.DESTROYED, true);
+    setBatch(null);
   }
 
   /**
@@ -104,53 +178,6 @@ public abstract class Layer {
       setFlag(Flag.XFDIRTY, false);
     }
     return transform;
-  }
-
-  /**
-   * Returns true if this layer is visible (i.e. it is being rendered).
-   */
-  public boolean visible() {
-    return isSet(Flag.VISIBLE);
-  }
-
-  /**
-   * Configures this layer's visibility: if true, it will be rendered as normal, if false it and
-   * its children will not be rendered.
-   *
-   * @return a reference to this layer for call chaining.
-   */
-  public Layer setVisible(boolean visible) {
-    setFlag(Flag.VISIBLE, visible);
-    return this;
-  }
-
-  /**
-   * Returns true if this layer reacts to clicks and touches. If a layer is interactive, it will
-   * respond to {@link #hitTest}, which forms the basis for the click and touch processing provided
-   * by the various {@code addListener} methods.
-   */
-  public boolean interactive() {
-    return isSet(Flag.INTERACTIVE);
-  }
-
-  /**
-   * Configures this layer as reactive to clicks and touches, or not. Note that a layer's
-   * interactivity is automatically activated when a listener is added to the layer (or to a child
-   * of a {@link GroupLayer}) via {@link #addListener}, etc. Also a {@link GroupLayer} will be made
-   * non-interactive automatically if an event is dispatched to it and it discovers that it has no
-   * interactive children. Manual management of interactivity is thus generally only useful for
-   * "leaf" nodes in the scene graph.
-   *
-   * @return a reference to this layer for call chaining.
-   */
-  public Layer setInteractive(boolean interactive) {
-    if (interactive() != interactive) {
-      // if we're being made interactive, active our parent as well, if we have one
-      if (interactive && parent != null)
-        parent.setInteractive(interactive);
-      setFlag(Flag.INTERACTIVE, interactive);
-    }
-    return this;
   }
 
   /**
@@ -638,46 +665,39 @@ public abstract class Layer {
     return bldr.toString();
   }
 
-  private float clipWidth, clipHeight;
+  private GroupLayer parent;
+  private Signal<Object> events; // created lazily
+  private HitTester hitTester;
+  private QuadBatch batch;
+  protected int flags;
+  protected float depth;
 
   // these values are cached in the layer to make the getters return sane values rather than have
   // to extract the values from the affine transform matrix (which is expensive, doesn't preserve
   // sign, and wraps rotation around at pi)
-  private float scaleX = 1,  scaleY = 1, rotation = 0;
+  private float scaleX = 1, scaleY = 1, rotation = 0;
   private final AffineTransform transform = new AffineTransform();
 
-  private GroupLayer parent;
-  protected QuadBatch batch;
-
-  // protected Interactor<?> rootInteractor;
-  protected HitTester hitTester;
-
+  private float clipWidth, clipHeight;
   protected float originX, originY;
   protected int tint = Tint.NOOP_TINT;
   // we keep a copy of alpha as a float so that we can return the exact alpha passed to setAlpha()
   // from alpha() to avoid funny business in clients due to the quantization; the actual alpha as
   // rendered by the shader will be quantized, but the eye won't know the difference
   protected float alpha = 1;
-  protected float depth;
-  protected int flags;
 
-  // /** Used to dispatch pointer/touch/mouse events to layers. */
-  // interface Interaction<L, E> {
-  //   void interact(L listener, E argument);
-  // }
+  void onAdd() {
+    if (destroyed()) throw new IllegalStateException("Illegal to use destroyed layer: " + this);
+  }
 
-  // protected static class Interactor<L> {
-  //   final Class<L> listenerType;
-  //   final L listener;
-  //   Interactor<?> next;
+  void onRemove() {
+  }
 
-  //   Interactor(Class<L> listenerType, L listener, Interactor<?> next) {
-  //     this.listenerType = listenerType;
-  //     this.listener = listener;
-  //     this.next = next;
-  //   }
-  // }
+  void setParent(GroupLayer parent) {
+    this.parent = parent;
+  }
 
+  /** Enumerates bit flags tracked by this layer. */
   protected static enum Flag {
     DESTROYED(1 << 0),
     VISIBLE(1 << 1),
@@ -691,21 +711,12 @@ public abstract class Layer {
     }
   }
 
-  void onAdd() {
-    if (destroyed()) throw new IllegalStateException("Illegal to use destroyed layer: " + this);
-  }
-
-  void onRemove() {
-  }
-
-  void setParent(GroupLayer parent) {
-    this.parent = parent;
-  }
-
+  /** Returns true if {@code flag} is set. */
   protected boolean isSet(Flag flag) {
     return (flags & flag.bitmask) != 0;
   }
 
+  /** Sets {@code flag} to {@code active}. */
   protected void setFlag(Flag flag, boolean active) {
     if (active) {
       flags |= flag.bitmask;
@@ -714,55 +725,6 @@ public abstract class Layer {
     }
   }
 
-  // <L, E> void interact(Class<L> listenerType, Interaction<L, E> interaction, E argument) {
-  //   interact(listenerType, interaction, rootInteractor, argument);
-  // }
-
-  boolean hasInteractors() {
-    // return rootInteractor != null;
-    return false;
-  }
-
-  // // dispatch interactions recursively, so as to dispatch in the order they were added; we assume
-  // // one will not have such a large number of listeners registered on a single layer that this will
-  // // blow the stack; note that this also avoids issues with interactor modifications during
-  // // dispatch: we essentially build a list of interactors to which to dispatch on the stack, before
-  // // dispatching to any interactors; if an interactor is added or removed during dispatch, it
-  // // neither affects, nor conflicts with, the current dispatch
-  // private <L, E> void interact(Class<L> type, Interaction<L, E> interaction,
-  //                              Interactor<?> current, E argument) {
-  //   if (current == null)
-  //     return;
-  //   interact(type, interaction, current.next, argument);
-  //   if (current.listenerType == type) {
-  //     @SuppressWarnings("unchecked") L listener = (L)current.listener;
-  //     interaction.interact(listener, argument);
-  //   }
-  // }
-
-  // private <L> AutoCloseable addInteractor(Class<L> listenerType, L listener) {
-  //   final Interactor<L> newint = new Interactor<L>(listenerType, listener, rootInteractor);
-  //   rootInteractor = newint;
-  //   // note that we (and our parents) are now interactive
-  //   setInteractive(true);
-  //   return new AutoCloseable() {
-  //     public void close() {
-  //       rootInteractor = removeInteractor(rootInteractor, newint);
-  //       // if we have no more interactors, become non-interactive. But not if we're a
-  //       // GroupLayer; we may be interactive for the sake of our children. In that case,
-  //       // we'll lazily realize and deal with it later
-  //       if (rootInteractor == null && !(Layer.this instanceof GroupLayer))
-  //         setInteractive(false);
-  //     }
-  //   };
-  // }
-
-  // private Interactor<?> removeInteractor(Interactor<?> current, Interactor<?> target) {
-  //   if (current == null)
-  //     return null;
-  //   if (current == target)
-  //     return current.next;
-  //   current.next = removeInteractor(current.next, target);
-  //   return current;
-  // }
+  /** Whether or not to deactivate this layer when its last event listener is removed. */
+  protected boolean deactivateOnNoListeners () { return true; }
 }

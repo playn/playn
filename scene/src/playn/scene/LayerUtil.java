@@ -116,6 +116,17 @@ public class LayerUtil {
   }
 
   /**
+   * Returns the layer hit by (screen) position {@code p} (or null) in the scene graph rooted at
+   * {@code root}, using {@link Layer#hitTest}. Note that {@code p} is mutated by this call.
+   */
+  public static Layer getHitLayer (Layer root, Point p) {
+    root.transform().inverseTransform(p, p);
+    p.x += root.originX();
+    p.y += root.originY();
+    return root.hitTest(p);
+  }
+
+  /**
    * Returns true if an {@link XY} touches a {@link Layer}. Note: if the supplied layer has no
    * size, this will always return false.
    */
