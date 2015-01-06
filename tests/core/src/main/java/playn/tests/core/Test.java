@@ -21,33 +21,27 @@ import react.Slot;
 
 import playn.core.*;
 import playn.scene.*;
+import playn.scene.Pointer;
 import static playn.tests.core.TestsGame.game;
 
 public abstract class Test {
 
   public static final int UPDATE_RATE = 25;
 
-  public abstract String getName();
-  public abstract String getDescription();
+  public final String name;
+  public final String descrip;
 
   protected final TestsGame game;
   protected final ConnectionGroup conns = new ConnectionGroup();
-  protected final TextFormat TEXT_FMT;
 
-  public Test (TestsGame game) {
+  public Test (TestsGame game, String name, String descrip) {
     this.game = game;
-    TEXT_FMT = new TextFormat().withFont(
-      game.graphics.createFont(new Font.Config("Helvetica", 12)));
+    this.name = name;
+    this.descrip = descrip;
   }
 
   public void init() {
   }
-
-  // public void update(int delta) {
-  // }
-
-  // public void paint(float alpha) {
-  // }
 
   public void dispose() {
     conns.disconnect();
@@ -87,43 +81,11 @@ public abstract class Test {
   }
 
   protected ImageLayer createDescripLayer(String descrip, float width) {
-    return new ImageLayer(wrapText(descrip, width, TextBlock.Align.CENTER));
-  }
-
-  protected Texture wrapText(String text, float width, TextBlock.Align align) {
-    TextLayout[] layouts = game.graphics.layoutText(text, TEXT_FMT, new TextWrap(width));
-    Canvas canvas = new TextBlock(layouts).toCanvas(game.graphics, align, 0xFF000000);
-    return game.graphics.createTexture(canvas.image);
-  }
-
-  protected Texture formatText (String text, boolean border) {
-    return formatText(TEXT_FMT, text, border);
-  }
-
-  protected Texture formatText (TextFormat format, String text, boolean border) {
-    TextLayout layout = game.graphics.layoutText(text, format);
-    float margin = border ? 10 : 0;
-    float width = layout.size.width()+2*margin, height = layout.size.height()+2*margin;
-    Canvas canvas = game.graphics.createCanvas(width, height);
-    canvas.setStrokeColor(0xFF000000);
-    canvas.setFillColor(0xFF000000);
-    canvas.fillText(layout, margin, margin);
-    if (border) canvas.strokeRect(0, 0, width-1, height-1);
-    return game.graphics.createTexture(canvas.image);
-  }
-
-  protected ImageLayer createButton (String text, final Runnable onClick) {
-    ImageLayer button = new ImageLayer(formatText(text, true));
-    // button.addListener(new Pointer.Adapter() {
-    //   @Override public void onPointerStart(Pointer.Event event) {
-    //     onClick.run();
-    //   }
-    // });
-    return button;
+    return new ImageLayer(game.ui.wrapText(descrip, width, TextBlock.Align.CENTER));
   }
 
   protected float addButton (String text, Runnable onClick, float x, float y) {
-    ImageLayer button = createButton(text, onClick);
+    ImageLayer button = game.ui.createButton(text, onClick);
     game.rootLayer.addAt(button, x, y);
     return x + button.width() + 10;
   }

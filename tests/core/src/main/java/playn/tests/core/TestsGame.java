@@ -21,7 +21,10 @@ import java.util.List;
 import java.util.Set;
 
 import playn.core.*;
+import playn.core.Mouse;
+import playn.core.Touch;
 import playn.scene.*;
+import playn.scene.Pointer;
 import react.Slot;
 
 public class TestsGame extends SceneGame<TestsGame> {
@@ -40,12 +43,11 @@ public class TestsGame extends SceneGame<TestsGame> {
         this.values.add(value);
       }
       this.prefix = name + ": ";
-      // layer.addListener(new Pointer.Adapter() {
-      //   @Override
-      //   public void onPointerStart(Event event) {
-      //     set((valueIdx + 1) % NToggle.this.values.size());
-      //   }
-      // });
+      layer.events().connect(new Pointer.Listener() {
+        @Override public void onStart (Pointer.Interaction iact) {
+          set((valueIdx + 1) % NToggle.this.values.size());
+        }
+      });
 
       set(0);
     }
@@ -56,7 +58,7 @@ public class TestsGame extends SceneGame<TestsGame> {
 
     public void set(int idx) {
       this.valueIdx = idx;
-      layer.setTexture(game.makeButtonTexture(prefix + toString(values.get(idx))));
+      layer.setTexture(game.ui.formatButton(prefix + toString(values.get(idx))));
     }
 
     public T value() {
@@ -74,15 +76,6 @@ public class TestsGame extends SceneGame<TestsGame> {
     }
   }
 
-  public Texture makeButtonTexture(String label) {
-    TextLayout layout = graphics.layoutText(label, BUTTON_FMT);
-    Canvas canvas = graphics.createCanvas(layout.size.width()+10, layout.size.height()+10);
-    canvas.setFillColor(0xFFCCCCCC).fillRect(0, 0, canvas.width, canvas.height);
-    canvas.setFillColor(0xFF000000).fillText(layout, 5, 5);
-    canvas.setStrokeColor(0xFF000000).strokeRect(0, 0, canvas.width-1, canvas.height-1);
-    return graphics.createTexture(canvas.image);
-  }
-
   // args passed to the Java launcher
   public static String[] args = {};
 
@@ -90,15 +83,15 @@ public class TestsGame extends SceneGame<TestsGame> {
   private Test currentTest;
 
   public final Platform plat;
+  public final UI ui;
   public final Assets assets;
   public final Graphics graphics;
-  public final Keyboard keyboard;
+  public final Input input;
   public final Log log;
-  public final Mouse mouse;
   public final Net net;
-  public final Pointer pointer;
   public final Storage storage;
-  public final Touch touch;
+
+  public final Pointer pointer;
 
   public TestsGame (Platform plat) {
     super(plat, Test.UPDATE_RATE);
@@ -106,15 +99,14 @@ public class TestsGame extends SceneGame<TestsGame> {
     this.plat = plat;
     assets = plat.assets();
     graphics = plat.graphics();
-    keyboard = plat.keyboard();
+    input = plat.input();
     log = plat.log();
-    mouse = plat.mouse();
     net = plat.net();
-    pointer = plat.pointer();
     storage = plat.storage();
-    touch = plat.touch();
-    BUTTON_FONT = graphics.createFont(new Font.Config("Helvetica", 24));
-    BUTTON_FMT = new TextFormat().withFont(BUTTON_FONT);
+    ui = new UI(this);
+
+    pointer = new Pointer(plat, rootLayer, true);
+    input.touchEvents.connect(new playn.scene.Touch.Dispatcher(rootLayer, true));
 
     tests = new Test[] {
       new CanvasTest(this),
@@ -143,8 +135,8 @@ public class TestsGame extends SceneGame<TestsGame> {
     };
   }
 
-  public SurfaceTexture createSurface (float width, float height) {
-    return new SurfaceTexture(graphics, defaultBatch, width, height);
+  public TextureSurface createSurface (float width, float height) {
+    return new TextureSurface(graphics, defaultBatch, width, height);
   }
 
   public void init() {
@@ -152,13 +144,13 @@ public class TestsGame extends SceneGame<TestsGame> {
     log.info("Right click, touch with two fingers, or type ESC to return to test menu.");
 
     // add global listeners which navigate back to the menu
-    mouse.events.connect(new Mouse.ButtonSlot() {
+    input.mouseEvents.connect(new Mouse.ButtonSlot() {
       public void onEmit (Mouse.ButtonEvent event) {
         if (currentTest != null && currentTest.usesPositionalInputs()) return;
         if (event.button == Mouse.ButtonEvent.Id.RIGHT) displayMenuLater();
       }
     });
-    touch.events.connect(new Slot<Touch.Event[]>() {
+    input.touchEvents.connect(new Slot<Touch.Event[]>() {
       public void onEmit (Touch.Event[] events) {
         if (currentTest != null && currentTest.usesPositionalInputs()) return;
         switch (events[0].kind) {
@@ -176,7 +168,7 @@ public class TestsGame extends SceneGame<TestsGame> {
       }
       protected Set<Integer> _active = new HashSet<Integer>();
     });
-    keyboard.events.connect(new Keyboard.KeySlot() {
+    input.keyboardEvents.connect(new Keyboard.KeySlot() {
       public void onEmit (Keyboard.KeyEvent event) {
         if (event.down && (event.key == Key.ESCAPE || event.key == Key.BACK)) displayMenu();
       }
@@ -210,15 +202,15 @@ public class TestsGame extends SceneGame<TestsGame> {
     float gap = 20, x = gap, y = gap, maxHeight = 0;
 
     String info = "Renderer: gl (batch=" + defaultBatch + ")";
-    Texture infoTex = tests[0].formatText(info, false);
+    Texture infoTex = ui.formatText(info, false);
     rootLayer.addAt(new ImageLayer(infoTex), x, y);
     y += infoTex.displayHeight + gap;
 
-    for (Test test : tests) {
-      if (!test.available()) {
-        continue;
-      }
-      ImageLayer button = createButton(test);
+    for (final Test test : tests) {
+      if (!test.available()) continue;
+      ImageLayer button = ui.createButton(test.name, new Runnable() {
+        public void run () { startTest(test); }
+      });
       if (x + button.width() > graphics.viewSize.width() - gap) {
         x = gap;
         y += maxHeight + gap;
@@ -228,16 +220,6 @@ public class TestsGame extends SceneGame<TestsGame> {
       rootLayer.addAt(button, x, y);
       x += button.width() + gap;
     }
-  }
-
-  ImageLayer createButton (final Test test) {
-    ImageLayer layer = new ImageLayer(makeButtonTexture(test.getName()));
-    // layer.addListener(new Pointer.Adapter() {
-    //   @Override public void onPointerStart(Pointer.Event event) {
-    //     startTest(test);
-    //   }
-    // });
-    return layer;
   }
 
   void clearTest() {
@@ -255,16 +237,14 @@ public class TestsGame extends SceneGame<TestsGame> {
     rootLayer.destroyAll();
     rootLayer.add(createWhiteBackground());
 
-    log.info("Starting " + currentTest.getName());
-    log.info(" Description: " + currentTest.getDescription());
+    log.info("Starting " + currentTest.name);
+    log.info(" Description: " + currentTest.descrip);
     currentTest.init();
 
     if (currentTest.usesPositionalInputs()) {
       // slap on a Back button if the test is testing the usual means of backing out
-      ImageLayer back = tests[0].createButton("Back", new Runnable() {
-        public void run () {
-          displayMenuLater();
-        }
+      ImageLayer back = ui.createButton("Back", new Runnable() {
+        public void run () { displayMenuLater(); }
       });
       rootLayer.addAt(back, graphics.viewSize.width() - back.width(), 0);
     }
@@ -280,7 +260,4 @@ public class TestsGame extends SceneGame<TestsGame> {
     bg.setDepth(Float.NEGATIVE_INFINITY); // render behind everything
     return bg;
   }
-
-  protected final Font BUTTON_FONT;
-  protected final TextFormat BUTTON_FMT;
 }

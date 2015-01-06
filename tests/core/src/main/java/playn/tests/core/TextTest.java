@@ -20,6 +20,7 @@ import pythagoras.f.Rectangle;
 
 import playn.core.*;
 import playn.scene.*;
+import react.Slot;
 
 public class TextTest extends Test {
 
@@ -33,28 +34,20 @@ public class TextTest extends Test {
     }
   }
 
-  NToggle<Font.Style> style;
-  NToggle<String> draw;
-  NToggle<String> effect;
-  NToggle<TextBlock.Align> align;
-  NToggle<String> font;
-  NToggle<Integer> wrap;
-  TestsGame.Toggle lineBounds;
-  final float outlineWidth = 2;
-  String sample = "The quick brown fox\njumped over the lazy dog.\nEvery good boy deserves fudge.";
-  ImageLayer text;
-  Rectangle row;
+  private NToggle<Font.Style> style;
+  private NToggle<String> draw;
+  private NToggle<String> effect;
+  private NToggle<TextBlock.Align> align;
+  private NToggle<String> font;
+  private NToggle<Integer> wrap;
+  private NToggle<Boolean> lineBounds;
+  private final float outlineWidth = 2;
+  private String sample = "The quick brown fox\njumped over the lazy dog.\nEvery good boy deserves fudge.";
+  private ImageLayer text;
+  private Rectangle row;
 
   public TextTest (TestsGame game) {
-    super(game);
-  }
-
-  @Override public String getName() {
-    return "TextTest";
-  }
-
-  @Override public String getDescription() {
-    return "Tests various text rendering features.";
+    super(game, "TextTest", "Tests various text rendering features.");
   }
 
   @Override public void init() {
@@ -68,23 +61,21 @@ public class TextTest extends Test {
         "Align", TextBlock.Align.LEFT, TextBlock.Align.CENTER, TextBlock.Align.RIGHT)).layer);
     addToRow((font = new NToggle<String>("Font", "Times New Roman", "Helvetica")).layer);
 
-    // class SetText extends Pointer.Adapter implements Callback<String> {
-    //   final ImageLayer layer = graphics().createImageLayer(TestsGame.makeButtonImage("Set Text"));{
-    //     layer.addListener(this);
-    //   }
-    //   @Override public void onPointerEnd(Event event) {
-    //     keyboard().getText(TextType.DEFAULT, "Test text", sample.replace("\n", "\\n"), this);
-    //   }
-    //   public void onSuccess(String result) {
-    //     if (result == null) return;
-    //     // parse \n to allow testing line breaks
-    //     sample = result.replace("\\n", "\n");
-    //     update();
-    //   }
-    //   public void onFailure(Throwable cause) {}
-    // }
-    // addToRow(new SetText().layer);
-    addToRow((lineBounds = new TestsGame.Toggle("Lines")).layer);
+    ImageLayer layer = game.ui.createButton("Set Text", new Runnable() {
+      public void run () {
+        game.input.getText(Keyboard.TextType.DEFAULT, "Test text", sample.replace("\n", "\\n")).
+          onSuccess(new Slot<String>() {
+            public void onEmit (String text) {
+              if (text == null) return;
+              // parse \n to allow testing line breaks
+              sample = text.replace("\\n", "\n");
+              update();
+            }
+          });
+      }
+    });
+    addToRow(layer);
+    addToRow((lineBounds = new NToggle<Boolean>("Lines", Boolean.FALSE, Boolean.TRUE)).layer);
 
     // test laying out the empty string
     TextLayout layout = game.graphics.layoutText("", new TextFormat());

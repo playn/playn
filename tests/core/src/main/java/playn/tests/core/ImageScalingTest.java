@@ -17,6 +17,7 @@ package playn.tests.core;
 
 import java.util.Arrays;
 import playn.core.*;
+import playn.core.Pointer;
 import playn.scene.*;
 import pythagoras.f.FloatMath;
 import react.RFuture;
@@ -28,15 +29,8 @@ public class ImageScalingTest extends Test {
   private boolean paused = false;
 
   public ImageScalingTest (TestsGame game) {
-    super(game);
-  }
-
-  @Override public String getName() {
-    return "ImageScalingTest";
-  }
-
-  @Override public String getDescription() {
-    return "Tests use of min/mag filters and mipmapping when scaling images.";
+    super(game, "ImageScalingTest",
+          "Tests use of min/mag filters and mipmapping when scaling images.");
   }
 
   @Override public void init () {
@@ -50,7 +44,8 @@ public class ImageScalingTest extends Test {
         final ImageLayer player1 = new ImageLayer(game.graphics, princess);
         player1.setOrigin(phwidth, phheight);
         game.rootLayer.addAt(player1, 100, 100);
-        final ImageLayer player2 = new ImageLayer(game.graphics.createTexture(princess, true, true));
+        final ImageLayer player2 = new ImageLayer(
+          game.graphics.createTexture(princess, true, true));
         player2.setOrigin(phwidth, phheight);
         game.rootLayer.addAt(player2, 250, 100);
 

@@ -21,16 +21,9 @@ import playn.scene.*;
 public class FullscreenTest extends Test {
   private static Host host;
 
-  public static void setHost (Host host) {
-    FullscreenTest.host = host;
-  }
-
   public static class Mode {
     public int width, height, depth;
-
-    @Override public String toString () {
-      return "" + width + "x" + height + "x" + depth;
-    }
+    @Override public String toString () { return "" + width + "x" + height + "x" + depth; }
   }
 
   public interface Host {
@@ -38,15 +31,23 @@ public class FullscreenTest extends Test {
     void setMode (Mode mode);
   }
 
+  public static void setHost (Host host) {
+    FullscreenTest.host = host;
+  }
+
   public FullscreenTest (TestsGame game) {
-    super(game);
+    super(game, "Full Screen", "Tests support for full screen modes");
+  }
+
+  @Override public boolean available () {
+    return host != null;
   }
 
   @Override public void init () {
     final float spacing = 5;
     float y = spacing, x = spacing, nextX = spacing;
     for (final Mode mode : host.enumerateModes()) {
-      ImageLayer button = createButton(mode.toString(), new Runnable() {
+      ImageLayer button = game.ui.createButton(mode.toString(), new Runnable() {
         @Override public void run () { host.setMode(mode); }
       });
       game.rootLayer.add(button);
@@ -58,17 +59,5 @@ public class FullscreenTest extends Test {
       y += button.height() + spacing;
       nextX = Math.max(nextX, x + button.width());
     }
-  }
-
-  @Override public boolean available () {
-    return host != null;
-  }
-
-  @Override public String getName () {
-    return "Full Screen";
-  }
-
-  @Override public String getDescription () {
-    return "Tests support for full screen modes";
   }
 }

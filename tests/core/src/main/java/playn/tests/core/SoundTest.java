@@ -16,17 +16,7 @@ import react.Slot;
 public class SoundTest extends Test {
 
   public SoundTest (TestsGame game) {
-    super(game);
-  }
-
-  @Override
-  public String getName() {
-    return "SoundTest";
-  }
-
-  @Override
-  public String getDescription() {
-    return "Tests playing and looping sounds.";
+    super(game, "SoundTest", "Tests playing and looping sounds.");
   }
 
   @Override public void init() {
@@ -95,7 +85,7 @@ public class SoundTest extends Test {
 
     float y = 0;
     for (TextLayout layout : game.graphics.layoutText(
-      buf.toString(), TEXT_FMT, new TextWrap(300))) {
+      buf.toString(), game.ui.TEXT_FMT, new TextWrap(300))) {
       canvas.fillText(layout, 0, y);
       y += layout.ascent() + layout.descent() + layout.leading();
     }

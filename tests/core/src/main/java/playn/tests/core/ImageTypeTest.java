@@ -21,7 +21,6 @@ import playn.scene.*;
 import react.Slot;
 
 public class ImageTypeTest extends Test {
-  GroupLayer rootLayer;
 
   static float width = 100;
   static float height = 100;
@@ -30,28 +29,20 @@ public class ImageTypeTest extends Test {
   static String imageGroundTruthSrc = "images/imagetypetest_expected.png";
 
   public ImageTypeTest (TestsGame game) {
-    super(game);
-  }
-
-  @Override
-  public String getName() {
-    return "ImageTypeTest";
-  }
-
-  @Override
-  public String getDescription() {
-    return "Test that image types display the same. Left-to-right: ImageLayer, SurfaceImage, CanvasImage, ground truth (expected).";
+    super(game, "ImageTypeTest",
+          "Test that image types display the same. Left-to-right: ImageLayer, SurfaceImage, " +
+          "CanvasImage, ground truth (expected).");
   }
 
   @Override public void init() {
     // add a half white, half blue background
     float bwidth = 4*width, bheight = 4*height;
-    SurfaceTexture bg = game.createSurface(bwidth, bheight);
+    TextureSurface bg = game.createSurface(bwidth, bheight);
     bg.begin().
       setFillColor(Color.rgb(255, 255, 255)).fillRect(0, 0, bwidth, bheight).
-      setFillColor(Color.rgb(0, 0, 255)).fillRect(0, bwidth/2, bwidth, bheight/2);
-    bg.end().close();
-    rootLayer.add(new ImageLayer(bg.texture));
+      setFillColor(Color.rgb(0, 0, 255)).fillRect(0, bwidth/2, bwidth, bheight/2).
+      end().close();
+    game.rootLayer.add(new ImageLayer(bg.texture));
 
     game.assets.getImage(imageSrc).state.onSuccess(new Slot<Image>() {
       public void onEmit (Image image) {
@@ -60,17 +51,16 @@ public class ImageTypeTest extends Test {
         game.rootLayer.addAt(new ImageLayer(imtex), offset, offset);
         game.rootLayer.addAt(new ImageLayer(imtex), offset, offset + 2*height);
 
-        SurfaceTexture surf = game.createSurface(image.width(), image.height());
-        surf.begin().draw(imtex, 0, 0);
-        surf.end().close();
+        TextureSurface surf = game.createSurface(image.width(), image.height());
+        surf.begin().clear().draw(imtex, 0, 0).end().close();
         game.rootLayer.addAt(new ImageLayer(surf.texture), offset + width, offset);
         game.rootLayer.addAt(new ImageLayer(surf.texture), offset + width, offset + 2*height);
 
         Canvas canvas = game.graphics.createCanvas(image.width(), image.height());
         canvas.drawImage(image, 0, 0);
         Texture cantex = game.graphics.createTexture(canvas.image);
-        rootLayer.addAt(new ImageLayer(cantex), offset + 2*width, offset);
-        rootLayer.addAt(new ImageLayer(cantex), offset + 2*width, offset + 2*height);
+        game.rootLayer.addAt(new ImageLayer(cantex), offset + 2*width, offset);
+        game.rootLayer.addAt(new ImageLayer(cantex), offset + 2*width, offset + 2*height);
       }
     });
 

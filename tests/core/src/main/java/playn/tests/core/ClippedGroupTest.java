@@ -26,17 +26,7 @@ public class ClippedGroupTest extends Test {
   private float elapsed;
 
   public ClippedGroupTest (TestsGame game) {
-    super(game);
-  }
-
-  @Override
-  public String getName() {
-    return "ClippedGroupTest";
-  }
-
-  @Override
-  public String getDescription() {
-    return "Tests clipping of children in group layers.";
+    super(game, "ClippedGroupTest", "Tests clipping of children in group layers.");
   }
 
   @Override public void init () {
@@ -68,9 +58,8 @@ public class ClippedGroupTest extends Test {
 
     // create a group layer with a static clip, and a rotating surface image inside
     final GroupLayer g4 = new GroupLayer(100, 100);
-    SurfaceTexture si = game.createSurface(100, 50);
-    si.begin().setFillColor(0xFF99CCFF).fillRect(0, 0, 100, 50);
-    si.end().close();
+    TextureSurface si = game.createSurface(100, 50);
+    si.begin().setFillColor(0xFF99CCFF).fillRect(0, 0, 100, 50).end().close();
     final ImageLayer s1 = new ImageLayer(si.texture);
     s1.setOrigin(s1.width()/2, s1.height()/2);
     g4.addAt(s1, 50, 50);

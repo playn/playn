@@ -25,16 +25,9 @@ import playn.scene.*;
 public class CanvasStressTest extends Test {
 
   public CanvasStressTest (TestsGame game) {
-    super(game);
-  }
-
-  @Override public String getName() {
-    return "Canvas Stress Test";
-  }
-
-  @Override public String getDescription() {
-    return "Animates a full-screen sized canvas, forcing a massive reupload of image data to " +
-      "the GPU on every frame.";
+    super(game, "Canvas Stress Test",
+          "Animates a full-screen sized canvas, forcing a massive reupload of image data to " +
+          "the GPU on every frame.");
   }
 
   @Override public void init() {
@@ -63,7 +56,8 @@ public class CanvasStressTest extends Test {
           canvas.strokeCircle(x, y, 100);
         }
 
-        // TODO: update canvasTex with canvas.image
+        // reupload the image data
+        canvasTex.update(canvas.image);
       }
     }));
   }

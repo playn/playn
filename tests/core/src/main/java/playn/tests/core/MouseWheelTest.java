@@ -17,6 +17,7 @@ package playn.tests.core;
 
 import playn.core.*;
 import playn.scene.*;
+import playn.scene.Mouse;
 
 public class MouseWheelTest extends Test
 {
@@ -25,15 +26,7 @@ public class MouseWheelTest extends Test
   private static final float HWIDTH = WIDTH / 2;
 
   public MouseWheelTest (TestsGame game) {
-    super(game);
-  }
-
-  @Override public String getName () {
-    return "MouseWheelTest";
-  }
-
-  @Override public String getDescription () {
-    return "Tests mouse wheel movement on layers";
+    super(game, "MouseWheelTest", "Tests mouse wheel movement on layers");
   }
 
   @Override public void init () {
@@ -47,7 +40,7 @@ public class MouseWheelTest extends Test
     knob.setStrokeColor(0xff000000).drawLine(0, HWIDTH / 2, WIDTH, HWIDTH / 2);
     knob.setStrokeColor(0xffff0000).strokeRect(0, 0, WIDTH - 1, HWIDTH - 1);
 
-    ImageLayer il = new ImageLayer(game.graphics, knob.image);
+    final ImageLayer il = new ImageLayer(game.graphics, knob.image);
     il.setOrigin(0, HWIDTH / 2).setDepth(1).setTranslation(0, HEIGHT / 2);
 
     GroupLayer slider = new GroupLayer();
@@ -55,12 +48,12 @@ public class MouseWheelTest extends Test
     slider.add(il);
     game.rootLayer.addAt(slider, 25, 25);
 
-    // bg.addListener(new Mouse.LayerAdapter() {
-    //   @Override public void onMouseWheelScroll (Mouse.WheelEvent event) {
-    //     float y = il.ty() + event.velocity();
-    //     y = Math.max(0, Math.min(y, HEIGHT));
-    //     il.setTranslation(0, y);
-    //   }
-    // });
+    bg.events().connect(new Mouse.Listener() {
+      @Override public void onWheel (Mouse.WheelEvent event, Mouse.Interaction iact) {
+        float y = il.ty() + event.velocity;
+        y = Math.max(0, Math.min(y, HEIGHT));
+        il.setTranslation(0, y);
+      }
+    });
   }
 }

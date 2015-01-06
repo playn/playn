@@ -21,15 +21,8 @@ import playn.scene.*;
 public class DepthTest extends Test {
 
   public DepthTest (TestsGame game) {
-    super(game);
-  }
-
-  @Override public String getName() {
-    return "DepthTest";
-  }
-
-  @Override public String getDescription() {
-    return "Tests that layers added with non-zero depth are inserted/rendered in proper order.";
+    super(game, "DepthTest",
+          "Tests that layers added with non-zero depth are inserted/rendered in proper order.");
   }
 
   @Override public void init() {

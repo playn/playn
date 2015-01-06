@@ -26,16 +26,9 @@ public class ImmediateTest extends Test {
   private float elapsed, rotation;
 
   public ImmediateTest (TestsGame game) {
-    super(game);
-  }
-
-  @Override public String getName() {
-    return "ImmediateTest";
-  }
-
-  @Override public String getDescription() {
-    return "Tests rendering of immediate layers with and without clipping. Clipped blue layer " +
-      "should not overdraw one pixel black line that circumscribes it.";
+    super(game, "ClippedLayerTest",
+          "Tests rendering of simple layers with and without clipping. Clipped blue layers " +
+          "should not overdraw one pixel black lines that circumscribes them.");
   }
 
   @Override public void init() {

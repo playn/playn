@@ -29,15 +29,7 @@ public class ShaderTest extends Test {
   private float elapsed;
 
   public ShaderTest (TestsGame game) {
-    super(game);
-  }
-
-  @Override public String getName() {
-    return "ShaderTest";
-  }
-
-  @Override public String getDescription() {
-    return "Tests custom shader support.";
+    super(game, "ShaderTest", "Tests custom shader support.");
   }
 
   @Override public void init () {

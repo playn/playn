@@ -18,18 +18,10 @@ import playn.scene.*;
 
 public class SurfaceTest extends Test {
 
-  private SurfaceTexture paintUpped;
+  private TextureSurface paintUpped;
 
   public SurfaceTest (TestsGame game) {
-    super(game);
-  }
-
-  @Override public String getName() {
-    return "SurfaceTest";
-  }
-
-  @Override public String getDescription() {
-    return "Tests various Surface rendering features.";
+    super(game, "SurfaceTest", "Tests various Surface rendering features.");
   }
 
   @Override public void init() {
@@ -52,15 +44,18 @@ public class SurfaceTest extends Test {
   @Override
   public void dispose() {
     super.dispose();
-    paintUpped.close();
-    paintUpped = null;
+    if (paintUpped != null) {
+      paintUpped.close();
+      paintUpped = null;
+    }
   }
 
   protected void addTests (final Image orange, Image tile) {
     final Pattern pattern = tile.toPattern(true, true);
 
     final Texture otex = game.graphics.createTexture(orange);
-    otex.setRepeat(true, true);
+    final Texture ttex = game.graphics.createTexture(tile);
+    ttex.setRepeat(true, true);
 
     // make samples big enough to force a buffer size increase
     final int samples = 128, hsamples = samples/2;
@@ -75,9 +70,9 @@ public class SurfaceTest extends Test {
     // draw some wide lines
     ypos = ygap + addTest(10, ypos, new Layer() {
       protected void paintImpl (Surface surf) {
-        drawLine(surf, 0, 0, 50, 50, 15);
-        drawLine(surf, 70, 50, 120, 0, 10);
-        drawLine(surf, 0, 70, 120, 120, 10);
+        drawLine(surf,  0,  0,  50,  50, 15);
+        drawLine(surf, 70, 50, 120,   0, 10);
+        drawLine(surf,  0, 70, 120, 120, 10);
       }
     }, 120, 120, "drawLine with width");
 
@@ -94,8 +89,8 @@ public class SurfaceTest extends Test {
       protected void paintImpl (Surface surf) {
         surf.setFillColor(0xFF0000FF).fillRect(0, 0, 100, 50);
         surf.setAlpha(0.5f);
-        surf.draw(otex, 55, 5);
         surf.fillRect(0, 50, 50, 50);
+        surf.draw(otex, 55, 5);
         surf.draw(otex, 55, 55);
         surf.setAlpha(1f);
       }
@@ -106,7 +101,7 @@ public class SurfaceTest extends Test {
     ypos = ygap + addTest(160, ypos, new Layer() {
       protected void paintImpl (Surface surf) {
         // fill some shapes with patterns
-        surf.setFillPattern(otex).fillRect(10, 0, 100, 100);
+        surf.setFillPattern(ttex).fillRect(10, 0, 100, 100);
         // use same fill pattern for the triangles
         surf.translate(0, 160);
         // TODO: triangles
@@ -119,9 +114,8 @@ public class SurfaceTest extends Test {
       private int offset = 0, doff = 1;
     }, 120, 210, "ImmediateLayer patterned fillRect, fillTriangles");
 
-    SurfaceTexture patted = game.createSurface(100, 100);
-    patted.begin().setFillPattern(otex).fillRect(0, 0, 100, 100);
-    patted.end().close();
+    TextureSurface patted = game.createSurface(100, 100);
+    patted.begin().clear().setFillPattern(ttex).fillRect(0, 0, 100, 100).end().close();
     ypos = ygap + addTest(170, ypos, new ImageLayer(patted.texture),
                           "SurfaceImage patterned fillRect");
 
@@ -132,16 +126,22 @@ public class SurfaceTest extends Test {
     GroupLayer group = new GroupLayer();
     ypos = ygap + addTest(315, 10, group, twidth, theight,
                           "Clipped pattern should not exceed grey rectangle");
-    group.add(new ClippedLayer(twidth, theight) {
-      protected void paintClipped (Surface surf) {
-        surf.setFillPattern(otex).fillRect(-10, -10, twidth+20, theight+20);
-      }
-    });
     group.add(new Layer() {
       protected void paintImpl (Surface surf) {
         surf.setFillColor(0xFFCCCCCC).fillRect(0, 0, twidth, theight);
       }
     });
+    group.add(new ClippedLayer(twidth, theight) {
+      protected void paintClipped (Surface surf) {
+        surf.setFillPattern(ttex).fillRect(-10, -10, twidth+20, theight+20);
+      }
+    });
+
+    // add a surface layer that is updated on every call to paint
+    // (a bad practice, but one that should actually work)
+    paintUpped = game.createSurface(100, 100);
+    ypos = ygap + addTest(315, ypos, new ImageLayer(paintUpped.texture),
+                          "SurfaceImage updated in paint()");
 
     // draw some randomly jiggling dots inside a bounded region
     final List<ImageLayer> dots = new ArrayList<ImageLayer>();
@@ -152,10 +152,11 @@ public class SurfaceTest extends Test {
       }
     }, dotBox.width, dotBox.height, "Randomly positioned SurfaceImages");
     for (int ii = 0; ii < 10; ii++) {
-      SurfaceTexture dot = game.createSurface(10, 10);
-      dot.begin().setFillColor(0xFFFF0000).fillRect(0, 0, 5, 5).fillRect(5, 5, 5, 5).
-        setFillColor(0xFF0000FF).fillRect(5, 0, 5, 5).fillRect(0, 5, 5, 5);
-      dot.end().close();
+      TextureSurface dot = game.createSurface(10, 10);
+      dot.begin().
+        setFillColor(0xFFFF0000).fillRect(0, 0, 5, 5).fillRect(5, 5, 5, 5).
+        setFillColor(0xFF0000FF).fillRect(5, 0, 5, 5).fillRect(0, 5, 5, 5).
+        end().close();
       ImageLayer dotl = new ImageLayer(dot.texture);
       dotl.setTranslation(dotBox.x + (float)Math.random()*(dotBox.width-10),
                           dotBox.y + (float)Math.random()*(dotBox.height-10));
@@ -164,12 +165,6 @@ public class SurfaceTest extends Test {
       // System.err.println("Created dot at " + dotl.transform());
       game.rootLayer.add(dotl);
     }
-
-    // add a surface layer that is updated on every call to paint (a bad practice, but one that
-    // should actually work)
-    paintUpped = game.createSurface(100, 100);
-    ypos = ygap + addTest(315, ypos, new ImageLayer(paintUpped.texture),
-                          "SurfaceImage updated in paint()");
 
     conns.add(game.paint.connect(new Slot<TestsGame>() {
       public void onEmit (TestsGame game) {
@@ -187,30 +182,18 @@ public class SurfaceTest extends Test {
         int c2 = (0xFF << 24) | (cosColor << 16) | (sinColor << 8);
         paintUpped.begin().clear().
           setFillColor(c1).fillRect(0, 0, 50, 50).
-          setFillColor(c2).fillRect(50, 50, 50, 50);
-        paintUpped.end();
+          setFillColor(c2).fillRect(50, 50, 50, 50).
+          end();
       }
     }));
-  }
-
-  protected float addTest(float lx, float ly, Layer layer,
-                          float lwidth, float lheight, String descrip) {
-    return addTest(lx, ly, layer, lwidth, lheight, descrip);
   }
 
   void drawLine(Surface surf, float x1, float y1, float x2, float y2, float width) {
     float xmin = Math.min(x1, x2), xmax = Math.max(x1, x2);
     float ymin = Math.min(y1, y2), ymax = Math.max(y1, y2);
-
-    surf.setFillColor(0xFF0000AA);
-    surf.fillRect(xmin, ymin, xmax-xmin, ymax-ymin);
-
-    surf.setFillColor(0xFF99FFCC);
-    surf.drawLine(x1, y1, x2, y2, width);
-
-    surf.setFillColor(0xFFFF0000);
-    surf.fillRect(x1, y1, 1, 1);
-    surf.fillRect(x2, y2, 1, 1);
+    surf.setFillColor(0xFF0000AA).fillRect(xmin, ymin, xmax-xmin, ymax-ymin);
+    surf.setFillColor(0xFF99FFCC).drawLine(x1, y1, x2, y2, width);
+    surf.setFillColor(0xFFFF0000).fillRect(x1, y1, 1, 1).fillRect(x2, y2, 1, 1);
   }
 
   private interface F {

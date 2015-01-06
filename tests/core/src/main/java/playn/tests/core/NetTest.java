@@ -31,15 +31,7 @@ public class NetTest extends Test {
   private Net.WebSocket _websock;
 
   public NetTest (TestsGame game) {
-    super(game);
-  }
-
-  @Override public String getName() {
-    return "NetTest";
-  }
-
-  @Override public String getDescription() {
-    return "Tests network support.";
+    super(game, "NetTest", "Tests network support.");
   }
 
   @Override public void init() {
@@ -149,7 +141,7 @@ public class NetTest extends Test {
   }
 
   protected RFuture<String> getText (String label) {
-    return game.keyboard.getText(Keyboard.TextType.DEFAULT, label, "");
+    return game.input.getText(Keyboard.TextType.DEFAULT, label, "");
   }
 
   protected void loadURL (String url) {
@@ -162,7 +154,7 @@ public class NetTest extends Test {
   }
 
   protected void displayText (String text) {
-    output.setTexture(wrapText(text, game.graphics.viewSize.width()-20, TextBlock.Align.LEFT));
+    output.setTexture(game.ui.wrapText(text, game.graphics.viewSize.width()-20, TextBlock.Align.LEFT));
   }
 
   protected final Slot<Net.Response> displayResult = new Slot<Net.Response>() {

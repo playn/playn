@@ -31,15 +31,7 @@ public class PauseResumeTest extends Test {
   private ImageLayer layer;
 
   public PauseResumeTest (TestsGame game) {
-    super(game);
-  }
-
-  @Override public String getName() {
-    return "PauseResumeTest";
-  }
-
-  @Override public String getDescription() {
-    return "Tests pause/resume notifications.";
+    super(game, "PauseResumeTest", "Tests pause/resume notifications.");
   }
 
   @Override public void init() {

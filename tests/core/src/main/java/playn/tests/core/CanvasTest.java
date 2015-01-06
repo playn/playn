@@ -33,15 +33,7 @@ public class CanvasTest extends Test {
   private int lastSecs;
 
   public CanvasTest (TestsGame game) {
-    super(game);
-  }
-
-  @Override public String getName() {
-    return "CanvasTest";
-  }
-
-  @Override public String getDescription() {
-    return "Tests various Canvas rendering features.";
+    super(game, "CanvasTest", "Tests various Canvas rendering features.");
   }
 
   @Override public void init() {
@@ -231,21 +223,22 @@ public class CanvasTest extends Test {
       }
     });
 
-    game.paint.connect(new Slot<TestsGame>() {
+    conns.add(game.paint.connect(new Slot<TestsGame>() {
       public void onEmit (TestsGame game) {
         int curSecs = game.paintTick/1000;
         if (curSecs != lastSecs) {
           timeImg.clear();
-          timeImg.setStrokeColor(0xFF000000).strokeRect(0, 0, 100, 100);
+          timeImg.setStrokeColor(0xFF000000).strokeRect(0, 0, 99, 99);
           timeImg.drawText(""+curSecs, 40, 55);
           lastSecs = curSecs;
-          // TODO: flish timeImg.image to timeTex
+          timeTex.update(timeImg.image);
         }
 
         // round the width so that it goes to zero sometimes (which should be fine)
-        tileLayer.width = Math.round(Math.abs(FloatMath.sin(game.paintTick/2f)) * 100);
+        if (tileLayer != null) tileLayer.forceWidth = Math.round(
+          Math.abs(FloatMath.sin(game.paintTick/2000f)) * 100);
       }
-    });
+    }));
   }
 
   private interface Drawer {
@@ -289,12 +282,14 @@ public class CanvasTest extends Test {
   private void addTestCanvas(String descrip, int width, int height, String imagePath,
                              final ImageDrawer drawer) {
     final Canvas target = game.graphics.createCanvas(width, height);
+    final Texture tex = game.graphics.createTexture(target.image);
     game.assets.getImage(imagePath).state.onSuccess(new Slot<Image>() {
       public void onEmit (Image image) {
         drawer.draw(target, image);
+        tex.update(target.image);
       }
     });
-    addTestLayer(descrip, width, height, new ImageLayer(game.graphics, target.image));
+    addTestLayer(descrip, width, height, new ImageLayer(tex));
   }
 
   private Font F_FONT = TestsGame.game.graphics.createFont(

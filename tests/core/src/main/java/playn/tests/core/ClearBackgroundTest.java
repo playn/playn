@@ -29,16 +29,9 @@ public class ClearBackgroundTest extends Test {
   static int height = 100;
 
   public ClearBackgroundTest (TestsGame game) {
-    super(game);
-  }
-
-  @Override public String getName () {
-    return "ClearBackgroundTest";
-  }
-
-  @Override public String getDescription () {
-    return "Test that the platform correctly clears the background to black between frames, " +
-      "even if nothing is painted.";
+    super(game, "ClearBackgroundTest",
+          "Test that the platform correctly clears the background to black between frames, " +
+          "even if nothing is painted.");
   }
 
   @Override public void init () {
@@ -46,9 +39,8 @@ public class ClearBackgroundTest extends Test {
     game.rootLayer.destroyAll();
 
     // add a grey square
-    SurfaceTexture surf = game.createSurface(width, height);
-    surf.begin().setFillColor(Color.rgb(200, 200, 200)).fillRect(0, 0, width, height);
-    surf.end().close();
+    TextureSurface surf = game.createSurface(width, height);
+    surf.begin().setFillColor(Color.rgb(200, 200, 200)).fillRect(0, 0, width, height).end().close();
     final ImageLayer square = new ImageLayer(surf.texture);
     game.rootLayer.add(square);
 

@@ -15,17 +15,7 @@ public class SubImageTest extends Test {
   private ImageLayer osci;
 
   public SubImageTest (TestsGame game) {
-    super(game);
-  }
-
-  @Override
-  public String getName() {
-    return "SubImageTest";
-  }
-
-  @Override
-  public String getDescription() {
-    return "Tests sub-image rendering in various circumstances.";
+    super(game, "SubImageTest", "Tests sub-image rendering in various circumstances.");
   }
 
   @Override public void init() {

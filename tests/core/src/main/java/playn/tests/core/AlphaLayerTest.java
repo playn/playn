@@ -26,17 +26,8 @@ public class AlphaLayerTest extends Test {
   static int offset = 5;
 
   public AlphaLayerTest (TestsGame game) {
-    super(game);
-  }
-
-  @Override
-  public String getName() {
-    return "AlphaLayerTest";
-  }
-
-  @Override
-  public String getDescription() {
-    return "Test that alpha works the same on all layer types and that alpha is 'additive'.";
+    super(game, "AlphaLayerTest",
+          "Test that alpha works the same on all layer types and that alpha is 'additive'.");
   }
 
   @Override public void init() {
@@ -44,11 +35,11 @@ public class AlphaLayerTest extends Test {
     final float fullWidth = 6*width, fullHeight = 3*height;
 
     // add a half white, half blue background
-    SurfaceTexture bg = game.createSurface(fullWidth, fullHeight);
-    Surface bgs = bg.begin();
-    bgs.setFillColor(Color.rgb(255, 255, 255)).fillRect(0, 0, fullWidth, fullHeight);
-    bgs.setFillColor(Color.rgb(0, 0, 255)).fillRect(0, 2*height, fullWidth, height);
-    bg.end().close();
+    TextureSurface bg = game.createSurface(fullWidth, fullHeight);
+    bg.begin().
+      setFillColor(Color.rgb(255, 255, 255)).fillRect(0, 0, fullWidth, fullHeight).
+      setFillColor(Color.rgb(0, 0, 255)).fillRect(0, 2*height, fullWidth, height).
+      end().close();
     rootLayer.add(new ImageLayer(bg.texture));
 
     addDescrip("all layers contained in group layer with a=0.5\n" +
@@ -70,17 +61,15 @@ public class AlphaLayerTest extends Test {
         groupLayer.addAt(new ImageLayer(imtex).setAlpha(0.5f), x, y2);
         x += width;
 
-        SurfaceTexture surf1 = game.createSurface(image.width(), image.height());
-        surf1.begin().setAlpha(0.5f).draw(imtex, 0, 0);
-        surf1.end().close();
+        TextureSurface surf1 = game.createSurface(image.width(), image.height());
+        surf1.begin().clear().setAlpha(0.5f).draw(imtex, 0, 0).end().close();
         groupLayer.addAt(new ImageLayer(surf1.texture), x, y0);
         addDescrip("surface a=0.5\nimg layer a=1", x, y1, width);
         groupLayer.addAt(new ImageLayer(surf1.texture), x, y2);
         x += width;
 
-        SurfaceTexture surf2 = game.createSurface(image.width(), image.height());
-        surf2.begin().draw(imtex, 0, 0);
-        surf2.end().close();
+        TextureSurface surf2 = game.createSurface(image.width(), image.height());
+        surf2.begin().clear().draw(imtex, 0, 0).end().close();
         groupLayer.addAt(new ImageLayer(surf2.texture).setAlpha(0.5f), x, y0);
         addDescrip("surface a=1\nimg layer a=0.5", x, y1, width);
         groupLayer.addAt(new ImageLayer(surf2.texture).setAlpha(0.5f), x, y2);
