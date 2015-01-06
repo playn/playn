@@ -32,10 +32,9 @@ public abstract class SceneGame<G extends SceneGame> extends Game<G> {
     gl.glDisable(GL20.GL_CULL_FACE);
     gl.glEnable(GL20.GL_BLEND);
     gl.glBlendFunc(GL20.GL_ONE, GL20.GL_ONE_MINUS_SRC_ALPHA);
-    gl.glClearColor(0, 0, 0, 1);
 
     defaultBatch = new UniformQuadBatch(gl);
-    viewSurf = new Surface(plat.graphics(), plat.graphics().defaultRenderTarget);
+    viewSurf = new Surface(plat.graphics(), plat.graphics().defaultRenderTarget, defaultBatch);
     rootLayer = new GroupLayer();
 
     paint.connect(new Slot<G>() {
@@ -47,13 +46,13 @@ public abstract class SceneGame<G extends SceneGame> extends Game<G> {
    * Renders the main scene graph into the OpenGL frame buffer.
    */
   protected void paintScene () {
-    defaultBatch.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
     viewSurf.saveTx();
-    viewSurf.beginBatch(defaultBatch);
+    viewSurf.begin();
+    viewSurf.clear();
     try {
       rootLayer.paint(viewSurf);
     } finally {
-      viewSurf.endBatch();
+      viewSurf.end();
       viewSurf.restoreTx();
     }
   }
