@@ -107,7 +107,7 @@ public class StubPlatform extends Platform {
     return (int)(System.currentTimeMillis() - start);
   }
 
-  @Override public void invokeLater (Slot<Platform> action) {
+  @Override public void invokeLater (Slot<? super Platform> action) {
     action.onEmit(this); // now is later!
   }
 

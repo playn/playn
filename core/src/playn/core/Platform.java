@@ -72,14 +72,14 @@ public abstract class Platform {
    * this uses {@link #invokeLater(UnitSlot)} so feel free to cut out the middle man.
    */
   public void invokeLater (final Runnable runnable) {
-    invokeLater(new UnitSlot() { public void onEmit () { runnable.run(); }});
+    invokeLater(new Slot<Platform>() { public void onEmit (Platform plat) { runnable.run(); }});
   }
 
   /**
    * Connects {@code action} to the {@link #frame} signal at a high priority and for a single
    * execution. This ensures that it runs before the game's normal callbacks.
    */
-  public void invokeLater (Slot<Platform> action) {
+  public void invokeLater (Slot<? super Platform> action) {
     frame.connect(action).atPrio(Short.MAX_VALUE).once();
   }
 
@@ -91,10 +91,14 @@ public abstract class Platform {
   public <T> RPromise<T> deferredPromise () {
     return new RPromise<T>() {
       @Override public void succeed (final T value) {
-        invokeLater(new UnitSlot() { public void onEmit () { superSucceed(value); }});
+        invokeLater(new Slot<Platform>() {
+          public void onEmit (Platform plat) { superSucceed(value); }
+        });
       }
       @Override public void fail (final Throwable cause) {
-        invokeLater(new UnitSlot() { public void onEmit () { superFail(cause); }});
+        invokeLater(new Slot<Platform>() {
+          public void onEmit (Platform plat) { superFail(cause); }
+        });
       }
       private void superSucceed (T value) { super.succeed(value); }
       private void superFail (Throwable cause) { super.fail(cause); }
