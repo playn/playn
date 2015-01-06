@@ -33,6 +33,7 @@ public abstract class RenderTarget implements Disposable {
       public int id () { return fb; }
       public int width () { return tex.pixelWidth; }
       public int height () { return tex.pixelHeight; }
+      public boolean flip () { return false; }
     };
   }
 
@@ -51,6 +52,11 @@ public abstract class RenderTarget implements Disposable {
 
   /** The height of the framebuffer in pixels. */
   public abstract int height ();
+
+  /** Whether or not to flip the y-axis when rendering to this target. When rendering to textures
+    * we do not want to flip the y-axis, but when rendering to the screen we do (so that the origin
+    * is at the upper-left of the screen). */
+  public abstract boolean flip ();
 
   /** Binds the framebuffer. */
   public void bind () {

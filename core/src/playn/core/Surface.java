@@ -32,11 +32,11 @@ import pythagoras.i.Rectangle;
  * {@link Surface#beginBatch} and {@link Surface#endBatch}. This ensures that the batch into which
  * the surface is rendering is properly flushed to the GPU at the right times.
  */
-public final class Surface {
+public class Surface implements Disposable {
 
   private final List<AffineTransform> transformStack = new ArrayList<>();
   private final Texture colorTex;
-  private final RenderTarget target;
+  protected final RenderTarget target;
 
   private final List<Rectangle> scissors = new ArrayList<Rectangle>();
   private int scissorDepth;
@@ -46,24 +46,29 @@ public final class Surface {
   private int tint = Tint.NOOP_TINT;
   private Texture patternTex;
 
-  public Surface (Graphics gfx, RenderTarget target) {
+  /**
+   * Creates a surface which will render to {@code target} using {@code defaultBatch} as its
+   * default quad renderer.
+   */
+  public Surface (Graphics gfx, RenderTarget target, QuadBatch defaultBatch) {
     this.target = target;
+    this.batch = defaultBatch;
     transformStack.add(new AffineTransform());
     colorTex = gfx.colorTex();
+    scale(gfx.scale.factor, gfx.scale.factor);
   }
 
   /** Starts a series of drawing commands to this surface. */
-  public Surface beginBatch (QuadBatch batch) {
+  public Surface begin () {
     target.bind();
-    this.batch = batch;
-    batch.begin(target.width(), target.height());
+    beginBatch(batch);
     return this;
   }
 
   /** Completes a series of drawing commands to this surface. */
-  public void endBatch () {
+  public Surface end () {
     batch.end();
-    batch = null;
+    return this;
   }
 
   /** Configures this surface to use {@code batch}, if non-null. NOOPs otherwise.
@@ -72,16 +77,16 @@ public final class Surface {
   public QuadBatch pushBatch (QuadBatch newBatch) {
     if (newBatch == null) return null;
     QuadBatch oldBatch = batch;
-    endBatch();
-    beginBatch(newBatch);
+    batch.end();
+    batch = beginBatch(newBatch);
     return oldBatch;
   }
 
   /** Restores the batch that was in effect prior to a {@link #pushBatch} call. */
   public void popBatch (QuadBatch oldBatch) {
     if (oldBatch != null) {
-      endBatch();
-      beginBatch(oldBatch);
+      batch.end();
+      batch = beginBatch(oldBatch);
     }
   }
 
@@ -256,7 +261,7 @@ public final class Surface {
   }
 
   /**
-   * Fills a line between the specified coordinates, of the specified  (pixel) width.
+   * Fills a line between the specified coordinates, of the specified display unit width.
    */
   public Surface drawLine (float x0, float y0, float x1, float y1, float width) {
     // swap the line end points if x1 is less than x0
@@ -277,13 +282,12 @@ public final class Surface {
     AffineTransform xf = new AffineTransform();
     xf.setRotation(FloatMath.atan2(dy, dx));
     xf.setTranslation(x0 + wy, y0 - wx);
-    xf.preConcatenate(tx());
+    Transforms.multiply(tx(), xf, xf);
 
     if (patternTex != null) {
-      batch.add(patternTex, tint, xf, 0, 0, length, width,
-                0, 0, length/patternTex.displayWidth, width/patternTex.displayHeight);
+      batch.add(patternTex, tint, xf, 0, 0, length, width);
     } else {
-      batch.add(colorTex, Tint.combine(fillColor, tint), xf, 0, 0, length, width, 0, 0, 1, 1);
+      batch.add(colorTex, Tint.combine(fillColor, tint), xf, 0, 0, length, width);
     }
     return this;
   }
@@ -293,14 +297,20 @@ public final class Surface {
    */
   public Surface fillRect (float x, float y, float width, float height) {
     if (patternTex != null) {
-      float tw = patternTex.displayWidth, th = patternTex.displayHeight;
-      float r = x+width, b = y+height;
-      batch.add(patternTex, tint, tx(), x, y, x+width, y+height, x/tw, y/th, r/tw, b/th);
+      batch.add(patternTex, tint, tx(), x, y, width, height);
     } else {
-      batch.add(colorTex, Tint.combine(fillColor, tint),
-                tx(), x, y, x+width, y+height, 0, 0, 1, 1);
+      batch.add(colorTex, Tint.combine(fillColor, tint), tx(), x, y, width, height);
     }
     return this;
+  }
+
+  @Override public void close () {
+    // nothing; this exists to make life easier for users of TextureSurface
+  }
+
+  private QuadBatch beginBatch (QuadBatch batch) {
+    batch.begin(target.width(), target.height(), target.flip());
+    return batch;
   }
 
   /**

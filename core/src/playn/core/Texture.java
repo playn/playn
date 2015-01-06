@@ -37,9 +37,6 @@ public class Texture implements Disposable {
   /** The height of this texture in pixels. */
   public final int pixelHeight;
 
-  /** The scale factor to use when rendering this texture as a quad. */
-  public final Scale scale;
-
   /** The width of this texture in display units. */
   public final float displayWidth;
   /** The height of this texture in display units. */
@@ -56,16 +53,16 @@ public class Texture implements Disposable {
 
   /** Updates the repeat settings for this texture. */
   public void setRepeat (boolean repeatX, boolean repeatY) {
-    if (this.repeatX != repeatX) {
-      this.repeatX = repeatX;
-      gfx.gl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S,
-                             repeatX ? GL_REPEAT : GL_CLAMP_TO_EDGE);
-    }
-    if (this.repeatY != repeatY) {
-      this.repeatY = repeatY;
-      gfx.gl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T,
-                             repeatY ? GL_REPEAT : GL_CLAMP_TO_EDGE);
-    }
+    boolean changeX = (this.repeatX != repeatX);
+    boolean changeY = (this.repeatY != repeatY);
+    if (!changeX && !changeY) return;
+    gfx.gl.glBindTexture(GL_TEXTURE_2D, id);
+    this.repeatX = repeatX;
+    if (changeX) gfx.gl.glTexParameteri(
+      GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, repeatX ? GL_REPEAT : GL_CLAMP_TO_EDGE);
+    this.repeatY = repeatY;
+    if (changeY) gfx.gl.glTexParameteri(
+      GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, repeatY ? GL_REPEAT : GL_CLAMP_TO_EDGE);
   }
 
   private boolean repeatX, repeatY;
@@ -73,12 +70,11 @@ public class Texture implements Disposable {
   private boolean destroyed;
 
   public Texture (Graphics gfx, int id, boolean managed, boolean mipmaps,
-                  int pixWidth, int pixHeight, Scale scale, float dispWidth, float dispHeight) {
+                  int pixWidth, int pixHeight, float dispWidth, float dispHeight) {
     this.gfx = gfx;
     this.id = id;
     this.managed = managed;
     this.mipmaps = mipmaps;
-    this.scale = scale;
     this.pixelWidth = pixWidth;
     this.pixelHeight = pixHeight;
     this.displayWidth = dispWidth;
@@ -97,6 +93,14 @@ public class Texture implements Disposable {
       assert refs > 0 : "Released a texture with no references!";
       if (--refs == 0) close();
     }
+  }
+
+  /** Uploads {@code image} to this texture's GPU memory. {@code image} must have the exact same
+    * size as this texture and must be fully loaded. This is generally useful for updating a
+    * texture which was created from a canvas when the canvas has been changed. */
+  public void update (Image image) {
+    gfx.upload(image, this);
+    if (mipmaps) gfx.gl.glGenerateMipmap(GL_TEXTURE_2D);
   }
 
   /** Returns whether this texture is been destroyed. */
@@ -120,17 +124,6 @@ public class Texture implements Disposable {
   // TODO: put these somewhere...
 
   // imageregiongl stuffs
-
-  // @Override
-  // public void draw(GC gc, float dx, float dy, float dw, float dh) {
-  //   draw(gc, dx, dy, dw, dh, 0, 0, width, height);
-  // }
-
-  // @Override
-  // public void draw(GC gc, float dx, float dy, float dw, float dh,
-  //                  float sx, float sy, float sw, float sh) {
-  //   parent.draw(gc, dx, dy, dw, dh, x+sx, y+sy, sw, sh);
-  // }
 
   // @Override
   // void draw(GLShader shader, InternalTransform xform, int tint,

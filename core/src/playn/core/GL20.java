@@ -432,14 +432,18 @@ public abstract class GL20 {
 
   /**
    * Checks for any GL error codes and logs them (if {@link #checkErrors} is true).
+   * @return true if any errors were reported.
    */
-  public void checkError (String op) {
+  public boolean checkError (String op) {
+    int reported = 0;
     if (checkErrors) {
       int error;
       while ((error = glGetError()) != GL_NO_ERROR) {
+        reported += 1;
         System.err.println(op + ": glError " + error);
       }
     }
+    return reported > 0;
   }
 
   public void glDeleteBuffer(int id) {

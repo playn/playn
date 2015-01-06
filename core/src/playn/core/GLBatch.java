@@ -19,27 +19,45 @@ package playn.core;
  */
 public abstract class GLBatch {
 
+  private boolean begun; // for great sanity checking
+
   /**
    * Must be called before this batch is used to accumulate and send drawing commands.
+   *
+   * @param flip whether or not to flip the y-axis. This is generally true when rendering to the
+   * default frame buffer (the screen), and false when rendering to textures.
    */
-  public abstract void begin (float fbufWidth, float fbufHeight);
+  public void begin (float fbufWidth, float fbufHeight, boolean flip) {
+    if (begun) throw new IllegalStateException(getClass().getSimpleName() + " mismatched begin()");
+    begun = true;
+  }
 
   /**
    * Sends any accumulated drawing calls to the GPU. Depending on the nature of the batch, this may
-   * be necessary before certain state changes (like switching to a new texture).
+   * be necessary before certain state changes (like switching to a new texture). This should be a
+   * NOOP if there's nothing to flush.
    */
-  public abstract void flush ();
+  public void flush () {
+    if (!begun) throw new IllegalStateException(
+      getClass().getSimpleName() + " flush() without begin()");
+  }
 
   /**
-   * Must be called when one is done using this batch to accumulate and send drawing commands.
-   * Note: implementations should probably automatically flush any pending calls in this call
-   * rather than require the caller to remember to call {@link #flush} manually.
+   * Must be called when one is done using this batch to accumulate and send drawing commands. The
+   * default implementation calls {@link #flush} and marks this batch as inactive.
    */
-  public abstract void end ();
+  public void end () {
+    if (!begun) throw new IllegalStateException(getClass().getSimpleName() + " mismatched end()");
+    flush();
+    begun = false;
+  }
 
   /**
    * Releases any GPU resources retained by this batch. This should be called when the batch will
    * never again be used.
    */
-  public abstract void destroy ();
+  public void destroy () {
+    if (begun) throw new IllegalStateException(
+      getClass().getSimpleName() + " destroy without end()");
+  }
 }

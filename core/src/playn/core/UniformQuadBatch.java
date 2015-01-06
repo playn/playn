@@ -32,6 +32,7 @@ public class UniformQuadBatch extends QuadBatch {
     /** Declares the uniform variables for our shader. */
     public static final String VERT_UNIFS =
       "uniform vec2 u_ScreenSize;\n" +
+      "uniform float u_Flip;\n" +
       "uniform vec4 u_Data[_VEC4S_PER_QUAD_*_MAX_QUADS_];\n";
 
     /** Declares the attribute variables for our shader. */
@@ -60,9 +61,11 @@ public class UniformQuadBatch extends QuadBatch {
       "gl_Position = vec4(transform * vec3(a_Vertex.xy, 1.0), 1.0);\n" +
       // Scale from screen coordinates to [0, 2].
       "gl_Position.xy /= u_ScreenSize.xy;\n" +
-      // Offset to [-1, 1] and flip y axis to put origin at top-left.
+      // Offset to [-1, 1].
       "gl_Position.x -= 1.0;\n" +
-      "gl_Position.y = 1.0 - gl_Position.y;\n";
+      "gl_Position.y -= 1.0;\n" +
+      // If requested, flip the y-axis.
+      "gl_Position.y *= u_Flip;\n";
 
     /** The shader code that computes {@code v_TexCoord}. */
     public static final String VERT_SETTEX =
@@ -107,6 +110,7 @@ public class UniformQuadBatch extends QuadBatch {
   public class Program extends GLProgram {
     public final int uTexture;
     public final int uScreenSize;
+    public final int uFlip;
     public final int uData;
     public final int aVertex;
 
@@ -116,6 +120,8 @@ public class UniformQuadBatch extends QuadBatch {
       assert uTexture >= 0 : "Failed to get u_Texture uniform";
       uScreenSize = gl.glGetUniformLocation(program, "u_ScreenSize");
       assert uScreenSize >= 0 : "Failed to get u_ScreenSize uniform";
+      uFlip = gl.glGetUniformLocation(program, "u_Flip");
+      assert uFlip >= 0 : "Failed to get u_Flip uniform";
       uData = gl.glGetUniformLocation(program, "u_Data");
       assert uData >= 0 : "Failed to get u_Data uniform";
       aVertex = gl.glGetAttribLocation(program, "a_Vertex");
@@ -188,7 +194,7 @@ public class UniformQuadBatch extends QuadBatch {
                              float x2, float y2, float sx2, float sy2,
                              float x3, float y3, float sx3, float sy3,
                              float x4, float y4, float sx4, float sy4) {
-    int pos = quadCounter * vec4sPerQuad();
+    int pos = quadCounter * vec4sPerQuad()*4;
     float dw = x2 - x1, dh = y3 - y1;
     data[pos++] = m00*dw;
     data[pos++] = m01*dw;
@@ -208,9 +214,11 @@ public class UniformQuadBatch extends QuadBatch {
     if (quadCounter >= maxQuads) flush();
   }
 
-  @Override public void begin (float fbufWidth, float fbufHeight) {
+  @Override public void begin (float fbufWidth, float fbufHeight, boolean flip) {
+    super.begin(fbufWidth, fbufHeight, flip);
     program.activate();
     gl.glUniform2f(program.uScreenSize, fbufWidth/2f, fbufHeight/2f);
+    gl.glUniform1f(program.uFlip, flip ? -1 : 1);
     gl.glBindBuffer(GL_ARRAY_BUFFER, verticesId);
     gl.glEnableVertexAttribArray(program.aVertex);
     gl.glVertexAttribPointer(program.aVertex, VERTEX_SIZE, GL_SHORT, false, 0, 0);
@@ -221,6 +229,7 @@ public class UniformQuadBatch extends QuadBatch {
   }
 
   @Override public void flush () {
+    super.flush();
     if (quadCounter > 0) {
       bindTexture();
       gl.glUniform4fv(program.uData, quadCounter * vec4sPerQuad(), data, 0);
@@ -231,14 +240,16 @@ public class UniformQuadBatch extends QuadBatch {
   }
 
   @Override public void end () {
-    flush();
+    super.end();
     gl.glDisableVertexAttribArray(program.aVertex);
     gl.checkError("UniformQuadBatch end");
   }
 
   @Override public void destroy () {
+    super.destroy();
     program.destroy();
     gl.glDeleteBuffers(2, new int[] { verticesId, elementsId }, 0);
+    gl.checkError("UniformQuadBatch destroy");
   }
 
   @Override public String toString () {

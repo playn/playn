@@ -36,18 +36,21 @@ public abstract class QuadBatch extends GLBatch {
   /** Adds {@code tex} as a transformed axis-aligned quad to this batch.
     * {@code x, y, w, h} define the size and position of the quad. */
   public void add (Texture tex, int tint, AffineTransform xf, float x, float y, float w, float h) {
-    float sw = tex.repeatX() ? w : tex.displayWidth, sh = tex.repeatY() ? h : tex.displayHeight;
-    add(tex, tint, xf, x, y, w, h, 0, 0, sw, sh);
+    setTexture(tex);
+    float sr = tex.repeatX() ? w/tex.displayWidth : 1, sb = tex.repeatY() ? h/tex.displayHeight : 1;
+    add(tint, xf, x, y, x+w, y+h, 0, 0, sr, sb);
   }
 
   /** Adds {@code tex} as a transformed axis-aligned quad to this batch.
-    * {@code sx, sy, sw, sh} define region of the texture which will be displayed in the quad.
-    * {@code dx, dy, dw, dh} define the size and position of the quad. */
+    * {@code dx, dy, dw, dh} define the size and position of the quad.
+    * {@code sx, sy, sw, sh} define region of the texture which will be displayed in the quad. */
   public void add (Texture tex, int tint, AffineTransform xf,
-                   float dx, float dy, float dw, float dh, float sx, float sy, float sw, float sh) {
+                   float dx, float dy, float dw, float dh,
+                   float sx, float sy, float sw, float sh) {
     setTexture(tex);
     float texWidth = tex.displayWidth, texHeight = tex.displayHeight;
-    add(tint, xf, dx, dy, dw, dh, sx/texWidth, sy/texHeight, (sx+sw)/texWidth, (sy+sh)/texHeight);
+    add(tint, xf, dx, dy, dx+dw, dy+dh,
+        sx/texWidth, sy/texHeight, (sx+sw)/texWidth, (sy+sh)/texHeight);
   }
 
   /** Adds a transformed axis-aligned quad to this batch.
