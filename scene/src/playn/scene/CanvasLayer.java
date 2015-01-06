@@ -72,10 +72,10 @@ public class CanvasLayer extends ImageLayer {
   }
 
   @Override public float width() {
-    return (width < 0) ? canvas.width : width;
+    return (forceWidth < 0) ? canvas.width : forceWidth;
   }
 
   @Override public float height() {
-    return (height < 0) ? canvas.height : height;
+    return (forceHeight < 0) ? canvas.height : forceHeight;
   }
 }

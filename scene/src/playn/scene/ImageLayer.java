@@ -38,10 +38,15 @@ public class ImageLayer extends Layer {
     * texture width or height, it will be scaled or repeated depending on the texture's repeat
     * configuration in the pertinent axis. If either value is {@code < 0} that indicates that the
     * size of the texture being rendered should be used. */
-  public float width = -1, height = -1;
+  public float forceWidth = -1, forceHeight = -1;
 
-  /** The subregion of the texture to render. If this is null, this is effectively {@code 0, 0,
-    * texWidth, texHeight}. */
+  /** The subregion of the texture to render. If this is {@code null} (the default) the entire
+    * texture is rendered. If {@link #forceWidth} or {@link #forceHeight} are not set, the width
+    * and height of this image layer will be the width and height of the supplied region.
+    *
+    * <p> <em>Note:</em> when a subregion is configured, a texture will always be
+    * scaled, never repeated. If you want to repeat a texture, you have to use the whole texture.
+    * This is a limitation of OpenGL. */
   public Rectangle region;
 
   /**
@@ -112,23 +117,25 @@ public class ImageLayer extends Layer {
   }
 
   /**
-   * Sets {@link #width} and {@link #height} and returns {@code this}, for convenient call
-   * chaining.
+   * Sets {@link #forceWidth} and {@link #forceHeight} and returns {@code this}, for convenient
+   * call chaining.
    */
   public ImageLayer setSize (float width, float height) {
-    this.width = width;
-    this.height = height;
+    forceWidth = width;
+    forceHeight = height;
     return this;
   }
 
   @Override public float width() {
-    if (width >= 0) return width;
+    if (forceWidth >= 0) return forceWidth;
+    if (region != null) return region.width;
     assert tex != null : "Texture has not yet been set";
     return tex.displayWidth;
   }
 
   @Override public float height() {
-    if (height >= 0) return height;
+    if (forceHeight >= 0) return forceHeight;
+    if (region != null) return region.height;
     assert tex != null : "Texture has not yet been set";
     return tex.displayHeight;
   }
