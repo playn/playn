@@ -101,10 +101,8 @@ public class JavaPlatform extends Platform {
   private final JavaNet net = new JavaNet(this);
   private final JavaStorage storage;
   private final JsonImpl json = new JsonImpl();
-  private final JavaKeyboard keyboard;
-  private final Touch touch;
   private final JavaGraphics graphics;
-  private final JavaMouse mouse;
+  private final JavaInput input;
   private final JavaAssets assets = new JavaAssets(this);
   private boolean active = true;
 
@@ -117,13 +115,11 @@ public class JavaPlatform extends Platform {
       unpackNatives();
     }
     graphics = createGraphics();
-    keyboard = createKeyboard();
-    mouse = createMouse();
-    touch = createTouch(keyboard, mouse);
+    input = createInput();
     storage = new JavaStorage(this);
 
     if (config.activationKey != null) {
-      keyboard.events.connect(new Slot<Keyboard.Event>() {
+      input.keyboardEvents.connect(new Slot<Keyboard.Event>() {
         public void onEmit (Keyboard.Event event) {
           if (event instanceof Keyboard.KeyEvent) {
             Keyboard.KeyEvent kevent = (Keyboard.KeyEvent)event;
@@ -163,8 +159,7 @@ public class JavaPlatform extends Platform {
       }
     }
 
-    keyboard.init();
-    mouse.init();
+    input.init();
   }
 
   @Override
@@ -198,23 +193,13 @@ public class JavaPlatform extends Platform {
   }
 
   @Override
-  public Keyboard keyboard() {
-    return keyboard;
+  public JavaInput input() {
+    return input;
   }
 
   @Override
   public Net net() {
     return net;
-  }
-
-  @Override
-  public Mouse mouse() {
-    return mouse;
-  }
-
-  @Override
-  public Touch touch() {
-    return touch;
   }
 
   @Override
@@ -269,14 +254,8 @@ public class JavaPlatform extends Platform {
   protected JavaGraphics createGraphics() {
     return new JavaGraphics(this);
   }
-  protected JavaTouch createTouch(Keyboard keyboard, Mouse mouse) {
-    return new JavaTouch(this, keyboard, mouse);
-  }
-  protected JavaMouse createMouse() {
-    return new JavaLWJGLMouse(this);
-  }
-  protected JavaKeyboard createKeyboard() {
-    return new JavaLWJGLKeyboard(this);
+  protected JavaInput createInput() {
+    return new JavaLWJGLInput(this);
   }
 
   protected void shutdown() {
@@ -297,10 +276,11 @@ public class JavaPlatform extends Platform {
 
   protected void processFrame() {
     // event handling
-    mouse.update();
-    keyboard.update();
+    try { input.update(); }
+    catch (Exception e) { log.warn("Input exception", e); }
     // emit a frame signal
-    frame.emit(this);
+    try { frame.emit(this); }
+    catch (Exception e) { log.warn("Frame tick exception", e); }
   }
 
   protected void toggleActivation () {

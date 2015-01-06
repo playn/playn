@@ -96,16 +96,9 @@ class JavaCanvasState {
 
   // TODO: optimize this so we're not setting this stuff all the time.
   void prepareFill(Graphics2D gfx) {
-    if (fillGradient != null) {
-      gfx.setPaint(fillGradient.paint);
-    } else if (fillPattern != null) {
-      TexturePaint paint = fillPattern.paint;
-      if (paint != null) {
-        gfx.setPaint(paint);
-      }
-    } else {
-      gfx.setPaint(convertColor(fillColor));
-    }
+    if (fillGradient != null) gfx.setPaint(fillGradient.paint);
+    else if (fillPattern != null) gfx.setPaint(fillPattern.paint);
+    else gfx.setPaint(convertColor(fillColor));
     clipper.setClip(gfx);
     gfx.setComposite(convertComposite(composite, alpha));
   }

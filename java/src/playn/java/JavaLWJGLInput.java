@@ -1,17 +1,15 @@
 /**
- * Copyright 2013 The PlayN Authors
+ * Copyright 2010-2015 The PlayN Authors
  *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not
- * use this file except in compliance with the License. You may obtain a copy of
- * the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
  *
  * http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
- * License for the specific language governing permissions and limitations under
- * the License.
+ * Unless required by applicable law or agreed to in writing, software distributed under the
+ * License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package playn.java;
 
@@ -20,17 +18,23 @@ import javax.swing.JOptionPane;
 
 import org.lwjgl.LWJGLException;
 import org.lwjgl.input.Keyboard;
+import org.lwjgl.input.Mouse;
+import org.lwjgl.opengl.Display;
+
+import pythagoras.f.Point;
+import react.RFuture;
 
 import playn.core.Event;
 import playn.core.Key;
-import react.RFuture;
+import static playn.core.Keyboard.*; // to avoid clash with LWJGL Keyboard; meh
+import static playn.core.Mouse.*;    // to avoid clash with LWJGL Mouse; double meh
 
-public class JavaLWJGLKeyboard extends JavaKeyboard {
+public class JavaLWJGLInput extends JavaInput {
 
   // TODO: set this from somewhere?
   private JFrame frame;
 
-  public JavaLWJGLKeyboard (JavaPlatform plat) {
+  public JavaLWJGLInput (JavaPlatform plat) {
     super(plat);
   }
 
@@ -40,30 +44,59 @@ public class JavaLWJGLKeyboard extends JavaKeyboard {
     return RFuture.success((String)result);
   }
 
+  @Override public boolean hasMouseLock () { return true; }
+  @Override public boolean isMouseLocked() { return Mouse.isGrabbed(); }
+  @Override public void setMouseLocked (boolean locked) { Mouse.setGrabbed(locked); }
+
   @Override void init() {
     try {
       Keyboard.create();
+      Mouse.create();
     } catch (LWJGLException e) {
       throw new RuntimeException(e);
     }
   }
 
-  @Override void update() {
+  @Override void update () {
+    super.update();
+
+    // process keyboard events
     while (Keyboard.next()) {
       double time = (double) (Keyboard.getEventNanoseconds() / 1000);
       int keyCode = Keyboard.getEventKey();
 
       if (Keyboard.getEventKeyState()) {
         Key key = translateKey(keyCode);
-        if (key != null) events.emit(new KeyEvent(0, time, key, true));
+        if (key != null) keyboardEvents.emit(new KeyEvent(0, time, key, true));
         char keyChar = Keyboard.getEventCharacter();
-        if (!Character.isISOControl(keyChar)) events.emit(new TypedEvent(0, time, keyChar));
+        if (!Character.isISOControl(keyChar)) keyboardEvents.emit(new TypedEvent(0, time, keyChar));
       } else {
         Key key = translateKey(keyCode);
-        if (key != null) events.emit(new KeyEvent(0, time, key, false));
+        if (key != null) keyboardEvents.emit(new KeyEvent(0, time, key, false));
       }
     }
-    super.update();
+
+    // process mouse events
+    while (Mouse.next()) {
+      double time = (double) (Mouse.getEventNanoseconds() / 1000000);
+      ButtonEvent.Id btn = getButton(Mouse.getEventButton());
+      Point m = new Point(Mouse.getEventX(), Display.getHeight() - Mouse.getEventY() - 1);
+      plat.graphics().transformMouse(m);
+
+      int dx = Mouse.getEventDX(), dy = -Mouse.getEventDY();
+      if (btn != null) {
+        if (Mouse.getEventButtonState()) {
+          onMouseDown(time, m.x, m.y, btn);
+        } else {
+          onMouseUp(time, m.x, m.y, btn);
+        }
+      } else if (Mouse.getEventDWheel() != 0) {
+        int delta = Mouse.getEventDWheel() > 0 ? -1 : 1;
+        onMouseWheelScroll(time, m.x, m.y, delta);
+      } else {
+        onMouseMove(time, m.x, m.y, dx, dy);
+      }
+    }
   }
 
   private Key translateKey(int keyCode) {
@@ -203,5 +236,14 @@ public class JavaLWJGLKeyboard extends JavaKeyboard {
     }
 
     return null;
+  }
+
+  private static ButtonEvent.Id getButton(int lwjglButton) {
+    switch (lwjglButton) {
+    case 0:  return ButtonEvent.Id.LEFT;
+    case 2:  return ButtonEvent.Id.MIDDLE;
+    case 1:  return ButtonEvent.Id.RIGHT;
+    default: return null;
+    }
   }
 }

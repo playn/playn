@@ -24,6 +24,7 @@ class JavaPattern extends Pattern {
 
   public JavaPattern (boolean repeatX, boolean repeatY, TexturePaint paint) {
     super(repeatX, repeatY);
+    assert paint != null;
     this.paint = paint;
   }
 }
