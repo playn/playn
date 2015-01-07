@@ -129,15 +129,13 @@ public class ImageLayer extends Layer {
   @Override public float width() {
     if (forceWidth >= 0) return forceWidth;
     if (region != null) return region.width;
-    assert tex != null : "Texture has not yet been set";
-    return tex.displayWidth;
+    return (tex == null) ? 0 : tex.displayWidth;
   }
 
   @Override public float height() {
     if (forceHeight >= 0) return forceHeight;
     if (region != null) return region.height;
-    assert tex != null : "Texture has not yet been set";
-    return tex.displayHeight;
+    return (tex == null) ? 0 : tex.displayHeight;
   }
 
   @Override public void destroy() {
