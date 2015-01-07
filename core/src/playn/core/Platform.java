@@ -67,10 +67,6 @@ public abstract class Platform {
   /** Opens the given URL in the default browser. */
   public abstract void openURL (String url);
 
-  /** Starts the main game loop.
-    * This must be called by the game's bootstrap code to get the party started. */
-  public abstract void start ();
-
   /** Returns the {@link Assets} service. */
   public abstract Assets assets ();
 

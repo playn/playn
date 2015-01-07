@@ -99,7 +99,6 @@ public class StubPlatform extends Platform {
   }
 
   @Override public void openURL (String url) { throw new UnsupportedOperationException(); }
-  @Override public void start () {} // noop!
 
   @Override public Assets assets () { throw new UnsupportedOperationException(); }
   @Override public Audio audio () { throw new UnsupportedOperationException(); }

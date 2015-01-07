@@ -133,6 +133,9 @@ public class JavaPlatform extends Platform {
     if (!config.headless) {
       setTitle(config.appName);
     }
+
+    // do the rest of init in an overridable method so that JavaSWTPlatform can hack it
+    finishInit();
   }
 
   /**
@@ -144,10 +147,7 @@ public class JavaPlatform extends Platform {
     Display.setTitle(title);
   }
 
-  /**
-   * Initializes the LWJGL subsystems. This must be called before calling {@link #start}.
-   */
-  public void init () {
+  void finishInit () {
     // set our starting display mode before we create our display
     graphics.preInit();
 
@@ -160,6 +160,28 @@ public class JavaPlatform extends Platform {
     }
 
     input.init();
+  }
+
+  /**
+   * Starts the game loop. This method will not return until the game exits.
+   */
+  public void start () {
+    boolean wasActive = Display.isActive();
+    while (!Display.isCloseRequested()) {
+      // notify the app if lose or regain focus (treat said as pause/resume)
+      boolean newActive = Display.isActive();
+      if (wasActive != newActive) {
+        lifecycle.emit(wasActive ? Lifecycle.PAUSE : Lifecycle.RESUME);
+        wasActive = newActive;
+      }
+      // process frame, if we don't need to provide true pausing
+      if (newActive || !config.truePause) processFrame();
+      Display.update();
+      // sleep until it's time for the next frame
+      Display.sync(60);
+    }
+
+    shutdown();
   }
 
   @Override
@@ -229,26 +251,6 @@ public class JavaPlatform extends Platform {
     } catch (Exception e) {
       reportError("Failed to open URL [url=" + url + "]", e);
     }
-  }
-
-  @Override
-  public void start() {
-    boolean wasActive = Display.isActive();
-    while (!Display.isCloseRequested()) {
-      // notify the app if lose or regain focus (treat said as pause/resume)
-      boolean newActive = Display.isActive();
-      if (wasActive != newActive) {
-        lifecycle.emit(wasActive ? Lifecycle.PAUSE : Lifecycle.RESUME);
-        wasActive = newActive;
-      }
-      // process frame, if we don't need to provide true pausing
-      if (newActive || !config.truePause) processFrame();
-      Display.update();
-      // sleep until it's time for the next frame
-      Display.sync(60);
-    }
-
-    shutdown();
   }
 
   protected JavaGraphics createGraphics() {

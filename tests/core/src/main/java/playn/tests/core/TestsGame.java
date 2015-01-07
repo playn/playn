@@ -76,9 +76,6 @@ public class TestsGame extends SceneGame<TestsGame> {
     }
   }
 
-  // args passed to the Java launcher
-  public static String[] args = {};
-
   private Test[] tests;
   private Test currentTest;
 
@@ -93,7 +90,7 @@ public class TestsGame extends SceneGame<TestsGame> {
 
   public final Pointer pointer;
 
-  public TestsGame (Platform plat) {
+  public TestsGame (Platform plat, String[] args) {
     super(plat, Test.UPDATE_RATE);
     game = this;
     this.plat = plat;
@@ -133,13 +130,6 @@ public class TestsGame extends SceneGame<TestsGame> {
       new FullscreenTest(this),
       /*new YourTest(this),*/
     };
-  }
-
-  public TextureSurface createSurface (float width, float height) {
-    return new TextureSurface(graphics, defaultBatch, width, height);
-  }
-
-  public void init() {
     // display basic instructions
     log.info("Right click, touch with two fingers, or type ESC to return to test menu.");
 
@@ -182,6 +172,10 @@ public class TestsGame extends SceneGame<TestsGame> {
         break;
       }
     }
+  }
+
+  public TextureSurface createSurface (float width, float height) {
+    return new TextureSurface(graphics, defaultBatch, width, height);
   }
 
   // defers display of menu by one frame to avoid the right click or touch being processed by the
