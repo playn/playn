@@ -37,13 +37,9 @@ import android.graphics.Typeface;
 import com.android.vending.expansion.zipfile.APKExpansionSupport;
 import com.android.vending.expansion.zipfile.ZipResourceFile;
 
-import playn.core.AbstractAssets;
-import playn.core.AsyncImage;
-import playn.core.Image;
-import playn.core.Sound;
-import playn.core.gl.Scale;
+import playn.core.*;
 
-public class AndroidAssets extends AbstractAssets<Bitmap> {
+public class AndroidAssets extends Assets {
 
   /** Extends {@link BitmapFactory.Options} with PlayN asset scale configuration. */
   public class BitmapOptions extends BitmapFactory.Options {
@@ -61,7 +57,7 @@ public class AndroidAssets extends AbstractAssets<Bitmap> {
     void adjustOptions(String path, BitmapOptions options);
   }
 
-  private final AndroidPlatform platform;
+  private final AndroidPlatform plat;
   private final AssetManager assetMgr;
   private String pathPrefix = ""; // 'assets/' is always prepended by AssetManager
   private Scale assetScale = null;
@@ -71,10 +67,10 @@ public class AndroidAssets extends AbstractAssets<Bitmap> {
     public void adjustOptions(String path, BitmapOptions options) {} // noop!
   };
 
-  public AndroidAssets(AndroidPlatform platform) {
-    super(platform);
-    this.platform = platform;
-    this.assetMgr = platform.activity.getResources().getAssets();
+  public AndroidAssets(AndroidPlatform plat) {
+    super(plat);
+    this.plat = plat;
+    this.assetMgr = plat.activity.getResources().getAssets();
   }
 
   /**
@@ -112,7 +108,7 @@ public class AndroidAssets extends AbstractAssets<Bitmap> {
    */
   public void setExpansionFile(int mainVersion, int patchVersion) throws IOException {
     expansionFile = APKExpansionSupport.getAPKExpansionZipFile(
-      platform.activity, mainVersion, patchVersion);
+      plat.activity, mainVersion, patchVersion);
     if (expansionFile == null) throw new FileNotFoundException("Missing APK expansion zip files");
   }
 
@@ -136,15 +132,17 @@ public class AndroidAssets extends AbstractAssets<Bitmap> {
   }
 
   @Override
-  public Image getRemoteImage(final String url, float width, float height) {
-    final AndroidAsyncImage image = new AndroidAsyncImage(platform.graphics().ctx, width, height);
-    platform.invokeAsync(new Runnable() {
+  public Image getRemoteImage(final String url, int width, int height) {
+    final ImageImpl image = createImage(width, height);
+    plat.invokeAsync(new Runnable() {
       public void run () {
         try {
           BitmapOptions options = createOptions(url, false, Scale.ONE);
-          setImageLater(image, downloadBitmap(url, options), options.scale);
+          Bitmap bitmap = downloadBitmap(url, options);
+          image.succeed(new ImageImpl.Data(options.scale, bitmap,
+                                           bitmap.getWidth(), bitmap.getHeight()));
         } catch (Exception error) {
-          setErrorLater(image, error);
+          image.fail(error);
         }
       }
     });
@@ -153,12 +151,12 @@ public class AndroidAssets extends AbstractAssets<Bitmap> {
 
   @Override
   public Sound getSound(String path) {
-    return platform.audio().createSound(path + ".mp3");
+    return plat.audio().createSound(path + ".mp3");
   }
 
   @Override
   public Sound getMusic(String path) {
-    return platform.audio().createMusic(path + ".mp3");
+    return plat.audio().createMusic(path + ".mp3");
   }
 
   @Override
@@ -200,25 +198,19 @@ public class AndroidAssets extends AbstractAssets<Bitmap> {
       }
   }
 
-  @Override
-  protected Image createStaticImage(Bitmap bitmap, Scale scale) {
-    return new AndroidImage(platform.graphics().ctx, bitmap, scale);
+  @Override protected ImageImpl createImage(int width, int height) {
+    return new AndroidImage(plat, width, height);
   }
 
-  @Override
-  protected AsyncImage<Bitmap> createAsyncImage(float width, float height) {
-    return new AndroidAsyncImage(platform.graphics().ctx, width, height);
-  }
-
-  @Override
-  protected Image loadImage(String path, ImageReceiver<Bitmap> recv) {
+  @Override protected ImageImpl.Data load (String path) throws Exception {
     Exception error = null;
     for (Scale.ScaledResource rsrc : assetScale().getScaledResources(path)) {
       try {
         InputStream is = openAsset(rsrc.path);
         try {
           BitmapOptions options = createOptions(path, true, rsrc.scale);
-          return recv.imageLoaded(BitmapFactory.decodeStream(is, null, options), options.scale);
+          Bitmap bitmap = BitmapFactory.decodeStream(is, null, options);
+          return new ImageImpl.Data(options.scale, bitmap, bitmap.getWidth(), bitmap.getHeight());
         } finally {
           is.close();
         }
@@ -229,8 +221,8 @@ public class AndroidAssets extends AbstractAssets<Bitmap> {
         break; // the image was broken not missing, stop here
       }
     }
-    platform.log().warn("Could not load image: " + pathPrefix + path, error);
-    return recv.loadFailed(error != null ? error : new FileNotFoundException(path));
+    plat.log().warn("Could not load image: " + pathPrefix + path, error);
+    throw error != null ? error : new FileNotFoundException(path);
   }
 
   Typeface getTypeface(String path) {
@@ -244,7 +236,7 @@ public class AndroidAssets extends AbstractAssets<Bitmap> {
   }
 
   protected Scale assetScale () {
-    return (assetScale != null) ? assetScale : platform.graphics().ctx.scale;
+    return (assetScale != null) ? assetScale : plat.graphics().scale;
   }
 
   /**
@@ -265,7 +257,7 @@ public class AndroidAssets extends AbstractAssets<Bitmap> {
     BitmapOptions options = new BitmapOptions();
     options.inScaled = false; // don't scale bitmaps based on device parameters
     options.inDither = true;
-    options.inPreferredConfig = platform.graphics().preferredBitmapConfig;
+    options.inPreferredConfig = plat.graphics().preferredBitmapConfig;
     options.inPurgeable = purgeable;
     options.inInputShareable = true;
     options.scale = scale;
@@ -310,7 +302,7 @@ public class AndroidAssets extends AbstractAssets<Bitmap> {
     } catch (Exception e) {
       // Could provide a more explicit error message for IOException or IllegalStateException
       getRequest.abort();
-      platform.reportError("Error while retrieving bitmap from " + url, e);
+      plat.reportError("Error while retrieving bitmap from " + url, e);
       throw e;
 
     } finally {

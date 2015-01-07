@@ -15,14 +15,26 @@
  */
 package playn.android;
 
-import playn.core.Gradient;
+import android.graphics.LinearGradient;
+import android.graphics.RadialGradient;
 import android.graphics.Shader;
+import playn.core.Gradient;
 
-class AndroidGradient implements Gradient {
+public class AndroidGradient extends Gradient {
 
   final Shader shader;
 
-  AndroidGradient(Shader shader) {
-    this.shader = shader;
+  public AndroidGradient (Config cfg) {
+    if (cfg instanceof Radial) {
+      Radial rc = (Radial)cfg;
+      this.shader = new RadialGradient(
+        rc.x, rc.y, rc.r, rc.colors, rc.positions, Shader.TileMode.CLAMP);
+
+    } else if (cfg instanceof Linear) {
+      Linear lc = (Linear)cfg;
+      this.shader = new LinearGradient(
+        lc.x0, lc.y0, lc.x1, lc.y1, lc.colors, lc.positions, Shader.TileMode.CLAMP);
+
+    } else throw new IllegalArgumentException("Unknown config " + cfg);
   }
 }

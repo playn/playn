@@ -160,7 +160,7 @@ public class TestsGame extends SceneGame<TestsGame> {
     });
     input.keyboardEvents.connect(new Keyboard.KeySlot() {
       public void onEmit (Keyboard.KeyEvent event) {
-        if (event.down && (event.key == Key.ESCAPE || event.key == Key.BACK)) displayMenu();
+        if (event.down && (event.key == Key.ESCAPE)) displayMenu();
       }
     });
 
@@ -176,6 +176,12 @@ public class TestsGame extends SceneGame<TestsGame> {
 
   public TextureSurface createSurface (float width, float height) {
     return new TextureSurface(graphics, defaultBatch, width, height);
+  }
+
+  public boolean onHardwardBack () {
+    if (currentTest == null) return false;
+    displayMenuLater(); // we're not currently on the GL thread
+    return true;
   }
 
   // defers display of menu by one frame to avoid the right click or touch being processed by the

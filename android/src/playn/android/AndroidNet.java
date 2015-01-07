@@ -35,25 +35,27 @@ import org.apache.http.params.HttpProtocolParams;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 
-import playn.core.NetImpl;
-import playn.core.util.Callback;
+import react.RFuture;
+import react.RPromise;
 
-class AndroidNet extends NetImpl {
+import playn.core.Net;
 
-  AndroidNet(AndroidPlatform platform) {
-    super(platform);
+public class AndroidNet extends Net {
+
+  private final AndroidPlatform plat;
+
+  public AndroidNet(AndroidPlatform plat) {
+    this.plat = plat;
   }
 
-  @Override
-  public WebSocket createWebSocket(String url, WebSocket.Listener listener) {
-    return new AndroidWebSocket(platform, url, listener);
+  @Override public WebSocket createWebSocket(String url, WebSocket.Listener listener) {
+    return new AndroidWebSocket(plat, url, listener);
   }
 
-  @Override
-  protected void execute(final BuilderImpl req, final Callback<Response> callback) {
-    platform.invokeAsync(new Runnable() {
-      @Override
-      public void run() {
+  @Override protected RFuture<Response> execute(final Builder req) {
+    final RPromise<Response> result = plat.deferredPromise();
+    plat.invokeAsync(new Runnable() {
+      @Override public void run() {
         HttpParams params = new BasicHttpParams();
         HttpProtocolParams.setContentCharset(params, HTTP.UTF_8);
         HttpProtocolParams.setHttpElementCharset(params, HTTP.UTF_8);
@@ -85,9 +87,9 @@ class AndroidNet extends NetImpl {
           int code = response.getStatusLine().getStatusCode();
           HttpEntity entity = response.getEntity();
 
-          ResponseImpl impl;
+          Response impl;
           if (entity == null) {
-            impl = new ResponseImpl(code) {
+            impl = new Response(code) {
               @Override
               public String payloadString() {
                 return "";
@@ -108,7 +110,7 @@ class AndroidNet extends NetImpl {
             if (encoding == null) {
               encoding = HTTP.UTF_8;
             }
-            impl = new BinaryResponse(code, data, encoding) {
+            impl = new Response.Binary(code, data, encoding) {
               @Override
               protected Map<String,List<String>> extractHeaders() {
                 return extractResponseHeaders(response);
@@ -116,9 +118,9 @@ class AndroidNet extends NetImpl {
             };
           }
 
-          platform.notifySuccess(callback, impl);
+          result.succeed(impl);
         } catch (Exception e) {
-          platform.notifyFailure(callback, e);
+          result.fail(e);
         }
       }
 
@@ -140,5 +142,6 @@ class AndroidNet extends NetImpl {
         return hmap;
       }
     });
+    return result;
   }
 }

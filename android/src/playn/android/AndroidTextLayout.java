@@ -20,7 +20,6 @@ import java.util.List;
 
 import pythagoras.f.Rectangle;
 
-import playn.core.AbstractTextLayout;
 import playn.core.TextFormat;
 import playn.core.TextLayout;
 import playn.core.TextWrap;
@@ -29,7 +28,7 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Path;
 
-class AndroidTextLayout extends AbstractTextLayout {
+class AndroidTextLayout extends TextLayout {
 
   private final AndroidFont font;
   private final Paint.FontMetrics metrics;
@@ -54,7 +53,7 @@ class AndroidTextLayout extends AbstractTextLayout {
 
     List<TextLayout> layouts = new ArrayList<TextLayout>();
     float[] measuredWidth = new float[1];
-    for (String ltext : AbstractTextLayout.normalizeEOL(text).split("\\n")) {
+    for (String ltext : normalizeEOL(text).split("\\n")) {
       // if we're only wrapping on newlines, then just add the whole line now
       if (wrap.width <= 0 || wrap.width == Float.MAX_VALUE) {
         layouts.add(new AndroidTextLayout(ltext, format, font, metrics, paint.measureText(ltext)));
@@ -79,8 +78,8 @@ class AndroidTextLayout extends AbstractTextLayout {
 
           // if we matched the rest of the line, things are simple
           if (lineEnd == end) {
-            layouts.add(new AndroidTextLayout(ltext.substring(start, lineEnd), format, font, metrics,
-                                              measuredWidth[0]));
+            layouts.add(new AndroidTextLayout(ltext.substring(start, lineEnd), format, font,
+                                              metrics, measuredWidth[0]));
             start += count;
 
           } else {
@@ -120,25 +119,19 @@ class AndroidTextLayout extends AbstractTextLayout {
     return layouts.toArray(new TextLayout[layouts.size()]);
   }
 
-  @Override
-  public float ascent() {
-    return -metrics.ascent;
-  }
-
-  @Override
-  public float descent() {
-    return metrics.descent;
-  }
-
-  @Override
-  public float leading() {
-    return metrics.leading;
-  }
+  @Override public float ascent() { return -metrics.ascent; }
+  @Override public float descent() { return metrics.descent; }
+  @Override public float leading() { return metrics.leading; }
 
   AndroidTextLayout(String text, TextFormat format, AndroidFont font, Paint.FontMetrics metrics,
                     float width) {
+    this(text, format, font, metrics, width, -metrics.ascent+metrics.descent);
+  }
+
+  AndroidTextLayout(String text, TextFormat format, AndroidFont font, Paint.FontMetrics metrics,
+                    float width, float height) {
     // Android doesn't provide a way to get precise text bounds, so we half-ass it, woo!
-    super(text, format, new Rectangle(0, 0, width, -metrics.ascent+metrics.descent));
+    super(text, format, new Rectangle(0, 0, width, height), height);
     this.font = font;
     this.metrics = metrics;
   }

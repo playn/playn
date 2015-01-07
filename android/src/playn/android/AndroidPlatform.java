@@ -20,15 +20,10 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import playn.core.AbstractPlatform;
-import playn.core.Game;
-import playn.core.Json;
-import playn.core.Mouse;
-import playn.core.MouseStub;
-import playn.core.TouchImpl;
+import playn.core.*;
 import playn.core.json.JsonImpl;
 
-public class AndroidPlatform extends AbstractPlatform {
+public class AndroidPlatform extends Platform {
 
   public static final boolean DEBUG_LOGS = false;
 
@@ -40,35 +35,35 @@ public class AndroidPlatform extends AbstractPlatform {
   private final AndroidAssets assets;
   private final AndroidAudio audio;
   private final AndroidGraphics graphics;
-  private final AndroidKeyboard keyboard;
+  private final AndroidInput input;
+  private final AndroidLog log;
   private final AndroidNet net;
-  private final AndroidPointer pointer;
   private final AndroidStorage storage;
-  private final TouchImpl touch;
   private final Json json;
   private final long start = System.nanoTime();
 
-  protected AndroidPlatform(GameActivity activity, AndroidGL20 gl20) {
-    super(new AndroidLog(activity));
+  public AndroidPlatform (GameActivity activity) {
     this.activity = activity;
 
+    log = new AndroidLog(activity);
     audio = new AndroidAudio(this);
-    graphics = new AndroidGraphics(this, gl20, activity.preferredBitmapConfig());
+    graphics = new AndroidGraphics(this, activity.preferredBitmapConfig());
     assets = new AndroidAssets(this);
     json = new JsonImpl();
-    keyboard = new AndroidKeyboard(this);
+    input = new AndroidInput(this);
     net = new AndroidNet(this);
-    pointer = new AndroidPointer();
     storage = new AndroidStorage(this);
-    touch = new TouchImpl();
   }
 
   static void debugLog(String message) {
     if (DEBUG_LOGS) Log.d("playn", message);
   }
 
-  @Override
-  public void invokeLater(Runnable runnable) {
+  @Override public Type type() { return Type.ANDROID; }
+  @Override public double time() { return System.currentTimeMillis(); }
+  @Override public int tick() { return (int)((System.nanoTime() - start) / 1000000L); }
+
+  @Override public void invokeLater(Runnable runnable) {
     switch (state) {
     default:
     case RUNNING:
@@ -89,8 +84,7 @@ public class AndroidPlatform extends AbstractPlatform {
     }
   }
 
-  @Override
-  public void invokeAsync(final Runnable action) {
+  @Override public void invokeAsync(final Runnable action) {
     activity.runOnUiThread(new Runnable() {
       public void run () {
         new AsyncTask<Void,Void,Void>() {
@@ -107,115 +101,35 @@ public class AndroidPlatform extends AbstractPlatform {
     });
   }
 
-  @Override
-  public AndroidAssets assets() {
-    return assets;
-  }
-
-  @Override
-  public AndroidAudio audio() {
-    return audio;
-  }
-
-  @Override
-  public AndroidGraphics graphics() {
-    return graphics;
-  }
-
-  @Override
-  public Json json() {
-    return json;
-  }
-
-  @Override
-  public AndroidKeyboard keyboard() {
-    return keyboard;
-  }
-
-  @Override
-  public AndroidNet net() {
-    return net;
-  }
-
-  @Override
-  public void openURL(String url) {
+  @Override public void openURL(String url) {
     Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
     activity.startActivity(browserIntent);
   }
 
-  @Override
-  public Mouse mouse() {
-    return new MouseStub();
-  }
-
-  @Override
-  public TouchImpl touch() {
-    return touch;
-  }
-
-  @Override
-  public AndroidPointer pointer() {
-    return pointer;
-  }
-
-  @Override
-  public float random() {
-    return (float) Math.random();
-  }
-
-  @Override
-  public void run(Game game) {
-    this.game = game;
-    game.init();
-  }
-
-  @Override
-  public AndroidStorage storage() {
-    return storage;
-  }
-
-  @Override
-  public double time() {
-    return System.currentTimeMillis();
-  }
-
-  @Override
-  public int tick() {
-    return (int)((System.nanoTime() - start) / 1000000L);
-  }
-
-  @Override
-  public void setPropagateEvents(boolean propagate) {
-    touch.setPropagateEvents(propagate);
-    pointer.setPropagateEvents(propagate);
-  }
-
-  @Override
-  public Type type() {
-    return Type.ANDROID;
-  }
+  @Override public AndroidAssets assets() { return assets; }
+  @Override public AndroidAudio audio() { return audio; }
+  @Override public AndroidGraphics graphics() { return graphics; }
+  @Override public AndroidInput input() { return input; }
+  @Override public AndroidLog log() { return log; }
+  @Override public AndroidNet net() { return net; }
+  @Override public AndroidStorage storage() { return storage; }
+  @Override public Json json() { return json; }
 
   // note: these are called by GameActivity
-  @Override
-  protected void onPause() {
-    super.onPause();
+  void onPause() {
     state = State.PAUSED;
+    lifecycle.emit(Lifecycle.PAUSE);
   }
-  @Override
-  protected void onResume() {
-    super.onResume();
+  void onResume() {
     state = State.RUNNING;
+    lifecycle.emit(Lifecycle.RESUME);
   }
-  @Override
-  protected void onExit() {
-    super.onExit();
+  void onExit() {
     state = State.EXITED;
+    lifecycle.emit(Lifecycle.EXIT);
   }
 
-  void update() {
-    runQueue.execute();
-    if (game != null) {
-      game.tick(tick());
-    }
+  void processFrame() {
+    frame.emit(this);
   }
 }

@@ -17,50 +17,31 @@ package playn.android;
 
 import android.view.KeyEvent;
 
-import playn.core.Events;
 import playn.core.Key;
 import playn.core.Keyboard;
 
-class KeyEventHandler {
+public class KeyEventHandler {
 
-  private final AndroidPlatform platform;
+  private final AndroidPlatform plat;
 
-  KeyEventHandler(AndroidPlatform platform) {
-    this.platform = platform;
+  public KeyEventHandler(AndroidPlatform plat) {
+    this.plat = plat;
   }
 
-  public void onKeyDown(int keyCode, KeyEvent nativeEvent) {
+  public void onKeyDown (int keyCode, KeyEvent nativeEvent) {
     long time = nativeEvent.getEventTime();
-    final Keyboard.Event event = new Keyboard.Event.Impl(
-      new Events.Flags.Impl(), time, keyForCode(keyCode));
-    platform.invokeLater(new Runnable() {
-      @Override
-      public void run() {
-        platform.keyboard().onKeyDown(event);
-      }
-    });
-
+    dispatch(new Keyboard.KeyEvent(0, time, keyForCode(keyCode), true));
     int unicodeChar = nativeEvent.getUnicodeChar();
-    if (unicodeChar != 0) {
-      final Keyboard.TypedEvent typedEvent =
-        new Keyboard.TypedEvent.Impl(event.flags(), time, (char)unicodeChar);
-      platform.invokeLater(new Runnable() {
-        @Override
-        public void run() {
-          platform.keyboard().onKeyTyped(typedEvent);
-        }
-      });
-    }
+    if (unicodeChar != 0) dispatch(new Keyboard.TypedEvent(0, time, (char)unicodeChar));
   }
 
-  public void onKeyUp(int keyCode, KeyEvent nativeEvent) {
-    final Keyboard.Event event = new Keyboard.Event.Impl(
-      new Events.Flags.Impl(), nativeEvent.getEventTime(), keyForCode(keyCode));
-    platform.invokeLater(new Runnable() {
-      @Override
-      public void run() {
-        platform.keyboard().onKeyUp(event);
-      }
+  public void onKeyUp (int keyCode, KeyEvent nativeEvent) {
+    dispatch(new Keyboard.KeyEvent(0, nativeEvent.getEventTime(), keyForCode(keyCode), false));
+  }
+
+  private void dispatch (final Keyboard.Event event) {
+    plat.invokeLater(new Runnable() {
+      @Override public void run() { plat.input().keyboardEvents.emit(event); }
     });
   }
 

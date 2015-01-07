@@ -16,25 +16,19 @@
 package playn.android;
 
 import android.graphics.Bitmap;
+import playn.core.*;
 
-import pythagoras.f.MathUtil;
+public class AndroidImage extends ImageImpl {
 
-import playn.core.Image;
-import playn.core.Pattern;
-import playn.core.gl.AbstractImageGL;
-import playn.core.gl.GLContext;
-import playn.core.gl.ImageGL;
-import playn.core.gl.Scale;
-import playn.core.util.Callback;
+  protected Bitmap bitmap;
 
-public class AndroidImage extends ImageGL<AndroidCanvas> implements AndroidGLContext.Refreshable {
+  public AndroidImage(Scale scale, Bitmap bitmap) {
+    super(scale, bitmap.getWidth(), bitmap.getHeight(), bitmap);
+    // TODO: move elsewhere: ((AndroidGLContext) ctx).addRefreshable(this);
+  }
 
-  protected Bitmap bitmap; // only mutated in AndroidAsyncImage
-
-  public AndroidImage(GLContext ctx, Bitmap bitmap, Scale scale) {
-    super(ctx, scale);
-    this.bitmap = bitmap;
-    ((AndroidGLContext) ctx).addRefreshable(this);
+  public AndroidImage (AndroidPlatform plat, int preWidth, int preHeight) {
+    super(plat, Scale.ONE, preWidth, preHeight);
   }
 
   /**
@@ -45,83 +39,60 @@ public class AndroidImage extends ImageGL<AndroidCanvas> implements AndroidGLCon
     return bitmap;
   }
 
-  @Override
-  public void addCallback(Callback<? super Image> callback) {
-    // we're always ready immediately
-    callback.onSuccess(this);
+  @Override public Pattern toPattern (boolean repeatX, boolean repeatY) {
+    return new AndroidPattern(repeatX, repeatY, bitmap);
   }
 
-  @Override
-  public void onSurfaceCreated() {
-  }
-
-  @Override
-  public void onSurfaceLost() {
-    clearTexture();
-  }
-
-  public void destroy() {
-    ((AndroidGLContext) ctx).removeRefreshable(this);
-    clearTexture();
-  }
-
-  @Override
-  public float height() {
-    return scale.invScaled(bitmap.getHeight());
-  }
-
-  @Override
-  public float width() {
-    return scale.invScaled(bitmap.getWidth());
-  }
-
-  @Override
-  public boolean isReady() {
-    return (bitmap != null);
-  }
-
-  @Override
-  public Pattern toPattern() {
-    return new AndroidPattern(this, repeatX, repeatY);
-  }
-
-  @Override
-  public void getRgb(int startX, int startY, int width, int height, int[] rgbArray, int offset,
-                     int scanSize) {
+  @Override public void getRgb(int startX, int startY, int width, int height,
+                               int[] rgbArray, int offset, int scanSize) {
     bitmap.getPixels(rgbArray, offset, scanSize, startX, startY, width, height);
   }
 
-  @Override
-  public Image transform(BitmapTransformer xform) {
-    return new AndroidImage(ctx, ((AndroidBitmapTransformer) xform).transform(bitmap), scale);
+  @Override public void setRgb(int startX, int startY, int width, int height,
+                               int[] rgbArray, int offset, int scanSize) {
+    bitmap.setPixels(rgbArray, offset, scanSize, startX, startY, width, height);
   }
 
-  @Override
-  public void draw(AndroidCanvas ac, float dx, float dy, float dw, float dh) {
-    draw(ac, dx, dy, dw, dh, 0, 0, width(), height());
+  @Override public Image transform(BitmapTransformer xform) {
+    return new AndroidImage(scale, ((AndroidBitmapTransformer) xform).transform(bitmap));
   }
 
-  @Override
-  public void draw(AndroidCanvas ac, float dx, float dy, float dw, float dh,
-                   float sx, float sy, float sw, float sh) {
+  @Override public void draw (Object ctx, float x, float y, float w, float h) {
+    draw(ctx, x, y, w, h, 0, 0, width(), height());
+  }
+
+  @Override public void draw (Object ctx, float dx, float dy, float dw, float dh,
+                              float sx, float sy, float sw, float sh) {
     // adjust our source rect to account for the scale factor
     sx *= scale.factor;
     sy *= scale.factor;
     sw *= scale.factor;
     sh *= scale.factor;
-    ac.draw(bitmap, dx, dy, dw, dh, sx, sy, sw, sh);
+    ((AndroidCanvas)ctx).draw(bitmap, dx, dy, dw, dh, sx, sy, sw, sh);
   }
 
-  @Override
-  protected Pattern toSubPattern(AbstractImageGL<?> image, boolean repeatX, boolean repeatY,
-                                 float x, float y, float width, float height) {
-    int ix = MathUtil.ifloor(x), iy = MathUtil.ifloor(y);
-    int iw = MathUtil.iceil(width), ih = MathUtil.iceil(height);
-    return new AndroidPattern(image, repeatX, repeatY, Bitmap.createBitmap(bitmap, ix, iy, iw, ih));
+  @Override protected void setBitmap (Object bitmap) {
+    this.bitmap = (Bitmap)bitmap;
   }
 
-  @Override
-  protected void updateTexture(int tex) {
-    ((AndroidGLContext) ctx).updateTexture(tex, bitmap);
+  @Override protected Object createErrorBitmap (int pixelWidth, int pixelHeight) {
+    Bitmap bitmap = Bitmap.createBitmap(pixelWidth, pixelHeight, Bitmap.Config.ARGB_4444);
+    android.graphics.Canvas c = new android.graphics.Canvas(bitmap);
+    android.graphics.Paint p = new android.graphics.Paint();
+    p.setColor(android.graphics.Color.RED);
+    for (int yy = 0; yy <= pixelHeight / 15; yy++) {
+      for (int xx = 0; xx <= pixelWidth / 45; xx++) {
+        c.drawText("ERROR", xx * 45, yy * 15, p);
+      }
+    }
+    return bitmap;
   }
+
+  // @Override
+  // protected Pattern toSubPattern(AbstractImageGL<?> image, boolean repeatX, boolean repeatY,
+  //                                float x, float y, float width, float height) {
+  //   int ix = MathUtil.ifloor(x), iy = MathUtil.ifloor(y);
+  //   int iw = MathUtil.iceil(width), ih = MathUtil.iceil(height);
+  //   return new AndroidPattern(image, repeatX, repeatY, Bitmap.createBitmap(bitmap, ix, iy, iw, ih));
+  // }
 }

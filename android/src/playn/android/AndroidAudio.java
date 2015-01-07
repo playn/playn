@@ -28,25 +28,26 @@ import android.media.MediaPlayer.OnErrorListener;
 import android.media.MediaPlayer;
 import android.media.SoundPool;
 
-import playn.core.AbstractSound;
-import playn.core.AudioImpl;
+import playn.core.Audio;
+import playn.core.SoundImpl;
 
-public class AndroidAudio extends AudioImpl {
+public class AndroidAudio extends Audio {
 
   protected interface Resolver<I> {
     void resolve(AndroidSound<I> sound);
   }
 
+  final AndroidPlatform plat;
   private final Set<AndroidSound<?>> playing = new HashSet<AndroidSound<?>>();
-  private final AndroidPlatform platform;
   private final Map<Integer,PooledSound> loadingSounds = new HashMap<Integer,PooledSound>();
   private final SoundPool pool;
 
-  private class PooledSound extends AbstractSound<Integer> {
+  private class PooledSound extends SoundImpl<Integer> {
     public final int soundId;
     private int streamId;
 
     public PooledSound(int soundId) {
+      super(plat);
       this.soundId = soundId;
     }
 
@@ -100,20 +101,19 @@ public class AndroidAudio extends AudioImpl {
     }
   }
 
-  public AndroidAudio(final AndroidPlatform platform) {
-    super(platform);
-    this.platform = platform;
-    this.pool = new SoundPool(platform.activity.maxSimultaneousSounds(),
+  public AndroidAudio(final AndroidPlatform plat) {
+    this.plat = plat;
+    this.pool = new SoundPool(plat.activity.maxSimultaneousSounds(),
                               AudioManager.STREAM_MUSIC, 0);
     this.pool.setOnLoadCompleteListener(new SoundPool.OnLoadCompleteListener() {
       public void onLoadComplete(SoundPool soundPool, int soundId, int status) {
         PooledSound sound = loadingSounds.remove(soundId);
         if (sound == null) {
-          platform.log().warn("Got load complete for unknown sound [id=" + soundId + "]");
+          plat.log().warn("Got load complete for unknown sound [id=" + soundId + "]");
         } else if (status == 0) {
-          dispatchLoaded(sound, soundId);
+          sound.succeed(soundId);
         } else {
-          dispatchLoadError(sound, new Exception("Sound load failed [errcode=" + status + "]"));
+          sound.fail(new Exception("Sound load failed [errcode=" + status + "]"));
         }
       }
     });
@@ -122,7 +122,7 @@ public class AndroidAudio extends AudioImpl {
   /**
    * Creates a sound instance from the supplied asset file descriptor.
    */
-  public AbstractSound<?> createSound(AssetFileDescriptor fd) {
+  public SoundImpl<?> createSound(AssetFileDescriptor fd) {
     PooledSound sound = new PooledSound(pool.load(fd, 1));
     loadingSounds.put(sound.soundId, sound);
     return sound;
@@ -131,23 +131,23 @@ public class AndroidAudio extends AudioImpl {
   /**
    * Creates a sound instance from the supplied file descriptor offset.
    */
-  public AbstractSound<?> createSound(FileDescriptor fd, long offset, long length) {
+  public SoundImpl<?> createSound(FileDescriptor fd, long offset, long length) {
     PooledSound sound = new PooledSound(pool.load(fd, offset, length, 1));
     loadingSounds.put(sound.soundId, sound);
     return sound;
   }
 
-  AbstractSound<?> createSound(final String path) {
+  SoundImpl<?> createSound(final String path) {
     try {
-      return createSound(platform.assets().openAssetFd(path));
+      return createSound(plat.assets().openAssetFd(path));
     } catch (IOException ioe) {
       PooledSound sound = new PooledSound(0);
-      sound.onLoadError(ioe);
+      sound.fail(ioe);
       return sound;
     }
   }
 
-  AbstractSound<?> createMusic(final String path) {
+  AndroidSound<?> createMusic(final String path) {
     // MediaPlayer should really be used to play compressed sounds and other file formats
     // AudioTrack cannot handle. However, the MediaPlayer implementation is currently the only
     // version of AndroidSound we have written, so we'll use it here regardless of format.
@@ -158,31 +158,27 @@ public class AndroidAudio extends AudioImpl {
         // it was created; resolve() will be called from the main PlayN thread and we want
         // callbacks to be dispatched on that same thread
         final MediaPlayer mp = new MediaPlayer();
-        platform.invokeAsync(new Runnable() {
+        plat.invokeAsync(new Runnable() {
           public void run () {
             try {
-              AssetFileDescriptor fd = platform.assets().openAssetFd(path);
+              AssetFileDescriptor fd = plat.assets().openAssetFd(path);
               mp.setDataSource(fd.getFileDescriptor(), fd.getStartOffset(), fd.getLength());
               fd.close();
               mp.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-                @Override
-                public void onPrepared(final MediaPlayer mp) {
-                  dispatchLoaded(sound, mp);
-                }
+                @Override public void onPrepared (MediaPlayer mp) { sound.succeed(mp); }
               });
               mp.setOnErrorListener(new OnErrorListener() {
-                @Override
-                public boolean onError(MediaPlayer mp, int what, int extra) {
-                  String errmsg = "MediaPlayer prepare failure [what=" + what + ", x=" + extra + "]";
-                  platform.log().warn(errmsg);
-                  dispatchLoadError(sound, new Exception(errmsg));
+                @Override public boolean onError(MediaPlayer mp, int what, int extra) {
+                  String errmsg = "MediaPlayer prepare fail [what=" + what + ", x=" + extra + "]";
+                  plat.log().warn(errmsg);
+                  sound.fail(new Exception(errmsg));
                   return false;
                 }
               });
               mp.prepareAsync();
             } catch (Exception e) {
-              platform.reportError("Sound load error '" + path + "'", e);
-              dispatchLoadError(sound, e);
+              plat.reportError("Sound load error '" + path + "'", e);
+              sound.fail(e);
             }
           }
         });

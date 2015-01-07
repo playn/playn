@@ -27,14 +27,14 @@ public class AndroidCompressedSound extends AndroidSound<MediaPlayer> {
   private int position;
 
   public AndroidCompressedSound(AndroidAudio audio, AndroidAudio.Resolver<MediaPlayer> resolver) {
+    super(audio.plat);
     this.audio = audio;
     this.resolver = resolver;
     resolve();
   }
 
-  @Override
-  public void onLoaded(MediaPlayer impl) {
-    super.onLoaded(impl);
+  @Override public void succeed (MediaPlayer impl) {
+    super.succeed(impl);
     impl.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
       public void onCompletion(MediaPlayer mp) {
         audio.onStopped(AndroidCompressedSound.this);

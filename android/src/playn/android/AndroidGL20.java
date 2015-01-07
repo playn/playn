@@ -18,28 +18,38 @@ package playn.android;
 import java.lang.reflect.Method;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
-import playn.core.gl.GL20;
-
 import android.opengl.GLES20;
 
-public class AndroidGL20 implements GL20 {
+import playn.core.GL20;
 
-  @Override
-  public String getPlatformGLExtensions() {
+public class AndroidGL20 extends GL20 {
+
+  public AndroidGL20 () {
+    super(new Buffers() {
+      public ByteBuffer createByteBuffer(int size) {
+        return ByteBuffer.allocateDirect(size).order(ByteOrder.nativeOrder());
+      }
+    });
+  }
+
+  @Override public int defaultFramebuffer () {
+    return 0;
+  }
+
+  @Override public String getPlatformGLExtensions() {
     String extensions = GLES20.glGetString(GLES20.GL_EXTENSIONS);
     return extensions;
   }
 
-  @Override
-  public int getSwapInterval() {
+  @Override public int getSwapInterval() {
     return 0;
   }
 
-  @Override
-  public void glActiveTexture(int texture) {
+  @Override public void glActiveTexture(int texture) {
     GLES20.glActiveTexture(texture);
   }
 

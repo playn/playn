@@ -15,9 +15,13 @@
  */
 package playn.android;
 
-import playn.core.AbstractSound;
+import playn.core.SoundImpl;
 
-public abstract class AndroidSound<I> extends AbstractSound<I> {
+public abstract class AndroidSound<I> extends SoundImpl<I> {
+
+  public AndroidSound (AndroidPlatform plat) {
+    super(plat);
+  }
 
   abstract void onPause();
 

@@ -15,15 +15,25 @@
  */
 package playn.tests.android;
 
+import android.util.DisplayMetrics;
 import playn.android.GameActivity;
-import playn.core.PlayN;
 
 import playn.tests.core.TestsGame;
 
 public class TestsGameActivity extends GameActivity {
 
-  @Override
-  public void main(){
-    PlayN.run(new TestsGame());
+  public TestsGame game;
+
+  @Override public void main () {
+    game = new TestsGame(platform(), new String[0]);
+  }
+
+  @Override public void onBackPressed () {
+    if (!game.onHardwardBack()) super.onBackPressed();
+  }
+
+  protected float scaleFactor () {
+    DisplayMetrics dm = getResources().getDisplayMetrics();
+    return Math.min(2, dm.density);
   }
 }

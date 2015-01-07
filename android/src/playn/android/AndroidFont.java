@@ -15,28 +15,27 @@
  */
 package playn.android;
 
-import android.graphics.Typeface;
-
 import java.util.EnumMap;
 import java.util.Map;
 
-import playn.core.AbstractFont;
+import android.graphics.Typeface;
 
-class AndroidFont extends AbstractFont {
+import playn.core.Font;
+
+class AndroidFont extends Font {
 
   private static final String[] NO_HACKS = {};
 
   public static final AndroidFont DEFAULT = new AndroidFont(
-    null, "Default", Style.PLAIN, 14, Typeface.DEFAULT, null);
+    new Font.Config("Default", Style.PLAIN, 14), Typeface.DEFAULT, null);
 
   public final Typeface typeface;
   public final String[] ligatureHacks;
 
-  public AndroidFont(AndroidGraphics graphics, String name, Style style, float size,
-                     Typeface typeface, String[] ligatureHacks) {
-    super(graphics, name, style, size);
+  public AndroidFont(Font.Config config, Typeface typeface, String[] ligatureHacks) {
+    super(config);
     this.typeface = (typeface != null) ? typeface :
-      Typeface.create(name, TO_ANDROID_STYLE.get(style));
+      Typeface.create(config.name, TO_ANDROID_STYLE.get(config.style));
     this.ligatureHacks = (ligatureHacks != null) ? ligatureHacks : NO_HACKS;
   }
 

@@ -33,25 +33,25 @@ import android.view.ViewGroup.LayoutParams;
 import android.view.WindowManager;
 import android.widget.LinearLayout;
 
-import playn.core.PlayN;
-
 /**
- * TODO: save/restore state
+ * The main activity for a PlayN game. Override {@link #main} to create your platform independent
+ * game and wire it into the Android {@link #platform()}.
  */
 public abstract class GameActivity extends Activity {
 
-  private final int REQUIRED_CONFIG_CHANGES =
-    ActivityInfo.CONFIG_ORIENTATION | ActivityInfo.CONFIG_KEYBOARD_HIDDEN;
+  private final int REQUIRED_CONFIG_CHANGES = (ActivityInfo.CONFIG_ORIENTATION |
+                                               ActivityInfo.CONFIG_KEYBOARD_HIDDEN);
 
   private AndroidPlatform platform;
   private GameViewGL gameView;
   private KeyEventHandler keyHandler;
 
   /**
-   * The entry-point into a PlayN game. Developers should implement main() to call
-   * platform().assets().setPathPrefix() and PlayN.run().
+   * The entry-point into a PlayN game activity. Create and initialize your game here. The platform
+   * will have been initialized when this method is called, but the first frame tick will not yet
+   * have been emitted.
    */
-  public abstract void main();
+  public abstract void main ();
 
   @Override
   public void onCreate(Bundle savedInstanceState) {
@@ -59,13 +59,9 @@ public abstract class GameActivity extends Activity {
 
     // Build the AndroidPlatform and register this activity.
     Context appctx = getApplicationContext();
-    AndroidGL20 gl20 = (isHoneycombOrLater() || !AndroidGL20Native.available) ?
-      new AndroidGL20() :      // uses platform methods for everything
-      new AndroidGL20Native(); // uses our own native bindings for some missing methods
-    this.platform = createPlatform(gl20);
-    this.gameView = new GameViewGL(appctx, platform, gl20);
+    this.platform = createPlatform();
+    this.gameView = new GameViewGL(appctx, platform);
     this.keyHandler = new KeyEventHandler(platform);
-    PlayN.setPlatform(platform);
 
     // Build the Window and View
     int windowFlags = makeWindowFlags();
@@ -156,13 +152,9 @@ public abstract class GameActivity extends Activity {
    * full-screen window, so apps that wish to preserve the notification bar will have to undo that
    * flag.
    */
-  protected int makeWindowFlags () {
-    int windowFlags = WindowManager.LayoutParams.FLAG_FULLSCREEN;
-    if (isHoneycombOrLater()) {
-      // Use the raw constant rather than the flag to avoid blowing up on earlier Android
-      windowFlags |= 0x1000000; // flagHardwareAccelerated
-    }
-    return windowFlags;
+ protected int makeWindowFlags () {
+    return (WindowManager.LayoutParams.FLAG_FULLSCREEN |
+            WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED);
   }
 
   /**
@@ -174,7 +166,7 @@ public abstract class GameActivity extends Activity {
   protected boolean usePortraitOrientation() {
     return false;
   }
-  
+
   /**
    * Returns the orientation. Defaults to {@code ActivityInfo.SCREEN_ORIENTATION_PORTRAIT} or
    * {@code ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE} based off the response from
@@ -229,16 +221,12 @@ public abstract class GameActivity extends Activity {
     return gameView;
   }
 
-  boolean isHoneycombOrLater() {
-    return android.os.Build.VERSION.SDK_INT >= 11;
-  }
-  
   /**
    * Returns a new AndroidPlatform. This method is protected to provide subclasses a chance to
-   * adjust the platform. 
+   * adjust the platform.
    */
-  protected AndroidPlatform createPlatform (AndroidGL20 gl) {
-    return new AndroidPlatform(this, gl);
+  protected AndroidPlatform createPlatform () {
+    return new AndroidPlatform(this);
   }
 
   protected AndroidPlatform platform() {

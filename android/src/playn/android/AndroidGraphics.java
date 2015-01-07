@@ -15,8 +15,10 @@
  */
 package playn.android;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.WeakHashMap;
 
 import android.graphics.Bitmap;
 import android.graphics.LinearGradient;
@@ -24,60 +26,60 @@ import android.graphics.Paint;
 import android.graphics.RadialGradient;
 import android.graphics.Shader.TileMode;
 import android.graphics.Typeface;
+import android.opengl.GLUtils;
 import android.util.Pair;
 
+import pythagoras.f.Dimension;
+import pythagoras.f.IDimension;
 import pythagoras.f.IPoint;
 import pythagoras.f.MathUtil;
 import pythagoras.f.Point;
 
-import playn.core.CanvasImage;
-import playn.core.Font;
-import playn.core.Gradient;
-import playn.core.GroupLayer;
-import playn.core.TextFormat;
-import playn.core.TextLayout;
-import playn.core.TextWrap;
-import playn.core.gl.GL20;
-import playn.core.gl.GLContext;
-import playn.core.gl.GraphicsGL;
-import playn.core.gl.GroupLayerGL;
-import playn.core.gl.Scale;
-import playn.core.gl.SurfaceGL;
+import playn.core.*;
 
-public class AndroidGraphics extends GraphicsGL {
+public class AndroidGraphics extends Graphics {
 
-  private final AndroidPlatform platform;
+  /** An interface implemented by entities that need to store things when our GL context is lost
+   * and restore them when we are given a new context. */
+  public interface Refreshable {
+    /** Called when our GL context is about to go away. */
+    void onSurfaceLost();
+    /** Called when we have been given a new GL context. */
+    void onSurfaceCreated();
+  }
+
+  private final AndroidPlatform plat;
   private final Point touchTemp = new Point();
+
+  private Map<Refreshable, Void> refreshables =
+    Collections.synchronizedMap(new WeakHashMap<Refreshable, Void>());
 
   private final Map<Pair<String,Font.Style>,Typeface> fonts =
     new HashMap<Pair<String,Font.Style>,Typeface>();
   private final Map<Pair<String,Font.Style>,String[]> ligatureHacks =
     new HashMap<Pair<String,Font.Style>,String[]>();
 
-  private int screenWidth, screenHeight;
+  private Dimension screenSize = new Dimension();
   private ScaleFunc canvasScaleFunc = new ScaleFunc() {
     public Scale computeScale (float width, float height, Scale gfxScale) {
       return gfxScale;
     }
   };
 
-  final AndroidGLContext ctx;
   final Bitmap.Config preferredBitmapConfig;
-  final GroupLayerGL rootLayer;
 
-  public AndroidGraphics(AndroidPlatform platform, AndroidGL20 gfx, Bitmap.Config bitmapConfig) {
-    this.platform = platform;
+  public AndroidGraphics(AndroidPlatform plat, Bitmap.Config bitmapConfig) {
+    super(plat, new AndroidGL20(), new Scale(plat.activity.scaleFactor()));
+    this.plat = plat;
     this.preferredBitmapConfig = bitmapConfig;
-    ctx = new AndroidGLContext(platform, gfx);
-    rootLayer = new GroupLayerGL(ctx);
   }
 
   void onSizeChanged(int viewWidth, int viewHeight) {
-    screenWidth = MathUtil.iceil(viewWidth / ctx.scale.factor);
-    screenHeight = MathUtil.iceil(viewHeight / ctx.scale.factor);
-    platform.log().info("Updating size " + viewWidth + "x" + viewHeight + " / " + ctx.scale.factor +
-                        " -> " + screenWidth + "x" + screenHeight);
-    ctx.setSize(screenWidth, screenHeight);
+    screenSize.width = viewWidth / scale.factor;
+    screenSize.height = viewHeight / scale.factor;
+    plat.log().info("Updating size " + viewWidth + "x" + viewHeight + " / " + scale.factor +
+                    " -> " + screenSize);
+    viewSizeChanged(viewWidth, viewHeight);
   }
 
   /**
@@ -96,9 +98,9 @@ public class AndroidGraphics extends GraphicsGL {
    */
   public void registerFont(String path, String name, Font.Style style, String... ligatureGlyphs) {
     try {
-      registerFont(platform.assets().getTypeface(path), name, style, ligatureGlyphs);
+      registerFont(plat.assets().getTypeface(path), name, style, ligatureGlyphs);
     } catch (Exception e) {
-      platform.reportError("Failed to load font [name=" + name + ", path=" + path + "]", e);
+      plat.reportError("Failed to load font [name=" + name + ", path=" + path + "]", e);
     }
   }
 
@@ -151,29 +153,24 @@ public class AndroidGraphics extends GraphicsGL {
     canvasScaleFunc = scaleFunc;
   }
 
-  @Override
-  public CanvasImage createImage(float width, float height) {
-    Scale scale = canvasScaleFunc.computeScale(width, height, ctx.scale);
-    return new AndroidCanvasImage(this, width, height, scale);
+  @Override public IDimension screenSize () { return screenSize; }
+
+  @Override public Canvas createCanvas(float width, float height) {
+    Scale scale = canvasScaleFunc.computeScale(width, height, this.scale);
+    Bitmap bitmap = Bitmap.createBitmap(scale.scaledCeil(width), scale.scaledCeil(height),
+                                        preferredBitmapConfig);
+    AndroidImage image = new AndroidImage(scale, bitmap);
+    return new AndroidCanvas(image);
+  }
+
+  @Override public Gradient createGradient(Gradient.Config cfg) {
+    return new AndroidGradient(cfg);
   }
 
   @Override
-  public Gradient createLinearGradient(float x0, float y0, float x1, float y1, int[] colors,
-      float[] positions) {
-    LinearGradient gradient = new LinearGradient(x0, y0, x1, y1, colors, positions, TileMode.CLAMP);
-    return new AndroidGradient(gradient);
-  }
-
-  @Override
-  public Gradient createRadialGradient(float x, float y, float r, int[] colors, float[] positions) {
-    RadialGradient gradient = new RadialGradient(x, y, r, colors, positions, TileMode.CLAMP);
-    return new AndroidGradient(gradient);
-  }
-
-  @Override
-  public Font createFont(String name, Font.Style style, float size) {
-    Pair<String,Font.Style> key = Pair.create(name, style);
-    return new AndroidFont(this, name, style, size, fonts.get(key), ligatureHacks.get(key));
+  public Font createFont(Font.Config config) {
+    Pair<String,Font.Style> key = Pair.create(config.name, config.style);
+    return new AndroidFont(config, fonts.get(key), ligatureHacks.get(key));
   }
 
   @Override
@@ -186,51 +183,35 @@ public class AndroidGraphics extends GraphicsGL {
     return AndroidTextLayout.layoutText(text, format, wrap);
   }
 
-  @Override
-  public int screenHeight() {
-    return screenHeight;
+  @Override protected void upload (Image image, Texture tex) {
+    Bitmap bitmap = ((AndroidImage)image).bitmap();
+    gl.glBindTexture(GL20.GL_TEXTURE_2D, tex.id);
+    GLUtils.texImage2D(GL20.GL_TEXTURE_2D, 0, bitmap, 0);
+    gl.checkError("updateTexture end");
   }
 
-  @Override
-  public int screenWidth() {
-    return screenWidth;
+  void onSurfaceCreated() {
+    // TODO: incrementEpoch(); // increment our GL context epoch
+    // TODO: init(); // reinitialize GL
+    for (Refreshable ref : refreshables.keySet()) ref.onSurfaceCreated();
   }
 
-  @Override
-  public int height() {
-    return ctx.viewHeight;
+  void onSurfaceLost() {
+    for (Refreshable ref : refreshables.keySet()) ref.onSurfaceLost();
   }
 
-  @Override
-  public int width() {
-    return ctx.viewWidth;
+  void addRefreshable(Refreshable ref) {
+    assert ref != null;
+    refreshables.put(ref, null);
   }
 
-  @Override
-  public GroupLayer rootLayer() {
-    return rootLayer;
-  }
-
-  @Override
-  public GL20 gl20() {
-    return ctx.gl;
-  }
-
-  @Override
-  public GLContext ctx() {
-    return ctx;
-  }
-
-  @Override
-  protected SurfaceGL createSurfaceGL(float width, float height) {
-    return new AndroidSurfaceGL(platform.activity.getCacheDir(), ctx, width, height);
-  }
-
-  void paint() {
-    ctx.paint(rootLayer);
+  void removeRefreshable(Refreshable ref) {
+    assert ref != null;
+    refreshables.remove(ref);
   }
 
   IPoint transformTouch(float x, float y) {
-    return ctx.rootTransform().inverseTransform(touchTemp.set(x, y), touchTemp);
+    // TODO: return ctx.rootTransform().inverseTransform(touchTemp.set(x, y), touchTemp);
+    return touchTemp.set(x / scale.factor, y / scale.factor);
   }
 }

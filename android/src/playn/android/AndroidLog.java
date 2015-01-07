@@ -17,9 +17,7 @@ package playn.android;
 
 import android.util.Log;
 
-import playn.core.LogImpl;
-
-class AndroidLog extends LogImpl {
+public class AndroidLog extends playn.core.Log {
 
   private final String logIdent;
 
