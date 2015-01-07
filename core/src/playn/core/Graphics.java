@@ -52,6 +52,7 @@ public abstract class Graphics {
     public int id () { return gl.defaultFramebuffer(); }
     public int width () { return viewPixelWidth; }
     public int height () { return viewPixelHeight; }
+    public Scale scale () { return scale; }
     public boolean flip () { return true; }
     public void close () {} // disable normal destroy-on-close behavior
   };
@@ -107,7 +108,7 @@ public abstract class Graphics {
       "Cannot create texture from unready image.");
 
     Texture tex = new Texture(this, createTexture(mipmaps), managed, mipmaps,
-                              image.pixelWidth(), image.pixelHeight(),
+                              image.pixelWidth(), image.pixelHeight(), image.scale(),
                               image.width(), image.height());
     tex.update(image);
     return tex;
@@ -144,11 +145,11 @@ public abstract class Graphics {
    * @param mipmaps whether the created texture should have mipmaps generated.
    */
   public Texture createTexture (float width, float height, boolean managed, boolean mipmaps) {
-    int pixWidth = scale.invScaledCeil(width), pixHeight = scale.invScaledCeil(height);
+    int pixWidth = scale.scaledCeil(width), pixHeight = scale.scaledCeil(height);
     int id = createTexture(mipmaps);
     gl.glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, pixWidth, pixHeight,
                     0, GL_RGBA, GL_UNSIGNED_BYTE, null);
-    return new Texture(this, id, managed, mipmaps, pixWidth, pixHeight, width, height);
+    return new Texture(this, id, managed, mipmaps, pixWidth, pixHeight, scale, width, height);
   }
 
   /** See {@link #createTexture(float,float,boolean,boolean)}. */

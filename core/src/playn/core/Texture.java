@@ -37,6 +37,8 @@ public class Texture implements Disposable {
   /** The height of this texture in pixels. */
   public final int pixelHeight;
 
+  /** The scale factor used by this texture. */
+  public final Scale scale;
   /** The width of this texture in display units. */
   public final float displayWidth;
   /** The height of this texture in display units. */
@@ -70,13 +72,14 @@ public class Texture implements Disposable {
   private boolean destroyed;
 
   public Texture (Graphics gfx, int id, boolean managed, boolean mipmaps,
-                  int pixWidth, int pixHeight, float dispWidth, float dispHeight) {
+                  int pixWidth, int pixHeight, Scale scale, float dispWidth, float dispHeight) {
     this.gfx = gfx;
     this.id = id;
     this.managed = managed;
     this.mipmaps = mipmaps;
     this.pixelWidth = pixWidth;
     this.pixelHeight = pixHeight;
+    this.scale = scale;
     this.displayWidth = dispWidth;
     this.displayHeight = dispHeight;
   }
