@@ -44,7 +44,7 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <android.version>4.1.1.4</android.version>
-    <android.maven.version>3.6.0</android.maven.version>
+    <android.maven.version>4.0.0</android.maven.version>
     <swt.version>4.3</swt.version>
     <monotouch.version>6.0.6</monotouch.version>
     <gwt.version>2.6.1</gwt.version>
@@ -72,26 +72,7 @@
       <id>forplay-legacy</id>
       <url>http://forplay.googlecode.com/svn/mavenrepo</url>
     </repository>
-    <!-- TEMP: remove this after there is a stable release available for Robovm -->
-    <repository>
-      <id>sonatype-snapshots</id>
-      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-    </repository>
   </repositories>
-
-  <!-- TEMP: remove this after there is a stable release available for Robovm -->
-  <pluginRepositories>
-    <pluginRepository>
-      <id>sonatype-plugin-snapshots</id>
-      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-    </pluginRepository>
-  </pluginRepositories>
 
   <!-- Common dependencies for all modules -->
   <dependencies>
