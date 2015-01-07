@@ -79,7 +79,7 @@ public class JavaImage extends ImageImpl {
   }
 
   @Override public void draw (Object ctx, float dx, float dy, float dw, float dh,
-                       float sx, float sy, float sw, float sh) {
+                              float sx, float sy, float sw, float sh) {
     // adjust our source rect to account for the scale factor
     float f = scale().factor;
     sx *= f; sy *= f; sw *= f; sh *= f;
@@ -106,11 +106,11 @@ public class JavaImage extends ImageImpl {
   //   return new JavaPattern(image, repeatX, repeatY, new TexturePaint(subImage, rect));
   // }
 
-  protected void setBitmap (Object bitmap) {
+  @Override protected void setBitmap (Object bitmap) {
     img = (BufferedImage)bitmap;
   }
 
-  protected Object createErrorBitmap (int rawWidth, int rawHeight) {
+  @Override protected Object createErrorBitmap (int rawWidth, int rawHeight) {
     BufferedImage img = new BufferedImage(rawWidth, rawHeight, BufferedImage.TYPE_INT_ARGB_PRE);
     Graphics2D g = img.createGraphics();
     try {
