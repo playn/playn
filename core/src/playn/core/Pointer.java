@@ -43,9 +43,13 @@ public class Pointer {
     /** Whether this event represents a start, move, etc. */
     public final Kind kind;
 
-    public Event (int flags, double time, float x, float y, Kind kind) {
+    /** Whether this event originated from a touch event. */
+    public boolean isTouch;
+
+    public Event (int flags, double time, float x, float y, Kind kind, boolean isTouch) {
       super(flags, time, x, y);
       this.kind = kind;
+      this.isTouch = isTouch;
     }
 
     @Override protected String name () {
@@ -55,6 +59,7 @@ public class Pointer {
     @Override protected void addFields (StringBuilder builder) {
       super.addFields(builder);
       builder.append(", kind=").append(kind);
+      builder.append(", touch=").append(isTouch);
     }
   }
 
@@ -75,12 +80,12 @@ public class Pointer {
       private boolean dragging;
       @Override public void onEmit (Mouse.Event event) {
         if (event instanceof Mouse.MotionEvent) {
-          if (dragging) forward(Event.Kind.DRAG, event);
+          if (dragging) forward(Event.Kind.DRAG, false, event);
         } else if (event instanceof Mouse.ButtonEvent) {
           Mouse.ButtonEvent bevent = (Mouse.ButtonEvent)event;
           if (bevent.button == Mouse.ButtonEvent.Id.LEFT) {
             dragging = bevent.down;
-            forward(bevent.down ? Event.Kind.START : Event.Kind.END, bevent);
+            forward(bevent.down ? Event.Kind.START : Event.Kind.END, false, bevent);
           }
         }
       }
@@ -93,7 +98,7 @@ public class Pointer {
         for (Touch.Event event : events) {
           if (active == -1 && event.kind.isStart) active = event.id;
           if (event.id == active) {
-            forward(Event.Kind.values()[event.kind.ordinal()], event);
+            forward(Event.Kind.values()[event.kind.ordinal()], true, event);
             if (event.kind.isEnd) active = -1;
           }
         }
@@ -101,9 +106,9 @@ public class Pointer {
     });
   }
 
-  protected void forward (Event.Kind kind, playn.core.Event.XY source) {
+  protected void forward (Event.Kind kind, boolean isTouch, playn.core.Event.XY source) {
     if (!enabled || !events.hasConnections()) return;
-    events.emit(new Event(source.flags, source.time, source.x, source.y, kind));
+    events.emit(new Event(source.flags, source.time, source.x, source.y, kind, isTouch));
     // TODO: propagate prevent default back to original event
   }
 }
