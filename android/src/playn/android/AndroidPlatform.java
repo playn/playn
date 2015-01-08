@@ -129,7 +129,5 @@ public class AndroidPlatform extends Platform {
     lifecycle.emit(Lifecycle.EXIT);
   }
 
-  void processFrame() {
-    frame.emit(this);
-  }
+  void processFrame() { emitFrame(); }
 }

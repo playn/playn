@@ -738,8 +738,6 @@ public abstract class GL20 {
     glVertexAttrib4f(indx, values[indx + offset], values[indx + 1 + offset], values[indx + 2 + offset], values[indx + 3 + offset]);
   }
 
-  public abstract int defaultFramebuffer ();
-
   public abstract String getPlatformGLExtensions ();
   public abstract int getSwapInterval ();
   public abstract void glActiveTexture (int texture);

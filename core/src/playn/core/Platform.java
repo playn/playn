@@ -154,4 +154,9 @@ public abstract class Platform {
     errors.emit(new Error(message, cause));
     log().warn(message, cause);
   }
+
+  protected void emitFrame () {
+    try { frame.emit(this); }
+    catch (Exception e) { log().warn("Frame tick exception", e); }
+  }
 }

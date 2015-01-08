@@ -31,11 +31,7 @@ public abstract class Graphics {
   private final Platform plat;
   protected final Dimension viewSizeM = new Dimension();
   protected int viewPixelWidth, viewPixelHeight;
-  protected int minFilter = GL_LINEAR, magFilter = GL_LINEAR;
   private Texture colorTex; // created lazily
-
-  /** The filter modes used when converting images to textures. */
-  public static enum Filter { LINEAR, NEAREST }
 
   /** Provides access to GL services. */
   public final GL20 gl;
@@ -49,10 +45,11 @@ public abstract class Graphics {
 
   /** The render target for the default framebuffer. */
   public RenderTarget defaultRenderTarget = new RenderTarget(this) {
-    public int id () { return gl.defaultFramebuffer(); }
+    public int id () { return defaultFramebuffer(); }
     public int width () { return viewPixelWidth; }
     public int height () { return viewPixelHeight; }
-    public Scale scale () { return scale; }
+    public float xscale () { return scale.factor; }
+    public float yscale () { return scale.factor; }
     public boolean flip () { return true; }
     public void close () {} // disable normal destroy-on-close behavior
   };
@@ -66,7 +63,9 @@ public abstract class Graphics {
   /**
    * Creates a {@link Canvas} with the specified display unit size.
    */
-  public abstract Canvas createCanvas (float width, float height);
+  public Canvas createCanvas (float width, float height) {
+    return createCanvasImpl(scale, scale.scaledCeil(width), scale.scaledCeil(height));
+  }
 
   /** See {@link #createCanvas(float,float)}. */
   public Canvas createCanvas (IDimension size) {
@@ -74,43 +73,26 @@ public abstract class Graphics {
   }
 
   /**
-   * Configures the filter functions to use when creating textures.
-   *
-   * @param minFilter the scaling to use when rendering textures that are scaled down.
-   * @param magFilter the scaling to use when rendering textures that are scaled up.
-   */
-  public void setTextureFilter (Filter minFilter, Filter magFilter) {
-    this.minFilter = toGL(minFilter);
-    this.magFilter = toGL(magFilter);
-  }
-
-  /**
-   * Creates a managed texture with the contents if {@code image}, with no mipmaps.
-   * See {@link #createTexture(Image,boolean,boolean)}.
+   * Creates a texture with the contents if {@code image}, with default config.
+   * See {@link #createTexture(Image,Texture.Config)}.
    */
   public Texture createTexture (Image image) {
-    return createTexture(image, true, false);
+    return createTexture(image, Texture.Config.DEFAULT);
   }
 
   /**
-   * Uploads {@code image}'s bitmap data to the GPU and returns a handle to the texture. The
-   * current filter parameters (per {@link #setTextureFilter}) will be used for the texture.
-   *
-   * @param managed whether the texture will be reference counted. If the texture will be used in
-   * an {@code ImageLayer}, it should be reference counted unless you are doing something special.
-   * Otherwise you can decide whether you want to use the reference counting mechanism or not.
-   * @param mipmaps whether the created texture should have mipmaps generated.
-   *
+   * Uploads {@code image}'s bitmap data to the GPU and returns a handle to the texture.
    * @throws IllegalStateException if {@code image} is not fully loaded.
    */
-  public Texture createTexture (Image image, boolean managed, boolean mipmaps) {
+  public Texture createTexture (Image image, Texture.Config config) {
     if (!image.state.isCompleteNow()) throw new IllegalStateException(
       "Cannot create texture from unready image.");
 
-    Texture tex = new Texture(this, createTexture(mipmaps), managed, mipmaps,
-                              image.pixelWidth(), image.pixelHeight(), image.scale(),
-                              image.width(), image.height());
-    tex.update(image);
+    int texWidth = config.toTexWidth(image.pixelWidth());
+    int texHeight = config.toTexHeight(image.pixelHeight());
+    Texture tex = new Texture(this, createTexture(config), config, texWidth, texHeight,
+                              image.scale(), image.width(), image.height());
+    tex.update(image); // this will handle non-POT source image conversion
     return tex;
   }
 
@@ -128,33 +110,28 @@ public abstract class Graphics {
    * Returns a future which will deliver a texture for {@code image} once its loading has
    * completed. Uses {@link #createTexture(Image,boolean,boolean)} to create texture.
    */
-  public RFuture<Texture> createTextureAsync (Image image, final boolean managed,
-                                              final boolean mipmaps) {
+  public RFuture<Texture> createTextureAsync (Image image, final Texture.Config config) {
     return image.state.map(new Function<Image,Texture>() {
-      public Texture apply (Image image) { return createTexture(image, managed, mipmaps); }
+      public Texture apply (Image image) { return createTexture(image, config); }
     });
   }
 
   /**
    * Creates an empty texture into which one can render. The supplied width and height are in
    * display units and will be converted to pixels based on the current scale factor.
-   *
-   * @param managed whether the texture will be reference counted. If the texture will be used in
-   * an {@code ImageLayer}, it should be reference counted unless you are doing something special.
-   * Otherwise you can decide whether you want to use the reference counting mechanism or not.
-   * @param mipmaps whether the created texture should have mipmaps generated.
    */
-  public Texture createTexture (float width, float height, boolean managed, boolean mipmaps) {
-    int pixWidth = scale.scaledCeil(width), pixHeight = scale.scaledCeil(height);
-    int id = createTexture(mipmaps);
-    gl.glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, pixWidth, pixHeight,
+  public Texture createTexture (float width, float height, Texture.Config config) {
+    int texWidth = config.toTexWidth(scale.scaledCeil(width));
+    int texHeight = config.toTexHeight(scale.scaledCeil(height));
+    int id = createTexture(config);
+    gl.glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, texWidth, texHeight,
                     0, GL_RGBA, GL_UNSIGNED_BYTE, null);
-    return new Texture(this, id, managed, mipmaps, pixWidth, pixHeight, scale, width, height);
+    return new Texture(this, id, config, texWidth, texHeight, scale, width, height);
   }
 
   /** See {@link #createTexture(float,float,boolean,boolean)}. */
-  public Texture createTexture (IDimension size, boolean managed, boolean mipmaps) {
-    return createTexture(size.width(), size.height(), managed, mipmaps);
+  public Texture createTexture (IDimension size, Texture.Config config) {
+    return createTexture(size.width(), size.height(), config);
   }
 
   /**
@@ -194,7 +171,7 @@ public abstract class Graphics {
     if (colorTex == null) {
       Canvas canvas = createCanvas(1, 1);
       canvas.setFillColor(0xFFFFFFFF).fillRect(0, 0, canvas.width, canvas.height);
-      colorTex = createTexture(canvas.image, false, false);
+      colorTex = createTexture(canvas.image, Texture.Config.UNMANAGED);
     }
     return colorTex;
   }
@@ -204,6 +181,18 @@ public abstract class Graphics {
     this.gl = gl;
     this.scale = scale;
   }
+
+  /**
+   * Returns the id of the default GL framebuffer. On most platforms this is 0, but not iOS.
+   */
+  protected int defaultFramebuffer () { return 0; }
+
+  /**
+   * Creates a {@link Canvas} with the specified pixel size. Because this is used when scaling
+   * images for rendering into POT textures, we need to be precise about the pixel width and
+   * height. So make sure this code path uses these exact sizes to make the canvas backing buffer.
+   */
+  protected abstract Canvas createCanvasImpl (Scale scale, int pixelWidth, int pixelHeight);
 
   /**
    * Informs the graphics system that the main viewport size has changed. The supplied size should
@@ -217,22 +206,17 @@ public abstract class Graphics {
     // TODO: allow listening for view size change?
   }
 
-  private int createTexture (boolean mipmaps) {
+  private int createTexture (Texture.Config config) {
     int id = gl.glGenTexture();
     gl.glBindTexture(GL_TEXTURE_2D, id);
-    gl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, magFilter);
-    gl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, mipmapify(minFilter, mipmaps));
-    gl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    gl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    gl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, config.magFilter);
+    int minFilter = mipmapify(config.minFilter, config.mipmaps);
+    gl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, minFilter);
+    gl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S,
+                       config.repeatX ? GL_REPEAT : GL_CLAMP_TO_EDGE);
+    gl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T,
+                       config.repeatY ? GL_REPEAT : GL_CLAMP_TO_EDGE);
     return id;
-  }
-
-  protected static int toGL (Filter filter) {
-    switch (filter) {
-    default:
-    case  LINEAR: return GL_LINEAR;
-    case NEAREST: return GL_NEAREST;
-    }
   }
 
   protected static int mipmapify (int filter, boolean mipmaps) {

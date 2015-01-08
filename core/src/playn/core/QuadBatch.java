@@ -37,7 +37,8 @@ public abstract class QuadBatch extends GLBatch {
     * {@code x, y, w, h} define the size and position of the quad. */
   public void add (Texture tex, int tint, AffineTransform xf, float x, float y, float w, float h) {
     setTexture(tex);
-    float sr = tex.repeatX() ? w/tex.displayWidth : 1, sb = tex.repeatY() ? h/tex.displayHeight : 1;
+    float sr = tex.config.repeatX ? w/tex.displayWidth : 1;
+    float sb = tex.config.repeatY ? h/tex.displayHeight : 1;
     add(tint, xf, x, y, x+w, y+h, 0, 0, sr, sb);
   }
 

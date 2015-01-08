@@ -16,15 +16,20 @@
 package playn.tests.core;
 
 import java.util.Arrays;
-import playn.core.*;
-import playn.core.Pointer;
-import playn.scene.*;
+
 import pythagoras.f.FloatMath;
 import react.RFuture;
 import react.Slot;
 import react.UnitSlot;
 
+import playn.core.*;
+import playn.core.Pointer;
+import playn.scene.*;
+
 public class ImageScalingTest extends Test {
+
+  private static final Texture.Config MIPMAPPED = new Texture.Config(
+    true, false, false, GL20.GL_LINEAR, GL20.GL_LINEAR, true);
 
   private boolean paused = false;
 
@@ -44,8 +49,7 @@ public class ImageScalingTest extends Test {
         final ImageLayer player1 = new ImageLayer(game.graphics, princess);
         player1.setOrigin(phwidth, phheight);
         game.rootLayer.addAt(player1, 100, 100);
-        final ImageLayer player2 = new ImageLayer(
-          game.graphics.createTexture(princess, true, true));
+        final ImageLayer player2 = new ImageLayer(game.graphics.createTexture(princess, MIPMAPPED));
         player2.setOrigin(phwidth, phheight);
         game.rootLayer.addAt(player2, 250, 100);
 
@@ -53,7 +57,7 @@ public class ImageScalingTest extends Test {
         final ImageLayer slayer1 = new ImageLayer(game.graphics, star);
         slayer1.setOrigin(shwidth, shheight);
         game.rootLayer.addAt(slayer1, 100, 250);
-        final ImageLayer slayer2 = new ImageLayer(game.graphics.createTexture(star, true, true));
+        final ImageLayer slayer2 = new ImageLayer(game.graphics.createTexture(star, MIPMAPPED));
         slayer2.setOrigin(shwidth, shheight);
         game.rootLayer.addAt(slayer2, 250, 250);
 

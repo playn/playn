@@ -33,7 +33,8 @@ public abstract class RenderTarget implements Disposable {
       public int id () { return fb; }
       public int width () { return tex.pixelWidth; }
       public int height () { return tex.pixelHeight; }
-      public Scale scale () { return tex.scale; }
+      public float xscale () { return tex.pixelWidth / tex.displayWidth; }
+      public float yscale () { return tex.pixelHeight / tex.displayHeight; }
       public boolean flip () { return false; }
     };
   }
@@ -50,12 +51,13 @@ public abstract class RenderTarget implements Disposable {
 
   /** The width of the framebuffer in pixels. */
   public abstract int width ();
-
   /** The height of the framebuffer in pixels. */
   public abstract int height ();
 
-  /** The scale factor for this framebuffer. */
-  public abstract Scale scale ();
+  /** The x-scale between display units and pixels for this target. */
+  public abstract float xscale ();
+  /** The y-scale between display units and pixels for this target. */
+  public abstract float yscale ();
 
   /** Whether or not to flip the y-axis when rendering to this target. When rendering to textures
     * we do not want to flip the y-axis, but when rendering to the screen we do (so that the origin
@@ -77,8 +79,8 @@ public abstract class RenderTarget implements Disposable {
   }
 
   @Override public String toString () {
-    return "[id=" + id() + ", size=" + width() + "x" + height() + " @ " + scale() +
-      ", flip=" + flip() + "]";
+    return "[id=" + id() + ", size=" + width() + "x" + height() + " @ " +
+      xscale() + "x" + yscale() + ", flip=" + flip() + "]";
   }
 
   @Override protected void finalize () {

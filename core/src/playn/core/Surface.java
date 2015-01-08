@@ -55,8 +55,7 @@ public class Surface implements Disposable {
     this.batch = defaultBatch;
     transformStack.add(new AffineTransform());
     colorTex = gfx.colorTex();
-    float sf = target.scale().factor;
-    scale(sf, sf);
+    scale(target.xscale(), target.yscale());
   }
 
   /** Starts a series of drawing commands to this surface. */

@@ -103,8 +103,8 @@ public class CanvasTest extends Test {
         canvas.setStrokeColor(0xFF000000).strokeRect(0, 0, 30, 30);
       }
     });
-    Texture reptex = game.graphics.createTexture(repcan.image);
-    reptex.setRepeat(true, true);
+    Texture reptex = game.graphics.createTexture(
+      repcan.image, Texture.Config.DEFAULT.repeat(true, true));
     addTestLayer("ImageLayer repeat x/y", 100, 100, new ImageLayer(reptex).setSize(100, 100));
 
     timeImg = game.graphics.createCanvas(100, 100);
@@ -216,8 +216,8 @@ public class CanvasTest extends Test {
 
     game.assets.getImage("images/tile.png").state.onSuccess(new Slot<Image>() {
       public void onEmit (Image tileImg) {
-        Texture tileTex = game.graphics.createTexture(tileImg);
-        tileTex.setRepeat(true, true);
+        Texture tileTex = game.graphics.createTexture(
+          tileImg, Texture.Config.DEFAULT.repeat(true, true));
         tileLayer = new ImageLayer(tileTex);
         addTestLayer("img layer anim setWidth", 100, 100, tileLayer.setSize(0, 100));
       }
@@ -282,14 +282,14 @@ public class CanvasTest extends Test {
   private void addTestCanvas(String descrip, int width, int height, String imagePath,
                              final ImageDrawer drawer) {
     final Canvas target = game.graphics.createCanvas(width, height);
-    final Texture tex = game.graphics.createTexture(target.image);
+    final ImageLayer layer = new ImageLayer().setSize(width, height);
     game.assets.getImage(imagePath).state.onSuccess(new Slot<Image>() {
       public void onEmit (Image image) {
         drawer.draw(target, image);
-        tex.update(target.image);
+        layer.setTexture(game.graphics.createTexture(target.image));
       }
     });
-    addTestLayer(descrip, width, height, new ImageLayer(tex));
+    addTestLayer(descrip, width, height, layer);
   }
 
   private Font F_FONT = TestsGame.game.graphics.createFont(

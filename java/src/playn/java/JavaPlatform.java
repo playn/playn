@@ -280,9 +280,7 @@ public class JavaPlatform extends Platform {
     // event handling
     try { input.update(); }
     catch (Exception e) { log.warn("Input exception", e); }
-    // emit a frame signal
-    try { frame.emit(this); }
-    catch (Exception e) { log.warn("Frame tick exception", e); }
+    emitFrame();
   }
 
   protected void toggleActivation () {

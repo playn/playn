@@ -144,6 +144,13 @@ public abstract class Canvas {
    */
   public abstract Image snapshot ();
 
+  /**
+   * Informs the platform that this canvas, and its backing image will no longer be used. On some
+   * platforms this can free up memory earlier than if we waited for the canvas to be garbage
+   * collected.
+   */
+  public void dispose () {} // nada by default
+
   /** Clears the entire canvas to {@code rgba(0, 0, 0, 0)}. */
   public abstract Canvas clear ();
 

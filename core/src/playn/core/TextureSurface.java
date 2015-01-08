@@ -35,9 +35,9 @@ public class TextureSurface extends Surface {
   public final Texture texture;
 
   /** Creates a texture surface which is {@code width x height} in display units.
-    * A (managed) backing texture will be automatically created. */
+    * A managed backing texture will be automatically created. */
   public TextureSurface (Graphics gfx, QuadBatch defaultBatch, float width, float height) {
-    this(gfx, defaultBatch, gfx.createTexture(width, height, true, false));
+    this(gfx, defaultBatch, gfx.createTexture(width, height, Texture.Config.DEFAULT));
   }
 
   /** Creates a texture surface which renders to {@code texture}. */

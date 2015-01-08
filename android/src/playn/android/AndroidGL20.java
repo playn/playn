@@ -36,10 +36,6 @@ public class AndroidGL20 extends GL20 {
     });
   }
 
-  @Override public int defaultFramebuffer () {
-    return 0;
-  }
-
   @Override public String getPlatformGLExtensions() {
     String extensions = GLES20.glGetString(GLES20.GL_EXTENSIONS);
     return extensions;

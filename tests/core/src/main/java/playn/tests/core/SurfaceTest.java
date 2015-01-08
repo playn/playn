@@ -51,11 +51,9 @@ public class SurfaceTest extends Test {
   }
 
   protected void addTests (final Image orange, Image tile) {
-    final Pattern pattern = tile.toPattern(true, true);
-
     final Texture otex = game.graphics.createTexture(orange);
-    final Texture ttex = game.graphics.createTexture(tile);
-    ttex.setRepeat(true, true);
+    final Texture ttex = game.graphics.createTexture(
+      tile, Texture.Config.DEFAULT.repeat(true, true));
 
     // make samples big enough to force a buffer size increase
     final int samples = 128, hsamples = samples/2;
@@ -162,7 +160,6 @@ public class SurfaceTest extends Test {
                           dotBox.y + (float)Math.random()*(dotBox.height-10));
       dots.add(dotl);
 
-      // System.err.println("Created dot at " + dotl.transform());
       game.rootLayer.add(dotl);
     }
 

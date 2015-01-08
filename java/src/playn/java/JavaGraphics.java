@@ -137,12 +137,6 @@ public class JavaGraphics extends Graphics {
     return screenSize;
   }
 
-  @Override public Canvas createCanvas(float width, float height) {
-    BufferedImage bitmap = new BufferedImage(scale.scaledCeil(width), scale.scaledCeil(height),
-                                             BufferedImage.TYPE_INT_ARGB_PRE);
-    return new JavaCanvas(new JavaImage(scale, bitmap));
-  }
-
   @Override public Gradient createGradient(Gradient.Config config) {
     if (config instanceof Gradient.Linear) {
       return JavaGradient.create((Gradient.Linear)config);
@@ -164,6 +158,12 @@ public class JavaGraphics extends Graphics {
 
   @Override public TextLayout[] layoutText(String text, TextFormat format, TextWrap wrap) {
     return JavaTextLayout.layoutText(this, text, format, wrap);
+  }
+
+  @Override protected Canvas createCanvasImpl (Scale scale, int pixelWidth, int pixelHeight) {
+    BufferedImage bitmap = new BufferedImage(
+      pixelWidth, pixelHeight, BufferedImage.TYPE_INT_ARGB_PRE);
+    return new JavaCanvas(new JavaImage(scale, bitmap));
   }
 
   /** Converts the given image into a format for quick upload to the GPU. */

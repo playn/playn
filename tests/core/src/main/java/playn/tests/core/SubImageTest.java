@@ -28,8 +28,8 @@ public class SubImageTest extends Test {
       public void onEmit (Image orange) {
         fragment("Image", orange, 250, 10);
 
-        final Texture oreptex = game.graphics.createTexture(orange);
-        oreptex.setRepeat(true, true);
+        final Texture oreptex = game.graphics.createTexture(
+          orange, Texture.Config.DEFAULT.repeat(true, true));
         final float pw = orange.width(), ph = orange.height(), phw = pw/2, phh = ph/2;
 
         // tile a sub-image, oh my!

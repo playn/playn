@@ -155,32 +155,31 @@ public class AndroidGraphics extends Graphics {
 
   @Override public IDimension screenSize () { return screenSize; }
 
-  @Override public Canvas createCanvas(float width, float height) {
+  @Override public Canvas createCanvas (float width, float height) {
     Scale scale = canvasScaleFunc.computeScale(width, height, this.scale);
-    Bitmap bitmap = Bitmap.createBitmap(scale.scaledCeil(width), scale.scaledCeil(height),
-                                        preferredBitmapConfig);
-    AndroidImage image = new AndroidImage(scale, bitmap);
-    return new AndroidCanvas(image);
+    return createCanvasImpl(scale, scale.scaledCeil(width), scale.scaledCeil(height));
   }
 
   @Override public Gradient createGradient(Gradient.Config cfg) {
     return new AndroidGradient(cfg);
   }
 
-  @Override
-  public Font createFont(Font.Config config) {
+  @Override public Font createFont(Font.Config config) {
     Pair<String,Font.Style> key = Pair.create(config.name, config.style);
     return new AndroidFont(config, fonts.get(key), ligatureHacks.get(key));
   }
 
-  @Override
-  public TextLayout layoutText(String text, TextFormat format) {
+  @Override public TextLayout layoutText(String text, TextFormat format) {
     return AndroidTextLayout.layoutText(text, format);
   }
 
-  @Override
-  public TextLayout[] layoutText(String text, TextFormat format, TextWrap wrap) {
+  @Override public TextLayout[] layoutText(String text, TextFormat format, TextWrap wrap) {
     return AndroidTextLayout.layoutText(text, format, wrap);
+  }
+
+  @Override protected Canvas createCanvasImpl(Scale scale, int pixelWidth, int pixelHeight) {
+    Bitmap bitmap = Bitmap.createBitmap(pixelWidth, pixelHeight, preferredBitmapConfig);
+    return new AndroidCanvas(new AndroidImage(scale, bitmap));
   }
 
   void onSurfaceCreated() {

@@ -61,10 +61,6 @@ final class JavaGL20 extends playn.core.GL20 {
     GL13.glActiveTexture(texture);
   }
 
-  @Override public int defaultFramebuffer () {
-    return 0;
-  }
-
   @Override
   public void glAttachShader(int program, int shader) {
     GL20.glAttachShader(program, shader);
