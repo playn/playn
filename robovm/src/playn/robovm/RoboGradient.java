@@ -20,7 +20,7 @@ import org.robovm.apple.coregraphics.CGPoint;
 
 import playn.core.Gradient;
 
-public abstract class RoboGradient implements Gradient {
+public abstract class RoboGradient extends Gradient {
 
   // TODO: use both options once RoboVM fixes their API
   private static final CGGradientDrawingOptions gdOptions =
@@ -32,10 +32,10 @@ public abstract class RoboGradient implements Gradient {
   public static class Linear extends RoboGradient {
     final CGPoint start, end;
 
-    public Linear(float x0, float y0, float x1, float y1, int[] colors, float[] positions) {
-      super(colors, positions);
-      this.start = new CGPoint(x0, y0);
-      this.end = new CGPoint(x1, y1);
+    public Linear(Gradient.Linear cfg) {
+      super(cfg);
+      this.start = new CGPoint(cfg.x0, cfg.y0);
+      this.end = new CGPoint(cfg.x1, cfg.y1);
     }
 
     @Override
@@ -48,10 +48,10 @@ public abstract class RoboGradient implements Gradient {
     final CGPoint center;
     final float r;
 
-    public Radial(float x, float y, float r, int[] colors, float[] positions) {
-      super(colors, positions);
-      this.center = new CGPoint(x, y);
-      this.r = r;
+    public Radial(Gradient.Radial cfg) {
+      super(cfg);
+      this.center = new CGPoint(cfg.x, cfg.y);
+      this.r = cfg.r;
     }
 
     @Override
@@ -62,17 +62,17 @@ public abstract class RoboGradient implements Gradient {
 
   abstract void fill(CGBitmapContext bctx);
 
-  protected RoboGradient(int[] colors, float[] positions) {
+  protected RoboGradient(Config cfg) {
     // expand the color components from ARGB into an array of floats in RGBA order
-    float[] comps = new float[colors.length*4];
+    float[] comps = new float[cfg.colors.length*4];
     int cc = 0;
-    for (int color : colors) {
+    for (int color : cfg.colors) {
       comps[cc++] = ((color >> 16) & 0xFF) / 255f;
       comps[cc++] = ((color >>  8) & 0xFF) / 255f;
       comps[cc++] = ((color >>  0) & 0xFF) / 255f;
       comps[cc++] = ((color >> 24) & 0xFF) / 255f;
     }
-    cgGradient = CGGradient.create(RoboGraphics.colorSpace, comps, positions);
+    cgGradient = CGGradient.create(RoboGraphics.colorSpace, comps, cfg.positions);
   }
 
   @Override

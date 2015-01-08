@@ -17,16 +17,17 @@ import java.io.File;
 
 import org.robovm.apple.avfoundation.AVAudioPlayer;
 import org.robovm.apple.avfoundation.AVAudioSession;
+import org.robovm.apple.avfoundation.AVAudioSessionSetActiveOptions;
 import org.robovm.apple.foundation.NSError;
 import org.robovm.apple.foundation.NSURL;
 
-import playn.core.AudioImpl;
+import playn.core.Audio;
 import playn.core.Sound;
 import static playn.robovm.OpenAL.*;
 
-public class RoboAudio extends AudioImpl {
+public class RoboAudio extends Audio {
 
-  private final RoboPlatform platform;
+  private final RoboPlatform plat;
   private final AVAudioSession session;
   private final long oalDevice;
   private final long oalContext;
@@ -35,19 +36,18 @@ public class RoboAudio extends AudioImpl {
   private final RoboSoundOAL[] active;
   private final int[] started;
 
-  public RoboAudio(RoboPlatform platform, int numSources) {
-    super(platform);
-    this.platform = platform;
+  public RoboAudio(RoboPlatform plat, int numSources) {
+    this.plat = plat;
 
-    session = AVAudioSession.sharedInstance();
-    session.setActive(true, null); // TODO: options?
+    session = AVAudioSession.getSharedInstance();
+    session.setActive(true, AVAudioSessionSetActiveOptions.None);
 
     oalDevice = alcOpenDevice(null);
     if (oalDevice != 0) {
       oalContext = alcCreateContext(oalDevice, null);
       alcMakeContextCurrent(oalContext);
     } else {
-      platform.log().warn("Unable to open OpenAL device. Disabling OAL sound.");
+      plat.log().warn("Unable to open OpenAL device. Disabling OAL sound.");
       oalContext = 0;
     }
 
@@ -82,17 +82,14 @@ public class RoboAudio extends AudioImpl {
   }
 
   Sound createAVAP(final NSURL url) {
-    final RoboSoundAVAP sound = new RoboSoundAVAP();
-    platform.invokeAsync(new Runnable() {
+    final RoboSoundAVAP sound = new RoboSoundAVAP(plat);
+    plat.invokeAsync(new Runnable() {
       public void run () {
-        NSError.NSErrorPtr error = new NSError.NSErrorPtr();
-        AVAudioPlayer player = new AVAudioPlayer(url, error);
-        if (error.get() == null) {
-          dispatchLoaded(sound, player);
-        } else {
-          String errstr = error.get().toString();
-          platform.log().warn("Error loading sound [" + url + ", " + errstr + "]");
-          dispatchLoadError(sound, new Exception(errstr));
+        try {
+          sound.succeed(new AVAudioPlayer(url));
+        } catch (Exception e) {
+          plat.log().warn("Error loading sound [" + url + "]", e);
+          sound.fail(e);
         }
       }
     });
@@ -100,18 +97,17 @@ public class RoboAudio extends AudioImpl {
   }
 
   Sound createOAL(final File assetPath) {
-    final RoboSoundOAL sound = new RoboSoundOAL(this);
-    platform.invokeAsync(new Runnable() {
+    final RoboSoundOAL sound = new RoboSoundOAL(plat);
+    plat.invokeAsync(new Runnable() {
       public void run () {
         int bufferId = 0;
         try {
           bufferId = alGenBuffer();
           CAFLoader.load(assetPath, bufferId);
-          dispatchLoaded(sound, bufferId);
+          sound.succeed(bufferId);
         } catch (Throwable t) {
-          if (bufferId != 0)
-            alDeleteBuffer(bufferId);
-          dispatchLoadError(sound, t);
+          if (bufferId != 0) alDeleteBuffer(bufferId);
+          sound.fail(t);
         }
       }
     });
@@ -149,7 +145,7 @@ public class RoboAudio extends AudioImpl {
     alSourcei(sourceId, AL_LOOPING, looping ? AL_TRUE : AL_FALSE);
     alSourcePlay(sourceId);
     active[sourceIdx] = sound;
-    started[sourceIdx] = platform.tick();
+    started[sourceIdx] = plat.tick();
     return sourceIdx;
   }
 

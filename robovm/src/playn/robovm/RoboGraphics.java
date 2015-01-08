@@ -16,134 +16,96 @@ package playn.robovm;
 import org.robovm.apple.coregraphics.CGBitmapContext;
 import org.robovm.apple.coregraphics.CGBitmapInfo;
 import org.robovm.apple.coregraphics.CGColorSpace;
+import org.robovm.apple.coregraphics.CGImage;
 import org.robovm.apple.coregraphics.CGImageAlphaInfo;
 import org.robovm.apple.coregraphics.CGRect;
 import org.robovm.apple.uikit.UIDevice;
 import org.robovm.apple.uikit.UIScreen;
 import org.robovm.apple.uikit.UIUserInterfaceIdiom;
 
-import playn.core.CanvasImage;
-import playn.core.Font;
-import playn.core.Gradient;
-import playn.core.GroupLayer;
-import playn.core.TextFormat;
-import playn.core.TextLayout;
-import playn.core.TextWrap;
-import playn.core.gl.GL20;
-import playn.core.gl.GLContext;
-import playn.core.gl.GraphicsGL;
-import playn.core.gl.GroupLayerGL;
+import org.robovm.rt.bro.ptr.VoidPtr;
+import playn.core.*;
+import pythagoras.f.Dimension;
+import pythagoras.f.IDimension;
 import pythagoras.f.IPoint;
 import pythagoras.f.Point;
 
 /**
  * Provides graphics implementation on iOS.
  */
-public class RoboGraphics extends GraphicsGL {
+public class RoboGraphics extends Graphics {
 
   // a shared colorspace instance for use all over the place
   static final CGColorSpace colorSpace = CGColorSpace.createDeviceRGB();
-  static final RoboFont defaultFont = new RoboFont(null, "Helvetica", Font.Style.PLAIN, 12);
+  static final RoboFont defaultFont = new RoboFont(
+    new Font.Config("Helvetica", Font.Style.PLAIN, 12));
 
-  private final RoboPlatform platform;
-  private final GroupLayerGL rootLayer;
+  final RoboPlatform plat;
   private final float touchScale;
   private final Point touchTemp = new Point();
-  private int screenWidth, screenHeight;
+  private final Dimension screenSize = new Dimension();
+  private int defaultFramebuffer;
 
   // a scratch bitmap context used for measuring text
   private static final int S_SIZE = 10;
   final CGBitmapContext scratchCtx = createCGBitmap(S_SIZE, S_SIZE);
 
-  final RoboGLContext ctx;
-
-  public RoboGraphics(RoboPlatform platform, CGRect bounds) {
-    this.platform = platform;
-
-    float deviceScale = (float)(/*(platform.osVersion >= 8) ?
-      UIScreen.getMainScreen().getNativeScale() :*/ // TODO: enable when RoboVM supports API
-      UIScreen.getMainScreen().getScale());
-
+  private static boolean useHalfSize (RoboPlatform plat) {
     boolean isPad = UIDevice.getCurrentDevice().getUserInterfaceIdiom() == UIUserInterfaceIdiom.Pad;
-    boolean useHalfSize = isPad && platform.config.iPadLikePhone;
-    float viewScale = (useHalfSize ? 2 : 1) * deviceScale;
+    return isPad && plat.config.iPadLikePhone;
+  }
+  private static Scale viewScale (RoboPlatform plat) {
+    float deviceScale = (float)UIScreen.getMainScreen().getScale();
+    boolean useHalfSize = useHalfSize(plat);
+    return new Scale((useHalfSize ? 2 : 1) * deviceScale);
+  }
 
-    int screenWidth = (int)bounds.getWidth(), screenHeight = (int)bounds.getHeight();
-    if (useHalfSize) {
-      screenWidth /= 2;
-      screenHeight /= 2;
+  public RoboGraphics(RoboPlatform plat, CGRect bounds) {
+    super(plat, new RoboGL20(), viewScale(plat));
+    this.plat = plat;
+    this.touchScale = useHalfSize(plat) ? 2 : 1;
+    setSize(bounds);
+  }
+
+  @Override public IDimension screenSize() {
+    // we just recompute this when asked so that we have the right orientation
+
+    // TODO: is this properly resolution independent?
+    CGRect screenBounds = UIScreen.getMainScreen().getBounds();
+    // TODO: (plat.osVersion < 8) manually divide by scale factor?
+    // tODO: (plat.osVersion < 8) manually flip width/height when in landscape?
+    screenSize.width = (int)screenBounds.getWidth();
+    screenSize.height = (int)screenBounds.getHeight();
+    if (useHalfSize(plat)) {
+      screenSize.width /= 2;
+      screenSize.height /= 2;
     }
-
-    this.touchScale = deviceScale;
-    ctx = new RoboGLContext(platform, new RoboGL20(), viewScale);
-    setSize(screenWidth, screenHeight);
-    rootLayer = new GroupLayerGL(ctx);
+    return screenSize;
   }
 
-  @Override
-  public CanvasImage createImage(float width, float height) {
-    return new RoboCanvasImage(ctx, width, height, platform.config.interpolateCanvasDrawing);
+  @Override public Gradient createGradient(Gradient.Config cfg) {
+    if (cfg instanceof Gradient.Linear) return new RoboGradient.Linear((Gradient.Linear)cfg);
+    else if (cfg instanceof Gradient.Radial) return new RoboGradient.Radial((Gradient.Radial)cfg);
+    else throw new IllegalArgumentException("Unknown config: " + cfg);
   }
 
-  @Override
-  public Gradient createLinearGradient(float x0, float y0, float x1, float y1,
-                                       int[] colors, float[] positions) {
-    return new RoboGradient.Linear(x0, y0, x1, y1, colors, positions);
+  @Override public Font createFont(Font.Config cfg) {
+    return new RoboFont(cfg);
   }
 
-  @Override
-  public Gradient createRadialGradient(float x, float y, float r, int[] colors, float[] positions) {
-    return new RoboGradient.Radial(x, y, r, colors, positions);
-  }
-
-  @Override
-  public Font createFont(String name, Font.Style style, float size) {
-    return new RoboFont(this, name, style, size);
-  }
-
-  @Override
-  public TextLayout layoutText(String text, TextFormat format) {
+  @Override public TextLayout layoutText(String text, TextFormat format) {
     return RoboTextLayout.layoutText(this, text, format);
   }
 
-  @Override
-  public TextLayout[] layoutText(String text, TextFormat format, TextWrap wrap) {
+  @Override public TextLayout[] layoutText(String text, TextFormat format, TextWrap wrap) {
     return RoboTextLayout.layoutText(this, text, format, wrap);
   }
 
-  @Override
-  public int screenHeight() {
-    return screenHeight;
-  }
+  @Override protected int defaultFramebuffer () { return defaultFramebuffer; }
 
-  @Override
-  public int screenWidth() {
-    return screenWidth;
-  }
-
-  @Override
-  public int height() {
-    return ctx.viewHeight;
-  }
-
-  @Override
-  public int width() {
-    return ctx.viewWidth;
-  }
-
-  @Override
-  public GroupLayer rootLayer() {
-    return rootLayer;
-  }
-
-  @Override
-  public GL20 gl20() {
-    return ctx.gl;
-  }
-
-  @Override
-  public GLContext ctx() {
-    return ctx;
+  @Override protected Canvas createCanvasImpl (Scale scale, int pixelWidth, int pixelHeight) {
+    return new RoboCanvas(new RoboCanvasImage(scale, pixelWidth, pixelHeight,
+                                              plat.config.interpolateCanvasDrawing));
   }
 
   static CGBitmapContext createCGBitmap(int width, int height) {
@@ -151,18 +113,34 @@ public class RoboGraphics extends GraphicsGL {
       CGImageAlphaInfo.PremultipliedLast.value()));
   }
 
-  void setSize(int screenWidth, int screenHeight) {
-    this.screenWidth = screenWidth;
-    this.screenHeight = screenHeight;
-    ctx.setSize(screenWidth, screenHeight);
+  // called when our view appears
+  void viewDidInit(CGRect bounds) {
+    System.err.println("viewDidInit(" + bounds + ") " + gl.glGetInteger(GL20.GL_MAX_TEXTURE_SIZE));
+    defaultFramebuffer = gl.glGetInteger(GL20.GL_FRAMEBUFFER_BINDING);
+    if (defaultFramebuffer == 0) throw new IllegalStateException(
+      "Failed to determine defaultFramebuffer");
+    setSize(bounds);
+    // TODO: anything else?
+  }
+
+  // called when our view changes size (at init, and when it rotates)
+  void setSize(CGRect bounds) {
+    System.err.println("setSize(" + bounds + ")");
+
+    boolean useHalfSize = useHalfSize(plat);
+    int viewWidth = scale.scaledCeil((float)bounds.getWidth());
+    int viewHeight = scale.scaledCeil((float)bounds.getHeight());
+    viewSizeChanged(viewWidth, viewHeight);
+
+    System.err.println("Screen size " + screenSize());
+    System.err.println("View size " + viewSize + " " + viewWidth + "x" + viewHeight);
+    System.err.println("View scale " + scale);
+    System.err.println("Touch scale " + touchScale);
+    System.err.println("DRT " + defaultRenderTarget);
+    // TODO: anything else?
   }
 
   IPoint transformTouch(float x, float y) {
-    return ctx.rootTransform().inverseTransform(
-      touchTemp.set(x*touchScale, y*touchScale), touchTemp);
-  }
-
-  void paint() {
-    ctx.paint(rootLayer);
+    return touchTemp.set(x/touchScale, y/touchScale);
   }
 }

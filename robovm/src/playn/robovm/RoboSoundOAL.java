@@ -15,19 +15,20 @@
  */
 package playn.robovm;
 
-import playn.core.AbstractSound;
+import playn.core.SoundImpl;
 
 /**
  * An implementation of Sound using OpenAL. This is used for brief sound effects.
  */
-public class RoboSoundOAL extends AbstractSound<Integer> {
+public class RoboSoundOAL extends SoundImpl<Integer> {
   // our "impl" is the OpenAL buffer ID that contains our sound data
 
   private final RoboAudio audio;
   private int sourceIdx;
 
-  public RoboSoundOAL(RoboAudio audio) {
-    this.audio = audio;
+  public RoboSoundOAL(RoboPlatform plat) {
+    super(plat);
+    this.audio = plat.audio();
   }
 
   /** Returns the OpenAL buffer id for this sound. */

@@ -13,15 +13,25 @@
  */
 package playn.robovm;
 
-import playn.core.LogImpl;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.io.Writer;
 
-public class RoboLog extends LogImpl {
+import org.robovm.apple.foundation.Foundation;
 
-  @Override
-  protected void logImpl(Level level, String msg, Throwable e) {
-    System.err.println(level + ": " + msg);
-    if (e != null) {
-      e.printStackTrace(System.err);
+import playn.core.Log;
+
+public class RoboLog extends Log {
+
+  // printStackTrace only uses println(), so this hackery routes that to Foundation.log
+  private final PrintWriter logOut = new PrintWriter(new StringWriter()) {
+    @Override public void println (String text) {
+      Foundation.log(text);
     }
+  };
+
+  @Override protected void logImpl(Level level, String msg, Throwable e) {
+    Foundation.log(level + ": " + msg);
+    if (e != null) e.printStackTrace(logOut);
   }
 }

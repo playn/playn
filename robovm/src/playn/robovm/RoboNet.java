@@ -28,24 +28,27 @@ import org.robovm.apple.foundation.NSURL;
 import org.robovm.apple.foundation.NSURLConnection;
 import org.robovm.apple.foundation.NSURLConnectionDataDelegateAdapter;
 import org.robovm.apple.foundation.NSURLRequest;
-
 import org.robovm.apple.foundation.NSURLResponse;
-import playn.core.NetImpl;
-import playn.core.util.Callback;
 
-public class RoboNet extends NetImpl {
+import playn.core.Net;
+import react.RFuture;
+import react.RPromise;
 
-  public RoboNet(RoboPlatform platform) {
-    super(platform);
+public class RoboNet extends Net {
+
+  private final RoboPlatform plat;
+
+  public RoboNet(RoboPlatform plat) {
+    this.plat = plat;
   }
 
-  @Override
-  public WebSocket createWebSocket(String url, WebSocket.Listener listener) {
-    return new RoboWebSocket(platform, url, listener);
+  @Override public WebSocket createWebSocket(String url, WebSocket.Listener listener) {
+    return new RoboWebSocket(plat, url, listener);
   }
 
-  @Override
-  protected void execute(BuilderImpl req, Callback<Response> callback) {
+  @Override protected RFuture<Response> execute(Builder req) {
+    RPromise<Response> result = plat.deferredPromise();
+
     NSMutableURLRequest mreq = new NSMutableURLRequest();
     mreq.setURL(new NSURL(req.url));
     for (Header header : req.headers) {
@@ -64,17 +67,17 @@ public class RoboNet extends NetImpl {
         mreq.setHTTPBody(new NSData(req.payloadBytes));
       }
     }
-    sendRequest(mreq, callback);
+    sendRequest(mreq, result);
+    return result;
   }
 
-  protected void sendRequest(NSURLRequest req, final Callback<Response> callback) {
+  protected void sendRequest(NSURLRequest req, final RPromise<Response> result) {
     new NSURLConnection(req, new NSURLConnectionDataDelegateAdapter() {
       private NSMutableData data;
       private int rspCode = -1;
       private Map<String,String> headers;
 
-      @Override
-      public void didReceiveResponse(NSURLConnection conn, NSURLResponse rsp) {
+      @Override public void didReceiveResponse(NSURLConnection conn, NSURLResponse rsp) {
         // if we are redirected, we may accumulate data as we bounce through requests, so we reset
         // our data accumulator each time we receive the response headers
         data = new NSMutableData();
@@ -85,21 +88,19 @@ public class RoboNet extends NetImpl {
           headers = hrsp.getAllHeaderFields();
         }
       }
-      @Override
-      public void didReceiveData(NSURLConnection conn, NSData data) {
+
+      @Override public void didReceiveData(NSURLConnection conn, NSData data) {
         this.data.append(data);
       }
-      @Override
-      public void didFail(NSURLConnection conn, NSError error) {
+
+      @Override public void didFail(NSURLConnection conn, NSError error) {
         String errmsg = error.getLocalizedDescription();
-        Exception exn = rspCode > 0 ? new HttpException(rspCode, errmsg) : new Exception(errmsg);
-        platform.notifyFailure(callback, exn);
+        result.fail(rspCode > 0 ? new HttpException(rspCode, errmsg) : new Exception(errmsg));
       }
-      @Override
-      public void didFinishLoading(NSURLConnection conn) {
-        platform.notifySuccess(callback, new ResponseImpl(rspCode) {
-          @Override
-          protected Map<String,List<String>> extractHeaders() {
+
+      @Override public void didFinishLoading(NSURLConnection conn) {
+        result.succeed(new Response(rspCode) {
+          @Override protected Map<String,List<String>> extractHeaders() {
             Map<String,List<String>> headerMap = new HashMap<String,List<String>>();
             if (headers != null) {
               for (Map.Entry<String,String> entry : headers.entrySet()) {
@@ -110,16 +111,14 @@ public class RoboNet extends NetImpl {
             }
             return headerMap;
           }
-          @Override
-          public String payloadString() {
+          @Override public String payloadString() {
             try {
               return new String(data.getBytes(), "UTF-8");
             } catch (UnsupportedEncodingException uee) {
               throw new RuntimeException(uee);
             }
           }
-          @Override
-          public byte[] payload() {
+          @Override public byte[] payload() {
             return data.getBytes();
           }
         });

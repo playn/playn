@@ -18,27 +18,23 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
+import org.robovm.apple.coregraphics.CGImage;
 import org.robovm.apple.foundation.NSBundle;
 import org.robovm.apple.foundation.NSData;
 import org.robovm.apple.uikit.UIImage;
 
-import playn.core.AbstractAssets;
-import playn.core.AsyncImage;
-import playn.core.Image;
-import playn.core.Net;
-import playn.core.Sound;
-import playn.core.gl.Scale;
-import playn.core.util.Callback;
+import playn.core.*;
+import react.Slot;
 
-public class RoboAssets extends AbstractAssets<UIImage> {
+public class RoboAssets extends Assets {
 
-  private final RoboPlatform platform;
+  private final RoboPlatform plat;
   private final File bundleRoot = new File(NSBundle.getMainBundle().getBundlePath());
   private File assetRoot = new File(bundleRoot, "assets");
 
-  public RoboAssets(RoboPlatform platform) {
-    super(platform);
-    this.platform = platform;
+  public RoboAssets(RoboPlatform plat) {
+    super(plat);
+    this.plat = plat;
   }
 
   /**
@@ -48,17 +44,17 @@ public class RoboAssets extends AbstractAssets<UIImage> {
     this.assetRoot = new File(bundleRoot, pathPrefix);
   }
 
-  @Override
-  public Image getRemoteImage(String url, float width, float height) {
-    final RoboAsyncImage image = new RoboAsyncImage(platform.graphics().ctx, width, height);
-    platform.net().req(url).execute(new Callback<Net.Response>() {
-      public void onSuccess (Net.Response rsp) {
-        image.setImage(UIImage.create(new NSData(rsp.payload())), Scale.ONE);
-      }
-      public void onFailure (Throwable cause) {
-        image.setError(cause);
-      }
-    });
+  @Override public Image getRemoteImage(String url, int width, int height) {
+    final ImageImpl image = createImage(width, height);
+    plat.net().req(url).execute().
+      onSuccess(new Slot<Net.Response>() {
+        public void onEmit (Net.Response rsp) {
+          image.succeed(toData(Scale.ONE, UIImage.create(new NSData(rsp.payload()))));
+        }
+      }).
+      onFailure(new Slot<Throwable>() {
+        public void onEmit (Throwable cause) { image.fail(cause); }
+      });
     return image;
   }
 
@@ -74,14 +70,14 @@ public class RoboAssets extends AbstractAssets<UIImage> {
 
   @Override
   public String getTextSync(String path) throws Exception {
-    platform.log().debug("Loading text " + path);
+    plat.log().debug("Loading text " + path);
     return new String(getBytesSync(path), "UTF-8");
   }
 
   @Override
   public byte[] getBytesSync(String path) throws Exception {
     File fullPath = resolvePath(path);
-    platform.log().debug("Loading bytes " + fullPath);
+    plat.log().debug("Loading bytes " + fullPath);
     FileInputStream in = new FileInputStream(fullPath);
     try {
       byte[] data = new byte[(int)fullPath.length()];
@@ -94,39 +90,37 @@ public class RoboAssets extends AbstractAssets<UIImage> {
     }
   }
 
-  @Override
-  protected Image createStaticImage(UIImage uiImage, Scale scale) {
-    return new RoboImage(platform.graphics().ctx, uiImage.getCGImage(), scale);
-  }
-
-  @Override
-  protected AsyncImage<UIImage> createAsyncImage(float width, float height) {
-    return new RoboAsyncImage(platform.graphics().ctx, width, height);
-  }
-
-  @Override
-  protected Image loadImage(String path, ImageReceiver<UIImage> recv) {
-    Throwable error = null;
-    for (Scale.ScaledResource rsrc : platform.graphics().ctx().scale.getScaledResources(path)) {
+  @Override protected ImageImpl.Data load (String path) throws Exception {
+    Exception error = null;
+    for (Scale.ScaledResource rsrc : plat.graphics().scale.getScaledResources(path)) {
       File fullPath = resolvePath(rsrc.path);
       if (!fullPath.exists()) continue;
 
-      // platform.log().debug("Loading image: " + fullPath);
+      // plat.log().debug("Loading image: " + fullPath);
       UIImage img = UIImage.create(fullPath);
-      if (img != null) return recv.imageLoaded(img, rsrc.scale);
+      if (img != null) return toData(rsrc.scale, img);
 
       // note this error if this is the lowest resolution image, but fall back to lower resolution
       // images if not; in the Java backend we'd fail here, but this is a production backend, so we
       // want to try to make things work
-      platform.log().warn("Failed to load image '" + fullPath + "'.");
+      plat.log().warn("Failed to load image '" + fullPath + "'.");
       error = new Exception("Failed to load " + fullPath);
     }
     if (error == null) {
       File fullPath = resolvePath(path);
-      platform.log().warn("Missing image '" + fullPath + "'.");
+      plat.log().warn("Missing image '" + fullPath + "'.");
       error = new FileNotFoundException(fullPath.toString());
     }
-    return recv.loadFailed(error);
+    throw error;
+  }
+
+  @Override protected ImageImpl createImage (int rawWidth, int rawHeight) {
+    return new RoboImage(plat, rawWidth, rawHeight);
+  }
+
+  private ImageImpl.Data toData (Scale scale, UIImage image) {
+    CGImage bitmap = image.getCGImage();
+    return new ImageImpl.Data(scale, bitmap, (int)bitmap.getWidth(), (int)bitmap.getHeight());
   }
 
   protected File resolvePath (String path) {
@@ -138,10 +132,10 @@ public class RoboAssets extends AbstractAssets<UIImage> {
     for (String encpath : new String[] { path + ".caf", path + ".aifc", path + ".mp3" }) {
       File fullPath = resolvePath(encpath);
       if (!fullPath.exists()) continue;
-      return platform.audio().createSound(fullPath, isMusic);
+      return plat.audio().createSound(fullPath, isMusic);
     }
 
-    platform.log().warn("Missing sound: " + path);
+    plat.log().warn("Missing sound: " + path);
     return new Sound.Error(new FileNotFoundException(path));
   }
 }

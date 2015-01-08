@@ -35,7 +35,7 @@ import org.robovm.rt.bro.annotation.Callback;
 import playn.core.*;
 import playn.core.json.JsonImpl;
 
-public class RoboPlatform extends AbstractPlatform {
+public class RoboPlatform extends Platform {
 
   /** Used to configure the RoboVM platform. */
   public static class Config {
@@ -97,17 +97,17 @@ public class RoboPlatform extends AbstractPlatform {
   }
 
   /**
-   * Registers the RoboVM platform for operation in {@code window}.
+   * Creates a RoboVM platform for operation in {@code window}.
    *
    * <p>This basically just sets the root view controller of the supplied window and that view
    * controller manages everything else. If you wish to embed a PlayN game in a larger iOS app, or
    * to customize PlayN more deeply, create a {@link RoboViewController} yourself and include it in
    * your app wherever you like.
    */
-  public static RoboPlatform register (UIWindow window, Config config) {
+  public static RoboPlatform create (UIWindow window, Config config) {
     RoboViewController ctrl = new RoboViewController(window.getBounds(), config);
     window.setRootViewController(ctrl);
-    return ctrl.platform();
+    return ctrl.platform;
   }
 
   /** Configures a listener to be notified when the device rotates. */
@@ -115,15 +115,19 @@ public class RoboPlatform extends AbstractPlatform {
     orientListener = listener;
   }
 
+  final int osVersion = getOSVersion();
+  final Config config;
+
+  // create log early because other services use it in their ctor
+  private final RoboLog log = new RoboLog();
+  private final Json json = new JsonImpl();
+
   private RoboAudio audio; // lazily initialized
-  private final RoboGraphics graphics;
-  private final Json json;
-  private final RoboKeyboard keyboard;
-  private final RoboNet net;
-  private final RoboPointer pointer;
-  private final RoboStorage storage;
-  private final RoboTouch touch;
   private final RoboAssets assets;
+  private final RoboGraphics graphics;
+  private final RoboInput input;
+  private final RoboNet net;
+  private final RoboStorage storage;
 
   /** Used as a guard flag to avoid duplicated entries caused by the double dispatches of
     * GLKViewControllerDelegate.willPause in one cycle. That could be a bug of RoboVM.
@@ -134,118 +138,40 @@ public class RoboPlatform extends AbstractPlatform {
   private final long gameStart = System.nanoTime();
   private final ExecutorService pool = Executors.newFixedThreadPool(3);
 
-  final int osVersion = getOSVersion();
-  final Config config;
-
-  protected RoboPlatform(CGRect bounds, Config config) {
-    super(new RoboLog());
+  protected RoboPlatform(Config config, CGRect initBounds) {
     this.config = config;
-    bounds = bounds != null ? bounds : UIScreen.getMainScreen().getBounds();
-    graphics = new RoboGraphics(this, bounds);
-    json = new JsonImpl();
-    keyboard = new RoboKeyboard(this);
-    net = new RoboNet(this);
-    pointer = new RoboPointer(this);
-    touch = new RoboTouch(this);
     assets = new RoboAssets(this);
+    graphics = new RoboGraphics(this, initBounds);
+    input = new RoboInput(this);
+    net = new RoboNet(this);
     storage = new RoboStorage(this);
   }
 
-  @Override
-  public void invokeAsync(Runnable action) {
+  @Override public void invokeAsync(Runnable action) {
     pool.execute(action);
   }
 
-  @Override
-  public Type type() {
-    return Type.IOS;
-  }
+  @Override public Type type() { return Type.IOS; }
+  @Override public double time() { return System.currentTimeMillis(); }
+  @Override public int tick() { return (int)((System.nanoTime() - gameStart) / 1000000); }
 
-  @Override
-  public RoboAssets assets() {
-    return assets;
-  }
-
-  @Override
-  public RoboAudio audio() {
-    if (audio == null) audio = new RoboAudio(this, config.openALSources);
-    return audio;
-  }
-
-  @Override
-  public RoboGraphics graphics() {
-    return graphics;
-  }
-
-  @Override
-  public Json json() {
-    return json;
-  }
-
-  @Override
-  public RoboKeyboard keyboard() {
-    return keyboard;
-  }
-
-  @Override
-  public RoboNet net() {
-    return net;
-  }
-
-  @Override
-  public Mouse mouse() {
-    return new MouseStub();
-  }
-
-  @Override
-  public RoboTouch touch() {
-    return touch;
-  }
-
-  @Override
-  public RoboPointer pointer() {
-    return pointer;
-  }
-
-  @Override
-  public float random() {
-    return (float) Math.random();
-  }
-
-  @Override
-  public RoboStorage storage() {
-    return storage;
-  }
-
-  @Override
-  public double time() {
-    return System.currentTimeMillis();
-  }
-
-  @Override
-  public int tick() {
-    return (int)((System.nanoTime() - gameStart) / 1000000);
-  }
-
-  @Override
-  public void openURL(String url) {
+  @Override public void openURL(String url) {
     if (!UIApplication.getSharedApplication().openURL(new NSURL(url))) {
       log().warn("Failed to open URL: " + url);
     }
   }
 
-  @Override
-  public void setPropagateEvents(boolean propagate) {
-    touch.setPropagateEvents(propagate);
-    pointer.setPropagateEvents(propagate);
+  @Override public RoboAssets assets() { return assets; }
+  @Override public RoboAudio audio() {
+    if (audio == null) audio = new RoboAudio(this, config.openALSources);
+    return audio;
   }
-
-  @Override
-  public void run(Game game) {
-    this.game = game;
-    // initialize the game and start things off
-    game.init();
-  }
+  @Override public Json json() { return json; }
+  @Override public Log log() { return log; }
+  @Override public Net net() { return net; }
+  @Override public RoboGraphics graphics() { return graphics; }
+  @Override public RoboInput input() { return input; }
+  @Override public Storage storage() { return storage; }
 
   // NOTE: all of the below callbacks are called by RoboViewController which handles interfacing
   // with iOS for rotation notifications, game loop callbacks, and app lifecycle events
@@ -261,26 +187,13 @@ public class RoboPlatform extends AbstractPlatform {
     }
   }
 
-  void update() {
-    // process pending actions
-    runQueue.execute();
-    // perform the game updates
-    game.tick(tick());
-    // flush any pending draw calls (to surfaces)
-    graphics.ctx().flush();
-  }
-
-  void paint() {
-    graphics.paint();
-  }
+  void processFrame() { emitFrame(); }
 
   void willEnterForeground () {
     if (!paused) return;
     paused = false;
     invokeLater(new Runnable() {
-      public void run() {
-        onResume();
-      }
+      public void run() { lifecycle.emit(Lifecycle.RESUME); }
     });
   }
 
@@ -290,14 +203,14 @@ public class RoboPlatform extends AbstractPlatform {
     // we call this directly rather than via invokeLater() because the PlayN thread is already
     // stopped at this point so a) there's no point in worrying about racing with that thread,
     // and b) onPause would never get called, since the PlayN thread is not processing events
-    onPause();
+    lifecycle.emit(Lifecycle.PAUSE);
   }
 
   void willTerminate () {
-    // let the app know that we're terminating
-    onExit();
     // shutdown the GL and AL systems
     ResourceCleaner.terminate(this);
+    // let the app know that we're terminating
+    lifecycle.emit(Lifecycle.EXIT);
   }
 
   private int getOSVersion () {
@@ -327,12 +240,9 @@ public class RoboPlatform extends AbstractPlatform {
         EAGLContext.setCurrentContext(null);
         // stop and release the AL resources (if audio was ever initialized)
         if (self.platform.audio != null) self.platform.audio.terminate();
+        // null out our platform reference
+        self.platform = null;
       }
-
-      self.platform = null;
-      // clear out the platform in order to make sure the game creation flow can be repeated when
-      // it is used as a part of a larger application
-      PlayN.setPlatform(null);
     }
   }
 }

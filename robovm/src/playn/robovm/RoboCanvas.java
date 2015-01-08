@@ -29,114 +29,77 @@ import org.robovm.apple.coregraphics.CGRect;
 import org.robovm.apple.coregraphics.CGTextEncoding;
 import org.robovm.rt.bro.ptr.VoidPtr;
 
-import playn.core.Canvas;
-import playn.core.Gradient;
-import playn.core.Path;
-import playn.core.Pattern;
-import playn.core.TextLayout;
-import playn.core.gl.AbstractCanvasGL;
+import playn.core.*;
 
 /**
  * Implements {@link Canvas}.
  */
-public class RoboCanvas extends AbstractCanvasGL<CGBitmapContext> {
-
-  private final int texWidth, texHeight;
+public class RoboCanvas extends Canvas {
 
   private float strokeWidth = 1;
   private int strokeColor = 0xFF000000;
   private int fillColor = 0xFF000000;
   private CGBitmapContext bctx;
-  private final RoboGLContext ctx;
 
   private LinkedList<RoboCanvasState> states = new LinkedList<RoboCanvasState>();
 
-  public RoboCanvas(RoboGLContext ctx, float width, float height, boolean interpolate) {
-    super(width, height);
+  public RoboCanvas(RoboCanvasImage image) {
+    super(image);
+
     // if our size is invalid, we'll fail below at CGBitmapContext, so fail here more usefully
     if (width <= 0 || height <= 0) throw new IllegalArgumentException(
       "Invalid size " + width + "x" + height);
     states.addFirst(new RoboCanvasState());
 
-    this.ctx = ctx;
-
-    // create our raw image data
-    texWidth = ctx.scale.scaledCeil(width);
-    texHeight = ctx.scale.scaledCeil(height);
-
-    // create the bitmap context via which we'll render into it
-    bctx = RoboGraphics.createCGBitmap(texWidth, texHeight);
-    if (!interpolate) {
-      bctx.setInterpolationQuality(CGInterpolationQuality.None);
-    }
-
+    bctx = image.bctx;
     // clear the canvas before we scale our bitmap context to avoid artifacts
-    bctx.clearRect(new CGRect(0, 0, texWidth, texHeight));
+    bctx.clearRect(new CGRect(0, 0, texWidth(), texHeight()));
 
     // CG coordinate system is OpenGL-style (0,0 in lower left); so we flip it
-    bctx.translateCTM(0, ctx.scale.scaled(height));
-    bctx.scaleCTM(ctx.scale.factor, -ctx.scale.factor);
+    Scale scale = image.scale();
+    bctx.translateCTM(0, scale.scaled(height));
+    bctx.scaleCTM(scale.factor, -scale.factor);
   }
 
-  public VoidPtr data() {
-    return bctx.getData();
-  }
+  public int texWidth() { return image.pixelWidth(); }
+  public int texHeight() { return image.pixelHeight(); }
 
-  public int texWidth() {
-    return texWidth;
-  }
+  // todo: make sure the image created by this call doesn't require any manual resource
+  // releasing, other than being eventually garbage collected
+  public CGImage cgimage() { return bctx.toImage(); }
 
-  public int texHeight() {
-    return texHeight;
-  }
-
-  public CGImage cgImage() {
-    // TODO: make sure the image created by this call doesn't require any manual resource
-    // releasing, other than being eventually garbage collected
-    return bctx.toImage();
-  }
-
-  public void dispose() {
-    if (bctx != null) {
-      bctx.dispose();
-      bctx = null;
-    }
-  }
-
-  @Override
-  public Canvas clear() {
-    bctx.clearRect(new CGRect(0, 0, texWidth, texHeight));
+  @Override public Canvas clear() {
+    bctx.clearRect(new CGRect(0, 0, texWidth(), texHeight()));
     isDirty = true;
     return this;
   }
 
-  @Override
-  public Canvas clearRect(float x, float y, float width, float height) {
+  @Override public Canvas clearRect(float x, float y, float width, float height) {
     bctx.clearRect(new CGRect(x, y, width, height));
     isDirty = true;
     return this;
   }
 
-  @Override
-  public Canvas clip(Path clipPath) {
+  @Override public Canvas clip(Path clipPath) {
     bctx.addPath(((RoboPath) clipPath).cgPath);
     bctx.clip();
     return this;
   }
 
-  @Override
-  public Canvas clipRect(float x, float y, float width, float height) {
+  @Override public Canvas clipRect(float x, float y, float width, float height) {
     bctx.clipToRect(new CGRect(x, y, width, height));
     return this;
   }
 
-  @Override
-  public Path createPath() {
+  @Override public Path createPath() {
     return new RoboPath();
   }
 
-  @Override
-  public Canvas drawLine(float x0, float y0, float x1, float y1) {
+  @Override public void dispose () {
+    ((RoboCanvasImage)image).dispose();
+  }
+
+  @Override public Canvas drawLine(float x0, float y0, float x1, float y1) {
     bctx.beginPath();
     bctx.moveToPoint(x0, y0);
     bctx.addLineToPoint(x1, y1);
@@ -145,8 +108,7 @@ public class RoboCanvas extends AbstractCanvasGL<CGBitmapContext> {
     return this;
   }
 
-  @Override
-  public Canvas drawPoint(float x, float y) {
+  @Override public Canvas drawPoint(float x, float y) {
     save();
     setStrokeWidth(0.5f);
     strokeRect(x + 0.25f, y + 0.25f, 0.5f, 0.5f);
@@ -154,8 +116,7 @@ public class RoboCanvas extends AbstractCanvasGL<CGBitmapContext> {
     return this;
   }
 
-  @Override
-  public Canvas drawText(String text, float x, float y) {
+  @Override public Canvas drawText(String text, float x, float y) {
     bctx.saveGState();
     bctx.translateCTM(x, y + RoboGraphics.defaultFont.ctFont.getDescent());
     bctx.scaleCTM(1, -1);
@@ -167,8 +128,7 @@ public class RoboCanvas extends AbstractCanvasGL<CGBitmapContext> {
     return this;
   }
 
-  @Override
-  public Canvas fillCircle(float x, float y, float radius) {
+  @Override public Canvas fillCircle(float x, float y, float radius) {
     RoboGradient gradient = currentState().gradient;
     if (gradient == null) {
       bctx.fillEllipseInRect(new CGRect(x-radius, y-radius, 2*radius, 2*radius));
@@ -183,8 +143,7 @@ public class RoboCanvas extends AbstractCanvasGL<CGBitmapContext> {
     return this;
   }
 
-  @Override
-  public Canvas fillPath(Path path) {
+  @Override public Canvas fillPath(Path path) {
     bctx.addPath(((RoboPath) path).cgPath);
     RoboGradient gradient = currentState().gradient;
     if (gradient == null) {
@@ -197,8 +156,7 @@ public class RoboCanvas extends AbstractCanvasGL<CGBitmapContext> {
     return this;
   }
 
-  @Override
-  public Canvas fillRect(float x, float y, float width, float height) {
+  @Override public Canvas fillRect(float x, float y, float width, float height) {
     RoboGradient gradient = currentState().gradient;
     if (gradient == null) {
       bctx.fillRect(new CGRect(x, y, width, height));
@@ -212,8 +170,7 @@ public class RoboCanvas extends AbstractCanvasGL<CGBitmapContext> {
     return this;
   }
 
-  @Override
-  public Canvas fillRoundRect(float x, float y, float width, float height, float radius) {
+  @Override public Canvas fillRoundRect(float x, float y, float width, float height, float radius) {
     addRoundRectPath(x, y, width, height, radius);
     RoboGradient gradient = currentState().gradient;
     if (gradient == null) {
@@ -226,8 +183,7 @@ public class RoboCanvas extends AbstractCanvasGL<CGBitmapContext> {
     return this;
   }
 
-  @Override
-  public Canvas fillText(TextLayout layout, float x, float y) {
+  @Override public Canvas fillText(TextLayout layout, float x, float y) {
     RoboGradient gradient = currentState().gradient;
     RoboTextLayout ilayout = (RoboTextLayout) layout;
     if (gradient == null) {
@@ -235,10 +191,11 @@ public class RoboCanvas extends AbstractCanvasGL<CGBitmapContext> {
 
     } else {
       // draw our text into a fresh context so we can use it as a mask for the gradient
-      CGBitmapContext maskContext = RoboGraphics.createCGBitmap(texWidth, texHeight);
-      maskContext.clearRect(new CGRect(0, 0, texWidth, texHeight));
+      CGBitmapContext maskContext = RoboGraphics.createCGBitmap(texWidth(), texHeight());
+      maskContext.clearRect(new CGRect(0, 0, texWidth(), texHeight()));
       // scale the context based on our scale factor
-      maskContext.scaleCTM(ctx.scale.factor, ctx.scale.factor);
+      float scale = image.scale().factor;
+      maskContext.scaleCTM(scale, scale);
       // fill the text into this temp context in white for use as a mask
       setFillColor(maskContext, 0xFFFFFFFF);
       ilayout.fill(maskContext, 0, 0, fillColor);
@@ -257,100 +214,89 @@ public class RoboCanvas extends AbstractCanvasGL<CGBitmapContext> {
     return this;
   }
 
-  @Override
-  public Canvas restore() {
+  @Override public Canvas restore() {
     states.removeFirst();
     bctx.restoreGState();
     return this;
   }
 
-  @Override
-  public Canvas rotate(float radians) {
+  @Override public Canvas rotate(float radians) {
     bctx.rotateCTM(radians);
     return this;
   }
 
-  @Override
-  public Canvas save() {
+  @Override public Canvas save() {
     states.addFirst(new RoboCanvasState(currentState()));
     bctx.saveGState();
     return this;
   }
 
-  @Override
-  public Canvas scale(float x, float y) {
+  @Override public Canvas scale(float x, float y) {
     bctx.scaleCTM(x, y);
     return this;
   }
 
-  @Override
-  public Canvas setAlpha(float alpha) {
+  @Override public Canvas setAlpha(float alpha) {
     bctx.setAlpha(alpha);
     return this;
   }
 
-  @Override
-  public Canvas setCompositeOperation(Composite composite) {
+  @Override public Canvas setCompositeOperation(Composite composite) {
     bctx.setBlendMode(compToBlend.get(composite));
     return this;
   }
 
-  @Override
-  public Canvas setFillColor(int color) {
+  @Override public Canvas setFillColor(int color) {
     this.fillColor = color;
     currentState().gradient = null;
     setFillColor(bctx, color);
     return this;
   }
 
-  @Override
-  public Canvas setFillGradient(Gradient gradient) {
+  @Override public Canvas setFillGradient(Gradient gradient) {
     currentState().gradient = (RoboGradient) gradient;
     return this;
   }
 
-  @Override
-  public Canvas setFillPattern(Pattern pattern) {
+  @Override public Canvas setFillPattern(Pattern pattern) {
     currentState().gradient = null;
     // TODO: this anchors the fill pattern in the lower left; sigh
     bctx.setFillColorWithColor(((RoboPattern) pattern).colorWithPattern);
     return this;
   }
 
-  @Override
-  public Canvas setLineCap(LineCap cap) {
+  @Override public Canvas setLineCap(LineCap cap) {
     bctx.setLineCap(decodeCap.get(cap));
     return this;
   }
 
-  @Override
-  public Canvas setLineJoin(LineJoin join) {
+  @Override public Canvas setLineJoin(LineJoin join) {
     bctx.setLineJoin(decodeJoin.get(join));
     return this;
   }
 
-  @Override
-  public Canvas setMiterLimit(float miter) {
+  @Override public Canvas setMiterLimit(float miter) {
     bctx.setMiterLimit(miter);
     return this;
   }
 
-  @Override
-  public Canvas setStrokeColor(int color) {
+  @Override public Canvas setStrokeColor(int color) {
     this.strokeColor = color;
     setStrokeColor(bctx, color);
     return this;
   }
 
-  @Override
-  public Canvas setStrokeWidth(float strokeWidth) {
+  @Override public Canvas setStrokeWidth(float strokeWidth) {
     this.strokeWidth = strokeWidth;
     bctx.setLineWidth(strokeWidth);
     return this;
   }
 
-  @Override
-  public Canvas strokeCircle(float x, float y, float radius) {
+  @Override public Image snapshot() {
+    return new RoboImage(image.scale(), ((RoboImage)image).cgImage());
+  }
+
+  @Override public Canvas strokeCircle(float x, float y, float radius) {
     bctx.strokeEllipseInRect(new CGRect(x-radius, y-radius, 2*radius, 2*radius));
     isDirty = true;
     return this;
@@ -364,47 +310,38 @@ public class RoboCanvas extends AbstractCanvasGL<CGBitmapContext> {
     return this;
   }
 
-  @Override
-  public Canvas strokeRect(float x, float y, float width, float height) {
+  @Override public Canvas strokeRect(float x, float y, float width, float height) {
     bctx.strokeRect(new CGRect(x, y, width, height));
     isDirty = true;
     return this;
   }
 
-  @Override
-  public Canvas strokeRoundRect(float x, float y, float width, float height, float radius) {
+  @Override public Canvas strokeRoundRect(float x, float y, float width, float height,
+                                          float radius) {
     addRoundRectPath(x, y, width, height, radius);
     bctx.strokePath();
     isDirty = true;
     return this;
   }
 
-  @Override
-  public Canvas strokeText(TextLayout layout, float x, float y) {
+  @Override public Canvas strokeText(TextLayout layout, float x, float y) {
     ((RoboTextLayout) layout).stroke(bctx, x, y, strokeWidth, strokeColor);
     isDirty = true;
     return this;
   }
 
-  @Override
-  public Canvas transform(float m11, float m12, float m21, float m22, float dx, float dy) {
+  @Override public Canvas transform(float m11, float m12, float m21, float m22,
+                                    float dx, float dy) {
     bctx.concatCTM(new CGAffineTransform(m11, m12, m21, m22, dx, dy));
     return this;
   }
 
-  @Override
-  public Canvas translate(float x, float y) {
+  @Override public Canvas translate(float x, float y) {
     bctx.translateCTM(x, y);
     return this;
   }
 
-  @Override
-  protected void finalize() {
-    dispose(); // meh
-  }
-
-  @Override
-  protected CGBitmapContext gc() {
+  @Override protected CGBitmapContext gc() {
     return bctx;
   }
 

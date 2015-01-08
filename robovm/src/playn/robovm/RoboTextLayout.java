@@ -28,12 +28,12 @@ import org.robovm.apple.uikit.NSAttributedStringAttributes;
 import org.robovm.apple.uikit.UIColor;
 import org.robovm.apple.uikit.UIFont;
 
-import playn.core.AbstractTextLayout;
 import playn.core.TextFormat;
+import playn.core.TextLayout;
 import playn.core.TextWrap;
 import pythagoras.f.Rectangle;
 
-class RoboTextLayout extends AbstractTextLayout {
+class RoboTextLayout extends TextLayout {
 
   public static RoboTextLayout layoutText(RoboGraphics gfx, final String text, TextFormat format) {
     final RoboFont font = (format.font == null) ? RoboGraphics.defaultFont : (RoboFont) format.font;
@@ -99,7 +99,8 @@ class RoboTextLayout extends AbstractTextLayout {
 
   private RoboTextLayout(RoboGraphics gfx, String text, TextFormat format, RoboFont font,
                          CTLine fillLine) {
-    super(text, format, computeBounds(font, fillLine.getImageBounds(gfx.scratchCtx)));
+    super(text, format, computeBounds(font, fillLine.getImageBounds(gfx.scratchCtx)),
+          (float)(font.ctFont.getAscent()+font.ctFont.getDescent()));
     this.font = font;
     this.fillLine = fillLine;
   }

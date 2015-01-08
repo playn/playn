@@ -19,13 +19,13 @@ import org.robovm.apple.avfoundation.AVAudioPlayer;
 import org.robovm.apple.avfoundation.AVAudioPlayerDelegate;
 import org.robovm.apple.foundation.NSError;
 
-import playn.core.AbstractSound;
+import playn.core.SoundImpl;
 
 /**
  * An implementation of Sound using the AVAudioPlayer. This is used for compressed audio,
  * especially lengthy music tracks.
  */
-public class RoboSoundAVAP extends AbstractSound<AVAudioPlayer> {
+public class RoboSoundAVAP extends SoundImpl<AVAudioPlayer> {
 
   private AVAudioPlayerDelegate delegate = new AVAudioPlayerDelegate() {
     public void didFinishPlaying(AVAudioPlayer player, boolean flag) {}
@@ -40,9 +40,8 @@ public class RoboSoundAVAP extends AbstractSound<AVAudioPlayer> {
     }
   };
 
-  @Override
-  public void onLoaded(AVAudioPlayer impl) {
-    super.onLoaded(impl);
+  public RoboSoundAVAP (RoboPlatform plat) {
+    super(plat);
   }
 
   @Override

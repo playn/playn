@@ -22,6 +22,8 @@ import org.robovm.apple.uikit.UIInterfaceOrientationMask;
 import org.robovm.apple.uikit.UIScreen;
 import org.robovm.apple.uikit.UIWindow;
 
+import playn.core.GL20;
+import playn.robovm.OpenGLES;
 import playn.robovm.RoboPlatform;
 import playn.tests.core.TestsGame;
 
@@ -33,11 +35,13 @@ public class TestsGameRoboVM extends UIApplicationDelegateAdapter {
     CGRect bounds = UIScreen.getMainScreen().getBounds();
     UIWindow window = new UIWindow(bounds);
 
-    // configure and register the PlayN platform; start our game
+    // configure and register the PlayN platform
     RoboPlatform.Config config = new RoboPlatform.Config();
     config.orients = UIInterfaceOrientationMask.All;
-    RoboPlatform pf = RoboPlatform.register(window, config);
-    pf.run(new TestsGame());
+    RoboPlatform pf = RoboPlatform.create(window, config);
+
+    // create and initialize our game
+    TestsGame game = new TestsGame(pf, new String[0]);
 
     // make our main window visible
     window.makeKeyAndVisible();

@@ -19,9 +19,9 @@ import java.util.Map;
 import org.robovm.apple.coregraphics.CGAffineTransform;
 import org.robovm.apple.coretext.CTFont;
 
-import playn.core.AbstractFont;
+import playn.core.Font;
 
-public class RoboFont extends AbstractFont {
+public class RoboFont extends Font {
 
   /**
    * Registers a font for use when a bold, italic or bold italic variant is requested. iOS does not
@@ -54,13 +54,13 @@ public class RoboFont extends AbstractFont {
 
   final CTFont ctFont;
 
-  public RoboFont(RoboGraphics graphics, String name, Style style, float size) {
-    super(graphics, name, style, size);
-    ctFont = CTFont.create(iosName(), size, CGAffineTransform.Identity());
+  public RoboFont(Font.Config config) {
+    super(config);
+    ctFont = CTFont.create(iosName(), config.size, CGAffineTransform.Identity());
   }
 
   public String iosName() {
-    return getVariant(name, style);
+    return getVariant(config.name, config.style);
   }
 
   private static String getVariant(String name, Style style) {

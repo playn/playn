@@ -1,5 +1,5 @@
 /**
- * Copyright 2014 The PlayN Authors
+ * Copyright 2010-2015 The PlayN Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  * in compliance with the License. You may obtain a copy of the License at
@@ -13,68 +13,38 @@
  */
 package playn.robovm;
 
+import org.robovm.apple.coregraphics.CGBitmapContext;
 import org.robovm.apple.coregraphics.CGImage;
+import org.robovm.apple.coregraphics.CGInterpolationQuality;
 
-import playn.core.Canvas;
-import playn.core.CanvasImage;
-import playn.core.Image;
+import playn.core.*;
 
-/**
- * Provides {@link Canvas} rendering into an image.
- */
-public class RoboCanvasImage extends RoboAbstractImage implements CanvasImage {
+public class RoboCanvasImage extends RoboImage {
 
-  private final RoboCanvas canvas;
+  CGBitmapContext bctx;
 
-  public RoboCanvasImage(RoboGLContext ctx, float width, float height, boolean interpolate) {
-    super(ctx, ctx.scale);
-    canvas = new RoboCanvas(ctx, width, height, interpolate);
+  public RoboCanvasImage (Scale scale, int pixelWidth, int pixelHeight, boolean interpolate) {
+    super(scale, pixelWidth, pixelHeight);
+    // create the bitmap context via which we'll render into it
+    bctx = RoboGraphics.createCGBitmap(pixelWidth, pixelHeight);
+    if (!interpolate) bctx.setInterpolationQuality(CGInterpolationQuality.None);
   }
 
-  @Override
-  public Canvas canvas() {
-    return canvas;
+  // this isn't as inefficient as it seems because the returned CGImage will only copy the image
+  // data on write, which means that if we don't modify the canvas, the snapshot is just a copy of
+  // the image metadata, not the whole enchilada; there's unfortunately no way to modify the bitmap
+  // data of a CGImage in place (that I can find...)
+  @Override public CGImage cgImage () { return bctx.toImage(); }
+
+  @Override protected void upload (Graphics gfx, Texture tex) {
+    upload(gfx, tex.id, pixelWidth, pixelHeight, bctx.getData());
   }
 
-  @Override
-  public Image snapshot() {
-    return new RoboImage(ctx, canvas.cgImage(), scale);
-  }
-
-  @Override
-  public CGImage cgImage() {
-    return canvas.cgImage();
-  }
-
-  @Override
-  public float width() {
-    return canvas.width();
-  }
-
-  @Override
-  public float height() {
-    return canvas.height();
-  }
-
-  @Override
-  public int ensureTexture() {
-    // if we have a canvas, and it's dirty, force the recreation of our texture which will obtain
-    // the latest canvas data
-    if (canvas.dirty()) {
-      canvas.clearDirty();
-      refreshTexture();
+  @Override public void dispose() {
+    super.dispose();
+    if (bctx != null) {
+      bctx.dispose();
+      bctx = null;
     }
-    return super.ensureTexture();
-  }
-
-  @Override
-  public void setRgb(int startX, int startY, int width, int height, int[] rgbArray, int offset,
-                     int scanSize) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  protected void updateTexture(int tex) {
-    ((RoboGLContext) ctx).updateTexture(tex, canvas.texWidth(), canvas.texHeight(), canvas.data());
   }
 }

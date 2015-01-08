@@ -15,35 +15,14 @@ package playn.robovm;
 
 import org.robovm.apple.coregraphics.CGColor;
 
-import playn.core.gl.AbstractImageGL;
-import playn.core.gl.GLPattern;
+import playn.core.Pattern;
 
-public class RoboPattern implements GLPattern {
+public class RoboPattern extends Pattern {
 
   CGColor colorWithPattern;
-  private final AbstractImageGL<?> image;
-  private final boolean repeatX, repeatY;
 
-  public RoboPattern(AbstractImageGL<?> image, CGColor colorWithPattern,
-                     boolean repeatX, boolean repeatY) {
-    this.image = image;
+  public RoboPattern(CGColor colorWithPattern, boolean repeatX, boolean repeatY) {
+    super(repeatX, repeatY);
     this.colorWithPattern = colorWithPattern;
-    this.repeatX = repeatX;
-    this.repeatY = repeatY;
-  }
-
-  @Override
-  public boolean repeatX() {
-    return repeatX;
-  }
-
-  @Override
-  public boolean repeatY() {
-    return repeatY;
-  }
-
-  @Override
-  public AbstractImageGL<?> image() {
-    return image;
   }
 }
