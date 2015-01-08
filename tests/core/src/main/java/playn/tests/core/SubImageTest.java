@@ -12,8 +12,6 @@ import react.Slot;
 
 public class SubImageTest extends Test {
 
-  private ImageLayer osci;
-
   public SubImageTest (TestsGame game) {
     super(game, "SubImageTest", "Tests sub-image rendering in various circumstances.");
   }
@@ -78,21 +76,20 @@ public class SubImageTest extends Test {
         }, 2*pw, 2*phh, "draw subimg into Surface", 100);
 
         // draw an image layer whose sub-image region oscillates
-        osci = new ImageLayer(oreptex);
+        final ImageLayer osci = new ImageLayer(oreptex);
         osci.region = new Rectangle(0, 0, orange.width(), orange.height());
         addTest(130, 190, osci, "ImageLayer with subimage with changing width", 100);
+
+        conns.add(game.paint.connect(new Slot<TestsGame>() {
+          public void onEmit (TestsGame game) {
+            float t = game.paintTick/1000f;
+            // round the width so that it sometimes goes to zero; just to be sure zero doesn't choke
+            osci.region.width = Math.round(
+              Math.abs(FloatMath.sin(t)) * osci.texture().displayWidth);
+          }
+        }));
       }
     }).onFailure(logFailure("Failed to load orange image"));
-
-    conns.add(game.paint.connect(new Slot<TestsGame>() {
-      public void onEmit (TestsGame game) {
-        if (osci != null) {
-          float t = game.paintTick/1000f;
-          // round the width so that it sometimes goes to zero; just to be sure zero doesn't choke
-          osci.region.width = Math.round(Math.abs(FloatMath.sin(t)) * osci.texture().displayWidth);
-        }
-      }
-    }));
   }
 
   protected void fragment (String source, Image image, float ox, float oy) {
