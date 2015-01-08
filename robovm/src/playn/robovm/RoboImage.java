@@ -181,13 +181,4 @@ public class RoboImage extends ImageImpl {
     // TODO: draw something into the image, or fill it with red or something
     return RoboGraphics.createCGBitmap(pixelWidth, pixelHeight).toImage();
   }
-
-  // @Override
-  // protected Pattern toSubPattern(AbstractImageGL<?> image, boolean repeatX, boolean repeatY,
-  //                                float x, float y, float width, float height) {
-  //   // this is a circuitous route, but I'm not savvy enough to find a more direct one
-  //   CGImage subImage = CGImage.createWithImageInRect(cgImage(), new CGRect(x, y, width, height));
-  //   return new RoboPattern(image, UIColor.fromPatternImage(new UIImage(subImage)).getCGColor(),
-  //                         repeatX, repeatY);
-  // }
 }

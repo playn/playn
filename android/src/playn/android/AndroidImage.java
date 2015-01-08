@@ -95,12 +95,4 @@ public class AndroidImage extends ImageImpl {
     }
     return bitmap;
   }
-
-  // @Override
-  // protected Pattern toSubPattern(AbstractImageGL<?> image, boolean repeatX, boolean repeatY,
-  //                                float x, float y, float width, float height) {
-  //   int ix = MathUtil.ifloor(x), iy = MathUtil.ifloor(y);
-  //   int iw = MathUtil.iceil(width), ih = MathUtil.iceil(height);
-  //   return new AndroidPattern(image, repeatX, repeatY, Bitmap.createBitmap(bitmap, ix, iy, iw, ih));
-  // }
 }

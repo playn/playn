@@ -28,57 +28,42 @@ public class SubImageTest extends Test {
       public void onEmit (Image orange) {
         fragment("Image", orange, 250, 10);
 
-        final Texture oreptex = game.graphics.createTexture(
-          orange, Texture.Config.DEFAULT.repeat(true, true));
+        final Texture otex = game.graphics.createTexture(orange);
         final float pw = orange.width(), ph = orange.height(), phw = pw/2, phh = ph/2;
 
+        // create tileable sub-texture
+        Texture subtex = game.graphics.createTexture(
+          pw, phh, Texture.Config.DEFAULT.repeat(true, true));
+        new TextureSurface(game.graphics, game.defaultBatch, subtex).begin().
+          clear().draw(otex, 0, 0, pw, phh, 0, phh/2, pw, phh).end().close();
+
         // tile a sub-image, oh my!
-        ImageLayer tiled = new ImageLayer(oreptex);
-        tiled.region = new Rectangle(0, phh/2, pw, phh);
+        ImageLayer tiled = new ImageLayer(subtex);
         tiled.setSize(100, 100);
-        addTest(10, 10, tiled, "ImageLayer tiled with subimage of Image");
+        addTest(10, 10, tiled, "ImageLayer tiled with sub-texture");
 
-        // TODO: how to do in new world order?
-        // // use a subimage as a fill pattern
-        // CanvasImage pat = graphics().createImage(100, 100);
-        // pat.canvas().setFillPattern(orangerep.toPattern());
-        // pat.canvas().fillRect(0, 0, 100, 100);
-        // addTest(10, 160, graphics().createImageLayer(pat), "Canvas filled with subimage");
-
-        // TODO: this is no longer interesting because it's all textures at this point, so we've
-        // already covered this case above with the stock image
-
-        // // tile a sub-image of a surface image, oh my!
-        // SurfaceImage surf = graphics().createSurface(orange.width(), orange.height());
-        // surf.surface().drawImage(orange, 0, 0);
-        // Image.Region surfrep = surf.subImage(0, phh/2, pw, phh);
-        // surfrep.setRepeat(true, true);
-        // ImageLayer surftiled = graphics().createImageLayer(surfrep);
-        // surftiled.setSize(100, 100);
-        // addTest(10, 300, surftiled, "ImageLayer tiled with subimage of SurfaceImage");
-
-        // // draw a subimage to a canvas
-        // CanvasImage split = graphics().createImage(orange.width(), orange.height());
-        // split.canvas().drawImage(orange.subImage(0, 0, phw, phh), phw, phh);
-        // split.canvas().drawImage(orange.subImage(phw, 0, phw, phh), 0, phh);
-        // split.canvas().drawImage(orange.subImage(0, phh, phw, phh), phw, 0);
-        // split.canvas().drawImage(orange.subImage(phw, phh, phw, phh), 0, 0);
-        // addTest(140, 10, graphics().createImageLayer(split), "draw subimg into Canvas", 80);
+        // draw a subimage to a canvas
+        Canvas split = game.graphics.createCanvas(orange.width(), orange.height());
+        split.drawImage(orange, phw, phh, phw, phh, 0, 0, phw, phh);
+        split.drawImage(orange,   0, phh, phw, phh, phw, 0, phw, phh);
+        split.drawImage(orange, phw,   0, phw, phh, 0, phh, phw, phh);
+        split.drawImage(orange,   0,   0, phw, phh, phw, phh, phw, phh);
+        addTest(140, 10, new ImageLayer(game.graphics, split.image), "draw subimg into Canvas", 80);
 
         // draw a subimage in an immediate layer
         addTest(130, 100, new Layer() {
           @Override protected void paintImpl (Surface surf) {
-            surf.draw(oreptex, 0 , 0  , pw, phh, 0, phh/2, pw, phh);
-            surf.draw(oreptex, pw, 0  , pw, phh, 0, phh/2, pw, phh);
-            surf.draw(oreptex, 0 , phh, pw, phh, 0, phh/2, pw, phh);
-            surf.draw(oreptex, pw, phh, pw, phh, 0, phh/2, pw, phh);
+            surf.draw(otex, 0 , 0  , pw, phh, 0, phh/2, pw, phh);
+            surf.draw(otex, pw, 0  , pw, phh, 0, phh/2, pw, phh);
+            surf.draw(otex, 0 , phh, pw, phh, 0, phh/2, pw, phh);
+            surf.draw(otex, pw, phh, pw, phh, 0, phh/2, pw, phh);
           }
-        }, 2*pw, 2*phh, "draw subimg into Surface", 100);
+        }, 2*pw, 2*phh, "Draw sub-images immediate", 100);
 
-        // draw an image layer whose sub-image region oscillates
-        final ImageLayer osci = new ImageLayer(oreptex);
+        // draw an image layer whose image region oscillates
+        final ImageLayer osci = new ImageLayer(otex);
         osci.region = new Rectangle(0, 0, orange.width(), orange.height());
-        addTest(130, 190, osci, "ImageLayer with subimage with changing width", 100);
+        addTest(10, 150, osci, "ImageLayer with changing width", 100);
 
         conns.add(game.paint.connect(new Slot<TestsGame>() {
           public void onEmit (TestsGame game) {

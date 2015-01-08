@@ -142,18 +142,6 @@ public class JavaImage extends ImageImpl {
     gfx.gl.checkError("updateTexture");
   }
 
-  // @Override
-  // protected Pattern toSubPattern(AbstractImageGL<?> image, boolean repeatX, boolean repeatY,
-  //                                float x, float y, float width, float height) {
-  //   assert isReady() : "Cannot generate a pattern from unready image.";
-  //   // we have to account for the scale factor when extracting our subimage
-  //   BufferedImage subImage = img.getSubimage(
-  //     scale.scaledFloor(x), scale.scaledFloor(y),
-  //     scale.scaledCeil(width), scale.scaledCeil(height));
-  //   Rectangle2D rect = new Rectangle2D.Float(0, 0, width, height);
-  //   return new JavaPattern(image, repeatX, repeatY, new TexturePaint(subImage, rect));
-  // }
-
   @Override protected void setBitmap (Object bitmap) {
     img = (BufferedImage)bitmap;
   }
