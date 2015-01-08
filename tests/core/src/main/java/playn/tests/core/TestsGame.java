@@ -104,6 +104,7 @@ public class TestsGame extends SceneGame<TestsGame> {
 
     pointer = new Pointer(plat, rootLayer, true);
     input.touchEvents.connect(new playn.scene.Touch.Dispatcher(rootLayer, true));
+    input.mouseEvents.connect(new playn.scene.Mouse.Dispatcher(rootLayer, true));
 
     tests = new Test[] {
       new CanvasTest(this),
@@ -246,7 +247,7 @@ public class TestsGame extends SceneGame<TestsGame> {
       ImageLayer back = ui.createButton("Back", new Runnable() {
         public void run () { displayMenuLater(); }
       });
-      rootLayer.addAt(back, graphics.viewSize.width() - back.width(), 0);
+      rootLayer.addAt(back, graphics.viewSize.width() - back.width() - 10, 10);
     }
   }
 

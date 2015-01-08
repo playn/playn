@@ -22,9 +22,13 @@ import java.util.TreeMap;
 
 import pythagoras.f.Point;
 import pythagoras.f.Vector;
+import react.UnitSlot;
 
 import playn.core.*;
 import playn.scene.*;
+import playn.scene.Mouse;
+import playn.scene.Pointer;
+import playn.scene.Touch;
 import static playn.tests.core.TestsGame.game;
 
 class PointerMouseTouchTest extends Test {
@@ -60,8 +64,9 @@ class PointerMouseTouchTest extends Test {
     //   }
     // };
     // graphics().rootLayer().addAt(propagate.layer, x, y);
-    // y += propagate.layer.image().height() + 5;
-    // x = 20;
+
+    y += preventDefault.layer.height() + 5;
+    x = 20;
 
     float boxWidth = 300, boxHeight = 110;
     final Box mouse = new Box("Mouse", 0xffff8080, boxWidth, boxHeight);
@@ -91,207 +96,199 @@ class PointerMouseTouchTest extends Test {
     motionLabel.layer.setTranslation(x, y);
     game.rootLayer.add(motionLabel.layer);
 
-    // // add mouse layer listener
-    // mouse.label.addListener(new Mouse.LayerListener() {
-    //   ImageLayer label = mouse.label;
-    //   @Override
-    //   public void onMouseDown(ButtonEvent event) {
-    //     _lstart = label.transform().translation();
-    //     _pstart = new Vector(event.x(), event.y());
-    //     label.setAlpha(0.5f);
-    //     modify(event);
-    //     logger.log(describe(event, "mouse down"));
-    //   }
-    //   @Override
-    //   public void onMouseDrag(MotionEvent event) {
-    //     Vector delta = new Vector(event.x(), event.y()).subtractLocal(_pstart);
-    //     label.setTranslation(_lstart.x + delta.x, _lstart.y + delta.y);
-    //     modify(event);
-    //     motionLabel.set("mouse drag", describe(event, ""));
-    //   }
-    //   @Override
-    //   public void onMouseUp(ButtonEvent event) {
-    //     label.setAlpha(1.0f);
-    //     modify(event);
-    //     logger.log(describe(event, "mouse up"));
-    //   }
-    //   @Override public void onMouseMove (MotionEvent event) {
-    //     modify(event);
-    //     motionLabel.set("mouse move", describe(event, ""));
-    //   }
-    //   @Override public void onMouseOver (MotionEvent event) {
-    //     modify(event);
-    //     logger.log(describe(event, "mouse over"));
-    //   }
-    //   @Override public void onMouseOut (MotionEvent event) {
-    //     modify(event);
-    //     logger.log(describe(event, "mouse out"));
-    //   }
-    //   @Override public void onMouseWheelScroll (WheelEvent event) {
-    //     modify(event);
-    //     logger.log(describe(event, "mouse wheel"));
-    //   }
+    // add mouse layer listener
+    mouse.label.events().connect(new Mouse.Listener() {
+      ImageLayer label = mouse.label;
 
-    //   protected Vector _lstart, _pstart;
-    // });
+      @Override public void onButton(Mouse.ButtonEvent event, Mouse.Interaction iact) {
+        if (event.down) {
+          _lstart = label.transform().translation();
+          _pstart = new Vector(event.x(), event.y());
+          label.setAlpha(0.5f);
+          modify(event);
+          logger.log(describe(event, "mouse down"));
+        } else {
+          label.setAlpha(1.0f);
+          modify(event);
+          logger.log(describe(event, "mouse up"));
+        }
+      }
 
-    // // add mouse layer listener to parent
-    // mouse.layer.addListener(new Mouse.LayerListener() {
-    //   @Override
-    //   public void onMouseDown(ButtonEvent event) {
-    //     logger.log(describe(event, "parent mouse down"));
-    //   }
-    //   @Override
-    //   public void onMouseDrag(MotionEvent event) {
-    //     motionLabel.set("parent mouse drag", describe(event, ""));
-    //   }
-    //   @Override
-    //   public void onMouseUp(ButtonEvent event) {
-    //     logger.log(describe(event, "parent mouse up"));
-    //   }
-    //   @Override public void onMouseMove (MotionEvent event) {
-    //     motionLabel.set("parent mouse move", describe(event, ""));
-    //   }
-    //   @Override public void onMouseOver (MotionEvent event) {
-    //     logger.log(describe(event, "parent mouse over"));
-    //   }
-    //   @Override public void onMouseOut (MotionEvent event) {
-    //     logger.log(describe(event, "parent mouse out"));
-    //   }
-    //   @Override public void onMouseWheelScroll (WheelEvent event) {
-    //     logger.log(describe(event, "parent mouse wheel"));
-    //   }
-    // });
+      @Override public void onDrag(Mouse.MotionEvent event, Mouse.Interaction iact) {
+        Vector delta = new Vector(event.x(), event.y()).subtractLocal(_pstart);
+        label.setTranslation(_lstart.x + delta.x, _lstart.y + delta.y);
+        modify(event);
+        motionLabel.set("mouse drag", describe(event, ""));
+      }
+      @Override public void onMotion (Mouse.MotionEvent event, Mouse.Interaction iact) {
+        modify(event);
+        motionLabel.set("mouse move", describe(event, ""));
+      }
 
-    // // add pointer layer listener
-    // pointer.label.addListener(new Pointer.Listener() {
-    //   ImageLayer label = pointer.label;
-    //   @Override
-    //   public void onPointerStart(Event event) {
-    //     _lstart = label.transform().translation();
-    //     _pstart = new Vector(event.x(), event.y());
-    //     label.setAlpha(0.5f);
-    //     modify(event);
-    //     logger.log(describe(event, "pointer start"));
-    //   }
-    //   @Override
-    //   public void onPointerDrag(Event event) {
-    //     Vector delta = new Vector(event.x(), event.y()).subtractLocal(_pstart);
-    //     label.setTranslation(_lstart.x + delta.x, _lstart.y + delta.y);
-    //     modify(event);
-    //     motionLabel.set("pointer drag", describe(event, ""));
-    //   }
-    //   @Override
-    //   public void onPointerEnd(Event event) {
-    //     label.setAlpha(1.0f);
-    //     modify(event);
-    //     logger.log(describe(event, "pointer end"));
-    //   }
-    //   @Override
-    //   public void onPointerCancel(Event event) {
-    //     label.setAlpha(1.0f);
-    //     modify(event);
-    //     logger.log(describe(event, "pointer cancel"));
-    //   }
-    //   protected Vector _lstart, _pstart;
-    // });
+      // @Override public void onOver (MotionEvent event, Mouse.Interaction iact) {
+      //   modify(event);
+      //   logger.log(describe(event, "mouse over"));
+      // }
+      // @Override public void onOut (MotionEvent event, Mouse.Interaction iact) {
+      //   modify(event);
+      //   logger.log(describe(event, "mouse out"));
+      // }
+      @Override public void onWheel (Mouse.WheelEvent event, Mouse.Interaction iact) {
+        modify(event);
+        logger.log(describe(event, "mouse wheel"));
+      }
 
-    // // add pointer listener for parent layer
-    // pointer.layer.addListener(new Pointer.Listener() {
-    //   double start;
-    //   @Override
-    //   public void onPointerStart(Event event) {
-    //     logger.log(describe(event, "parent pointer start"));
-    //     start = event.time();
-    //   }
-    //   @Override
-    //   public void onPointerDrag(Event event) {
-    //     motionLabel.set("parent pointer drag", describe(event, ""));
-    //     if (capture.value() && event.time() - start > 2000) {
-    //       event.capture();
-    //     }
-    //   }
-    //   @Override
-    //   public void onPointerEnd(Event event) {
-    //     logger.log(describe(event, "parent pointer end"));
-    //   }
-    //   @Override
-    //   public void onPointerCancel(Event event) {
-    //     logger.log(describe(event, "parent pointer cancel"));
-    //   }
-    // });
+      protected Vector _lstart, _pstart;
+    });
 
-    // // add touch layer listener
-    // touch.label.addListener(new Touch.LayerListener() {
-    //   ImageLayer label = touch.label;
-    //   @Override
-    //   public void onTouchStart(Touch.Event event) {
-    //     _lstart = label.transform().translation();
-    //     _pstart = new Vector(event.x(), event.y());
-    //     label.setAlpha(0.5f);
-    //     modify(event);
-    //     logger.log(describe(event, "touch start"));
-    //   }
+    // add mouse layer listener to parent
+    mouse.layer.events().connect(new Mouse.Listener() {
+      double start;
+      @Override public void onButton(Mouse.ButtonEvent event, Mouse.Interaction iact) {
+        if (event.down) {
+          start = event.time;
+          logger.log(describe(event, "parent mouse down " + capture.value()));
+        }
+        else logger.log(describe(event, "parent mouse up"));
+      }
+      @Override public void onDrag(Mouse.MotionEvent event, Mouse.Interaction iact) {
+        motionLabel.set("parent mouse drag", describe(event, ""));
+        if (capture.value() && event.time - start > 1000 && !iact.captured()) iact.capture();
+      }
+      @Override public void onMotion (Mouse.MotionEvent event, Mouse.Interaction iact) {
+        motionLabel.set("parent mouse move", describe(event, ""));
+      }
+      // @Override public void onOver (Mouse.MotionEvent event, Mouse.Interaction iact) {
+      //   logger.log(describe(event, "parent mouse over"));
+      // }
+      // @Override public void onOut (Mouse.MotionEvent event, Mouse.Interaction iact) {
+      //   logger.log(describe(event, "parent mouse out"));
+      // }
+      @Override public void onWheel (Mouse.WheelEvent event, Mouse.Interaction iact) {
+        logger.log(describe(event, "parent mouse wheel"));
+      }
+    });
 
-    //   @Override
-    //   public void onTouchMove(Touch.Event event) {
-    //     Vector delta = new Vector(event.x(), event.y()).subtractLocal(_pstart);
-    //     label.setTranslation(_lstart.x + delta.x, _lstart.y + delta.y);
-    //     modify(event);
-    //     motionLabel.set("touch move", describe(event, ""));
-    //   }
+    // add pointer layer listener
+    pointer.label.events().connect(new Pointer.Listener() {
+      ImageLayer label = pointer.label;
+      @Override public void onStart(Pointer.Interaction iact) {
+        Pointer.Event event = iact.event;
+        _lstart = label.transform().translation();
+        _pstart = new Vector(event.x(), event.y());
+        label.setAlpha(0.5f);
+        modify(event);
+        logger.log(describe(event, "pointer start"));
+      }
+      @Override public void onDrag(Pointer.Interaction iact) {
+        Pointer.Event event = iact.event;
+        Vector delta = new Vector(event.x(), event.y()).subtractLocal(_pstart);
+        label.setTranslation(_lstart.x + delta.x, _lstart.y + delta.y);
+        modify(event);
+        motionLabel.set("pointer drag", describe(event, ""));
+      }
 
-    //   @Override
-    //   public void onTouchEnd(Touch.Event event) {
-    //     label.setAlpha(1.0f);
-    //     modify(event);
-    //     logger.log(describe(event, "touch end"));
-    //   }
+      @Override public void onEnd(Pointer.Interaction iact) {
+        Pointer.Event event = iact.event;
+        label.setAlpha(1.0f);
+        modify(event);
+        logger.log(describe(event, "pointer end"));
+      }
+      @Override public void onCancel(Pointer.Interaction iact) {
+        Pointer.Event event = iact.event;
+        label.setAlpha(1.0f);
+        modify(event);
+        logger.log(describe(event, "pointer cancel"));
+      }
+      protected Vector _lstart, _pstart;
+    });
 
-    //   @Override
-    //   public void onTouchCancel(Touch.Event event) {
-    //     label.setAlpha(1.0f);
-    //     modify(event);
-    //     logger.log(describe(event, "touch cancel"));
-    //   }
+    // add pointer listener for parent layer
+    pointer.layer.events().connect(new Pointer.Listener() {
+      double start;
+      @Override public void onStart(Pointer.Interaction iact) {
+        Pointer.Event event = iact.event;
+        logger.log(describe(event, "parent pointer start"));
+        start = event.time;
+      }
+      @Override public void onDrag(Pointer.Interaction iact) {
+        Pointer.Event event = iact.event;
+        motionLabel.set("parent pointer drag", describe(event, ""));
+        if (capture.value() && event.time - start > 1000 && !iact.captured()) iact.capture();
+      }
+      @Override public void onEnd(Pointer.Interaction iact) {
+        Pointer.Event event = iact.event;
+        logger.log(describe(event, "parent pointer end"));
+      }
+      @Override public void onCancel(Pointer.Interaction iact) {
+        Pointer.Event event = iact.event;
+        logger.log(describe(event, "parent pointer cancel"));
+      }
+    });
 
-    //   protected Vector _lstart, _pstart;
-    // });
+    // add touch layer listener
+    touch.label.events().connect(new Touch.Listener() {
+      ImageLayer label = touch.label;
+      @Override public void onStart(Touch.Interaction iact) {
+        Touch.Event event = iact.event;
+        _lstart = label.transform().translation();
+        _pstart = new Vector(event.x(), event.y());
+        label.setAlpha(0.5f);
+        modify(event);
+        logger.log(describe(event, "touch start"));
+      }
+      @Override public void onMove(Touch.Interaction iact) {
+        Touch.Event event = iact.event;
+        Vector delta = new Vector(event.x(), event.y()).subtractLocal(_pstart);
+        label.setTranslation(_lstart.x + delta.x, _lstart.y + delta.y);
+        modify(event);
+        motionLabel.set("touch move", describe(event, ""));
+      }
 
-    // // add touch parent layer listener
-    // touch.layer.addListener(new Touch.LayerListener() {
-    //   @Override
-    //   public void onTouchStart(Touch.Event event) {
-    //     logger.log(describe(event, "parent touch start"));
-    //   }
+      @Override public void onEnd(Touch.Interaction iact) {
+        Touch.Event event = iact.event;
+        label.setAlpha(1.0f);
+        modify(event);
+        logger.log(describe(event, "touch end"));
+      }
+      @Override public void onCancel(Touch.Interaction iact) {
+        Touch.Event event = iact.event;
+        label.setAlpha(1.0f);
+        modify(event);
+        logger.log(describe(event, "touch cancel"));
+      }
+      protected Vector _lstart, _pstart;
+    });
 
-    //   @Override
-    //   public void onTouchMove(Touch.Event event) {
-    //     motionLabel.set("parent touch move", describe(event, ""));
-    //   }
+    // add touch parent layer listener
+    touch.layer.events().connect(new Touch.Listener() {
+      @Override public void onStart(Touch.Interaction iact) {
+        Touch.Event event = iact.event;
+        logger.log(describe(event, "parent touch start"));
+      }
+      @Override public void onMove(Touch.Interaction iact) {
+        Touch.Event event = iact.event;
+        motionLabel.set("parent touch move", describe(event, ""));
+      }
+      @Override public void onEnd(Touch.Interaction iact) {
+        Touch.Event event = iact.event;
+        logger.log(describe(event, "parent touch end"));
+      }
+      @Override public void onCancel(Touch.Interaction iact) {
+        Touch.Event event = iact.event;
+        logger.log(describe(event, "parent touch cancel"));
+      }
+    });
 
-    //   @Override
-    //   public void onTouchEnd(Touch.Event event) {
-    //     logger.log(describe(event, "parent touch end"));
-    //   }
-
-    //   @Override
-    //   public void onTouchCancel(Touch.Event event) {
-    //     logger.log(describe(event, "parent touch cancel"));
-    //   }
-    // });
+    conns.add(game.plat.frame.connect(new UnitSlot() { public void onEmit () {
+      logger.paint();
+      motionLabel.paint();
+    }}));
   }
 
   @Override public boolean usesPositionalInputs () {
     return true;
   }
-
-  // @Override
-  // public void paint(float alpha) {
-  //   super.paint(alpha);
-  //   logger.paint();
-  //   motionLabel.paint();
-  // }
 
   protected ImageLayer createLabel(String text, int bg, float x, float y) {
     return createLabel(text, game.rootLayer, 0xFF202020, bg, x, y, 0);
@@ -320,16 +317,16 @@ class PointerMouseTouchTest extends Test {
     String time = "@" + (int)(event.time % 10000);
     String pd = event.isSet(Event.F_PREVENT_DEFAULT) ? "pd " : "";
     String msg = time + " " + pd + handler + " (" + event.x() + "," + event.y() + ")";
-    // if (event instanceof Pointer.Event) {
-    //   msg += " isTouch(" + ((Pointer.Event)event).isTouch() + ")";
-    // }
-    // if (event instanceof Mouse.ButtonEvent) {
-    //   msg += " button(" + ((Mouse.ButtonEvent)event).button() + ")";
-    // }
-    // if (event instanceof Mouse.MotionEvent) {
-    //   Mouse.MotionEvent me = (Mouse.MotionEvent)event;
-    //   msg += " d(" + me.dx() + "," + me.dy() + ")";
-    // }
+    if (event instanceof Pointer.Event) {
+      msg += " isTouch(" + ((Pointer.Event)event).isTouch + ")";
+    }
+    if (event instanceof Mouse.ButtonEvent) {
+      msg += " button(" + ((Mouse.ButtonEvent)event).button + ")";
+    }
+    if (event instanceof Mouse.MotionEvent) {
+      Mouse.MotionEvent me = (Mouse.MotionEvent)event;
+      msg += " d(" + me.dx + "," + me.dy + ")";
+    }
     return msg;
   }
 
