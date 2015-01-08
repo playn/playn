@@ -102,7 +102,7 @@ public class Texture implements Disposable {
     * size as this texture and must be fully loaded. This is generally useful for updating a
     * texture which was created from a canvas when the canvas has been changed. */
   public void update (Image image) {
-    gfx.upload(image, this);
+    image.upload(gfx, this);
     if (mipmaps) gfx.gl.glGenerateMipmap(GL_TEXTURE_2D);
   }
 

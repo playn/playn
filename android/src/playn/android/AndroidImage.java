@@ -16,6 +16,8 @@
 package playn.android;
 
 import android.graphics.Bitmap;
+import android.opengl.GLUtils;
+
 import playn.core.*;
 
 public class AndroidImage extends ImageImpl {
@@ -69,6 +71,12 @@ public class AndroidImage extends ImageImpl {
     sw *= scale.factor;
     sh *= scale.factor;
     ((AndroidCanvas)ctx).draw(bitmap, dx, dy, dw, dh, sx, sy, sw, sh);
+  }
+
+  @Override protected void upload (Graphics gfx, Texture tex) {
+    gfx.gl.glBindTexture(GL20.GL_TEXTURE_2D, tex.id);
+    GLUtils.texImage2D(GL20.GL_TEXTURE_2D, 0, bitmap, 0);
+    gfx.gl.checkError("updateTexture end");
   }
 
   @Override protected void setBitmap (Object bitmap) {

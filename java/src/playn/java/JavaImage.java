@@ -21,11 +21,20 @@ import java.awt.TexturePaint;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
+import java.awt.image.DataBuffer;
+import java.awt.image.DataBufferByte;
+import java.awt.image.DataBufferInt;
+import java.nio.ByteBuffer;
 
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL12;
+
+import playn.core.Graphics;
 import playn.core.Image;
 import playn.core.ImageImpl;
 import playn.core.Pattern;
 import playn.core.Scale;
+import playn.core.Texture;
 import pythagoras.f.MathUtil;
 
 public class JavaImage extends ImageImpl {
@@ -92,6 +101,45 @@ public class JavaImage extends ImageImpl {
     gfx.drawImage(img, new AffineTransform(scaleX, 0f, 0f, scaleY, dx-sx*scaleX, dy-sy*scaleY),
                   null);
     gfx.setClip(oclip);
+  }
+
+  @Override protected void upload (Graphics gfx, Texture tex) {
+    // Convert the bitmap into a format for quick uploading (NOOPs if already optimized)
+    JavaGraphics jgfx = (JavaGraphics)gfx;
+    BufferedImage bitmap = jgfx.convertImage(img);
+
+    DataBuffer dbuf = bitmap.getRaster().getDataBuffer();
+    ByteBuffer bbuf;
+    int format, type;
+
+    if (bitmap.getType() == BufferedImage.TYPE_INT_ARGB_PRE) {
+      DataBufferInt ibuf = (DataBufferInt)dbuf;
+      int iSize = ibuf.getSize()*4;
+      bbuf = jgfx.checkGetImageBuffer(iSize);
+      bbuf.asIntBuffer().put(ibuf.getData());
+      bbuf.position(bbuf.position()+iSize);
+      bbuf.flip();
+      format = GL12.GL_BGRA;
+      type = GL12.GL_UNSIGNED_INT_8_8_8_8_REV;
+
+    } else if (bitmap.getType() == BufferedImage.TYPE_4BYTE_ABGR) {
+      DataBufferByte dbbuf = (DataBufferByte)dbuf;
+      bbuf = jgfx.checkGetImageBuffer(dbbuf.getSize());
+      bbuf.put(dbbuf.getData());
+      bbuf.flip();
+      format = GL11.GL_RGBA;
+      type = GL12.GL_UNSIGNED_INT_8_8_8_8;
+
+    } else {
+      // Something went awry and convertImage thought this image was in a good form already,
+      // except we don't know how to deal with it
+      throw new RuntimeException("Image type wasn't converted to usable: " + bitmap.getType());
+    }
+
+    gfx.gl.glBindTexture(GL11.GL_TEXTURE_2D, tex.id);
+    GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA, bitmap.getWidth(), bitmap.getHeight(),
+                      0, format, type, bbuf);
+    gfx.gl.checkError("updateTexture");
   }
 
   // @Override

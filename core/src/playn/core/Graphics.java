@@ -227,8 +227,6 @@ public abstract class Graphics {
     return id;
   }
 
-  protected abstract void upload (Image image, Texture tex);
-
   protected static int toGL (Filter filter) {
     switch (filter) {
     default:

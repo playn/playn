@@ -130,23 +130,20 @@ public class JavaGraphics extends Graphics {
     }
   }
 
-  @Override
-  public IDimension screenSize() {
+  @Override public IDimension screenSize() {
     DisplayMode mode = Display.getDesktopDisplayMode();
     screenSize.width = scale.invScaled(mode.getWidth());
     screenSize.height = scale.invScaled(mode.getHeight());
     return screenSize;
   }
 
-  @Override
-  public Canvas createCanvas(float width, float height) {
+  @Override public Canvas createCanvas(float width, float height) {
     BufferedImage bitmap = new BufferedImage(scale.scaledCeil(width), scale.scaledCeil(height),
                                              BufferedImage.TYPE_INT_ARGB_PRE);
     return new JavaCanvas(new JavaImage(scale, bitmap));
   }
 
-  @Override
-  public Gradient createGradient(Gradient.Config config) {
+  @Override public Gradient createGradient(Gradient.Config config) {
     if (config instanceof Gradient.Linear) {
       return JavaGradient.create((Gradient.Linear)config);
     } else {
@@ -154,21 +151,18 @@ public class JavaGraphics extends Graphics {
     }
   }
 
-  @Override
-  public Font createFont(Font.Config config) {
+  @Override public Font createFont(Font.Config config) {
     java.awt.Font jfont = fonts.get(config.name);
     // if we don't have a custom font registered for this name, assume it's a platform font
     if (jfont == null) jfont = new java.awt.Font(config.name, java.awt.Font.PLAIN, 12);
     return new JavaFont(config, jfont);
   }
 
-  @Override
-  public TextLayout layoutText(String text, TextFormat format) {
+  @Override public TextLayout layoutText(String text, TextFormat format) {
     return JavaTextLayout.layoutText(this, text, format);
   }
 
-  @Override
-  public TextLayout[] layoutText(String text, TextFormat format, TextWrap wrap) {
+  @Override public TextLayout[] layoutText(String text, TextFormat format, TextWrap wrap) {
     return JavaTextLayout.layoutText(this, text, format, wrap);
   }
 
@@ -207,51 +201,9 @@ public class JavaGraphics extends Graphics {
     return point;
   }
 
-  @Override protected void upload (Image image, Texture tex) {
-    BufferedImage bitmap = ((JavaImage)image).bufferedImage();
-    // Convert the bitmap into a format for quick uploading (NOOPs if already optimized)
-    bitmap = convertImage(bitmap);
-
-    DataBuffer dbuf = bitmap.getRaster().getDataBuffer();
-    ByteBuffer bbuf;
-    int format, type;
-
-    if (bitmap.getType() == BufferedImage.TYPE_INT_ARGB_PRE) {
-      DataBufferInt ibuf = (DataBufferInt)dbuf;
-      int iSize = ibuf.getSize()*4;
-      bbuf = checkGetImageBuffer(iSize);
-      bbuf.asIntBuffer().put(ibuf.getData());
-      bbuf.position(bbuf.position()+iSize);
-      bbuf.flip();
-      format = GL12.GL_BGRA;
-      type = GL12.GL_UNSIGNED_INT_8_8_8_8_REV;
-
-    } else if (bitmap.getType() == BufferedImage.TYPE_4BYTE_ABGR) {
-      DataBufferByte dbbuf = (DataBufferByte)dbuf;
-      bbuf = checkGetImageBuffer(dbbuf.getSize());
-      bbuf.put(dbbuf.getData());
-      bbuf.flip();
-      format = GL11.GL_RGBA;
-      type = GL12.GL_UNSIGNED_INT_8_8_8_8;
-
-    } else {
-      // Something went awry and convertImage thought this image was in a good form already,
-      // except we don't know how to deal with it
-      throw new RuntimeException("Image type wasn't converted to usable: " + bitmap.getType());
-    }
-
-    gl.glBindTexture(GL11.GL_TEXTURE_2D, tex.id);
-    GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA, bitmap.getWidth(), bitmap.getHeight(),
-                      0, format, type, bbuf);
-    gl.checkError("updateTexture");
-  }
-
-  private ByteBuffer checkGetImageBuffer (int byteSize) {
-    if (imgBuf.capacity() >= byteSize) {
-      imgBuf.clear(); // reuse it!
-    } else {
-      imgBuf = createImageBuffer(byteSize);
-    }
+  ByteBuffer checkGetImageBuffer (int byteSize) {
+    if (imgBuf.capacity() >= byteSize) imgBuf.clear(); // reuse it!
+    else imgBuf = createImageBuffer(byteSize);
     return imgBuf;
   }
 

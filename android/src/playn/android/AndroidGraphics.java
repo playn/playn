@@ -183,13 +183,6 @@ public class AndroidGraphics extends Graphics {
     return AndroidTextLayout.layoutText(text, format, wrap);
   }
 
-  @Override protected void upload (Image image, Texture tex) {
-    Bitmap bitmap = ((AndroidImage)image).bitmap();
-    gl.glBindTexture(GL20.GL_TEXTURE_2D, tex.id);
-    GLUtils.texImage2D(GL20.GL_TEXTURE_2D, 0, bitmap, 0);
-    gl.checkError("updateTexture end");
-  }
-
   void onSurfaceCreated() {
     // TODO: incrementEpoch(); // increment our GL context epoch
     // TODO: init(); // reinitialize GL

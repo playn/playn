@@ -123,4 +123,7 @@ public abstract class Image {
   protected Image () {
     this.state = RFuture.success(this);
   }
+
+  /** Uploads this image's data into {@code tex}. */
+  protected abstract void upload (Graphics gfx, Texture tex);
 }
