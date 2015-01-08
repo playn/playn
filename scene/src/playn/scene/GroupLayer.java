@@ -34,15 +34,18 @@ public class GroupLayer extends ClippedLayer implements Iterable<Layer> {
 
   private final List<Layer> children = new ArrayList<>();
   private final AffineTransform paintTx = new AffineTransform();
+  private final boolean disableClip;
 
   /** Creates an unclipped group layer. Unclipped groups have no defined size. */
   public GroupLayer () {
     super(0, 0);
+    disableClip = true;
   }
 
   /** Creates a clipped group layer with the specified size. */
   public GroupLayer (float width, float height) {
     super(width, height);
+    disableClip = false;
   }
 
   /** Returns whether this group has any child layers. */
@@ -168,6 +171,10 @@ public class GroupLayer extends ClippedLayer implements Iterable<Layer> {
     // interactive children have been deactivated or removed
     if (!sawInteractiveChild && !hasEventListeners()) setInteractive(false);
     return null;
+  }
+
+  @Override protected boolean disableClip () {
+    return disableClip;
   }
 
   @Override protected void paintClipped (Surface surf) {

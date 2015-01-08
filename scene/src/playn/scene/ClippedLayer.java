@@ -25,10 +25,6 @@ import pythagoras.f.Vector;
  *
  * <p>NOTE: clipping rectangles cannot be rotated. If the layer has a rotation, the clipping region
  * will be undefined (and most certainly wacky).
- *
- * <p>NOTE: if a clipped layer's width or height are set to zero, it becomes unclipped. This is an
- * unfortunate implementation detail that allows {@link GroupLayer} to be clipped or not depending
- * on whether its width is configured.
  */
 public abstract class ClippedLayer extends Layer {
 
@@ -68,9 +64,12 @@ public abstract class ClippedLayer extends Layer {
     return this;
   }
 
+  protected boolean disableClip () {
+    return false;
+  }
+
   @Override protected final void paintImpl (Surface surf) {
-    // if we have zero width or height, we're not clipped
-    if (width == 0 || height == 0) paintClipped(surf);
+    if (disableClip()) paintClipped(surf);
     else {
       Transform tx = surf.tx();
       tx.translate(originX, originY);
