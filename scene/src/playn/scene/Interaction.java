@@ -43,9 +43,14 @@ public class Interaction<E extends Event.XY> {
     return event.y;
   }
 
+  /** Returns whether this interaction is captured. */
+  public boolean captured () {
+    return capturingLayer != null;
+  }
+
   /** Captures this interaction. See {@link Dispatcher}. */
   public void capture () {
-    if (capturingLayer != null) throw new IllegalStateException("Interaction already captured.");
+    if (captured()) throw new IllegalStateException("Interaction already captured.");
     assert dispatchLayer != null;
     capturingLayer = dispatchLayer;
     // TODO: notify all non-capturing layers of cancel
@@ -64,7 +69,7 @@ public class Interaction<E extends Event.XY> {
       if (bubble) {
         for (Layer target = hitLayer; target != null; target = target.parent()) {
           if (capturingLayer != null && target != capturingLayer) continue;
-          if (target.hasEventListeners()) dispatch(hitLayer);
+          if (target.hasEventListeners()) dispatch(target);
         }
       } else {
         if (hitLayer.hasEventListeners()) dispatch(hitLayer);

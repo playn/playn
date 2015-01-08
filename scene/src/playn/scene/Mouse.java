@@ -108,7 +108,7 @@ public class Mouse extends playn.core.Mouse {
           // if we have no current interaction, start one
           if (currentIact == null) {
             Layer hitLayer = LayerUtil.getHitLayer(root, scratch.set(event.x, event.y));
-            if (hitLayer != null) new Interaction(hitLayer, false);
+            if (hitLayer != null) currentIact = new Interaction(hitLayer, false);
           }
           if (currentIact != null) {
             currentIact.add(bevent.button);
