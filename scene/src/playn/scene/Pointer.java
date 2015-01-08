@@ -73,18 +73,14 @@ public class Pointer extends playn.core.Pointer {
 
     @Override public void onEmit (Event event) {
       // start a new interaction on START, if we don't already have one
-      if (currentIact == null && event.kind == Event.Kind.START) {
+      if (currentIact == null && event.kind.isStart) {
         Layer hitLayer = LayerUtil.getHitLayer(root, scratch.set(event.x, event.y));
         if (hitLayer != null) currentIact = new Interaction(hitLayer);
       }
-
       // dispatch the event to the interaction
       if (currentIact != null) currentIact.dispatch(event, bubble);
-
       // if this is END or CANCEL, clear out the current interaction
-      if (event.kind == Event.Kind.END || event.kind == Event.Kind.CANCEL) {
-        currentIact = null;
-      }
+      if (event.kind.isEnd) currentIact = null;
     }
   }
 

@@ -26,8 +26,18 @@ public class Touch {
   public static class Event extends playn.core.Event.XY {
 
     /** Enumerates the different kinds of touch event. */
-    public static enum Kind { START, MOVE, END, CANCEL };
-    // NOTE: this enum must match Pointer.Event.Kind exactly
+    public static enum Kind {
+      START(true, false), MOVE(false, false), END(false, true), CANCEL(false, true);
+      // NOTE: this enum order must match Pointer.Event.Kind exactly
+
+      /** Whether this touch kind starts or ends an interaction. */
+      public final boolean isStart, isEnd;
+
+      Kind (boolean isStart, boolean isEnd) {
+        this.isStart = isStart;
+        this.isEnd = isEnd;
+      }
+    };
 
     /** Whether this event represents a start, move, etc. */
     public final Kind kind;
@@ -63,7 +73,7 @@ public class Touch {
 
     @Override protected void addFields (StringBuilder builder) {
       super.addFields(builder);
-      builder.append(", kind=").append(kind).append(", kind=").append(id).
+      builder.append(", kind=").append(kind).append(", id=").append(id).
         append(", pressure=").append(pressure).append(", size=").append(size);
     }
   }

@@ -27,7 +27,17 @@ public class Pointer {
   public static class Event extends playn.core.Event.XY {
 
     /** Enumerates the different kinds of pointer event. */
-    public static enum Kind { START, DRAG, END, CANCEL };
+    public static enum Kind {
+      START(true, false), DRAG(false, false), END(false, true), CANCEL(false, true);
+
+      /** Whether this kind starts or ends an interaction. */
+      public final boolean isStart, isEnd;
+
+      Kind (boolean isStart, boolean isEnd) {
+        this.isStart = isStart;
+        this.isEnd = isEnd;
+      }
+    };
     // NOTE: this enum must match Touch.Event.Kind exactly
 
     /** Whether this event represents a start, move, etc. */
@@ -81,9 +91,10 @@ public class Pointer {
       private int active = -1;
       @Override public void onEmit (Touch.Event[] events) {
         for (Touch.Event event : events) {
-          if (active == -1 || event.id == active) {
-            active = event.id;
+          if (active == -1 && event.kind.isStart) active = event.id;
+          if (event.id == active) {
             forward(Event.Kind.values()[event.kind.ordinal()], event);
+            if (event.kind.isEnd) active = -1;
           }
         }
       }

@@ -72,6 +72,11 @@ public abstract class RenderTarget implements Disposable {
     }
   }
 
+  @Override public String toString () {
+    return "[id=" + id() + ", size=" + width() + "x" + height() + " @ " + scale() +
+      ", flip=" + flip() + "]";
+  }
+
   @Override protected void finalize () {
     if (!destroyed) gfx.queueForDestroy(this);
   }

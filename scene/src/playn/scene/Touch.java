@@ -78,7 +78,7 @@ public class Touch extends playn.core.Touch {
       for (Event event : events) {
         // start a new interaction for this id if START and we don't already have one
         Interaction iact = activeIacts.get(event.id);
-        if (iact == null && event.kind == Event.Kind.START) {
+        if (iact == null && event.kind.isStart) {
           Layer hitLayer = LayerUtil.getHitLayer(root, scratch.set(event.x, event.y));
           if (hitLayer != null) activeIacts.put(event.id, iact = new Interaction(hitLayer));
         }
@@ -87,8 +87,7 @@ public class Touch extends playn.core.Touch {
         if (iact != null) iact.dispatch(event, bubble);
 
         // if this is END or CANCEL, clear out the interaction for this id
-        if (event.kind == Event.Kind.END ||
-            event.kind == Event.Kind.CANCEL) activeIacts.remove(event.id);
+        if (event.kind.isEnd) activeIacts.remove(event.id);
       }
     }
   }
