@@ -111,12 +111,15 @@ public class Surface implements Disposable {
   /** Starts a series of drawing commands that are clipped to the specified rectangle (in view
     * coordinates, not OpenGL coordinates). Thus must be followed by a call to {@link #endClipped}
     * when the clipped drawing commands are done.
-    * @return whether the resulting clip rectangle is not empty */
+    *
+    * @return whether the resulting clip rectangle is non-empty. <em>Note:</em> the caller may wish
+    * to skip their drawing if this returns false, but they must still call {@link #endClipped}. */
   public boolean startClipped (int x, int y, int width, int height) {
     batch.flush(); // flush any pending unclipped calls
     Rectangle r = pushScissorState(x, target.height()-y-height, width, height);
     batch.gl.glScissor(r.x, r.y, r.width, r.height);
     if (scissorDepth == 1) batch.gl.glEnable(GL20.GL_SCISSOR_TEST);
+    batch.gl.checkError("startClipped");
     return !r.isEmpty();
   }
 
@@ -126,6 +129,7 @@ public class Surface implements Disposable {
     Rectangle r = popScissorState();
     if (r == null) batch.gl.glDisable(GL20.GL_SCISSOR_TEST);
     else batch.gl.glScissor(r.x, r.y, r.width, r.height);
+    batch.gl.checkError("endClipped");
   }
 
   /** Translates the current transformation matrix by the given amount. */
@@ -313,40 +317,23 @@ public class Surface implements Disposable {
     return batch;
   }
 
-  /**
-   * Adds the given rectangle to the scissors stack, intersecting with the previous one if it
-   * exists. Intended for use by subclasses to implement {@link #startClipped} and {@link
-   * #endClipped}.
-   *
-   * <p>NOTE: calls to this method <b>must</b> be matched by a corresponding call {@link
-   * #popScissorState}, or all hell will break loose.</p>
-   *
-   * @return the new clipping rectangle to use
-   */
   private Rectangle pushScissorState (int x, int y, int width, int height) {
-      // grow the scissors buffer if necessary
-      if (scissorDepth == scissors.size()) {
-        scissors.add(new Rectangle());
-      }
+    // grow the scissors buffer if necessary
+    if (scissorDepth == scissors.size()) scissors.add(new Rectangle());
 
-      Rectangle r = scissors.get(scissorDepth);
-      if (scissorDepth == 0) {
-        r.setBounds(x, y, width, height);
-      } else {
-        // intersect current with previous
-        Rectangle pr = scissors.get(scissorDepth - 1);
-        r.setLocation(Math.max(pr.x, x), Math.max(pr.y, y));
-        r.setSize(Math.min(pr.maxX(), x + width - 1) - r.x,
-            Math.min(pr.maxY(), y + height - 1) - r.y);
-      }
-      scissorDepth++;
-      return r;
+    Rectangle r = scissors.get(scissorDepth);
+    if (scissorDepth == 0) r.setBounds(x, y, width, height);
+    else {
+      // intersect current with previous
+      Rectangle pr = scissors.get(scissorDepth - 1);
+      r.setLocation(Math.max(pr.x, x), Math.max(pr.y, y));
+      r.setSize(Math.max(Math.min(pr.maxX(), x + width - 1) - r.x, 0),
+                Math.max(Math.min(pr.maxY(), y + height - 1) - r.y, 0));
+    }
+    scissorDepth++;
+    return r;
   }
 
-  /**
-   * Removes the most recently pushed scissor state and returns the rectangle that should now
-   * be used for clipping, or null if clipping should be disabled.
-   */
   private Rectangle popScissorState () {
     scissorDepth--;
     return scissorDepth == 0 ? null : scissors.get(scissorDepth - 1);
