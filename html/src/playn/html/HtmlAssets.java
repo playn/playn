@@ -33,17 +33,12 @@ import com.google.gwt.xhr.client.XMLHttpRequest;
 
 import pythagoras.f.MathUtil;
 
-import playn.core.AbstractAssets;
-import playn.core.AsyncImage;
-import playn.core.AutoClientBundleWithLookup;
-import playn.core.Image;
-import playn.core.PlayN;
-import playn.core.Sound;
-import playn.core.gl.Scale;
-import playn.core.util.Callback;
+import playn.core.*;
 import playn.html.XDomainRequest.Handler;
+import react.RFuture;
+import react.RPromise;
 
-public class HtmlAssets extends AbstractAssets<Void> {
+public class HtmlAssets extends Assets {
 
   /**
    * Whether or not to log successful progress of {@code XMLHTTPRequest} and
@@ -51,7 +46,7 @@ public class HtmlAssets extends AbstractAssets<Void> {
    */
   private static final boolean LOG_XHR_SUCCESS = false;
 
-  private final HtmlPlatform platform;
+  private final HtmlPlatform plat;
   private final Map<String, AutoClientBundleWithLookup> clientBundles =
     new HashMap<String, AutoClientBundleWithLookup>();
   private String pathPrefix = GWT.getModuleBaseForStaticFiles();
@@ -60,9 +55,10 @@ public class HtmlAssets extends AbstractAssets<Void> {
 
   /** See {@link #setImageManifest}. */
   public interface ImageManifest {
-    /** Returns {@code {width, height}} for the image at {@code path}. The path <em>will not</em>
-     * contain any configured path prefix; it will be the path passed to {@link #getImageSync}. */
-    float[] imageSize(String path);
+    /** Returns the pixel {@code {width, height}} for the image at {@code path}.
+      * The path <em>will not</em> contain any configured path prefix; it will be the path passed
+      * to {@link #getImageSync}. */
+    int[] imageSize(String path);
   }
 
   public void setPathPrefix(String prefix) {
@@ -93,50 +89,39 @@ public class HtmlAssets extends AbstractAssets<Void> {
 
   @Override
   public Image getImageSync(String path) {
-    if (imageManifest == null)
-      throw new UnsupportedOperationException("getImageSync(" + path + ")");
+    if (imageManifest == null) throw new UnsupportedOperationException(
+      "getImageSync(" + path + ")");
     else {
       for (Scale.ScaledResource rsrc : assetScale().getScaledResources(path)) {
-        float[] size = imageManifest.imageSize(rsrc.path);
+        int[] size = imageManifest.imageSize(rsrc.path);
         if (size == null) continue; // try other scales
-        HtmlImage image = getImage(rsrc.path, rsrc.scale);
-        image.img.setWidth(MathUtil.iceil(size[0]));
-        image.img.setHeight(MathUtil.iceil(size[1]));
-        return image;
+        return getImage(rsrc.path, rsrc.scale).preload(size[0], size[1]);
       }
-      return createErrorImage(new Throwable("Image missing from manifest: " + path));
+      return new HtmlImage(new Throwable("Image missing from manifest: " + path));
     }
   }
 
-  @Override
-  public Image getImage(String path) {
+  @Override public Image getImage (String path) {
     return getImage(path, Scale.ONE);
   }
 
-  protected HtmlImage getImage(String path, Scale scale) {
+  protected HtmlImage getImage (String path, Scale scale) {
     String url = pathPrefix + path;
     AutoClientBundleWithLookup clientBundle = getBundle(path);
     if (clientBundle != null) {
       String key = getKey(path);
       ImageResource resource = (ImageResource) getResource(key, clientBundle);
-      if (resource != null) {
-        url = resource.getSafeUri().asString();
-      }
+      if (resource != null) url = resource.getSafeUri().asString();
     }
     return adaptImage(url, scale);
   }
 
-  @Override
-  public Image getRemoteImage(String url) {
+  @Override public Image getRemoteImage(String url) {
     return adaptImage(url, Scale.ONE);
   }
 
-  @Override
-  public Image getRemoteImage(String url, float width, float height) {
-    HtmlImage image = adaptImage(url, Scale.ONE);
-    image.img.setWidth(MathUtil.iceil(width));
-    image.img.setHeight(MathUtil.iceil(height));
-    return image;
+  @Override public Image getRemoteImage(String url, int width, int height) {
+    return adaptImage(url, Scale.ONE).preload(width, height);
   }
 
   @Override
@@ -152,7 +137,7 @@ public class HtmlAssets extends AbstractAssets<Void> {
     } else {
       url += ".mp3";
     }
-    return adaptSound(url);
+    return plat.audio().createSound(url);
   }
 
   @Override
@@ -161,7 +146,8 @@ public class HtmlAssets extends AbstractAssets<Void> {
   }
 
   @Override
-  public void getText(final String path, final Callback<String> callback) {
+  public RFuture<String> getText(final String path) {
+    RPromise<String> result = RPromise.create();
     final String fullPath = pathPrefix + path;
     /*
      * Except for IE, all browsers support on-domain and cross-domain XHR via
@@ -174,179 +160,109 @@ public class HtmlAssets extends AbstractAssets<Void> {
      * running on IE.
      */
     try {
-      doXhr(fullPath, callback);
+      doXhr(fullPath, result);
     } catch (JavaScriptException e) {
       if (Window.Navigator.getUserAgent().indexOf("MSIE") != -1) {
-        doXdr(fullPath, callback);
+        doXdr(fullPath, result);
       } else {
         throw e;
       }
     }
+    return result;
   }
 
-  @Override
-  public byte[] getBytesSync(String path) throws Exception {
-    throw new UnsupportedOperationException("getTextSync(" + path + ")");
+  @Override public byte[] getBytesSync(String path) throws Exception {
+    throw new UnsupportedOperationException("getByteSync(" + path + ")");
   }
 
-  @Override
-  public void getBytes(final String path, final Callback<byte[]> callback) {
-    throw new UnsupportedOperationException("getText(" + path + ")");
+  @Override public RFuture<byte[]> getBytes(String path) {
+    return RFuture.failure(new UnsupportedOperationException("getByte(" + path + ")"));
   }
 
-  @Override
-  protected Image createErrorImage(Throwable cause, float width, float height) {
-    ImageElement img = Document.get().createImageElement();
-    img.setWidth(MathUtil.iceil(width));
-    img.setHeight(MathUtil.iceil(height));
-    // TODO: proper error image that reports failure to callbacks
-    return new HtmlImage(platform.graphics().ctx(), Scale.ONE, img);
-  }
-
-  @Override
-  protected Image createStaticImage(Void iimpl, Scale scale) {
+  @Override protected ImageImpl.Data load (String path) throws Exception {
     throw new UnsupportedOperationException("unused");
   }
 
-  @Override
-  protected AsyncImage<Void> createAsyncImage(float width, float height) {
+  @Override protected ImageImpl createImage (int rawWidth, int rawHeight) {
     throw new UnsupportedOperationException("unused");
   }
 
-  @Override
-  protected Image loadImage(String path, ImageReceiver<Void> recv) {
-    throw new UnsupportedOperationException("unused");
-  }
-
-  HtmlAssets(HtmlPlatform platform) {
-    super(platform);
-    this.platform = platform;
+  HtmlAssets(HtmlPlatform plat) {
+    super(plat);
+    this.plat = plat;
   }
 
   private Scale assetScale() {
-    return (assetScale != null) ? assetScale : platform.graphics().scale();
+    return (assetScale != null) ? assetScale : plat.graphics().scale;
   }
 
-  private void doXdr(final String fullPath, final Callback<String> callback) {
+  private void doXdr(final String path, final RPromise<String> result) {
     XDomainRequest xdr = XDomainRequest.create();
     xdr.setHandler(new Handler() {
-
-      @Override
-      public void onTimeout(XDomainRequest xdr) {
-        PlayN.log().error("xdr::onTimeout[" + fullPath + "]()");
-        callback.onFailure(
-          new RuntimeException("Error getting " + fullPath + " : " + xdr.getStatus()));
+      @Override public void onTimeout(XDomainRequest xdr) {
+        plat.log().error("xdr::onTimeout[" + path + "]()");
+        result.fail(new Exception("Error getting " + path + " : " + xdr.getStatus()));
       }
 
-      @Override
-      public void onProgress(XDomainRequest xdr) {
-        if (LOG_XHR_SUCCESS) {
-          PlayN.log().debug("xdr::onProgress[" + fullPath + "]()");
-        }
+      @Override public void onProgress(XDomainRequest xdr) {
+        if (LOG_XHR_SUCCESS) plat.log().debug("xdr::onProgress[" + path + "]()");
       }
 
-      @Override
-      public void onLoad(XDomainRequest xdr) {
-        if (LOG_XHR_SUCCESS) {
-          PlayN.log().debug("xdr::onLoad[" + fullPath + "]()");
-        }
-        callback.onSuccess(xdr.getResponseText());
+      @Override public void onLoad(XDomainRequest xdr) {
+        if (LOG_XHR_SUCCESS) plat.log().debug("xdr::onLoad[" + path + "]()");
+        result.succeed(xdr.getResponseText());
       }
 
-      @Override
-      public void onError(XDomainRequest xdr) {
-        PlayN.log().error("xdr::onError[" + fullPath + "]()");
-        callback.onFailure(
-          new RuntimeException("Error getting " + fullPath + " : " + xdr.getStatus()));
+      @Override public void onError(XDomainRequest xdr) {
+        plat.log().error("xdr::onError[" + path + "]()");
+        result.fail(new Exception("Error getting " + path + " : " + xdr.getStatus()));
       }
     });
-
-    if (LOG_XHR_SUCCESS) {
-      PlayN.log().debug("xdr.open('GET', '" + fullPath + "')...");
-    }
-    xdr.open("GET", fullPath);
-
-    if (LOG_XHR_SUCCESS) {
-      PlayN.log().debug("xdr.send()...");
-    }
+    if (LOG_XHR_SUCCESS) plat.log().debug("xdr.open('GET', '" + path + "')...");
+    xdr.open("GET", path);
+    if (LOG_XHR_SUCCESS) plat.log().debug("xdr.send()...");
     xdr.send();
   }
 
-  private void doXhr(final String fullPath, final Callback<String> callback) {
+  private void doXhr(final String path, final RPromise<String> result) {
     XMLHttpRequest xhr = XMLHttpRequest.create();
     xhr.setOnReadyStateChange(new ReadyStateChangeHandler() {
-      @Override
-      public void onReadyStateChange(XMLHttpRequest xhr) {
+      @Override public void onReadyStateChange(XMLHttpRequest xhr) {
         int readyState = xhr.getReadyState();
         if (readyState == XMLHttpRequest.DONE) {
           int status = xhr.getStatus();
           // status code 0 will be returned for non-http requests, e.g. file://
           if (status != 0 && (status < 200 || status >= 400)) {
-            PlayN.log().error(
-                "xhr::onReadyStateChange[" + fullPath + "](readyState = " + readyState
-                    + "; status = " + status + ")");
-            callback.onFailure(
-              new RuntimeException("Error getting " + fullPath + " : " + xhr.getStatusText()));
+            plat.log().error("xhr::onReadyStateChange[" + path + "]" +
+                             "(readyState = " + readyState + "; status = " + status + ")");
+            result.fail(new Exception("Error getting " + path + " : " + xhr.getStatusText()));
           } else {
-            if (LOG_XHR_SUCCESS) {
-              PlayN.log().debug(
-                  "xhr::onReadyStateChange[" + fullPath + "](readyState = " + readyState
-                      + "; status = " + status + ")");
-            }
-            // TODO(fredsa): Remove try-catch and materialized exception once issue 6562 is fixed
-            // http://code.google.com/p/google-web-toolkit/issues/detail?id=6562
-            try {
-              callback.onSuccess(xhr.getResponseText());
-            } catch(JavaScriptException e) {
-              if (GWT.isProdMode()) {
-                throw e;
-              } else {
-                JavaScriptException materialized = new JavaScriptException(e.getName(),
-                    e.getDescription());
-                materialized.setStackTrace(e.getStackTrace());
-                throw materialized;
-              }
-            }
+            if (LOG_XHR_SUCCESS) plat.log().debug("xhr::onReadyStateChange[" + path + "]" +
+                                                  "(readyState = " + readyState +
+                                                  "; status = " + status + ")");
+            result.succeed(xhr.getResponseText());
           }
         }
       }
     });
-
-    if (LOG_XHR_SUCCESS) {
-      PlayN.log().debug("xhr.open('GET', '" + fullPath + "')...");
-    }
-    xhr.open("GET", fullPath);
-
-    if (LOG_XHR_SUCCESS) {
-      PlayN.log().debug("xhr.send()...");
-    }
+    if (LOG_XHR_SUCCESS) plat.log().debug("xhr.open('GET', '" + path + "')...");
+    xhr.open("GET", path);
+    if (LOG_XHR_SUCCESS) plat.log().debug("xhr.send()...");
     xhr.send();
   }
 
-  private Sound adaptSound(String url) {
-    HtmlAudio audio = (HtmlAudio) PlayN.audio();
-    HtmlSound sound = audio.createSound(url);
-    return sound;
-  }
-
-  /**
-   * Determine the resource key from a given path.
-   *
-   * @param fullPath full path, with or without a file extension
-   * @return the key by which the resource can be looked up
-   */
-  private String getKey(String fullPath) {
+  private String getKey (String fullPath) {
     String key = fullPath.substring(fullPath.lastIndexOf('/') + 1);
     int dotCharIdx = key.indexOf('.');
     return dotCharIdx != -1 ? key.substring(0, dotCharIdx) : key;
   }
 
-  private ResourcePrototype getResource(String key, AutoClientBundleWithLookup clientBundle) {
+  private ResourcePrototype getResource (String key, AutoClientBundleWithLookup clientBundle) {
     ResourcePrototype resource = clientBundle.getResource(key);
     return resource;
   }
 
-  private AutoClientBundleWithLookup getBundle(String collection) {
+  private AutoClientBundleWithLookup getBundle (String collection) {
     AutoClientBundleWithLookup clientBundle = null;
     for (Map.Entry<String, AutoClientBundleWithLookup> entry : clientBundles.entrySet()) {
       String regExp = entry.getKey();
@@ -357,27 +273,22 @@ public class HtmlAssets extends AbstractAssets<Void> {
     return clientBundle;
   }
 
-  private HtmlImage adaptImage(String url, Scale scale) {
+  private HtmlImage adaptImage (String url, Scale scale) {
     ImageElement img = Document.get().createImageElement();
-    /*
-     * When the server provides an appropriate {@literal Access-Control-Allow-Origin} response
-     * header, allow images to be served cross origin on supported, CORS enabled, browsers.
-     */
+    // when the server provides an appropriate `Access-Control-Allow-Origin` response header,
+    // allow images to be served cross origin on supported, CORS enabled, browsers
     setCrossOrigin(img, "anonymous");
     img.setSrc(url);
-    return new HtmlImage(platform.graphics().ctx(), scale, img);
+    return new HtmlImage(scale, img);
   }
 
   /**
    * Set the state of the {@code crossOrigin} attribute for CORS.
    *
-   * @param elem the DOM element on which to set the {@code crossOrigin}
-   *          attribute
+   * @param elem the DOM element on which to set the {@code crossOrigin} attribute
    * @param state one of {@code "anonymous"} or {@code "use-credentials"}
    */
   private native void setCrossOrigin(Element elem, String state) /*-{
-    if ('crossOrigin' in elem) {
-      elem.setAttribute('crossOrigin', state);
-    }
+    if ('crossOrigin' in elem) elem.setAttribute('crossOrigin', state);
   }-*/;
 }

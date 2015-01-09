@@ -16,14 +16,27 @@
 package playn.html;
 
 import com.google.gwt.canvas.dom.client.CanvasGradient;
+import com.google.gwt.canvas.dom.client.Context2d;
 
 import playn.core.Gradient;
 
-class HtmlGradient implements Gradient {
+public class HtmlGradient extends Gradient {
 
   final CanvasGradient gradient;
 
-  HtmlGradient(CanvasGradient gradient) {
-    this.gradient = gradient;
+  public HtmlGradient (Context2d ctx, Config config) {
+    if (config instanceof Linear) {
+      Linear cfg = (Linear)config;
+      gradient = ctx.createLinearGradient(cfg.x0, cfg.y0, cfg.x1, cfg.y1);
+      for (int ii = 0; ii < cfg.colors.length; ++ii) {
+        gradient.addColorStop(cfg.positions[ii], HtmlGraphics.cssColorString(cfg.colors[ii]));
+      }
+    } else if (config instanceof Radial) {
+      Radial cfg = (Radial)config;
+      gradient = ctx.createRadialGradient(cfg.x, cfg.y, 0, cfg.x, cfg.y, cfg.r);
+      for (int ii = 0; ii < cfg.colors.length; ++ii) {
+        gradient.addColorStop(cfg.positions[ii], HtmlGraphics.cssColorString(cfg.colors[ii]));
+      }
+    } else throw new IllegalArgumentException("?? " + config);
   }
 }

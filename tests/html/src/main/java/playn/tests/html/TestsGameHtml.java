@@ -15,26 +15,25 @@
  */
 package playn.tests.html;
 
+import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.user.client.Window;
 
-import playn.core.PlayN;
-import playn.html.HtmlGame;
 import playn.html.HtmlPlatform;
 
 import playn.tests.core.TestsGame;
 
-public class TestsGameHtml extends HtmlGame {
+public class TestsGameHtml implements EntryPoint {
 
-  @Override
-  public void start() {
+  @Override public void onModuleLoad () {
     HtmlPlatform.Config config = new HtmlPlatform.Config();
     try {
       config.scaleFactor = Float.parseFloat(Window.Location.getParameter("scale"));
     } catch (Exception e) {} // oh well
-    HtmlPlatform platform = HtmlPlatform.register(config);
-    platform.setTitle("Tests");
-    platform.assets().setPathPrefix("testsgame/");
-    HtmlPlatform.disableRightClickContextMenu();
-    PlayN.run(new TestsGame());
+    HtmlPlatform plat = new HtmlPlatform(config);
+    plat.setTitle("Tests");
+    plat.assets().setPathPrefix("testsgame/");
+    plat.disableRightClickContextMenu();
+    TestsGame game = new TestsGame(plat, new String[0]);
+    plat.start();
   }
 }

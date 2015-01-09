@@ -15,8 +15,8 @@
  */
 package playn.html;
 
-import playn.core.LogImpl;
+import playn.core.Log;
 
-public abstract class HtmlLog extends LogImpl {
+public abstract class HtmlLog extends Log {
 
 }

@@ -17,8 +17,6 @@ package com.allen_sauer.gwt.voices.client.ui.impl;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Window;
 
-import playn.core.PlayN;
-
 /**
  * This class allows us to replacing the normal compile time deferred binding implementation
  * decision, with a runtime decision, based on the runtime user agent. Doing so, allows us to use
@@ -35,7 +33,7 @@ public class FlashMovieImplPlayN extends FlashMovieImpl {
     } else {
       impl = new FlashMovieImplSafari();
     }
-    PlayN.log().debug("CHOSE: " + impl.getClass().getName());
+    // PlayN.log().debug("CHOSE: " + impl.getClass().getName());
   }
 
   @Override

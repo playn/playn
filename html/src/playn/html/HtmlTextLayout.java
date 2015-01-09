@@ -22,13 +22,12 @@ import pythagoras.f.Rectangle;
 import java.util.ArrayList;
 import java.util.List;
 
-import playn.core.AbstractTextLayout;
 import playn.core.Font;
 import playn.core.TextFormat;
 import playn.core.TextLayout;
 import playn.core.TextWrap;
 
-class HtmlTextLayout extends AbstractTextLayout {
+class HtmlTextLayout extends TextLayout {
 
   public static TextLayout layoutText(HtmlGraphics gfx, Context2d ctx, String text,
                                       TextFormat format) {
@@ -45,7 +44,7 @@ class HtmlTextLayout extends AbstractTextLayout {
     List<TextLayout> layouts = new ArrayList<TextLayout>();
 
     // normalize newlines in the text (Windows: CRLF -> LF, Mac OS pre-X: CR -> LF)
-    text = AbstractTextLayout.normalizeEOL(text);
+    text = normalizeEOL(text);
     for (String line : text.split("\\n")) {
       String[] words = line.split("\\s"); // TODO: preserve intra-line whitespace
       for (int idx = 0; idx < words.length; ) {
@@ -60,7 +59,8 @@ class HtmlTextLayout extends AbstractTextLayout {
   private final HtmlFontMetrics metrics;
 
   HtmlTextLayout(String text, TextFormat format, HtmlFontMetrics metrics, float width) {
-    super(text, format, new Rectangle(0, 0, metrics.adjustWidth(width), metrics.height));
+    super(text, format, new Rectangle(0, 0, metrics.adjustWidth(width), metrics.height),
+          metrics.ascent()+metrics.descent());
     this.metrics = metrics;
   }
 

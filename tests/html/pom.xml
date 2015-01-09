@@ -38,6 +38,13 @@
 
     <dependency>
       <groupId>com.googlecode.playn</groupId>
+      <artifactId>playn-scene</artifactId>
+      <version>${project.version}</version>
+      <classifier>sources</classifier>
+    </dependency>
+
+    <dependency>
+      <groupId>com.googlecode.playn</groupId>
       <artifactId>playn-html</artifactId>
       <version>${project.version}</version>
     </dependency>

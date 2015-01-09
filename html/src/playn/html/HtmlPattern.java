@@ -19,55 +19,31 @@ import com.google.gwt.canvas.dom.client.CanvasPattern;
 import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.dom.client.ImageElement;
 
-import playn.core.gl.AbstractImageGL;
-import playn.core.gl.GLPattern;
+import playn.core.Pattern;
 
-class HtmlPattern implements GLPattern {
+class HtmlPattern extends Pattern {
 
-  private final AbstractImageGL<?> image;
   private final ImageElement patimg;
-  private final boolean repeatX, repeatY;
+  private CanvasPattern pattern;
 
-  HtmlPattern(HtmlImage image, boolean repeatX, boolean repeatY) {
-    this(image, image.img, repeatX, repeatY);
-  }
-
-  HtmlPattern(AbstractImageGL<?> image, ImageElement patimg,
-              boolean repeatX, boolean repeatY) {
-    this.image = image;
+  HtmlPattern(ImageElement patimg, boolean repeatX, boolean repeatY) {
+    super(repeatX, repeatY);
     this.patimg = patimg;
-    this.repeatX = repeatX;
-    this.repeatY = repeatY;
   }
 
-  public CanvasPattern pattern(Context2d ctx) {
-    Context2d.Repetition repeat;
-    if (repeatX) {
-      if (repeatY) {
-        repeat = Context2d.Repetition.REPEAT;
+  public CanvasPattern pattern (Context2d ctx) {
+    if (pattern == null) {
+      Context2d.Repetition repeat;
+      if (repeatX) {
+        if (repeatY) repeat = Context2d.Repetition.REPEAT;
+        else repeat = Context2d.Repetition.REPEAT_X;
+      } else if (repeatY) {
+        repeat = Context2d.Repetition.REPEAT_Y;
       } else {
-        repeat = Context2d.Repetition.REPEAT_X;
+        repeat = null;
       }
-    } else if (repeatY) {
-      repeat = Context2d.Repetition.REPEAT_Y;
-    } else {
-      return null;
+      pattern = ctx.createPattern(patimg, repeat);
     }
-    return ctx.createPattern(patimg, repeat);
-  }
-
-  @Override
-  public boolean repeatX() {
-    return repeatX;
-  }
-
-  @Override
-  public boolean repeatY() {
-    return repeatY;
-  }
-
-  @Override
-  public AbstractImageGL<?> image() {
-    return image;
+    return pattern;
   }
 }

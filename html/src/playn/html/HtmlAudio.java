@@ -25,59 +25,46 @@ import playn.core.Audio;
  * This class is temporarily public, in order to expose {@link #isFlash9AudioPluginMissing()}, to
  * assist with in game Flash detection.
  */
-public class HtmlAudio implements Audio {
+public class HtmlAudio extends Audio {
 
+  private final HtmlPlatform plat;
   private Element audioContext;
   private SoundController soundController = new SoundController();
+
+  public HtmlAudio (HtmlPlatform plat) {
+    this.plat = plat;
+    @SuppressWarnings("deprecation") SoundType[] types = soundController.getPreferredSoundTypes();
+    plat.log().debug("Preferred sound type(s): " + types);
+    // Attempt to create Web Audio API audio context
+    audioContext = maybeCreateAudioContext();
+  }
 
   /**
    * Creates a sound instance from the supplied URL.
    */
-  public HtmlSound createSound(String url) {
+  public HtmlSound createSound (String url) {
     Sound sound = soundController.createSound("audio/mpeg", url);
     // HtmlPlatform.log.debug(sound.getClass().getName() + " " + sound.getUrl());
-    return new HtmlSound(sound);
+    return new HtmlSound(plat, sound);
   }
 
   /**
    * Borrowed form com.allen_sauer.gwt.voices.client.WebAudioSound#createAudioContext()
    */
-  private static native Element maybeCreateAudioContext() /*-{
-    try {
-      return new AudioContext();
-    } catch (ignore) {
-    }
-
-    try {
-      return new webkitAudioContext();
-    } catch (ignore) {
-    }
-
+  private static native Element maybeCreateAudioContext () /*-{
+    try { return new AudioContext(); } catch (ignore) {}
+    try { return new webkitAudioContext(); } catch (ignore) {}
     return null;
   }-*/;
 
-  @SuppressWarnings("deprecation")
-  void init() {
-    HtmlPlatform.log.debug("Preferred sound type(s): " + soundController.getPreferredSoundTypes());
-
-    // Attempt to create Web Audio API audio context
-    audioContext = maybeCreateAudioContext();
-  }
-
-  @SuppressWarnings("deprecation")
-  boolean isFlash9AudioPluginMissing() {
-    if (audioContext != null) {
-      // Web Audio API is available; Flash not needed
-      return false;
-    }
-
+  boolean isFlash9AudioPluginMissing () {
+    // Web Audio API is available; Flash not needed
+    if (audioContext != null) return false;
     // Is Flash one of the requested audio types?
-    for (SoundType type : soundController.getPreferredSoundTypes()) {
-      if (type == SoundType.FLASH) {
-        return isFlash9AudioPluginMissingImpl();
-      }
+    @SuppressWarnings("deprecation") SoundType[] types = soundController.getPreferredSoundTypes();
+    for (SoundType type : types) {
+      if (type == SoundType.FLASH) return isFlash9AudioPluginMissingImpl();
     }
-
     // Flash audio is not one of the request sound types
     return false;
   }
@@ -85,8 +72,8 @@ public class HtmlAudio implements Audio {
   boolean isFlash9AudioPluginMissingImpl() {
     boolean supported = FlashMovie.isExternalInterfaceSupported();
     int version = FlashMovie.getMajorVersion();
-    HtmlPlatform.log.debug("FlashMovie.isExternalInterfaceSupported: " + supported +
-                           ", getMajorVersion: " + version);
+    plat.log().debug("FlashMovie.isExternalInterfaceSupported: " + supported +
+                     ", getMajorVersion: " + version);
     // if Flash plugin is operational and at least version 9, then it's not "missing"
     return (supported && version < 9);
   }

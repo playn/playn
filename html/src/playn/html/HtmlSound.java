@@ -22,30 +22,31 @@ import com.allen_sauer.gwt.voices.client.Sound.LoadState;
 
 import com.allen_sauer.gwt.voices.client.Sound;
 
-import playn.core.AbstractSound;
+import playn.core.SoundImpl;
 
-class HtmlSound extends AbstractSound<Sound> {
+public class HtmlSound extends SoundImpl<Sound> {
 
-  HtmlSound(final Sound sound) {
+  public HtmlSound(HtmlPlatform plat, final Sound sound) {
+    super(plat);
     sound.addEventHandler(new SoundHandler() {
       @Override
       public void onSoundLoadStateChange(SoundLoadStateChangeEvent event) {
         LoadState loadState = event.getLoadState();
         switch (loadState) {
-        case LOAD_STATE_UNINITIALIZED:
-        case LOAD_STATE_SUPPORTED_NOT_READY:
-          // ignore
-          break;
-        case LOAD_STATE_SUPPORTED_AND_READY:
-        case LOAD_STATE_SUPPORT_NOT_KNOWN:
-        case LOAD_STATE_SUPPORTED_MAYBE_READY:
-          onLoaded(sound);
-          break;
-        case LOAD_STATE_NOT_SUPPORTED:
-          onLoadError(new RuntimeException(loadState.name()));
-          break;
-        default:
-          throw new RuntimeException("Unrecognized sound load state " + loadState.name());
+          case LOAD_STATE_UNINITIALIZED:
+          case LOAD_STATE_SUPPORTED_NOT_READY:
+            // ignore
+            break;
+          case LOAD_STATE_SUPPORTED_AND_READY:
+          case LOAD_STATE_SUPPORT_NOT_KNOWN:
+          case LOAD_STATE_SUPPORTED_MAYBE_READY:
+            succeed(sound);
+            break;
+          case LOAD_STATE_NOT_SUPPORTED:
+            fail(new Exception(loadState.name()));
+            break;
+          default:
+            throw new RuntimeException("Unrecognized sound load state " + loadState.name());
         }
       }
 

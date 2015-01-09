@@ -1,0 +1,5 @@
+<!-- defines our GWT module -->
+<module>
+  <inherits name="playn.Core"/>
+  <source path="scene"/>
+</module>

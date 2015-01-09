@@ -24,22 +24,24 @@ import java.util.Map;
 import com.google.gwt.xhr.client.ReadyStateChangeHandler;
 import com.google.gwt.xhr.client.XMLHttpRequest;
 
-import playn.core.NetImpl;
-import playn.core.util.Callback;
+import playn.core.Net;
+import react.RFuture;
+import react.RPromise;
 
 public class HtmlNet extends Net {
 
-  public HtmlNet(HtmlPlatform platform) {
-    super(platform);
+  private final HtmlPlatform plat;
+
+  public HtmlNet(HtmlPlatform plat) {
+    this.plat = plat;
   }
 
-  @Override
-  public WebSocket createWebSocket(String url, WebSocket.Listener listener) {
+  @Override public WebSocket createWebSocket(String url, WebSocket.Listener listener) {
     return new HtmlWebSocket(url, listener);
   }
 
-  @Override
-  protected void execute(final BuilderImpl req, final Callback<Response> callback) {
+  @Override protected RFuture<Response> execute(final Builder req) {
+    final RPromise<Response> result = RPromise.create();
     try {
       XMLHttpRequest xhr = XMLHttpRequest.create();
       xhr.open(req.method(), req.url);
@@ -47,13 +49,26 @@ public class HtmlNet extends Net {
         xhr.setRequestHeader(header.name, header.value);
       }
       xhr.setOnReadyStateChange(new ReadyStateChangeHandler() {
-        @Override
-        public void onReadyStateChange(final XMLHttpRequest xhr) {
+        @Override public void onReadyStateChange(final XMLHttpRequest xhr) {
           if (xhr.getReadyState() == XMLHttpRequest.DONE) {
             final String text = xhr.getResponseText();
-            callback.onSuccess(new Response(xhr.getStatus()) {
+            result.succeed(new Response(xhr.getStatus()) {
               @Override public String payloadString() {
                 return text;
+              }
+              @Override public String header(String name) {
+                // some browsers have buggy implementation of getAllResponseHeaders, so calling
+                // this directly instead of relying on our parsed map helps things to mostly work
+                // in those cases; yay web!
+                return xhr.getResponseHeader(name);
+              }
+              @Override public List<String> headers(String name) {
+                // if we were able to parse the headers ourselves, use those, but if not (due
+                // perhaps to bugs, etc.) then fall back to using getResponseHeader
+                List<String> values = super.headers(name);
+                if (!values.isEmpty()) return values;
+                String value = xhr.getResponseHeader(name);
+                return (value == null) ? values : Collections.singletonList(value);
               }
               @Override protected Map<String,List<String>> extractHeaders() {
                 Map<String,List<String>> headers = new HashMap<String,List<String>>();
@@ -69,37 +84,21 @@ public class HtmlNet extends Net {
                 }
                 return headers;
               }
-              @Override
-              public String header(String name) {
-                // some browsers have buggy implementation of getAllResponseHeaders, so calling
-                // this directly instead of relying on our parsed map helps things to mostly work
-                // in those cases; yay web!
-                return xhr.getResponseHeader(name);
-              }
-              @Override
-              public List<String> headers(String name) {
-                // if we were able to parse the headers ourselves, use those, but if not (due
-                // perhaps to bugs, etc.) then fall back to using getResponseHeader
-                List<String> values = super.headers(name);
-                if (!values.isEmpty()) return values;
-                String value = xhr.getResponseHeader(name);
-                return (value == null) ? values : Collections.singletonList(value);
-              }
             });
           }
         }
       });
       if (req.isPost()) {
-        if (req.payloadBytes != null) {
-          throw new UnsupportedOperationException("Raw bytes not currently supported in HTML5.");
-        }
+        if (req.payloadBytes != null) throw new UnsupportedOperationException(
+          "Raw bytes not currently supported in HTML5.");
         xhr.setRequestHeader("Content-Type", req.contentType());
         xhr.send(req.payloadString);
       } else {
         xhr.send();
       }
     } catch (Exception e) {
-      callback.onFailure(e);
+      result.fail(e);
     }
+    return result;
   }
 }

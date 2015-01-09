@@ -15,18 +15,20 @@
  */
 package playn.html;
 
-import playn.core.AbstractFont;
+import playn.core.Font;
 
-class HtmlFont extends AbstractFont {
+class HtmlFont extends Font {
 
   /** For use when no font is specified. */
-  public static final HtmlFont DEFAULT = new HtmlFont(null, "sans-serif", Style.PLAIN, 12);
+  public static final HtmlFont DEFAULT = new HtmlFont(new Config("sans-serif", Style.PLAIN, 12));
 
-  public HtmlFont(HtmlGraphics graphics, String name, Style style, float size) {
-    super(graphics, quoteFontName(name), style, size);
+  public HtmlFont(Config config) {
+    super(quoteName(config));
   }
 
-  protected static final String quoteFontName(String name) {
-    return (!name.startsWith("\"") && name.contains(" ")) ? ('"' + name + '"') : name;
+  private static Config quoteName (Config config) {
+    String name = config.name;
+    if (name.startsWith("\"") || !name.contains(" ")) return config;
+    return new Config('"' + name + '"', config.style, config.size);
   }
 }

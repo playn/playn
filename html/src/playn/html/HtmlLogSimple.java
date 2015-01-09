@@ -28,8 +28,7 @@ class HtmlLogSimple extends HtmlLog {
   private HtmlLogSimple() {
   }
 
-  @Override
-  protected void logImpl(Level level, String msg, Throwable e) {
+  @Override protected void logImpl(Level level, String msg, Throwable e) {
     String lmsg = level + ": " + msg;
     // keep console output intact by using System.out for both
     System.out.println(lmsg);

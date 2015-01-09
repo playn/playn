@@ -27,46 +27,27 @@ import com.google.gwt.dom.client.Style;
 import com.google.gwt.event.logical.shared.ResizeEvent;
 import com.google.gwt.event.logical.shared.ResizeHandler;
 import com.google.gwt.user.client.Window;
+import com.google.gwt.webgl.client.WebGLContextAttributes;
+import com.google.gwt.webgl.client.WebGLRenderingContext;
 
+import pythagoras.f.Dimension;
+import pythagoras.f.IDimension;
 import pythagoras.f.Point;
 
-import playn.core.CanvasImage;
-import playn.core.Font;
-import playn.core.Gradient;
-import playn.core.Graphics;
-import playn.core.TextFormat;
-import playn.core.TextLayout;
-import playn.core.TextWrap;
-import playn.core.gl.GL20;
-import playn.core.gl.Scale;
+import playn.core.*;
 
-public abstract class HtmlGraphics implements Graphics {
+public class HtmlGraphics extends Graphics {
 
-  static String cssColorString(int color) {
-    double a = ((color >> 24) & 0xff) / 255.0;
-    int r = (color >> 16) & 0xff;
-    int g = (color >> 8) & 0xff;
-    int b = (color >> 0) & 0xff;
-    return "rgba(" + r + "," + g + "," + b + "," + a + ")";
-  }
-
-  private static native void setLoadHandlers(ImageElement img, EventHandler onload,
-      EventHandler onerror) /*-{
-    img.onload = function(e) {
-      onload.@playn.html.EventHandler::handleEvent(Lcom/google/gwt/dom/client/NativeEvent;)(e);
-    };
-    img.onerror = function(e) {
-      onerror.@playn.html.EventHandler::handleEvent(Lcom/google/gwt/dom/client/NativeEvent;)(e);
-    };
-  }-*/;
-
-  protected final CanvasElement dummyCanvas;
-  protected Element rootElement;
+  private final CanvasElement dummyCanvas;
   private final Context2d dummyCtx;
-  private final Point mousePoint = new Point();
 
   private final Element measureElement;
   private final Map<Font,HtmlFontMetrics> fontMetrics = new HashMap<Font,HtmlFontMetrics>();
+
+  final Element rootElement;
+  private final CanvasElement canvas;
+  private final Point mousePoint = new Point();
+  private final Dimension screenSize = new Dimension();
 
   private static final String HEIGHT_TEXT =
     "THEQUICKBROWNFOXJUMPEDOVERTHELAZYDOGthequickbrownfoxjumpedoverthelazydog_-+!.,[]0123456789";
@@ -75,14 +56,87 @@ public abstract class HtmlGraphics implements Graphics {
   // Temporary hack to fix mouse coordinates for scaled fullscreen mode.
   static float experimentalScale = 1;
 
+  public HtmlGraphics(HtmlPlatform plat, HtmlPlatform.Config config) {
+    super(plat, new HtmlGL20(), new Scale(config.scaleFactor));
+    Document doc = Document.get();
+
+    dummyCanvas = doc.createCanvasElement();
+    dummyCtx = dummyCanvas.getContext2d();
+
+    Element root = doc.getElementById(config.rootId);
+    if (root == null) {
+      root = doc.createDivElement();
+      root.setAttribute("style", "width: 640px; height: 480px");
+      doc.getBody().appendChild(root);
+    } else {
+      // clear the contents of the root element, if present
+      root.setInnerHTML("");
+    }
+    rootElement = root;
+
+    // create a hidden element used to measure font heights
+    measureElement = doc.createDivElement();
+    measureElement.getStyle().setVisibility(Style.Visibility.HIDDEN);
+    measureElement.getStyle().setPosition(Style.Position.ABSOLUTE);
+    measureElement.getStyle().setTop(-500, Unit.PX);
+    measureElement.getStyle().setOverflow(Style.Overflow.VISIBLE);
+    measureElement.getStyle().setWhiteSpace(Style.WhiteSpace.NOWRAP);
+    root.appendChild(measureElement);
+
+    canvas = Document.get().createCanvasElement();
+    canvas.setWidth(root.getOffsetWidth());
+    canvas.setHeight(root.getOffsetHeight());
+    root.appendChild(canvas);
+    viewSizeChanged(canvas.getWidth(), canvas.getHeight());
+
+    WebGLContextAttributes attrs = WebGLContextAttributes.create();
+    attrs.setAlpha(config.transparentCanvas);
+    attrs.setAntialias(config.antiAliasing);
+
+    // if this returns null, the browser doesn't support WebGL on this machine
+    WebGLRenderingContext glc = WebGLRenderingContext.getContext(canvas, attrs);
+    if (glc == null) throw new RuntimeException("Unable to create GL context");
+
+    // pass our gl context into HtmlGL20
+    ((HtmlGL20)gl).init(glc);
+
+    if (config.experimentalFullscreen) {
+      Window.addResizeHandler(new ResizeHandler() {
+        @Override
+        public void onResize(ResizeEvent event) {
+          if (fullScreenWidth() == event.getWidth() && fullScreenHeight() == event.getHeight()) {
+            float width = viewSize.width(), height = viewSize.height();
+            experimentalScale = Math.min(fullScreenWidth() / width, fullScreenHeight() / height);
+            // less distance to the top
+            int yOfs = (int) ((fullScreenHeight() - height * experimentalScale) / 3.f);
+            int xOfs = (int) ((fullScreenWidth() - width * experimentalScale) / 2.f);
+            rootElement.setAttribute("style",
+                                     "width:" + experimentalScale * width + "px; " +
+                                     "height:" + experimentalScale*height + "px; " +
+                                     "position:absolute; left:" + xOfs + "px; top:" + yOfs);
+            // This is needed to work around a focus bug in Chrome :(
+            Window.alert("Switching to fullscreen mode.");
+            Document.get().getBody().addClassName("fullscreen");
+          } else {
+            experimentalScale = 1;
+            rootElement.removeAttribute("style");
+            Document.get().getBody().removeClassName("fullscreen");
+          }
+        }});
+    }
+  }
+
   /**
-   * Sizes or resizes the root element that contains the PlayN view.
+   * Sizes or resizes the root element that contains the game view.
    * @param width the new width, in pixels, of the view.
    * @param height the new height, in pixels, of the view.
    */
   public void setSize(int width, int height) {
     rootElement.getStyle().setWidth(width, Unit.PX);
     rootElement.getStyle().setHeight(height, Unit.PX);
+    canvas.setWidth(width);
+    canvas.setHeight(height);
+    viewSizeChanged(width, height);
   }
 
   /**
@@ -93,134 +147,56 @@ public abstract class HtmlGraphics implements Graphics {
    *
    * @param lineHeight the height of a line of text in the specified font (in pixels).
    */
-  public void registerFontMetrics(String name, Font.Style style, float size, float lineHeight) {
-    HtmlFont font = new HtmlFont(this, name, style, size);
+  public void registerFontMetrics(String name, Font.Config config, float lineHeight) {
+    HtmlFont font = new HtmlFont(config);
     HtmlFontMetrics metrics = getFontMetrics(font); // get emwidth via default measurement
     fontMetrics.put(font, new HtmlFontMetrics(font, lineHeight, metrics.emwidth));
   }
 
-  @Override
-  public CanvasImage createImage(float width, float height) {
-    return new HtmlCanvasImage(ctx(), scale(), HtmlCanvas.create(scale(), width, height));
+  @Override public IDimension screenSize () {
+    // TODO: inverse scale?
+    screenSize.width = Document.get().getDocumentElement().getClientWidth();
+    screenSize.height = Document.get().getDocumentElement().getClientHeight();
+    return screenSize;
   }
 
-  @Override
-  public Gradient createLinearGradient(float x0, float y0, float x1, float y1,
-      int[] colors, float[] positions) {
-    assert colors.length == positions.length;
-
-    CanvasGradient gradient = dummyCtx.createLinearGradient(x0, y0, x1, y1);
-    for (int i = 0; i < colors.length; ++i) {
-      gradient.addColorStop(positions[i], cssColorString(colors[i]));
-    }
-    return new HtmlGradient(gradient);
+  @Override public Gradient createGradient(Gradient.Config config) {
+    return new HtmlGradient(dummyCtx, config);
   }
 
-  @Override
-  public Gradient createRadialGradient(float x, float y, float r, int[] colors,
-      float[] positions) {
-    assert colors.length == positions.length;
-
-    CanvasGradient gradient = dummyCtx.createRadialGradient(x, y, 0, x, y, r);
-    for (int i = 0; i < colors.length; ++i) {
-      gradient.addColorStop(positions[i], cssColorString(colors[i]));
-    }
-    return new HtmlGradient(gradient);
+  @Override public Font createFont(Font.Config config) {
+    return new HtmlFont(config);
   }
 
-  @Override
-  public Font createFont(String name, Font.Style style, float size) {
-    return new HtmlFont(this, name, style, size);
-  }
-
-  @Override
-  public TextLayout layoutText(String text, TextFormat format) {
+  @Override public TextLayout layoutText(String text, TextFormat format) {
     return HtmlTextLayout.layoutText(this, dummyCtx, text, format);
   }
 
-  @Override
-  public TextLayout[] layoutText(String text, TextFormat format, TextWrap wrap) {
+  @Override public TextLayout[] layoutText(String text, TextFormat format, TextWrap wrap) {
     return HtmlTextLayout.layoutText(this, dummyCtx, text, format, wrap);
   }
 
-  @Override
-  public int screenHeight() {
-    return Document.get().getDocumentElement().getClientHeight();
+  @Override protected Canvas createCanvasImpl(Scale scale, int pixelWidth, int pixelHeight) {
+    CanvasElement elem = Document.get().createCanvasElement();
+    elem.setWidth(pixelWidth);
+    elem.setHeight(pixelHeight);
+    HtmlImage image = new HtmlImage(scale, elem);
+    return new HtmlCanvas(image);
   }
 
-  @Override
-  public int screenWidth() {
-    return Document.get().getDocumentElement().getClientWidth();
+  static String cssColorString(int color) {
+    double a = ((color >> 24) & 0xff) / 255.0;
+    int r = (color >> 16) & 0xff;
+    int g = (color >> 8) & 0xff;
+    int b = (color >> 0) & 0xff;
+    return "rgba(" + r + "," + g + "," + b + "," + a + ")";
   }
 
-  @Override
-  public float scaleFactor() {
-    return scale().factor;
+  void updateTexture(int tex, ImageElement img) {
+    gl.glBindTexture(GL20.GL_TEXTURE_2D, tex);
+    ((HtmlGL20)gl).glTexImage2D(GL20.GL_TEXTURE_2D, 0, GL20.GL_RGBA, GL20.GL_RGBA,
+                                GL20.GL_UNSIGNED_BYTE, img);
   }
-
-  @Override
-  public GL20 gl20() {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public HtmlGLContext ctx() {
-    return null;
-  }
-
-  protected HtmlGraphics(HtmlPlatform.Config config) {
-    Document doc = Document.get();
-
-    dummyCanvas = doc.createCanvasElement();
-    dummyCtx = dummyCanvas.getContext2d();
-
-    rootElement = doc.getElementById(config.rootId);
-    if (rootElement == null) {
-      rootElement = doc.createDivElement();
-      rootElement.setAttribute("style", "width: 640px; height: 480px");
-      doc.getBody().appendChild(rootElement);
-    } else {
-      // clear the contents of the root element, if present
-      rootElement.setInnerHTML("");
-    }
-
-    // create a hidden element used to measure font heights
-    measureElement = doc.createDivElement();
-    measureElement.getStyle().setVisibility(Style.Visibility.HIDDEN);
-    measureElement.getStyle().setPosition(Style.Position.ABSOLUTE);
-    measureElement.getStyle().setTop(-500, Unit.PX);
-    measureElement.getStyle().setOverflow(Style.Overflow.VISIBLE);
-    measureElement.getStyle().setWhiteSpace(Style.WhiteSpace.NOWRAP);
-    rootElement.appendChild(measureElement);
-
-    if (config.experimentalFullscreen) {
-      Window.addResizeHandler(new ResizeHandler() {
-        @Override
-        public void onResize(ResizeEvent event) {
-          if (fullScreenWidth() == event.getWidth() && fullScreenHeight() == event.getHeight()) {
-            experimentalScale = Math.min((float) fullScreenWidth() / (float) width(),
-                                         (float) fullScreenHeight() / (float) height());
-            // less distance to the top
-            int yOfs = (int) ((fullScreenHeight() - height() * experimentalScale) / 3.f);
-            int xOfs = (int) ((fullScreenWidth() - width() * experimentalScale) / 2.f);
-            rootElement().setAttribute(
-              "style",
-              "width:" + experimentalScale * width() + "px; " +
-              "height:" + experimentalScale*height() + "px; " +
-              "position:absolute; left:" + xOfs + "px; top:" + yOfs);
-            // This is needed to work around a focus bug in Chrome :(
-            Window.alert("Switching to fullscreen mode.");
-            Document.get().getBody().addClassName("fullscreen");
-          } else {
-            experimentalScale = 1;
-            rootElement().removeAttribute("style");
-            Document.get().getBody().removeClassName("fullscreen");
-          }
-        }});
-    }
-  }
-
-  abstract Scale scale();
 
   HtmlFontMetrics getFontMetrics(HtmlFont font) {
     HtmlFontMetrics metrics = fontMetrics.get(font);
@@ -255,17 +231,9 @@ public abstract class HtmlGraphics implements Graphics {
   }
 
   Point transformMouse(float x, float y) {
-    return mousePoint.set(x / scale().factor, y / scale().factor);
+    return mousePoint.set(x / scale.factor, y / scale.factor);
   }
 
-  abstract Element rootElement();
-
-  abstract void paint();
-
-  private native int fullScreenWidth() /*-{
-     return $wnd.screen.width;
-  }-*/;
-
-  private native int fullScreenHeight() /*-{
-    return $wnd.screen.height;
-  }-*/;}
+  private native int fullScreenWidth () /*-{ return $wnd.screen.width; }-*/;
+  private native int fullScreenHeight () /*-{ return $wnd.screen.height; }-*/;
+}

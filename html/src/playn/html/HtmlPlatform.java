@@ -20,20 +20,10 @@ import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.Style.Cursor;
 import com.google.gwt.user.client.Window;
 
-import playn.core.AbstractPlatform;
-import playn.core.Storage;
-import playn.core.Audio;
-import playn.core.PlayN;
-import playn.core.Game;
-import playn.core.Json;
-import playn.core.Keyboard;
-import playn.core.Net;
-import playn.core.Pointer;
-import playn.core.Mouse;
-import playn.core.Touch;
+import playn.core.*;
 import playn.html.HtmlUrlParameters.Renderer;
 
-public class HtmlPlatform extends AbstractPlatform {
+public class HtmlPlatform extends Platform {
 
   /** Configures the PlayN HTML platform. */
   public static class Config {
@@ -74,34 +64,12 @@ public class HtmlPlatform extends AbstractPlatform {
     protected AgentInfo() {}
   }
 
-  /** Indicates whether this browser supports JavaScript typed arrays. */
-  static final boolean hasTypedArraySupport = hasTypedArraySupport();
-
-  /**
-   * Prepares the HTML platform for operation.
-   */
-  public static HtmlPlatform register() {
-    return register(new Config());
-  }
-
-  /**
-   * Prepares the HTML platform for operation.
-   *
-   * @param config platform-specific settings.
-   */
-  public static HtmlPlatform register(Config config) {
-    HtmlPlatform platform = new HtmlPlatform(config);
-    PlayN.setPlatform(platform);
-    platform.init();
-    return platform;
-  }
-
   /**
    * Sets the title of the browser's window or tab.
    *
    * @param title the window title
    */
-  public void setTitle(String title) {
+  public void setTitle (String title) {
     Window.setTitle(title);
   }
 
@@ -110,84 +78,55 @@ public class HtmlPlatform extends AbstractPlatform {
    *
    * @param cursor the {@link Cursor} to use, or null to hide the cursor.
    */
-  public static void setCursor(Cursor cursor) {
-    Element rootElement = ((HtmlGraphics) PlayN.graphics()).rootElement();
-    if (cursor == null) {
-      rootElement.getStyle().setProperty("cursor", "none");
-    } else {
-      rootElement.getStyle().setCursor(cursor);
-    }
+  public void setCursor (Cursor cursor) {
+    Element rootElement = graphics.rootElement;
+    if (cursor == null) rootElement.getStyle().setProperty("cursor", "none");
+    else rootElement.getStyle().setCursor(cursor);
   }
 
   /**
    * Disable the right-click context menu.
    */
-  public static void disableRightClickContextMenu() {
-    Element rootElement = ((HtmlGraphics) PlayN.graphics()).rootElement();
-    disableRightClickImpl(rootElement);
+  public void disableRightClickContextMenu () {
+    disableRightClickImpl(graphics.rootElement);
   }
 
-  static native void addEventListener(JavaScriptObject target, String name, EventHandler handler,
-      boolean capture) /*-{
-    target.addEventListener(name, function(e) {
-    handler.@playn.html.EventHandler::handleEvent(Lcom/google/gwt/dom/client/NativeEvent;)(e);
-    }, capture);
-  }-*/;
-
-  static void captureEvent(String name, EventHandler handler) {
-    captureEvent(null, name, handler);
-  }
-
-  static void captureEvent(Element target, String name, EventHandler handler) {
-    addEventListener((target == null ? Document.get() : target), name, handler, true);
-  }
-
-  /** Contains precomputed information on the user-agent. Useful for dealing with browser and OS
-   * behavioral differences. */
-  static AgentInfo agentInfo() {
-    return agentInfo;
-  }
-
-  // Provide a static logging instance so that it can be used by other subsystems during
-  // initialization, before we have called PlayN.setPlatform
-  static final HtmlLog log = GWT.create(HtmlLog.class);
-
-  private final HtmlAssets assets = new HtmlAssets(this);
-  private final HtmlAudio audio = new HtmlAudio();
-  private final HtmlGraphics graphics;
-  private final HtmlJson json = new HtmlJson();
-  private final HtmlKeyboard keyboard = new HtmlKeyboard();
-  private final HtmlNet net = new HtmlNet(this);
-  private final HtmlPointer pointer;
-  private final HtmlMouse mouse;
-  private final HtmlTouch touch;
-  private final HtmlStorage storage = new HtmlStorage(this);
+  /** Contains precomputed information on the user-agent.
+    * Useful for dealing with browser and OS behavioral differences. */
+  static final AgentInfo agentInfo = computeAgentInfo();
 
   // installs backwards compat Date.now() if needed and calls it
   private final double start = initNow();
 
-  private TimerCallback paintCallback;
+  private final HtmlLog log = GWT.create(HtmlLog.class);
+  private final HtmlAssets assets;
+  private final HtmlAudio audio;
+  private final HtmlGraphics graphics;
+  private final HtmlInput input;
+  private final HtmlJson json = new HtmlJson();
+  private final HtmlNet net;
+  private final HtmlStorage storage;
 
-  private static AgentInfo agentInfo = computeAgentInfo();
+  /**
+   * Creates an HTML platform instance. Once this is created, a game is free to initialize itself,
+   * and it should eventually call {@link #start} when it's ready to run.
+   */
+  public HtmlPlatform(Config config) {
+    GWT.setUncaughtExceptionHandler(new GWT.UncaughtExceptionHandler() {
+      @Override public void onUncaughtException(Throwable e) {
+        log.error("Uncaught Exception: ", e);
+      }
+    });
 
-  protected HtmlPlatform(Config config) {
-    super(log);
-    if (!GWT.isProdMode()) {
-      log.info("You are running in GWT Development Mode. "
-          + "For optimal performance you may want to use an alternative method. "
-          + "See http://code.google.com/p/playn/wiki/GameDebuggingOptions");
-    }
-
-    /*
-     * Wrap remaining calls in try-catch, since the UncaughtExceptionHandler installed by HtmlLog
-     * above won't take effect until we yield to the browser event loop. That means we have to catch
-     * our own exceptions here.
-     */
+    // wrap these calls in try-catch, a the UncaughtExceptionHandler installed above won't take
+    // effect until we yield to the browser event loop
     try {
-      graphics = createGraphics(config);
-      pointer = new HtmlPointer(this, graphics.rootElement());
-      mouse = new HtmlMouse(this, graphics.rootElement());
-      touch = new HtmlTouch(this, graphics.rootElement());
+      graphics = new HtmlGraphics(this, config);
+      input = new HtmlInput(this, graphics.rootElement);
+      audio = new HtmlAudio(this);
+      assets = new HtmlAssets(this);
+      net = new HtmlNet(this);
+      storage = new HtmlStorage(this);
 
     } catch (Throwable e) {
       log.error("init()", e);
@@ -196,133 +135,33 @@ public class HtmlPlatform extends AbstractPlatform {
     }
   }
 
-  public void init() {
-    audio.init();
-    keyboard.init();
-  }
-
-  @Override
-  public HtmlAssets assets() {
-    return assets;
-  }
-
-  @Override
-  public Audio audio() {
-    return audio;
-  }
-
-  @Override
-  public HtmlGraphics graphics() {
-    return graphics;
-  }
-
-  @Override
-  public Json json() {
-    return json;
-  }
-
-  @Override
-  public Keyboard keyboard() {
-    return keyboard;
-  }
-
-  @Override
-  public Net net() {
-    return net;
-  }
-
-  @Override
-  public Pointer pointer() {
-    return pointer;
-  }
-
-  @Override
-  public Mouse mouse() {
-    return mouse;
-  }
-
-  @Override
-  public Touch touch() {
-    return touch;
-  }
-
-  @Override
-  public Storage storage() {
-    return storage;
-  }
-
-  @Override
-  public float random() {
-    return (float) Math.random();
-  }
-
-  @Override
-  public void run(final Game game) {
-    game.init();
-    // Game loop.
-    paintCallback = new TimerCallback() {
-      @Override
-      public void fire() {
-        requestAnimationFrame(paintCallback);
-        runQueue.execute(); // process pending actions
-        game.tick(tick());  // update the game
-        graphics.paint();   // draw the scene graph
-      }
-    };
-    requestAnimationFrame(paintCallback);
-  }
-
-  @Override
-  public double time() {
-    return now();
-  }
-
-  @Override
-  public int tick() {
-    return (int)(now() - start);
-  }
-
   /**
-   * @see playn.core.Platform#openURL(java.lang.String)
+   * Starts the frame tick for the platform. A game should call this after it has performed its own
+   * initialization.
    */
-  @Override
-  public void openURL(String url) {
-    Window.open(url, "_blank", "");
-  }
-
-  @Override
-  public void setPropagateEvents(boolean propagate) {
-    mouse.setPropagateEvents(propagate);
-    touch.setPropagateEvents(propagate);
-    pointer.setPropagateEvents(propagate);
-  }
-
-  @Override
-  public Type type() {
-    return Type.HTML;
-  }
-
-  private HtmlGraphics createGraphics(Config config) {
-    try {
-      switch (config.mode) {
-      case CANVAS:
-        return new HtmlGraphicsCanvas(config);
-      case WEBGL:
-        return new HtmlGraphicsGL(this, config);
-      default:
-      case AUTODETECT:
-        return hasGLSupport() ? new HtmlGraphicsGL(this, config) : new HtmlGraphicsCanvas(config);
+  public void start () {
+    requestAnimationFrame(new TimerCallback() {
+      @Override public void fire () {
+        requestAnimationFrame(this);
+        emitFrame();
       }
-
-    // HtmlGraphicsGL ctor throws a runtime exception if the context creation fails.
-    } catch (RuntimeException e) {
-      log().info("Failed to create GL context (" + e.getMessage() + "). Falling back.");
-    } catch (Throwable t) {
-      log().info("GL context creation failed with an unknown error." + t);
-    }
-
-    return new HtmlGraphicsCanvas(config);
+    });
   }
+
+  @Override public Type type() { return Type.HTML; }
+  @Override public double time() { return now(); }
+  @Override public int tick() { return (int)(now() - start); }
+
+  @Override public void openURL(String url) { Window.open(url, "_blank", ""); }
+
+  @Override public HtmlAssets assets() { return assets; }
+  @Override public HtmlAudio audio() { return audio; }
+  @Override public HtmlGraphics graphics() { return graphics; }
+  @Override public Json json() { return json; }
+  @Override public Input input() { return input; }
+  @Override public Log log() { return log; }
+  @Override public Net net() { return net; }
+  @Override public Storage storage() { return storage; }
 
   private native JavaScriptObject getWindow() /*-{
     return $wnd;
@@ -339,8 +178,7 @@ public class HtmlPlatform extends AbstractPlatform {
     } else if ($wnd.webkitRequestAnimationFrame) {
       $wnd.webkitRequestAnimationFrame(fn);
     } else {
-      // 20ms => 50fps
-      $wnd.setTimeout(fn, 20);
+      $wnd.setTimeout(fn, 20); // 20ms => 50fps
     }
   }-*/;
 
@@ -360,39 +198,14 @@ public class HtmlPlatform extends AbstractPlatform {
     };
   }-*/;
 
-  /**
-   * Return true if the browser supports WebGL
-   *
-   * Note: This test can have false positives depending on the graphics hardware.
-   *
-   * @return true if the browser supports WebGL
-   */
-  private static native boolean hasGLSupport() /*-{
-    return !!$wnd.WebGLRenderingContext &&
-      // WebGL is slow on Chrome OSX 10.5
-      (!/Chrome/.test(navigator.userAgent) || !/OS X 10_5/.test(navigator.userAgent));
-  }-*/;
-
-  private static native boolean hasTypedArraySupport() /*-{
-    return typeof(Float32Array) != 'undefined';
-  }-*/;
-
   private static native void disableRightClickImpl(JavaScriptObject target) /*-{
-    target.oncontextmenu = function() {
-      return false;
-    };
+    target.oncontextmenu = function() { return false; };
   }-*/;
 
   private static native double initNow () /*-{
-    if (!Date.now) {
-      Date.now = function now() {
-        return +(new Date);
-      };
-    }
+    if (!Date.now) Date.now = function now () { return +(new Date); };
     return Date.now();
   }-*/;
 
-  private static native double now () /*-{
-    return Date.now();
-  }-*/;
+  private static native double now () /*-{ return Date.now(); }-*/;
 }

@@ -15,12 +15,14 @@
  */
 package playn.html;
 
+import com.google.gwt.dom.client.CanvasElement;
+import com.google.gwt.dom.client.ImageElement;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
-
-import playn.core.util.Buffers;
+import java.nio.ShortBuffer;
 
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayInteger;
@@ -45,10 +47,14 @@ import static com.google.gwt.webgl.client.WebGLRenderingContext.ELEMENT_ARRAY_BU
 import static com.google.gwt.webgl.client.WebGLRenderingContext.FLOAT;
 import static com.google.gwt.webgl.client.WebGLRenderingContext.INT;
 import static com.google.gwt.webgl.client.WebGLRenderingContext.LINK_STATUS;
+import static com.google.gwt.webgl.client.WebGLRenderingContext.ONE;
 import static com.google.gwt.webgl.client.WebGLRenderingContext.SHORT;
 import static com.google.gwt.webgl.client.WebGLRenderingContext.STREAM_DRAW;
+import static com.google.gwt.webgl.client.WebGLRenderingContext.UNPACK_PREMULTIPLY_ALPHA_WEBGL;
 import static com.google.gwt.webgl.client.WebGLRenderingContext.UNSIGNED_BYTE;
 import static com.google.gwt.webgl.client.WebGLRenderingContext.UNSIGNED_SHORT;
+
+import playn.core.GL20;
 
 /**
  * WebGL implementation of GL20. Maintains a set of VBOs to translate the NIO buffer based version
@@ -56,7 +62,7 @@ import static com.google.gwt.webgl.client.WebGLRenderingContext.UNSIGNED_SHORT;
  *
  * @author Stefan Haustein
  */
-public final class HtmlGL20 implements playn.core.gl.GL20 {
+public final class HtmlGL20 extends GL20 {
 
   static final int VERTEX_ATTRIB_ARRAY_COUNT = 5; //  position, color, texture0, texture1, normals
 
@@ -68,7 +74,7 @@ public final class HtmlGL20 implements playn.core.gl.GL20 {
   private int enabledArrays = 0;
   private int useNioBuffer = 0;
 
-  private final WebGLRenderingContext gl;
+  private WebGLRenderingContext glc;
   private VertexAttribArrayState[] vertexAttribArrayState =
     new VertexAttribArrayState[VERTEX_ATTRIB_ARRAY_COUNT];
 
@@ -82,34 +88,45 @@ public final class HtmlGL20 implements playn.core.gl.GL20 {
   private WebGLBuffer boundElementArrayBuffer;
   private WebGLBuffer requestedElementArrayBuffer;
 
-  HtmlGL20(WebGLRenderingContext gl) {
-    this.gl = gl;
+  public HtmlGL20 () {
+    super(new Buffers() {
+      public ByteBuffer createByteBuffer(int size) {
+        ByteBuffer buffer = ByteBuffer.allocateDirect(size);
+        buffer.order(ByteOrder.nativeOrder());
+        return buffer;
+      }
+    }, HtmlUrlParameters.checkGLErrors);
+  }
+
+  void init (WebGLRenderingContext glc) {
+    // TODO: do we always want to do this?
+    glc.pixelStorei(UNPACK_PREMULTIPLY_ALPHA_WEBGL, ONE);
+    this.glc = glc;
 
     webGLObjects.push(null);
     webGLObjectTypes.push(WebGLObjectType.NULL.ordinal());
+    elementBuffer = glc.createBuffer();
 
-    elementBuffer = gl.createBuffer();
-
-    for (int i = 0; i < VERTEX_ATTRIB_ARRAY_COUNT; i++) {
+    for (int ii = 0; ii < VERTEX_ATTRIB_ARRAY_COUNT; ii++) {
       VertexAttribArrayState data = new VertexAttribArrayState();
-      data.webGlBuffer = gl.createBuffer();
-      vertexAttribArrayState[i] = data;
+      data.webGlBuffer = glc.createBuffer();
+      vertexAttribArrayState[ii] = data;
     }
   }
 
-  protected boolean isObjectType(int index,  WebGLObjectType type) {
+  protected boolean isObjectType (int index,  WebGLObjectType type) {
     return webGLObjectTypes.get(index) == type.ordinal();
   }
 
-  private WebGLBuffer getBuffer(int index) {
+  private WebGLBuffer getBuffer (int index) {
     return (WebGLBuffer) webGLObjects.get(index);
   }
 
-  private WebGLFramebuffer getFramebuffer(int index) {
+  private WebGLFramebuffer getFramebuffer (int index) {
     return (WebGLFramebuffer) webGLObjects.get(index);
   }
 
-  private WebGLProgram getProgram(int index) {
+  private WebGLProgram getProgram (int index) {
     return (WebGLProgram) webGLObjects.get(index);
   }
 
@@ -135,22 +152,22 @@ public final class HtmlGL20 implements playn.core.gl.GL20 {
     webGLObjectTypes.set(index, WebGLObjectType.NULL.ordinal());
     switch(type) {
     case BUFFER:
-      gl.deleteBuffer((WebGLBuffer) object);
+      glc.deleteBuffer((WebGLBuffer) object);
       break;
     case FRAME_BUFFER:
-      gl.deleteFramebuffer((WebGLFramebuffer) object);
+      glc.deleteFramebuffer((WebGLFramebuffer) object);
       break;
     case PROGRAM:
-      gl.deleteProgram((WebGLProgram) object);
+      glc.deleteProgram((WebGLProgram) object);
       break;
     case RENDER_BUFFER:
-      gl.deleteRenderbuffer((WebGLRenderbuffer) object);
+      glc.deleteRenderbuffer((WebGLRenderbuffer) object);
       break;
     case SHADER:
-      gl.deleteShader((WebGLShader) object);
+      glc.deleteShader((WebGLShader) object);
       break;
     case TEXTURE:
-      gl.deleteTexture((WebGLTexture) object);
+      glc.deleteTexture((WebGLTexture) object);
       break;
     default:
       break;
@@ -186,15 +203,15 @@ public final class HtmlGL20 implements playn.core.gl.GL20 {
   protected WebGLObject genObject(WebGLObjectType type) {
     switch(type) {
     case BUFFER:
-      return gl.createBuffer();
+      return glc.createBuffer();
     case FRAME_BUFFER:
-      return gl.createFramebuffer();
+      return glc.createFramebuffer();
     case PROGRAM:
-      return gl.createProgram();
+      return glc.createProgram();
     case RENDER_BUFFER:
-      return gl.createRenderbuffer();
+      return glc.createRenderbuffer();
     case TEXTURE:
-      return gl.createTexture();
+      return glc.createTexture();
     default:
       throw new RuntimeException("genObject(s) not supported for type " + type);
     }
@@ -234,9 +251,9 @@ public final class HtmlGL20 implements playn.core.gl.GL20 {
       int enabled = enabledArrays & mask;
       if (enabled != (previouslyEnabledArrays & mask)) {
         if (enabled != 0) {
-          gl.enableVertexAttribArray(i);
+          glc.enableVertexAttribArray(i);
         } else {
-          gl.disableVertexAttribArray(i);
+          glc.disableVertexAttribArray(i);
         }
       }
       if (enabled != 0 && (useNioBuffer & mask) != 0) {
@@ -244,32 +261,32 @@ public final class HtmlGL20 implements playn.core.gl.GL20 {
         if (previousNio != null && previousNio.nioBuffer == data.nioBuffer &&
             previousNio.nioBufferLimit >= data.nioBufferLimit) {
           if (boundArrayBuffer != previousNio.webGlBuffer) {
-            gl.bindBuffer(ARRAY_BUFFER, previousNio.webGlBuffer);
+            glc.bindBuffer(ARRAY_BUFFER, previousNio.webGlBuffer);
             boundArrayBuffer = data.webGlBuffer;
           }
-          gl.vertexAttribPointer(i, data.size, data.type, data.normalize, data.stride,
+          glc.vertexAttribPointer(i, data.size, data.type, data.normalize, data.stride,
                                  data.nioBufferPosition * previousElementSize);
         } else {
           if (boundArrayBuffer != data.webGlBuffer) {
-            gl.bindBuffer(ARRAY_BUFFER, data.webGlBuffer);
+            glc.bindBuffer(ARRAY_BUFFER, data.webGlBuffer);
             boundArrayBuffer = data.webGlBuffer;
           }
-          int elementSize = Buffers.getElementSize(data.nioBuffer);
+          int elementSize = getElementSize(data.nioBuffer);
           int savePosition = data.nioBuffer.position();
           if (data.nioBufferPosition * elementSize < data.stride) {
             data.nioBuffer.position(0);
-            gl.bufferData(ARRAY_BUFFER, getTypedArray(data.nioBuffer, data.type, data.nioBufferLimit *
+            glc.bufferData(ARRAY_BUFFER, getTypedArray(data.nioBuffer, data.type, data.nioBufferLimit *
                                                       elementSize), STREAM_DRAW);
-            gl.vertexAttribPointer(i, data.size, data.type, data.normalize, data.stride,
+            glc.vertexAttribPointer(i, data.size, data.type, data.normalize, data.stride,
                                    data.nioBufferPosition * elementSize);
             previousNio = data;
             previousElementSize = elementSize;
           } else {
             data.nioBuffer.position(data.nioBufferPosition);
-            gl.bufferData(ARRAY_BUFFER, getTypedArray(data.nioBuffer, data.type,
+            glc.bufferData(ARRAY_BUFFER, getTypedArray(data.nioBuffer, data.type,
                                                       (data.nioBufferLimit - data.nioBufferPosition) *
                                                       elementSize), STREAM_DRAW);
-            gl.vertexAttribPointer(i, data.size, data.type, data.normalize, data.stride, 0);
+            glc.vertexAttribPointer(i, data.size, data.type, data.normalize, data.stride, 0);
           }
           data.nioBuffer.position(savePosition);
         }
@@ -280,10 +297,9 @@ public final class HtmlGL20 implements playn.core.gl.GL20 {
   }
 
   /**
-   * Returns the typed array of the given native buffer.
-   * Set byteSize to -1 to use remaining()
+   * Returns the typed array of the given native buffer. Set byteSize to -1 to use remaining().
    */
-  protected ArrayBufferView getTypedArray(Buffer buffer, int type, int byteSize) {
+  private ArrayBufferView getTypedArray(Buffer buffer, int type, int byteSize) {
     if (!(buffer instanceof HasArrayBufferView)) {
       throw new RuntimeException("Native buffer required " + buffer);
     }
@@ -301,51 +317,60 @@ public final class HtmlGL20 implements playn.core.gl.GL20 {
     int byteOffset = webGLArray.byteOffset() + buffer.position() * bufferElementSize;
 
     switch (type) {
-    case FLOAT:
-      return TypedArrays.createFloat32Array(webGLArray.buffer(), byteOffset, byteSize / 4);
-    case UNSIGNED_BYTE:
-      return TypedArrays.createUint8Array(webGLArray.buffer(), byteOffset, byteSize);
-    case UNSIGNED_SHORT:
-      return TypedArrays.createUint16Array(webGLArray.buffer(), byteOffset, byteSize / 2);
-    case INT:
-      return TypedArrays.createInt32Array(webGLArray.buffer(), byteOffset, byteSize / 4);
-    case SHORT:
-      return TypedArrays.createInt16Array(webGLArray.buffer(), byteOffset, byteSize / 2);
-    case BYTE:
-      return TypedArrays.createInt8Array(webGLArray.buffer(), byteOffset, byteSize);
-    default:
-      throw new IllegalArgumentException("Type: " + type);
+      case FLOAT:
+        return TypedArrays.createFloat32Array(webGLArray.buffer(), byteOffset, byteSize / 4);
+      case UNSIGNED_BYTE:
+        return TypedArrays.createUint8Array(webGLArray.buffer(), byteOffset, byteSize);
+      case UNSIGNED_SHORT:
+        return TypedArrays.createUint16Array(webGLArray.buffer(), byteOffset, byteSize / 2);
+      case INT:
+        return TypedArrays.createInt32Array(webGLArray.buffer(), byteOffset, byteSize / 4);
+      case SHORT:
+        return TypedArrays.createInt16Array(webGLArray.buffer(), byteOffset, byteSize / 2);
+      case BYTE:
+        return TypedArrays.createInt8Array(webGLArray.buffer(), byteOffset, byteSize);
+      default:
+        throw new IllegalArgumentException("Type: " + type);
     }
   }
 
-  @Override
-  public void glDeleteTextures(int n, IntBuffer texnumBuffer) {
-    deleteObjects(n, texnumBuffer, WebGLObjectType.TEXTURE);
+  private static int getElementSize(Buffer buffer) {
+    if ((buffer instanceof FloatBuffer) || (buffer instanceof IntBuffer)) return 4;
+    else if (buffer instanceof ShortBuffer) return 2;
+    else if (buffer instanceof ByteBuffer) return 1;
+    else throw new RuntimeException("Unrecognized buffer type: " + buffer.getClass());
   }
 
-  @Override
-  public void glDepthFunc(int func) {
-    gl.depthFunc(func);
+  public void glTexImage2D(int target, int level, int internalformat, int format, int type, ImageElement image) {
+    glc.texImage2D(target, level, internalformat, format, type, image);
+    checkError("texImage2D");
   }
 
-  @Override
-  public void glDepthMask(boolean b) {
-    gl.depthMask(b);
+  public void glTexImage2D(int target, int level, int internalformat, int format, int type, CanvasElement image) {
+    glc.texImage2D(target, level, internalformat, format, type, image);
+    checkError("texImage2D");
   }
 
-  @Override
-  public void glDrawElements(int mode, int count, int type, Buffer indices) {
+  @Override public void glDepthFunc(int func) {
+    glc.depthFunc(func);
+  }
+
+  @Override public void glDepthMask(boolean b) {
+    glc.depthMask(b);
+  }
+
+  @Override public void glDrawElements(int mode, int count, int type, Buffer indices) {
     prepareDraw();
     if (boundElementArrayBuffer != elementBuffer) {
-      gl.bindBuffer(ELEMENT_ARRAY_BUFFER, elementBuffer);
+      glc.bindBuffer(ELEMENT_ARRAY_BUFFER, elementBuffer);
       boundElementArrayBuffer = elementBuffer;
     }
-    gl.bufferData(ELEMENT_ARRAY_BUFFER, getTypedArray(indices, type, count * getTypeSize(type)),
+    glc.bufferData(ELEMENT_ARRAY_BUFFER, getTypedArray(indices, type, count * getTypeSize(type)),
                   STREAM_DRAW);
 //    if ("ModelPart".equals(debugInfo)) {
 //      HtmlPlatform.log.info("drawElements f. ModelPart; count: " + count);
 //    }
-    gl.drawElements(mode, count, type, 0);
+    glc.drawElements(mode, count, type, 0);
   }
 
   private int getTypeSize(int type) {
@@ -364,85 +389,63 @@ public final class HtmlGL20 implements playn.core.gl.GL20 {
     }
   }
 
-  @Override
-  public void glFinish() {
-//    HtmlPlatform.log.info("glFinish()");
-    gl.finish();
+  @Override public void glFinish() {
+    glc.finish();
   }
 
-  @Override
-  public String glGetString(int id) {
+  @Override public String glGetString(int id) {
     // TODO: Where is getParameter()?
-    // String s = gl.getParameter(id);
+    // String s = glc.getParameter(id);
     //return s == null ? "" : s;
     return "glGetString not implemented";
   }
 
-  @Override
-  public void glPixelStorei(int i, int j) {
-    gl.pixelStorei(i, j);
+  @Override public void glPixelStorei(int i, int j) {
+    glc.pixelStorei(i, j);
   }
 
-  @Override
-  public void glTexParameteri(int glTexture2d, int glTextureMinFilter, int glFilterMin) {
-    gl.texParameteri(glTexture2d, glTextureMinFilter, glFilterMin);
+  @Override public void glBindTexture(int target, int textureId) {
+    glc.bindTexture(target, getTexture(textureId));
   }
 
-  @Override
-  public void glBindTexture(int target, int textureId) {
-    gl.bindTexture(target, getTexture(textureId));
+  @Override public final void glClear(int mask) {
+    glc.clear(mask);
+  }
+  @Override public final void glClearColor(float f, float g, float h, float i) {
+    glc.clearColor(f, g, h, i);
   }
 
-  @Override
-  public final void glBlendFunc(int a, int b) {
-    gl.blendFunc(a, b);
-  }
-
-  @Override
-  public final void glClear(int mask) {
-    gl.clear(mask);
-  }
-
-  @Override
-  public final int glGetError() {
-    return gl.getError();
-  }
-
-  @Override
-  public final void glClearColor(float f, float g, float h, float i) {
-    gl.clearColor(f, g, h, i);
-  }
-
-  @Override
-  public void glDrawArrays(int mode, int first, int count) {
+  @Override public void glDrawArrays(int mode, int first, int count) {
     prepareDraw();
-    gl.drawArrays(mode, first, count);
+    glc.drawArrays(mode, first, count);
   }
 
-  @Override
-  public final void glScissor(int i, int j, int width, int height) {
-    gl.scissor(i, j, width, height);
+  @Override public final int glGetError() {
+    return glc.getError();
   }
 
-  @Override
-  public void glTexParameterf(int target, int pname, float param) {
-    gl.texParameterf(target, pname, param);
+  @Override public final void glScissor(int i, int j, int width, int height) {
+    glc.scissor(i, j, width, height);
   }
 
-  @Override
-  public final void glCullFace(int c) {
-    gl.cullFace(c);
+  @Override public void glTexParameteri(int glTexture2d, int glTextureMinFilter, int glFilterMin) {
+    glc.texParameteri(glTexture2d, glTextureMinFilter, glFilterMin);
+  }
+  @Override public void glTexParameterf(int target, int pname, float param) {
+    glc.texParameterf(target, pname, param);
   }
 
-  @Override
-  public void glViewport(int x, int y, int w, int h) {
-    gl.viewport(x, y, w, h);
+  @Override public final void glCullFace(int c) {
+    glc.cullFace(c);
+  }
+
+  @Override public void glViewport(int x, int y, int w, int h) {
+    glc.viewport(x, y, w, h);
 //    checkError("glViewport");
   }
 
   // arrayId (index) is in the range 0..GL_MAX_VERTEX_ATTRIBS-1
-  @Override
-  public void glVertexAttribPointer(int arrayId, int size, int type, boolean normalize,
+  @Override public void glVertexAttribPointer(int arrayId, int size, int type, boolean normalize,
                                     int byteStride, Buffer nioBuffer) {
 
     VertexAttribArrayState data = vertexAttribArrayState[arrayId];
@@ -458,79 +461,48 @@ public final class HtmlGL20 implements playn.core.gl.GL20 {
     data.stride = byteStride == 0 ? size * getTypeSize(type) : byteStride;
   }
 
-  public void glGenerateMipmap(int t) {
-    gl.generateMipmap(t);
+  @Override public void glClearDepthf(float depth) {
+    glc.clearDepth(depth);
+  }
+  @Override public void glClearStencil(int s) {
+    glc.clearStencil(s);
   }
 
-  @Override
-  public void glClearDepthf(float depth) {
-    gl.clearDepth(depth);
+  @Override public void glColorMask(boolean red, boolean green, boolean blue, boolean alpha) {
+    glc.colorMask(red, green, blue, alpha);
   }
 
-  @Override
-  public void glClearStencil(int s) {
-    gl.clearStencil(s);
-  }
-
-  @Override
-  public void glColorMask(boolean red, boolean green, boolean blue, boolean alpha) {
-    gl.colorMask(red, green, blue, alpha);
-  }
-
-  @Override
-  public void glCompressedTexImage2D(int target, int level, int internalformat,
-                                     int width, int height, int border, int imageSize, Buffer data) {
+  @Override public void glCompressedTexImage2D(int target, int level, int internalformat, int width, int height, int border, int imageSize, Buffer data) {
     throw new RuntimeException("NYI glCompressedTexImage2D");
   }
-
-  @Override
-  public void glCompressedTexSubImage2D(int target, int level, int xoffset,
-                                        int yoffset, int width, int height, int format, int imageSize,
-                                        Buffer data) {
+  @Override public void glCompressedTexSubImage2D(int target, int level, int xoffset, int yoffset, int width, int height, int format, int imageSize, Buffer data) {
     throw new RuntimeException("NYI glCompressedTexSubImage2D");
   }
 
-  @Override
-  public void glCopyTexImage2D(int target, int level, int internalformat, int x,
-                               int y, int width, int height, int border) {
-    gl.copyTexImage2D(target, level, internalformat, x, y, width, height, border);
+  @Override public void glCopyTexImage2D(int target, int level, int internalformat, int x, int y, int width, int height, int border) {
+    glc.copyTexImage2D(target, level, internalformat, x, y, width, height, border);
+  }
+  @Override public void glCopyTexSubImage2D(int target, int level, int xoffset, int yoffset, int x, int y, int width, int height) {
+    glc.copyTexSubImage2D(target, level, xoffset, yoffset, x, y, width, height);
   }
 
-  @Override
-  public void glCopyTexSubImage2D(int target, int level, int xoffset,
-                                  int yoffset, int x, int y, int width, int height) {
-    gl.copyTexSubImage2D(target, level, xoffset, yoffset, x, y, width, height);
+  @Override public void glDepthRangef(float zNear, float zFar) {
+    glc.depthRange(zNear, zFar);
   }
 
-  @Override
-  public void glDepthRangef(float zNear, float zFar) {
-    gl.depthRange(zNear, zFar);
+  @Override public void glFlush() {
+    glc.flush();
   }
 
-  @Override
-  public void glFlush() {
-//    HtmlPlatform.log.info("glFlush");
-    gl.flush();
+  @Override public void glFrontFace(int mode) {
+    glc.frontFace(mode);
   }
 
-  @Override
-  public void glFrontFace(int mode) {
-    gl.frontFace(mode);
+  @Override public int glGetInteger(int pname) {
+    return glc.getParameteri(pname);
   }
-
-  @Override
-  public void glGenTextures(int n, IntBuffer textures) {
-    genObjects(n, textures, WebGLObjectType.TEXTURE);
-  }
-
-  @Override
-  public int glGetInteger(int pname) {
-    return gl.getParameteri(pname);
-  }
-
-  @Override
-  public void glGetIntegerv(int pname, IntBuffer params) {
-    Int32Array result = (Int32Array) gl.getParameterv(pname);
+  @Override public void glGetIntegerv(int pname, IntBuffer params) {
+    Int32Array result = (Int32Array) glc.getParameterv(pname);
     int pos = params.position();
     int len = result.length();
     for (int i = 0; i < len; i++) {
@@ -538,89 +510,53 @@ public final class HtmlGL20 implements playn.core.gl.GL20 {
     }
   }
 
-  @Override
-  public void glHint(int target, int mode) {
-    gl.hint(target, mode);
+  @Override public void glHint(int target, int mode) {
+    glc.hint(target, mode);
   }
 
-  @Override
-  public void glLineWidth(float width) {
-    gl.lineWidth(width);
+  @Override public void glLineWidth(float width) {
+    glc.lineWidth(width);
   }
 
-  @Override
-  public void glPolygonOffset(float factor, float units) {
-    gl.polygonOffset(factor, units);
+  @Override public void glPolygonOffset(float factor, float units) {
+    glc.polygonOffset(factor, units);
   }
 
-  @Override
-  public void glReadPixels(int x, int y, int width, int height, int format, int type, Buffer pixels) {
-    gl.readPixels(x, y, width, height, format, type, getTypedArray(pixels, type, -1));
+  @Override public void glReadPixels(int x, int y, int width, int height, int format, int type, Buffer pixels) {
+    glc.readPixels(x, y, width, height, format, type, getTypedArray(pixels, type, -1));
   }
 
-  @Override
-  public void glStencilFunc(int func, int ref, int mask) {
-    gl.stencilFunc(func, ref, mask);
+  @Override public void glStencilFunc(int func, int ref, int mask) {
+    glc.stencilFunc(func, ref, mask);
+  }
+  @Override public void glStencilMask(int mask) {
+    glc.stencilMask(mask);
+  }
+  @Override public void glStencilOp(int fail, int zfail, int zpass) {
+    glc.stencilOp(fail, zfail, zpass);
   }
 
-  @Override
-  public void glStencilMask(int mask) {
-    gl.stencilMask(mask);
-  }
-
-  @Override
-  public void glStencilOp(int fail, int zfail, int zpass) {
-    gl.stencilOp(fail, zfail, zpass);
-  }
-
-  /*
-    public void glTexImage2d(int target, int level, int internalformat,
-    int format, int type, ImageElement image) {
-    // log("setting texImage2d; image: " + image.getSrc());
-    gl.texImage2D(target, level, internalformat, format, type, image);
-    checkError("texImage2D");
-    }
-
-    public void glTexImage2d(int target, int level, int internalformat,
-    int format, int type, CanvasElement image) {
-    // log("setting texImage2d; image: " + image.getSrc());
-    gl.texImage2D(target, level, internalformat, format, type, image);
-    checkError("texImage2D");
-    }
-  */
-
-  @Override
-  public void glTexImage2D(int target, int level, int internalformat, int width,
+  @Override public void glTexImage2D(int target, int level, int internalformat, int width,
                            int height, int border, int format, int type, Buffer pixels) {
     ArrayBufferView buffer = (pixels == null) ? null : getTypedArray(pixels, type, -1);
-    gl.texImage2D(target, level, internalformat, width, height, border, format, type, buffer);
+    glc.texImage2D(target, level, internalformat, width, height, border, format, type, buffer);
   }
-
-//  @Override
-//  public void glTexImage2D(int target, int level, int internalformat, int format, int type, Image image) {
-//      gl.texImage2D(target, level, internalformat, format, type, ((HtmlImage) image).img);
-//  }
-
-  @Override
-  public void glTexSubImage2D(int target, int level, int xoffset, int yoffset,
+  @Override public void glTexSubImage2D(int target, int level, int xoffset, int yoffset,
                               int width, int height, int format, int type, Buffer pixels) {
-    gl.texSubImage2D(target, level, xoffset, yoffset, width, height, format, type,
+    glc.texSubImage2D(target, level, xoffset, yoffset, width, height, format, type,
                      getTypedArray(pixels, type, -1));
   }
 
-  @Override
-  public void glAttachShader(int program, int shader) {
-    gl.attachShader((WebGLProgram) webGLObjects.get(program),
+  @Override public void glAttachShader(int program, int shader) {
+    glc.attachShader((WebGLProgram) webGLObjects.get(program),
                     (WebGLShader) webGLObjects.get(shader));
   }
 
-  @Override
-  public void glBindAttribLocation(int program, int index, String name) {
-    gl.bindAttribLocation((WebGLProgram) webGLObjects.get(program), index, name);
+  @Override public void glBindAttribLocation(int program, int index, String name) {
+    glc.bindAttribLocation((WebGLProgram) webGLObjects.get(program), index, name);
   }
 
-  @Override
-  public void glBindBuffer(int target, int buffer) {
+  @Override public void glBindBuffer(int target, int buffer) {
     // Yes, bindBuffer is so expensive that this makes sense..
     WebGLBuffer webGlBuf = getBuffer(buffer);
     if (target == GL_ARRAY_BUFFER) {
@@ -628,540 +564,417 @@ public final class HtmlGL20 implements playn.core.gl.GL20 {
     } else if (target == GL_ELEMENT_ARRAY_BUFFER) {
       requestedElementArrayBuffer = webGlBuf;
     } else {
-      gl.bindBuffer(target, webGlBuf);
+      glc.bindBuffer(target, webGlBuf);
     }
   }
-
-  @Override
-  public void glBindFramebuffer(int target, int framebuffer) {
-    gl.bindFramebuffer(target, getFramebuffer(framebuffer));
+  @Override public void glBindFramebuffer(int target, int framebuffer) {
+    glc.bindFramebuffer(target, getFramebuffer(framebuffer));
+  }
+  @Override public void glBindRenderbuffer(int target, int renderbuffer) {
+    glc.bindRenderbuffer(target, getRenderbuffer(renderbuffer));
   }
 
-  @Override
-  public void glBindRenderbuffer(int target, int renderbuffer) {
-    gl.bindRenderbuffer(target, getRenderbuffer(renderbuffer));
+  @Override public final void glBlendFunc(int a, int b) {
+    glc.blendFunc(a, b);
   }
-
-  @Override
-  public void glBlendColor(float red, float green, float blue, float alpha) {
-    gl.blendColor(red, green, blue, alpha);
+  @Override public void glBlendColor(float red, float green, float blue, float alpha) {
+    glc.blendColor(red, green, blue, alpha);
   }
-
-  @Override
-  public void glBlendEquation(int mode) {
-    gl.blendEquation(mode);
+  @Override public void glBlendEquation(int mode) {
+    glc.blendEquation(mode);
   }
-
-  @Override
-  public void glBlendEquationSeparate(int modeRGB, int modeAlpha) {
-    gl.blendEquationSeparate(modeRGB, modeAlpha);
+  @Override public void glBlendEquationSeparate(int modeRGB, int modeAlpha) {
+    glc.blendEquationSeparate(modeRGB, modeAlpha);
   }
-
-  @Override
-  public void glBlendFuncSeparate(int srcRGB, int dstRGB, int srcAlpha,
+  @Override public void glBlendFuncSeparate(int srcRGB, int dstRGB, int srcAlpha,
                                   int dstAlpha) {
-    gl.blendFuncSeparate(srcRGB, dstRGB, srcAlpha, dstAlpha);
+    glc.blendFuncSeparate(srcRGB, dstRGB, srcAlpha, dstAlpha);
   }
 
-  @Override
-  public void glBufferData(int target, int byteSize, Buffer data, int usage) {
+  @Override public void glBufferData(int target, int byteSize, Buffer data, int usage) {
     if (target == GL_ARRAY_BUFFER) {
       if (requestedArrayBuffer != boundArrayBuffer) {
-        gl.bindBuffer(target, requestedArrayBuffer);
+        glc.bindBuffer(target, requestedArrayBuffer);
         boundArrayBuffer = requestedArrayBuffer;
       }
     } else if (target == GL_ELEMENT_ARRAY_BUFFER) {
       if (requestedElementArrayBuffer != boundElementArrayBuffer) {
-        gl.bindBuffer(target, requestedElementArrayBuffer);
+        glc.bindBuffer(target, requestedElementArrayBuffer);
         boundElementArrayBuffer = requestedElementArrayBuffer;
       }
     }
-    gl.bufferData(target, getTypedArray(data, GL_BYTE, byteSize), usage);
+    glc.bufferData(target, getTypedArray(data, GL_BYTE, byteSize), usage);
   }
-
-  @Override
-  public void glBufferSubData(int target, int offset, int size, Buffer data) {
+  @Override public void glBufferSubData(int target, int offset, int size, Buffer data) {
     if (target == GL_ARRAY_BUFFER && requestedArrayBuffer != boundArrayBuffer) {
-      gl.bindBuffer(target, requestedArrayBuffer);
+      glc.bindBuffer(target, requestedArrayBuffer);
       boundArrayBuffer = requestedArrayBuffer;
     }
     throw new RuntimeException("NYI glBufferSubData");
   }
 
-  @Override
-  public int glCheckFramebufferStatus(int target) {
-    return gl.checkFramebufferStatus(target);
+  @Override public int glCheckFramebufferStatus(int target) {
+    return glc.checkFramebufferStatus(target);
   }
 
-  @Override
-  public void glCompileShader(int shader) {
-    gl.compileShader(getShader(shader));
+  @Override public void glCompileShader(int shader) {
+    glc.compileShader(getShader(shader));
   }
 
-  @Override
-  public int glCreateProgram() {
-    return createObject(gl.createProgram(), WebGLObjectType.PROGRAM);
+  @Override public int glCreateProgram() {
+    return createObject(glc.createProgram(), WebGLObjectType.PROGRAM);
+  }
+  @Override public int glCreateShader(int type) {
+    return createObject(glc.createShader(type), WebGLObjectType.SHADER);
   }
 
-  @Override
-  public int glCreateShader(int type) {
-    return createObject(gl.createShader(type), WebGLObjectType.SHADER);
+  @Override public void glDeleteTextures(int n, IntBuffer texnumBuffer) {
+    deleteObjects(n, texnumBuffer, WebGLObjectType.TEXTURE);
   }
-
-  @Override
-  public void glDeleteBuffers(int n, IntBuffer buffers) {
+  @Override public void glDeleteBuffers(int n, IntBuffer buffers) {
     deleteObjects(n, buffers, WebGLObjectType.BUFFER);
   }
-
-  @Override
-  public void glDeleteFramebuffers(int n, IntBuffer framebuffers) {
+  @Override public void glDeleteFramebuffers(int n, IntBuffer framebuffers) {
     deleteObjects(n, framebuffers, WebGLObjectType.FRAME_BUFFER);
   }
-
-  @Override
-  public void glDeleteProgram(int program) {
+  @Override public void glDeleteProgram(int program) {
     deleteObject(program, WebGLObjectType.PROGRAM);
   }
-
-  @Override
-  public void glDeleteRenderbuffers(int n, IntBuffer renderbuffers) {
+  @Override public void glDeleteRenderbuffers(int n, IntBuffer renderbuffers) {
     deleteObjects(n, renderbuffers, WebGLObjectType.RENDER_BUFFER);
   }
 
-  @Override
-  public void glDeleteShader(int shader) {
+  @Override public void glDeleteShader(int shader) {
     deleteObject(shader, WebGLObjectType.SHADER);
   }
 
-  @Override
-  public void glDetachShader(int program, int shader) {
-    gl.detachShader(getProgram(program), getShader(shader));
+  @Override public void glDetachShader(int program, int shader) {
+    glc.detachShader(getProgram(program), getShader(shader));
   }
 
-  @Override
-  public void glDisableVertexAttribArray(int index) {
+  @Override public void glDisableVertexAttribArray(int index) {
     enabledArrays &= ~(1 << index);
   }
 
-  @Override
-  public void glDrawElements(int mode, int count, int type, int indices) {
+  @Override public void glDrawElements(int mode, int count, int type, int indices) {
     prepareDraw();
     if (requestedElementArrayBuffer != boundElementArrayBuffer) {
-      gl.bindBuffer(GL_ELEMENT_ARRAY_BUFFER, requestedElementArrayBuffer);
+      glc.bindBuffer(GL_ELEMENT_ARRAY_BUFFER, requestedElementArrayBuffer);
       boundElementArrayBuffer = requestedElementArrayBuffer;
     }
-    gl.drawElements(mode, count, type, indices);
+    glc.drawElements(mode, count, type, indices);
   }
 
-  @Override
-  public void glEnableVertexAttribArray(int index) {
+  @Override public void glEnableVertexAttribArray(int index) {
     enabledArrays |= (1 << index);
   }
 
-  @Override
-  public void glFramebufferRenderbuffer(int target, int attachment,
-                                        int renderbuffertarget, int renderbuffer) {
-    gl.framebufferRenderbuffer(target, attachment, renderbuffertarget,
+  @Override public void glFramebufferRenderbuffer(int target, int attachment, int renderbuffertarget, int renderbuffer) {
+    glc.framebufferRenderbuffer(target, attachment, renderbuffertarget,
                                getRenderbuffer(renderbuffer));
   }
-
-  @Override
-  public void glFramebufferTexture2D(int target, int attachment, int textarget,
-                                     int texture, int level) {
-    gl.framebufferTexture2D(target, attachment, textarget, getTexture(texture), level);
+  @Override public void glFramebufferTexture2D(int target, int attachment, int textarget, int texture, int level) {
+    glc.framebufferTexture2D(target, attachment, textarget, getTexture(texture), level);
   }
 
-  @Override
-  public void glGenBuffers(int n, IntBuffer buffers) {
+  @Override public void glGenerateMipmap(int t) {
+    glc.generateMipmap(t);
+  }
+
+  @Override public void glGenBuffers(int n, IntBuffer buffers) {
     genObjects(n, buffers, WebGLObjectType.BUFFER);
   }
-
-  @Override
-  public void glGenFramebuffers(int n, IntBuffer framebuffers) {
+  @Override public void glGenFramebuffers(int n, IntBuffer framebuffers) {
     genObjects(n, framebuffers, WebGLObjectType.FRAME_BUFFER);
   }
-
-  @Override
-  public void glGenRenderbuffers(int n, IntBuffer renderbuffers) {
+  @Override public void glGenRenderbuffers(int n, IntBuffer renderbuffers) {
     genObjects(n, renderbuffers, WebGLObjectType.RENDER_BUFFER);
   }
-
-  @Override
-  public int glGetAttribLocation(int program, String name) {
-    return gl.getAttribLocation(getProgram(program), name);
+  @Override public void glGenTextures(int n, IntBuffer textures) {
+    genObjects(n, textures, WebGLObjectType.TEXTURE);
   }
 
-  @Override
-  public void glGetBufferParameteriv(int target, int pname, IntBuffer params) {
-    params.put(params.position(), gl.getBufferParameter(target, pname));
+  @Override public void glGenBuffers(int n, int[] buffers, int offset) {
+    genObjects(n, buffers, offset, WebGLObjectType.BUFFER);
+  }
+  @Override public void glGenFramebuffers(int n, int[] framebuffers, int offset) {
+    genObjects(n, framebuffers, offset, WebGLObjectType.FRAME_BUFFER);
+  }
+  @Override public void glGenRenderbuffers(int n, int[] renderbuffers, int offset) {
+    genObjects(n, renderbuffers, offset, WebGLObjectType.RENDER_BUFFER);
+  }
+  @Override public void glGenTextures(int n, int[] textures, int offset) {
+    genObjects(n, textures, offset, WebGLObjectType.TEXTURE);
   }
 
-  @Override
-  public float glGetFloat(int pname) {
-    return gl.getParameterf(pname);
+  @Override public int glGetAttribLocation(int program, String name) {
+    return glc.getAttribLocation(getProgram(program), name);
   }
 
-  @Override
-  public void glGetFloatv(int pname, FloatBuffer params) {
+  @Override public void glGetBufferParameteriv(int target, int pname, IntBuffer params) {
+    params.put(params.position(), glc.getBufferParameter(target, pname));
+  }
+
+  @Override public float glGetFloat(int pname) {
+    return glc.getParameterf(pname);
+  }
+  @Override public void glGetFloatv(int pname, FloatBuffer params) {
     throw new RuntimeException("NYI glGetFloatv");
   }
 
-  @Override
-  public void glGetFramebufferAttachmentParameteriv(int target, int attachment,
+  @Override public void glGetFramebufferAttachmentParameteriv(int target, int attachment,
                                                     int pname, IntBuffer params) {
     throw new RuntimeException("NYI glGetFramebufferAttachmentParameteriv");
   }
 
-  @Override
-  public void glGetProgramiv(int program, int pname, IntBuffer params) {
+  @Override public void glGetProgramiv(int program, int pname, IntBuffer params) {
     if (pname == GL_LINK_STATUS) {
-      params.put(gl.getProgramParameterb(getProgram(program), LINK_STATUS) ? GL_TRUE : GL_FALSE);
+      params.put(glc.getProgramParameterb(getProgram(program), LINK_STATUS) ? GL_TRUE : GL_FALSE);
     } else {
       throw new RuntimeException("NYI glGetProgramiv");
     }
   }
 
-  @Override
-  public String glGetProgramInfoLog(int program) {
-    return gl.getProgramInfoLog(getProgram(program));
+  @Override public String glGetProgramInfoLog(int program) {
+    return glc.getProgramInfoLog(getProgram(program));
   }
 
-  @Override
-  public void glGetRenderbufferParameteriv(int target, int pname, IntBuffer params) {
+  @Override public void glGetRenderbufferParameteriv(int target, int pname, IntBuffer params) {
     throw new RuntimeException("NYI glGetRenderbufferParameteriv");
   }
 
-  @Override
-  public void glGetShaderiv(int shader, int pname, IntBuffer params) {
+  @Override public void glGetShaderiv(int shader, int pname, IntBuffer params) {
     if (pname == GL_COMPILE_STATUS) {
-      params.put(gl.getShaderParameterb(getShader(shader), COMPILE_STATUS) ? GL_TRUE : GL_FALSE);
+      params.put(glc.getShaderParameterb(getShader(shader), COMPILE_STATUS) ? GL_TRUE : GL_FALSE);
     } else {
       throw new RuntimeException("NYI glGetShaderiv: " + pname);
     }
   }
 
-  @Override
-  public String glGetShaderInfoLog(int shader) {
-    return gl.getShaderInfoLog(getShader(shader));
+  @Override public String glGetShaderInfoLog(int shader) {
+    return glc.getShaderInfoLog(getShader(shader));
   }
 
-  @Override
-  public void glGetShaderPrecisionFormat(int shadertype, int precisiontype,
+  @Override public void glGetShaderPrecisionFormat(int shadertype, int precisiontype,
                                          IntBuffer range, IntBuffer precision) {
     throw new RuntimeException("NYI glGetShaderInfoLog");
   }
 
-  @Override
-  public void glGetTexParameterfv(int target, int pname, FloatBuffer params) {
-    params.put(params.position(), gl.getTexParameter(target, pname));
+  @Override public void glGetTexParameterfv(int target, int pname, FloatBuffer params) {
+    params.put(params.position(), glc.getTexParameter(target, pname));
+  }
+  @Override public void glGetTexParameteriv(int target, int pname, IntBuffer params) {
+    params.put(params.position(), glc.getTexParameter(target, pname));
   }
 
-  @Override
-  public void glGetTexParameteriv(int target, int pname, IntBuffer params) {
-    params.put(params.position(), gl.getTexParameter(target, pname));
+  @Override public void glGetUniformfv(int program, int location, FloatBuffer params) {
+    Float32Array v = glc.getUniformv(getProgram(program), getUniformLocation(location));
+    for (int i = 0; i < v.length(); i++) {
+      params.put(params.position() + i, v.get(i));
+    }
   }
-
-  @Override
-  public void glGetUniformfv(int program, int location, FloatBuffer params) {
-    Float32Array v = gl.getUniformv(getProgram(program), getUniformLocation(location));
+  @Override public void glGetUniformiv(int program, int location, IntBuffer params) {
+    Int32Array v = glc.getUniformv(getProgram(program), getUniformLocation(location));
     for (int i = 0; i < v.length(); i++) {
       params.put(params.position() + i, v.get(i));
     }
   }
 
-  @Override
-  public void glGetUniformiv(int program, int location, IntBuffer params) {
-    Int32Array v = gl.getUniformv(getProgram(program), getUniformLocation(location));
-    for (int i = 0; i < v.length(); i++) {
-      params.put(params.position() + i, v.get(i));
-    }
-  }
-
-  @Override
-  public int glGetUniformLocation(int program, String name) {
-    return createObject(gl.getUniformLocation(getProgram(program), name),
+  @Override public int glGetUniformLocation(int program, String name) {
+    return createObject(glc.getUniformLocation(getProgram(program), name),
                         WebGLObjectType.UNIFORM_LOCATION);
   }
 
-  @Override
-  public void glGetVertexAttribfv(int index, int pname, FloatBuffer params) {
-    Float32Array v = gl.getVertexAttribv(index, pname);
+  @Override public void glGetVertexAttribfv(int index, int pname, FloatBuffer params) {
+    Float32Array v = glc.getVertexAttribv(index, pname);
     for (int i = 0; i < v.length(); i++) {
       params.put(params.position() + i, v.get(i));
     }
   }
 
-  @Override
-  public void glGetVertexAttribiv(int index, int pname, IntBuffer params) {
+  @Override public void glGetVertexAttribiv(int index, int pname, IntBuffer params) {
     throw new UnsupportedOperationException("NYI glGetVertexAttribiv: WebGL getVertexAttribv always returns a float buffer.");
   }
 
-  @Override
-  public boolean glIsBuffer(int buffer) {
+  @Override public boolean glIsBuffer(int buffer) {
     return isObjectType(buffer, WebGLObjectType.BUFFER);
   }
-
-  @Override
-  public boolean glIsEnabled(int cap) {
-    return gl.isEnabled(cap);
+  @Override public boolean glIsEnabled(int cap) {
+    return glc.isEnabled(cap);
   }
-
-  @Override
-  public boolean glIsFramebuffer(int framebuffer) {
+  @Override public boolean glIsFramebuffer(int framebuffer) {
     return isObjectType(framebuffer, WebGLObjectType.FRAME_BUFFER);
   }
-
-  @Override
-  public boolean glIsProgram(int program) {
+  @Override public boolean glIsProgram(int program) {
     return isObjectType(program, WebGLObjectType.PROGRAM);
   }
-
-  @Override
-  public boolean glIsRenderbuffer(int renderbuffer) {
+  @Override public boolean glIsRenderbuffer(int renderbuffer) {
     return isObjectType(renderbuffer, WebGLObjectType.FRAME_BUFFER);
   }
-
-  @Override
-  public boolean glIsShader(int shader) {
+  @Override public boolean glIsShader(int shader) {
     return isObjectType(shader, WebGLObjectType.SHADER);
   }
-
-  @Override
-  public boolean glIsTexture(int texture) {
+  @Override public boolean glIsTexture(int texture) {
     return isObjectType(texture, WebGLObjectType.TEXTURE);
   }
 
-  @Override
-  public void glLinkProgram(int program) {
-    gl.linkProgram(getProgram(program));
+  @Override public void glLinkProgram(int program) {
+    glc.linkProgram(getProgram(program));
   }
 
-  @Override
-  public void glReleaseShaderCompiler() {
+  @Override public void glReleaseShaderCompiler() {
     throw new RuntimeException("NYI glReleaseShaderCompiler");
   }
 
-  @Override
-  public void glRenderbufferStorage(int target, int internalformat, int width,
+  @Override public void glRenderbufferStorage(int target, int internalformat, int width,
                                     int height) {
-    gl.renderbufferStorage(target, internalformat, width, height);
+    glc.renderbufferStorage(target, internalformat, width, height);
   }
 
-  @Override
-  public void glSampleCoverage(float value, boolean invert) {
-    gl.sampleCoverage(value, invert);
+  @Override public void glSampleCoverage(float value, boolean invert) {
+    glc.sampleCoverage(value, invert);
   }
 
-  @Override
-  public void glShaderBinary(int n, IntBuffer shaders, int binaryformat, Buffer binary, int length) {
+  @Override public void glShaderBinary(int n, IntBuffer shaders, int binaryformat, Buffer binary, int length) {
     throw new RuntimeException("NYI glReleaseShaderCompiler");
   }
-
-  @Override
-  public void glShaderSource(int shader, String string) {
-    gl.shaderSource(getShader(shader), string);
+  @Override public void glShaderSource(int shader, String string) {
+    glc.shaderSource(getShader(shader), string);
   }
 
-  @Override
-  public void glStencilFuncSeparate(int face, int func, int ref, int mask) {
-    gl.stencilFuncSeparate(face, func, ref, mask);
+  @Override public void glStencilFuncSeparate(int face, int func, int ref, int mask) {
+    glc.stencilFuncSeparate(face, func, ref, mask);
+  }
+  @Override public void glStencilMaskSeparate(int face, int mask) {
+    glc.stencilMaskSeparate(face, mask);
+  }
+  @Override public void glStencilOpSeparate(int face, int fail, int zfail, int zpass) {
+    glc.stencilOpSeparate(face, fail, zfail, zpass);
   }
 
-  @Override
-  public void glStencilMaskSeparate(int face, int mask) {
-    gl.stencilMaskSeparate(face, mask);
-  }
-
-  @Override
-  public void glStencilOpSeparate(int face, int fail, int zfail, int zpass) {
-    gl.stencilOpSeparate(face, fail, zfail, zpass);
-  }
-
-  @Override
-  public void glTexParameterfv(int target, int pname, FloatBuffer params) {
+  @Override public void glTexParameterfv(int target, int pname, FloatBuffer params) {
     throw new RuntimeException("NYI glTexParameterfv");
   }
-
-  @Override
-  public void glTexParameteriv(int target, int pname, IntBuffer params) {
+  @Override public void glTexParameteriv(int target, int pname, IntBuffer params) {
     throw new RuntimeException("NYI glTexParameteriv");
   }
 
-  @Override
-  public void glUniform1f(int location, float x) {
-    gl.uniform1f(getUniformLocation(location), x);
+  @Override public void glUniform1f(int location, float x) {
+    glc.uniform1f(getUniformLocation(location), x);
   }
-
-  @Override
-  public void glUniform1fv(int location, int count, FloatBuffer v) {
+  @Override public void glUniform1fv(int location, int count, FloatBuffer v) {
     throw new RuntimeException("NYI glUniform1fv");
   }
-
-  @Override
-  public void glUniform1i(int location, int x) {
-    gl.uniform1i(getUniformLocation(location), x);
+  @Override public void glUniform1i(int location, int x) {
+    glc.uniform1i(getUniformLocation(location), x);
   }
-
-  @Override
-  public void glUniform1iv(int location, int count, IntBuffer v) {
-    gl.uniform1iv(getUniformLocation(location), (Int32Array) getTypedArray(v, GL_INT, count * 4));
+  @Override public void glUniform1iv(int location, int count, IntBuffer v) {
+    glc.uniform1iv(getUniformLocation(location), (Int32Array) getTypedArray(v, GL_INT, count * 4));
   }
-
-  @Override
-  public void glUniform2f(int location, float x, float y) {
-    gl.uniform2f(getUniformLocation(location), x, y);
+  @Override public void glUniform2f(int location, float x, float y) {
+    glc.uniform2f(getUniformLocation(location), x, y);
   }
-
-  @Override
-  public void glUniform2fv(int location, int count, FloatBuffer v) {
-    gl.uniform2fv(getUniformLocation(location),
+  @Override public void glUniform2fv(int location, int count, FloatBuffer v) {
+    glc.uniform2fv(getUniformLocation(location),
                   (Float32Array) getTypedArray(v, GL_FLOAT, count * 2 * 4));
   }
-
-  @Override
-  public void glUniform2i(int location, int x, int y) {
-    gl.uniform2i(getUniformLocation(location), x, y);
+  @Override public void glUniform2i(int location, int x, int y) {
+    glc.uniform2i(getUniformLocation(location), x, y);
   }
-
-  @Override
-  public void glUniform2iv(int location, int count, IntBuffer v) {
+  @Override public void glUniform2iv(int location, int count, IntBuffer v) {
     throw new RuntimeException("NYI glUniform2iv");
   }
-
-  @Override
-  public void glUniform3f(int location, float x, float y, float z) {
-    gl.uniform3f(getUniformLocation(location), x, y, z);
+  @Override public void glUniform3f(int location, float x, float y, float z) {
+    glc.uniform3f(getUniformLocation(location), x, y, z);
   }
-
-  @Override
-  public void glUniform3fv(int location, int count, FloatBuffer v) {
+  @Override public void glUniform3fv(int location, int count, FloatBuffer v) {
     throw new RuntimeException("NYI glUniform3fv");
   }
-
-  @Override
-  public void glUniform3i(int location, int x, int y, int z) {
-    gl.uniform3i(getUniformLocation(location), x, y, z);
+  @Override public void glUniform3i(int location, int x, int y, int z) {
+    glc.uniform3i(getUniformLocation(location), x, y, z);
   }
-
-  @Override
-  public void glUniform3iv(int location, int count, IntBuffer v) {
+  @Override public void glUniform3iv(int location, int count, IntBuffer v) {
     throw new RuntimeException("NYI glUniform3fi");
   }
-
-  @Override
-  public void glUniform4f(int location, float x, float y, float z, float w) {
-    gl.uniform4f(getUniformLocation(location), x, y, z, w);
+  @Override public void glUniform4f(int location, float x, float y, float z, float w) {
+    glc.uniform4f(getUniformLocation(location), x, y, z, w);
   }
-
-  @Override
-  public void glUniform4fv(int location, int count, FloatBuffer v) {
-    gl.uniform4fv(getUniformLocation(location),
+  @Override public void glUniform4fv(int location, int count, FloatBuffer v) {
+    glc.uniform4fv(getUniformLocation(location),
                   (Float32Array) getTypedArray(v, GL_FLOAT, 4 * 4 * count));
   }
-
-  @Override
-  public void glUniform4i(int location, int x, int y, int z, int w) {
-    gl.uniform4i(getUniformLocation(location), x, y, z, w);
+  @Override public void glUniform4i(int location, int x, int y, int z, int w) {
+    glc.uniform4i(getUniformLocation(location), x, y, z, w);
   }
-
-  @Override
-  public void glUniform4iv(int location, int count, IntBuffer v) {
+  @Override public void glUniform4iv(int location, int count, IntBuffer v) {
     throw new RuntimeException("NYI glUniform4iv");
   }
 
-  @Override
-  public void glUniformMatrix2fv(int location, int count, boolean transpose,
+  @Override public void glUniformMatrix2fv(int location, int count, boolean transpose,
                                  FloatBuffer value) {
     throw new RuntimeException("NYI glUniformMatrix2fv");
   }
-
-  @Override
-  public void glUniformMatrix3fv(int location, int count, boolean transpose,
+  @Override public void glUniformMatrix3fv(int location, int count, boolean transpose,
                                  FloatBuffer value) {
     throw new RuntimeException("NYI glUniformMatrix3fv");
   }
-
-  @Override
-  public void glUniformMatrix4fv(int location, int count, boolean transpose, FloatBuffer value) {
-    gl.uniformMatrix4fv(getUniformLocation(location), transpose,
-                        (Float32Array) getTypedArray(value, GL_FLOAT, count * 16 * 4));
+  @Override public void glUniformMatrix4fv(int location, int count, boolean transpose, FloatBuffer value) {
+    glc.uniformMatrix4fv(getUniformLocation(location), transpose,
+                         (Float32Array) getTypedArray(value, GL_FLOAT, count * 16 * 4));
   }
 
-  @Override
-  public void glUseProgram(int program) {
-    gl.useProgram(getProgram(program));
+  @Override public void glUseProgram(int program) {
+    glc.useProgram(getProgram(program));
   }
 
-  @Override
-  public void glValidateProgram(int program) {
-    gl.validateProgram(getProgram(program));
+  @Override public void glValidateProgram(int program) {
+    glc.validateProgram(getProgram(program));
   }
 
-  @Override
-  public void glVertexAttrib1f(int indx, float x) {
-    gl.vertexAttrib1f(indx, x);
+  @Override public void glVertexAttrib1f(int indx, float x) {
+    glc.vertexAttrib1f(indx, x);
   }
-
-  @Override
-  public void glVertexAttrib1fv(int indx, FloatBuffer values) {
+  @Override public void glVertexAttrib1fv(int indx, FloatBuffer values) {
     throw new RuntimeException("NYI glVertexAttrib1fv");
   }
-
-  @Override
-  public void glVertexAttrib2f(int indx, float x, float y) {
-    gl.vertexAttrib2f(indx, x, y);
+  @Override public void glVertexAttrib2f(int indx, float x, float y) {
+    glc.vertexAttrib2f(indx, x, y);
   }
-
-  @Override
-  public void glVertexAttrib2fv(int indx, FloatBuffer values) {
+  @Override public void glVertexAttrib2fv(int indx, FloatBuffer values) {
     throw new RuntimeException("NYI glVertexAttrib2fv");
   }
-
-  @Override
-  public void glVertexAttrib3f(int indx, float x, float y, float z) {
-    gl.vertexAttrib3f(indx, x, y, z);
+  @Override public void glVertexAttrib3f(int indx, float x, float y, float z) {
+    glc.vertexAttrib3f(indx, x, y, z);
   }
-
-  @Override
-  public void glVertexAttrib3fv(int indx, FloatBuffer values) {
+  @Override public void glVertexAttrib3fv(int indx, FloatBuffer values) {
     throw new RuntimeException("NYI glVertexAttrib3fv");
   }
-
-  @Override
-  public void glVertexAttrib4f(int indx, float x, float y, float z, float w) {
-    gl.vertexAttrib4f(indx, x, y, z, w);
+  @Override public void glVertexAttrib4f(int indx, float x, float y, float z, float w) {
+    glc.vertexAttrib4f(indx, x, y, z, w);
   }
-
-  @Override
-  public void glVertexAttrib4fv(int indx, FloatBuffer values) {
+  @Override public void glVertexAttrib4fv(int indx, FloatBuffer values) {
     throw new RuntimeException("NYI glVertexAttrib4fv");
   }
 
-  @Override
-  public void glVertexAttribPointer(int indx, int size, int type, boolean normalized,
-                                    int stride, int ptr) {
+  @Override public void glVertexAttribPointer(int indx, int size, int type, boolean normalized, int stride, int ptr) {
     useNioBuffer &= ~(1 << indx);
     if (boundArrayBuffer != requestedArrayBuffer) {
-      gl.bindBuffer(GL_ARRAY_BUFFER, requestedArrayBuffer);
+      glc.bindBuffer(GL_ARRAY_BUFFER, requestedArrayBuffer);
       boundArrayBuffer = requestedArrayBuffer;
     }
 
-    gl.vertexAttribPointer(indx, size, type, normalized, stride, ptr);
+    glc.vertexAttribPointer(indx, size, type, normalized, stride, ptr);
   }
 
-  @Override
-  public void glDisable(int cap) {
-    gl.disable(cap);
+  @Override public void glDisable(int cap) {
+    glc.disable(cap);
+  }
+  @Override public void glEnable(int cap) {
+    glc.enable(cap);
   }
 
-  @Override
-  public void glEnable(int cap) {
-    gl.enable(cap);
-  }
-
-  @Override
-  public void glActiveTexture(int texture) {
-    gl.activeTexture(texture);
+  @Override public void glActiveTexture(int texture) {
+    glc.activeTexture(texture);
   }
 
   class VertexAttribArrayState {
@@ -1175,482 +988,183 @@ public final class HtmlGL20 implements playn.core.gl.GL20 {
     WebGLBuffer webGlBuffer;
   }
 
-  @Override
-  public String getPlatformGLExtensions() {
+  @Override public String getPlatformGLExtensions() {
     throw new RuntimeException("NYI getPlatformGLExtensions");
   }
 
-  @Override
-  public int getSwapInterval() {
+  @Override public int getSwapInterval() {
     throw new RuntimeException("NYI getSwapInterval");
   }
 
-  @Override
-  public void glClearDepth(double depth) {
+  @Override public void glClearDepth(double depth) {
     throw new RuntimeException("NYI glClearDepth");
   }
 
-  @Override
-  public void glCompressedTexImage3D(int arg0, int arg1, int arg2, int arg3,
-                                     int arg4, int arg5, int arg6, int arg7, Buffer arg8) {
+  @Override public void glCompressedTexImage3D(int arg0, int arg1, int arg2, int arg3, int arg4, int arg5, int arg6, int arg7, Buffer arg8) {
     throw new RuntimeException("NYI glCompressedTexImage3D");
   }
-
-  @Override
-  public void glCompressedTexSubImage3D(int arg0, int arg1, int arg2, int arg3, int arg4, int arg5,
-                                        int arg6, int arg7, int arg8, int arg9, Buffer arg10) {
+  @Override public void glCompressedTexSubImage3D(int arg0, int arg1, int arg2, int arg3, int arg4, int arg5, int arg6, int arg7, int arg8, int arg9, Buffer arg10) {
     throw new RuntimeException("NYI glCompressedTexSubImage3D");
   }
-
-  @Override
-  public void glCopyTexSubImage3D(int arg0, int arg1, int arg2, int arg3, int arg4, int arg5,
-                                  int arg6, int arg7, int arg8) {
+  @Override public void glCopyTexSubImage3D(int arg0, int arg1, int arg2, int arg3, int arg4, int arg5, int arg6, int arg7, int arg8) {
     throw new RuntimeException("NYI glCopyTexSubImage3D");
   }
 
-  @Override
-  public void glDeleteBuffers(int n, int[] buffers, int offset) {
+  @Override public void glDeleteBuffers(int n, int[] buffers, int offset) {
     deleteObjects(n, buffers, offset, WebGLObjectType.BUFFER);
   }
-
-  @Override
-  public void glDeleteFramebuffers(int n, int[] framebuffers, int offset) {
+  @Override public void glDeleteFramebuffers(int n, int[] framebuffers, int offset) {
     deleteObjects(n, framebuffers, offset, WebGLObjectType.FRAME_BUFFER);
   }
-
-  @Override
-  public void glDeleteRenderbuffers(int n, int[] renderbuffers, int offset) {
+  @Override public void glDeleteRenderbuffers(int n, int[] renderbuffers, int offset) {
     deleteObjects(n, renderbuffers, offset, WebGLObjectType.RENDER_BUFFER);
   }
-
-  @Override
-  public void glDeleteTextures(int n, int[] textures, int offset) {
+  @Override public void glDeleteTextures(int n, int[] textures, int offset) {
     deleteObjects(n, textures, offset, WebGLObjectType.TEXTURE);
   }
 
-  @Override
-  public void glDepthRange(double zNear, double zFar) {
+  @Override public void glDepthRange(double zNear, double zFar) {
     throw new RuntimeException("NYI glDepthRange");
   }
 
-  @Override
-  public void glFramebufferTexture3D(int target, int attachment, int textarget, int texture,
-                                     int level, int zoffset) {
+  @Override public void glFramebufferTexture3D(int target, int attachment, int textarget, int texture, int level, int zoffset) {
     throw new RuntimeException("NYI glFramebufferTexture3D");
   }
 
-  @Override
-  public void glGenBuffers(int n, int[] buffers, int offset) {
-    genObjects(n, buffers, offset, WebGLObjectType.BUFFER);
-  }
-
-  @Override
-  public void glGenFramebuffers(int n, int[] framebuffers, int offset) {
-    genObjects(n, framebuffers, offset, WebGLObjectType.FRAME_BUFFER);
-  }
-
-  @Override
-  public void glGenRenderbuffers(int n, int[] renderbuffers, int offset) {
-    genObjects(n, renderbuffers, offset, WebGLObjectType.RENDER_BUFFER);
-  }
-
-  @Override
-  public void glGenTextures(int n, int[] textures, int offset) {
-    genObjects(n, textures, offset, WebGLObjectType.TEXTURE);
-  }
-
-  @Override
-  public void glGetActiveAttrib(int program, int index, int bufsize, int[] length, int lengthOffset,
-                                int[] size, int sizeOffset, int[] type, int typeOffset,
-                                byte[] name, int nameOffset) {
+  @Override public void glGetActiveAttrib(int program, int index, int bufsize, int[] length, int lengthOffset, int[] size, int sizeOffset, int[] type, int typeOffset, byte[] name, int nameOffset) {
     throw new RuntimeException("NYI glGetActiveAttrib");
   }
-
-  @Override
-  public void glGetActiveAttrib(int program, int index, int bufsize, IntBuffer length, IntBuffer size,
-                                IntBuffer type, ByteBuffer name) {
+  @Override public void glGetActiveAttrib(int program, int index, int bufsize, IntBuffer length, IntBuffer size, IntBuffer type, ByteBuffer name) {
     throw new RuntimeException("NYI glGetActiveAttrib");
   }
-
-  @Override
-  public void glGetActiveUniform(int program, int index, int bufsize, int[] length, int lengthOffset,
-                                 int[] size, int sizeOffset, int[] type, int typeOffset,
-                                 byte[] name, int nameOffset) {
+  @Override public void glGetActiveUniform(int program, int index, int bufsize, int[] length, int lengthOffset, int[] size, int sizeOffset, int[] type, int typeOffset, byte[] name, int nameOffset) {
     throw new RuntimeException("NYI glGetActiveUniform");
   }
-
-  @Override
-  public void glGetActiveUniform(int program, int index, int bufsize, IntBuffer length,
-                                 IntBuffer size, IntBuffer type, ByteBuffer name) {
+  @Override public void glGetActiveUniform(int program, int index, int bufsize, IntBuffer length, IntBuffer size, IntBuffer type, ByteBuffer name) {
     throw new RuntimeException("NYI glGetActiveUniform");
   }
-
-  @Override
-  public void glGetAttachedShaders(int program, int maxcount, int[] count, int countOffset,
-                                   int[] shaders, int shadersOffset) {
+  @Override public void glGetAttachedShaders(int program, int maxcount, int[] count, int countOffset, int[] shaders, int shadersOffset) {
+    throw new RuntimeException("NYI glGetAttachedShaders");
+  }
+  @Override public void glGetAttachedShaders(int program, int maxcount, IntBuffer count, IntBuffer shaders) {
     throw new RuntimeException("NYI glGetAttachedShaders");
   }
 
-  @Override
-  public void glGetAttachedShaders(int program, int maxcount, IntBuffer count, IntBuffer shaders) {
-    throw new RuntimeException("NYI glGetAttachedShaders");
+  @Override public boolean glGetBoolean(int pname) {
+    return glc.getParameterb(pname);
   }
-
-  @Override
-  public boolean glGetBoolean(int pname) {
-    return gl.getParameterb(pname);
-  }
-
-  @Override
-  public void glGetBooleanv(int pname, byte[] params, int offset) {
+  @Override public void glGetBooleanv(int pname, ByteBuffer params) {
     throw new RuntimeException("NYI glGetBooleanv");
   }
 
-  @Override
-  public void glGetBooleanv(int pname, ByteBuffer params) {
-    throw new RuntimeException("NYI glGetBooleanv");
-  }
-
-  @Override
-  public int glGetBoundBuffer(int arg0) {
+  @Override public int glGetBoundBuffer(int arg0) {
     throw new RuntimeException("NYI glGetBoundBuffer");
   }
 
-  @Override
-  public void glGetBufferParameteriv(int target, int pname, int[] params, int offset) {
-    throw new RuntimeException("NYI glGetBufferParameteriv");
-  }
-
-  @Override
-  public void glGetFloatv(int pname, float[] params, int offset) {
-    throw new RuntimeException("NYI glGetFloatv");
-  }
-
-  @Override
-  public void glGetFramebufferAttachmentParameteriv(int target, int attachment, int pname,
-                                                    int[] params, int offset) {
-    throw new RuntimeException("NYI glGetFramebufferAttachmentParameteriv");
-  }
-
-  @Override
-  public void glGetIntegerv(int pname, int[] params, int offset) {
-    throw new RuntimeException("NYI glGetIntegerv");
-  }
-
-  @Override
-  public void glGetProgramBinary(int arg0, int arg1, int[] arg2, int arg3, int[] arg4, int arg5,
-                                 Buffer arg6) {
-    throw new RuntimeException("NYI glGetProgramBinary");
-
-  }
-
-  @Override
-  public void glGetProgramBinary(int arg0, int arg1, IntBuffer arg2, IntBuffer arg3, Buffer arg4) {
+  @Override public void glGetProgramBinary(int arg0, int arg1, IntBuffer arg2, IntBuffer arg3, Buffer arg4) {
     throw new RuntimeException("NYI glGetProgramBinary");
   }
-
-  @Override
-  public void glGetProgramInfoLog(int program, int bufsize, int[] length, int lengthOffset,
-                                  byte[] infolog, int infologOffset) {
+  @Override public void glGetProgramInfoLog(int program, int bufsize, IntBuffer length, ByteBuffer infolog) {
     throw new RuntimeException("NYI glGetProgramInfoLog");
   }
 
-  @Override
-  public void glGetProgramInfoLog(int program, int bufsize, IntBuffer length, ByteBuffer infolog) {
-    throw new RuntimeException("NYI glGetProgramInfoLog");
+  @Override public void glGetProgramiv(int program, int pname, int[] params, int offset) {
+    if (pname == GL_LINK_STATUS) params[offset] = glc.getProgramParameterb(getProgram(program), LINK_STATUS) ? GL_TRUE : GL_FALSE;
+    else throw new RuntimeException("NYI glGetProgramiv: " + pname);
   }
 
-  @Override
-  public void glGetProgramiv(int program, int pname, int[] params, int offset) {
-    if (pname == GL_LINK_STATUS) {
-      params[offset] = gl.getProgramParameterb(getProgram(program), LINK_STATUS) ?
-        GL_TRUE : GL_FALSE;
-    } else {
-      throw new RuntimeException("NYI glGetProgramiv");
-    }
-  }
-
-  @Override
-  public void glGetRenderbufferParameteriv(int target, int pname, int[] params, int offset) {
-    throw new RuntimeException("NYI glGetRenderbufferParameteriv");
-  }
-
-  @Override
-  public void glGetShaderInfoLog(int shader, int bufsize, int[] length, int lengthOffset,
-                                 byte[] infolog, int infologOffset) {
+  @Override public void glGetShaderInfoLog(int shader, int bufsize, IntBuffer length, ByteBuffer infolog) {
     throw new RuntimeException("NYI glGetShaderInfoLog");
   }
 
-  @Override
-  public void glGetShaderInfoLog(int shader, int bufsize, IntBuffer length, ByteBuffer infolog) {
-    throw new RuntimeException("NYI glGetShaderInfoLog");
+  @Override public void glGetShaderiv(int shader, int pname, int[] params, int offset) {
+    if (pname == GL_COMPILE_STATUS) params[offset] = glc.getShaderParameterb(getShader(shader), COMPILE_STATUS) ? GL_TRUE : GL_FALSE;
+    else throw new RuntimeException("NYI glGetShaderiv: " + pname);
   }
 
-  @Override
-  public void glGetShaderiv(int shader, int pname, int[] params, int offset) {
-    if (pname == GL_COMPILE_STATUS) {
-      params[offset] = gl.getShaderParameterb(getShader(shader), COMPILE_STATUS) ?
-        GL_TRUE : GL_FALSE;
-    } else {
-      throw new RuntimeException("NYI glGetShaderiv: " + pname);
-    }
-  }
-
-  @Override
-  public void glGetShaderPrecisionFormat(int shadertype, int precisiontype, int[] range,
-                                         int rangeOffset, int[] precision, int precisionOffset) {
+  @Override public void glGetShaderPrecisionFormat(int shadertype, int precisiontype, int[] range, int rangeOffset, int[] precision, int precisionOffset) {
     throw new RuntimeException("NYI glGetShaderPrecisionFormat");
   }
-
-  @Override
-  public void glGetShaderSource(int shader, int bufsize, int[] length, int lengthOffset,
-                                byte[] source, int sourceOffset) {
+  @Override public void glGetShaderSource(int shader, int bufsize, int[] length, int lengthOffset, byte[] source, int sourceOffset) {
+    throw new RuntimeException("NYI glGetShaderSource");
+  }
+  @Override public void glGetShaderSource(int shader, int bufsize, IntBuffer length, ByteBuffer source) {
     throw new RuntimeException("NYI glGetShaderSource");
   }
 
-  @Override
-  public void glGetShaderSource(int shader, int bufsize, IntBuffer length, ByteBuffer source) {
-    throw new RuntimeException("NYI glGetShaderSource");
-  }
-
-  @Override
-  public void glGetTexParameterfv(int target, int pname, float[] params, int offset) {
-    throw new RuntimeException("NYI glGetTexParameterfv");
-  }
-
-  @Override
-  public void glGetTexParameteriv(int target, int pname, int[] params, int offset) {
-    throw new RuntimeException("NYI glGetTexParameteriv");
-  }
-
-  @Override
-  public void glGetUniformfv(int program, int location, float[] params, int offset) {
-    throw new RuntimeException("NYI glGetUniformfv");
-  }
-
-  @Override
-  public void glGetUniformiv(int program, int location, int[] params, int offset) {
-    throw new RuntimeException("NYI glGetUniformiv");
-  }
-
-  @Override
-  public void glGetVertexAttribfv(int index, int pname, float[] params, int offset) {
-    throw new RuntimeException("NYI glGetVertexAttribfv");
-  }
-
-  @Override
-  public void glGetVertexAttribiv(int index, int pname, int[] params, int offset) {
-    throw new RuntimeException("NYI glGetVertexAttribiv");
-  }
-
-  @Override
-  public boolean glIsVBOArrayEnabled() {
+  @Override public boolean glIsVBOArrayEnabled() {
     throw new RuntimeException("NYI glIsVBOArrayEnabled");
   }
-
-  @Override
-  public boolean glIsVBOElementEnabled() {
+  @Override public boolean glIsVBOElementEnabled() {
     throw new RuntimeException("NYI glIsVBOElementEnabled");
   }
 
-  @Override
-  public ByteBuffer glMapBuffer(int arg0, int arg1) {
+  @Override public ByteBuffer glMapBuffer(int arg0, int arg1) {
     throw new RuntimeException("NYI glMapBuffer");
   }
 
-  @Override
-  public void glProgramBinary(int arg0, int arg1, Buffer arg2, int arg3) {
+  @Override public void glProgramBinary(int arg0, int arg1, Buffer arg2, int arg3) {
     throw new RuntimeException("NYI glProgramBinary");
   }
-
-  @Override
-  public void glShaderBinary(int n, int[] shaders, int offset, int binaryformat, Buffer binary,
-                             int length) {
+  @Override public void glShaderBinary(int n, int[] shaders, int offset, int binaryformat, Buffer binary, int length) {
     throw new RuntimeException("NYI glShaderBinary");
   }
-
-  @Override
-  public void glShaderSource(int shader, int count, String[] strings, int[] length,
-                             int lengthOffset) {
+  @Override public void glShaderSource(int shader, int count, String[] strings, int[] length, int lengthOffset) {
+    throw new RuntimeException("NYI glShaderSource");
+  }
+  @Override public void glShaderSource(int shader, int count, String[] strings, IntBuffer length) {
     throw new RuntimeException("NYI glShaderSource");
   }
 
-  @Override
-  public void glShaderSource(int shader, int count, String[] strings, IntBuffer length) {
-    throw new RuntimeException("NYI glShaderSource");
-  }
-
-  @Override
-  public void glTexImage3D(int arg0, int arg1, int arg2, int arg3, int arg4,
-                           int arg5, int arg6, int arg7, int arg8, Buffer arg9) {
+  @Override public void glTexImage3D(int arg0, int arg1, int arg2, int arg3, int arg4, int arg5, int arg6, int arg7, int arg8, Buffer arg9) {
     throw new RuntimeException("NYI glTexImage3D");
   }
-
-  @Override
-  public void glTexParameterfv(int target, int pname, float[] params, int offset) {
-    throw new RuntimeException("NYI glTexParameterfv");
-  }
-
-  @Override
-  public void glTexParameteriv(int target, int pname, int[] params, int offset) {
-    throw new RuntimeException("NYI glTexParameteriv");
-  }
-
-  @Override
-  public void glTexSubImage3D(int arg0, int arg1, int arg2, int arg3, int arg4, int arg5,
-                              int arg6, int arg7, int arg8, int arg9, Buffer arg10) {
+  @Override public void glTexSubImage3D(int arg0, int arg1, int arg2, int arg3, int arg4, int arg5, int arg6, int arg7, int arg8, int arg9, Buffer arg10) {
     throw new RuntimeException("NYI glTexSubImage3D");
   }
 
-  @Override
-  public void glUniform1fv(int location, int count, float[] v, int offset) {
-    throw new RuntimeException("NYI glUniform1fv");
-  }
-
-  @Override
-  public void glUniform1iv(int location, int count, int[] v, int offset) {
-    throw new RuntimeException("NYI glUniform1iv");
-  }
-
-  @Override
-  public void glUniform2fv(int location, int count, float[] v, int offset) {
-    throw new RuntimeException("NYI glUniform2fv");
-  }
-
-  @Override
-  public void glUniform2iv(int location, int count, int[] v, int offset) {
-    throw new RuntimeException("NYI glUniform2iv");
-  }
-
-  @Override
-  public void glUniform3fv(int location, int count, float[] v, int offset) {
-    throw new RuntimeException("NYI glUniform3fv");
-  }
-
-  @Override
-  public void glUniform3iv(int location, int count, int[] v, int offset) {
-    throw new RuntimeException("NYI glUniform3iv");
-  }
-
-  @Override
-  public void glUniform4fv(int location, int count, float[] v, int offset) {
-    throw new RuntimeException("NYI glUniform4fv");
-  }
-
-  @Override
-  public void glUniform4iv(int location, int count, int[] v, int offset) {
-    throw new RuntimeException("NYI glUniform4iv");
-  }
-
-  @Override
-  public void glUniformMatrix2fv(int location, int count, boolean transpose, float[] value,
-                                 int offset) {
-    throw new RuntimeException("NYI glUniformMatrix2fv");
-  }
-
-  @Override
-  public void glUniformMatrix3fv(int location, int count, boolean transpose, float[] value,
-                                 int offset) {
-    throw new RuntimeException("NYI glUniformMatrix3fv");
-  }
-
-  @Override
-  public void glUniformMatrix4fv(int location, int count, boolean transpose, float[] value,
-                                 int offset) {
-    throw new RuntimeException("NYI glUniformMatrix4fv");
-  }
-
-  @Override
-  public boolean glUnmapBuffer(int arg0) {
+  @Override public boolean glUnmapBuffer(int arg0) {
     throw new RuntimeException("NYI glUnmapBuffer");
   }
 
-  @Override
-  public void glVertexAttrib1fv(int indx, float[] values, int offset) {
-    throw new RuntimeException("NYI glVertexAttrib1fv");
-  }
-
-  @Override
-  public void glVertexAttrib2fv(int indx, float[] values, int offset) {
-    throw new RuntimeException("NYI glVertexAttrib2fv");
-  }
-
-  @Override
-  public void glVertexAttrib3fv(int indx, float[] values, int offset) {
-    throw new RuntimeException("NYI glVertexAttrib3fv");
-  }
-
-  @Override
-  public void glVertexAttrib4fv(int indx, float[] values, int offset) {
-    throw new RuntimeException("NYI glVertexAttrib4fv");
-  }
-
-  @Override
-  public boolean hasGLSL() {
+  @Override public boolean hasGLSL() {
     return true;
   }
 
-  @Override
-  public boolean isExtensionAvailable(String extension) {
+  @Override public boolean isExtensionAvailable(String extension) {
     throw new RuntimeException("NYI isExtensionAvailable");
   }
-
-  @Override
-  public boolean isFunctionAvailable(String function) {
+  @Override public boolean isFunctionAvailable(String function) {
     throw new RuntimeException("NYI isFunctionAvailable");
   }
 
-  @Override
-  public void glCompressedTexImage2D(int arg0, int arg1, int arg2, int arg3,
-                                     int arg4, int arg5, int arg6, int arg7) {
+  @Override public void glCompressedTexImage2D(int arg0, int arg1, int arg2, int arg3, int arg4, int arg5, int arg6, int arg7) {
     throw new RuntimeException("NYI glCompressedTexImage2D");
   }
-
-  @Override
-  public void glCompressedTexImage3D(int arg0, int arg1, int arg2, int arg3, int arg4, int arg5,
-                                     int arg6, int arg7, int arg8) {
+  @Override public void glCompressedTexImage3D(int arg0, int arg1, int arg2, int arg3, int arg4, int arg5, int arg6, int arg7, int arg8) {
     throw new RuntimeException("NYI glCompressedTexImage3D");
   }
-
-  @Override
-  public void glCompressedTexSubImage2D(int arg0, int arg1, int arg2, int arg3, int arg4, int arg5,
-                                        int arg6, int arg7, int arg8) {
+  @Override public void glCompressedTexSubImage2D(int arg0, int arg1, int arg2, int arg3, int arg4, int arg5, int arg6, int arg7, int arg8) {
     throw new RuntimeException("NYI glCompressedTexSubImage2D");
   }
-
-  @Override
-  public void glCompressedTexSubImage3D(int arg0, int arg1, int arg2, int arg3, int arg4, int arg5,
-                                        int arg6, int arg7, int arg8, int arg9, int arg10) {
+  @Override public void glCompressedTexSubImage3D(int arg0, int arg1, int arg2, int arg3, int arg4, int arg5, int arg6, int arg7, int arg8, int arg9, int arg10) {
     throw new RuntimeException("NYI glCompressedTexSubImage3D");
   }
 
-  @Override
-  public void glReadPixels(int x, int y, int width, int height, int format, int type,
-                           int pixelsBufferOffset) {
+  @Override public void glReadPixels(int x, int y, int width, int height, int format, int type, int pixelsBufferOffset) {
     throw new RuntimeException("NYI glReadPixels");
   }
 
-  @Override
-  public void glTexImage2D(int arg0, int arg1, int arg2, int arg3, int arg4, int arg5, int arg6,
-                           int arg7, int arg8) {
+  @Override public void glTexImage2D(int arg0, int arg1, int arg2, int arg3, int arg4, int arg5, int arg6, int arg7, int arg8) {
     throw new RuntimeException("NYI glTexImage2D");
   }
-
-  @Override
-  public void glTexImage3D(int arg0, int arg1, int arg2, int arg3, int arg4,
-                           int arg5, int arg6, int arg7, int arg8, int arg9) {
+  @Override public void glTexImage3D(int arg0, int arg1, int arg2, int arg3, int arg4, int arg5, int arg6, int arg7, int arg8, int arg9) {
     throw new RuntimeException("NYI glTexImage3D");
   }
-
-  @Override
-  public void glTexSubImage2D(int arg0, int arg1, int arg2, int arg3, int arg4,
-                              int arg5, int arg6, int arg7, int arg8) {
+  @Override public void glTexSubImage2D(int arg0, int arg1, int arg2, int arg3, int arg4, int arg5, int arg6, int arg7, int arg8) {
     throw new RuntimeException("NYI glTexSubImage2D");
   }
-
-  @Override
-  public void glTexSubImage3D(int arg0, int arg1, int arg2, int arg3, int arg4, int arg5,
-                              int arg6, int arg7, int arg8, int arg9, int arg10) {
+  @Override public void glTexSubImage3D(int arg0, int arg1, int arg2, int arg3, int arg4, int arg5, int arg6, int arg7, int arg8, int arg9, int arg10) {
     throw new RuntimeException("NYI glTexSubImage3D");
   }
 }
