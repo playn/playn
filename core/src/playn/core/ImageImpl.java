@@ -13,6 +13,7 @@
  */
 package playn.core;
 
+import react.RFuture;
 import react.RPromise;
 
 /**
@@ -62,30 +63,26 @@ public abstract class ImageImpl extends Image {
   public abstract void draw (Object ctx, float dx, float dy, float dw, float dh,
                              float sx, float sy, float sw, float sh);
 
-  @Override public Scale scale () {
-    return scale;
-  }
-
-  @Override public int pixelWidth () {
-    return pixelWidth;
-  }
-
-  @Override public int pixelHeight () {
-    return pixelHeight;
-  }
-
-  protected ImageImpl (Platform plat, Scale preScale, int preWidth, int preHeight) {
-    super(plat.<Image>deferredPromise());
-    scale = preScale;
-    pixelWidth = preWidth;
-    pixelHeight = preHeight;
-  }
+  @Override public Scale scale () { return scale; }
+  @Override public int pixelWidth () { return pixelWidth; }
+  @Override public int pixelHeight () { return pixelHeight; }
 
   protected ImageImpl (Scale scale, int pixelWidth, int pixelHeight, Object bitmap) {
     this.scale = scale;
     this.pixelWidth = pixelWidth;
     this.pixelHeight = pixelHeight;
     setBitmap(bitmap);
+  }
+
+  protected ImageImpl (RFuture<Image> state, Scale preScale, int preWidth, int preHeight) {
+    super(state);
+    scale = preScale;
+    pixelWidth = preWidth;
+    pixelHeight = preHeight;
+  }
+
+  protected ImageImpl (Platform plat, Scale preScale, int preWidth, int preHeight) {
+    this(plat.<Image>deferredPromise(), preScale, preWidth, preHeight);
   }
 
   protected abstract void setBitmap (Object bitmap);
