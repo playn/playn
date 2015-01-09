@@ -48,6 +48,7 @@ public class HtmlGraphics extends Graphics {
   private final CanvasElement canvas;
   private final Point mousePoint = new Point();
   private final Dimension screenSize = new Dimension();
+  private final float mouseScale;
 
   private static final String HEIGHT_TEXT =
     "THEQUICKBROWNFOXJUMPEDOVERTHELAZYDOGthequickbrownfoxjumpedoverthelazydog_-+!.,[]0123456789";
@@ -58,8 +59,8 @@ public class HtmlGraphics extends Graphics {
 
   public HtmlGraphics(HtmlPlatform plat, HtmlPlatform.Config config) {
     super(plat, new HtmlGL20(), new Scale(config.scaleFactor));
-    Document doc = Document.get();
 
+    Document doc = Document.get();
     dummyCanvas = doc.createCanvasElement();
     dummyCtx = dummyCanvas.getContext2d();
 
@@ -83,11 +84,13 @@ public class HtmlGraphics extends Graphics {
     measureElement.getStyle().setWhiteSpace(Style.WhiteSpace.NOWRAP);
     root.appendChild(measureElement);
 
+    // our mouse scale is our configured scale divided by our device scale factor; when we're
+    // displaying at our device scale factor, then it's one and everything is simple
+    mouseScale = config.scaleFactor / HtmlPlatform.devicePixelRatio();
+
     canvas = Document.get().createCanvasElement();
-    canvas.setWidth(root.getOffsetWidth());
-    canvas.setHeight(root.getOffsetHeight());
     root.appendChild(canvas);
-    viewSizeChanged(canvas.getWidth(), canvas.getHeight());
+    setSize(root.getOffsetWidth(), root.getOffsetHeight());
 
     WebGLContextAttributes attrs = WebGLContextAttributes.create();
     attrs.setAlpha(config.transparentCanvas);
@@ -127,16 +130,22 @@ public class HtmlGraphics extends Graphics {
   }
 
   /**
-   * Sizes or resizes the root element that contains the game view.
-   * @param width the new width, in pixels, of the view.
-   * @param height the new height, in pixels, of the view.
+   * Sizes or resizes the root element that contains the game view. This is specified in pixels as
+   * understood by page elements. If the page is actually being dispalyed on a HiDPI (Retina)
+   * device, the actual framebuffer may be 2x (or larger) the specified size.
    */
-  public void setSize(int width, int height) {
+  public void setSize (int width, int height) {
     rootElement.getStyle().setWidth(width, Unit.PX);
     rootElement.getStyle().setHeight(height, Unit.PX);
-    canvas.setWidth(width);
-    canvas.setHeight(height);
-    viewSizeChanged(width, height);
+    // set the canvas size to the pixel size, this controls the framebuffer size
+    canvas.setWidth(scale.scaledCeil(width));
+    canvas.setHeight(scale.scaledCeil(height));
+    // set the canvas's CSS size to the display unit size, this ensures that hi-dpi canvases are
+    // displayed at the proper size in the page
+    canvas.getStyle().setWidth(width, Style.Unit.PX);
+    canvas.getStyle().setHeight(height, Style.Unit.PX);
+    viewSizeChanged(canvas.getWidth(), canvas.getHeight());
+    plat.log().info("FB " + viewPixelWidth + "x" + viewPixelHeight + " LG " + viewSize);
   }
 
   /**
@@ -180,8 +189,7 @@ public class HtmlGraphics extends Graphics {
     CanvasElement elem = Document.get().createCanvasElement();
     elem.setWidth(pixelWidth);
     elem.setHeight(pixelHeight);
-    HtmlImage image = new HtmlImage(scale, elem);
-    return new HtmlCanvas(image);
+    return new HtmlCanvas(new HtmlImage(scale, elem));
   }
 
   static String cssColorString(int color) {
@@ -231,7 +239,7 @@ public class HtmlGraphics extends Graphics {
   }
 
   Point transformMouse(float x, float y) {
-    return mousePoint.set(x / scale.factor, y / scale.factor);
+    return mousePoint.set(x / mouseScale, y / mouseScale);
   }
 
   private native int fullScreenWidth () /*-{ return $wnd.screen.width; }-*/;

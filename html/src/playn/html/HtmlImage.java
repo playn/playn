@@ -152,8 +152,8 @@ public class HtmlImage extends ImageImpl {
   }
 
   @Override public String toString () {
-    return "HtmlImage[scale=" + scale + ", psize=" + pixelWidth + "x" + pixelHeight +
-      ", img=" + img + ", canvas=" + canvas + "]";
+    return "HtmlImage[scale=" + scale + ", size=" + width() + "x" + height() +
+      ", psize=" + pixelWidth + "x" + pixelHeight + ", img=" + img + ", canvas=" + canvas + "]";
   }
 
   @Override protected void setBitmap (Object bitmap) {

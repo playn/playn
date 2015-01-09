@@ -37,7 +37,7 @@ public class HtmlPlatform extends Platform {
     public boolean antiAliasing = true;
 
     /** The HiDPI scale factor to use. */
-    public float scaleFactor = 1;
+    public float scaleFactor = devicePixelRatio();
 
     /** The id of the {@code <div>} element where the game will be inserted. */
     public String rootId = "playn-root";
@@ -91,6 +91,13 @@ public class HtmlPlatform extends Platform {
     disableRightClickImpl(graphics.rootElement);
   }
 
+  native static float devicePixelRatio () /*-{
+    return $wnd.devicePixelRatio || 1;
+  }-*/;
+  native static float backingStorePixelRatio () /*-{
+    return $wnd.webkitBackingStorePixelRatio || 1;
+  }-*/;
+
   /** Contains precomputed information on the user-agent.
     * Useful for dealing with browser and OS behavioral differences. */
   static final AgentInfo agentInfo = computeAgentInfo();
@@ -117,6 +124,8 @@ public class HtmlPlatform extends Platform {
         log.error("Uncaught Exception: ", e);
       }
     });
+
+    log.info("DPR " + devicePixelRatio() + " BSPR " + backingStorePixelRatio());
 
     // wrap these calls in try-catch, a the UncaughtExceptionHandler installed above won't take
     // effect until we yield to the browser event loop
