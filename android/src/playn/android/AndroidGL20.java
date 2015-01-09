@@ -33,7 +33,7 @@ public class AndroidGL20 extends GL20 {
       public ByteBuffer createByteBuffer(int size) {
         return ByteBuffer.allocateDirect(size).order(ByteOrder.nativeOrder());
       }
-    });
+    }, false /*checkErrors*/);
   }
 
   @Override public String getPlatformGLExtensions() {

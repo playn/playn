@@ -421,13 +421,12 @@ public abstract class GL20 {
     }
   }
 
-  /** Whether or not to check errors after GL operations. */
-  public static boolean checkErrors = true;
-
   public final Buffers bufs;
+  public final boolean checkErrors;
 
-  protected GL20 (Buffers buffers) {
-    bufs = buffers;
+  protected GL20 (Buffers buffers, boolean checkErrors) {
+    this.bufs = buffers;
+    this.checkErrors = checkErrors;
   }
 
   /**

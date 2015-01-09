@@ -33,7 +33,7 @@ public class RoboGL20 extends GL20 {
         buffer.order(ByteOrder.nativeOrder());
         return buffer;
       }
-    });
+    }, false /*checkErrors*/);
   }
 
   @Override public String getPlatformGLExtensions() {

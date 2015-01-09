@@ -28,7 +28,7 @@ import static playn.core.GL20.*;
  */
 public abstract class Graphics {
 
-  private final Platform plat;
+  protected final Platform plat;
   protected final Dimension viewSizeM = new Dimension();
   protected int viewPixelWidth, viewPixelHeight;
   private Texture colorTex; // created lazily

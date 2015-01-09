@@ -53,8 +53,7 @@ final class JavaGL20 extends playn.core.GL20 {
       public ByteBuffer createByteBuffer(int size) {
         return BufferUtils.createByteBuffer(size);
       }
-    });
-    checkErrors = Boolean.getBoolean("playn.glerrors");
+    }, Boolean.getBoolean("playn.glerrors"));
   }
 
   public void glActiveTexture(int texture) {
