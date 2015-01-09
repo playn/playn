@@ -29,6 +29,13 @@ public abstract class Image {
   public final RFuture<Image> state;
 
   /**
+   * Returns whether this image is fully loaded. In general you'll want to react to {@link #state},
+   * but this method is useful when you need to assert that something is only allowed on a fully
+   * loaded image image.
+   */
+  public boolean isLoaded () { return state.isCompleteNow(); }
+
+  /**
    * Returns the scale of resolution independent pixels to actual pixels for this image. This will
    * be {@link Scale#ONE} unless HiDPI images are being used.
    */

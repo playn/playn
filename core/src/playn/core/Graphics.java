@@ -85,11 +85,14 @@ public abstract class Graphics {
    * @throws IllegalStateException if {@code image} is not fully loaded.
    */
   public Texture createTexture (Image image, Texture.Config config) {
-    if (!image.state.isCompleteNow()) throw new IllegalStateException(
+    if (!image.isLoaded()) throw new IllegalStateException(
       "Cannot create texture from unready image.");
 
     int texWidth = config.toTexWidth(image.pixelWidth());
     int texHeight = config.toTexHeight(image.pixelHeight());
+    if (texWidth <= 0 || texHeight <= 0) throw new IllegalArgumentException(
+      "Invalid texture size: " + texWidth + "x" + texHeight + " from: " + image);
+
     Texture tex = new Texture(this, createTexture(config), config, texWidth, texHeight,
                               image.scale(), image.width(), image.height());
     tex.update(image); // this will handle non-POT source image conversion
@@ -123,6 +126,9 @@ public abstract class Graphics {
   public Texture createTexture (float width, float height, Texture.Config config) {
     int texWidth = config.toTexWidth(scale.scaledCeil(width));
     int texHeight = config.toTexHeight(scale.scaledCeil(height));
+    if (texWidth <= 0 || texHeight <= 0) throw new IllegalArgumentException(
+      "Invalid texture size: " + texWidth + "x" + texHeight);
+
     int id = createTexture(config);
     gl.glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, texWidth, texHeight,
                     0, GL_RGBA, GL_UNSIGNED_BYTE, null);

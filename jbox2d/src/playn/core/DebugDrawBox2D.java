@@ -6,36 +6,28 @@ import org.jbox2d.common.OBBViewportTransform;
 import org.jbox2d.common.Transform;
 import org.jbox2d.common.Vec2;
 
-import static playn.core.PlayN.log;
-
 public class DebugDrawBox2D extends DebugDraw {
 
   private static String CANVASERROR =
       "Must set canvas (DebugDrawBox2D.setCanvas()) in DebugDrawBox2D before drawing.";
 
+  private final Platform plat;
   private Canvas canvas;
-
   private float strokeWidth;
-
   private int strokeAlpha;
-
   private int fillAlpha;
-
   private float cameraX, cameraY, cameraScale = 1;
 
   private static float cacheFillR, cacheFillG, cacheFillB; // cached fill color
-
-  private static float cacheStrokeR, cacheStrokeG, cacheStrokeB; // cached
-                                                                 // stroke color
+  private static float cacheStrokeR, cacheStrokeG, cacheStrokeB; // cached stroke color
 
   private final Vec2 tempVec1 = new Vec2();
-
   private final Vec2 tempVec2 = new Vec2();
-
   private final Vec2 tempVec3 = new Vec2();
 
-  public DebugDrawBox2D() {
+  public DebugDrawBox2D(Platform plat) {
     super(new OBBViewportTransform());
+    this.plat = plat;
     viewportTransform.setYFlip(true);
     strokeWidth = 1.0f;
     strokeAlpha = 255;
@@ -45,7 +37,7 @@ public class DebugDrawBox2D extends DebugDraw {
   @Override
   public void drawCircle(Vec2 center, float radius, Color3f color) {
     if (canvas == null) {
-      log().error(CANVASERROR);
+      plat.log().error(CANVASERROR);
       return;
     }
 
@@ -62,7 +54,7 @@ public class DebugDrawBox2D extends DebugDraw {
   @Override
   public void drawPoint(Vec2 argPoint, float argRadiusOnScreen, Color3f color) {
     if (canvas == null) {
-      log().error(CANVASERROR);
+      plat.log().error(CANVASERROR);
       return;
     }
 
@@ -75,7 +67,7 @@ public class DebugDrawBox2D extends DebugDraw {
   @Override
   public void drawSegment(Vec2 p1, Vec2 p2, Color3f color) {
     if (canvas == null) {
-      log().error(CANVASERROR);
+      plat.log().error(CANVASERROR);
       return;
     }
 
@@ -89,7 +81,7 @@ public class DebugDrawBox2D extends DebugDraw {
   @Override
   public void drawSolidCircle(Vec2 center, float radius, Vec2 axis, Color3f color) {
     if (canvas == null) {
-      log().error(CANVASERROR);
+      plat.log().error(CANVASERROR);
       return;
     }
 
@@ -107,7 +99,7 @@ public class DebugDrawBox2D extends DebugDraw {
   @Override
   public void drawSolidPolygon(Vec2[] vertices, int vertexCount, Color3f color) {
     if (canvas == null) {
-      log().error(CANVASERROR);
+      plat.log().error(CANVASERROR);
       return;
     }
 
@@ -130,17 +122,16 @@ public class DebugDrawBox2D extends DebugDraw {
   @Override
   public void drawString(float x, float y, String s, Color3f color) {
     if (canvas == null) {
-      log().error(CANVASERROR);
+      plat.log().error(CANVASERROR);
       return;
     }
-
-    log().info("drawString not yet implemented in DebugDrawBox2D: " + s);
+    plat.log().info("drawString not yet implemented in DebugDrawBox2D: " + s);
   }
 
   @Override
   public void drawTransform(Transform xf) {
     if (canvas == null) {
-      log().error(CANVASERROR);
+      plat.log().error(CANVASERROR);
       return;
     }
 
@@ -202,8 +193,8 @@ public class DebugDrawBox2D extends DebugDraw {
     updateCamera();
   }
 
-  public void setCanvas(CanvasImage image) {
-    this.canvas = image.canvas();
+  public void setCanvas(Canvas canvas) {
+    this.canvas = canvas;
     canvas.setStrokeWidth(strokeWidth);
     setStrokeColorFromCache();
     setFillColorFromCache();

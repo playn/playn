@@ -68,6 +68,8 @@ public abstract class ImageImpl extends Image {
   @Override public int pixelHeight () { return pixelHeight; }
 
   protected ImageImpl (Scale scale, int pixelWidth, int pixelHeight, Object bitmap) {
+    if (pixelWidth == 0 || pixelHeight == 0) throw new IllegalArgumentException(
+      "Invalid size for ready image: " + pixelWidth + "x" + pixelHeight + " bitmap: " + bitmap);
     this.scale = scale;
     this.pixelWidth = pixelWidth;
     this.pixelHeight = pixelHeight;
