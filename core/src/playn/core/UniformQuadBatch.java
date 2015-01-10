@@ -26,8 +26,8 @@ import static playn.core.GL20.*;
  */
 public class UniformQuadBatch extends QuadBatch {
 
-  /** Builds the stock quad batch shader program. */
-  public static class ProgramBuilder extends GLProgramBuilder {
+  /** The source for the stock quad batch shader program. */
+  public static class Source extends TexturedBatch.Source {
 
     /** Declares the uniform variables for our shader. */
     public static final String VERT_UNIFS =
@@ -62,8 +62,7 @@ public class UniformQuadBatch extends QuadBatch {
       // Scale from screen coordinates to [0, 2].
       "gl_Position.xy /= u_HScreenSize.xy;\n" +
       // Offset to [-1, 1].
-      "gl_Position.x -= 1.0;\n" +
-      "gl_Position.y -= 1.0;\n" +
+      "gl_Position.xy -= 1.0;\n" +
       // If requested, flip the y-axis.
       "gl_Position.y *= u_Flip;\n";
 
@@ -80,52 +79,24 @@ public class UniformQuadBatch extends QuadBatch {
       "float green = (tcs.w - blue) / 256.0;\n" +
       "v_Color = vec4(red / 255.0, green / 255.0, blue / 255.0, alpha / 255.0);\n";
 
-    /** The GLSL code for our vertex shader. */
-    public static final String VERTEX_SHADER =
-      VERT_UNIFS +
-      VERT_ATTRS +
-      VERT_VARS +
-      "void main(void) {\n" +
-      VERT_EXTRACTDATA +
-      VERT_SETPOS +
-      VERT_SETTEX +
-      VERT_SETCOLOR +
-      "}";
-
-    public Program build (UniformQuadBatch batch) {
-      return new Program(batch.gl, vertexSource(batch), fragmentSource());
-    }
-
-    protected String vertexSource (UniformQuadBatch batch) {
-      return vertexSource().
+    /** Returns the source to the vertex shader program. */
+    public String vertex (UniformQuadBatch batch) {
+      return vertex().
         replace("_MAX_QUADS_", ""+batch.maxQuads).
         replace("_VEC4S_PER_QUAD_", ""+batch.vec4sPerQuad());
     }
 
-    @Override protected String vertexSource () {
-      return VERTEX_SHADER;
-    }
-  }
-
-  public static class Program extends GLProgram {
-    public final int uTexture;
-    public final int uHScreenSize;
-    public final int uFlip;
-    public final int uData;
-    public final int aVertex;
-
-    public Program (GL20 gl, String vertexSource, String fragmentSource) {
-      super(gl, vertexSource, fragmentSource);
-      uTexture = gl.glGetUniformLocation(program, "u_Texture");
-      assert uTexture >= 0 : "Failed to get u_Texture uniform";
-      uHScreenSize = gl.glGetUniformLocation(program, "u_HScreenSize");
-      assert uHScreenSize >= 0 : "Failed to get u_HScreenSize uniform";
-      uFlip = gl.glGetUniformLocation(program, "u_Flip");
-      assert uFlip >= 0 : "Failed to get u_Flip uniform";
-      uData = gl.glGetUniformLocation(program, "u_Data");
-      assert uData >= 0 : "Failed to get u_Data uniform";
-      aVertex = gl.glGetAttribLocation(program, "a_Vertex");
-      assert aVertex >= 0 : "Failed to get a_Vertex uniform";
+    /** Returns the raw vertex source, which will have some parameters subbed into it. */
+    protected String vertex () {
+      return (VERT_UNIFS +
+              VERT_ATTRS +
+              VERT_VARS +
+              "void main(void) {\n" +
+              VERT_EXTRACTDATA +
+              VERT_SETPOS +
+              VERT_SETTEX +
+              VERT_SETCOLOR +
+              "}");
     }
   }
 
@@ -140,26 +111,39 @@ public class UniformQuadBatch extends QuadBatch {
   }
 
   protected final int maxQuads;
-  protected final Program program;
+
+  protected final GLProgram program;
+  protected final int uTexture;
+  protected final int uHScreenSize;
+  protected final int uFlip;
+  protected final int uData;
+  protected final int aVertex;
+
   protected final int verticesId, elementsId;
   protected final float[] data;
   protected int quadCounter;
 
   /** Creates a uniform quad batch with the default shader programs. */
   public UniformQuadBatch (GL20 gl) {
-    this(gl, new ProgramBuilder());
+    this(gl, new Source());
   }
 
   /** Creates a uniform quad batch with the supplied custom shader program builder. */
-  public UniformQuadBatch (GL20 gl, ProgramBuilder builder) {
+  public UniformQuadBatch (GL20 gl, Source source) {
     super(gl);
     int maxVecs = usableMaxUniformVectors(gl) - extraVec4s();
     if (maxVecs < vec4sPerQuad())
     throw new RuntimeException(
       "GL_MAX_VERTEX_UNIFORM_VECTORS too low: have " + maxVecs +
         ", need at least " + vec4sPerQuad());
-    this.maxQuads = maxVecs / vec4sPerQuad();
-    this.program = builder.build(this);
+    maxQuads = maxVecs / vec4sPerQuad();
+
+    program = new GLProgram(gl, source.vertex(this), source.fragment());
+    uTexture = program.getUniformLocation("u_Texture");
+    uHScreenSize = program.getUniformLocation("u_HScreenSize");
+    uFlip = program.getUniformLocation("u_Flip");
+    uData = program.getUniformLocation("u_Data");
+    aVertex = program.getAttribLocation("a_Vertex");
 
     // create our stock supply of unit quads and stuff them into our buffers
     short[] verts = new short[maxQuads*VERTICES_PER_QUAD*VERTEX_SIZE];
@@ -223,14 +207,14 @@ public class UniformQuadBatch extends QuadBatch {
   @Override public void begin (float fbufWidth, float fbufHeight, boolean flip) {
     super.begin(fbufWidth, fbufHeight, flip);
     program.activate();
-    gl.glUniform2f(program.uHScreenSize, fbufWidth/2f, fbufHeight/2f);
-    gl.glUniform1f(program.uFlip, flip ? -1 : 1);
+    gl.glUniform2f(uHScreenSize, fbufWidth/2f, fbufHeight/2f);
+    gl.glUniform1f(uFlip, flip ? -1 : 1);
     gl.glBindBuffer(GL_ARRAY_BUFFER, verticesId);
-    gl.glEnableVertexAttribArray(program.aVertex);
-    gl.glVertexAttribPointer(program.aVertex, VERTEX_SIZE, GL_SHORT, false, 0, 0);
+    gl.glEnableVertexAttribArray(aVertex);
+    gl.glVertexAttribPointer(aVertex, VERTEX_SIZE, GL_SHORT, false, 0, 0);
     gl.glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementsId);
     gl.glActiveTexture(GL_TEXTURE0);
-    gl.glUniform1i(program.uTexture, 0);
+    gl.glUniform1i(uTexture, 0);
     gl.checkError("UniformQuadBatch begin");
   }
 
@@ -238,7 +222,7 @@ public class UniformQuadBatch extends QuadBatch {
     super.flush();
     if (quadCounter > 0) {
       bindTexture();
-      gl.glUniform4fv(program.uData, quadCounter * vec4sPerQuad(), data, 0);
+      gl.glUniform4fv(uData, quadCounter * vec4sPerQuad(), data, 0);
       gl.glDrawElements(GL_TRIANGLES, quadCounter*ELEMENTS_PER_QUAD, GL_UNSIGNED_SHORT, 0);
       gl.checkError("UniformQuadBatch flush");
       quadCounter = 0;
@@ -247,7 +231,7 @@ public class UniformQuadBatch extends QuadBatch {
 
   @Override public void end () {
     super.end();
-    gl.glDisableVertexAttribArray(program.aVertex);
+    gl.glDisableVertexAttribArray(aVertex);
     gl.checkError("UniformQuadBatch end");
   }
 

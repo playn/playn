@@ -22,7 +22,9 @@ public class GLProgram {
 
   private final GL20 gl;
   private final int vertexShader, fragmentShader;
-  protected final int program;
+
+  /** The GL id of this shader program. */
+  public final int id;
 
   /**
    * Compiles and links the shader program described by {@code vertexSource} and
@@ -32,46 +34,62 @@ public class GLProgram {
   public GLProgram (GL20 gl, String vertexSource, String fragmentSource) {
     this.gl = gl;
 
-    int program = 0, vertexShader = 0, fragmentShader = 0;
+    int id = 0, vertexShader = 0, fragmentShader = 0;
     try {
-      program = gl.glCreateProgram();
-      if (program == 0) {
-        throw new RuntimeException("Failed to create program: " + gl.glGetError());
-      }
+      id = gl.glCreateProgram();
+      if (id == 0) throw new RuntimeException("Failed to create program: " + gl.glGetError());
       gl.checkError("glCreateProgram");
 
       vertexShader = compileShader(GL20.GL_VERTEX_SHADER, vertexSource);
-      gl.glAttachShader(program, vertexShader);
+      gl.glAttachShader(id, vertexShader);
       gl.checkError("glAttachShader / vertex");
 
       fragmentShader = compileShader(GL20.GL_FRAGMENT_SHADER, fragmentSource);
-      gl.glAttachShader(program, fragmentShader);
+      gl.glAttachShader(id, fragmentShader);
       gl.checkError("glAttachShader / fragment");
 
-      gl.glLinkProgram(program);
+      gl.glLinkProgram(id);
       int[] linkStatus = new int[1];
-      gl.glGetProgramiv(program, GL20.GL_LINK_STATUS, linkStatus, 0);
+      gl.glGetProgramiv(id, GL20.GL_LINK_STATUS, linkStatus, 0);
       if (linkStatus[0] == GL20.GL_FALSE) {
-        String log = gl.glGetProgramInfoLog(program);
-        gl.glDeleteProgram(program);
+        String log = gl.glGetProgramInfoLog(id);
+        gl.glDeleteProgram(id);
         throw new RuntimeException("Failed to link program: " + log);
       }
 
-      this.program = program;
+      this.id = id;
       this.vertexShader = vertexShader;
       this.fragmentShader = fragmentShader;
-      program = vertexShader = fragmentShader = 0;
+      id = vertexShader = fragmentShader = 0;
 
     } finally {
-      if (program != 0) gl.glDeleteProgram(program);
+      if (id != 0) gl.glDeleteProgram(id);
       if (vertexShader != 0) gl.glDeleteShader(vertexShader);
       if (fragmentShader != 0) gl.glDeleteShader(fragmentShader);
     }
   }
 
+  /**
+   * Returns the uniform location with the specified {@code name}.
+   */
+  public int getUniformLocation (String name) {
+    int loc = gl.glGetUniformLocation(id, name);
+    assert loc >= 0 : "Failed to get " + name + " uniform";
+    return loc;
+  }
+
+  /**
+   * Returns the attribute location with the specified {@code name}.
+   */
+  public int getAttribLocation (String name) {
+    int loc = gl.glGetAttribLocation(id, name);
+    assert loc >= 0 : "Failed to get " + name + " uniform";
+    return loc;
+  }
+
   /** Binds this shader program, in preparation for rendering. */
   public void activate () {
-    gl.glUseProgram(program);
+    gl.glUseProgram(id);
   }
 
   /** Frees this program and associated compiled shaders. The program must not be used after
@@ -79,7 +97,7 @@ public class GLProgram {
   public void destroy () {
     gl.glDeleteShader(vertexShader);
     gl.glDeleteShader(fragmentShader);
-    gl.glDeleteProgram(program);
+    gl.glDeleteProgram(id);
   }
 
   private int compileShader(int type, final String shaderSource) {

@@ -18,6 +18,53 @@ package playn.core;
  */
 public class TexturedBatch extends GLBatch {
 
+  /** Provides some standard bits for a shader program that uses a tint and a texture. */
+  public static abstract class Source {
+
+    /** Returns the source of the texture fragment shader program. Note that this program
+      * <em>must</em> preserve the use of the existing varying attributes. You can add new varying
+      * attributes, but you cannot remove or change the defaults. */
+    public String fragment () {
+      StringBuilder str = new StringBuilder(FRAGMENT_PREAMBLE);
+      str.append(textureUniforms());
+      str.append(textureVaryings());
+      str.append("void main(void) {\n");
+      str.append(textureColor());
+      str.append(textureTint());
+      str.append(textureAlpha());
+      str.append("  gl_FragColor = textureColor;\n" +
+                 "}");
+      return str.toString();
+    }
+
+    protected String textureUniforms () {
+      return "uniform lowp sampler2D u_Texture;\n";
+    }
+    protected String textureVaryings () {
+      return ("varying mediump vec2 v_TexCoord;\n" +
+              "varying lowp vec4 v_Color;\n");
+    }
+    protected String textureColor () {
+      return "  vec4 textureColor = texture2D(u_Texture, v_TexCoord);\n";
+    }
+    protected String textureTint () {
+      return "  textureColor.rgb *= v_Color.rgb;\n";
+    }
+    protected String textureAlpha () {
+      return "  textureColor *= v_Color.a;\n";
+    }
+
+    protected static final String FRAGMENT_PREAMBLE =
+      "#ifdef GL_ES\n" +
+      "precision lowp float;\n" +
+      "#else\n" +
+      // Not all versions of regular OpenGL supports precision qualifiers, define placeholders
+      "#define lowp\n" +
+      "#define mediump\n" +
+      "#define highp\n" +
+      "#endif\n";
+  }
+
   public final GL20 gl;
   protected int curTexId;
 

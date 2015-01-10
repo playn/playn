@@ -24,8 +24,8 @@ import static playn.core.GL20.*;
  */
 public class TriangleBatch extends QuadBatch {
 
-  /** Builds the stock triangle batch shader program. */
-  public static class ProgramBuilder extends GLProgramBuilder {
+  /** The source for the stock triangle batch shader program. */
+  public static class Source extends TexturedBatch.Source {
 
     /** Declares the uniform variables for our shader. */
     public static final String VERT_UNIFS =
@@ -52,15 +52,14 @@ public class TriangleBatch extends QuadBatch {
     public static final String VERT_SETPOS =
       // Transform the vertex.
       "mat3 transform = mat3(\n" +
-      "  a_Matrix[0], a_Matrix[1], 0,\n" +
-      "  a_Matrix[2], a_Matrix[3], 0,\n" +
+      "  a_Matrix[0],      a_Matrix[1],      0,\n" +
+      "  a_Matrix[2],      a_Matrix[3],      0,\n" +
       "  a_Translation[0], a_Translation[1], 1);\n" +
       "gl_Position = vec4(transform * vec3(a_Position, 1.0), 1);\n" +
       // Scale from screen coordinates to [0, 2].
       "gl_Position.xy /= u_HScreenSize.xy;\n" +
       // Offset to [-1, 1].
-      "gl_Position.x -= 1.0;\n" +
-      "gl_Position.y -= 1.0;\n" +
+      "gl_Position.xy -= 1.0;\n" +
       // If requested, flip the y-axis.
       "gl_Position.y *= u_Flip;\n";
 
@@ -77,52 +76,17 @@ public class TriangleBatch extends QuadBatch {
       "float green = (a_Color.y - blue) / 256.0;\n" +
       "v_Color = vec4(red / 255.0, green / 255.0, blue / 255.0, alpha / 255.0);\n";
 
-    /** The GLSL code for our vertex shader. */
-    public static final String VERTEX_SHADER =
-      VERT_UNIFS +
-      VERT_ATTRS +
-      PER_VERT_ATTRS +
-      VERT_VARS +
-      "void main(void) {\n" +
-      VERT_SETPOS +
-      VERT_SETTEX +
-      VERT_SETCOLOR +
-      "}";
-
-    public Program build (GL20 gl) {
-      return new Program(gl, vertexSource(), fragmentSource());
-    }
-
-    @Override protected String vertexSource () {
-      return VERTEX_SHADER;
-    }
-  }
-
-  public static class Program extends GLProgram {
-    public final int uTexture;
-    public final int uHScreenSize;
-    public final int uFlip;
-    public final int aMatrix, aTranslation, aColor; // stable (same for whole quad)
-    public final int aPosition, aTexCoord; // changing (varies per quad vertex)
-
-    public Program (GL20 gl, String vertexSource, String fragmentSource) {
-      super(gl, vertexSource, fragmentSource);
-      uTexture = gl.glGetUniformLocation(program, "u_Texture");
-      assert uTexture >= 0 : "Failed to get u_Texture uniform";
-      uHScreenSize = gl.glGetUniformLocation(program, "u_HScreenSize");
-      assert uHScreenSize >= 0 : "Failed to get u_HScreenSize uniform";
-      uFlip = gl.glGetUniformLocation(program, "u_Flip");
-      assert uFlip >= 0 : "Failed to get u_Flip uniform";
-      aMatrix = gl.glGetAttribLocation(program, "a_Matrix");
-      assert aMatrix >= 0 : "Failed to get a_Matrix uniform";
-      aTranslation = gl.glGetAttribLocation(program, "a_Translation");
-      assert aTranslation >= 0 : "Failed to get a_Translation uniform";
-      aColor = gl.glGetAttribLocation(program, "a_Color");
-      assert aColor >= 0 : "Failed to get a_Color uniform";
-      aPosition = gl.glGetAttribLocation(program, "a_Position");
-      assert aPosition >= 0 : "Failed to get a_Position uniform";
-      aTexCoord = gl.glGetAttribLocation(program, "a_TexCoord");
-      assert aTexCoord >= 0 : "Failed to get a_TexCoord uniform";
+    /** Returns the source of the vertex shader program. */
+    public String vertex () {
+      return (VERT_UNIFS +
+              VERT_ATTRS +
+              PER_VERT_ATTRS +
+              VERT_VARS +
+              "void main(void) {\n" +
+              VERT_SETPOS +
+              VERT_SETTEX +
+              VERT_SETCOLOR +
+              "}");
     }
   }
 
@@ -134,7 +98,13 @@ public class TriangleBatch extends QuadBatch {
 
   private final boolean delayedBinding;
 
-  protected final Program program;
+  protected final GLProgram program;
+  protected final int uTexture;
+  protected final int uHScreenSize;
+  protected final int uFlip;
+  protected final int aMatrix, aTranslation, aColor; // stable (same for whole quad)
+  protected final int aPosition, aTexCoord; // changing (varies per quad vertex)
+
   protected final int verticesId, elementsId;
   protected final float[] stableAttrs;
   protected float[] vertices;
@@ -143,14 +113,23 @@ public class TriangleBatch extends QuadBatch {
 
   /** Creates a triangle batch with the default shader program. */
   public TriangleBatch (GL20 gl) {
-    this(gl, new ProgramBuilder());
+    this(gl, new Source());
   }
 
-  /** Creates a triangle batch with the supplied custom program builder. */
-  public TriangleBatch (GL20 gl, ProgramBuilder builder) {
+  /** Creates a triangle batch with the supplied custom shader program. */
+  public TriangleBatch (GL20 gl, Source source) {
     super(gl);
     delayedBinding = "Intel".equals(gl.glGetString(GL20.GL_VENDOR));
-    program = builder.build(gl);
+
+    program = new GLProgram(gl, source.vertex(), source.fragment());
+    uTexture = program.getUniformLocation("u_Texture");
+    uHScreenSize = program.getUniformLocation("u_HScreenSize");
+    uFlip = program.getUniformLocation("u_Flip");
+    aMatrix = program.getAttribLocation("a_Matrix");
+    aTranslation = program.getAttribLocation("a_Translation");
+    aColor = program.getAttribLocation("a_Color");
+    aPosition = program.getAttribLocation("a_Position");
+    aTexCoord = program.getAttribLocation("a_TexCoord");
 
     // create our vertex and index buffers
     stableAttrs = new float[stableAttrsSize()];
@@ -293,8 +272,8 @@ public class TriangleBatch extends QuadBatch {
   @Override public void begin (float fbufWidth, float fbufHeight, boolean flip) {
     super.begin(fbufWidth, fbufHeight, flip);
     program.activate();
-    gl.glUniform2f(program.uHScreenSize, fbufWidth/2f, fbufHeight/2f);
-    gl.glUniform1f(program.uFlip, flip ? -1 : 1);
+    gl.glUniform2f(uHScreenSize, fbufWidth/2f, fbufHeight/2f);
+    gl.glUniform1f(uFlip, flip ? -1 : 1);
     // certain graphics cards (I'm looking at you, Intel) exhibit broken behavior if we bind our
     // attributes once during activation, so for those cards we bind every time in flush()
     if (!delayedBinding) bindAttribsBufs();
@@ -306,18 +285,18 @@ public class TriangleBatch extends QuadBatch {
 
     // bind our stable vertex attributes
     int stride = vertexStride();
-    glBindVertAttrib(program.aMatrix, 4, GL_FLOAT, stride, 0);
-    glBindVertAttrib(program.aTranslation, 2, GL_FLOAT, stride, 16);
-    glBindVertAttrib(program.aColor, 2, GL_FLOAT, stride, 24);
+    glBindVertAttrib(aMatrix, 4, GL_FLOAT, stride, 0);
+    glBindVertAttrib(aTranslation, 2, GL_FLOAT, stride, 16);
+    glBindVertAttrib(aColor, 2, GL_FLOAT, stride, 24);
 
     // bind our changing vertex attributes
     int offset = stableAttrsSize()*FLOAT_SIZE_BYTES;
-    glBindVertAttrib(program.aPosition, 2, GL_FLOAT, stride, offset);
-    glBindVertAttrib(program.aTexCoord, 2, GL_FLOAT, stride, offset+8);
+    glBindVertAttrib(aPosition, 2, GL_FLOAT, stride, offset);
+    glBindVertAttrib(aTexCoord, 2, GL_FLOAT, stride, offset+8);
 
     gl.glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementsId);
     gl.glActiveTexture(GL_TEXTURE0);
-    gl.glUniform1i(program.uTexture, 0);
+    gl.glUniform1i(uTexture, 0);
   }
 
   @Override public void flush () {
@@ -347,11 +326,11 @@ public class TriangleBatch extends QuadBatch {
 
   @Override public void end () {
     super.end();
-    gl.glDisableVertexAttribArray(program.aMatrix);
-    gl.glDisableVertexAttribArray(program.aTranslation);
-    gl.glDisableVertexAttribArray(program.aColor);
-    gl.glDisableVertexAttribArray(program.aPosition);
-    gl.glDisableVertexAttribArray(program.aTexCoord);
+    gl.glDisableVertexAttribArray(aMatrix);
+    gl.glDisableVertexAttribArray(aTranslation);
+    gl.glDisableVertexAttribArray(aColor);
+    gl.glDisableVertexAttribArray(aPosition);
+    gl.glDisableVertexAttribArray(aTexCoord);
     gl.checkError("TriangleBatch end");
   }
 
