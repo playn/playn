@@ -26,8 +26,6 @@ import react.Slot;
  */
 public class ShaderTest extends Test {
 
-  private float elapsed;
-
   public ShaderTest (TestsGame game) {
     super(game, "ShaderTest", "Tests custom shader support.");
   }
@@ -46,7 +44,9 @@ public class ShaderTest extends Test {
         olayer.setBatch(createSepiaBatch());
         game.rootLayer.addAt(olayer, 25+dx, 25);
 
-        QuadBatch rotBatch = createRotBatch();
+        final RotYBatch rotBatch = createRotBatch();
+        rotBatch.eyeX = 0;
+        rotBatch.eyeY = orange.height()/2;
 
         // add an image that is rotated around the (3D) y axis
         Canvas canvas = game.graphics.createCanvas(orange.width(), orange.height());
@@ -65,89 +65,88 @@ public class ShaderTest extends Test {
         };
         irotlayer.setBatch(rotBatch);
         game.rootLayer.addAt(irotlayer, 25 + 3*dx + orange.width(), 25);
+
+        conns.add(game.paint.connect(new Slot<Game>() {
+          public void onEmit (Game game) {
+            rotBatch.elapsed = game.paintTick/1000f;
+          }
+        }));
       }
     });
-
-    conns.add(game.paint.connect(new Slot<Game>() {
-      public void onEmit (Game game) {
-        elapsed = game.paintTick/1000f;
-      }
-    }));
   }
 
-  protected QuadBatch createRotBatch () {
-    return null; // TODO
+  protected RotYBatch createRotBatch () {
+    return new RotYBatch(game.graphics.gl);
+  }
 
-    // // create a shader that rotates things around the (3D) y axis
-    // IndexedTrisShader rotShader = new IndexedTrisShader(graphics().ctx()) {
-    //   @Override protected String vertexShader() {
-    //     return VERT_UNIFS +
-    //       "uniform float u_Angle;\n" +
-    //       "uniform vec2 u_Eye;\n" +
-    //       VERT_ATTRS +
-    //       PER_VERT_ATTRS +
-    //       VERT_VARS +
+  // a batch with a shader that rotates things around the (3D) y axis
+  protected static class RotYBatch extends TriangleBatch {
+    public static class Source extends TriangleBatch.Source {
+      @Override public String vertex () {
+      return (VERT_UNIFS +
+              "uniform float u_Angle;\n" +
+              "uniform vec2 u_Eye;\n" +
+              VERT_ATTRS +
+              PER_VERT_ATTRS +
+              VERT_VARS +
+              "void main(void) {\n" +
+              VERT_ROTSETPOS +
+              VERT_SETTEX +
+              VERT_SETCOLOR +
+              "}");
+      }
 
-    //       "void main(void) {\n" +
-    //       // Rotate the vertex per our 3D rotation
-    //       "  float cosa = cos(u_Angle);\n" +
-    //       "  float sina = sin(u_Angle);\n" +
-    //       "  mat4 rotmat = mat4(\n" +
-    //       "    cosa, 0, sina, 0,\n" +
-    //       "    0,    1, 0,    0,\n" +
-    //       "   -sina, 0, cosa, 0,\n" +
-    //       "    0,    0, 0,    1);\n" +
-    //       "  vec4 pos = rotmat * vec4(a_Position - u_Eye, 0, 1);\n" +
+      protected static final String VERT_ROTSETPOS =
+        // Rotate the vertex per our 3D rotation
+        "  float cosa = cos(u_Angle);\n" +
+        "  float sina = sin(u_Angle);\n" +
+        "  mat4 rotmat = mat4(\n" +
+        "    cosa, 0, sina, 0,\n" +
+        "    0,    1, 0,    0,\n" +
+        "   -sina, 0, cosa, 0,\n" +
+        "    0,    0, 0,    1);\n" +
+        "  vec4 pos = rotmat * vec4(a_Position - u_Eye, 0, 1);\n" +
 
-    //       // Perspective project the vertex back into the plane
-    //       "  mat4 persp = mat4(\n" +
-    //       "    1, 0, 0, 0,\n" +
-    //       "    0, 1, 0, 0,\n" +
-    //       "    0, 0, 1, -1.0/200.0,\n" +
-    //       "    0, 0, 0, 1);\n" +
-    //       "  pos = persp * pos;\n" +
-    //       "  pos /= pos.w;\n" +
-    //       "  pos += vec4(u_Eye, 0, 0);\n;" +
+        // Perspective project the vertex back into the plane
+        "  mat4 persp = mat4(\n" +
+        "    1, 0, 0, 0,\n" +
+        "    0, 1, 0, 0,\n" +
+        "    0, 0, 1, -1.0/200.0,\n" +
+        "    0, 0, 0, 1);\n" +
+        "  pos = persp * pos;\n" +
+        "  pos /= pos.w;\n" +
+        "  pos += vec4(u_Eye, 0, 0);\n;" +
 
-    //       // Transform the vertex per the normal screen transform
-    //       "  mat4 transform = mat4(\n" +
-    //       "    a_Matrix[0],      a_Matrix[1],      0, 0,\n" +
-    //       "    a_Matrix[2],      a_Matrix[3],      0, 0,\n" +
-    //       "    0,                0,                1, 0,\n" +
-    //       "    a_Translation[0], a_Translation[1], 0, 1);\n" +
-    //       "  pos = transform * pos;\n" +
-    //       "  pos.x /= (u_ScreenSize.x / 2.0);\n" +
-    //       "  pos.y /= (u_ScreenSize.y / 2.0);\n" +
-    //       "  pos.z /= (u_ScreenSize.y / 2.0);\n" +
-    //       "  pos.x -= 1.0;\n" +
-    //       "  pos.y = 1.0 - pos.y;\n" +
-    //       "  gl_Position = pos;\n" +
+        // Transform the vertex per the normal screen transform
+        "  mat4 transform = mat4(\n" +
+        "    a_Matrix[0],      a_Matrix[1],      0, 0,\n" +
+        "    a_Matrix[2],      a_Matrix[3],      0, 0,\n" +
+        "    0,                0,                1, 0,\n" +
+        "    a_Translation[0], a_Translation[1], 0, 1);\n" +
+        "  pos = transform * pos;\n" +
+        "  pos.xy /= u_HScreenSize.xy;\n" +
+        "  pos.z  /= u_HScreenSize.y;\n" +
+        "  pos.xy -= 1.0;\n" +
+        "  pos.y *= u_Flip;\n" +
+        "  gl_Position = pos;\n";
+    }
 
-    //       VERT_SETTEX +
-    //       VERT_SETCOLOR +
-    //       "}";
-    //   }
+    public float elapsed;
+    public float eyeX, eyeY;
 
-    //   @Override
-    //   protected Core createTextureCore() {
-    //     return new RotCore(vertexShader(), textureFragmentShader());
-    //   }
+    public final int uAngle;
+    public final int uEye;
 
-    //   class RotCore extends ITCore {
-    //     private final Uniform1f uAngle = prog.getUniform1f("u_Angle");
-    //     private final Uniform2f uEye = prog.getUniform2f("u_Eye");
+    public RotYBatch (GL20 gl) {
+      super(gl, new Source());
+      uAngle = program.getUniformLocation("u_Angle");
+      uEye = program.getUniformLocation("u_Eye");
+    }
 
-    //     public RotCore (String vertShader, String fragShader) {
-    //       super(vertShader, fragShader);
-    //     }
-
-    //     @Override
-    //     public void activate(int fbufWidth, int fbufHeight) {
-    //       super.activate(fbufWidth, fbufHeight);
-    //       uAngle.bind(elapsed * FloatMath.PI);
-    //       uEye.bind(0, orange.height()/2);
-    //     }
-    //   }
-    // };
+    @Override public void begin (float fbufWidth, float fbufHeight, boolean flip) {
+      super.begin(fbufWidth, fbufHeight, flip);
+      gl.glUniform1f(uAngle, elapsed * FloatMath.PI);
+      gl.glUniform2f(uEye, eyeX, eyeY);
+    }
   }
 }
