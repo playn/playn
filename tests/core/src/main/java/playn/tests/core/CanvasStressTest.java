@@ -16,6 +16,7 @@
 package playn.tests.core;
 
 import pythagoras.f.FloatMath;
+import pythagoras.f.IDimension;
 import react.Connection;
 import react.Slot;
 
@@ -35,11 +36,11 @@ public class CanvasStressTest extends Test {
     final Texture canvasTex = game.graphics.createTexture(canvas.image);
     game.rootLayer.add(new ImageLayer(canvasTex));
 
-    conns.add(game.update.connect(new Slot<TestsGame>() {
+    conns.add(game.update.connect(new Slot<Game>() {
       private int noSegs = 30;
       private int direction = 1;
 
-      public void onEmit (TestsGame game) {
+      public void onEmit (Game game) {
         canvas.clear();
         canvas.setStrokeWidth(3);
         canvas.setStrokeColor(0x88ff0000);
@@ -51,8 +52,9 @@ public class CanvasStressTest extends Test {
         final float r = 100;
         for (int ii = 0; ii < noSegs; ii++) {
           float angle = 2*FloatMath.PI * ii / noSegs;
-          float x = (r * FloatMath.cos(angle)) + game.graphics.viewSize.width() / 2;
-          float y = (r * FloatMath.sin(angle)) + game.graphics.viewSize.height() /2;
+          IDimension viewSize = game.plat.graphics().viewSize;
+          float x = (r * FloatMath.cos(angle)) + viewSize.width() / 2;
+          float y = (r * FloatMath.sin(angle)) + viewSize.height() /2;
           canvas.strokeCircle(x, y, 100);
         }
 

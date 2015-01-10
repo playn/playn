@@ -31,16 +31,16 @@ import react.Slot;
  *
  * @see <a href="http://code.google.com/p/playn/wiki/GameLoop">Understanding the Game Loop</a>
  */
-public abstract class Game<G extends Game> {
+public abstract class Game {
 
   /** The platform on which this game is running. */
   public final Platform plat;
 
   /** A signal emitted on every simulation update. */
-  public final Signal<G> update = Signal.create();
+  public final Signal<Game> update = Signal.create();
 
   /** A signal emitted on every frame. */
-  public final Signal<G> paint = Signal.create();
+  public final Signal<Game> paint = Signal.create();
 
   /** The number of millis that have elapsed since the last update. This will be a multiple of
     * the {@code updateRate} supplied to the constructor, usually one. */
@@ -85,12 +85,12 @@ public abstract class Game<G extends Game> {
       this.nextUpdate = nextUpdate;
       this.updateTick = updateTick;
       this.updateDelta = updates*updateRate;
-      update.emit((G)this);
+      update.emit(this);
     }
 
     int newPaintTick = plat.tick();
     paintDt = newPaintTick - paintTick;
     paintTick = newPaintTick;
-    paint.emit((G)this);
+    paint.emit(this);
   }
 }

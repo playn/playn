@@ -71,9 +71,9 @@ public class ImageScalingTest extends Test {
           }
         }));
 
-        conns.add(game.paint.connect(new Slot<TestsGame>() {
+        conns.add(game.paint.connect(new Slot<Game>() {
           private float elapsed;
-          public void onEmit (TestsGame game) {
+          public void onEmit (Game game) {
             if (!paused) {
               elapsed += game.paintDt/1000f;
               float scale = Math.abs(FloatMath.sin(elapsed));

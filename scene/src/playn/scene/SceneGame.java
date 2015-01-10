@@ -19,7 +19,7 @@ import react.Slot;
 /**
  * A simple class for games which wish to use a single scene graph.
  */
-public abstract class SceneGame<G extends SceneGame> extends Game<G> {
+public abstract class SceneGame extends Game {
 
   public final QuadBatch defaultBatch;
   public final Surface viewSurf;
@@ -37,8 +37,8 @@ public abstract class SceneGame<G extends SceneGame> extends Game<G> {
     viewSurf = new Surface(plat.graphics(), plat.graphics().defaultRenderTarget, defaultBatch);
     rootLayer = new GroupLayer();
 
-    paint.connect(new Slot<G>() {
-      public void onEmit (G game) { paintScene(); }
+    paint.connect(new Slot<Game>() {
+      public void onEmit (Game game) { paintScene(); }
     }).atPrio(scenePaintPrio());
   }
 

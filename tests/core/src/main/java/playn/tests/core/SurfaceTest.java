@@ -163,8 +163,8 @@ public class SurfaceTest extends Test {
       game.rootLayer.add(dotl);
     }
 
-    conns.add(game.paint.connect(new Slot<TestsGame>() {
-      public void onEmit (TestsGame game) {
+    conns.add(game.paint.connect(new Slot<Game>() {
+      public void onEmit (Game game) {
         for (ImageLayer dot : dots) {
           if (Math.random() > 0.95) {
             dot.setTranslation(dotBox.x + (float)Math.random()*(dotBox.width-10),

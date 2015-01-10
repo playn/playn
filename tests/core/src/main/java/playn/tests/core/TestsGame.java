@@ -27,7 +27,7 @@ import playn.scene.*;
 import playn.scene.Pointer;
 import react.Slot;
 
-public class TestsGame extends SceneGame<TestsGame> {
+public class TestsGame extends SceneGame {
 
   public static TestsGame game;
 

@@ -223,8 +223,8 @@ public class CanvasTest extends Test {
       }
     });
 
-    conns.add(game.paint.connect(new Slot<TestsGame>() {
-      public void onEmit (TestsGame game) {
+    conns.add(game.paint.connect(new Slot<Game>() {
+      public void onEmit (Game game) {
         int curSecs = game.paintTick/1000;
         if (curSecs != lastSecs) {
           timeImg.clear();
