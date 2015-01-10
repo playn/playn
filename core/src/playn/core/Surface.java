@@ -243,7 +243,7 @@ public class Surface implements Disposable {
    * size {@code  (w x h)}.
    */
   public Surface draw (Texture tex, float x, float y, float w, float h) {
-    batch.add(tex, tint, tx(), x, y, w, h);
+    batch.addQuad(tex, tint, tx(), x, y, w, h);
     return this;
   }
 
@@ -253,7 +253,7 @@ public class Surface implements Disposable {
    */
   public Surface draw (Texture tex, float dx, float dy, float dw, float dh,
                        float sx, float sy, float sw, float sh) {
-    batch.add(tex, tint, tx(), dx, dy, dw, dh, sx, sy, sw, sh);
+    batch.addQuad(tex, tint, tx(), dx, dy, dw, dh, sx, sy, sw, sh);
     return this;
   }
 
@@ -289,9 +289,9 @@ public class Surface implements Disposable {
     Transforms.multiply(tx(), xf, xf);
 
     if (patternTex != null) {
-      batch.add(patternTex, tint, xf, 0, 0, length, width);
+      batch.addQuad(patternTex, tint, xf, 0, 0, length, width);
     } else {
-      batch.add(colorTex, Tint.combine(fillColor, tint), xf, 0, 0, length, width);
+      batch.addQuad(colorTex, Tint.combine(fillColor, tint), xf, 0, 0, length, width);
     }
     return this;
   }
@@ -301,9 +301,9 @@ public class Surface implements Disposable {
    */
   public Surface fillRect (float x, float y, float width, float height) {
     if (patternTex != null) {
-      batch.add(patternTex, tint, tx(), x, y, width, height);
+      batch.addQuad(patternTex, tint, tx(), x, y, width, height);
     } else {
-      batch.add(colorTex, Tint.combine(fillColor, tint), tx(), x, y, width, height);
+      batch.addQuad(colorTex, Tint.combine(fillColor, tint), tx(), x, y, width, height);
     }
     return this;
   }

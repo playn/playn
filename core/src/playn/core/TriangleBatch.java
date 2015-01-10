@@ -227,7 +227,7 @@ public class TriangleBatch extends QuadBatch {
     float[] verts = vertices, stables = stableAttrs;
     for (int ii = xysOffset, ll = ii+xysLen; ii < ll; ii += 2) {
       float x = xys[ii], y = xys[ii+1];
-      offset = addVert(verts, offset, stables, x, y, x/tw, y/th);
+      offset = add(verts, add(verts, offset, stables), x, y, x/tw, y/th);
     }
     vertPos = offset;
 
@@ -243,27 +243,27 @@ public class TriangleBatch extends QuadBatch {
     int vertIdx = beginPrimitive(xysLen/2, indicesLen), offset = vertPos;
     float[] verts = vertices, stables = stableAttrs;
     for (int ii = xysOffset, ll = ii+xysLen; ii < ll; ii += 2) {
-      offset = addVert(verts, offset, stables, xys[ii], xys[ii+1], sxys[ii], sxys[ii+1]);
+      offset = add(verts, add(verts, offset, stables), xys[ii], xys[ii+1], sxys[ii], sxys[ii+1]);
     }
     vertPos = offset;
 
     addElems(vertIdx, indices, indicesOffset, indicesLen, indexBase);
   }
 
-  @Override public void add (int tint,
-                             float m00, float m01, float m10, float m11, float tx, float ty,
-                             float x1, float y1, float sx1, float sy1,
-                             float x2, float y2, float sx2, float sy2,
-                             float x3, float y3, float sx3, float sy3,
-                             float x4, float y4, float sx4, float sy4) {
+  @Override public void addQuad (int tint,
+                                 float m00, float m01, float m10, float m11, float tx, float ty,
+                                 float x1, float y1, float sx1, float sy1,
+                                 float x2, float y2, float sx2, float sy2,
+                                 float x3, float y3, float sx3, float sy3,
+                                 float x4, float y4, float sx4, float sy4) {
     prepare(tint, m00, m01, m10, m11, tx, ty);
 
     int vertIdx = beginPrimitive(4, 6); int offset = vertPos;
     float[] verts = vertices, stables = stableAttrs;
-    offset = addVert(verts, offset, stables, x1, y1, sx1, sy1);
-    offset = addVert(verts, offset, stables, x2, y2, sx2, sy2);
-    offset = addVert(verts, offset, stables, x3, y3, sx3, sy3);
-    offset = addVert(verts, offset, stables, x4, y4, sx4, sy4);
+    offset = add(verts, add(verts, offset, stables), x1, y1, sx1, sy1);
+    offset = add(verts, add(verts, offset, stables), x2, y2, sx2, sy2);
+    offset = add(verts, add(verts, offset, stables), x3, y3, sx3, sy3);
+    offset = add(verts, add(verts, offset, stables), x4, y4, sx4, sy4);
     vertPos = offset;
 
     addElems(vertIdx, QUAD_INDICES, 0, QUAD_INDICES.length, 0);
@@ -395,14 +395,21 @@ public class TriangleBatch extends QuadBatch {
     elements = new short[newElems];
   }
 
-  protected static int addVert (float[] data, int offset,
-                                float[] prefix, float x, float y, float sx, float sy) {
-    System.arraycopy(prefix, 0, data, offset, prefix.length);
-    offset += prefix.length;
-    data[offset++] = x;
-    data[offset++] = y;
-    data[offset++] = sx;
-    data[offset++] = sy;
+  protected static int add (float[] into, int offset, float[] stables) {
+    System.arraycopy(stables, 0, into, offset, stables.length);
+    return offset + stables.length;
+  }
+
+  protected static int add (float[] into, int offset, float[] stables, int soff, int slen) {
+    System.arraycopy(stables, soff, into, offset, slen);
+    return offset + slen;
+  }
+
+  protected static int add (float[] into, int offset, float x, float y, float sx, float sy) {
+    into[offset++] = x;
+    into[offset++] = y;
+    into[offset++] = sx;
+    into[offset++] = sy;
     return offset;
   }
 
