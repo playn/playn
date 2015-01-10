@@ -19,19 +19,7 @@ import pythagoras.f.AffineTransform;
  * A batch which can render textured quads. Since that's a pretty common thing to do, we factor out
  * this API, and allow for different implementations thereof.
  */
-public abstract class QuadBatch extends GLBatch {
-
-  public final GL20 gl;
-  protected int curTexId;
-
-  /** Prepares this batch to render quads using the supplied texture. If pending quads have been
-    * added to this batch for a different texture, this call will trigger a {@link #flush}.
-    * <p>Note: if you call {@code add} methods that take a texture, you do not need to call this
-    * method manually. Only if you're adding bare quads is it needed. */
-  public void setTexture (Texture texture) {
-    if (curTexId != 0 && curTexId != texture.id) flush();
-    this.curTexId = texture.id;
-  }
+public abstract class QuadBatch extends TexturedBatch {
 
   /** Adds {@code tex} as a transformed axis-aligned quad to this batch.
     * {@code x, y, w, h} define the size and position of the quad. */
@@ -90,12 +78,6 @@ public abstract class QuadBatch extends GLBatch {
                             float x4, float y4, float sx4, float sy4);
 
   protected QuadBatch (GL20 gl) {
-    this.gl = gl;
-  }
-
-  /** Binds our current texture. Subclasses need to call this in {@link #flush}. */
-  protected void bindTexture () {
-    gl.glBindTexture(GL20.GL_TEXTURE_2D, curTexId);
-    gl.checkError("QuadBatch glBindTexture");
+    super(gl);
   }
 }

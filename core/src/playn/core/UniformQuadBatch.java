@@ -27,11 +27,11 @@ import static playn.core.GL20.*;
 public class UniformQuadBatch extends QuadBatch {
 
   /** Builds the stock quad batch shader program. */
-  public class ProgramBuilder extends GLProgramBuilder {
+  public static class ProgramBuilder extends GLProgramBuilder {
 
     /** Declares the uniform variables for our shader. */
     public static final String VERT_UNIFS =
-      "uniform vec2 u_ScreenSize;\n" +
+      "uniform vec2 u_HScreenSize;\n" +
       "uniform float u_Flip;\n" +
       "uniform vec4 u_Data[_VEC4S_PER_QUAD_*_MAX_QUADS_];\n";
 
@@ -60,7 +60,7 @@ public class UniformQuadBatch extends QuadBatch {
       "  txc.x, txc.y, 1);\n" +
       "gl_Position = vec4(transform * vec3(a_Vertex.xy, 1.0), 1.0);\n" +
       // Scale from screen coordinates to [0, 2].
-      "gl_Position.xy /= u_ScreenSize.xy;\n" +
+      "gl_Position.xy /= u_HScreenSize.xy;\n" +
       // Offset to [-1, 1].
       "gl_Position.x -= 1.0;\n" +
       "gl_Position.y -= 1.0;\n" +
@@ -92,14 +92,14 @@ public class UniformQuadBatch extends QuadBatch {
       VERT_SETCOLOR +
       "}";
 
-    public Program build (GL20 gl, int maxQuads) {
-      return new Program(gl, vertexSource(maxQuads), fragmentSource());
+    public Program build (UniformQuadBatch batch) {
+      return new Program(batch.gl, vertexSource(batch), fragmentSource());
     }
 
-    protected String vertexSource (int maxQuads) {
+    protected String vertexSource (UniformQuadBatch batch) {
       return vertexSource().
-        replace("_MAX_QUADS_", ""+maxQuads).
-        replace("_VEC4S_PER_QUAD_", ""+vec4sPerQuad());
+        replace("_MAX_QUADS_", ""+batch.maxQuads).
+        replace("_VEC4S_PER_QUAD_", ""+batch.vec4sPerQuad());
     }
 
     @Override protected String vertexSource () {
@@ -107,9 +107,9 @@ public class UniformQuadBatch extends QuadBatch {
     }
   }
 
-  public class Program extends GLProgram {
+  public static class Program extends GLProgram {
     public final int uTexture;
-    public final int uScreenSize;
+    public final int uHScreenSize;
     public final int uFlip;
     public final int uData;
     public final int aVertex;
@@ -118,8 +118,8 @@ public class UniformQuadBatch extends QuadBatch {
       super(gl, vertexSource, fragmentSource);
       uTexture = gl.glGetUniformLocation(program, "u_Texture");
       assert uTexture >= 0 : "Failed to get u_Texture uniform";
-      uScreenSize = gl.glGetUniformLocation(program, "u_ScreenSize");
-      assert uScreenSize >= 0 : "Failed to get u_ScreenSize uniform";
+      uHScreenSize = gl.glGetUniformLocation(program, "u_HScreenSize");
+      assert uHScreenSize >= 0 : "Failed to get u_HScreenSize uniform";
       uFlip = gl.glGetUniformLocation(program, "u_Flip");
       assert uFlip >= 0 : "Failed to get u_Flip uniform";
       uData = gl.glGetUniformLocation(program, "u_Data");
@@ -145,7 +145,13 @@ public class UniformQuadBatch extends QuadBatch {
   protected final float[] data;
   protected int quadCounter;
 
+  /** Creates a uniform quad batch with the default shader programs. */
   public UniformQuadBatch (GL20 gl) {
+    this(gl, new ProgramBuilder());
+  }
+
+  /** Creates a uniform quad batch with the supplied custom shader program builder. */
+  public UniformQuadBatch (GL20 gl, ProgramBuilder builder) {
     super(gl);
     int maxVecs = usableMaxUniformVectors(gl) - extraVec4s();
     if (maxVecs < vec4sPerQuad())
@@ -153,7 +159,7 @@ public class UniformQuadBatch extends QuadBatch {
       "GL_MAX_VERTEX_UNIFORM_VECTORS too low: have " + maxVecs +
         ", need at least " + vec4sPerQuad());
     this.maxQuads = maxVecs / vec4sPerQuad();
-    this.program = createBuilder().build(gl, maxQuads);
+    this.program = builder.build(this);
 
     // create our stock supply of unit quads and stuff them into our buffers
     short[] verts = new short[maxQuads*VERTICES_PER_QUAD*VERTEX_SIZE];
@@ -217,7 +223,7 @@ public class UniformQuadBatch extends QuadBatch {
   @Override public void begin (float fbufWidth, float fbufHeight, boolean flip) {
     super.begin(fbufWidth, fbufHeight, flip);
     program.activate();
-    gl.glUniform2f(program.uScreenSize, fbufWidth/2f, fbufHeight/2f);
+    gl.glUniform2f(program.uHScreenSize, fbufWidth/2f, fbufHeight/2f);
     gl.glUniform1f(program.uFlip, flip ? -1 : 1);
     gl.glBindBuffer(GL_ARRAY_BUFFER, verticesId);
     gl.glEnableVertexAttribArray(program.aVertex);
@@ -256,11 +262,6 @@ public class UniformQuadBatch extends QuadBatch {
     return "uquad/" + maxQuads;
   }
 
-  /** Returns the shader program builder used to build our stock shader. */
-  protected ProgramBuilder createBuilder () {
-    return new ProgramBuilder();
-  }
-
   protected int vec4sPerQuad () {
     return BASE_VEC4S_PER_QUAD;
   }
@@ -277,7 +278,7 @@ public class UniformQuadBatch extends QuadBatch {
 
   private static int usableMaxUniformVectors (GL20 gl) {
     // this returns the maximum number of vec4s; then we subtract one vec2 to account for the
-    // uScreenSize uniform, and two more because some GPUs seem to need one for our vec3 attr
+    // uHScreenSize uniform, and two more because some GPUs seem to need one for our vec3 attr
     int maxVecs = gl.glGetInteger(GL_MAX_VERTEX_UNIFORM_VECTORS) - 3;
     gl.checkError("glGetInteger(GL_MAX_VERTEX_UNIFORM_VECTORS)");
     return maxVecs;

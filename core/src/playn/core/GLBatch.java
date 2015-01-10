@@ -48,8 +48,11 @@ public abstract class GLBatch {
    */
   public void end () {
     if (!begun) throw new IllegalStateException(getClass().getSimpleName() + " mismatched end()");
-    flush();
-    begun = false;
+    try {
+      flush();
+    } finally {
+      begun = false;
+    }
   }
 
   /**

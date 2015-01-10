@@ -33,7 +33,7 @@ public abstract class SceneGame extends Game {
     gl.glEnable(GL20.GL_BLEND);
     gl.glBlendFunc(GL20.GL_ONE, GL20.GL_ONE_MINUS_SRC_ALPHA);
 
-    defaultBatch = new UniformQuadBatch(gl);
+    defaultBatch = createDefaultBatch(gl);
     viewSurf = new Surface(plat.graphics(), plat.graphics().defaultRenderTarget, defaultBatch);
     rootLayer = new GroupLayer();
 
@@ -62,5 +62,16 @@ public abstract class SceneGame extends Game {
     * default priority (0). */
   protected int scenePaintPrio () {
     return -1;
+  }
+
+  /** Creates the {@link QuadBatch} used as the default top-level batch when rendering the scene
+    * graph. This uses {@link UniformQuadBatch} if possible, {@link TriangleBatch} otherwise. */
+  protected QuadBatch createDefaultBatch (GL20 gl) {
+    try {
+      if (UniformQuadBatch.isLikelyToPerform(gl)) return new UniformQuadBatch(gl);
+    } catch (Exception e) {
+      // oops, fall through and use a TriangleBatch
+    }
+    return new TriangleBatch(gl);
   }
 }
