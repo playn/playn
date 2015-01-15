@@ -207,6 +207,9 @@ public class UniformQuadBatch extends QuadBatch {
   @Override public void begin (float fbufWidth, float fbufHeight, boolean flip) {
     super.begin(fbufWidth, fbufHeight, flip);
     program.activate();
+    // TODO: apparently we can avoid glUniform calls because they're part of the program state; so
+    // we can cache the last set values for all these glUniform calls and only set them anew if
+    // they differ...
     gl.glUniform2f(uHScreenSize, fbufWidth/2f, fbufHeight/2f);
     gl.glUniform1f(uFlip, flip ? -1 : 1);
     gl.glBindBuffer(GL_ARRAY_BUFFER, verticesId);
