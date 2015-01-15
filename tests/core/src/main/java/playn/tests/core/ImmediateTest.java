@@ -87,9 +87,9 @@ public class ImmediateTest extends Test {
       }
     }, 260, 160);
 
-    conns.add(game.paint.connect(new Slot<Game>() {
-      public void onEmit (Game game) {
-        elapsed = game.paintTick/1000f;
+    conns.add(game.paint.connect(new Slot<Clock>() {
+      public void onEmit (Clock clock) {
+        elapsed = clock.tick/1000f;
         rotation = elapsed * FloatMath.PI/2;
       }
     }));

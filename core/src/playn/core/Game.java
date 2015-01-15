@@ -37,28 +37,13 @@ public abstract class Game {
   public final Platform plat;
 
   /** A signal emitted on every simulation update. */
-  public final Signal<Game> update = Signal.create();
+  public final Signal<Clock> update = Signal.create();
 
   /** A signal emitted on every frame. */
-  public final Signal<Game> paint = Signal.create();
+  public final Signal<Clock> paint = Signal.create();
 
-  /** The number of millis that have elapsed since the last update. This will be a multiple of
-    * the {@code updateRate} supplied to the constructor, usually one. */
-  public int updateDelta;
-
-  /** The game tick (monotonically increasing value in millis) immediately prior to emitting
-    * {@link #update}. */
-  public int updateTick;
-
-  /** The game tick (monotonically increasing value in millis) immediately prior to emitting
-    * {@link #paint}. */
-  public int paintTick;
-
-  /** the ms between this {@link #painttick} and the previous. some animation apis really just want
-    * to know how many ms have elapsed since they last did their interpolation, and this saves them
-    * the trouble of having to track it themselves. */
-  public int paintDt;
-
+  private final Clock updateClock = new Clock();
+  private final Clock paintClock = new Clock();
   private final int updateRate;
   private int nextUpdate;
 
@@ -83,14 +68,16 @@ public abstract class Game {
         updates++;
       }
       this.nextUpdate = nextUpdate;
-      this.updateTick = updateTick;
-      this.updateDelta = updates*updateRate;
-      update.emit(this);
+      int updateDt = updates*updateRate;
+      updateClock.tick += updateDt;
+      updateClock.dt = updateDt;
+      update.emit(updateClock);
     }
 
-    int newPaintTick = plat.tick();
-    paintDt = newPaintTick - paintTick;
-    paintTick = newPaintTick;
-    paint.emit(this);
+    int paintTick = plat.tick();
+    paintClock.dt = paintTick - paintClock.dt;
+    paintClock.tick = paintTick;
+    paintClock.alpha = 1 - (nextUpdate - paintTick) / (float)updateRate;
+    paint.emit(paintClock);
   }
 }

@@ -66,9 +66,9 @@ public class ShaderTest extends Test {
         irotlayer.setBatch(rotBatch);
         game.rootLayer.addAt(irotlayer, 25 + 3*dx + orange.width(), 25);
 
-        conns.add(game.paint.connect(new Slot<Game>() {
-          public void onEmit (Game game) {
-            rotBatch.elapsed = game.paintTick/1000f;
+        conns.add(game.paint.connect(new Slot<Clock>() {
+          public void onEmit (Clock clock) {
+            rotBatch.elapsed = clock.tick/1000f;
           }
         }));
       }

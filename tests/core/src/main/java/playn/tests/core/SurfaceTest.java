@@ -163,8 +163,8 @@ public class SurfaceTest extends Test {
       game.rootLayer.add(dotl);
     }
 
-    conns.add(game.paint.connect(new Slot<Game>() {
-      public void onEmit (Game game) {
+    conns.add(game.paint.connect(new Slot<Clock>() {
+      public void onEmit (Clock clock) {
         for (ImageLayer dot : dots) {
           if (Math.random() > 0.95) {
             dot.setTranslation(dotBox.x + (float)Math.random()*(dotBox.width-10),
@@ -172,7 +172,7 @@ public class SurfaceTest extends Test {
           }
         }
 
-        float now = game.paintTick/1000f;
+        float now = clock.tick/1000f;
         float sin = Math.abs(FloatMath.sin(now)), cos = Math.abs(FloatMath.cos(now));
         int sinColor = (int)(sin * 255), cosColor = (int)(cos * 255);
         int c1 = (0xFF << 24) | (sinColor << 16) | (cosColor << 8);

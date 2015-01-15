@@ -65,9 +65,9 @@ public class SubImageTest extends Test {
         osci.region = new Rectangle(0, 0, orange.width(), orange.height());
         addTest(10, 150, osci, "ImageLayer with changing width", 100);
 
-        conns.add(game.paint.connect(new Slot<Game>() {
-          public void onEmit (Game game) {
-            float t = game.paintTick/1000f;
+        conns.add(game.paint.connect(new Slot<Clock>() {
+          public void onEmit (Clock clock) {
+            float t = clock.tick/1000f;
             // round the width so that it sometimes goes to zero; just to be sure zero doesn't choke
             osci.region.width = Math.round(
               Math.abs(FloatMath.sin(t)) * osci.texture().displayWidth);

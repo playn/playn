@@ -101,9 +101,9 @@ public class ClippedGroupTest extends Test {
     game.rootLayer.addAt(g4, 400, 25);
     game.rootLayer.addAt(g5, 525, 25);
 
-    conns.add(game.paint.connect(new Slot<Game>() {
-      public void onEmit (Game game) {
-        float elapsed = game.paintTick/1000f;
+    conns.add(game.paint.connect(new Slot<Clock>() {
+      public void onEmit (Clock clock) {
+        float elapsed = clock.tick/1000f;
         i1.setRotation(elapsed * FloatMath.PI/2);
         s1.setRotation(elapsed * FloatMath.PI/2);
         g2.setWidth(Math.round(Math.abs(100 * FloatMath.sin(elapsed))));

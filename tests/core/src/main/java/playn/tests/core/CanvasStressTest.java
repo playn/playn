@@ -36,11 +36,11 @@ public class CanvasStressTest extends Test {
     final Texture canvasTex = game.graphics.createTexture(canvas.image);
     game.rootLayer.add(new ImageLayer(canvasTex));
 
-    conns.add(game.update.connect(new Slot<Game>() {
+    conns.add(game.update.connect(new Slot<Clock>() {
       private int noSegs = 30;
       private int direction = 1;
 
-      public void onEmit (Game game) {
+      public void onEmit (Clock clock) {
         canvas.clear();
         canvas.setStrokeWidth(3);
         canvas.setStrokeColor(0x88ff0000);

@@ -44,9 +44,9 @@ public class ClearBackgroundTest extends Test {
     final ImageLayer square = new ImageLayer(surf.texture);
     game.rootLayer.add(square);
 
-    conns.add(game.paint.connect(new Slot<Game>() {
-      public void onEmit (Game game) {
-        float t = game.paintTick / 1000f;
+    conns.add(game.paint.connect(new Slot<Clock>() {
+      public void onEmit (Clock clock) {
+        float t = clock.tick / 1000f;
         IDimension vsize = game.plat.graphics().viewSize;
         square.setTranslation((FloatMath.cos(t) + 1) * (vsize.width() - width)/2,
                               (FloatMath.sin(t) + 1) * (vsize.height() - height)/2);

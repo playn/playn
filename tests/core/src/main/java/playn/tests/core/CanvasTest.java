@@ -222,9 +222,9 @@ public class CanvasTest extends Test {
       }
     });
 
-    conns.add(game.paint.connect(new Slot<Game>() {
-      public void onEmit (Game game) {
-        int curSecs = game.paintTick/1000;
+    conns.add(game.paint.connect(new Slot<Clock>() {
+      public void onEmit (Clock clock) {
+        int curSecs = clock.tick/1000;
         if (curSecs != lastSecs) {
           timeImg.clear();
           timeImg.setStrokeColor(0xFF000000).strokeRect(0, 0, 99, 99);
@@ -235,7 +235,7 @@ public class CanvasTest extends Test {
 
         // round the width so that it goes to zero sometimes (which should be fine)
         if (tileLayer != null) tileLayer.forceWidth = Math.round(
-          Math.abs(FloatMath.sin(game.paintTick/2000f)) * 100);
+          Math.abs(FloatMath.sin(clock.tick/2000f)) * 100);
       }
     }));
   }

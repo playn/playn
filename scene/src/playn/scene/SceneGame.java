@@ -37,8 +37,8 @@ public abstract class SceneGame extends Game {
     viewSurf = new Surface(plat.graphics(), plat.graphics().defaultRenderTarget, defaultBatch);
     rootLayer = new GroupLayer();
 
-    paint.connect(new Slot<Game>() {
-      public void onEmit (Game game) { paintScene(); }
+    paint.connect(new Slot<Clock>() {
+      public void onEmit (Clock clock) { paintScene(); }
     }).atPrio(scenePaintPrio());
   }
 
