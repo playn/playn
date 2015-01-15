@@ -137,13 +137,6 @@ public class JavaGraphics extends Graphics {
     return screenSize;
   }
 
-  @Override public Font createFont(Font.Config config) {
-    java.awt.Font jfont = fonts.get(config.name);
-    // if we don't have a custom font registered for this name, assume it's a platform font
-    if (jfont == null) jfont = new java.awt.Font(config.name, java.awt.Font.PLAIN, 12);
-    return new JavaFont(config, jfont);
-  }
-
   @Override public TextLayout layoutText(String text, TextFormat format) {
     return JavaTextLayout.layoutText(this, text, format);
   }
@@ -156,6 +149,16 @@ public class JavaGraphics extends Graphics {
     BufferedImage bitmap = new BufferedImage(
       pixelWidth, pixelHeight, BufferedImage.TYPE_INT_ARGB_PRE);
     return new JavaCanvas(new JavaImage(scale, bitmap));
+  }
+
+  java.awt.Font resolveFont(Font font) {
+    java.awt.Font jfont = fonts.get(font.name);
+    // if we don't have a custom font registered for this name, assume it's a platform font
+    if (jfont == null) {
+      fonts.put(font.name, jfont = new java.awt.Font(font.name, java.awt.Font.PLAIN, 12));
+    }
+    // derive a font instance at the desired style and size
+    return jfont.deriveFont(STYLE_TO_JAVA[font.style.ordinal()], font.size);
   }
 
   /** Converts the given image into a format for quick upload to the GPU. */
@@ -202,4 +205,10 @@ public class JavaGraphics extends Graphics {
   private static ByteBuffer createImageBuffer (int byteSize) {
     return ByteBuffer.allocateDirect(byteSize).order(ByteOrder.nativeOrder());
   }
+
+  // this matches the order in Font.Style
+  private static final int[] STYLE_TO_JAVA = {
+    java.awt.Font.PLAIN, java.awt.Font.BOLD, java.awt.Font.ITALIC,
+    java.awt.Font.BOLD|java.awt.Font.ITALIC
+  };
 }

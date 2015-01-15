@@ -33,18 +33,18 @@ import playn.core.TextWrap;
 
 class JavaTextLayout extends playn.core.TextLayout {
 
-  public static JavaTextLayout layoutText(JavaGraphics gfx, String text, TextFormat format) {
+  public static JavaTextLayout layoutText (JavaGraphics gfx, String text, TextFormat format) {
     // we do some fiddling to work around the fact that TextLayout chokes on the empty string
     AttributedString astring = new AttributedString(text.length() == 0 ? " " : text);
     if (format.font != null) {
-      astring.addAttribute(TextAttribute.FONT, ((JavaFont)format.font).jfont);
+      astring.addAttribute(TextAttribute.FONT, gfx.resolveFont(format.font));
     }
     FontRenderContext frc = format.antialias ? gfx.aaFontContext : gfx.aFontContext;
     return new JavaTextLayout(text, format, new TextLayout(astring.getIterator(), frc));
   }
 
-  public static JavaTextLayout[] layoutText(JavaGraphics gfx, String text, TextFormat format,
-                                            TextWrap wrap) {
+  public static JavaTextLayout[] layoutText (JavaGraphics gfx, String text, TextFormat format,
+                                             TextWrap wrap) {
     // normalize newlines in the text (Windows: CRLF -> LF, Mac OS pre-X: CR -> LF)
     text = normalizeEOL(text);
 
@@ -54,7 +54,7 @@ class JavaTextLayout extends playn.core.TextLayout {
     // set up an attributed character iterator so that we can measure the text
     AttributedString astring = new AttributedString(ltext);
     if (format.font != null) {
-      astring.addAttribute(TextAttribute.FONT, ((JavaFont)format.font).jfont);
+      astring.addAttribute(TextAttribute.FONT, gfx.resolveFont(format.font));
     }
 
     List<JavaTextLayout> layouts = new ArrayList<JavaTextLayout>();

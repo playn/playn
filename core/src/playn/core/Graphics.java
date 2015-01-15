@@ -141,11 +141,6 @@ public abstract class Graphics {
   }
 
   /**
-   * Creates a font with the specified configuration.
-   */
-  public abstract Font createFont (Font.Config config);
-
-  /**
    * Lays out a single line of text using the specified format. The text may subsequently be
    * rendered on a canvas via {@link Canvas#fillText (TextLayout,float,float)}.
    */

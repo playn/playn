@@ -91,20 +91,12 @@ class HtmlTextLayout extends TextLayout {
 
   static void configContext(Context2d ctx, TextFormat format) {
     Font font = getFont(format);
-    String style = "";
-    switch (font.style()) {
-    case BOLD:        style = "bold";   break;
-    case ITALIC:      style = "italic"; break;
-    case BOLD_ITALIC: style = "bold italic"; break;
-    default: break; // nada
-    }
-
-    ctx.setFont(style + " " + font.size() + "px " + font.name());
+    ctx.setFont(HtmlFont.toCSS(font));
     ctx.setTextBaseline(Context2d.TextBaseline.TOP);
   }
 
-  static HtmlFont getFont(TextFormat format) {
-    return (format.font == null) ? HtmlFont.DEFAULT : (HtmlFont)format.font;
+  static Font getFont(TextFormat format) {
+    return (format.font == null) ? HtmlFont.DEFAULT : format.font;
   }
 
   static int measureLine(Context2d ctx, TextFormat format, TextWrap wrap, HtmlFontMetrics metrics,

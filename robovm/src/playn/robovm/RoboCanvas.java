@@ -27,6 +27,7 @@ import org.robovm.apple.coregraphics.CGLineJoin;
 import org.robovm.apple.coregraphics.CGMutablePath;
 import org.robovm.apple.coregraphics.CGRect;
 import org.robovm.apple.coregraphics.CGTextEncoding;
+import org.robovm.apple.coretext.CTFont;
 import org.robovm.rt.bro.ptr.VoidPtr;
 
 import playn.core.*;
@@ -123,11 +124,11 @@ public class RoboCanvas extends Canvas {
   }
 
   @Override public Canvas drawText(String text, float x, float y) {
+    CTFont font = RoboFont.resolveFont(null); // default font
     bctx.saveGState();
-    bctx.translateCTM(x, y + RoboGraphics.defaultFont.ctFont.getDescent());
+    bctx.translateCTM(x, y + font.getDescent());
     bctx.scaleCTM(1, -1);
-    bctx.selectFont(RoboGraphics.defaultFont.iosName(), RoboGraphics.defaultFont.size(),
-                    CGTextEncoding.MacRoman);
+    bctx.selectFont(font.getPostScriptName(), font.getSize(), CGTextEncoding.MacRoman);
     bctx.showTextAtPoint(0, 0, text);
     bctx.restoreGState();
     isDirty = true;

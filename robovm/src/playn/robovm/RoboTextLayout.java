@@ -19,6 +19,7 @@ import org.robovm.apple.coregraphics.CGAffineTransform;
 import org.robovm.apple.coregraphics.CGBitmapContext;
 import org.robovm.apple.coregraphics.CGPath;
 import org.robovm.apple.coregraphics.CGRect;
+import org.robovm.apple.coretext.CTFont;
 // TODO: restore these when stock CTFrame binding is no longer broken
 // import org.robovm.apple.coretext.CTFrame;
 // import org.robovm.apple.coretext.CTFramesetter;
@@ -36,7 +37,7 @@ import pythagoras.f.Rectangle;
 class RoboTextLayout extends TextLayout {
 
   public static RoboTextLayout layoutText(RoboGraphics gfx, final String text, TextFormat format) {
-    final RoboFont font = (format.font == null) ? RoboGraphics.defaultFont : (RoboFont) format.font;
+    final CTFont font = RoboFont.resolveFont(format.font);
     NSAttributedStringAttributes attribs = createAttribs(font);
     CTLine line = CTLine.create(new NSAttributedString(text, attribs));
     return new RoboTextLayout(gfx, text, format, font, line);
@@ -46,7 +47,7 @@ class RoboTextLayout extends TextLayout {
                                             TextWrap wrap) {
     text = normalizeEOL(text);
 
-    final RoboFont font = (format.font == null) ? RoboGraphics.defaultFont : (RoboFont) format.font;
+    final CTFont font = RoboFont.resolveFont(format.font);
     NSAttributedStringAttributes attribs = createAttribs(font);
     CFArray lines = wrapLines(new NSAttributedString(text, attribs), wrap.width);
 
@@ -60,17 +61,17 @@ class RoboTextLayout extends TextLayout {
     return layouts;
   }
 
-  private static NSAttributedStringAttributes createAttribs(RoboFont font) {
+  private static NSAttributedStringAttributes createAttribs(CTFont font) {
     NSAttributedStringAttributes attribs = new NSAttributedStringAttributes();
-    attribs.setFont(font.ctFont.as(UIFont.class));
+    attribs.setFont(font.as(UIFont.class));
     // attribs.setForegroundColorFromContext(true); // TODO
     return attribs;
   }
 
-  private static void addStroke(NSAttributedStringAttributes attribs, RoboFont font,
+  private static void addStroke(NSAttributedStringAttributes attribs, CTFont font,
                                 float strokeWidth, int strokeColor) {
     // stroke width is expressed as a percentage of the font size in iOS
-    float strokePct = 100 * strokeWidth / font.size();
+    double strokePct = 100 * strokeWidth / font.getSize();
     attribs.setStrokeWidth(strokePct);
     // unfortunately we have to set the stroke color here, we cannot inherit it from the context
     attribs.setStrokeColor(toUIColor(strokeColor));
@@ -90,34 +91,34 @@ class RoboTextLayout extends TextLayout {
     }
   }
 
-  private final RoboFont font;
+  private final CTFont font;
   private CTLine fillLine;
   private int fillColor;
   private CTLine strokeLine; // initialized lazily
   private float strokeWidth;
   private int strokeColor;
 
-  private RoboTextLayout(RoboGraphics gfx, String text, TextFormat format, RoboFont font,
+  private RoboTextLayout(RoboGraphics gfx, String text, TextFormat format, CTFont font,
                          CTLine fillLine) {
     super(text, format, computeBounds(font, fillLine.getImageBounds(gfx.scratchCtx)),
-          (float)(font.ctFont.getAscent()+font.ctFont.getDescent()));
+          (float)(font.getAscent()+font.getDescent()));
     this.font = font;
     this.fillLine = fillLine;
   }
 
   @Override
   public float ascent() {
-    return (float)font.ctFont.getAscent();
+    return (float)font.getAscent();
   }
 
   @Override
   public float descent() {
-    return (float)font.ctFont.getDescent();
+    return (float)font.getDescent();
   }
 
   @Override
   public float leading() {
-    return (float)font.ctFont.getLeading();
+    return (float)font.getLeading();
   }
 
   void stroke(CGBitmapContext bctx, float x, float y, float strokeWidth, int strokeColor) {
@@ -162,13 +163,13 @@ class RoboTextLayout extends TextLayout {
     return new UIColor(red, green, blue, alpha);
   }
 
-  private static Rectangle computeBounds(RoboFont font, CGRect bounds) {
+  private static Rectangle computeBounds(CTFont font, CGRect bounds) {
     // the y coordinate of bounds is a little tricky: iOS reports y as the number of pixels to
     // below the baseline that the text extends (the descent, but precisely for this text, not the
     // font's "maximum" descent) and the value is negative (due to the inverted coordinate system);
     // so we have to do some math to recover the desired y value which is the number of pixels
     // below the top-left of the line bounding box
-    float ascent = (float)font.ctFont.getAscent();
+    float ascent = (float)font.getAscent();
     return new Rectangle((float)bounds.getMinX(),
                          ascent - (float)(bounds.getHeight() + bounds.getMinY()),
                          (float)bounds.getWidth(), (float)bounds.getHeight());

@@ -16,8 +16,7 @@
 package playn.core;
 
 /**
- * Contains configuration for laying out and drawing single- or multi-line text to a {@link
- * Canvas}.
+ * Contains info for laying out and drawing single- or multi-line text to a {@link Canvas}.
  */
 public class TextFormat {
 
@@ -30,7 +29,12 @@ public class TextFormat {
 
   /** Creates a default text format instance. */
   public TextFormat() {
-    this(null, true);
+    this(null);
+  }
+
+  /** Creates a text format instance with the specified font. */
+  public TextFormat(Font font) {
+    this(font, true);
   }
 
   /** Creates a configured text format instance. */
@@ -44,16 +48,12 @@ public class TextFormat {
     return new TextFormat(font, this.antialias);
   }
   /** Returns a clone of this text format with the font configured as specified. */
-  public TextFormat withFont(Graphics gfx, Font.Config fconfig) {
-    return withFont(gfx.createFont(fconfig));
+  public TextFormat withFont(String name, Font.Style style, float size) {
+    return withFont(new Font(name, style, size));
   }
   /** Returns a clone of this text format with the font configured as specified. */
-  public TextFormat withFont(Graphics gfx, String name, Font.Style style, float size) {
-    return withFont(gfx.createFont(new Font.Config(name, style, size)));
-  }
-  /** Returns a clone of this text format with the font configured as specified. */
-  public TextFormat withFont(Graphics gfx, String name, float size) {
-    return withFont(gfx.createFont(new Font.Config(name, size)));
+  public TextFormat withFont(String name, float size) {
+    return withFont(new Font(name, size));
   }
 
   /** Returns a clone of this text format with {@link #antialias} configured as specified. */
@@ -61,13 +61,11 @@ public class TextFormat {
     return new TextFormat(this.font, antialias);
   }
 
-  @Override
-  public String toString() {
+  @Override public String toString() {
     return "[font=" + font + ", antialias=" + antialias + "]";
   }
 
-  @Override
-  public boolean equals(Object other) {
+  @Override public boolean equals(Object other) {
     if (other instanceof TextFormat) {
       TextFormat ofmt = (TextFormat)other;
       return (font == ofmt.font || (font != null && font.equals(ofmt.font))) &&
@@ -77,8 +75,7 @@ public class TextFormat {
     }
   }
 
-  @Override
-  public int hashCode() {
+  @Override public int hashCode() {
     int hash = (antialias ? 1 : 0);
     if (font != null) hash ^= font.hashCode();
     return hash;

@@ -17,18 +17,23 @@ package playn.html;
 
 import playn.core.Font;
 
-class HtmlFont extends Font {
+class HtmlFont {
 
   /** For use when no font is specified. */
-  public static final HtmlFont DEFAULT = new HtmlFont(new Config("sans-serif", Style.PLAIN, 12));
+  public static final Font DEFAULT = new Font("sans-serif", Font.Style.PLAIN, 12);
 
-  public HtmlFont(Config config) {
-    super(quoteName(config));
-  }
+  public static String toCSS (Font font) {
+    String name = font.name;
+    if (!name.startsWith("\"") && name.contains(" ")) name = '"' + name + '"';
 
-  private static Config quoteName (Config config) {
-    String name = config.name;
-    if (name.startsWith("\"") || !name.contains(" ")) return config;
-    return new Config('"' + name + '"', config.style, config.size);
+    String style = "";
+    switch (font.style) {
+    case BOLD:        style = "bold";   break;
+    case ITALIC:      style = "italic"; break;
+    case BOLD_ITALIC: style = "bold italic"; break;
+    default: break; // nada
+    }
+
+    return style + " " + font.size + "px " + name;
   }
 }

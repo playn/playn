@@ -160,22 +160,25 @@ public class AndroidGraphics extends Graphics {
     return createCanvasImpl(scale, scale.scaledCeil(width), scale.scaledCeil(height));
   }
 
-  @Override public Font createFont(Font.Config config) {
-    Pair<String,Font.Style> key = Pair.create(config.name, config.style);
-    return new AndroidFont(config, fonts.get(key), ligatureHacks.get(key));
-  }
-
   @Override public TextLayout layoutText(String text, TextFormat format) {
-    return AndroidTextLayout.layoutText(text, format);
+    return AndroidTextLayout.layoutText(this, text, format);
   }
 
   @Override public TextLayout[] layoutText(String text, TextFormat format, TextWrap wrap) {
-    return AndroidTextLayout.layoutText(text, format, wrap);
+    return AndroidTextLayout.layoutText(this, text, format, wrap);
   }
 
   @Override protected Canvas createCanvasImpl(Scale scale, int pixelWidth, int pixelHeight) {
     Bitmap bitmap = Bitmap.createBitmap(pixelWidth, pixelHeight, preferredBitmapConfig);
     return new AndroidCanvas(new AndroidImage(scale, bitmap));
+  }
+
+  AndroidFont resolveFont(Font font) {
+    if (font == null) return AndroidFont.DEFAULT;
+    Pair<String,Font.Style> key = Pair.create(font.name, font.style);
+    Typeface face = fonts.get(key);
+    if (face == null) fonts.put(key, face = AndroidFont.create(font));
+    return new AndroidFont(face, font.size, ligatureHacks.get(key));
   }
 
   void onSurfaceCreated() {

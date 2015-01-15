@@ -20,8 +20,9 @@ import org.robovm.apple.coregraphics.CGAffineTransform;
 import org.robovm.apple.coretext.CTFont;
 
 import playn.core.Font;
+import playn.core.Font.Style;
 
-public class RoboFont extends Font {
+public class RoboFont {
 
   /**
    * Registers a font for use when a bold, italic or bold italic variant is requested. iOS does not
@@ -46,21 +47,16 @@ public class RoboFont extends Font {
   }
 
   /**
-   * Returns the font used when no font is configured.
+   * Resolves the CTFont for the PlayN {@code font}. {@code font} may be {@code null}, in which
+   * case the default font is returned.
    */
-  public static RoboFont defaultFont () {
-    return RoboGraphics.defaultFont;
-  }
-
-  final CTFont ctFont;
-
-  public RoboFont(Font.Config config) {
-    super(config);
-    ctFont = CTFont.create(iosName(), config.size, CGAffineTransform.Identity());
-  }
-
-  public String iosName() {
-    return getVariant(config.name, config.style);
+  static CTFont resolveFont (Font font) {
+    CTFont ctFont = fonts.get(font == null ? DEFAULT_FONT : font);
+    if (ctFont == null) {
+      String iosName = getVariant(font.name, font.style);
+      fonts.put(font, ctFont = CTFont.create(iosName, font.size, CGAffineTransform.Identity()));
+    }
+    return ctFont;
   }
 
   private static String getVariant(String name, Style style) {
@@ -74,7 +70,10 @@ public class RoboFont extends Font {
     else return name;
   }
 
-  private static Map<Style,Map<String,String>> _variants = new HashMap<Style,Map<String,String>>();
+  // TODO: I should probably move this cache into RoboGraphics...
+  private static Map<Font,CTFont> fonts = new HashMap<>();
+
+  private static Map<Style,Map<String,String>> _variants = new HashMap<>();
   static {
     // this is a selection of moderately well-known fonts that are available on iOS;
     // see http://www.bluecrowbar.com/blog/2010/12/ios-fonts.html for a complete list
@@ -132,4 +131,6 @@ public class RoboFont extends Font {
     registerVariant("Times", Style.BOLD, "TimesNewRomanPS-BoldMT");
     registerVariant("Times", Style.BOLD_ITALIC, "TimesNewRomanPS-BoldItalicMT");
   }
+
+  private static final Font DEFAULT_FONT = new Font("Helvetica", Font.Style.PLAIN, 12);
 }

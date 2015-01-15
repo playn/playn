@@ -19,6 +19,7 @@ import org.robovm.apple.coregraphics.CGColorSpace;
 import org.robovm.apple.coregraphics.CGImage;
 import org.robovm.apple.coregraphics.CGImageAlphaInfo;
 import org.robovm.apple.coregraphics.CGRect;
+import org.robovm.apple.coretext.CTFont;
 import org.robovm.apple.uikit.UIDevice;
 import org.robovm.apple.uikit.UIScreen;
 import org.robovm.apple.uikit.UIUserInterfaceIdiom;
@@ -37,8 +38,6 @@ public class RoboGraphics extends Graphics {
 
   // a shared colorspace instance for use all over the place
   static final CGColorSpace colorSpace = CGColorSpace.createDeviceRGB();
-  static final RoboFont defaultFont = new RoboFont(
-    new Font.Config("Helvetica", Font.Style.PLAIN, 12));
 
   final RoboPlatform plat;
   private final float touchScale;
@@ -81,10 +80,6 @@ public class RoboGraphics extends Graphics {
       screenSize.height /= 2;
     }
     return screenSize;
-  }
-
-  @Override public Font createFont(Font.Config cfg) {
-    return new RoboFont(cfg);
   }
 
   @Override public TextLayout layoutText(String text, TextFormat format) {

@@ -15,13 +15,15 @@
  */
 package playn.html;
 
+import playn.core.Font;
+
 /**
  * Contains metrics measured for an HTML font at a particular size and style.
  */
 class HtmlFontMetrics {
 
   /** The font in question. */
-  public final HtmlFont font;
+  public final Font font;
 
   /** The full height of a line of text rendered with this font. */
   public final float height;
@@ -29,7 +31,7 @@ class HtmlFontMetrics {
   /** The width of a lower-case 'm'. */
   public final float emwidth;
 
-  public HtmlFontMetrics(HtmlFont font, float height, float emwidth) {
+  public HtmlFontMetrics(Font font, float height, float emwidth) {
     this.font = font;
     this.height = height;
     this.emwidth = emwidth;
@@ -63,7 +65,7 @@ class HtmlFontMetrics {
   public float adjustWidth(float width) {
     // Canvas.measureText does not account for the extra width consumed by italic characters, so we
     // fudge in a fraction of an em and hope the font isn't too slanted
-    switch (font.style()) {
+    switch (font.style) {
     case ITALIC:      return width + emwidth/8;
     case BOLD_ITALIC: return width + emwidth/6;
     default:          return width; // nada

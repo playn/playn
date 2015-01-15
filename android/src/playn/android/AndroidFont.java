@@ -22,29 +22,32 @@ import android.graphics.Typeface;
 
 import playn.core.Font;
 
-class AndroidFont extends Font {
+class AndroidFont {
 
   private static final String[] NO_HACKS = {};
 
-  public static final AndroidFont DEFAULT = new AndroidFont(
-    new Font.Config("Default", Style.PLAIN, 14), Typeface.DEFAULT, null);
+  public static final AndroidFont DEFAULT = new AndroidFont(Typeface.DEFAULT, 14, null);
 
   public final Typeface typeface;
+  public final float size;
   public final String[] ligatureHacks;
 
-  public AndroidFont(Font.Config config, Typeface typeface, String[] ligatureHacks) {
-    super(config);
-    this.typeface = (typeface != null) ? typeface :
-      Typeface.create(config.name, TO_ANDROID_STYLE.get(config.style));
+  public AndroidFont(Typeface typeface, float size, String[] ligatureHacks) {
+    this.typeface = typeface;
+    this.size = size;
     this.ligatureHacks = (ligatureHacks != null) ? ligatureHacks : NO_HACKS;
   }
 
-  protected static final Map<Style,Integer> TO_ANDROID_STYLE =
-    new EnumMap<Style,Integer>(Style.class);
+  public static Typeface create (Font font) {
+    return Typeface.create(font.name, TO_ANDROID_STYLE.get(font.style));
+  }
+
+  protected static final Map<Font.Style,Integer> TO_ANDROID_STYLE =
+    new EnumMap<Font.Style,Integer>(Font.Style.class);
   static {
-    TO_ANDROID_STYLE.put(Style.PLAIN,       Typeface.NORMAL);
-    TO_ANDROID_STYLE.put(Style.BOLD,        Typeface.BOLD);
-    TO_ANDROID_STYLE.put(Style.ITALIC,      Typeface.ITALIC);
-    TO_ANDROID_STYLE.put(Style.BOLD_ITALIC, Typeface.BOLD_ITALIC);
+    TO_ANDROID_STYLE.put(Font.Style.PLAIN,       Typeface.NORMAL);
+    TO_ANDROID_STYLE.put(Font.Style.BOLD,        Typeface.BOLD);
+    TO_ANDROID_STYLE.put(Font.Style.ITALIC,      Typeface.ITALIC);
+    TO_ANDROID_STYLE.put(Font.Style.BOLD_ITALIC, Typeface.BOLD_ITALIC);
   }
 }

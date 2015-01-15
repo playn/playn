@@ -33,21 +33,22 @@ class AndroidTextLayout extends TextLayout {
   private final AndroidFont font;
   private final Paint.FontMetrics metrics;
 
-  public static TextLayout layoutText(String text, TextFormat format) {
-    AndroidFont font = (format.font == null) ? AndroidFont.DEFAULT : (AndroidFont)format.font;
+  public static TextLayout layoutText(AndroidGraphics gfx, String text, TextFormat format) {
+    AndroidFont font = gfx.resolveFont(format.font);
     Paint paint = new Paint(format.antialias ? Paint.ANTI_ALIAS_FLAG : 0);
     paint.setTypeface(font.typeface);
-    paint.setTextSize(font.size());
+    paint.setTextSize(font.size);
     paint.setSubpixelText(true);
     Paint.FontMetrics metrics = paint.getFontMetrics();
     return new AndroidTextLayout(text, format, font, metrics, paint.measureText(text));
   }
 
-  public static TextLayout[] layoutText(String text, TextFormat format, TextWrap wrap) {
-    AndroidFont font = (format.font == null) ? AndroidFont.DEFAULT : (AndroidFont)format.font;
+  public static TextLayout[] layoutText(AndroidGraphics gfx, String text, TextFormat format,
+                                        TextWrap wrap) {
+    AndroidFont font = gfx.resolveFont(format.font);
     Paint paint = new Paint(format.antialias ? Paint.ANTI_ALIAS_FLAG : 0);
     paint.setTypeface(font.typeface);
-    paint.setTextSize(font.size());
+    paint.setTextSize(font.size);
     paint.setSubpixelText(true);
     Paint.FontMetrics metrics = paint.getFontMetrics();
 
@@ -141,12 +142,12 @@ class AndroidTextLayout extends TextLayout {
     paint.setAntiAlias(format.antialias);
     try {
       paint.setTypeface(font.typeface);
-      paint.setTextSize(font.size());
+      paint.setTextSize(font.size);
       paint.setSubpixelText(true);
 
       // if we're drawing REALLY BIG TEXT, draw to a path rather than directly drawing text to work
       // around KitKat bug: https://code.google.com/p/android/issues/detail?id=62800
-      if (font.size() > 250) {
+      if (font.size > 250) {
         Path path = new Path();
         paint.getTextPath(text, 0, text.length(), x, y - metrics.ascent, path);
         canvas.drawPath(path, paint);

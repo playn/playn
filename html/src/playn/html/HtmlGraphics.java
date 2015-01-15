@@ -156,8 +156,7 @@ public class HtmlGraphics extends Graphics {
    *
    * @param lineHeight the height of a line of text in the specified font (in pixels).
    */
-  public void registerFontMetrics(String name, Font.Config config, float lineHeight) {
-    HtmlFont font = new HtmlFont(config);
+  public void registerFontMetrics(String name, Font font, float lineHeight) {
     HtmlFontMetrics metrics = getFontMetrics(font); // get emwidth via default measurement
     fontMetrics.put(font, new HtmlFontMetrics(font, lineHeight, metrics.emwidth));
   }
@@ -167,10 +166,6 @@ public class HtmlGraphics extends Graphics {
     screenSize.width = Document.get().getDocumentElement().getClientWidth();
     screenSize.height = Document.get().getDocumentElement().getClientHeight();
     return screenSize;
-  }
-
-  @Override public Font createFont(Font.Config config) {
-    return new HtmlFont(config);
   }
 
   @Override public TextLayout layoutText(String text, TextFormat format) {
@@ -202,16 +197,16 @@ public class HtmlGraphics extends Graphics {
                                 GL20.GL_UNSIGNED_BYTE, img);
   }
 
-  HtmlFontMetrics getFontMetrics(HtmlFont font) {
+  HtmlFontMetrics getFontMetrics(Font font) {
     HtmlFontMetrics metrics = fontMetrics.get(font);
     if (metrics == null) {
       // TODO: when Context2d.measureText some day returns a height, nix this hackery
-      measureElement.getStyle().setFontSize(font.size(), Unit.PX);
+      measureElement.getStyle().setFontSize(font.size, Unit.PX);
       measureElement.getStyle().setFontWeight(Style.FontWeight.NORMAL);
       measureElement.getStyle().setFontStyle(Style.FontStyle.NORMAL);
-      measureElement.getStyle().setProperty("fontFamily", font.name());
+      measureElement.getStyle().setProperty("fontFamily", font.name);
       measureElement.setInnerText(HEIGHT_TEXT);
-      switch (font.style()) {
+      switch (font.style) {
       case BOLD:
         measureElement.getStyle().setFontWeight(Style.FontWeight.BOLD);
         break;
