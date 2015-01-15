@@ -166,6 +166,9 @@ public abstract class Canvas {
   /** Creates a path object. */
   public abstract Path createPath ();
 
+  /** Creates a gradient fill pattern. */
+  public abstract Gradient createGradient (Gradient.Config config);
+
   /**
    * Draws an image at the specified location {@code (x, y)}.
    */

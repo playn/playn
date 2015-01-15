@@ -95,6 +95,12 @@ public class RoboCanvas extends Canvas {
     return new RoboPath();
   }
 
+  @Override public Gradient createGradient(Gradient.Config cfg) {
+    if (cfg instanceof Gradient.Linear) return new RoboGradient.Linear((Gradient.Linear)cfg);
+    else if (cfg instanceof Gradient.Radial) return new RoboGradient.Radial((Gradient.Radial)cfg);
+    else throw new IllegalArgumentException("Unknown config: " + cfg);
+  }
+
   @Override public void dispose () {
     ((RoboCanvasImage)image).dispose();
   }

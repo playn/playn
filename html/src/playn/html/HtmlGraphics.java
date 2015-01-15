@@ -169,10 +169,6 @@ public class HtmlGraphics extends Graphics {
     return screenSize;
   }
 
-  @Override public Gradient createGradient(Gradient.Config config) {
-    return new HtmlGradient(dummyCtx, config);
-  }
-
   @Override public Font createFont(Font.Config config) {
     return new HtmlFont(config);
   }

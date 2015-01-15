@@ -85,6 +85,10 @@ public class AndroidCanvas extends Canvas {
     return new AndroidPath();
   }
 
+  @Override public Gradient createGradient(Gradient.Config cfg) {
+    return new AndroidGradient(cfg);
+  }
+
   @Override public Canvas drawLine(float x0, float y0, float x1, float y1) {
     canvas.drawLine(x0, y0, x1, y1, currentState().prepareStroke());
     isDirty = true;

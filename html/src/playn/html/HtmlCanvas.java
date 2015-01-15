@@ -56,6 +56,10 @@ public class HtmlCanvas extends Canvas {
     return new HtmlPath();
   }
 
+  @Override public Gradient createGradient(Gradient.Config config) {
+    return new HtmlGradient(ctx, config);
+  }
+
   @Override public Canvas drawLine(float x0, float y0, float x1, float y1) {
     ctx.beginPath();
     ctx.moveTo(x0, y0);

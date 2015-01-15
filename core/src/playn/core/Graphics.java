@@ -141,11 +141,6 @@ public abstract class Graphics {
   }
 
   /**
-   * Creates a gradient fill pattern.
-   */
-  public abstract Gradient createGradient (Gradient.Config config);
-
-  /**
    * Creates a font with the specified configuration.
    */
   public abstract Font createFont (Font.Config config);

@@ -137,14 +137,6 @@ public class JavaGraphics extends Graphics {
     return screenSize;
   }
 
-  @Override public Gradient createGradient(Gradient.Config config) {
-    if (config instanceof Gradient.Linear) {
-      return JavaGradient.create((Gradient.Linear)config);
-    } else {
-      return JavaGradient.create((Gradient.Radial)config);
-    }
-  }
-
   @Override public Font createFont(Font.Config config) {
     java.awt.Font jfont = fonts.get(config.name);
     // if we don't have a custom font registered for this name, assume it's a platform font

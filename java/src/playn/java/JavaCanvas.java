@@ -116,6 +116,12 @@ class JavaCanvas extends Canvas {
     return new JavaPath();
   }
 
+  @Override public Gradient createGradient(Gradient.Config cfg) {
+    if (cfg instanceof Gradient.Linear) return JavaGradient.create((Gradient.Linear)cfg);
+    else if (cfg instanceof Gradient.Radial) return JavaGradient.create((Gradient.Radial)cfg);
+    else throw new IllegalArgumentException("Unknown config: " + cfg);
+  }
+
   @Override
   public Canvas drawLine(float x0, float y0, float x1, float y1) {
     currentState().prepareStroke(gfx);

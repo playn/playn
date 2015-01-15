@@ -160,10 +160,6 @@ public class AndroidGraphics extends Graphics {
     return createCanvasImpl(scale, scale.scaledCeil(width), scale.scaledCeil(height));
   }
 
-  @Override public Gradient createGradient(Gradient.Config cfg) {
-    return new AndroidGradient(cfg);
-  }
-
   @Override public Font createFont(Font.Config config) {
     Pair<String,Font.Style> key = Pair.create(config.name, config.style);
     return new AndroidFont(config, fonts.get(key), ligatureHacks.get(key));
