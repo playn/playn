@@ -134,9 +134,9 @@ public class TextBlock {
    * it. The image will include padding around the edge to ensure that antialiasing has a bit of
    * extra space to do its work.
    */
-  public Canvas toCanvas(Graphics graphics, Align align, int fillColor) {
-    float pad = 1/graphics.scale.factor;
-    Canvas canvas = graphics.createCanvas(bounds.width()+2*pad, bounds.height()+2*pad);
+  public Canvas toCanvas(Graphics gfx, Align align, int fillColor) {
+    float pad = 1/gfx.scale.factor;
+    Canvas canvas = gfx.createCanvas(bounds.width()+2*pad, bounds.height()+2*pad);
     canvas.setFillColor(fillColor);
     fill(canvas, align, pad, pad);
     return canvas;
