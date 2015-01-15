@@ -15,6 +15,8 @@ package playn.scene;
 
 import playn.core.Canvas;
 import playn.core.Graphics;
+import playn.core.Image;
+import playn.core.Texture;
 
 /**
  * Simplifies the process of displaying a {@link Canvas} which is updated after its initial
@@ -67,8 +69,14 @@ public class CanvasLayer extends ImageLayer {
   /** Informs this layer that a drawing operation has just completed. The backing canvas image data
     * is uploaded to the GPU. */
   public void end () {
-    // TODO: if our texture is the right size, just update it
-    setTexture(gfx.createTexture(canvas.image));
+    Texture tex = texture();
+    Image image = canvas.image;
+    // if our texture is already the right size, just update it
+    if (tex != null && tex.pixelWidth == image.pixelWidth() &&
+        tex.pixelHeight == image.pixelHeight()) tex.update(image);
+    // otherwise we need to create a new texture (setTexture will unreference the old texture which
+    // will cause it to be destroyed)
+    else setTexture(gfx.createTexture(canvas.image));
   }
 
   @Override public float width() {
