@@ -125,14 +125,11 @@ class PointerMouseTouchTest extends Test {
         motionLabel.set("mouse move", describe(event, ""));
       }
 
-      // @Override public void onOver (MotionEvent event, Mouse.Interaction iact) {
-      //   modify(event);
-      //   logger.log(describe(event, "mouse over"));
-      // }
-      // @Override public void onOut (MotionEvent event, Mouse.Interaction iact) {
-      //   modify(event);
-      //   logger.log(describe(event, "mouse out"));
-      // }
+      @Override public void onHover (Mouse.HoverEvent event, Mouse.Interaction iact) {
+        modify(event);
+        logger.log(describe(event, event.inside ? "mouse over" : "mouse out"));
+      }
+
       @Override public void onWheel (Mouse.WheelEvent event, Mouse.Interaction iact) {
         modify(event);
         logger.log(describe(event, "mouse wheel"));
@@ -158,12 +155,9 @@ class PointerMouseTouchTest extends Test {
       @Override public void onMotion (Mouse.MotionEvent event, Mouse.Interaction iact) {
         motionLabel.set("parent mouse move", describe(event, ""));
       }
-      // @Override public void onOver (Mouse.MotionEvent event, Mouse.Interaction iact) {
-      //   logger.log(describe(event, "parent mouse over"));
-      // }
-      // @Override public void onOut (Mouse.MotionEvent event, Mouse.Interaction iact) {
-      //   logger.log(describe(event, "parent mouse out"));
-      // }
+      @Override public void onHover (Mouse.HoverEvent event, Mouse.Interaction iact) {
+        logger.log(describe(event, "parent mouse " + (event.inside ? "over" : "out")));
+      }
       @Override public void onWheel (Mouse.WheelEvent event, Mouse.Interaction iact) {
         logger.log(describe(event, "parent mouse wheel"));
       }

@@ -23,12 +23,39 @@ import react.Slot;
  */
 public class Mouse extends playn.core.Mouse {
 
+  /** An event dispatched when the mouse enters or exits a layer. */
+  public static class HoverEvent extends Event {
+
+    /** Whether the mouse is now inside or outside the layer in question. */
+    public final boolean inside;
+
+    public HoverEvent (int flags, double time, float x, float y, boolean inside) {
+      super(flags, time, x, y);
+      this.inside = inside;
+    }
+
+    @Override protected String name () {
+      return "Hover";
+    }
+
+    @Override protected void addFields (StringBuilder builder) {
+      super.addFields(builder);
+      builder.append(", inside=").append(inside);
+    }
+  }
+
   /** A listener for mouse button, motion and wheel events with layer info. */
   public static abstract class Listener extends Slot<Object> {
 
     /** Notifies listener of a mouse motion event. A motion event is dispatched when no button is
-      * currently pressed, and always goes to the layer hit by the event coordinates. */
+      * currently pressed, in an isolated "one shot" interaction, and always goes to the layer hit
+      * by the event coordinates. */
     public void onMotion (MotionEvent event, Interaction iact) {}
+
+    /** Notifies listener of mouse entry or exit. Hover events are dispatched in an isolated "one
+      * shot" interaction, regardless of whether there is currently a button-triggered interaction
+      * in progress, and always got to the layer whose hover status changed. */
+    public void onHover (HoverEvent event, Interaction iact) {}
 
     /** Notifies listener of a mouse button event. A button down event will start an interaction if
       * no interaction is already in progress, or will be dispatched to the hit layer of the
@@ -82,6 +109,8 @@ public class Mouse extends playn.core.Mouse {
       } else if (mevent instanceof MotionEvent) {
         if (solo) lner.onMotion((MotionEvent)mevent, this);
         else lner.onDrag((MotionEvent)mevent, this);
+      } else if (mevent instanceof HoverEvent) {
+        lner.onHover((HoverEvent)mevent, this);
       } else if (mevent instanceof WheelEvent) {
         lner.onWheel((WheelEvent)mevent, this);
       }
@@ -95,6 +124,7 @@ public class Mouse extends playn.core.Mouse {
     private final boolean bubble;
     private final Point scratch = new Point();
     private Interaction currentIact;
+    private Layer hoverLayer;
 
     public Dispatcher (Layer root, boolean bubble) {
       this.root = root;
@@ -127,10 +157,25 @@ public class Mouse extends playn.core.Mouse {
         }
 
       } else if (event instanceof MotionEvent) {
+        // we always compute the hit layer because we need to hover events
+        Layer hitLayer = LayerUtil.getHitLayer(root, scratch.set(event.x, event.y));
         // if we have a current interaction, dispatch a drag event
         if (currentIact != null) currentIact.dispatch(event, bubble);
         // otherwise dispatch the mouse motion event solo
-        else dispatchSolo(event);
+        else if (hitLayer != null) new Interaction(hitLayer, true).dispatch(event, bubble);
+
+        // dispatch hover events if the hit layer changed
+        if (hitLayer != hoverLayer) {
+          if (hoverLayer != null) {
+            HoverEvent hevent = new HoverEvent(0, event.time, event.x, event.y, false);
+            new Interaction(hoverLayer, true).dispatch(hevent, bubble);
+          }
+          hoverLayer = hitLayer;
+          if (hitLayer != null) {
+            HoverEvent hevent = new HoverEvent(0, event.time, event.x, event.y, true);
+            new Interaction(hitLayer, true).dispatch(hevent, bubble);
+          }
+        }
 
       } else if (event instanceof WheelEvent) {
         // if we have a current interaction, dispatch to that
