@@ -44,7 +44,7 @@ public class CanvasTest extends Test {
       public void draw(Canvas canvas) {
         Gradient.Config cfg = new Gradient.Radial(
           0, 0, 50, new int[] { 0xFFFF0000, 0xFF00FF00 }, new float[] { 0, 1 });
-        canvas.setFillGradient(game.graphics.createGradient(cfg));
+        canvas.setFillGradient(canvas.createGradient(cfg));
         canvas.fillRect(0, 0, 100, 100);
       }
     });
@@ -53,7 +53,7 @@ public class CanvasTest extends Test {
       public void draw(Canvas canvas) {
         Gradient.Config cfg = new Gradient.Linear(
           0, 0, 100, 100, new int[] { 0xFF0000FF, 0xFF00FF00 }, new float[] { 0, 1 });
-        canvas.setFillGradient(game.graphics.createGradient(cfg));
+        canvas.setFillGradient(canvas.createGradient(cfg));
         canvas.fillRect(0, 0, 100, 100);
       }
     });
@@ -111,10 +111,10 @@ public class CanvasTest extends Test {
     timeTex = game.graphics.createTexture(timeImg.image);
     addTestLayer("updated canvas", 100, 100, new ImageLayer(timeTex));
 
-    final Gradient linear = game.graphics.createGradient(new Gradient.Linear(
+    final Gradient linear = timeImg.createGradient(new Gradient.Linear(
       0, 0, 100, 100, new int[] { 0xFF0000FF, 0xFF00FF00 }, new float[] { 0, 1 }));
     final float dotRadius = 40;
-    final Gradient radial = game.graphics.createGradient(new Gradient.Radial(
+    final Gradient radial = timeImg.createGradient(new Gradient.Radial(
       100/3f, 100/2.5f, dotRadius, new int[] { 0xFFFFFFFF, 0xFFCC66FF }, new float[] { 0, 1 }));
 
     addTestCanvas("filled bezier path", 100, 100, new Drawer() {
@@ -146,8 +146,7 @@ public class CanvasTest extends Test {
       public void draw(Canvas canvas) {
         // draw a rounded rect directly
         canvas.setFillGradient(linear);
-        TextLayout capF = game.graphics.layoutText("F", new TextFormat().withFont(
-          F_FONT.derive(game.graphics, 96)));
+        TextLayout capF = game.graphics.layoutText("F", new TextFormat(F_FONT.derive(96)));
         canvas.fillText(capF, 15, 5);
       }
     });
@@ -173,7 +172,7 @@ public class CanvasTest extends Test {
       public void draw(Canvas canvas) {
         canvas.setFillColor(0xFFCCCCCC).fillRect(0, 0, 50, 50);
         canvas.setFillColor(0xFFCCCCCC).fillRect(50, 50, 50, 50);
-        TextLayout capF = game.graphics.layoutText("F", new TextFormat().withFont(F_FONT));
+        TextLayout capF = game.graphics.layoutText("F", new TextFormat(F_FONT));
         float theta = -FloatMath.PI/4, tsin = FloatMath.sin(theta), tcos = FloatMath.cos(theta);
         canvas.setFillColor(0xFF000000).fillText(capF, 0, 0);
         canvas.transform(tcos, -tsin, tsin, tcos, 50, 50);
@@ -292,6 +291,5 @@ public class CanvasTest extends Test {
     addTestLayer(descrip, width, height, layer);
   }
 
-  private Font F_FONT = TestsGame.game.graphics.createFont(
-    new Font.Config("Helvetica", Font.Style.BOLD, 48));
+  private Font F_FONT = new Font("Helvetica", Font.Style.BOLD, 48);
 }

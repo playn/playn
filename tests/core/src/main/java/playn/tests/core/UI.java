@@ -25,10 +25,8 @@ public class UI {
 
   public UI (TestsGame game) {
     this.game = game;
-    BUTTON_FMT = new TextFormat().withFont(
-      game.graphics.createFont(new Font.Config("Helvetica", 24)));
-    TEXT_FMT = new TextFormat().withFont(
-      game.graphics.createFont(new Font.Config("Helvetica", 12)));
+    BUTTON_FMT = new TextFormat(new Font("Helvetica", 24));
+    TEXT_FMT = new TextFormat(new Font("Helvetica", 12));
   }
 
   public Texture formatText (TextFormat format, String text, boolean border) {

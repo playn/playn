@@ -33,8 +33,8 @@ import static playn.tests.core.TestsGame.game;
 
 class PointerMouseTouchTest extends Test {
 
-  private TextFormat baseFormat = new TextFormat().withFont(game.graphics, "Times New Roman", 20);
-  private TextFormat logFormat = new TextFormat().withFont(game.graphics, "Times New Roman", 12);
+  private TextFormat baseFormat = new TextFormat(new Font("Times New Roman", 20));
+  private TextFormat logFormat = new TextFormat(new Font("Times New Roman", 12));
 
   private TextLogger logger;
   private TextMapper motionLabel;

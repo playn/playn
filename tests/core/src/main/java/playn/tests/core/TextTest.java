@@ -115,8 +115,7 @@ public class TextTest extends Test {
   }
 
   protected Texture makeTextImage() {
-    TextFormat format = new TextFormat(
-      game.graphics.createFont(new Font.Config(font.value(), style.value(), 24)), true);
+    TextFormat format = new TextFormat(new Font(font.value(), style.value(), 24));
     float wrapWidth = wrap.value() == 0 ?
       Float.MAX_VALUE : game.graphics.viewSize.width()*wrap.value()/100;
     TextBlock block = new TextBlock(

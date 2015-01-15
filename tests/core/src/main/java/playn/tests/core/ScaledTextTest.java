@@ -26,7 +26,7 @@ public class ScaledTextTest extends Test {
 
   @Override public void init() {
     String text = "The quick brown fox jumped over the lazy dog.";
-    TextFormat format = new TextFormat().withFont(game.graphics, "Helvetica", 18);
+    TextFormat format = new TextFormat(new Font("Helvetica", 18));
     TextBlock block = new TextBlock(game.graphics.layoutText(text, format, new TextWrap(100)));
 
     float x = 5;
@@ -44,7 +44,7 @@ public class ScaledTextTest extends Test {
   }
 
   protected void addInfo (Canvas canvas, float cx, float y) {
-    TextFormat infoFormat = new TextFormat().withFont(game.graphics, "Helvetica", 12);
+    TextFormat infoFormat = new TextFormat(new Font("Helvetica", 12));
     TextLayout ilayout = game.graphics.layoutText(canvas.width + "x" + canvas.height, infoFormat);
     Canvas iimage = game.graphics.createCanvas(ilayout.size);
     iimage.setFillColor(0xFF000000).fillText(ilayout, 0, 0);

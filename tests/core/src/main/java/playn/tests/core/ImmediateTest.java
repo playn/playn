@@ -37,7 +37,7 @@ public class ImmediateTest extends Test {
     final Texture cirtex = game.graphics.createTexture(circle.image);
 
     Canvas sausage = game.graphics.createCanvas(100, 50);
-    Gradient linear = game.graphics.createGradient(new Gradient.Linear(
+    Gradient linear = sausage.createGradient(new Gradient.Linear(
       0, 0, 100, 100, new int[] { 0xFF0000FF, 0xFF00FF00 }, new float[] { 0, 1 }));
     sausage.setFillGradient(linear).fillRoundRect(0, 0, 100, 50, 10);
     final Texture saustex = game.graphics.createTexture(sausage.image);

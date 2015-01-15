@@ -32,7 +32,7 @@ public class ClippedGroupTest extends Test {
   @Override public void init () {
     final float iwidth = 100, iheight = 50;
     final Canvas img = game.graphics.createCanvas(iwidth, iheight);
-    Gradient linear = game.graphics.createGradient(new Gradient.Linear(
+    Gradient linear = img.createGradient(new Gradient.Linear(
       0, 0, 100, 100, new int[] { 0xFF0000FF, 0xFF00FF00 }, new float[] { 0, 1 }));
     img.setFillGradient(linear).fillRoundRect(0, 0, 100, 50, 10);
     final Texture tex = game.graphics.createTexture(img.image);
