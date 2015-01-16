@@ -44,7 +44,7 @@ public abstract class Test {
   }
 
   public void dispose() {
-    conns.disconnect();
+    conns.close();
   }
 
   public boolean usesPositionalInputs () {
