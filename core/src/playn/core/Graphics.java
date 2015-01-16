@@ -73,49 +73,49 @@ public abstract class Graphics {
   }
 
   /**
-   * Creates a texture with the contents if {@code image}, with default config.
-   * See {@link #createTexture(Image,Texture.Config)}.
+   * Creates a texture with the contents if {@code bitmap}, with default config.
+   * See {@link #createTexture(Bitmap,Texture.Config)}.
    */
-  public Texture createTexture (Image image) {
-    return createTexture(image, Texture.Config.DEFAULT);
+  public Texture createTexture (Bitmap bitmap) {
+    return createTexture(bitmap, Texture.Config.DEFAULT);
   }
 
   /**
-   * Uploads {@code image}'s bitmap data to the GPU and returns a handle to the texture.
-   * @throws IllegalStateException if {@code image} is not fully loaded.
+   * Uploads {@code bitmap}'s data to the GPU and returns a handle to the texture.
+   * @throws IllegalStateException if {@code bitmap} is not fully loaded.
    */
-  public Texture createTexture (Image image, Texture.Config config) {
-    if (!image.isLoaded()) throw new IllegalStateException(
-      "Cannot create texture from unready image.");
+  public Texture createTexture (Bitmap bitmap, Texture.Config config) {
+    if (!bitmap.isLoaded()) throw new IllegalStateException(
+      "Cannot create texture from unready bitmap.");
 
-    int texWidth = config.toTexWidth(image.pixelWidth());
-    int texHeight = config.toTexHeight(image.pixelHeight());
+    int texWidth = config.toTexWidth(bitmap.pixelWidth());
+    int texHeight = config.toTexHeight(bitmap.pixelHeight());
     if (texWidth <= 0 || texHeight <= 0) throw new IllegalArgumentException(
-      "Invalid texture size: " + texWidth + "x" + texHeight + " from: " + image);
+      "Invalid texture size: " + texWidth + "x" + texHeight + " from: " + bitmap);
 
     Texture tex = new Texture(this, createTexture(config), config, texWidth, texHeight,
-                              image.scale(), image.width(), image.height());
-    tex.update(image); // this will handle non-POT source image conversion
+                              bitmap.scale(), bitmap.width(), bitmap.height());
+    tex.update(bitmap); // this will handle non-POT source bitmap conversion
     return tex;
   }
 
   /**
-   * Returns a future which will deliver a texture for {@code image} once its loading has
-   * completed. Uses {@link #createTexture(Image)} to create texture.
+   * Returns a future which will deliver a texture for {@code bitmap} once its loading has
+   * completed. Uses {@link #createTexture(Bitmap)} to create texture.
    */
-  public RFuture<Texture> createTextureAsync (Image image) {
-    return image.state.map(new Function<Image,Texture>() {
-      public Texture apply (Image image) { return createTexture(image); }
+  public RFuture<Texture> createTextureAsync (Bitmap bitmap) {
+    return bitmap.state.map(new Function<Bitmap,Texture>() {
+      public Texture apply (Bitmap bitmap) { return createTexture(bitmap); }
     });
   }
 
   /**
-   * Returns a future which will deliver a texture for {@code image} once its loading has
-   * completed. Uses {@link #createTexture(Image,boolean,boolean)} to create texture.
+   * Returns a future which will deliver a texture for {@code bitmap} once its loading has
+   * completed. Uses {@link #createTexture(Bitmap,boolean,boolean)} to create texture.
    */
-  public RFuture<Texture> createTextureAsync (Image image, final Texture.Config config) {
-    return image.state.map(new Function<Image,Texture>() {
-      public Texture apply (Image image) { return createTexture(image, config); }
+  public RFuture<Texture> createTextureAsync (Bitmap bitmap, final Texture.Config config) {
+    return bitmap.state.map(new Function<Bitmap,Texture>() {
+      public Texture apply (Bitmap bitmap) { return createTexture(bitmap, config); }
     });
   }
 
@@ -167,7 +167,7 @@ public abstract class Graphics {
     if (colorTex == null) {
       Canvas canvas = createCanvas(1, 1);
       canvas.setFillColor(0xFFFFFFFF).fillRect(0, 0, canvas.width, canvas.height);
-      colorTex = createTexture(canvas.image, Texture.Config.UNMANAGED);
+      colorTex = createTexture(canvas.bitmap, Texture.Config.UNMANAGED);
     }
     return colorTex;
   }
@@ -185,7 +185,7 @@ public abstract class Graphics {
 
   /**
    * Creates a {@link Canvas} with the specified pixel size. Because this is used when scaling
-   * images for rendering into POT textures, we need to be precise about the pixel width and
+   * bitmaps for rendering into POT textures, we need to be precise about the pixel width and
    * height. So make sure this code path uses these exact sizes to make the canvas backing buffer.
    */
   protected abstract Canvas createCanvasImpl (Scale scale, int pixelWidth, int pixelHeight);

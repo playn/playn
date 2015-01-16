@@ -19,15 +19,14 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 import playn.core.Log;
-import playn.core.Image;
+import playn.core.Bitmap;
 
 /**
  * Tests various JavaImage behavior.
  */
 public class JavaImageTest extends AbstractPlayNTest {
 
-  @Test
-  public void testMissingImage() {
+  @Test public void testMissingImage() {
     final StringBuilder buf = new StringBuilder();
     plat.log().setCollector(new Log.Collector() {
       public void logged(Log.Level level, String msg, Throwable cause) {
@@ -35,9 +34,9 @@ public class JavaImageTest extends AbstractPlayNTest {
       }
     });
 
-    Image missing;
+    Bitmap missing;
     try {
-      missing = plat.assets().getImageSync("missing.png");
+      missing = plat.assets().getBitmapSync("missing.png");
     } finally {
       plat.log().setCollector(null);
     }

@@ -27,17 +27,17 @@ import org.robovm.rt.bro.ptr.VoidPtr;
 import playn.core.*;
 import playn.robovm.OpenGLES;
 
-public class RoboImage extends ImageImpl {
+public class RoboBitmap extends BitmapImpl {
 
   // note: this is not used for the image that backs a RoboCanvas because of the way
   // CGBitmapContext and CGImage don't completely place nicely together
   private CGImage image;
 
-  public RoboImage (Scale scale, CGImage img) {
+  public RoboBitmap (Scale scale, CGImage img) {
     super(scale, (int)img.getWidth(), (int)img.getHeight(), img);
   }
 
-  public RoboImage (RoboPlatform plat, int preWidth, int preHeight) {
+  public RoboBitmap (RoboPlatform plat, int preWidth, int preHeight) {
     super(plat, Scale.ONE, preWidth, preHeight);
   }
 
@@ -94,9 +94,9 @@ public class RoboImage extends ImageImpl {
     throw new UnsupportedOperationException("TODO!");
   }
 
-  @Override public Image transform(BitmapTransformer xform) {
+  @Override public Bitmap transform(BitmapTransformer xform) {
     UIImage ximage = new UIImage(((RoboBitmapTransformer) xform).transform(cgImage()));
-    return new RoboImage(scale, ximage.getCGImage());
+    return new RoboBitmap(scale, ximage.getCGImage());
   }
 
   @Override public void draw(Object ctx, float x, float y, float width, float height) {
@@ -141,7 +141,7 @@ public class RoboImage extends ImageImpl {
     }
   }
 
-  protected RoboImage (Scale scale, int pixelWidth, int pixelHeight) {
+  protected RoboBitmap (Scale scale, int pixelWidth, int pixelHeight) {
     super(scale, pixelWidth, pixelHeight, null);
   }
 

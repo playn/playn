@@ -14,12 +14,13 @@
 package playn.robovm;
 
 import org.robovm.apple.coregraphics.CGImage;
-import playn.core.Image;
+
+import playn.core.Bitmap;
 
 /**
  * Enables the transformation of iOS image bitmaps.
  */
-public interface RoboBitmapTransformer extends Image.BitmapTransformer {
+public interface RoboBitmapTransformer extends Bitmap.BitmapTransformer {
 
   /**
    * Transforms the supplied platform image into a new platform image which will be used as the

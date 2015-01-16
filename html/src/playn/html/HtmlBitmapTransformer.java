@@ -17,13 +17,13 @@ package playn.html;
 
 import com.google.gwt.dom.client.ImageElement;
 
-import playn.core.Image;
+import playn.core.Bitmap;
 
 /**
  * Enables the transformation of Html image bitmaps.
  */
-public interface HtmlBitmapTransformer extends Image.BitmapTransformer
-{
+public interface HtmlBitmapTransformer extends Bitmap.BitmapTransformer {
+
   /**
    * Transforms the supplied bitmap into a new bitmap which will be used as the source data for a
    * new PlayN image. <em>Do not</em> modify the bitmap passed into this method or you will break

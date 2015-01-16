@@ -148,7 +148,7 @@ public class JavaGraphics extends Graphics {
   @Override protected Canvas createCanvasImpl (Scale scale, int pixelWidth, int pixelHeight) {
     BufferedImage bitmap = new BufferedImage(
       pixelWidth, pixelHeight, BufferedImage.TYPE_INT_ARGB_PRE);
-    return new JavaCanvas(new JavaImage(scale, bitmap));
+    return new JavaCanvas(new JavaBitmap(scale, bitmap));
   }
 
   java.awt.Font resolveFont(Font font) {

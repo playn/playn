@@ -132,15 +132,15 @@ public class AndroidAssets extends Assets {
   }
 
   @Override
-  public Image getRemoteImage(final String url, int width, int height) {
-    final ImageImpl image = createImage(width, height);
+  public playn.core.Bitmap getRemoteBitmap(final String url, int width, int height) {
+    final BitmapImpl image = createBitmap(width, height);
     plat.invokeAsync(new Runnable() {
       public void run () {
         try {
           BitmapOptions options = createOptions(url, false, Scale.ONE);
           Bitmap bitmap = downloadBitmap(url, options);
-          image.succeed(new ImageImpl.Data(options.scale, bitmap,
-                                           bitmap.getWidth(), bitmap.getHeight()));
+          image.succeed(new BitmapImpl.Data(options.scale, bitmap,
+                                            bitmap.getWidth(), bitmap.getHeight()));
         } catch (Exception error) {
           image.fail(error);
         }
@@ -198,11 +198,11 @@ public class AndroidAssets extends Assets {
       }
   }
 
-  @Override protected ImageImpl createImage(int width, int height) {
-    return new AndroidImage(plat, width, height);
+  @Override protected BitmapImpl createBitmap(int width, int height) {
+    return new AndroidBitmap(plat, width, height);
   }
 
-  @Override protected ImageImpl.Data load (String path) throws Exception {
+  @Override protected BitmapImpl.Data load (String path) throws Exception {
     Exception error = null;
     for (Scale.ScaledResource rsrc : assetScale().getScaledResources(path)) {
       try {
@@ -210,7 +210,7 @@ public class AndroidAssets extends Assets {
         try {
           BitmapOptions options = createOptions(path, true, rsrc.scale);
           Bitmap bitmap = BitmapFactory.decodeStream(is, null, options);
-          return new ImageImpl.Data(options.scale, bitmap, bitmap.getWidth(), bitmap.getHeight());
+          return new BitmapImpl.Data(options.scale, bitmap, bitmap.getWidth(), bitmap.getHeight());
         } finally {
           is.close();
         }

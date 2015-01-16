@@ -72,7 +72,7 @@ public class GroupLayerTest {
     int[] zs = { 0, 0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3, 4 };
     Layer[] layers = new Layer[zs.length];
     for (int ii = 0; ii < layers.length; ii++) {
-      layers[ii] = new ImageLayer();
+      layers[ii] = new TextureLayer();
       layers[ii].setDepth(zs[ii]);
     }
     return Arrays.asList(layers);

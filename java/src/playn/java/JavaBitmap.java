@@ -29,23 +29,23 @@ import java.nio.ByteBuffer;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 
+import playn.core.Bitmap;
+import playn.core.BitmapImpl;
 import playn.core.Graphics;
-import playn.core.Image;
-import playn.core.ImageImpl;
 import playn.core.Pattern;
 import playn.core.Scale;
 import playn.core.Texture;
 import pythagoras.f.MathUtil;
 
-public class JavaImage extends ImageImpl {
+public class JavaBitmap extends BitmapImpl {
 
   protected BufferedImage img;
 
-  public JavaImage (Scale scale, BufferedImage img) {
+  public JavaBitmap (Scale scale, BufferedImage img) {
     super(scale, img.getWidth(), img.getHeight(), img);
   }
 
-  public JavaImage (JavaPlatform plat, int preWidth, int preHeight) {
+  public JavaBitmap (JavaPlatform plat, int preWidth, int preHeight) {
     super(plat, Scale.ONE, preWidth, preHeight);
   }
 
@@ -76,8 +76,8 @@ public class JavaImage extends ImageImpl {
   }
 
   @Override
-  public Image transform(BitmapTransformer xform) {
-    return new JavaImage(scale, ((JavaBitmapTransformer) xform).transform(img));
+  public Bitmap transform(BitmapTransformer xform) {
+    return new JavaBitmap(scale, ((JavaBitmapTransformer) xform).transform(img));
   }
 
   @Override public void draw (Object ctx, float x, float y, float w, float h) {

@@ -29,7 +29,7 @@ public class LayerUtilTest {
   @Test public void testTransformWithScale() {
     GroupLayer root = new GroupLayer();
     GroupLayer middle = new GroupLayer();
-    Layer child = new ImageLayer();
+    Layer child = new TextureLayer();
     root.add(middle);
     middle.add(child);
 
@@ -52,7 +52,7 @@ public class LayerUtilTest {
   @Test public void testTransformWithTrans() {
     GroupLayer root = new GroupLayer();
     GroupLayer middle = new GroupLayer();
-    Layer child = new ImageLayer();
+    Layer child = new TextureLayer();
     root.add(middle);
     middle.add(child);
 
@@ -75,7 +75,7 @@ public class LayerUtilTest {
   @Test public void testTransformWithRot() {
     GroupLayer root = new GroupLayer();
     GroupLayer middle = new GroupLayer();
-    Layer child = new ImageLayer();
+    Layer child = new TextureLayer();
     root.add(middle);
     middle.add(child);
 
@@ -98,7 +98,7 @@ public class LayerUtilTest {
   @Test public void testTransformWithScaleRotTrans() {
     GroupLayer root = new GroupLayer();
     GroupLayer middle = new GroupLayer();
-    Layer child = new ImageLayer();
+    Layer child = new TextureLayer();
     root.add(middle);
     middle.add(child);
 

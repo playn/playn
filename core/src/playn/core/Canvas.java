@@ -25,92 +25,50 @@ public abstract class Canvas {
    * {@link Canvas#setCompositeOperation(Composite)}.
    */
   public static enum Composite {
-    /**
-     * A (B is ignored). Display the source image instead of the destination
-     * image.
-     *
-     * [Sa, Sc]
-     */
+    /** A (B is ignored). Display the source image instead of the destination image.
+      * {@code [Sa, Sc]} */
     SRC,
 
-    /**
-     * B atop A. Same as source-atop but using the destination image instead of
-     * the source image and vice versa.
-     *
-     * [Sa, Sa * Dc + Sc * (1 - Da)]
-     */
+    /** B atop A. Same as source-atop but using the destination image instead of the source image
+      * and vice versa. {@code [Sa, Sa * Dc + Sc * (1 - Da)]}. */
     DST_ATOP,
 
-    /**
-     * A over B. Display the source image wherever the source image is opaque.
-     * Display the destination image elsewhere.
-     *
-     * [Sa + (1 - Sa)*Da, Rc = Sc + (1 - Sa)*Dc]
-     */
+    /** A over B. Display the source image wherever the source image is opaque. Display the
+      * destination image elsewhere. {@code [Sa + (1 - Sa)*Da, Rc = Sc + (1 - Sa)*Dc]}. */
     SRC_OVER,
 
-    /**
-     * B over A. Same as source-over but using the destination image instead of
-     * the source image and vice versa.
-     *
-     * [Sa + (1 - Sa)*Da, Rc = Dc + (1 - Da)*Sc]
-     */
+    /** B over A. Same as source-over but using the destination image instead of the source image
+      * and vice versa. {@code [Sa + (1 - Sa)*Da, Rc = Dc + (1 - Da)*Sc]}. */
     DST_OVER,
 
-    /**
-     * A in B. Display the source image wherever both the source image and
-     * destination image are opaque. Display transparency elsewhere.
-     *
-     * [Sa * Da, Sc * Da]
-     */
+    /** A in B. Display the source image wherever both the source image and destination image are
+      * opaque. Display transparency elsewhere. {@code [Sa * Da, Sc * Da]}. */
     SRC_IN,
 
-    /**
-     * B in A. Same as source-in but using the destination image instead of the
-     * source image and vice versa.
-     *
-     * [Sa * Da, Sa * Dc]
-     */
+    /** B in A. Same as source-in but using the destination image instead of the
+      * source image and vice versa. {@code [Sa * Da, Sa * Dc]}. */
     DST_IN,
 
-    /**
-     * A out B. Display the source image wherever the source image is opaque and
-     * the destination image is transparent. Display transparency elsewhere.
-     *
-     * [Sa * (1 - Da), Sc * (1 - Da)]
-     */
+    /** A out B. Display the source image wherever the source image is opaque and the destination
+      * image is transparent. Display transparency elsewhere.
+      * {@code [Sa * (1 - Da), Sc * (1 - Da)]}. */
     SRC_OUT,
 
-    /**
-     * B out A. Same as source-out but using the destination image instead of
-     * the source image and vice versa.
-     *
-     * [Da * (1 - Sa), Dc * (1 - Sa)]
-     */
+    /** B out A. Same as source-out but using the destination image instead of
+      * the source image and vice versa. {@code [Da * (1 - Sa), Dc * (1 - Sa)]}. */
     DST_OUT,
 
-    /**
-     * A atop B. Display the source image wherever both images are opaque.
-     * Display the destination image wherever the destination image is opaque
-     * but the source image is transparent. Display transparency elsewhere.
-     *
-     * [Da, Sc * Da + (1 - Sa) * Dc]
-     */
+    /** A atop B. Display the source image wherever both images are opaque. Display the destination
+      * image wherever the destination image is opaque but the source image is transparent. Display
+      * transparency elsewhere. {@code [Da, Sc * Da + (1 - Sa) * Dc]}. */
     SRC_ATOP,
 
-    /**
-     * A xor B. Exclusive OR of the source image and destination image.
-     *
-     * [Sa + Da - 2 * Sa * Da, Sc * (1 - Da) + (1 - Sa) * Dc]
-     */
+    /** A xor B. Exclusive OR of the source image and destination image.
+      * {@code [Sa + Da - 2 * Sa * Da, Sc * (1 - Da) + (1 - Sa) * Dc]}. */
     XOR,
 
-    /**
-     * A * B. Multiplies the source and destination images. <b>NOTE:</b> this is not supported by
-     * the HTML5 and Flash backends.
-     *
-     * [Sa * Da, Sc * Dc]
-     */
+    /** A * B. Multiplies the source and destination images. <b>NOTE:</b> this is not supported by
+      * the HTML5 and Flash backends. {@code [Sa * Da, Sc * Dc]}. */
     MULTIPLY,
   }
 
@@ -128,8 +86,8 @@ public abstract class Canvas {
     BEVEL, MITER, ROUND
   }
 
-  /** The image that underlies this canvas. */
-  public final Image image;
+  /** The bitmap that underlies this canvas. */
+  public final Bitmap bitmap;
 
   /** The width of this canvas. */
   public final float width;
@@ -138,14 +96,14 @@ public abstract class Canvas {
   public final float height;
 
   /**
-   * Returns a snapshot of the image that backs this canvas which is no longer mutable. Subsequent
-   * changes to this canvas will not be reflected in the returned image. If you are going to render
-   * a canvas image into another canvas image a lot, using a snapshot can improve performance.
+   * Returns an immutable snapshot of the bitmap that backs this canvas. Subsequent changes to this
+   * canvas will not be reflected in the returned bitmap. If you are going to render a canvas
+   * bitmap into another canvas bitmap a lot, using a snapshot can improve performance.
    */
-  public abstract Image snapshot ();
+  public abstract Bitmap snapshot ();
 
   /**
-   * Informs the platform that this canvas, and its backing image will no longer be used. On some
+   * Informs the platform that this canvas, and its backing bitmap will no longer be used. On some
    * platforms this can free up memory earlier than if we waited for the canvas to be garbage
    * collected.
    */
@@ -170,38 +128,38 @@ public abstract class Canvas {
   public abstract Gradient createGradient (Gradient.Config config);
 
   /**
-   * Draws an image at the specified location {@code (x, y)}.
+   * Draws a bitmap at the specified location {@code (x, y)}.
    */
-  public Canvas drawImage (Image image, float x, float y) {
-    return drawImage(image, x, y, image.width(), image.height());
+  public Canvas draw (Bitmap bitmap, float x, float y) {
+    return draw(bitmap, x, y, bitmap.width(), bitmap.height());
   }
 
   /**
-   * Draws an image centered at the specified location. Subtracts {@code image.width/2} from x
-   * and {@code image.height/2} from y.
+   * Draws a bitmap centered at the specified location. Subtracts {@code bitmap.width/2} from x
+   * and {@code bitmap.height/2} from y.
    */
-  public Canvas drawImageCentered (Image image, float x, float y) {
-    return drawImage(image, x - image.width()/2, y - image.height()/2);
+  public Canvas drawCentered (Bitmap bitmap, float x, float y) {
+    return draw(bitmap, x - bitmap.width()/2, y - bitmap.height()/2);
   }
 
   /**
-   * Draws a scaled image at the specified location {@code (x, y)} size {@code (w x h)}.
+   * Draws a scaled bitmap at the specified location {@code (x, y)} size {@code (w x h)}.
    */
-  public Canvas drawImage (Image image, float x, float y, float w, float h) {
-    ((ImageImpl)image).draw(gc(), x, y, w, h);
+  public Canvas draw (Bitmap bitmap, float x, float y, float w, float h) {
+    ((BitmapImpl)bitmap).draw(gc(), x, y, w, h);
     isDirty = true;
     return this;
   }
 
   /**
-   * Draws a subregion of an image ({@code (sw x sh) @ (sx, sy)} at the specified
-   * size {@code (dw x dh)} and location {@code (dx, dy)}.
+   * Draws a subregion of a bitmap {@code (sw x sh) @ (sx, sy)} at the specified size
+   * {@code (dw x dh)} and location {@code (dx, dy)}.
    *
    * TODO (jgw): Document whether out-of-bounds source coordinates clamp, repeat, or do nothing.
    */
-  public Canvas drawImage (Image image, float dx, float dy, float dw, float dh,
-                           float sx, float sy, float sw, float sh) {
-    ((ImageImpl)image).draw(gc(), dx, dy, dw, dh, sx, sy, sw, sh);
+  public Canvas draw (Bitmap bitmap, float dx, float dy, float dw, float dh,
+                      float sx, float sy, float sw, float sh) {
+    ((BitmapImpl)bitmap).draw(gc(), dx, dy, dw, dh, sx, sy, sw, sh);
     isDirty = true;
     return this;
   }
@@ -388,13 +346,13 @@ public abstract class Canvas {
    */
   public abstract Canvas translate (float x, float y);
 
-  /** Used to track modifications to our underlying image. */
+  /** Used to track modifications to our underlying bitmap. */
   protected boolean isDirty;
 
-  protected Canvas (Image image) {
-    this.image = image;
-    this.width = image.width();
-    this.height = image.height();
+  protected Canvas (Bitmap bitmap) {
+    this.bitmap = bitmap;
+    this.width = bitmap.width();
+    this.height = bitmap.height();
   }
 
   /** Returns the platform dependent graphics context for this canvas. */

@@ -20,7 +20,7 @@ import react.RFuture;
 import react.Slot;
 
 import playn.core.Graphics;
-import playn.core.Image;
+import playn.core.Bitmap;
 import playn.core.QuadBatch;
 import playn.core.Surface;
 import playn.core.Texture;
@@ -30,7 +30,7 @@ import playn.core.Texture;
  * underlying image, but its size can be changed from that default and the layer will either scale
  * or repeat the image to cause it to fill its bounds depending on the {@link Texture} it renders.
  */
-public class ImageLayer extends Layer {
+public class TextureLayer extends Layer {
 
   private Texture tex;
 
@@ -52,7 +52,7 @@ public class ImageLayer extends Layer {
   /**
    * Creates an image layer with the supplied texture.
    */
-  public ImageLayer (Texture texture) {
+  public TextureLayer (Texture texture) {
     setTexture(texture);
   }
 
@@ -60,7 +60,7 @@ public class ImageLayer extends Layer {
    * Creates an image layer with the supplied async texture. When the texture is loaded, this layer
    * will configure itself with it and start rendering.
    */
-  public ImageLayer (RFuture<Texture> texture) {
+  public TextureLayer (RFuture<Texture> texture) {
     texture.onSuccess(new Slot<Texture>() {
       public void onEmit (Texture texture) { setTexture(texture); }
     });
@@ -70,14 +70,14 @@ public class ImageLayer extends Layer {
    * Converts {@code image} into a texture and creates an image layer with it. The texture will be
    * destroyed when this layer is {@link #destroy}ed.
    */
-  public ImageLayer (Graphics gfx, Image image) {
-    this(gfx.createTexture(image));
+  public TextureLayer (Graphics gfx, Bitmap bitmap) {
+    this(gfx.createTexture(bitmap));
   }
 
   /**
    * Creates an image layer with no texture. It will be invisible until a texture is set into it.
    */
-  public ImageLayer () {
+  public TextureLayer () {
     // nada!
   }
 
@@ -94,7 +94,7 @@ public class ImageLayer extends Layer {
    * isn't something one would normally do, but could be useful if one was free-listing image
    * layers for some reason.
    */
-  public ImageLayer setTexture (Texture tex) {
+  public TextureLayer setTexture (Texture tex) {
     // avoid releasing and rereferencing texture if nothing changes
     if (this.tex != tex) {
       if (this.tex != null) this.tex.release();
@@ -109,7 +109,7 @@ public class ImageLayer extends Layer {
    * the future completes, this layer's texture will be set. Until then, the current texture (if
    * any) will continue to be rendered.
    */
-  public ImageLayer setTexture (RFuture<Texture> texture) {
+  public TextureLayer setTexture (RFuture<Texture> texture) {
     texture.onSuccess(new Slot<Texture>() {
       public void onEmit (Texture texture) { setTexture(texture); }
     });
@@ -120,7 +120,7 @@ public class ImageLayer extends Layer {
    * Sets {@link #forceWidth} and {@link #forceHeight} and returns {@code this}, for convenient
    * call chaining.
    */
-  public ImageLayer setSize (float width, float height) {
+  public TextureLayer setSize (float width, float height) {
     forceWidth = width;
     forceHeight = height;
     return this;

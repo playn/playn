@@ -143,10 +143,10 @@ public class AndroidGraphics extends Graphics {
   }
 
   /**
-   * Configures the scale factor function to use for {@link CanvasImage}. By default we use the
-   * current graphics scale factor, which provides maximum resolution. Apps running on memory
-   * constrained devices may wish to lower to lower this scale factor to reduce memory usage for
-   * especially large canvases.
+   * Configures the scale factor function to use for {@link Canvas}. By default we use the current
+   * graphics scale factor, which provides maximum resolution. Apps running on memory constrained
+   * devices may wish to lower to lower this scale factor to reduce memory usage for especially
+   * large canvases.
    */
   public void setCanvasScaleFunc(ScaleFunc scaleFunc) {
     if (scaleFunc == null) throw new NullPointerException("Scale func must not be null");
@@ -170,7 +170,7 @@ public class AndroidGraphics extends Graphics {
 
   @Override protected Canvas createCanvasImpl(Scale scale, int pixelWidth, int pixelHeight) {
     Bitmap bitmap = Bitmap.createBitmap(pixelWidth, pixelHeight, preferredBitmapConfig);
-    return new AndroidCanvas(new AndroidImage(scale, bitmap));
+    return new AndroidCanvas(new AndroidBitmap(scale, bitmap));
   }
 
   AndroidFont resolveFont(Font font) {

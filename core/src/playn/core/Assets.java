@@ -24,68 +24,68 @@ import react.RPromise;
 public abstract class Assets {
 
   /**
-   * Synchronously loads and returns an image. The calling thread will block while the image is
-   * loaded from disk and decoded. When this call returns, the image's width and height will be
-   * valid, and the image can be immediately converted to a texture and drawn into a canvas.
+   * Synchronously loads and returns an bitmap. The calling thread will block while the bitmap is
+   * loaded from disk and decoded. When this call returns, the bitmap's width and height will be
+   * valid, and the bitmap can be immediately converted to a texture and drawn into a canvas.
    *
-   * @param path the path to the image asset.
+   * @param path the path to the bitmap asset.
    * @throws UnsupportedOperationException on platforms that cannot support synchronous asset
    * loading (HTML).
    */
-  public Image getImageSync (String path) {
-    ImageImpl image = createImage(0, 0);
+  public Bitmap getBitmapSync (String path) {
+    BitmapImpl bitmap = createBitmap(0, 0);
     try {
-      image.succeed(load(path));
+      bitmap.succeed(load(path));
     } catch (Exception e) {
-      image.fail(e);
+      bitmap.fail(e);
     }
-    return image;
+    return bitmap;
   }
 
   /**
-   * Asynchronously loads and returns an image. The calling thread will not block. The returned
-   * image will not be immediately usable, will not report valid width and height, and cannot be
-   * immediately rendered into a canvas or converted into a texture. Use {@link Image#state} to be
+   * Asynchronously loads and returns an bitmap. The calling thread will not block. The returned
+   * bitmap will not be immediately usable, will not report valid width and height, and cannot be
+   * immediately rendered into a canvas or converted into a texture. Use {@link Bitmap#state} to be
    * notified when loading succeeds or fails.
    *
-   * @param path the path to the image asset.
+   * @param path the path to the bitmap asset.
    */
-  public Image getImage (final String path) {
-    final ImageImpl image = createImage(0, 0);
+  public Bitmap getBitmap (final String path) {
+    final BitmapImpl bitmap = createBitmap(0, 0);
     plat.invokeAsync(new Runnable() {
       public void run () {
         try {
-          image.succeed(load(path));
+          bitmap.succeed(load(path));
         } catch (Exception e) {
-          image.fail(e);
+          bitmap.fail(e);
         }
       }
     });
-    return image;
+    return bitmap;
   }
 
   /**
-   * Asynchronously loads and returns the image at the specified URL. The width and height of the
-   * image will be unset (0) until the image is loaded. <em>Note:</em> on non-HTML platforms, this
-   * spawns a new thread for each loaded image. Thus, attempts to load large numbers of remote
-   * images simultaneously may result in poor performance.
+   * Asynchronously loads and returns the bitmap at the specified URL. The width and height of the
+   * bitmap will be unset (0) until the bitmap is loaded. <em>Note:</em> on non-HTML platforms, this
+   * spawns a new thread for each loaded bitmap. Thus, attempts to load large numbers of remote
+   * bitmaps simultaneously may result in poor performance.
    */
-  public Image getRemoteImage (String url) {
-    return getRemoteImage(url, 0, 0);
+  public Bitmap getRemoteBitmap (String url) {
+    return getRemoteBitmap(url, 0, 0);
   }
 
   /**
-   * Asynchronously loads and returns the image at the specified URL. The width and height of the
-   * image will be the supplied {@code width} and {@code height} until the image is loaded.
-   * <em>Note:</em> on non-HTML platforms, this spawns a new thread for each loaded image. Thus,
-   * attempts to load large numbers of remote images simultaneously may result in poor performance.
+   * Asynchronously loads and returns the bitmap at the specified URL. The width and height of the
+   * bitmap will be the supplied {@code width} and {@code height} until the bitmap is loaded.
+   * <em>Note:</em> on non-HTML platforms, this spawns a new thread for each loaded bitmap. Thus,
+   * attempts to load large numbers of remote bitmaps simultaneously may result in poor performance.
    */
-  public Image getRemoteImage (String url, int width, int height) {
+  public Bitmap getRemoteBitmap (String url, int width, int height) {
     Exception error = new Exception(
-      "Remote image loading not yet supported: " + url + "@" + width + "x" + height);
-    ImageImpl image = createImage(width, height);
-    image.fail(error);
-    return image;
+      "Remote bitmap loading not yet supported: " + url + "@" + width + "x" + height);
+    BitmapImpl bitmap = createBitmap(width, height);
+    bitmap.fail(error);
+    return bitmap;
   }
 
   /**
@@ -181,14 +181,14 @@ public abstract class Assets {
   }
 
   /**
-   * Synchronously loads image data at {@code path}.
+   * Synchronously loads bitmap data at {@code path}.
    */
-  protected abstract ImageImpl.Data load (String path) throws Exception;
+  protected abstract BitmapImpl.Data load (String path) throws Exception;
 
   /**
-   * Creates an image with the specified width and height.
+   * Creates an bitmap with the specified width and height.
    */
-  protected abstract ImageImpl createImage (int rawWidth, int rawHeight);
+  protected abstract BitmapImpl createBitmap (int rawWidth, int rawHeight);
 
   /**
    * Normalizes the path, by removing {@code foo/..} pairs until the path contains no {@code ..}s.

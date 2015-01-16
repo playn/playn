@@ -34,11 +34,11 @@ public class AndroidCanvas extends Canvas {
   private final android.graphics.Canvas canvas;
   private final LinkedList<AndroidCanvasState> paintStack = new LinkedList<>();
 
-  public AndroidCanvas(AndroidImage image) {
-    super(image);
-    canvas = new android.graphics.Canvas(image.bitmap());
+  public AndroidCanvas(AndroidBitmap bitmap) {
+    super(bitmap);
+    canvas = new android.graphics.Canvas(bitmap.bitmap());
     paintStack.addFirst(new AndroidCanvasState());
-    float factor = image.scale().factor;
+    float factor = bitmap.scale().factor;
     scale(factor, factor);
   }
 
@@ -219,9 +219,9 @@ public class AndroidCanvas extends Canvas {
     return this;
   }
 
-  @Override public Image snapshot() {
-    Bitmap bitmap = ((AndroidImage)image).bitmap();
-    return new AndroidImage(image.scale(), bitmap.copy(bitmap.getConfig(), false));
+  @Override public playn.core.Bitmap snapshot() {
+    Bitmap bitmap = ((AndroidBitmap)this.bitmap).bitmap();
+    return new AndroidBitmap(this.bitmap.scale(), bitmap.copy(bitmap.getConfig(), false));
   }
 
   @Override public Canvas strokeCircle(float x, float y, float radius) {

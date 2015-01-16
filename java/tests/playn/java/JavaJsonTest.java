@@ -26,8 +26,7 @@ public class JavaJsonTest extends AbstractPlayNTest {
   /**
    * Ensures that getArray and getObject return null when pulling missing keys.
    */
-  @Test
-  public void testMissingKey() {
+  @Test public void testMissingKey() {
     Json.Object o = plat.json().parse("{\"array\":[]}");
     assertNull(o.getArray("notthere"));
     assertNull(o.getObject("notthere"));

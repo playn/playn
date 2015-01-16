@@ -180,7 +180,7 @@ public class HtmlGraphics extends Graphics {
     CanvasElement elem = Document.get().createCanvasElement();
     elem.setWidth(pixelWidth);
     elem.setHeight(pixelHeight);
-    return new HtmlCanvas(new HtmlImage(scale, elem));
+    return new HtmlCanvas(new HtmlBitmap(scale, elem));
   }
 
   static String cssColorString(int color) {

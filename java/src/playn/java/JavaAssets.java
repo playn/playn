@@ -31,8 +31,8 @@ import javax.sound.sampled.AudioSystem;
 import pythagoras.f.MathUtil;
 
 import playn.core.Assets;
-import playn.core.Image;
-import playn.core.ImageImpl;
+import playn.core.Bitmap;
+import playn.core.BitmapImpl;
 import playn.core.Scale;
 import playn.core.Sound;
 
@@ -100,13 +100,13 @@ public class JavaAssets extends Assets {
     this.assetScale = new Scale(scaleFactor);
   }
 
-  @Override public Image getRemoteImage(final String url, int width, int height) {
-    final JavaImage image = new JavaImage(plat, width, height);
+  @Override public Bitmap getRemoteBitmap(final String url, int width, int height) {
+    final JavaBitmap image = new JavaBitmap(plat, width, height);
     plat.invokeAsync(new Runnable() {
       public void run () {
         try {
           BufferedImage bmp = ImageIO.read(new URL(url));
-          image.succeed(new ImageImpl.Data(Scale.ONE, bmp, bmp.getWidth(), bmp.getHeight()));
+          image.succeed(new BitmapImpl.Data(Scale.ONE, bmp, bmp.getWidth(), bmp.getHeight()));
         } catch (Exception error) {
           image.fail(error);
         }
@@ -264,7 +264,7 @@ public class JavaAssets extends Assets {
     }
   }
 
-  @Override protected ImageImpl.Data load (String path) throws Exception {
+  @Override protected BitmapImpl.Data load (String path) throws Exception {
     Exception error = null;
     for (Scale.ScaledResource rsrc : assetScale().getScaledResources(path)) {
       try {
@@ -283,7 +283,7 @@ public class JavaAssets extends Assets {
             image = convertedImage;
           }
         }
-        return new ImageImpl.Data(imageScale, image, image.getWidth(), image.getHeight());
+        return new BitmapImpl.Data(imageScale, image, image.getWidth(), image.getHeight());
       } catch (FileNotFoundException fnfe) {
         error = fnfe; // keep going, checking for lower resolution images
       }
@@ -292,8 +292,8 @@ public class JavaAssets extends Assets {
     throw error != null ? error : new FileNotFoundException(path);
   }
 
-  @Override protected ImageImpl createImage (int rawWidth, int rawHeight) {
-    return new JavaImage(plat, rawWidth, rawHeight);
+  @Override protected BitmapImpl createBitmap (int rawWidth, int rawHeight) {
+    return new JavaBitmap(plat, rawWidth, rawHeight);
   }
 
   protected static final String[] SUFFIXES = { ".wav", ".mp3" };

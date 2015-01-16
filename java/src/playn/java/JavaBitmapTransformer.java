@@ -17,12 +17,12 @@ package playn.java;
 
 import java.awt.image.BufferedImage;
 
-import playn.core.Image;
+import playn.core.Bitmap;
 
 /**
  * Enables the transformation of Java image bitmaps.
  */
-public interface JavaBitmapTransformer extends Image.BitmapTransformer
+public interface JavaBitmapTransformer extends Bitmap.BitmapTransformer
 {
   /**
    * Transforms the supplied buffered image into a new buffered image which will be used as the

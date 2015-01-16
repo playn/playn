@@ -31,7 +31,7 @@ import java.util.LinkedList;
 
 import playn.core.Canvas;
 import playn.core.Gradient;
-import playn.core.Image;
+import playn.core.Bitmap;
 import playn.core.Path;
 import playn.core.Pattern;
 import playn.core.TextLayout;
@@ -47,12 +47,12 @@ class JavaCanvas extends Canvas {
   private Rectangle2D.Float rect = new Rectangle2D.Float();
   private RoundRectangle2D.Float roundRect = new RoundRectangle2D.Float();
 
-  JavaCanvas(JavaImage image) {
-    super(image);
+  JavaCanvas(JavaBitmap bitmap) {
+    super(bitmap);
 
-    gfx = image.bufferedImage().createGraphics();
+    gfx = bitmap.bufferedImage().createGraphics();
     gfx.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-    float scale = image.scale().factor;
+    float scale = bitmap.scale().factor;
     gfx.scale(scale, scale);
 
     // push default state
@@ -67,13 +67,13 @@ class JavaCanvas extends Canvas {
   }
 
   @Override
-  public Image snapshot() {
-    BufferedImage bmp = ((JavaImage)image).bufferedImage();
+  public Bitmap snapshot() {
+    BufferedImage bmp = ((JavaBitmap)bitmap).bufferedImage();
     ColorModel cm = bmp.getColorModel();
     boolean isAlphaPremultiplied = bmp.isAlphaPremultiplied();
     WritableRaster raster = bmp.copyData(null);
     BufferedImage snap = new BufferedImage(cm, raster, isAlphaPremultiplied, null);
-    return new JavaImage(image.scale(), snap);
+    return new JavaBitmap(bitmap.scale(), snap);
   }
 
   @Override

@@ -29,31 +29,31 @@ import playn.core.*;
 import react.RFuture;
 import react.RPromise;
 
-public class HtmlImage extends ImageImpl {
+public class HtmlBitmap extends BitmapImpl {
 
   private static native boolean isComplete (ImageElement img) /*-{ return img.complete; }-*/;
 
   private ImageElement img;
   CanvasElement canvas; // used for get/setRGB and by HtmlCanvas
 
-  public HtmlImage (Scale scale, CanvasElement elem) {
+  public HtmlBitmap (Scale scale, CanvasElement elem) {
     super(scale, elem.getWidth(), elem.getHeight(), elem);
     this.canvas = elem;
   }
 
-  public HtmlImage (Scale scale, ImageElement elem) {
-    super(RPromise.<Image>create(), scale, elem.getWidth(), elem.getHeight());
+  public HtmlBitmap (Scale scale, ImageElement elem) {
+    super(RPromise.<Bitmap>create(), scale, elem.getWidth(), elem.getHeight());
     img = elem;
 
     // we know that in this case, our state is a promise
-    final RPromise<Image> pstate = ((RPromise<Image>)state);
+    final RPromise<Bitmap> pstate = ((RPromise<Bitmap>)state);
     if (isComplete(img)) pstate.succeed(this);
     else {
       HtmlInput.addEventListener(img, "load", new EventHandler() {
         @Override public void handleEvent (NativeEvent evt) {
           pixelWidth = img.getWidth();
           pixelHeight = img.getHeight();
-          pstate.succeed(HtmlImage.this);
+          pstate.succeed(HtmlBitmap.this);
         }
       }, false);
       HtmlInput.addEventListener(img, "error", new EventHandler() {
@@ -64,8 +64,8 @@ public class HtmlImage extends ImageImpl {
     }
   }
 
-  public HtmlImage (Throwable error) {
-    super(RFuture.<Image>failure(error), Scale.ONE, 50, 50);
+  public HtmlBitmap (Throwable error) {
+    super(RFuture.<Bitmap>failure(error), Scale.ONE, 50, 50);
     setBitmap(createErrorBitmap(pixelWidth, pixelHeight));
   }
 
@@ -73,7 +73,7 @@ public class HtmlImage extends ImageImpl {
     * write custom backend code to do special stuff. No promises are made, caveat coder. */
   public ImageElement imageElement () { return img; }
 
-  HtmlImage preload (int prePixelWidth, int prePixelHeight) {
+  HtmlBitmap preload (int prePixelWidth, int prePixelHeight) {
     pixelWidth = prePixelWidth;
     pixelHeight = prePixelHeight;
     return this;
@@ -133,8 +133,8 @@ public class HtmlImage extends ImageImpl {
     ctx.putImageData(imageData, startX, startY);
   }
 
-  @Override public Image transform (BitmapTransformer xform) {
-    return new HtmlImage(scale, ((HtmlBitmapTransformer) xform).transform(img));
+  @Override public Bitmap transform (BitmapTransformer xform) {
+    return new HtmlBitmap(scale, ((HtmlBitmapTransformer) xform).transform(img));
   }
 
   @Override public void draw(Object ctx, float x, float y, float width, float height) {
@@ -152,7 +152,7 @@ public class HtmlImage extends ImageImpl {
   }
 
   @Override public String toString () {
-    return "HtmlImage[scale=" + scale + ", size=" + width() + "x" + height() +
+    return "HtmlBitmap[scale=" + scale + ", size=" + width() + "x" + height() +
       ", psize=" + pixelWidth + "x" + pixelHeight + ", img=" + img + ", canvas=" + canvas + "]";
   }
 

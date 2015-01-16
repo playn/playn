@@ -25,8 +25,7 @@ public abstract class AbstractPlayNTest {
 
   public static JavaPlatform plat;
 
-  @BeforeClass
-  public static void initializePlatform() {
+  @BeforeClass public static void initializePlatform() {
     JavaPlatform.Config config = new JavaPlatform.Config();
     config.headless = true;
     plat = new JavaPlatform(config);
