@@ -21,15 +21,86 @@ import playn.core.*;
 import playn.scene.*;
 import react.Slot;
 
-public class ClippedGroupTest extends Test {
+public class ClippedLayerTest extends Test {
 
-  private float elapsed;
+  private float elapsed, rotation;
 
-  public ClippedGroupTest (TestsGame game) {
-    super(game, "ClippedGroupTest", "Tests clipping of children in group layers.");
+  public ClippedLayerTest (TestsGame game) {
+    super(game, "ClippedLayerTest",
+          "Tests rendering of layers with and without clipping. Clipped layers " +
+          "should not overdraw one pixel black lines that circumscribes them.");
   }
 
-  @Override public void init () {
+  @Override public void init() {
+    addClippedLayers();
+    addClippedGroupLayers();
+  }
+
+  protected void addClippedLayers () {
+    Canvas circle = game.graphics.createCanvas(100, 100);
+    circle.setFillColor(0xFFCC99FF).fillCircle(50, 50, 50);
+    final Texture cirtex = circle.toTextureDispose();
+
+    Canvas sausage = game.graphics.createCanvas(100, 50);
+    Gradient linear = sausage.createGradient(new Gradient.Linear(
+      0, 0, 100, 100, new int[] { 0xFF0000FF, 0xFF00FF00 }, new float[] { 0, 1 }));
+    sausage.setFillGradient(linear).fillRoundRect(0, 0, 100, 50, 10);
+    final Texture saustex = sausage.toTextureDispose();
+
+    // add an unclipped layer which will draw our background and outlines
+    game.rootLayer.add(new Layer() {
+      @Override protected void paintImpl (Surface surf) {
+        surf.setFillColor(0xFFFFCC99).fillRect(
+          0, 0, game.graphics.viewSize.width(), game.graphics.viewSize.height());
+
+        // fill a rect that will be covered except for one pixel by the clipped immediate layers
+        surf.setFillColor(0xFF000000);
+        surf.fillRect(29, 29, 152, 152);
+        surf.fillRect(259, 29, 102, 102);
+        surf.fillRect(389, 29, 102, 102);
+      }
+    });
+
+    // add a clipped layer that will clip a fill and image draw
+    ClippedLayer clayer = new ClippedLayer(150, 150) {
+      protected void paintClipped (Surface surf) {
+        // this fill should be clipped to our bounds
+        surf.setFillColor(0xFF99CCFF);
+        surf.fillRect(-50, -50, 200, 200);
+        // and this image should be clipped to our bounds
+        surf.draw(cirtex, 80, -25);
+      }
+    };
+    // adjust the origin to ensure that is accounted for in the clipping
+    game.rootLayer.addAt(clayer.setOrigin(100, 100), 130, 130);
+
+    // add a clipped layer that draws an image through a rotation transform
+    game.rootLayer.addAt(new ClippedLayer(100, 100) {
+      protected void paintClipped (Surface surf) {
+        surf.setFillColor(0xFF99CCFF).fillRect(0, 0, 100, 100);
+        surf.translate(50, 50).rotate(rotation).translate(-50, -50);
+        surf.draw(saustex, 0, 25);
+      }
+    }, 260, 30);
+
+    // add a clipped layer that draws an image through a translation transform
+    game.rootLayer.addAt(new ClippedLayer(100, 100) {
+      protected void paintClipped (Surface surf) {
+        surf.setFillColor(0xFF99CCFF).fillRect(0, 0, 100, 100);
+        surf.translate(FloatMath.sin(elapsed) * 50, FloatMath.cos(elapsed) * 50 + 25);
+        surf.draw(saustex, 0, 0);
+      }
+    }, 390, 30);
+
+    conns.add(game.paint.connect(new Slot<Clock>() {
+      public void onEmit (Clock clock) {
+        elapsed = clock.tick/1000f;
+        rotation = elapsed * FloatMath.PI/2;
+      }
+    }));
+  }
+
+  protected void addClippedGroupLayers () {
     final float iwidth = 100, iheight = 50;
     final Canvas img = game.graphics.createCanvas(iwidth, iheight);
     Gradient linear = img.createGradient(new Gradient.Linear(
@@ -95,11 +166,11 @@ public class ClippedGroupTest extends Test {
         surf.drawLine(left, bot, right, bot, 1);
       }
     });
-    game.rootLayer.addAt(g1, 75, 25);
-    game.rootLayer.addAt(g2, 200, 75);
-    game.rootLayer.addAt(g3, 275, 25);
-    game.rootLayer.addAt(g4, 400, 25);
-    game.rootLayer.addAt(g5, 525, 25);
+    game.rootLayer.addAt(g1, 75, 225);
+    game.rootLayer.addAt(g2, 200, 275);
+    game.rootLayer.addAt(g3, 275, 225);
+    game.rootLayer.addAt(g4, 400, 225);
+    game.rootLayer.addAt(g5, 525, 225);
 
     conns.add(game.paint.connect(new Slot<Clock>() {
       public void onEmit (Clock clock) {
