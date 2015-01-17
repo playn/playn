@@ -69,22 +69,18 @@ public abstract class Canvas {
 
     /** A * B. Multiplies the source and destination images. <b>NOTE:</b> this is not supported by
       * the HTML5 and Flash backends. {@code [Sa * Da, Sc * Dc]}. */
-    MULTIPLY,
+    MULTIPLY
   }
 
   /**
    * Values that may be used with {@link Canvas#setLineCap(LineCap)}.
    */
-  public static enum LineCap {
-    BUTT, ROUND, SQUARE
-  }
+  public static enum LineCap { BUTT, ROUND, SQUARE }
 
   /**
    * Values that may be used with {@link Canvas#setLineJoin(LineJoin)}.
    */
-  public static enum LineJoin {
-    BEVEL, MITER, ROUND
-  }
+  public static enum LineJoin { BEVEL, MITER, ROUND }
 
   /** The bitmap that underlies this canvas. */
   public final Bitmap bitmap;
@@ -336,6 +332,21 @@ public abstract class Canvas {
    */
   public abstract Canvas strokeText (TextLayout text, float x, float y);
 
+  /** A helper function for creating a texture from this canvas's bitmap. Note: unless you're
+    * planning on further modifying this canvas and generating more textures from it, you may want
+    * to be using {@link #toTexture}. */
+  public Texture createTexture () {
+    return gfx.createTexture(bitmap);
+  }
+
+  /** A helper function for creating a texture from this canvas's bitmap, and then disposing this
+    * canvas. This is useful for situations where you create a canvas, draw something in it, turn
+    * it into a texture and then never use the canvas again. */
+  public Texture toTexture () {
+    try { return toTexture(); }
+    finally { dispose(); }
+  }
+
   /**
    * Multiplies the current transformation matrix by the given matrix.
    */
@@ -349,7 +360,10 @@ public abstract class Canvas {
   /** Used to track modifications to our underlying bitmap. */
   protected boolean isDirty;
 
-  protected Canvas (Bitmap bitmap) {
+  private Graphics gfx;
+
+  protected Canvas (Graphics gfx, Bitmap bitmap) {
+    this.gfx = gfx;
     this.bitmap = bitmap;
     this.width = bitmap.width();
     this.height = bitmap.height();

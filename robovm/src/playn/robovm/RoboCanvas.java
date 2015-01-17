@@ -44,8 +44,8 @@ public class RoboCanvas extends Canvas {
 
   private LinkedList<RoboCanvasState> states = new LinkedList<RoboCanvasState>();
 
-  public RoboCanvas(RoboCanvasBitmap bitmap) {
-    super(bitmap);
+  public RoboCanvas(Graphics gfx, RoboCanvasBitmap bitmap) {
+    super(gfx, bitmap);
 
     // if our size is invalid, we'll fail below at CGBitmapContext, so fail here more usefully
     if (width <= 0 || height <= 0) throw new IllegalArgumentException(

@@ -23,8 +23,8 @@ public class HtmlCanvas extends Canvas {
 
   private final Context2d ctx;
 
-  public HtmlCanvas(HtmlBitmap bitmap) {
-    super(bitmap);
+  public HtmlCanvas(Graphics gfx, HtmlBitmap bitmap) {
+    super(gfx, bitmap);
     this.ctx = bitmap.canvas.getContext2d();
   }
 

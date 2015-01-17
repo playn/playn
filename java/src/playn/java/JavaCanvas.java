@@ -29,12 +29,7 @@ import java.awt.image.WritableRaster;
 import java.util.Deque;
 import java.util.LinkedList;
 
-import playn.core.Canvas;
-import playn.core.Gradient;
-import playn.core.Bitmap;
-import playn.core.Path;
-import playn.core.Pattern;
-import playn.core.TextLayout;
+import playn.core.*;
 import pythagoras.f.MathUtil;
 
 class JavaCanvas extends Canvas {
@@ -47,8 +42,8 @@ class JavaCanvas extends Canvas {
   private Rectangle2D.Float rect = new Rectangle2D.Float();
   private RoundRectangle2D.Float roundRect = new RoundRectangle2D.Float();
 
-  JavaCanvas(JavaBitmap bitmap) {
-    super(bitmap);
+  JavaCanvas(Graphics jgfx, JavaBitmap bitmap) {
+    super(jgfx, bitmap);
 
     gfx = bitmap.bufferedImage().createGraphics();
     gfx.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);

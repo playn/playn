@@ -34,8 +34,8 @@ public class AndroidCanvas extends Canvas {
   private final android.graphics.Canvas canvas;
   private final LinkedList<AndroidCanvasState> paintStack = new LinkedList<>();
 
-  public AndroidCanvas(AndroidBitmap bitmap) {
-    super(bitmap);
+  public AndroidCanvas(Graphics gfx, AndroidBitmap bitmap) {
+    super(gfx, bitmap);
     canvas = new android.graphics.Canvas(bitmap.bitmap());
     paintStack.addFirst(new AndroidCanvasState());
     float factor = bitmap.scale().factor;

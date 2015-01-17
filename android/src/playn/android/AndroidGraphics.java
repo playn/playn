@@ -170,7 +170,7 @@ public class AndroidGraphics extends Graphics {
 
   @Override protected Canvas createCanvasImpl(Scale scale, int pixelWidth, int pixelHeight) {
     Bitmap bitmap = Bitmap.createBitmap(pixelWidth, pixelHeight, preferredBitmapConfig);
-    return new AndroidCanvas(new AndroidBitmap(scale, bitmap));
+    return new AndroidCanvas(this, new AndroidBitmap(scale, bitmap));
   }
 
   AndroidFont resolveFont(Font font) {
