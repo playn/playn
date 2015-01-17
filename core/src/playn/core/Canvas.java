@@ -334,15 +334,15 @@ public abstract class Canvas {
 
   /** A helper function for creating a texture from this canvas's bitmap. Note: unless you're
     * planning on further modifying this canvas and generating more textures from it, you may want
-    * to be using {@link #toTexture}. */
-  public Texture createTexture () {
-    return gfx.createTexture(bitmap);
+    * to be using {@link #toTextureDispose}. */
+  public Texture toTexture () {
+    return bitmap.toTexture();
   }
 
   /** A helper function for creating a texture from this canvas's bitmap, and then disposing this
     * canvas. This is useful for situations where you create a canvas, draw something in it, turn
     * it into a texture and then never use the canvas again. */
-  public Texture toTexture () {
+  public Texture toTextureDispose () {
     try { return toTexture(); }
     finally { dispose(); }
   }
@@ -360,7 +360,7 @@ public abstract class Canvas {
   /** Used to track modifications to our underlying bitmap. */
   protected boolean isDirty;
 
-  private Graphics gfx;
+  protected final Graphics gfx;
 
   protected Canvas (Graphics gfx, Bitmap bitmap) {
     this.gfx = gfx;

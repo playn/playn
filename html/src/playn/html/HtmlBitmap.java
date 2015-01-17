@@ -36,13 +36,13 @@ public class HtmlBitmap extends BitmapImpl {
   private ImageElement img;
   CanvasElement canvas; // used for get/setRGB and by HtmlCanvas
 
-  public HtmlBitmap (Scale scale, CanvasElement elem) {
-    super(scale, elem.getWidth(), elem.getHeight(), elem);
+  public HtmlBitmap (Graphics gfx, Scale scale, CanvasElement elem) {
+    super(gfx, scale, elem.getWidth(), elem.getHeight(), elem);
     this.canvas = elem;
   }
 
-  public HtmlBitmap (Scale scale, ImageElement elem) {
-    super(RPromise.<Bitmap>create(), scale, elem.getWidth(), elem.getHeight());
+  public HtmlBitmap (Graphics gfx, Scale scale, ImageElement elem) {
+    super(gfx, RPromise.<Bitmap>create(), scale, elem.getWidth(), elem.getHeight());
     img = elem;
 
     // we know that in this case, our state is a promise
@@ -64,8 +64,8 @@ public class HtmlBitmap extends BitmapImpl {
     }
   }
 
-  public HtmlBitmap (Throwable error) {
-    super(RFuture.<Bitmap>failure(error), Scale.ONE, 50, 50);
+  public HtmlBitmap (Graphics gfx, Throwable error) {
+    super(gfx, RFuture.<Bitmap>failure(error), Scale.ONE, 50, 50);
     setBitmap(createErrorBitmap(pixelWidth, pixelHeight));
   }
 
@@ -134,7 +134,7 @@ public class HtmlBitmap extends BitmapImpl {
   }
 
   @Override public Bitmap transform (BitmapTransformer xform) {
-    return new HtmlBitmap(scale, ((HtmlBitmapTransformer) xform).transform(img));
+    return new HtmlBitmap(gfx, scale, ((HtmlBitmapTransformer) xform).transform(img));
   }
 
   @Override public void draw(Object ctx, float x, float y, float width, float height) {

@@ -34,7 +34,7 @@ import pythagoras.f.MathUtil;
 
 class JavaCanvas extends Canvas {
 
-  final Graphics2D gfx;
+  final Graphics2D g2d;
   private Deque<JavaCanvasState> stateStack = new LinkedList<JavaCanvasState>();
 
   private Ellipse2D.Float ellipse = new Ellipse2D.Float();
@@ -42,19 +42,19 @@ class JavaCanvas extends Canvas {
   private Rectangle2D.Float rect = new Rectangle2D.Float();
   private RoundRectangle2D.Float roundRect = new RoundRectangle2D.Float();
 
-  JavaCanvas(Graphics jgfx, JavaBitmap bitmap) {
-    super(jgfx, bitmap);
+  public JavaCanvas (Graphics gfx, JavaBitmap bitmap) {
+    super(gfx, bitmap);
 
-    gfx = bitmap.bufferedImage().createGraphics();
-    gfx.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+    g2d = bitmap.bufferedImage().createGraphics();
+    g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
     float scale = bitmap.scale().factor;
-    gfx.scale(scale, scale);
+    g2d.scale(scale, scale);
 
     // push default state
     stateStack.push(new JavaCanvasState());
 
     // All clears go to rgba(0,0,0,0).
-    gfx.setBackground(new Color(0, true));
+    g2d.setBackground(new Color(0, true));
   }
 
   public float alpha() {
@@ -68,21 +68,21 @@ class JavaCanvas extends Canvas {
     boolean isAlphaPremultiplied = bmp.isAlphaPremultiplied();
     WritableRaster raster = bmp.copyData(null);
     BufferedImage snap = new BufferedImage(cm, raster, isAlphaPremultiplied, null);
-    return new JavaBitmap(bitmap.scale(), snap);
+    return new JavaBitmap(gfx, bitmap.scale(), snap);
   }
 
   @Override
   public Canvas clear() {
-    currentState().prepareClear(gfx);
-    gfx.clearRect(0, 0, MathUtil.iceil(width), MathUtil.iceil(height));
+    currentState().prepareClear(g2d);
+    g2d.clearRect(0, 0, MathUtil.iceil(width), MathUtil.iceil(height));
     isDirty = true;
     return this;
   }
 
   @Override
   public Canvas clearRect(float x, float y, float width, float height) {
-    currentState().prepareClear(gfx);
-    gfx.clearRect(MathUtil.ifloor(x), MathUtil.ifloor(y),
+    currentState().prepareClear(g2d);
+    g2d.clearRect(MathUtil.ifloor(x), MathUtil.ifloor(y),
                   MathUtil.iceil(width), MathUtil.iceil(height));
     isDirty = true;
     return this;
@@ -99,8 +99,8 @@ class JavaCanvas extends Canvas {
     final int cx = MathUtil.ifloor(x), cy = MathUtil.ifloor(y);
     final int cwidth = MathUtil.iceil(width), cheight = MathUtil.iceil(height);
     currentState().clipper = new JavaCanvasState.Clipper() {
-      public void setClip(Graphics2D gfx) {
-        gfx.clipRect(cx, cy, cwidth, cheight);
+      public void setClip(Graphics2D g2d) {
+        g2d.clipRect(cx, cy, cwidth, cheight);
       }
     };
     return this;
@@ -119,68 +119,68 @@ class JavaCanvas extends Canvas {
 
   @Override
   public Canvas drawLine(float x0, float y0, float x1, float y1) {
-    currentState().prepareStroke(gfx);
+    currentState().prepareStroke(g2d);
     line.setLine(x0, y0, x1, y1);
-    gfx.draw(line);
+    g2d.draw(line);
     isDirty = true;
     return this;
   }
 
   @Override
   public Canvas drawPoint(float x, float y) {
-    currentState().prepareStroke(gfx);
-    gfx.drawLine((int) x, (int) y, (int) x, (int) y);
+    currentState().prepareStroke(g2d);
+    g2d.drawLine((int) x, (int) y, (int) x, (int) y);
     isDirty = true;
     return this;
   }
 
   @Override
   public Canvas drawText(String text, float x, float y) {
-    currentState().prepareFill(gfx);
-    gfx.drawString(text, x, y);
+    currentState().prepareFill(g2d);
+    g2d.drawString(text, x, y);
     isDirty = true;
     return this;
   }
 
   @Override
   public Canvas fillCircle(float x, float y, float radius) {
-    currentState().prepareFill(gfx);
+    currentState().prepareFill(g2d);
     ellipse.setFrame(x - radius, y - radius, 2 * radius, 2 * radius);
-    gfx.fill(ellipse);
+    g2d.fill(ellipse);
     isDirty = true;
     return this;
   }
 
   @Override
   public Canvas fillPath(Path path) {
-    currentState().prepareFill(gfx);
-    gfx.fill(((JavaPath) path).path);
+    currentState().prepareFill(g2d);
+    g2d.fill(((JavaPath) path).path);
     isDirty = true;
     return this;
   }
 
   @Override
   public Canvas fillRect(float x, float y, float width, float height) {
-    currentState().prepareFill(gfx);
+    currentState().prepareFill(g2d);
     rect.setRect(x, y, width, height);
-    gfx.fill(rect);
+    g2d.fill(rect);
     isDirty = true;
     return this;
   }
 
   @Override
   public Canvas fillRoundRect(float x, float y, float width, float height, float radius) {
-    currentState().prepareFill(gfx);
+    currentState().prepareFill(g2d);
     roundRect.setRoundRect(x, y, width, height, radius*2, radius*2);
-    gfx.fill(roundRect);
+    g2d.fill(roundRect);
     isDirty = true;
     return this;
   }
 
   @Override
   public Canvas fillText(TextLayout layout, float x, float y) {
-    currentState().prepareFill(gfx);
-    ((JavaTextLayout)layout).fill(gfx, x, y);
+    currentState().prepareFill(g2d);
+    ((JavaTextLayout)layout).fill(g2d, x, y);
     isDirty = true;
     return this;
   }
@@ -188,20 +188,20 @@ class JavaCanvas extends Canvas {
   @Override
   public Canvas restore() {
     stateStack.pop();
-    gfx.setTransform(currentState().transform);
+    g2d.setTransform(currentState().transform);
     return this;
   }
 
   @Override
   public Canvas rotate(float angle) {
-    gfx.rotate(angle);
+    g2d.rotate(angle);
     return this;
   }
 
   @Override
   public Canvas save() {
     // update saved transform
-    currentState().transform = gfx.getTransform();
+    currentState().transform = g2d.getTransform();
 
     // clone to maintain current state
     stateStack.push(new JavaCanvasState(currentState()));
@@ -210,7 +210,7 @@ class JavaCanvas extends Canvas {
 
   @Override
   public Canvas scale(float x, float y) {
-    gfx.scale(x, y);
+    g2d.scale(x, y);
     return this;
   }
 
@@ -281,64 +281,64 @@ class JavaCanvas extends Canvas {
 
   @Override
   public Canvas strokeCircle(float x, float y, float radius) {
-    currentState().prepareStroke(gfx);
+    currentState().prepareStroke(g2d);
     ellipse.setFrame(x - radius, y - radius, 2 * radius, 2 * radius);
-    gfx.draw(ellipse);
+    g2d.draw(ellipse);
     isDirty = true;
     return this;
   }
 
   @Override
   public Canvas strokePath(Path path) {
-    currentState().prepareStroke(gfx);
-    gfx.setColor(new Color(currentState().strokeColor, false));
-    gfx.draw(((JavaPath) path).path);
+    currentState().prepareStroke(g2d);
+    g2d.setColor(new Color(currentState().strokeColor, false));
+    g2d.draw(((JavaPath) path).path);
     isDirty = true;
     return this;
   }
 
   @Override
   public Canvas strokeRect(float x, float y, float width, float height) {
-    currentState().prepareStroke(gfx);
+    currentState().prepareStroke(g2d);
     rect.setRect(x, y, width, height);
-    gfx.draw(rect);
+    g2d.draw(rect);
     isDirty = true;
     return this;
   }
 
   @Override
   public Canvas strokeRoundRect(float x, float y, float width, float height, float radius) {
-    currentState().prepareStroke(gfx);
+    currentState().prepareStroke(g2d);
     roundRect.setRoundRect(x, y, width, height, radius*2, radius*2);
-    gfx.draw(roundRect);
+    g2d.draw(roundRect);
     isDirty = true;
     return this;
   }
 
   @Override
   public Canvas strokeText(TextLayout layout, float x, float y) {
-    currentState().prepareStroke(gfx);
-    ((JavaTextLayout)layout).stroke(gfx, x, y);
+    currentState().prepareStroke(g2d);
+    ((JavaTextLayout)layout).stroke(g2d, x, y);
     isDirty = true;
     return this;
   }
 
   @Override
   public Canvas transform(float m11, float m12, float m21, float m22, float dx, float dy) {
-    gfx.transform(new AffineTransform(m11, m12, m21, m22, dx, dy));
+    g2d.transform(new AffineTransform(m11, m12, m21, m22, dx, dy));
     return this;
   }
 
   @Override
   public Canvas translate(float x, float y) {
-    gfx.translate(x, y);
+    g2d.translate(x, y);
     return this;
   }
 
   @Override
   protected Graphics2D gc() {
-    currentState().prepareFill(gfx);
-    return gfx;
+    currentState().prepareFill(g2d);
+    return g2d;
   }
 
   private JavaCanvasState currentState() {

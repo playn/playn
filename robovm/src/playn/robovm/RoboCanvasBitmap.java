@@ -23,8 +23,9 @@ public class RoboCanvasBitmap extends RoboBitmap {
 
   CGBitmapContext bctx;
 
-  public RoboCanvasBitmap (Scale scale, int pixelWidth, int pixelHeight, boolean interpolate) {
-    super(scale, pixelWidth, pixelHeight);
+  public RoboCanvasBitmap (Graphics gfx, Scale scale, int pixelWidth, int pixelHeight,
+                           boolean interpolate) {
+    super(gfx, scale, pixelWidth, pixelHeight);
     // create the bitmap context via which we'll render into it
     bctx = RoboGraphics.createCGBitmap(pixelWidth, pixelHeight);
     if (!interpolate) bctx.setInterpolationQuality(CGInterpolationQuality.None);

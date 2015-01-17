@@ -15,6 +15,7 @@
  */
 package playn.core;
 
+import react.Function;
 import react.RFuture;
 import react.RPromise;
 
@@ -70,11 +71,6 @@ public abstract class Bitmap {
   public abstract int pixelHeight ();
 
   /**
-   * Converts this bitmap into a pattern which can be used to fill a canvas.
-   */
-  public abstract Pattern toPattern (boolean repeatX, boolean repeatY);
-
-  /**
    * Extracts pixel data from a rectangular area of this bitmap. This method may perform poorly, in
    * particular on the HTML platform.
    *
@@ -112,9 +108,57 @@ public abstract class Bitmap {
   public abstract void setRgb (int startX, int startY, int width, int height, int[] rgbArray,
                                int offset, int scanSize);
 
-  /** Used with {@link #transform}. */
-  public static interface BitmapTransformer {
+  /**
+   * Converts this bitmap into a pattern which can be used to fill a canvas.
+   */
+  public abstract Pattern toPattern (boolean repeatX, boolean repeatY);
+
+  /**
+   * Creates a texture with the contents of this bitmap, with default config.
+   * See {@link #toTexture(Texture.Config)}.
+   */
+  public Texture toTexture () { return toTexture(Texture.Config.DEFAULT); }
+
+  /**
+   * Uploads this bitmap's data to the GPU and returns a handle to the texture.
+   * @throws IllegalStateException if this bitmap is not fully loaded.
+   */
+  public Texture toTexture (Texture.Config config) {
+    if (!isLoaded()) throw new IllegalStateException("Cannot create texture from unready bitmap.");
+
+    int texWidth = config.toTexWidth(pixelWidth());
+    int texHeight = config.toTexHeight(pixelHeight());
+    if (texWidth <= 0 || texHeight <= 0) throw new IllegalArgumentException(
+      "Invalid texture size: " + texWidth + "x" + texHeight + " from: " + this);
+
+    Texture tex = new Texture(gfx, gfx.createTexture(config), config, texWidth, texHeight,
+                              scale(), width(), height());
+    tex.update(this); // this will handle non-POT source bitmap conversion
+    return tex;
   }
+
+  /**
+   * Returns a future which will deliver a texture for this bitmap once its loading has completed.
+   * Uses {@link #toTexture()} to create texture.
+   */
+  public RFuture<Texture> toTextureAsync () {
+    return state.map(new Function<Bitmap,Texture>() {
+      public Texture apply (Bitmap bitmap) { return toTexture(); }
+    });
+  }
+
+  /**
+   * Returns a future which will deliver a texture for this bitmap once its loading has completed.
+   * Uses {@link #toTexture(Texture.Config)} to create texture.
+   */
+  public RFuture<Texture> toTextureAsync (final Texture.Config config) {
+    return state.map(new Function<Bitmap,Texture>() {
+      public Texture apply (Bitmap bitmap) { return toTexture(config); }
+    });
+  }
+
+  /** Used with {@link #transform}. */
+  public static interface BitmapTransformer {}
 
   /**
    * Generates a new bitmap from this bitmap, using a transformer created for the platform in use.
@@ -122,12 +166,16 @@ public abstract class Bitmap {
    */
   public abstract Bitmap transform (BitmapTransformer xform);
 
-  protected Bitmap (RFuture<Bitmap> state) {
+  protected final Graphics gfx;
+
+  protected Bitmap (Graphics gfx, RFuture<Bitmap> state) {
+    this.gfx = gfx;
     this.state = state;
   }
 
   // this ctor is used for bitmaps that are constructed immediately with their bitmaps
-  protected Bitmap () {
+  protected Bitmap (Graphics gfx) {
+    this.gfx = gfx;
     this.state = RFuture.success(this);
   }
 

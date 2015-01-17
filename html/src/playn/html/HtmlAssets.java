@@ -97,7 +97,7 @@ public class HtmlAssets extends Assets {
         if (size == null) continue; // try other scales
         return getBitmap(rsrc.path, rsrc.scale).preload(size[0], size[1]);
       }
-      return new HtmlBitmap(new Throwable("Image missing from manifest: " + path));
+      return new HtmlBitmap(plat.graphics(), new Throwable("Image missing from manifest: " + path));
     }
   }
 
@@ -279,7 +279,7 @@ public class HtmlAssets extends Assets {
     // allow images to be served cross origin on supported, CORS enabled, browsers
     setCrossOrigin(img, "anonymous");
     img.setSrc(url);
-    return new HtmlBitmap(scale, img);
+    return new HtmlBitmap(plat.graphics(), scale, img);
   }
 
   /**

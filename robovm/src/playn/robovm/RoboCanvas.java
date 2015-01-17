@@ -300,7 +300,7 @@ public class RoboCanvas extends Canvas {
   }
 
   @Override public Bitmap snapshot() {
-    return new RoboBitmap(bitmap.scale(), ((RoboBitmap)bitmap).cgImage());
+    return new RoboBitmap(gfx, bitmap.scale(), ((RoboBitmap)bitmap).cgImage());
   }
 
   @Override public Canvas strokeCircle(float x, float y, float radius) {

@@ -73,53 +73,6 @@ public abstract class Graphics {
   }
 
   /**
-   * Creates a texture with the contents if {@code bitmap}, with default config.
-   * See {@link #createTexture(Bitmap,Texture.Config)}.
-   */
-  public Texture createTexture (Bitmap bitmap) {
-    return createTexture(bitmap, Texture.Config.DEFAULT);
-  }
-
-  /**
-   * Uploads {@code bitmap}'s data to the GPU and returns a handle to the texture.
-   * @throws IllegalStateException if {@code bitmap} is not fully loaded.
-   */
-  public Texture createTexture (Bitmap bitmap, Texture.Config config) {
-    if (!bitmap.isLoaded()) throw new IllegalStateException(
-      "Cannot create texture from unready bitmap.");
-
-    int texWidth = config.toTexWidth(bitmap.pixelWidth());
-    int texHeight = config.toTexHeight(bitmap.pixelHeight());
-    if (texWidth <= 0 || texHeight <= 0) throw new IllegalArgumentException(
-      "Invalid texture size: " + texWidth + "x" + texHeight + " from: " + bitmap);
-
-    Texture tex = new Texture(this, createTexture(config), config, texWidth, texHeight,
-                              bitmap.scale(), bitmap.width(), bitmap.height());
-    tex.update(bitmap); // this will handle non-POT source bitmap conversion
-    return tex;
-  }
-
-  /**
-   * Returns a future which will deliver a texture for {@code bitmap} once its loading has
-   * completed. Uses {@link #createTexture(Bitmap)} to create texture.
-   */
-  public RFuture<Texture> createTextureAsync (Bitmap bitmap) {
-    return bitmap.state.map(new Function<Bitmap,Texture>() {
-      public Texture apply (Bitmap bitmap) { return createTexture(bitmap); }
-    });
-  }
-
-  /**
-   * Returns a future which will deliver a texture for {@code bitmap} once its loading has
-   * completed. Uses {@link #createTexture(Bitmap,boolean,boolean)} to create texture.
-   */
-  public RFuture<Texture> createTextureAsync (Bitmap bitmap, final Texture.Config config) {
-    return bitmap.state.map(new Function<Bitmap,Texture>() {
-      public Texture apply (Bitmap bitmap) { return createTexture(bitmap, config); }
-    });
-  }
-
-  /**
    * Creates an empty texture into which one can render. The supplied width and height are in
    * display units and will be converted to pixels based on the current scale factor.
    */
@@ -167,7 +120,7 @@ public abstract class Graphics {
     if (colorTex == null) {
       Canvas canvas = createCanvas(1, 1);
       canvas.setFillColor(0xFFFFFFFF).fillRect(0, 0, canvas.width, canvas.height);
-      colorTex = createTexture(canvas.bitmap, Texture.Config.UNMANAGED);
+      colorTex = canvas.bitmap.toTexture(Texture.Config.UNMANAGED);
     }
     return colorTex;
   }
@@ -202,7 +155,7 @@ public abstract class Graphics {
     // TODO: allow listening for view size change?
   }
 
-  private int createTexture (Texture.Config config) {
+  int createTexture (Texture.Config config) {
     int id = gl.glGenTexture();
     gl.glBindTexture(GL_TEXTURE_2D, id);
     gl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, config.magFilter);

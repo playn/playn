@@ -41,8 +41,8 @@ public class JavaBitmap extends BitmapImpl {
 
   protected BufferedImage img;
 
-  public JavaBitmap (Scale scale, BufferedImage img) {
-    super(scale, img.getWidth(), img.getHeight(), img);
+  public JavaBitmap (Graphics gfx, Scale scale, BufferedImage img) {
+    super(gfx, scale, img.getWidth(), img.getHeight(), img);
   }
 
   public JavaBitmap (JavaPlatform plat, int preWidth, int preHeight) {
@@ -77,7 +77,7 @@ public class JavaBitmap extends BitmapImpl {
 
   @Override
   public Bitmap transform(BitmapTransformer xform) {
-    return new JavaBitmap(scale, ((JavaBitmapTransformer) xform).transform(img));
+    return new JavaBitmap(gfx, scale, ((JavaBitmapTransformer) xform).transform(img));
   }
 
   @Override public void draw (Object ctx, float x, float y, float w, float h) {

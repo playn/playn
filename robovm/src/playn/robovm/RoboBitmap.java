@@ -33,8 +33,8 @@ public class RoboBitmap extends BitmapImpl {
   // CGBitmapContext and CGImage don't completely place nicely together
   private CGImage image;
 
-  public RoboBitmap (Scale scale, CGImage img) {
-    super(scale, (int)img.getWidth(), (int)img.getHeight(), img);
+  public RoboBitmap (Graphics gfx, Scale scale, CGImage img) {
+    super(gfx, scale, (int)img.getWidth(), (int)img.getHeight(), img);
   }
 
   public RoboBitmap (RoboPlatform plat, int preWidth, int preHeight) {
@@ -96,7 +96,7 @@ public class RoboBitmap extends BitmapImpl {
 
   @Override public Bitmap transform(BitmapTransformer xform) {
     UIImage ximage = new UIImage(((RoboBitmapTransformer) xform).transform(cgImage()));
-    return new RoboBitmap(scale, ximage.getCGImage());
+    return new RoboBitmap(gfx, scale, ximage.getCGImage());
   }
 
   @Override public void draw(Object ctx, float x, float y, float width, float height) {
@@ -141,8 +141,8 @@ public class RoboBitmap extends BitmapImpl {
     }
   }
 
-  protected RoboBitmap (Scale scale, int pixelWidth, int pixelHeight) {
-    super(scale, pixelWidth, pixelHeight, null);
+  protected RoboBitmap (Graphics gfx, Scale scale, int pixelWidth, int pixelHeight) {
+    super(gfx, scale, pixelWidth, pixelHeight, null);
   }
 
   @Override

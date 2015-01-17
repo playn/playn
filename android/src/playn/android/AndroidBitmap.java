@@ -24,8 +24,8 @@ public class AndroidBitmap extends BitmapImpl {
 
   protected Bitmap bitmap;
 
-  public AndroidBitmap(Scale scale, Bitmap bitmap) {
-    super(scale, bitmap.getWidth(), bitmap.getHeight(), bitmap);
+  public AndroidBitmap(Graphics gfx, Scale scale, Bitmap bitmap) {
+    super(gfx, scale, bitmap.getWidth(), bitmap.getHeight(), bitmap);
     // TODO: move elsewhere: ((AndroidGLContext) ctx).addRefreshable(this);
   }
 
@@ -56,7 +56,7 @@ public class AndroidBitmap extends BitmapImpl {
   }
 
   @Override public playn.core.Bitmap transform(BitmapTransformer xform) {
-    return new AndroidBitmap(scale, ((AndroidBitmapTransformer) xform).transform(bitmap));
+    return new AndroidBitmap(gfx, scale, ((AndroidBitmapTransformer) xform).transform(bitmap));
   }
 
   @Override public void draw (Object ctx, float x, float y, float w, float h) {

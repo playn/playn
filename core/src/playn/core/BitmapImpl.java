@@ -67,7 +67,8 @@ public abstract class BitmapImpl extends Bitmap {
   @Override public int pixelWidth () { return pixelWidth; }
   @Override public int pixelHeight () { return pixelHeight; }
 
-  protected BitmapImpl (Scale scale, int pixelWidth, int pixelHeight, Object bitmap) {
+  protected BitmapImpl (Graphics gfx, Scale scale, int pixelWidth, int pixelHeight, Object bitmap) {
+    super(gfx);
     if (pixelWidth == 0 || pixelHeight == 0) throw new IllegalArgumentException(
       "Invalid size for ready bitmap: " + pixelWidth + "x" + pixelHeight + " bitmap: " + bitmap);
     this.scale = scale;
@@ -76,15 +77,16 @@ public abstract class BitmapImpl extends Bitmap {
     setBitmap(bitmap);
   }
 
-  protected BitmapImpl (RFuture<Bitmap> state, Scale preScale, int preWidth, int preHeight) {
-    super(state);
+  protected BitmapImpl (Graphics gfx, RFuture<Bitmap> state, Scale preScale,
+                        int preWidth, int preHeight) {
+    super(gfx, state);
     scale = preScale;
     pixelWidth = preWidth;
     pixelHeight = preHeight;
   }
 
   protected BitmapImpl (Platform plat, Scale preScale, int preWidth, int preHeight) {
-    this(plat.<Bitmap>deferredPromise(), preScale, preWidth, preHeight);
+    this(plat.graphics(), plat.<Bitmap>deferredPromise(), preScale, preWidth, preHeight);
   }
 
   protected abstract void setBitmap (Object bitmap);

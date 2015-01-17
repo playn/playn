@@ -221,7 +221,7 @@ public class AndroidCanvas extends Canvas {
 
   @Override public playn.core.Bitmap snapshot() {
     Bitmap bitmap = ((AndroidBitmap)this.bitmap).bitmap();
-    return new AndroidBitmap(this.bitmap.scale(), bitmap.copy(bitmap.getConfig(), false));
+    return new AndroidBitmap(gfx, this.bitmap.scale(), bitmap.copy(bitmap.getConfig(), false));
   }
 
   @Override public Canvas strokeCircle(float x, float y, float radius) {
