@@ -13,6 +13,8 @@
  */
 package playn.scene;
 
+import pythagoras.f.IDimension;
+
 import playn.core.Bitmap;
 import playn.core.Canvas;
 import playn.core.Graphics;
@@ -28,6 +30,13 @@ public class CanvasLayer extends TextureLayer {
 
   private final Graphics gfx;
   private Canvas canvas;
+
+  /**
+   * Creates a canvas layer with a backing canvas of {@code size} (in display units). This layer
+   * will display nothing until a {@link #begin}/{@link #end} pair is used to render something to
+   * its backing canvas.
+   */
+  public CanvasLayer (Graphics gfx, IDimension size) { this(gfx, size.width(), size.height()); }
 
   /**
    * Creates a canvas layer with a backing canvas of size {@code width x height} (in display
@@ -46,7 +55,7 @@ public class CanvasLayer extends TextureLayer {
   public CanvasLayer (Graphics gfx, Canvas canvas) {
     this.gfx = gfx;
     this.canvas = canvas;
-    setTexture(gfx.createTexture(canvas.bitmap));
+    setTexture(canvas.bitmap.toTexture());
   }
 
   /**
@@ -77,7 +86,7 @@ public class CanvasLayer extends TextureLayer {
         tex.pixelHeight == bitmap.pixelHeight()) tex.update(bitmap);
     // otherwise we need to create a new texture (setTexture will unreference the old texture which
     // will cause it to be destroyed)
-    else setTexture(gfx.createTexture(canvas.bitmap));
+    else setTexture(canvas.bitmap.toTexture());
   }
 
   @Override public float width () {

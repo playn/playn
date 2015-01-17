@@ -67,19 +67,15 @@ public class TextureLayer extends Layer {
   }
 
   /**
-   * Converts {@code image} into a texture and creates an image layer with it. The texture will be
-   * destroyed when this layer is {@link #destroy}ed.
+   * Converts {@code bitmap} into a texture and creates an image layer with it. {@code bitmap} must
+   * be fully loaded. The texture will be destroyed when this layer is {@link #destroy}ed.
    */
-  public TextureLayer (Graphics gfx, Bitmap bitmap) {
-    this(gfx.createTexture(bitmap));
-  }
+  public TextureLayer (Bitmap bitmap) { this(bitmap.toTexture()); }
 
   /**
    * Creates an image layer with no texture. It will be invisible until a texture is set into it.
    */
-  public TextureLayer () {
-    // nada!
-  }
+  public TextureLayer () {} // nada!
 
   /**
    * Returns the texture rendered by this layer.
