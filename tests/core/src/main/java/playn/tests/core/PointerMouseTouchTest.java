@@ -43,7 +43,7 @@ class PointerMouseTouchTest extends Test {
   // private TestsGame.NToggle<String> propagate;
 
   public PointerMouseTouchTest (TestsGame game) {
-    super(game, "PointerMouseTouchTest", "Tests the Pointer, Mouse, and Touch interfaces.");
+    super(game, "PointerMouseTouch", "Tests the Pointer, Mouse, and Touch interfaces.");
   }
 
   @Override public void init() {

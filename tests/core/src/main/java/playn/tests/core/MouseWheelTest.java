@@ -26,7 +26,7 @@ public class MouseWheelTest extends Test
   private static final float HWIDTH = WIDTH / 2;
 
   public MouseWheelTest (TestsGame game) {
-    super(game, "MouseWheelTest", "Tests mouse wheel movement on layers");
+    super(game, "MouseWheel", "Tests mouse wheel movement on layers");
   }
 
   @Override public void init () {

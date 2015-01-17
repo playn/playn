@@ -28,7 +28,7 @@ import playn.scene.Touch;
 class LayerClickTest extends Test {
 
   public LayerClickTest (TestsGame game) {
-    super(game, "LayerClickTest",
+    super(game, "LayerClick",
           "Tests the hit testing and click/touch processing provided for layers.");
   }
 

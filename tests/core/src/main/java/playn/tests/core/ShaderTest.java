@@ -27,7 +27,7 @@ import react.Slot;
 public class ShaderTest extends Test {
 
   public ShaderTest (TestsGame game) {
-    super(game, "ShaderTest", "Tests custom shader support.");
+    super(game, "Shader", "Tests custom shader support.");
   }
 
   @Override public void init () {

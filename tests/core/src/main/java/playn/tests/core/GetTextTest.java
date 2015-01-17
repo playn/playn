@@ -22,7 +22,7 @@ import react.Slot;
 class GetTextTest extends Test {
 
   public GetTextTest (TestsGame game) {
-    super(game, "GetTextTest", "Tests mobile text entry support.");
+    super(game, "GetText", "Tests mobile text entry support.");
   }
 
   @Override public void init() {

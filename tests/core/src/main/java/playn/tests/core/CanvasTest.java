@@ -32,7 +32,7 @@ public class CanvasTest extends Test {
   private int lastSecs;
 
   public CanvasTest (TestsGame game) {
-    super(game, "CanvasTest", "Tests various Canvas rendering features.");
+    super(game, "Canvas", "Tests various Canvas rendering features.");
   }
 
   @Override public void init() {

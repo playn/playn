@@ -16,7 +16,7 @@ import react.Slot;
 public class SoundTest extends Test {
 
   public SoundTest (TestsGame game) {
-    super(game, "SoundTest", "Tests playing and looping sounds.");
+    super(game, "Sound", "Tests playing and looping sounds.");
   }
 
   @Override public void init() {

@@ -31,7 +31,7 @@ public class PauseResumeTest extends Test {
   private TextureLayer layer;
 
   public PauseResumeTest (TestsGame game) {
-    super(game, "PauseResumeTest", "Tests pause/resume notifications.");
+    super(game, "PauseResume", "Tests pause/resume notifications.");
   }
 
   @Override public void init() {

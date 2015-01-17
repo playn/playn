@@ -21,7 +21,7 @@ public class SurfaceTest extends Test {
   private TextureSurface paintUpped;
 
   public SurfaceTest (TestsGame game) {
-    super(game, "SurfaceTest", "Tests various Surface rendering features.");
+    super(game, "Surface", "Tests various Surface rendering features.");
   }
 
   @Override public void init() {

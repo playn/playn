@@ -26,7 +26,7 @@ public class AlphaLayerTest extends Test {
   static int offset = 5;
 
   public AlphaLayerTest (TestsGame game) {
-    super(game, "AlphaLayerTest",
+    super(game, "AlphaLayer",
           "Test that alpha works the same on all layer types and that alpha is 'additive'.");
   }
 

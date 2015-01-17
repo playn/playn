@@ -47,7 +47,7 @@ public class TextTest extends Test {
   private Rectangle row;
 
   public TextTest (TestsGame game) {
-    super(game, "TextTest", "Tests various text rendering features.");
+    super(game, "Text", "Tests various text rendering features.");
   }
 
   @Override public void init() {

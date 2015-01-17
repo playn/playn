@@ -13,7 +13,7 @@ import react.Slot;
 public class SubImageTest extends Test {
 
   public SubImageTest (TestsGame game) {
-    super(game, "SubImageTest", "Tests sub-image rendering in various circumstances.");
+    super(game, "SubImage", "Tests sub-image rendering in various circumstances.");
   }
 
   @Override public void init() {

@@ -29,7 +29,7 @@ public class ImageTypeTest extends Test {
   static String imageGroundTruthSrc = "images/imagetypetest_expected.png";
 
   public ImageTypeTest (TestsGame game) {
-    super(game, "ImageTypeTest",
+    super(game, "ImageType",
           "Test that image types display the same. Left-to-right: TextureLayer, SurfaceImage, " +
           "CanvasImage, ground truth (expected).");
   }

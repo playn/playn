@@ -26,7 +26,7 @@ public class ClippedLayerTest extends Test {
   private float elapsed, rotation;
 
   public ClippedLayerTest (TestsGame game) {
-    super(game, "ClippedLayerTest",
+    super(game, "ClippedLayer",
           "Tests rendering of layers with and without clipping. Clipped layers " +
           "should not overdraw one pixel black lines that circumscribes them.");
   }

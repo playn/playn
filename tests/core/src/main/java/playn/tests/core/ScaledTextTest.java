@@ -21,7 +21,7 @@ import playn.scene.*;
 public class ScaledTextTest extends Test {
 
   public ScaledTextTest (TestsGame game) {
-    super(game, "ScaledTextTest", "Tests that text rendering to scaled Canvas works properly.");
+    super(game, "ScaledText", "Tests that text rendering to scaled Canvas works properly.");
   }
 
   @Override public void init() {

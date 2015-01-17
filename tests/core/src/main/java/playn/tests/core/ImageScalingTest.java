@@ -34,7 +34,7 @@ public class ImageScalingTest extends Test {
   private boolean paused = false;
 
   public ImageScalingTest (TestsGame game) {
-    super(game, "ImageScalingTest",
+    super(game, "ImageScaling",
           "Tests use of min/mag filters and mipmapping when scaling images.");
   }
 

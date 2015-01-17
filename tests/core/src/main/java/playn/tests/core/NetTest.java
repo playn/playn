@@ -31,7 +31,7 @@ public class NetTest extends Test {
   private Net.WebSocket _websock;
 
   public NetTest (TestsGame game) {
-    super(game, "NetTest", "Tests network support.");
+    super(game, "Net", "Tests network support.");
   }
 
   @Override public void init() {

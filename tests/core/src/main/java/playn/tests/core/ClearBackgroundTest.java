@@ -29,7 +29,7 @@ public class ClearBackgroundTest extends Test {
   static int height = 100;
 
   public ClearBackgroundTest (TestsGame game) {
-    super(game, "ClearBackgroundTest",
+    super(game, "ClearBackground",
           "Test that the platform correctly clears the background to black between frames, " +
           "even if nothing is painted.");
   }

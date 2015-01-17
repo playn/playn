@@ -26,7 +26,7 @@ import playn.scene.*;
 public class CanvasStressTest extends Test {
 
   public CanvasStressTest (TestsGame game) {
-    super(game, "Canvas Stress Test",
+    super(game, "Canvas Stress",
           "Animates a full-screen sized canvas, forcing a massive reupload of image data to " +
           "the GPU on every frame.");
   }

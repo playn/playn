@@ -21,7 +21,7 @@ import playn.scene.*;
 public class DepthTest extends Test {
 
   public DepthTest (TestsGame game) {
-    super(game, "DepthTest",
+    super(game, "Depth",
           "Tests that layers added with non-zero depth are inserted/rendered in proper order.");
   }
 
