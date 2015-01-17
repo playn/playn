@@ -38,6 +38,7 @@ public class TestsGame extends SceneGame {
     public final List<T> values = new ArrayList<T>();
     private int valueIdx;
 
+    @SafeVarargs @SuppressWarnings("varargs")
     public NToggle(String name, T...values) {
       for (T value : values) {
         this.values.add(value);

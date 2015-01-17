@@ -106,7 +106,7 @@ public class JavaBitmap extends BitmapImpl {
   @Override protected void upload (Graphics gfx, Texture tex) {
     // Convert the bitmap into a format for quick uploading (NOOPs if already optimized)
     JavaGraphics jgfx = (JavaGraphics)gfx;
-    BufferedImage bitmap = jgfx.convertImage(img);
+    BufferedImage bitmap = JavaGraphics.convertImage(img);
 
     DataBuffer dbuf = bitmap.getRaster().getDataBuffer();
     ByteBuffer bbuf;
