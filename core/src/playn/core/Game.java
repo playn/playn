@@ -75,7 +75,7 @@ public abstract class Game {
     }
 
     int paintTick = plat.tick();
-    paintClock.dt = paintTick - paintClock.dt;
+    paintClock.dt = paintTick - paintClock.tick;
     paintClock.tick = paintTick;
     paintClock.alpha = 1 - (nextUpdate - paintTick) / (float)updateRate;
     paint.emit(paintClock);
