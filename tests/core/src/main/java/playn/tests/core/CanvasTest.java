@@ -27,8 +27,7 @@ public class CanvasTest extends Test {
   private final static float GAP = 10;
   private float nextX, nextY, maxY;
 
-  private Canvas timeImg;
-  private Texture timeTex;
+  private CanvasLayer time;
   private TextureLayer tileLayer;
   private int lastSecs;
 
@@ -98,23 +97,22 @@ public class CanvasTest extends Test {
     });
 
     Canvas repcan = createCanvas(30, 30, new Drawer() {
-      public void draw(Canvas canvas) {
+      public void draw (Canvas canvas) {
         canvas.setFillColor(0xFF99CCFF).fillCircle(15, 15, 15);
         canvas.setStrokeColor(0xFF000000).strokeRect(0, 0, 30, 30);
       }
     });
-    Texture reptex = game.graphics.createTexture(
-      repcan.bitmap, Texture.Config.DEFAULT.repeat(true, true));
+    Texture reptex = repcan.bitmap.toTexture(Texture.Config.DEFAULT.repeat(true, true));
+    repcan.dispose();
     addTestLayer("TextureLayer repeat x/y", 100, 100, new TextureLayer(reptex).setSize(100, 100));
 
-    timeImg = game.graphics.createCanvas(100, 100);
-    timeTex = game.graphics.createTexture(timeImg.bitmap);
-    addTestLayer("updated canvas", 100, 100, new TextureLayer(timeTex));
+    time = new CanvasLayer(game.graphics, 100, 100);
+    addTestLayer("updated canvas", 100, 100, time);
 
-    final Gradient linear = timeImg.createGradient(new Gradient.Linear(
+    final Gradient linear = repcan.createGradient(new Gradient.Linear(
       0, 0, 100, 100, new int[] { 0xFF0000FF, 0xFF00FF00 }, new float[] { 0, 1 }));
     final float dotRadius = 40;
-    final Gradient radial = timeImg.createGradient(new Gradient.Radial(
+    final Gradient radial = repcan.createGradient(new Gradient.Radial(
       100/3f, 100/2.5f, dotRadius, new int[] { 0xFFFFFFFF, 0xFFCC66FF }, new float[] { 0, 1 }));
 
     addTestCanvas("filled bezier path", 100, 100, new Drawer() {
@@ -215,9 +213,7 @@ public class CanvasTest extends Test {
 
     game.assets.getBitmap("images/tile.png").state.onSuccess(new Slot<Bitmap>() {
       public void onEmit (Bitmap tileImg) {
-        Texture tileTex = game.graphics.createTexture(
-          tileImg, Texture.Config.DEFAULT.repeat(true, true));
-        tileLayer = new TextureLayer(tileTex);
+        tileLayer = new TextureLayer(tileImg.toTexture(Texture.Config.DEFAULT.repeat(true, true)));
         addTestLayer("img layer anim setWidth", 100, 100, tileLayer.setSize(0, 100));
       }
     });
@@ -226,11 +222,12 @@ public class CanvasTest extends Test {
       public void onEmit (Clock clock) {
         int curSecs = clock.tick/1000;
         if (curSecs != lastSecs) {
-          timeImg.clear();
-          timeImg.setStrokeColor(0xFF000000).strokeRect(0, 0, 99, 99);
-          timeImg.drawText(""+curSecs, 40, 55);
+          Canvas tcanvas = time.begin();
+          tcanvas.clear();
+          tcanvas.setStrokeColor(0xFF000000).strokeRect(0, 0, 99, 99);
+          tcanvas.drawText(""+curSecs, 40, 55);
           lastSecs = curSecs;
-          timeTex.update(timeImg.bitmap);
+          time.end();
         }
 
         // round the width so that it goes to zero sometimes (which should be fine)
@@ -246,7 +243,7 @@ public class CanvasTest extends Test {
 
   private void addTestCanvas(String descrip, int width, int height, Drawer drawer) {
     Canvas canvas = createCanvas(width, height, drawer);
-    addTestLayer(descrip, width, height, new TextureLayer(game.graphics, canvas.bitmap));
+    addTestLayer(descrip, width, height, new TextureLayer(canvas.toTextureDispose()));
   }
 
   private Canvas createCanvas(int width, int height, final Drawer drawer) {
@@ -285,7 +282,7 @@ public class CanvasTest extends Test {
     game.assets.getBitmap(imagePath).state.onSuccess(new Slot<Bitmap>() {
       public void onEmit (Bitmap image) {
         drawer.draw(target, image);
-        layer.setTexture(game.graphics.createTexture(target.bitmap));
+        layer.setTexture(target.toTextureDispose());
       }
     });
     addTestLayer(descrip, width, height, layer);

@@ -34,13 +34,13 @@ public class ImmediateTest extends Test {
   @Override public void init() {
     Canvas circle = game.graphics.createCanvas(100, 100);
     circle.setFillColor(0xFFCC99FF).fillCircle(50, 50, 50);
-    final Texture cirtex = game.graphics.createTexture(circle.bitmap);
+    final Texture cirtex = circle.toTextureDispose();
 
     Canvas sausage = game.graphics.createCanvas(100, 50);
     Gradient linear = sausage.createGradient(new Gradient.Linear(
       0, 0, 100, 100, new int[] { 0xFF0000FF, 0xFF00FF00 }, new float[] { 0, 1 }));
     sausage.setFillGradient(linear).fillRoundRect(0, 0, 100, 50, 10);
-    final Texture saustex = game.graphics.createTexture(sausage.bitmap);
+    final Texture saustex = sausage.toTextureDispose();
 
     // add an unclipped layer which will draw our background and outlines
     game.rootLayer.add(new Layer() {

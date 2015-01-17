@@ -21,15 +21,14 @@ public class SubImageTest extends Test {
     int r = 30;
     Canvas canvas = game.graphics.createCanvas(2*r, 2*r);
     canvas.setFillColor(0xFF99CCFF).fillCircle(r, r, r);
-    fragment("CanvasImage", canvas.bitmap, 250, 160);
-    canvas.dispose();
+    fragment("CanvasImage", canvas.toTextureDispose(), 250, 160);
 
     // draw subimages of a simple static image
     game.assets.getBitmap("images/orange.png").state.onSuccess(new Slot<Bitmap>() {
       public void onEmit (Bitmap orange) {
-        fragment("Image", orange, 250, 10);
+        final Texture otex = orange.toTexture();
+        fragment("Image", otex, 250, 10);
 
-        final Texture otex = game.graphics.createTexture(orange);
         final float pw = orange.width(), ph = orange.height(), phw = pw/2, phh = ph/2;
 
         // create tileable sub-texture
@@ -49,8 +48,7 @@ public class SubImageTest extends Test {
         split.draw(orange,   0, phh, phw, phh, phw, 0, phw, phh);
         split.draw(orange, phw,   0, phw, phh, 0, phh, phw, phh);
         split.draw(orange,   0,   0, phw, phh, phw, phh, phw, phh);
-        addTest(140, 10, new TextureLayer(split.toTextureDispose(game.graphics)),
-                "draw subimg into Canvas", 80);
+        addTest(140, 10, new TextureLayer(split.toTextureDispose()), "draw subimg into Canvas", 80);
 
         // draw a subimage in an immediate layer
         addTest(130, 100, new Layer() {
@@ -79,15 +77,14 @@ public class SubImageTest extends Test {
     }).onFailure(logFailure("Failed to load orange image"));
   }
 
-  protected void fragment (String source, Bitmap image, float ox, float oy) {
-    float hw = image.width()/2f, hh = image.height()/2f;
+  protected void fragment (String source, Texture tex, float ox, float oy) {
+    float hw = tex.displayWidth/2f, hh = tex.displayHeight/2f;
     Rectangle ul = new Rectangle(0, 0, hw, hh);
     Rectangle ur = new Rectangle(hw, 0, hw, hh);
     Rectangle ll = new Rectangle(0, hh, hw, hh);
     Rectangle lr = new Rectangle(hw, hh, hw, hh);
     Rectangle ctr = new Rectangle(hw/2, hh/2, hw, hh);
 
-    Texture tex = game.graphics.createTexture(image);
     float dx = hw + 10, dy = hh + 10;
     GroupLayer group = new GroupLayer();
     group.addAt(create(tex, ul), 0, 0);
@@ -96,15 +93,15 @@ public class SubImageTest extends Test {
     group.addAt(create(tex, lr), dx, dy);
     group.addAt(create(tex, ctr), dx/2, 2*dy);
 
-    float xoff = image.width() + 20;
+    float xoff = tex.displayWidth + 20;
     group.addAt(create(tex, ul).setScale(2), xoff, 0);
     group.addAt(create(tex, ur).setScale(2), xoff+2*dx, 0);
     group.addAt(create(tex, ll).setScale(2), xoff, 2*dy);
     group.addAt(create(tex, lr).setScale(2), xoff+2*dx, 2*dy);
 
     game.rootLayer.addAt(group, ox, oy);
-    addDescrip(source + " split into subimages, and scaled", ox, oy + image.height()*2 + 25,
-               3*image.width()+40);
+    addDescrip(source + " split into subimages, and scaled", ox, oy + tex.displayHeight*2 + 25,
+               3*tex.displayWidth+40);
   }
 
   protected TextureLayer create (Texture tex, Rectangle region) {

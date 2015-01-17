@@ -52,7 +52,7 @@ public class AlphaLayerTest extends Test {
 
     game.assets.getBitmap("images/alphalayertest.png").state.onSuccess(new Slot<Bitmap>() {
       public void onEmit(Bitmap image) {
-        Texture imtex = game.graphics.createTexture(image);
+        Texture imtex = image.toTexture();
         float x = offset, y0 = offset, y1 = offset+height, y2 = offset+2*height;
 
         // add the layers over a white background, then again over blue
@@ -77,7 +77,7 @@ public class AlphaLayerTest extends Test {
 
         Canvas canvas1 = game.graphics.createCanvas(image.width(), image.height());
         canvas1.draw(image, 0, 0);
-        Texture cantex1 = game.graphics.createTexture(canvas1.bitmap);
+        Texture cantex1 = canvas1.toTextureDispose();
         groupLayer.addAt(new TextureLayer(cantex1).setAlpha(0.5f), x, y0);
         addDescrip("canvas a=1\nimg layer a=0.5", x, y1, width);
         groupLayer.addAt(new TextureLayer(cantex1).setAlpha(0.5f), x, y2);
@@ -85,7 +85,7 @@ public class AlphaLayerTest extends Test {
 
         Canvas canvas2 = game.graphics.createCanvas(image.width(), image.height());
         canvas2.setAlpha(0.5f).draw(image, 0, 0);
-        Texture cantex2 = game.graphics.createTexture(canvas2.bitmap);
+        Texture cantex2 = canvas2.toTextureDispose();
         groupLayer.addAt(new TextureLayer(cantex2), x, y0);
         addDescrip("canvas a=0.5\nimg layer a=1", x, y1, width);
         groupLayer.addAt(new TextureLayer(cantex2), x, y2);
@@ -103,11 +103,8 @@ public class AlphaLayerTest extends Test {
     });
 
     // add ground truth of 25% opaque image
-    game.assets.getBitmap("images/alphalayertest_expected.png").state.onSuccess(new Slot<Bitmap>() {
-      public void onEmit (Bitmap image) {
-        rootLayer.addAt(new TextureLayer(game.graphics, image), 5*width, 0);
-        addDescrip("ground truth", 5*width, offset+height, width);
-      }
-    });
+    Bitmap truth = game.assets.getBitmap("images/alphalayertest_expected.png");
+    rootLayer.addAt(new TextureLayer(truth.toTextureAsync()), 5*width, 0);
+    addDescrip("ground truth", 5*width, offset+height, width);
   }
 }

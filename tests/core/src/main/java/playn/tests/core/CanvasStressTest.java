@@ -32,15 +32,15 @@ public class CanvasStressTest extends Test {
   }
 
   @Override public void init() {
-    final Canvas canvas = game.graphics.createCanvas(game.graphics.viewSize);
-    final Texture canvasTex = game.graphics.createTexture(canvas.bitmap);
-    game.rootLayer.add(new TextureLayer(canvasTex));
+    final CanvasLayer clayer = new CanvasLayer(game.graphics, game.graphics.viewSize);
+    game.rootLayer.add(clayer);
 
     conns.add(game.update.connect(new Slot<Clock>() {
       private int noSegs = 30;
       private int direction = 1;
 
       public void onEmit (Clock clock) {
+        Canvas canvas = clayer.begin();
         canvas.clear();
         canvas.setStrokeWidth(3);
         canvas.setStrokeColor(0x88ff0000);
@@ -58,8 +58,7 @@ public class CanvasStressTest extends Test {
           canvas.strokeCircle(x, y, 100);
         }
 
-        // reupload the image data
-        canvasTex.update(canvas.bitmap);
+        clayer.end(); // reupload the image data
       }
     }));
   }

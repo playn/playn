@@ -47,7 +47,7 @@ public class ImageTypeTest extends Test {
     game.assets.getBitmap(imageSrc).state.onSuccess(new Slot<Bitmap>() {
       public void onEmit (Bitmap image) {
         // once the image loads, create our layers
-        Texture imtex = game.graphics.createTexture(image);
+        Texture imtex = image.toTexture();
         game.rootLayer.addAt(new TextureLayer(imtex), offset, offset);
         game.rootLayer.addAt(new TextureLayer(imtex), offset, offset + 2*height);
 
@@ -58,17 +58,14 @@ public class ImageTypeTest extends Test {
 
         Canvas canvas = game.graphics.createCanvas(image.width(), image.height());
         canvas.draw(image, 0, 0);
-        Texture cantex = game.graphics.createTexture(canvas.bitmap);
+        Texture cantex = canvas.toTextureDispose();
         game.rootLayer.addAt(new TextureLayer(cantex), offset + 2*width, offset);
         game.rootLayer.addAt(new TextureLayer(cantex), offset + 2*width, offset + 2*height);
       }
     });
 
     // add ground truth image
-    game.assets.getBitmap(imageGroundTruthSrc).state.onSuccess(new Slot<Bitmap>() {
-      public void onEmit (Bitmap image) {
-        game.rootLayer.addAt(new TextureLayer(game.graphics, image), 3 * width, 0);
-      }
-    });
+    Bitmap truth = game.assets.getBitmap(imageGroundTruthSrc);
+    game.rootLayer.addAt(new TextureLayer(truth.toTextureAsync()), 3 * width, 0);
   }
 }

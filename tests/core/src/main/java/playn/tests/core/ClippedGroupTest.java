@@ -35,7 +35,7 @@ public class ClippedGroupTest extends Test {
     Gradient linear = img.createGradient(new Gradient.Linear(
       0, 0, 100, 100, new int[] { 0xFF0000FF, 0xFF00FF00 }, new float[] { 0, 1 }));
     img.setFillGradient(linear).fillRoundRect(0, 0, 100, 50, 10);
-    final Texture tex = game.graphics.createTexture(img.bitmap);
+    final Texture tex = img.toTextureDispose();
 
     // create a group layer with a static clip, and a rotating image inside
     final GroupLayer g1 = new GroupLayer(100, 100);

@@ -51,9 +51,8 @@ public class SurfaceTest extends Test {
   }
 
   protected void addTests (final Bitmap orange, Bitmap tile) {
-    final Texture otex = game.graphics.createTexture(orange);
-    final Texture ttex = game.graphics.createTexture(
-      tile, Texture.Config.DEFAULT.repeat(true, true));
+    final Texture otex = orange.toTexture();
+    final Texture ttex = tile.toTexture(Texture.Config.DEFAULT.repeat(true, true));
 
     // make samples big enough to force a buffer size increase
     final int samples = 128, hsamples = samples/2;
