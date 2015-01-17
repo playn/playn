@@ -37,7 +37,7 @@ public class UI {
     if (border) canvas.setFillColor(0xFFCCCCCC).fillRect(0, 0, canvas.width, canvas.height);
     canvas.setFillColor(0xFF000000).fillText(layout, margin, margin);
     if (border) canvas.setStrokeColor(0xFF000000).strokeRect(0, 0, width-1, height-1);
-    return game.graphics.createTexture(canvas.image);
+    return canvas.toTextureDispose(game.graphics);
   }
 
   public Texture formatText (String text, boolean border) {
@@ -47,15 +47,15 @@ public class UI {
   public Texture wrapText(String text, float width, TextBlock.Align align) {
     TextLayout[] layouts = game.graphics.layoutText(text, TEXT_FMT, new TextWrap(width));
     Canvas canvas = new TextBlock(layouts).toCanvas(game.graphics, align, 0xFF000000);
-    return game.graphics.createTexture(canvas.image);
+    return canvas.toTextureDispose(game.graphics);
   }
 
   public Texture formatButton (String label) {
     return formatText(BUTTON_FMT, label, true);
   }
 
-  public ImageLayer createButton (String label, final Runnable onClick) {
-    ImageLayer layer = new ImageLayer(formatButton(label));
+  public TextureLayer createButton (String label, final Runnable onClick) {
+    TextureLayer layer = new TextureLayer(formatButton(label));
     layer.events().connect(new Pointer.Listener() {
       @Override public void onStart (Pointer.Interaction iact) { onClick.run(); }
     });

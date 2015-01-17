@@ -21,11 +21,12 @@ public class SubImageTest extends Test {
     int r = 30;
     Canvas canvas = game.graphics.createCanvas(2*r, 2*r);
     canvas.setFillColor(0xFF99CCFF).fillCircle(r, r, r);
-    fragment("CanvasImage", canvas.image, 250, 160);
+    fragment("CanvasImage", canvas.bitmap, 250, 160);
+    canvas.dispose();
 
     // draw subimages of a simple static image
-    game.assets.getImage("images/orange.png").state.onSuccess(new Slot<Image>() {
-      public void onEmit (Image orange) {
+    game.assets.getBitmap("images/orange.png").state.onSuccess(new Slot<Bitmap>() {
+      public void onEmit (Bitmap orange) {
         fragment("Image", orange, 250, 10);
 
         final Texture otex = game.graphics.createTexture(orange);
@@ -38,17 +39,18 @@ public class SubImageTest extends Test {
           clear().draw(otex, 0, 0, pw, phh, 0, phh/2, pw, phh).end().close();
 
         // tile a sub-image, oh my!
-        ImageLayer tiled = new ImageLayer(subtex);
+        TextureLayer tiled = new TextureLayer(subtex);
         tiled.setSize(100, 100);
-        addTest(10, 10, tiled, "ImageLayer tiled with sub-texture");
+        addTest(10, 10, tiled, "TextureLayer tiled with sub-texture");
 
         // draw a subimage to a canvas
         Canvas split = game.graphics.createCanvas(orange.width(), orange.height());
-        split.drawImage(orange, phw, phh, phw, phh, 0, 0, phw, phh);
-        split.drawImage(orange,   0, phh, phw, phh, phw, 0, phw, phh);
-        split.drawImage(orange, phw,   0, phw, phh, 0, phh, phw, phh);
-        split.drawImage(orange,   0,   0, phw, phh, phw, phh, phw, phh);
-        addTest(140, 10, new ImageLayer(game.graphics, split.image), "draw subimg into Canvas", 80);
+        split.draw(orange, phw, phh, phw, phh, 0, 0, phw, phh);
+        split.draw(orange,   0, phh, phw, phh, phw, 0, phw, phh);
+        split.draw(orange, phw,   0, phw, phh, 0, phh, phw, phh);
+        split.draw(orange,   0,   0, phw, phh, phw, phh, phw, phh);
+        addTest(140, 10, new TextureLayer(split.toTextureDispose(game.graphics)),
+                "draw subimg into Canvas", 80);
 
         // draw a subimage in an immediate layer
         addTest(130, 100, new Layer() {
@@ -61,9 +63,9 @@ public class SubImageTest extends Test {
         }, 2*pw, 2*phh, "Draw sub-images immediate", 100);
 
         // draw an image layer whose image region oscillates
-        final ImageLayer osci = new ImageLayer(otex);
+        final TextureLayer osci = new TextureLayer(otex);
         osci.region = new Rectangle(0, 0, orange.width(), orange.height());
-        addTest(10, 150, osci, "ImageLayer with changing width", 100);
+        addTest(10, 150, osci, "TextureLayer with changing width", 100);
 
         conns.add(game.paint.connect(new Slot<Clock>() {
           public void onEmit (Clock clock) {
@@ -77,7 +79,7 @@ public class SubImageTest extends Test {
     }).onFailure(logFailure("Failed to load orange image"));
   }
 
-  protected void fragment (String source, Image image, float ox, float oy) {
+  protected void fragment (String source, Bitmap image, float ox, float oy) {
     float hw = image.width()/2f, hh = image.height()/2f;
     Rectangle ul = new Rectangle(0, 0, hw, hh);
     Rectangle ur = new Rectangle(hw, 0, hw, hh);
@@ -105,12 +107,12 @@ public class SubImageTest extends Test {
                3*image.width()+40);
   }
 
-  protected ImageLayer create (Texture tex, Rectangle region) {
-    ImageLayer layer = new ImageLayer(tex);
+  protected TextureLayer create (Texture tex, Rectangle region) {
+    TextureLayer layer = new TextureLayer(tex);
     layer.region = region;
     return layer;
   }
-  protected ImageLayer scaleLayer(ImageLayer layer, float scale) {
+  protected TextureLayer scaleLayer(TextureLayer layer, float scale) {
     layer.setScale(scale);
     return layer;
   }

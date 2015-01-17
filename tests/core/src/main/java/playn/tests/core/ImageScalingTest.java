@@ -39,25 +39,27 @@ public class ImageScalingTest extends Test {
   }
 
   @Override public void init () {
-    final Image princess = game.assets.getImage("images/princess.png");
-    final Image star     = game.assets.getImage("images/star.png");
+    final Bitmap princess = game.assets.getBitmap("images/princess.png");
+    final Bitmap star     = game.assets.getBitmap("images/star.png");
 
     RFuture.collect(Arrays.asList(princess.state, star.state)).onSuccess(new UnitSlot() {
       public void onEmit () {
         // the second princess and (64x64) star images are mipmapped
         float phwidth = princess.width()/2f, phheight = princess.height()/2f;
-        final ImageLayer player1 = new ImageLayer(game.graphics, princess);
+        final TextureLayer player1 = new TextureLayer(game.graphics, princess);
         player1.setOrigin(phwidth, phheight);
         game.rootLayer.addAt(player1, 100, 100);
-        final ImageLayer player2 = new ImageLayer(game.graphics.createTexture(princess, MIPMAPPED));
+        final TextureLayer player2 = new TextureLayer(
+          game.graphics.createTexture(princess, MIPMAPPED));
         player2.setOrigin(phwidth, phheight);
         game.rootLayer.addAt(player2, 250, 100);
 
         float shwidth = star.width()/2, shheight = star.height()/2;
-        final ImageLayer slayer1 = new ImageLayer(game.graphics, star);
+        final TextureLayer slayer1 = new TextureLayer(game.graphics, star);
         slayer1.setOrigin(shwidth, shheight);
         game.rootLayer.addAt(slayer1, 100, 250);
-        final ImageLayer slayer2 = new ImageLayer(game.graphics.createTexture(star, MIPMAPPED));
+        final TextureLayer slayer2 = new TextureLayer(
+          game.graphics.createTexture(star, MIPMAPPED));
         slayer2.setOrigin(shwidth, shheight);
         game.rootLayer.addAt(slayer2, 250, 250);
 
@@ -75,6 +77,7 @@ public class ImageScalingTest extends Test {
           private float elapsed;
           public void onEmit (Clock clock) {
             if (!paused) {
+              System.out.println(clock.dt);
               elapsed += clock.dt/1000f;
               float scale = Math.abs(FloatMath.sin(elapsed));
               player1.setScale(scale);

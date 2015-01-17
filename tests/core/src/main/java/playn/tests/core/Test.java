@@ -16,7 +16,7 @@
 
 package playn.tests.core;
 
-import react.ConnectionGroup;
+import react.Closeable;
 import react.Slot;
 
 import playn.core.*;
@@ -32,7 +32,7 @@ public abstract class Test {
   public final String descrip;
 
   protected final TestsGame game;
-  protected final ConnectionGroup conns = new ConnectionGroup();
+  protected final Closeable.Set conns = new Closeable.Set();
 
   public Test (TestsGame game, String name, String descrip) {
     this.game = game;
@@ -75,17 +75,17 @@ public abstract class Test {
   }
 
   protected float addDescrip(String descrip, float x, float y, float width) {
-    ImageLayer layer = createDescripLayer(descrip, width);
+    TextureLayer layer = createDescripLayer(descrip, width);
     game.rootLayer.addAt(layer, Math.round(x + (width - layer.width())/2), y);
     return y + layer.height();
   }
 
-  protected ImageLayer createDescripLayer(String descrip, float width) {
-    return new ImageLayer(game.ui.wrapText(descrip, width, TextBlock.Align.CENTER));
+  protected TextureLayer createDescripLayer(String descrip, float width) {
+    return new TextureLayer(game.ui.wrapText(descrip, width, TextBlock.Align.CENTER));
   }
 
   protected float addButton (String text, Runnable onClick, float x, float y) {
-    ImageLayer button = game.ui.createButton(text, onClick);
+    TextureLayer button = game.ui.createButton(text, onClick);
     game.rootLayer.addAt(button, x, y);
     return x + button.width() + 10;
   }

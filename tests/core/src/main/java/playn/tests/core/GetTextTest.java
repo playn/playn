@@ -27,13 +27,13 @@ class GetTextTest extends Test {
 
   @Override public void init() {
     String instructions = "Click one of the buttons below to display the text entry UI.";
-    ImageLayer instLayer = new ImageLayer(game.ui.formatText(instructions, false));
+    TextureLayer instLayer = new TextureLayer(game.ui.formatText(instructions, false));
     game.rootLayer.addAt(instLayer, 50, 50);
 
     String last = game.storage.getItem("last_text");
     if (last == null) last = "...";
 
-    final ImageLayer outputLayer = new ImageLayer(game.ui.formatText(last, false));
+    final TextureLayer outputLayer = new TextureLayer(game.ui.formatText(last, false));
     game.rootLayer.addAt(outputLayer, 50, 150);
 
     final Slot<String> onGotText = new Slot<String>() {
@@ -45,7 +45,7 @@ class GetTextTest extends Test {
 
     float x = 50;
     for (final Keyboard.TextType type : Keyboard.TextType.values()) {
-      ImageLayer button = game.ui.createButton(type.toString(), new Runnable() {
+      TextureLayer button = game.ui.createButton(type.toString(), new Runnable() {
         public void run() {
           game.input.getText(Keyboard.TextType.DEFAULT, "Enter " + type + " text:", "").
             onSuccess(onGotText);

@@ -33,7 +33,7 @@ public class TestsGame extends SceneGame {
 
   /** Helpful class for allowing selection of an one of a set of values for a test. */
   public static class NToggle<T> {
-    public final ImageLayer layer = new ImageLayer();
+    public final TextureLayer layer = new TextureLayer();
     public final String prefix;
     public final List<T> values = new ArrayList<T>();
     private int valueIdx;
@@ -204,12 +204,12 @@ public class TestsGame extends SceneGame {
 
     String info = "Renderer: gl (batch=" + defaultBatch + ")";
     Texture infoTex = ui.formatText(info, false);
-    rootLayer.addAt(new ImageLayer(infoTex), x, y);
+    rootLayer.addAt(new TextureLayer(infoTex), x, y);
     y += infoTex.displayHeight + gap;
 
     for (final Test test : tests) {
       if (!test.available()) continue;
-      ImageLayer button = ui.createButton(test.name, new Runnable() {
+      TextureLayer button = ui.createButton(test.name, new Runnable() {
         public void run () { startTest(test); }
       });
       if (x + button.width() > graphics.viewSize.width() - gap) {
@@ -244,7 +244,7 @@ public class TestsGame extends SceneGame {
 
     if (currentTest.usesPositionalInputs()) {
       // slap on a Back button if the test is testing the usual means of backing out
-      ImageLayer back = ui.createButton("Back", new Runnable() {
+      TextureLayer back = ui.createButton("Back", new Runnable() {
         public void run () { displayMenuLater(); }
       });
       rootLayer.addAt(back, graphics.viewSize.width() - back.width() - 10, 10);

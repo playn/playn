@@ -98,7 +98,7 @@ class PointerMouseTouchTest extends Test {
 
     // add mouse layer listener
     mouse.label.events().connect(new Mouse.Listener() {
-      ImageLayer label = mouse.label;
+      TextureLayer label = mouse.label;
 
       @Override public void onButton(Mouse.ButtonEvent event, Mouse.Interaction iact) {
         if (event.down) {
@@ -165,7 +165,7 @@ class PointerMouseTouchTest extends Test {
 
     // add pointer layer listener
     pointer.label.events().connect(new Pointer.Listener() {
-      ImageLayer label = pointer.label;
+      TextureLayer label = pointer.label;
       @Override public void onStart(Pointer.Interaction iact) {
         Pointer.Event event = iact.event;
         _lstart = label.transform().translation();
@@ -222,7 +222,7 @@ class PointerMouseTouchTest extends Test {
 
     // add touch layer listener
     touch.label.events().connect(new Touch.Listener() {
-      ImageLayer label = touch.label;
+      TextureLayer label = touch.label;
       @Override public void onStart(Touch.Interaction iact) {
         Touch.Event event = iact.event;
         _lstart = label.transform().translation();
@@ -284,11 +284,11 @@ class PointerMouseTouchTest extends Test {
     return true;
   }
 
-  protected ImageLayer createLabel(String text, int bg, float x, float y) {
+  protected TextureLayer createLabel(String text, int bg, float x, float y) {
     return createLabel(text, game.rootLayer, 0xFF202020, bg, x, y, 0);
   }
 
-  protected ImageLayer createLabel(String text, GroupLayer parent,
+  protected TextureLayer createLabel(String text, GroupLayer parent,
                                    int fg, int bg, float x, float y, float padding) {
     TextLayout layout = game.graphics.layoutText(text, baseFormat);
     float twidth = layout.size.width() + padding * 2;
@@ -296,7 +296,7 @@ class PointerMouseTouchTest extends Test {
     Canvas canvas = game.graphics.createCanvas(twidth, theight);
     if (bg != 0) canvas.setFillColor(bg).fillRect(0, 0, twidth, theight);
     canvas.setFillColor(fg).fillText(layout, padding, padding);
-    ImageLayer imageLayer = new ImageLayer(game.graphics, canvas.image);
+    TextureLayer imageLayer = new TextureLayer(canvas.toTextureDispose(game.graphics));
     parent.addAt(imageLayer, x, y);
     return imageLayer;
   }
@@ -413,7 +413,7 @@ class PointerMouseTouchTest extends Test {
 
   protected class Box implements Layer.HitTester {
     final GroupLayer layer;
-    final ImageLayer label;
+    final TextureLayer label;
 
     Box (String text, int color, float wid, float hei) {
       layer = new GroupLayer(wid, hei);

@@ -26,7 +26,7 @@ import static playn.tests.core.TestsGame.game;
 
 public class NetTest extends Test {
 
-  private ImageLayer output;
+  private TextureLayer output;
   private String lastPostURL;
   private Net.WebSocket _websock;
 
@@ -35,7 +35,7 @@ public class NetTest extends Test {
   }
 
   @Override public void init() {
-    output = new ImageLayer();
+    output = new TextureLayer();
     game.rootLayer.addAt(output, 10, 60);
     displayText("HTTP response shown here.");
 

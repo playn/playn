@@ -25,8 +25,8 @@ public class SurfaceTest extends Test {
   }
 
   @Override public void init() {
-    final Image tile = game.assets.getImage("images/tile.png");
-    final Image orange = game.assets.getImage("images/orange.png");
+    final Bitmap tile = game.assets.getBitmap("images/tile.png");
+    final Bitmap orange = game.assets.getBitmap("images/orange.png");
     Slot<Throwable> onError = new Slot<Throwable>() {
       float errY = 0;
       public void onEmit (Throwable err) {
@@ -50,7 +50,7 @@ public class SurfaceTest extends Test {
     }
   }
 
-  protected void addTests (final Image orange, Image tile) {
+  protected void addTests (final Bitmap orange, Bitmap tile) {
     final Texture otex = game.graphics.createTexture(orange);
     final Texture ttex = game.graphics.createTexture(
       tile, Texture.Config.DEFAULT.repeat(true, true));
@@ -114,7 +114,7 @@ public class SurfaceTest extends Test {
 
     TextureSurface patted = game.createSurface(100, 100);
     patted.begin().clear().setFillPattern(ttex).fillRect(0, 0, 100, 100).end().close();
-    ypos = ygap + addTest(170, ypos, new ImageLayer(patted.texture),
+    ypos = ygap + addTest(170, ypos, new TextureLayer(patted.texture),
                           "SurfaceImage patterned fillRect");
 
     ypos = 10;
@@ -138,11 +138,11 @@ public class SurfaceTest extends Test {
     // add a surface layer that is updated on every call to paint
     // (a bad practice, but one that should actually work)
     paintUpped = game.createSurface(100, 100);
-    ypos = ygap + addTest(315, ypos, new ImageLayer(paintUpped.texture),
+    ypos = ygap + addTest(315, ypos, new TextureLayer(paintUpped.texture),
                           "SurfaceImage updated in paint()");
 
     // draw some randomly jiggling dots inside a bounded region
-    final List<ImageLayer> dots = new ArrayList<ImageLayer>();
+    final List<TextureLayer> dots = new ArrayList<TextureLayer>();
     final Rectangle dotBox = new Rectangle(315, ypos, 200, 100);
     ypos = ygap + addTest(dotBox.x, dotBox.y, new Layer() {
       protected void paintImpl (Surface surf) {
@@ -155,7 +155,7 @@ public class SurfaceTest extends Test {
         setFillColor(0xFFFF0000).fillRect(0, 0, 5, 5).fillRect(5, 5, 5, 5).
         setFillColor(0xFF0000FF).fillRect(5, 0, 5, 5).fillRect(0, 5, 5, 5).
         end().close();
-      ImageLayer dotl = new ImageLayer(dot.texture);
+      TextureLayer dotl = new TextureLayer(dot.texture);
       dotl.setTranslation(dotBox.x + (float)Math.random()*(dotBox.width-10),
                           dotBox.y + (float)Math.random()*(dotBox.height-10));
       dots.add(dotl);
@@ -165,7 +165,7 @@ public class SurfaceTest extends Test {
 
     conns.add(game.paint.connect(new Slot<Clock>() {
       public void onEmit (Clock clock) {
-        for (ImageLayer dot : dots) {
+        for (TextureLayer dot : dots) {
           if (Math.random() > 0.95) {
             dot.setTranslation(dotBox.x + (float)Math.random()*(dotBox.width-10),
                                dotBox.y + (float)Math.random()*(dotBox.height-10));

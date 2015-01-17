@@ -37,7 +37,7 @@ public class ScaledTextTest extends Test {
       canvas.scale(scale, scale);
       canvas.setFillColor(0xFF000000);
       block.fill(canvas, TextBlock.Align.RIGHT, 0, 0);
-      game.rootLayer.addAt(new ImageLayer(game.graphics, canvas.image), x, 5);
+      game.rootLayer.addAt(new TextureLayer(canvas.toTextureDispose(game.graphics)), x, 5);
       addInfo(canvas, x + swidth/2, sheight + 10);
       x += swidth + 5;
     }
@@ -48,6 +48,7 @@ public class ScaledTextTest extends Test {
     TextLayout ilayout = game.graphics.layoutText(canvas.width + "x" + canvas.height, infoFormat);
     Canvas iimage = game.graphics.createCanvas(ilayout.size);
     iimage.setFillColor(0xFF000000).fillText(ilayout, 0, 0);
-    game.rootLayer.addAt(new ImageLayer(game.graphics, iimage.image), cx - iimage.width/2, y);
+    game.rootLayer.addAt(new TextureLayer(iimage.toTextureDispose(game.graphics)),
+                         cx - iimage.width/2, y);
   }
 }

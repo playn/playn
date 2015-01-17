@@ -43,7 +43,7 @@ public class TextTest extends Test {
   private NToggle<Boolean> lineBounds;
   private final float outlineWidth = 2;
   private String sample = "The quick brown fox\njumped over the lazy dog.\nEvery good boy deserves fudge.";
-  private ImageLayer text;
+  private TextureLayer text;
   private Rectangle row;
 
   public TextTest (TestsGame game) {
@@ -61,7 +61,7 @@ public class TextTest extends Test {
         "Align", TextBlock.Align.LEFT, TextBlock.Align.CENTER, TextBlock.Align.RIGHT)).layer);
     addToRow((font = new NToggle<String>("Font", "Times New Roman", "Helvetica")).layer);
 
-    ImageLayer layer = game.ui.createButton("Set Text", new Runnable() {
+    TextureLayer layer = game.ui.createButton("Set Text", new Runnable() {
       public void run () {
         game.input.getText(Keyboard.TextType.DEFAULT, "Test text", sample.replace("\n", "\\n")).
           onSuccess(new Slot<String>() {
@@ -79,17 +79,17 @@ public class TextTest extends Test {
 
     // test laying out the empty string
     TextLayout layout = game.graphics.layoutText("", new TextFormat());
-    ImageLayer empty = new ImageLayer(makeLabel(
+    TextureLayer empty = new TextureLayer(makeLabel(
       "Empty string size " + layout.size.width() + "x" + layout.size.height()));
     newRow();
     addToRow(empty);
 
     newRow();
 
-    addToRow((text = new ImageLayer(makeTextImage())));
+    addToRow((text = new TextureLayer(makeTextImage())));
   }
 
-  protected void addToRow (ImageLayer layer) {
+  protected void addToRow (TextureLayer layer) {
     game.rootLayer.add(layer.setTranslation(row.x + row.width, row.y));
     row.width += layer.width() + 45;
     row.height = Math.max(row.height, layer.height());
@@ -111,7 +111,7 @@ public class TextTest extends Test {
     TextLayout layout = game.graphics.layoutText(label, new TextFormat());
     Canvas canvas = game.graphics.createCanvas(layout.size);
     canvas.setFillColor(0xFF000000).fillText(layout, 0, 0);
-    return game.graphics.createTexture(canvas.image);
+    return canvas.toTextureDispose(game.graphics);
   }
 
   protected Texture makeTextImage() {
@@ -126,7 +126,7 @@ public class TextTest extends Test {
     canvas.translate(pad, pad);
     canvas.setStrokeColor(0xFFFFCCCC).strokeRect(0, 0, awidth, aheight);
     render(canvas, block, align.value(), lineBounds.value());
-    return game.graphics.createTexture(canvas.image);
+    return canvas.toTextureDispose(game.graphics);
   }
 
   protected float adjustDim (float value) {

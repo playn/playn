@@ -33,8 +33,8 @@ public class CanvasStressTest extends Test {
 
   @Override public void init() {
     final Canvas canvas = game.graphics.createCanvas(game.graphics.viewSize);
-    final Texture canvasTex = game.graphics.createTexture(canvas.image);
-    game.rootLayer.add(new ImageLayer(canvasTex));
+    final Texture canvasTex = game.graphics.createTexture(canvas.bitmap);
+    game.rootLayer.add(new TextureLayer(canvasTex));
 
     conns.add(game.update.connect(new Slot<Clock>() {
       private int noSegs = 30;
@@ -59,7 +59,7 @@ public class CanvasStressTest extends Test {
         }
 
         // reupload the image data
-        canvasTex.update(canvas.image);
+        canvasTex.update(canvas.bitmap);
       }
     }));
   }

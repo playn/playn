@@ -31,16 +31,16 @@ public class ShaderTest extends Test {
   }
 
   @Override public void init () {
-    game.assets.getImage("images/orange.png").state.onSuccess(new Slot<Image>() {
-      public void onEmit (Image orange) {
+    game.assets.getBitmap("images/orange.png").state.onSuccess(new Slot<Bitmap>() {
+      public void onEmit (Bitmap orange) {
         final Texture otex = game.graphics.createTexture(orange);
 
         // add the normal orange
         float dx = orange.width() + 25;
-        game.rootLayer.addAt(new ImageLayer(otex), 25, 25);
+        game.rootLayer.addAt(new TextureLayer(otex), 25, 25);
 
         // add a sepia toned orange
-        ImageLayer olayer = new ImageLayer(otex);
+        TextureLayer olayer = new TextureLayer(otex);
         olayer.setBatch(createSepiaBatch());
         game.rootLayer.addAt(olayer, 25+dx, 25);
 
@@ -51,8 +51,8 @@ public class ShaderTest extends Test {
         // add an image that is rotated around the (3D) y axis
         Canvas canvas = game.graphics.createCanvas(orange.width(), orange.height());
         canvas.setFillColor(0xFF99CCFF).fillRect(0, 0, canvas.width, canvas.height);
-        canvas.drawImage(orange, 0, 0);
-        ImageLayer rotlayer = new ImageLayer(game.graphics, canvas.image);
+        canvas.draw(orange, 0, 0);
+        TextureLayer rotlayer = new TextureLayer(canvas.toTextureDispose(game.graphics));
         rotlayer.setBatch(rotBatch);
         game.rootLayer.addAt(rotlayer, 25 + 2*dx + orange.width(), 25);
 
