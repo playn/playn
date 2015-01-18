@@ -13,14 +13,18 @@
  */
 package playn.core;
 
+import pythagoras.f.AffineTransform;
+import pythagoras.f.IRectangle;
+
 import playn.core.Graphics;
 import playn.core.Scale;
 import static playn.core.GL20.*;
 
 /**
- * A handle to an OpenGL texture.
+ * A handle to an OpenGL texture. A texture is also a {@link Tile} which contains the entire
+ * texture, which allows rendering methods to operate uniformly on tiles.
  */
-public class Texture implements Disposable {
+public class Texture extends Tile implements Disposable {
 
   /** Used to configure texture at creation time. */
   public final static class Config {
@@ -161,9 +165,52 @@ public class Texture implements Disposable {
     if (config.mipmaps) gfx.gl.glGenerateMipmap(GL_TEXTURE_2D);
   }
 
+  /**
+   * Returns an instance that can be used to render a sub-region of this texture.
+   */
+  public Tile tile (IRectangle region) {
+    return tile(region.x(), region.y(), region.width(), region.height());
+  }
+
+  /**
+   * Returns an instance that can be used to render a sub-region of this texture.
+   */
+  public Tile tile (float x, float y, float width, float height) {
+    final float tileX = x, tileY = y, tileWidth = width, tileHeight = height;
+    return new Tile() {
+      @Override public Texture atlas () { return Texture.this; }
+      @Override public float width () { return tileWidth; }
+      @Override public float height () { return tileHeight; }
+      @Override public void addToBatch (QuadBatch batch, int tint, AffineTransform tx,
+                                        float x, float y, float width, float height) {
+        batch.addQuad(atlas(), tint, tx, x, y, width, height, tileX, tileY, tileWidth, tileHeight);
+      }
+      @Override public void addToBatch (QuadBatch batch, int tint, AffineTransform tx,
+                                        float dx, float dy, float dw, float dh,
+                                        float sx, float sy, float sw, float sh) {
+        batch.addQuad(atlas(), tint, tx, dx, dy, dw, dh, tileX+sx, tileY+sx, sw, sh);
+      }
+    };
+  }
+
   /** Returns whether this texture is been destroyed. */
   public boolean destroyed () {
     return destroyed;
+  }
+
+  @Override public Texture atlas () { return this; }
+  @Override public float width () { return displayWidth; }
+  @Override public float height () { return displayHeight; }
+
+  @Override public void addToBatch (QuadBatch batch, int tint, AffineTransform tx,
+                                    float x, float y, float width, float height) {
+    batch.addQuad(this, tint, tx, x, y, width, height);
+  }
+
+  @Override public void addToBatch (QuadBatch batch, int tint, AffineTransform tx,
+                                    float dx, float dy, float dw, float dh,
+                                    float sx, float sy, float sw, float sh) {
+    batch.addQuad(this, tint, tx, dx, dy, dw, dh, sx, sy, sw, sh);
   }
 
   /** Deletes this texture's GPU resources and renders it unusable. */

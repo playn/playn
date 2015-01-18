@@ -233,17 +233,16 @@ public class Surface implements Disposable {
     return this;
   }
 
-  /** Draws a texture at the specified location: {@code x, y}. */
-  public Surface draw (Texture tex, float x, float y) {
-    return draw(tex, x, y, tex.displayWidth, tex.displayHeight);
+  /** Draws a tile at the specified location: {@code x, y}. */
+  public Surface draw (Tile tile, float x, float y) {
+    return draw(tile, x, y, tile.width(), tile.height());
   }
 
   /**
-   * Draws a scaled or repeated texture at the specified location {@code (x, y)} and
-   * size {@code  (w x h)}.
+   * Draws a tile at the specified location {@code (x, y)} and size {@code (w x h)}.
    */
-  public Surface draw (Texture tex, float x, float y, float w, float h) {
-    batch.addQuad(tex, tint, tx(), x, y, w, h);
+  public Surface draw (Tile tile, float x, float y, float w, float h) {
+    tile.addToBatch(batch, tint, tx(), x, y, w, h);
     return this;
   }
 
@@ -251,17 +250,17 @@ public class Surface implements Disposable {
    * Draws a scaled subset of an image (defined by {@code (sx, sy)} and {@code (w x h)}) at the
    * specified location {@code (dx, dy)} and size {@code (dw x dh)}.
    */
-  public Surface draw (Texture tex, float dx, float dy, float dw, float dh,
+  public Surface draw (Tile tile, float dx, float dy, float dw, float dh,
                        float sx, float sy, float sw, float sh) {
-    batch.addQuad(tex, tint, tx(), dx, dy, dw, dh, sx, sy, sw, sh);
+    tile.addToBatch(batch, tint, tx(), dx, dy, dw, dh, sx, sy, sw, sh);
     return this;
   }
 
   /**
-   * Draws a texture, centered at the specified location.
+   * Draws a texture tile, centered at the specified location.
    */
-  public Surface drawCentered (Texture tex, float x, float y) {
-    return draw(tex, x - tex.displayWidth/2, y - tex.displayHeight/2);
+  public Surface drawCentered (Tile tile, float x, float y) {
+    return draw(tile, x - tile.width()/2, y - tile.height()/2);
   }
 
   /**
