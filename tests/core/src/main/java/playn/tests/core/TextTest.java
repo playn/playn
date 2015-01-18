@@ -43,7 +43,7 @@ public class TextTest extends Test {
   private NToggle<Boolean> lineBounds;
   private final float outlineWidth = 2;
   private String sample = "The quick brown fox\njumped over the lazy dog.\nEvery good boy deserves fudge.";
-  private TextureLayer text;
+  private ImageLayer text;
   private Rectangle row;
 
   public TextTest (TestsGame game) {
@@ -61,7 +61,7 @@ public class TextTest extends Test {
         "Align", TextBlock.Align.LEFT, TextBlock.Align.CENTER, TextBlock.Align.RIGHT)).layer);
     addToRow((font = new NToggle<String>("Font", "Times New Roman", "Helvetica")).layer);
 
-    TextureLayer layer = game.ui.createButton("Set Text", new Runnable() {
+    ImageLayer layer = game.ui.createButton("Set Text", new Runnable() {
       public void run () {
         game.input.getText(Keyboard.TextType.DEFAULT, "Test text", sample.replace("\n", "\\n")).
           onSuccess(new Slot<String>() {
@@ -79,17 +79,17 @@ public class TextTest extends Test {
 
     // test laying out the empty string
     TextLayout layout = game.graphics.layoutText("", new TextFormat());
-    TextureLayer empty = new TextureLayer(makeLabel(
+    ImageLayer empty = new ImageLayer(makeLabel(
       "Empty string size " + layout.size.width() + "x" + layout.size.height()));
     newRow();
     addToRow(empty);
 
     newRow();
 
-    addToRow((text = new TextureLayer(makeTextImage())));
+    addToRow((text = new ImageLayer(makeTextImage())));
   }
 
-  protected void addToRow (TextureLayer layer) {
+  protected void addToRow (ImageLayer layer) {
     game.rootLayer.add(layer.setTranslation(row.x + row.width, row.y));
     row.width += layer.width() + 45;
     row.height = Math.max(row.height, layer.height());
@@ -104,7 +104,7 @@ public class TextTest extends Test {
 
   protected void update() {
     if (text == null) return;
-    text.setTexture(makeTextImage());
+    text.setTile(makeTextImage());
   }
 
   protected Texture makeLabel(String label) {

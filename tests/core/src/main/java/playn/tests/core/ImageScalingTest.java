@@ -46,18 +46,18 @@ public class ImageScalingTest extends Test {
       public void onEmit () {
         // the second princess and (64x64) star images are mipmapped
         float phwidth = princess.width()/2f, phheight = princess.height()/2f;
-        final TextureLayer player1 = new TextureLayer(princess);
+        final ImageLayer player1 = new ImageLayer(princess);
         player1.setOrigin(phwidth, phheight);
         game.rootLayer.addAt(player1, 100, 100);
-        final TextureLayer player2 = new TextureLayer(princess.createTexture(MIPMAPPED));
+        final ImageLayer player2 = new ImageLayer(princess.createTexture(MIPMAPPED));
         player2.setOrigin(phwidth, phheight);
         game.rootLayer.addAt(player2, 250, 100);
 
         float shwidth = star.width()/2, shheight = star.height()/2;
-        final TextureLayer slayer1 = new TextureLayer(star);
+        final ImageLayer slayer1 = new ImageLayer(star);
         slayer1.setOrigin(shwidth, shheight);
         game.rootLayer.addAt(slayer1, 100, 250);
-        final TextureLayer slayer2 = new TextureLayer(star.createTexture(MIPMAPPED));
+        final ImageLayer slayer2 = new ImageLayer(star.createTexture(MIPMAPPED));
         slayer2.setOrigin(shwidth, shheight);
         game.rootLayer.addAt(slayer2, 250, 250);
 

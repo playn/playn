@@ -37,10 +37,10 @@ public class ShaderTest extends Test {
 
         // add the normal orange
         float dx = orange.width() + 25;
-        game.rootLayer.addAt(new TextureLayer(otex), 25, 25);
+        game.rootLayer.addAt(new ImageLayer(otex), 25, 25);
 
         // add a sepia toned orange
-        TextureLayer olayer = new TextureLayer(otex);
+        ImageLayer olayer = new ImageLayer(otex);
         olayer.setBatch(createSepiaBatch());
         game.rootLayer.addAt(olayer, 25+dx, 25);
 
@@ -52,7 +52,7 @@ public class ShaderTest extends Test {
         Canvas canvas = game.graphics.createCanvas(orange.width(), orange.height());
         canvas.setFillColor(0xFF99CCFF).fillRect(0, 0, canvas.width, canvas.height);
         canvas.draw(orange, 0, 0);
-        TextureLayer rotlayer = new TextureLayer(canvas.toTexture());
+        ImageLayer rotlayer = new ImageLayer(canvas.toTexture());
         rotlayer.setBatch(rotBatch);
         game.rootLayer.addAt(rotlayer, 25 + 2*dx + orange.width(), 25);
 

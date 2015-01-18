@@ -35,7 +35,7 @@ public class Texture extends Tile implements Disposable {
     public static Config UNMANAGED = new Config(false, false, false, GL_LINEAR, GL_LINEAR, false);
 
     /** Whether or not texture's lifecycle is automatically managed via reference counting. If the
-      * texture will be used in an {@code TextureLayer}, it should be reference counted unless you
+      * texture will be used in an {@code ImageLayer}, it should be reference counted unless you
       * are doing something special. Otherwise you can decide whether you want to use the reference
       * counting mechanism or not. */
     public final boolean managed;

@@ -23,59 +23,60 @@ import playn.core.Graphics;
 import playn.core.Image;
 import playn.core.QuadBatch;
 import playn.core.Surface;
-import playn.core.Texture;
+import playn.core.Tile;
 
 /**
- * A layer that displays a bitmapped image. By default, the layer is the same size as its
- * underlying image, but its size can be changed from that default and the layer will either scale
- * or repeat the image to cause it to fill its bounds depending on the {@link Texture} it renders.
+ * A layer that displays a texture or region of a texture (tile). By default, the layer is the same
+ * size as its source, but its size can be changed from that default and the layer will either
+ * scale or repeat the texture to cause it to fill its bounds depending on the {@link Texture} it
+ * renders.
  */
-public class TextureLayer extends Layer {
+public class ImageLayer extends Layer {
 
-  private Texture tex;
+  private Tile tile;
 
   /** An explicit width and height for this layer. If the width or height exceeds the underlying
-    * texture width or height, it will be scaled or repeated depending on the texture's repeat
+    * tile width or height, it will be scaled or repeated depending on the tile texture's repeat
     * configuration in the pertinent axis. If either value is {@code < 0} that indicates that the
-    * size of the texture being rendered should be used. */
+    * size of the tile being rendered should be used. */
   public float forceWidth = -1, forceHeight = -1;
 
-  /** The subregion of the texture to render. If this is {@code null} (the default) the entire
-    * texture is rendered. If {@link #forceWidth} or {@link #forceHeight} are not set, the width
-    * and height of this image layer will be the width and height of the supplied region.
+  /** The subregion of the tile to render. If this is {@code null} (the default) the entire tile is
+    * rendered. If {@link #forceWidth} or {@link #forceHeight} are not set, the width and height of
+    * this image layer will be the width and height of the supplied region.
     *
-    * <p> <em>Note:</em> when a subregion is configured, a texture will always be
-    * scaled, never repeated. If you want to repeat a texture, you have to use the whole texture.
-    * This is a limitation of OpenGL. */
+    * <p> <em>Note:</em> when a subregion is configured, a texture will always be scaled, never
+    * repeated. If you want to repeat a texture, you have to use the whole texture. This is a
+    * limitation of OpenGL. */
   public Rectangle region;
 
   /**
-   * Creates an image layer with the supplied texture.
+   * Creates an image layer with the supplied texture tile.
    */
-  public TextureLayer (Texture texture) {
-    setTexture(texture);
+  public ImageLayer (Tile tile) {
+    setTile(tile);
   }
 
   /**
    * Generates {@code image}'s default texture and creates a layer with it.
    */
-  public TextureLayer (Image image) {
-    if (image.isLoaded()) setTexture(image.texture());
+  public ImageLayer (Image image) {
+    if (image.isLoaded()) setTile(image.texture());
     else image.state.onSuccess(new Slot<Image>() {
-      public void onEmit (Image image) { setTexture(image.texture()); }
+      public void onEmit (Image image) { setTile(image.texture()); }
     });
   }
 
   /**
    * Creates a texture layer with no texture. It will be invisible until a texture is set into it.
    */
-  public TextureLayer () {} // nada!
+  public ImageLayer () {} // nada!
 
   /**
-   * Returns the texture rendered by this layer.
+   * Returns the tile rendered by this layer.
    */
-  public Texture texture () {
-    return tex;
+  public Tile tile () {
+    return tile;
   }
 
   /**
@@ -84,24 +85,24 @@ public class TextureLayer extends Layer {
    * isn't something one would normally do, but could be useful if one was free-listing image
    * layers for some reason.
    */
-  public TextureLayer setTexture (Texture tex) {
+  public ImageLayer setTile (Tile tile) {
     // avoid releasing and rereferencing texture if nothing changes
-    if (this.tex != tex) {
-      if (this.tex != null) this.tex.release();
-      this.tex = tex;
-      if (tex != null) tex.reference();
+    if (this.tile != tile) {
+      if (this.tile != null) this.tile.atlas().release();
+      this.tile = tile;
+      if (tile != null) tile.atlas().reference();
     }
     return this;
   }
 
   /**
-   * Sets the texture rendered by this layer to the asynchronous result of {@code texture}. When
-   * the future completes, this layer's texture will be set. Until then, the current texture (if
-   * any) will continue to be rendered.
+   * Sets the tile rendered by this layer to the asynchronous result of {@code tile}. When the
+   * future completes, this layer's tile will be set. Until then, the current tile (if any) will
+   * continue to be rendered.
    */
-  public TextureLayer setTexture (RFuture<Texture> texture) {
-    texture.onSuccess(new Slot<Texture>() {
-      public void onEmit (Texture texture) { setTexture(texture); }
+  public ImageLayer setTile (RFuture<? extends Tile> tile) {
+    tile.onSuccess(new Slot<Tile>() {
+      public void onEmit (Tile tile) { setTile(tile); }
     });
     return this;
   }
@@ -110,7 +111,7 @@ public class TextureLayer extends Layer {
    * Sets {@link #forceWidth} and {@link #forceHeight} and returns {@code this}, for convenient
    * call chaining.
    */
-  public TextureLayer setSize (float width, float height) {
+  public ImageLayer setSize (float width, float height) {
     forceWidth = width;
     forceHeight = height;
     return this;
@@ -119,7 +120,7 @@ public class TextureLayer extends Layer {
   /**
    * Sets {@link #region} and returns {@code this}, for convenient call chaining.
    */
-  public TextureLayer setRegion (Rectangle region) {
+  public ImageLayer setRegion (Rectangle region) {
     this.region = region;
     return this;
   }
@@ -127,29 +128,29 @@ public class TextureLayer extends Layer {
   @Override public float width() {
     if (forceWidth >= 0) return forceWidth;
     if (region != null) return region.width;
-    return (tex == null) ? 0 : tex.displayWidth;
+    return (tile == null) ? 0 : tile.width();
   }
 
   @Override public float height() {
     if (forceHeight >= 0) return forceHeight;
     if (region != null) return region.height;
-    return (tex == null) ? 0 : tex.displayHeight;
+    return (tile == null) ? 0 : tile.height();
   }
 
   @Override public void destroy() {
     super.destroy();
-    setTexture((Texture)null);
+    setTile((Tile)null);
   }
 
   @Override protected void paintImpl (Surface surf) {
-    if (tex != null) {
+    if (tile != null) {
       float dwidth = width(), dheight = height();
-      if (region == null) surf.draw(tex, 0, 0, dwidth, dheight);
-      else surf.draw(tex, 0, 0, dwidth, dheight, region.x, region.y, region.width, region.height);
+      if (region == null) surf.draw(tile, 0, 0, dwidth, dheight);
+      else surf.draw(tile, 0, 0, dwidth, dheight, region.x, region.y, region.width, region.height);
     }
   }
 
   @Override protected void finalize () {
-    setTexture((Texture)null);
+    setTile((Tile)null);
   }
 }

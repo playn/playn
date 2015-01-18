@@ -47,7 +47,7 @@ public class FullscreenTest extends Test {
     final float spacing = 5;
     float y = spacing, x = spacing, nextX = spacing;
     for (final Mode mode : host.enumerateModes()) {
-      TextureLayer button = game.ui.createButton(mode.toString(), new Runnable() {
+      ImageLayer button = game.ui.createButton(mode.toString(), new Runnable() {
         @Override public void run () { host.setMode(mode); }
       });
       game.rootLayer.add(button);

@@ -31,7 +31,7 @@ import react.Signal;
  * can be manipulated directly and which "take effect" the next time the layer is {@link #paint}ed.
  *
  * <p>Everything can be accomplished by extending {@link Layer} and overriding {@link #paintImpl}.
- * However, {@link GroupLayer}, {@link TextureLayer}, {@link ClippedLayer} etc. are provided to
+ * However, {@link GroupLayer}, {@link ImageLayer}, {@link ClippedLayer} etc. are provided to
  * make it easy to implement common use cases "out of the box".
  */
 public abstract class Layer {

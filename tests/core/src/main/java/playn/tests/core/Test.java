@@ -75,17 +75,17 @@ public abstract class Test {
   }
 
   protected float addDescrip(String descrip, float x, float y, float width) {
-    TextureLayer layer = createDescripLayer(descrip, width);
+    ImageLayer layer = createDescripLayer(descrip, width);
     game.rootLayer.addAt(layer, Math.round(x + (width - layer.width())/2), y);
     return y + layer.height();
   }
 
-  protected TextureLayer createDescripLayer(String descrip, float width) {
-    return new TextureLayer(game.ui.wrapText(descrip, width, TextBlock.Align.CENTER));
+  protected ImageLayer createDescripLayer(String descrip, float width) {
+    return new ImageLayer(game.ui.wrapText(descrip, width, TextBlock.Align.CENTER));
   }
 
   protected float addButton (String text, Runnable onClick, float x, float y) {
-    TextureLayer button = game.ui.createButton(text, onClick);
+    ImageLayer button = game.ui.createButton(text, onClick);
     game.rootLayer.addAt(button, x, y);
     return x + button.width() + 10;
   }

@@ -15,10 +15,13 @@ package playn.scene;
 
 import pythagoras.f.IDimension;
 
+import react.RFuture;
+
 import playn.core.Canvas;
 import playn.core.Graphics;
 import playn.core.Image;
 import playn.core.Texture;
+import playn.core.Tile;
 
 /**
  * Simplifies the process of displaying a {@link Canvas} which is updated after its initial
@@ -26,7 +29,7 @@ import playn.core.Texture;
  * canvas, do the desired rendering, then call {@link #end} to upload the modified image data to
  * the GPU for display by this layer.
  */
-public class CanvasLayer extends TextureLayer {
+public class CanvasLayer extends ImageLayer {
 
   private final Graphics gfx;
   private Canvas canvas;
@@ -55,7 +58,7 @@ public class CanvasLayer extends TextureLayer {
   public CanvasLayer (Graphics gfx, Canvas canvas) {
     this.gfx = gfx;
     this.canvas = canvas;
-    setTexture(canvas.image.createTexture(Texture.Config.DEFAULT));
+    super.setTile(canvas.image.createTexture(Texture.Config.DEFAULT));
   }
 
   /**
@@ -79,14 +82,22 @@ public class CanvasLayer extends TextureLayer {
   /** Informs this layer that a drawing operation has just completed. The backing canvas image data
     * is uploaded to the GPU. */
   public void end () {
-    Texture tex = texture();
+    Texture tex = (Texture)tile();
     Image image = canvas.image;
     // if our texture is already the right size, just update it
     if (tex != null && tex.pixelWidth == image.pixelWidth() &&
         tex.pixelHeight == image.pixelHeight()) tex.update(image);
     // otherwise we need to create a new texture (setTexture will unreference the old texture which
     // will cause it to be destroyed)
-    else setTexture(canvas.image.createTexture(Texture.Config.DEFAULT));
+    else super.setTile(canvas.image.createTexture(Texture.Config.DEFAULT));
+  }
+
+  @Override public ImageLayer setTile (Tile tile) {
+    if (tile == null || tile instanceof Texture) return super.setTile(tile);
+    else throw new UnsupportedOperationException();
+  }
+  @Override public ImageLayer setTile (RFuture<? extends Tile> tile) {
+    throw new UnsupportedOperationException();
   }
 
   @Override public float width () {

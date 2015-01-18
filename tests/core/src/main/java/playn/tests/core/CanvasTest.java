@@ -103,7 +103,7 @@ public class CanvasTest extends Test {
     });
     Texture.Config repeat = Texture.Config.DEFAULT.repeat(true, true);
     Texture reptex = repcan.toTexture(repeat);
-    addTestLayer("TextureLayer repeat x/y", 100, 100, new TextureLayer(reptex).setSize(100, 100));
+    addTestLayer("ImageLayer repeat x/y", 100, 100, new ImageLayer(reptex).setSize(100, 100));
 
     time = new CanvasLayer(game.graphics, 100, 100);
     addTestLayer("updated canvas", 100, 100, time);
@@ -210,7 +210,7 @@ public class CanvasTest extends Test {
       }
     });
 
-    final TextureLayer tileLayer = new TextureLayer(
+    final ImageLayer tileLayer = new ImageLayer(
       game.assets.getImage("images/tile.png").setConfig(repeat));
     addTestLayer("img layer anim setWidth", 100, 100, tileLayer.setSize(0, 100));
 
@@ -239,7 +239,7 @@ public class CanvasTest extends Test {
 
   private void addTestCanvas(String descrip, int width, int height, Drawer drawer) {
     Canvas canvas = createCanvas(width, height, drawer);
-    addTestLayer(descrip, width, height, new TextureLayer(canvas.toTexture()));
+    addTestLayer(descrip, width, height, new ImageLayer(canvas.toTexture()));
   }
 
   private Canvas createCanvas(int width, int height, final Drawer drawer) {
@@ -258,7 +258,7 @@ public class CanvasTest extends Test {
 
     // add the layer and its description below
     game.rootLayer.addAt(layer, nextX, nextY);
-    TextureLayer dlayer = createDescripLayer(descrip, width);
+    ImageLayer dlayer = createDescripLayer(descrip, width);
     game.rootLayer.addAt(dlayer, nextX + Math.round((width-dlayer.width())/2),
                          nextY + height + 2);
 
@@ -274,11 +274,11 @@ public class CanvasTest extends Test {
   private void addTestCanvas(String descrip, int width, int height, String imagePath,
                              final ImageDrawer drawer) {
     final Canvas target = game.graphics.createCanvas(width, height);
-    final TextureLayer layer = new TextureLayer().setSize(width, height);
+    final ImageLayer layer = new ImageLayer().setSize(width, height);
     game.assets.getImage(imagePath).state.onSuccess(new Slot<Image>() {
       public void onEmit (Image image) {
         drawer.draw(target, image);
-        layer.setTexture(target.toTexture());
+        layer.setTile(target.toTexture());
       }
     });
     addTestLayer(descrip, width, height, layer);

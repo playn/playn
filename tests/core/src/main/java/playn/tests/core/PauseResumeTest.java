@@ -28,7 +28,7 @@ import react.Slot;
 public class PauseResumeTest extends Test {
 
   private final List<String> notifications = new ArrayList<String>();
-  private TextureLayer layer;
+  private ImageLayer layer;
 
   public PauseResumeTest (TestsGame game) {
     super(game, "PauseResume", "Tests pause/resume notifications.");
@@ -58,7 +58,7 @@ public class PauseResumeTest extends Test {
       }
     }));
 
-    game.rootLayer.addAt(layer = new TextureLayer(), 15, 15);
+    game.rootLayer.addAt(layer = new ImageLayer(), 15, 15);
     updateDisplay();
   }
 
@@ -74,6 +74,6 @@ public class PauseResumeTest extends Test {
     TextLayout layout = game.graphics.layoutText(buf.toString(), new TextFormat());
     Canvas canvas = game.graphics.createCanvas(layout.size);
     canvas.setFillColor(0xFF000000).fillText(layout, 0, 0);
-    layer.setTexture(canvas.toTexture());
+    layer.setTile(canvas.toTexture());
   }
 }

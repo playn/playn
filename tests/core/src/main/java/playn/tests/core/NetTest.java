@@ -26,7 +26,7 @@ import static playn.tests.core.TestsGame.game;
 
 public class NetTest extends Test {
 
-  private TextureLayer output;
+  private ImageLayer output;
   private String lastPostURL;
   private Net.WebSocket _websock;
 
@@ -35,7 +35,7 @@ public class NetTest extends Test {
   }
 
   @Override public void init() {
-    output = new TextureLayer();
+    output = new ImageLayer();
     game.rootLayer.addAt(output, 10, 60);
     displayText("HTTP response shown here.");
 
@@ -154,7 +154,7 @@ public class NetTest extends Test {
   }
 
   protected void displayText (String text) {
-    output.setTexture(game.ui.wrapText(text, game.graphics.viewSize.width()-20, TextBlock.Align.LEFT));
+    output.setTile(game.ui.wrapText(text, game.graphics.viewSize.width()-20, TextBlock.Align.LEFT));
   }
 
   protected final Slot<Net.Response> displayResult = new Slot<Net.Response>() {

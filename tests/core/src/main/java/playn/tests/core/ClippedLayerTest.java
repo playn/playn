@@ -112,18 +112,18 @@ public class ClippedLayerTest extends Test {
     final GroupLayer g1 = new GroupLayer(100, 100);
     // test the origin not being at zero/zero
     g1.setOrigin(50, 0);
-    final TextureLayer i1 = new TextureLayer(tex);
+    final ImageLayer i1 = new ImageLayer(tex);
     i1.setOrigin(i1.width()/2, i1.height()/2);
     g1.addAt(i1, 50, 50);
 
     // static image inside and animated clipped width
     final GroupLayer g2 = new GroupLayer(100, 100);
     g2.setOrigin(50, 50);
-    g2.addAt(new TextureLayer(tex), (100 - iwidth)/2, (100 - iheight)/2);
+    g2.addAt(new ImageLayer(tex), (100 - iwidth)/2, (100 - iheight)/2);
 
     // nest a group layer inside with an animated origin
     final GroupLayer inner = new GroupLayer();
-    inner.addAt(new TextureLayer(tex), (100 - iwidth)/2, (100 - iheight)/2);
+    inner.addAt(new ImageLayer(tex), (100 - iwidth)/2, (100 - iheight)/2);
     final GroupLayer g3 = new GroupLayer(100, 100);
     g3.add(inner);
 
@@ -131,16 +131,16 @@ public class ClippedLayerTest extends Test {
     final GroupLayer g4 = new GroupLayer(100, 100);
     TextureSurface si = game.createSurface(100, 50);
     si.begin().setFillColor(0xFF99CCFF).fillRect(0, 0, 100, 50).end().close();
-    final TextureLayer s1 = new TextureLayer(si.texture);
+    final ImageLayer s1 = new ImageLayer(si.texture);
     s1.setOrigin(s1.width()/2, s1.height()/2);
     g4.addAt(s1, 50, 50);
 
     // put a large clipped group inside a small one
     final GroupLayer g5Inner = new GroupLayer(150, 150);
-    g5Inner.addAt(new TextureLayer(tex).setScale(2), -iwidth, -iheight);
-    g5Inner.addAt(new TextureLayer(tex).setScale(2), -iwidth, iheight);
-    g5Inner.addAt(new TextureLayer(tex).setScale(2), iwidth, -iheight);
-    g5Inner.addAt(new TextureLayer(tex).setScale(2), iwidth, iheight);
+    g5Inner.addAt(new ImageLayer(tex).setScale(2), -iwidth, -iheight);
+    g5Inner.addAt(new ImageLayer(tex).setScale(2), -iwidth, iheight);
+    g5Inner.addAt(new ImageLayer(tex).setScale(2), iwidth, -iheight);
+    g5Inner.addAt(new ImageLayer(tex).setScale(2), iwidth, iheight);
     final GroupLayer g5 = new GroupLayer(100, 100);
     g5.addAt(g5Inner, -25, -25);
 

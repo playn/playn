@@ -27,25 +27,25 @@ class GetTextTest extends Test {
 
   @Override public void init() {
     String instructions = "Click one of the buttons below to display the text entry UI.";
-    TextureLayer instLayer = new TextureLayer(game.ui.formatText(instructions, false));
+    ImageLayer instLayer = new ImageLayer(game.ui.formatText(instructions, false));
     game.rootLayer.addAt(instLayer, 50, 50);
 
     String last = game.storage.getItem("last_text");
     if (last == null) last = "...";
 
-    final TextureLayer outputLayer = new TextureLayer(game.ui.formatText(last, false));
+    final ImageLayer outputLayer = new ImageLayer(game.ui.formatText(last, false));
     game.rootLayer.addAt(outputLayer, 50, 150);
 
     final Slot<String> onGotText = new Slot<String>() {
       public void onEmit(String text) {
-        outputLayer.setTexture(game.ui.formatText(text == null ? "canceled" : text, false));
+        outputLayer.setTile(game.ui.formatText(text == null ? "canceled" : text, false));
         if (text != null) game.storage.setItem("last_text", text);
       }
     };
 
     float x = 50;
     for (final Keyboard.TextType type : Keyboard.TextType.values()) {
-      TextureLayer button = game.ui.createButton(type.toString(), new Runnable() {
+      ImageLayer button = game.ui.createButton(type.toString(), new Runnable() {
         public void run() {
           game.input.getText(Keyboard.TextType.DEFAULT, "Enter " + type + " text:", "").
             onSuccess(onGotText);

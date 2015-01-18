@@ -54,8 +54,8 @@ public class UI {
     return formatText(BUTTON_FMT, label, true);
   }
 
-  public TextureLayer createButton (String label, final Runnable onClick) {
-    TextureLayer layer = new TextureLayer(formatButton(label));
+  public ImageLayer createButton (String label, final Runnable onClick) {
+    ImageLayer layer = new ImageLayer(formatButton(label));
     layer.events().connect(new Pointer.Listener() {
       @Override public void onStart (Pointer.Interaction iact) { onClick.run(); }
     });

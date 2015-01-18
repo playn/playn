@@ -30,17 +30,18 @@ public class SubImageTest extends Test {
         fragment("Image", otex, 250, 10);
 
         final float pw = orange.width(), ph = orange.height(), phw = pw/2, phh = ph/2;
+        final Tile otile = otex.tile(0, phh/2, pw, phh);
 
         // create tileable sub-texture
         Texture subtex = game.graphics.createTexture(
-          pw, phh, Texture.Config.DEFAULT.repeat(true, true));
+          otile.width(), otile.height(), Texture.Config.DEFAULT.repeat(true, true));
         new TextureSurface(game.graphics, game.defaultBatch, subtex).begin().
-          clear().draw(otex, 0, 0, pw, phh, 0, phh/2, pw, phh).end().close();
+          clear().draw(otile, 0, 0).end().close();
 
         // tile a sub-image, oh my!
-        TextureLayer tiled = new TextureLayer(subtex);
+        ImageLayer tiled = new ImageLayer(subtex);
         tiled.setSize(100, 100);
-        addTest(10, 10, tiled, "TextureLayer tiled with sub-texture");
+        addTest(10, 10, tiled, "ImageLayer tiled with sub-texture");
 
         // draw a subimage to a canvas
         Canvas split = game.graphics.createCanvas(orange.width(), orange.height());
@@ -48,29 +49,28 @@ public class SubImageTest extends Test {
         split.draw(orange,   0, phh, phw, phh, phw, 0, phw, phh);
         split.draw(orange, phw,   0, phw, phh, 0, phh, phw, phh);
         split.draw(orange,   0,   0, phw, phh, phw, phh, phw, phh);
-        addTest(140, 10, new TextureLayer(split.toTexture()), "draw subimg into Canvas", 80);
+        addTest(140, 10, new ImageLayer(split.toTexture()), "draw subimg into Canvas", 80);
 
         // draw a subimage in an immediate layer
         addTest(130, 100, new Layer() {
           @Override protected void paintImpl (Surface surf) {
-            surf.draw(otex, 0 , 0  , pw, phh, 0, phh/2, pw, phh);
-            surf.draw(otex, pw, 0  , pw, phh, 0, phh/2, pw, phh);
-            surf.draw(otex, 0 , phh, pw, phh, 0, phh/2, pw, phh);
-            surf.draw(otex, pw, phh, pw, phh, 0, phh/2, pw, phh);
+            surf.draw(otile, 0 , 0  );
+            surf.draw(otile, pw, 0  );
+            surf.draw(otile, 0 , phh);
+            surf.draw(otile, pw, phh);
           }
         }, 2*pw, 2*phh, "Draw sub-images immediate", 100);
 
         // draw an image layer whose image region oscillates
-        final TextureLayer osci = new TextureLayer(otex);
+        final ImageLayer osci = new ImageLayer(otex);
         osci.region = new Rectangle(0, 0, orange.width(), orange.height());
-        addTest(10, 150, osci, "TextureLayer with changing width", 100);
+        addTest(10, 150, osci, "ImageLayer with changing width", 100);
 
         conns.add(game.paint.connect(new Slot<Clock>() {
           public void onEmit (Clock clock) {
             float t = clock.tick/1000f;
             // round the width so that it sometimes goes to zero; just to be sure zero doesn't choke
-            osci.region.width = Math.round(
-              Math.abs(FloatMath.sin(t)) * osci.texture().displayWidth);
+            osci.region.width = Math.round(Math.abs(FloatMath.sin(t)) * osci.tile().width());
           }
         }));
       }
@@ -79,38 +79,28 @@ public class SubImageTest extends Test {
 
   protected void fragment (String source, Texture tex, float ox, float oy) {
     float hw = tex.displayWidth/2f, hh = tex.displayHeight/2f;
-    Rectangle ul = new Rectangle(0, 0, hw, hh);
-    Rectangle ur = new Rectangle(hw, 0, hw, hh);
-    Rectangle ll = new Rectangle(0, hh, hw, hh);
-    Rectangle lr = new Rectangle(hw, hh, hw, hh);
-    Rectangle ctr = new Rectangle(hw/2, hh/2, hw, hh);
+    Tile ul = tex.tile(0, 0, hw, hh);
+    Tile ur = tex.tile(hw, 0, hw, hh);
+    Tile ll = tex.tile(0, hh, hw, hh);
+    Tile lr = tex.tile(hw, hh, hw, hh);
+    Tile ctr = tex.tile(hw/2, hh/2, hw, hh);
 
     float dx = hw + 10, dy = hh + 10;
     GroupLayer group = new GroupLayer();
-    group.addAt(create(tex, ul), 0, 0);
-    group.addAt(create(tex, ur), dx, 0);
-    group.addAt(create(tex, ll), 0, dy);
-    group.addAt(create(tex, lr), dx, dy);
-    group.addAt(create(tex, ctr), dx/2, 2*dy);
+    group.addAt(new ImageLayer(ul), 0, 0);
+    group.addAt(new ImageLayer(ur), dx, 0);
+    group.addAt(new ImageLayer(ll), 0, dy);
+    group.addAt(new ImageLayer(lr), dx, dy);
+    group.addAt(new ImageLayer(ctr), dx/2, 2*dy);
 
     float xoff = tex.displayWidth + 20;
-    group.addAt(create(tex, ul).setScale(2), xoff, 0);
-    group.addAt(create(tex, ur).setScale(2), xoff+2*dx, 0);
-    group.addAt(create(tex, ll).setScale(2), xoff, 2*dy);
-    group.addAt(create(tex, lr).setScale(2), xoff+2*dx, 2*dy);
+    group.addAt(new ImageLayer(ul).setScale(2), xoff, 0);
+    group.addAt(new ImageLayer(ur).setScale(2), xoff+2*dx, 0);
+    group.addAt(new ImageLayer(ll).setScale(2), xoff, 2*dy);
+    group.addAt(new ImageLayer(lr).setScale(2), xoff+2*dx, 2*dy);
 
     game.rootLayer.addAt(group, ox, oy);
     addDescrip(source + " split into subimages, and scaled", ox, oy + tex.displayHeight*2 + 25,
                3*tex.displayWidth+40);
-  }
-
-  protected TextureLayer create (Texture tex, Rectangle region) {
-    TextureLayer layer = new TextureLayer(tex);
-    layer.region = region;
-    return layer;
-  }
-  protected TextureLayer scaleLayer(TextureLayer layer, float scale) {
-    layer.setScale(scale);
-    return layer;
   }
 }

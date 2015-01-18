@@ -25,7 +25,7 @@ package playn.core;
  *
  * <p>The texture's lifecycle is also independent of the {@code TextureSurface} and is managed by
  * reference counting. The texture is neither referenced, nor released by the {@code
- * TextureSurface}. It is assumed that the texture will be stuffed into an {@code TextureLayer} or
+ * TextureSurface}. It is assumed that the texture will be stuffed into an {@code ImageLayer} or
  * used for rendering elsewhere and that code will manage the texture's lifecycle (even if the
  * texture is created by {@code TextureSurface} in the first place).
  */

@@ -33,7 +33,7 @@ public class TestsGame extends SceneGame {
 
   /** Helpful class for allowing selection of an one of a set of values for a test. */
   public static class NToggle<T> {
-    public final TextureLayer layer = new TextureLayer();
+    public final ImageLayer layer = new ImageLayer();
     public final String prefix;
     public final List<T> values = new ArrayList<T>();
     private int valueIdx;
@@ -59,7 +59,7 @@ public class TestsGame extends SceneGame {
 
     public void set(int idx) {
       this.valueIdx = idx;
-      layer.setTexture(game.ui.formatButton(prefix + toString(values.get(idx))));
+      layer.setTile(game.ui.formatButton(prefix + toString(values.get(idx))));
     }
 
     public T value() {
@@ -113,15 +113,15 @@ public class TestsGame extends SceneGame {
       new SubImageTest(this),
       new ClippedLayerTest(this),
       new CanvasStressTest(this),
-      new PauseResumeTest(this),
-      new TextTest(this),
-      new ScaledTextTest(this),
-      new GetTextTest(this),
       new ImageTypeTest(this),
       new AlphaLayerTest(this),
       new ImageScalingTest(this),
       new DepthTest(this),
       new ClearBackgroundTest(this),
+      new PauseResumeTest(this),
+      new TextTest(this),
+      new ScaledTextTest(this),
+      new GetTextTest(this),
       new LayerClickTest(this),
       new PointerMouseTouchTest(this),
       new MouseWheelTest(this),
@@ -204,12 +204,12 @@ public class TestsGame extends SceneGame {
 
     String info = "Renderer: gl (batch=" + defaultBatch + ")";
     Texture infoTex = ui.formatText(info, false);
-    rootLayer.addAt(new TextureLayer(infoTex), x, y);
+    rootLayer.addAt(new ImageLayer(infoTex), x, y);
     y += infoTex.displayHeight + gap;
 
     for (final Test test : tests) {
       if (!test.available()) continue;
-      TextureLayer button = ui.createButton(test.name, new Runnable() {
+      ImageLayer button = ui.createButton(test.name, new Runnable() {
         public void run () { startTest(test); }
       });
       if (x + button.width() > graphics.viewSize.width() - gap) {
@@ -244,7 +244,7 @@ public class TestsGame extends SceneGame {
 
     if (currentTest.usesPositionalInputs()) {
       // slap on a Back button if the test is testing the usual means of backing out
-      TextureLayer back = ui.createButton("Back", new Runnable() {
+      ImageLayer back = ui.createButton("Back", new Runnable() {
         public void run () { displayMenuLater(); }
       });
       rootLayer.addAt(back, graphics.viewSize.width() - back.width() - 10, 10);
