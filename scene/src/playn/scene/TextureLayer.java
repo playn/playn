@@ -122,6 +122,14 @@ public class TextureLayer extends Layer {
     return this;
   }
 
+  /**
+   * Sets {@link #region} and returns {@code this}, for convenient call chaining.
+   */
+  public TextureLayer setRegion (Rectangle region) {
+    this.region = region;
+    return this;
+  }
+
   @Override public float width() {
     if (forceWidth >= 0) return forceWidth;
     if (region != null) return region.width;
