@@ -111,7 +111,7 @@ public class TextTest extends Test {
     TextLayout layout = game.graphics.layoutText(label, new TextFormat());
     Canvas canvas = game.graphics.createCanvas(layout.size);
     canvas.setFillColor(0xFF000000).fillText(layout, 0, 0);
-    return canvas.toTextureDispose();
+    return canvas.toTexture();
   }
 
   protected Texture makeTextImage() {
@@ -126,7 +126,7 @@ public class TextTest extends Test {
     canvas.translate(pad, pad);
     canvas.setStrokeColor(0xFFFFCCCC).strokeRect(0, 0, awidth, aheight);
     render(canvas, block, align.value(), lineBounds.value());
-    return canvas.toTextureDispose();
+    return canvas.toTexture();
   }
 
   protected float adjustDim (float value) {

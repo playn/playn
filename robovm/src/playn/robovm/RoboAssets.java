@@ -44,18 +44,18 @@ public class RoboAssets extends Assets {
     this.assetRoot = new File(bundleRoot, pathPrefix);
   }
 
-  @Override public Bitmap getRemoteBitmap(String url, int width, int height) {
-    final BitmapImpl bitmap = createBitmap(width, height);
+  @Override public Image getRemoteImage(String url, int width, int height) {
+    final ImageImpl image = createImage(width, height);
     plat.net().req(url).execute().
       onSuccess(new Slot<Net.Response>() {
         public void onEmit (Net.Response rsp) {
-          bitmap.succeed(toData(Scale.ONE, UIImage.create(new NSData(rsp.payload()))));
+          image.succeed(toData(Scale.ONE, UIImage.create(new NSData(rsp.payload()))));
         }
       }).
       onFailure(new Slot<Throwable>() {
-        public void onEmit (Throwable cause) { bitmap.fail(cause); }
+        public void onEmit (Throwable cause) { image.fail(cause); }
       });
-    return bitmap;
+    return image;
   }
 
   @Override
@@ -90,7 +90,7 @@ public class RoboAssets extends Assets {
     }
   }
 
-  @Override protected BitmapImpl.Data load (String path) throws Exception {
+  @Override protected ImageImpl.Data load (String path) throws Exception {
     Exception error = null;
     for (Scale.ScaledResource rsrc : plat.graphics().scale.getScaledResources(path)) {
       File fullPath = resolvePath(rsrc.path);
@@ -114,13 +114,13 @@ public class RoboAssets extends Assets {
     throw error;
   }
 
-  @Override protected BitmapImpl createBitmap (int rawWidth, int rawHeight) {
-    return new RoboBitmap(plat, rawWidth, rawHeight);
+  @Override protected ImageImpl createImage (int rawWidth, int rawHeight) {
+    return new RoboImage(plat, rawWidth, rawHeight);
   }
 
-  private BitmapImpl.Data toData (Scale scale, UIImage image) {
+  private ImageImpl.Data toData (Scale scale, UIImage image) {
     CGImage bitmap = image.getCGImage();
-    return new BitmapImpl.Data(scale, bitmap, (int)bitmap.getWidth(), (int)bitmap.getHeight());
+    return new ImageImpl.Data(scale, bitmap, (int)bitmap.getWidth(), (int)bitmap.getHeight());
   }
 
   protected File resolvePath (String path) {

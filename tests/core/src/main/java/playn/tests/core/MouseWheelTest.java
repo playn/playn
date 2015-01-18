@@ -33,14 +33,14 @@ public class MouseWheelTest extends Test
     Canvas bgcanvas = game.graphics.createCanvas(WIDTH + 10, HEIGHT);
     bgcanvas.setFillColor(0xff808080);
     bgcanvas.fillRect(0, 0, WIDTH + 10, HEIGHT);
-    TextureLayer bg = new TextureLayer(bgcanvas.toTextureDispose());
+    TextureLayer bg = new TextureLayer(bgcanvas.toTexture());
 
     Canvas knob = game.graphics.createCanvas(WIDTH, HWIDTH);
     knob.setFillColor(0xffffffff).fillRect(0, 0, WIDTH, HWIDTH);
     knob.setStrokeColor(0xff000000).drawLine(0, HWIDTH / 2, WIDTH, HWIDTH / 2);
     knob.setStrokeColor(0xffff0000).strokeRect(0, 0, WIDTH - 1, HWIDTH - 1);
 
-    final TextureLayer il = new TextureLayer(knob.toTextureDispose());
+    final TextureLayer il = new TextureLayer(knob.toTexture());
     il.setOrigin(0, HWIDTH / 2).setDepth(1).setTranslation(0, HEIGHT / 2);
 
     GroupLayer slider = new GroupLayer();

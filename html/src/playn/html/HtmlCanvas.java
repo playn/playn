@@ -23,9 +23,9 @@ public class HtmlCanvas extends Canvas {
 
   private final Context2d ctx;
 
-  public HtmlCanvas(Graphics gfx, HtmlBitmap bitmap) {
-    super(gfx, bitmap);
-    this.ctx = bitmap.canvas.getContext2d();
+  public HtmlCanvas(Graphics gfx, HtmlImage image) {
+    super(gfx, image);
+    this.ctx = image.canvas.getContext2d();
   }
 
   @Override public Canvas clear() {
@@ -191,8 +191,8 @@ public class HtmlCanvas extends Canvas {
     return this;
   }
 
-  @Override public Bitmap snapshot () {
-    return bitmap; // TODO: anything?
+  @Override public Image snapshot () {
+    return image; // TODO: anything?
   }
 
   @Override public Canvas strokeCircle(float x, float y, float radius) {

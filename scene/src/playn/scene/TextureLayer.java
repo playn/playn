@@ -20,7 +20,7 @@ import react.RFuture;
 import react.Slot;
 
 import playn.core.Graphics;
-import playn.core.Bitmap;
+import playn.core.Image;
 import playn.core.QuadBatch;
 import playn.core.Surface;
 import playn.core.Texture;
@@ -57,23 +57,17 @@ public class TextureLayer extends Layer {
   }
 
   /**
-   * Creates an image layer with the supplied async texture. When the texture is loaded, this layer
-   * will configure itself with it and start rendering.
+   * Generates {@code image}'s default texture and creates a layer with it.
    */
-  public TextureLayer (RFuture<Texture> texture) {
-    texture.onSuccess(new Slot<Texture>() {
-      public void onEmit (Texture texture) { setTexture(texture); }
+  public TextureLayer (Image image) {
+    if (image.isLoaded()) setTexture(image.texture());
+    else image.state.onSuccess(new Slot<Image>() {
+      public void onEmit (Image image) { setTexture(image.texture()); }
     });
   }
 
   /**
-   * Converts {@code bitmap} into a texture and creates an image layer with it. {@code bitmap} must
-   * be fully loaded. The texture will be destroyed when this layer is {@link #destroy}ed.
-   */
-  public TextureLayer (Bitmap bitmap) { this(bitmap.toTexture()); }
-
-  /**
-   * Creates an image layer with no texture. It will be invisible until a texture is set into it.
+   * Creates a texture layer with no texture. It will be invisible until a texture is set into it.
    */
   public TextureLayer () {} // nada!
 
@@ -153,5 +147,9 @@ public class TextureLayer extends Layer {
       if (region == null) surf.draw(tex, 0, 0, dwidth, dheight);
       else surf.draw(tex, 0, 0, dwidth, dheight, region.x, region.y, region.width, region.height);
     }
+  }
+
+  @Override protected void finalize () {
+    setTexture((Texture)null);
   }
 }

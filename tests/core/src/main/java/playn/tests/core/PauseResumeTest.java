@@ -74,6 +74,6 @@ public class PauseResumeTest extends Test {
     TextLayout layout = game.graphics.layoutText(buf.toString(), new TextFormat());
     Canvas canvas = game.graphics.createCanvas(layout.size);
     canvas.setFillColor(0xFF000000).fillText(layout, 0, 0);
-    layer.setTexture(canvas.toTextureDispose());
+    layer.setTexture(canvas.toTexture());
   }
 }

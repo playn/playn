@@ -29,23 +29,23 @@ import java.nio.ByteBuffer;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 
-import playn.core.Bitmap;
-import playn.core.BitmapImpl;
+import playn.core.Image;
+import playn.core.ImageImpl;
 import playn.core.Graphics;
 import playn.core.Pattern;
 import playn.core.Scale;
 import playn.core.Texture;
 import pythagoras.f.MathUtil;
 
-public class JavaBitmap extends BitmapImpl {
+public class JavaImage extends ImageImpl {
 
   protected BufferedImage img;
 
-  public JavaBitmap (Graphics gfx, Scale scale, BufferedImage img) {
+  public JavaImage (Graphics gfx, Scale scale, BufferedImage img) {
     super(gfx, scale, img.getWidth(), img.getHeight(), img);
   }
 
-  public JavaBitmap (JavaPlatform plat, int preWidth, int preHeight) {
+  public JavaImage (JavaPlatform plat, int preWidth, int preHeight) {
     super(plat, Scale.ONE, preWidth, preHeight);
   }
 
@@ -57,7 +57,7 @@ public class JavaBitmap extends BitmapImpl {
     return img;
   }
 
-  @Override public Pattern toPattern (boolean repeatX, boolean repeatY) {
+  @Override public Pattern createPattern (boolean repeatX, boolean repeatY) {
     assert img != null : "Cannot generate a pattern from unready image.";
     Rectangle2D rect = new Rectangle2D.Float(0, 0, width(), height());
     return new JavaPattern(repeatX, repeatY, new TexturePaint(img, rect));
@@ -76,8 +76,8 @@ public class JavaBitmap extends BitmapImpl {
   }
 
   @Override
-  public Bitmap transform(BitmapTransformer xform) {
-    return new JavaBitmap(gfx, scale, ((JavaBitmapTransformer) xform).transform(img));
+  public Image transform(BitmapTransformer xform) {
+    return new JavaImage(gfx, scale, ((JavaBitmapTransformer) xform).transform(img));
   }
 
   @Override public void draw (Object ctx, float x, float y, float w, float h) {

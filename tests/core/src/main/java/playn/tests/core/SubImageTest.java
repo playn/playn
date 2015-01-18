@@ -21,12 +21,12 @@ public class SubImageTest extends Test {
     int r = 30;
     Canvas canvas = game.graphics.createCanvas(2*r, 2*r);
     canvas.setFillColor(0xFF99CCFF).fillCircle(r, r, r);
-    fragment("CanvasImage", canvas.toTextureDispose(), 250, 160);
+    fragment("CanvasImage", canvas.toTexture(), 250, 160);
 
     // draw subimages of a simple static image
-    game.assets.getBitmap("images/orange.png").state.onSuccess(new Slot<Bitmap>() {
-      public void onEmit (Bitmap orange) {
-        final Texture otex = orange.toTexture();
+    game.assets.getImage("images/orange.png").state.onSuccess(new Slot<Image>() {
+      public void onEmit (Image orange) {
+        final Texture otex = orange.texture();
         fragment("Image", otex, 250, 10);
 
         final float pw = orange.width(), ph = orange.height(), phw = pw/2, phh = ph/2;
@@ -48,7 +48,7 @@ public class SubImageTest extends Test {
         split.draw(orange,   0, phh, phw, phh, phw, 0, phw, phh);
         split.draw(orange, phw,   0, phw, phh, 0, phh, phw, phh);
         split.draw(orange,   0,   0, phw, phh, phw, phh, phw, phh);
-        addTest(140, 10, new TextureLayer(split.toTextureDispose()), "draw subimg into Canvas", 80);
+        addTest(140, 10, new TextureLayer(split.toTexture()), "draw subimg into Canvas", 80);
 
         // draw a subimage in an immediate layer
         addTest(130, 100, new Layer() {

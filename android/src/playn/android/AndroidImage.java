@@ -20,16 +20,16 @@ import android.opengl.GLUtils;
 
 import playn.core.*;
 
-public class AndroidBitmap extends BitmapImpl {
+public class AndroidImage extends ImageImpl {
 
   protected Bitmap bitmap;
 
-  public AndroidBitmap(Graphics gfx, Scale scale, Bitmap bitmap) {
+  public AndroidImage(Graphics gfx, Scale scale, Bitmap bitmap) {
     super(gfx, scale, bitmap.getWidth(), bitmap.getHeight(), bitmap);
     // TODO: move elsewhere: ((AndroidGLContext) ctx).addRefreshable(this);
   }
 
-  public AndroidBitmap (AndroidPlatform plat, int preWidth, int preHeight) {
+  public AndroidImage (AndroidPlatform plat, int preWidth, int preHeight) {
     super(plat, Scale.ONE, preWidth, preHeight);
   }
 
@@ -41,7 +41,7 @@ public class AndroidBitmap extends BitmapImpl {
     return bitmap;
   }
 
-  @Override public Pattern toPattern (boolean repeatX, boolean repeatY) {
+  @Override public Pattern createPattern (boolean repeatX, boolean repeatY) {
     return new AndroidPattern(repeatX, repeatY, bitmap);
   }
 
@@ -55,8 +55,8 @@ public class AndroidBitmap extends BitmapImpl {
     bitmap.setPixels(rgbArray, offset, scanSize, startX, startY, width, height);
   }
 
-  @Override public playn.core.Bitmap transform(BitmapTransformer xform) {
-    return new AndroidBitmap(gfx, scale, ((AndroidBitmapTransformer) xform).transform(bitmap));
+  @Override public Image transform(BitmapTransformer xform) {
+    return new AndroidImage(gfx, scale, ((AndroidBitmapTransformer) xform).transform(bitmap));
   }
 
   @Override public void draw (Object ctx, float x, float y, float w, float h) {

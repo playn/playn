@@ -296,7 +296,7 @@ class PointerMouseTouchTest extends Test {
     Canvas canvas = game.graphics.createCanvas(twidth, theight);
     if (bg != 0) canvas.setFillColor(bg).fillRect(0, 0, twidth, theight);
     canvas.setFillColor(fg).fillText(layout, padding, padding);
-    TextureLayer imageLayer = new TextureLayer(canvas.toTextureDispose());
+    TextureLayer imageLayer = new TextureLayer(canvas.toTexture());
     parent.addAt(imageLayer, x, y);
     return imageLayer;
   }

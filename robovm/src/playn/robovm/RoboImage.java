@@ -27,17 +27,17 @@ import org.robovm.rt.bro.ptr.VoidPtr;
 import playn.core.*;
 import playn.robovm.OpenGLES;
 
-public class RoboBitmap extends BitmapImpl {
+public class RoboImage extends ImageImpl {
 
   // note: this is not used for the image that backs a RoboCanvas because of the way
   // CGBitmapContext and CGImage don't completely place nicely together
   private CGImage image;
 
-  public RoboBitmap (Graphics gfx, Scale scale, CGImage img) {
+  public RoboImage (Graphics gfx, Scale scale, CGImage img) {
     super(gfx, scale, (int)img.getWidth(), (int)img.getHeight(), img);
   }
 
-  public RoboBitmap (RoboPlatform plat, int preWidth, int preHeight) {
+  public RoboImage (RoboPlatform plat, int preWidth, int preHeight) {
     super(plat, Scale.ONE, preWidth, preHeight);
   }
 
@@ -54,7 +54,7 @@ public class RoboBitmap extends BitmapImpl {
     return new UIImage(cgImage());
   }
 
-  @Override public Pattern toPattern(boolean repeatX, boolean repeatY) {
+  @Override public Pattern createPattern(boolean repeatX, boolean repeatY) {
     if (image == null) throw new IllegalStateException("Can't create pattern from un-ready image.");
     // this is a circuitous route, but I'm not savvy enough to find a more direct one
     return new RoboPattern(UIColor.fromPatternImage(toUIImage()).getCGColor(), repeatX, repeatY);
@@ -94,9 +94,9 @@ public class RoboBitmap extends BitmapImpl {
     throw new UnsupportedOperationException("TODO!");
   }
 
-  @Override public Bitmap transform(BitmapTransformer xform) {
+  @Override public Image transform(BitmapTransformer xform) {
     UIImage ximage = new UIImage(((RoboBitmapTransformer) xform).transform(cgImage()));
-    return new RoboBitmap(gfx, scale, ximage.getCGImage());
+    return new RoboImage(gfx, scale, ximage.getCGImage());
   }
 
   @Override public void draw(Object ctx, float x, float y, float width, float height) {
@@ -141,7 +141,7 @@ public class RoboBitmap extends BitmapImpl {
     }
   }
 
-  protected RoboBitmap (Graphics gfx, Scale scale, int pixelWidth, int pixelHeight) {
+  protected RoboImage (Graphics gfx, Scale scale, int pixelWidth, int pixelHeight) {
     super(gfx, scale, pixelWidth, pixelHeight, null);
   }
 

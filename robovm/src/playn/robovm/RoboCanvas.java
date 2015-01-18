@@ -44,26 +44,26 @@ public class RoboCanvas extends Canvas {
 
   private LinkedList<RoboCanvasState> states = new LinkedList<RoboCanvasState>();
 
-  public RoboCanvas(Graphics gfx, RoboCanvasBitmap bitmap) {
-    super(gfx, bitmap);
+  public RoboCanvas(Graphics gfx, RoboCanvasImage image) {
+    super(gfx, image);
 
     // if our size is invalid, we'll fail below at CGBitmapContext, so fail here more usefully
     if (width <= 0 || height <= 0) throw new IllegalArgumentException(
       "Invalid size " + width + "x" + height);
     states.addFirst(new RoboCanvasState());
 
-    bctx = bitmap.bctx;
+    bctx = image.bctx;
     // clear the canvas before we scale our bitmap context to avoid artifacts
     bctx.clearRect(new CGRect(0, 0, texWidth(), texHeight()));
 
     // CG coordinate system is OpenGL-style (0,0 in lower left); so we flip it
-    Scale scale = bitmap.scale();
+    Scale scale = image.scale();
     bctx.translateCTM(0, scale.scaled(height));
     bctx.scaleCTM(scale.factor, -scale.factor);
   }
 
-  public int texWidth() { return bitmap.pixelWidth(); }
-  public int texHeight() { return bitmap.pixelHeight(); }
+  public int texWidth() { return image.pixelWidth(); }
+  public int texHeight() { return image.pixelHeight(); }
 
   // todo: make sure the image created by this call doesn't require any manual resource
   // releasing, other than being eventually garbage collected
@@ -103,7 +103,7 @@ public class RoboCanvas extends Canvas {
   }
 
   @Override public void dispose () {
-    ((RoboCanvasBitmap)bitmap).dispose();
+    ((RoboCanvasImage)image).dispose();
   }
 
   @Override public Canvas drawLine(float x0, float y0, float x1, float y1) {
@@ -201,7 +201,7 @@ public class RoboCanvas extends Canvas {
       CGBitmapContext maskContext = RoboGraphics.createCGBitmap(texWidth(), texHeight());
       maskContext.clearRect(new CGRect(0, 0, texWidth(), texHeight()));
       // scale the context based on our scale factor
-      float scale = bitmap.scale().factor;
+      float scale = image.scale().factor;
       maskContext.scaleCTM(scale, scale);
       // fill the text into this temp context in white for use as a mask
       setFillColor(maskContext, 0xFFFFFFFF);
@@ -299,8 +299,8 @@ public class RoboCanvas extends Canvas {
     return this;
   }
 
-  @Override public Bitmap snapshot() {
-    return new RoboBitmap(gfx, bitmap.scale(), ((RoboBitmap)bitmap).cgImage());
+  @Override public Image snapshot() {
+    return new RoboImage(gfx, image.scale(), ((RoboImage)image).cgImage());
   }
 
   @Override public Canvas strokeCircle(float x, float y, float radius) {

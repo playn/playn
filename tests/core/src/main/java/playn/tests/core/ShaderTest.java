@@ -31,9 +31,9 @@ public class ShaderTest extends Test {
   }
 
   @Override public void init () {
-    game.assets.getBitmap("images/orange.png").state.onSuccess(new Slot<Bitmap>() {
-      public void onEmit (Bitmap orange) {
-        final Texture otex = orange.toTexture();
+    game.assets.getImage("images/orange.png").state.onSuccess(new Slot<Image>() {
+      public void onEmit (Image orange) {
+        final Texture otex = orange.texture();
 
         // add the normal orange
         float dx = orange.width() + 25;
@@ -52,7 +52,7 @@ public class ShaderTest extends Test {
         Canvas canvas = game.graphics.createCanvas(orange.width(), orange.height());
         canvas.setFillColor(0xFF99CCFF).fillRect(0, 0, canvas.width, canvas.height);
         canvas.draw(orange, 0, 0);
-        TextureLayer rotlayer = new TextureLayer(canvas.toTextureDispose());
+        TextureLayer rotlayer = new TextureLayer(canvas.toTexture());
         rotlayer.setBatch(rotBatch);
         game.rootLayer.addAt(rotlayer, 25 + 2*dx + orange.width(), 25);
 

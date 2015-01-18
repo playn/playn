@@ -88,24 +88,24 @@ public class HtmlAssets extends Assets {
   }
 
   @Override
-  public Bitmap getBitmapSync(String path) {
+  public Image getImageSync(String path) {
     if (imageManifest == null) throw new UnsupportedOperationException(
-      "getBitmapSync(" + path + ")");
+      "getImageSync(" + path + ")");
     else {
       for (Scale.ScaledResource rsrc : assetScale().getScaledResources(path)) {
         int[] size = imageManifest.imageSize(rsrc.path);
         if (size == null) continue; // try other scales
-        return getBitmap(rsrc.path, rsrc.scale).preload(size[0], size[1]);
+        return getImage(rsrc.path, rsrc.scale).preload(size[0], size[1]);
       }
-      return new HtmlBitmap(plat.graphics(), new Throwable("Image missing from manifest: " + path));
+      return new HtmlImage(plat.graphics(), new Throwable("Image missing from manifest: " + path));
     }
   }
 
-  @Override public Bitmap getBitmap (String path) {
-    return getBitmap(path, Scale.ONE);
+  @Override public Image getImage (String path) {
+    return getImage(path, Scale.ONE);
   }
 
-  protected HtmlBitmap getBitmap (String path, Scale scale) {
+  protected HtmlImage getImage (String path, Scale scale) {
     String url = pathPrefix + path;
     AutoClientBundleWithLookup clientBundle = getBundle(path);
     if (clientBundle != null) {
@@ -116,11 +116,11 @@ public class HtmlAssets extends Assets {
     return adaptImage(url, scale);
   }
 
-  @Override public Bitmap getRemoteBitmap(String url) {
+  @Override public Image getRemoteImage(String url) {
     return adaptImage(url, Scale.ONE);
   }
 
-  @Override public Bitmap getRemoteBitmap(String url, int width, int height) {
+  @Override public Image getRemoteImage(String url, int width, int height) {
     return adaptImage(url, Scale.ONE).preload(width, height);
   }
 
@@ -179,11 +179,11 @@ public class HtmlAssets extends Assets {
     return RFuture.failure(new UnsupportedOperationException("getByte(" + path + ")"));
   }
 
-  @Override protected BitmapImpl.Data load (String path) throws Exception {
+  @Override protected ImageImpl.Data load (String path) throws Exception {
     throw new UnsupportedOperationException("unused");
   }
 
-  @Override protected BitmapImpl createBitmap (int rawWidth, int rawHeight) {
+  @Override protected ImageImpl createImage (int rawWidth, int rawHeight) {
     throw new UnsupportedOperationException("unused");
   }
 
@@ -273,13 +273,13 @@ public class HtmlAssets extends Assets {
     return clientBundle;
   }
 
-  private HtmlBitmap adaptImage (String url, Scale scale) {
+  private HtmlImage adaptImage (String url, Scale scale) {
     ImageElement img = Document.get().createImageElement();
     // when the server provides an appropriate `Access-Control-Allow-Origin` response header,
     // allow images to be served cross origin on supported, CORS enabled, browsers
     setCrossOrigin(img, "anonymous");
     img.setSrc(url);
-    return new HtmlBitmap(plat.graphics(), scale, img);
+    return new HtmlImage(plat.graphics(), scale, img);
   }
 
   /**

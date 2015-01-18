@@ -19,9 +19,9 @@ import react.RPromise;
 /**
  * An implementation detail. Not part of the public API.
  */
-public abstract class BitmapImpl extends Bitmap {
+public abstract class ImageImpl extends Image {
 
-  /** Used to provide bitmap data to the abstract bitmap once it's ready. */
+  /** Used to provide bitmap data to the abstract image once it's ready. */
   public static class Data {
     public final Scale scale;
     public final Object bitmap;
@@ -37,29 +37,29 @@ public abstract class BitmapImpl extends Bitmap {
   protected Scale scale;
   protected int pixelWidth, pixelHeight;
 
-  /** Notifies this bitmap that its implementation bitmap is available.
+  /** Notifies this image that its implementation bitmap is available.
     * This can be called from any thread. */
   public synchronized void succeed (Data data) {
     scale = data.scale;
     pixelWidth = data.pixelWidth;
     pixelHeight = data.pixelHeight;
     setBitmap(data.bitmap);
-    ((RPromise<Bitmap>)state).succeed(this); // state is a deferred promise
+    ((RPromise<Image>)state).succeed(this); // state is a deferred promise
   }
 
-  /** Notifies this bitmap that its implementation bitmap failed to load.
+  /** Notifies this image that its implementation bitmap failed to load.
     * This can be called from any thread. */
   public synchronized void fail (Throwable error) {
     int errWidth = (pixelWidth == 0) ? 50 : pixelWidth;
     int errHeight = (pixelHeight == 0) ? 50 : pixelHeight;
     setBitmap(createErrorBitmap(errWidth, errHeight));
-    ((RPromise<Bitmap>)state).fail(error); // state is a deferred promise
+    ((RPromise<Image>)state).fail(error); // state is a deferred promise
   }
 
-  /** Renders this bitmap into a platform-specific drawing context. */
+  /** Renders this image into a platform-specific drawing context. */
   public abstract void draw (Object ctx, float dx, float dy, float dw, float dh);
 
-  /** Renders this bitmap into a platform-specific drawing context. */
+  /** Renders this image into a platform-specific drawing context. */
   public abstract void draw (Object ctx, float dx, float dy, float dw, float dh,
                              float sx, float sy, float sw, float sh);
 
@@ -67,26 +67,26 @@ public abstract class BitmapImpl extends Bitmap {
   @Override public int pixelWidth () { return pixelWidth; }
   @Override public int pixelHeight () { return pixelHeight; }
 
-  protected BitmapImpl (Graphics gfx, Scale scale, int pixelWidth, int pixelHeight, Object bitmap) {
+  protected ImageImpl (Graphics gfx, Scale scale, int pixelWidth, int pixelHeight, Object bitmap) {
     super(gfx);
     if (pixelWidth == 0 || pixelHeight == 0) throw new IllegalArgumentException(
-      "Invalid size for ready bitmap: " + pixelWidth + "x" + pixelHeight + " bitmap: " + bitmap);
+      "Invalid size for ready image: " + pixelWidth + "x" + pixelHeight + " bitmap: " + bitmap);
     this.scale = scale;
     this.pixelWidth = pixelWidth;
     this.pixelHeight = pixelHeight;
     setBitmap(bitmap);
   }
 
-  protected BitmapImpl (Graphics gfx, RFuture<Bitmap> state, Scale preScale,
-                        int preWidth, int preHeight) {
+  protected ImageImpl (Graphics gfx, RFuture<Image> state, Scale preScale,
+                       int preWidth, int preHeight) {
     super(gfx, state);
     scale = preScale;
     pixelWidth = preWidth;
     pixelHeight = preHeight;
   }
 
-  protected BitmapImpl (Platform plat, Scale preScale, int preWidth, int preHeight) {
-    this(plat.graphics(), plat.<Bitmap>deferredPromise(), preScale, preWidth, preHeight);
+  protected ImageImpl (Platform plat, Scale preScale, int preWidth, int preHeight) {
+    this(plat.graphics(), plat.<Image>deferredPromise(), preScale, preWidth, preHeight);
   }
 
   protected abstract void setBitmap (Object bitmap);

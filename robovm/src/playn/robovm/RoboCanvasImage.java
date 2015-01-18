@@ -19,12 +19,12 @@ import org.robovm.apple.coregraphics.CGInterpolationQuality;
 
 import playn.core.*;
 
-public class RoboCanvasBitmap extends RoboBitmap {
+public class RoboCanvasImage extends RoboImage {
 
   CGBitmapContext bctx;
 
-  public RoboCanvasBitmap (Graphics gfx, Scale scale, int pixelWidth, int pixelHeight,
-                           boolean interpolate) {
+  public RoboCanvasImage (Graphics gfx, Scale scale, int pixelWidth, int pixelHeight,
+                          boolean interpolate) {
     super(gfx, scale, pixelWidth, pixelHeight);
     // create the bitmap context via which we'll render into it
     bctx = RoboGraphics.createCGBitmap(pixelWidth, pixelHeight);

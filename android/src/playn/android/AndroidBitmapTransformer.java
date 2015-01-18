@@ -17,15 +17,15 @@ package playn.android;
 
 import android.graphics.Bitmap;
 
+import playn.core.Image;
+
 /**
  * Enables the transformation of Android bitmaps.
  */
-public interface AndroidBitmapTransformer extends playn.core.Bitmap.BitmapTransformer
+public interface AndroidBitmapTransformer extends Image.BitmapTransformer
 {
-  /**
-   * Transforms the supplied bitmap into a new bitmap which will be used as the source data for a
-   * new PlayN image. <em>Do not</em> modify the bitmap passed into this method or you will break
-   * things.
-   */
+  /** Transforms the supplied bitmap into a new bitmap which will be used as the source data for a
+    * new PlayN image. <em>Do not</em> modify the bitmap passed into this method or you will break
+    * things. */
   Bitmap transform(Bitmap bitmap);
 }

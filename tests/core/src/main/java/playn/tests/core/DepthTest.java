@@ -35,7 +35,7 @@ public class DepthTest extends Test {
       Canvas canvas = game.graphics.createCanvas(width, height);
       canvas.setFillColor(fills[ii]).fillRect(0, 0, width, height);
       canvas.setFillColor(0xFF000000).drawText(depth + "/" + ii, 5, 15);
-      TextureLayer layer = new TextureLayer(canvas.toTextureDispose());
+      TextureLayer layer = new TextureLayer(canvas.toTexture());
       layer.setDepth(depth).setTranslation(225-50*depth, 125+25*depth);
       game.rootLayer.add(layer);
     }

@@ -120,7 +120,7 @@ public abstract class Graphics {
     if (colorTex == null) {
       Canvas canvas = createCanvas(1, 1);
       canvas.setFillColor(0xFFFFFFFF).fillRect(0, 0, canvas.width, canvas.height);
-      colorTex = canvas.bitmap.toTexture(Texture.Config.UNMANAGED);
+      colorTex = canvas.toTexture(Texture.Config.UNMANAGED);
     }
     return colorTex;
   }

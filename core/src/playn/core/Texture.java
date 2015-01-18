@@ -139,25 +139,25 @@ public class Texture implements Disposable {
     }
   }
 
-  /** Uploads {@code bitmap} to this texture's GPU memory. {@code bitmap} must have the exact same
+  /** Uploads {@code image} to this texture's GPU memory. {@code image} must have the exact same
     * size as this texture and must be fully loaded. This is generally useful for updating a
     * texture which was created from a canvas when the canvas has been changed. */
-  public void update (Bitmap bitmap) {
-    // if we're a repeating texture (or we want mipmaps) and this bitmap is non-POT on the relevant
+  public void update (Image image) {
+    // if we're a repeating texture (or we want mipmaps) and this image is non-POT on the relevant
     // axes, we need to scale it before we upload it; we'll just do this on the CPU since it feels
     // like creating a second texture, a frame buffer to render into it, sending a GPU batch and
     // doing all the blah blah blah is going to be more expensive overall
     if (config.repeatX || config.repeatY || config.mipmaps) {
-      int pixWidth = bitmap.pixelWidth(), pixHeight = bitmap.pixelHeight();
+      int pixWidth = image.pixelWidth(), pixHeight = image.pixelHeight();
       int potWidth = config.toTexWidth(pixWidth), potHeight = config.toTexWidth(pixHeight);
       if (potWidth != pixWidth || potHeight != pixHeight) {
         Canvas scaled = gfx.createCanvasImpl(Scale.ONE, potWidth, potHeight);
-        scaled.draw(bitmap, 0, 0, potWidth, potHeight);
-        scaled.bitmap.upload(gfx, this);
+        scaled.draw(image, 0, 0, potWidth, potHeight);
+        scaled.image.upload(gfx, this);
         scaled.dispose();
-      } else bitmap.upload(gfx, this); // fast path, woo!
+      } else image.upload(gfx, this); // fast path, woo!
     }
-    else bitmap.upload(gfx, this); // fast path, woo!
+    else image.upload(gfx, this); // fast path, woo!
     if (config.mipmaps) gfx.gl.glGenerateMipmap(GL_TEXTURE_2D);
   }
 
@@ -184,7 +184,7 @@ public class Texture implements Disposable {
     if (!destroyed) gfx.queueForDestroy(this);
   }
 
-  // bitmapregiongl stuffs
+  // imageregiongl stuffs
 
   // @Override
   // void draw(GLShader shader, InternalTransform xform, int tint,

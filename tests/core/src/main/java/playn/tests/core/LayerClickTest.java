@@ -33,19 +33,18 @@ class LayerClickTest extends Test {
   }
 
   @Override public void init() {
-    Bitmap orange = game.assets.getBitmap("images/orange.png");
-    RFuture<Texture> ortex = orange.toTextureAsync();
+    Image orange = game.assets.getImage("images/orange.png");
 
-    TextureLayer l1 = new TextureLayer(ortex);
+    TextureLayer l1 = new TextureLayer(orange);
     game.rootLayer.addAt(l1.setScale(2).setRotation(FloatMath.PI/8), 50, 50);
     l1.events().connect(new Mover(l1).listener(game.input));
 
-    TextureLayer l2 = new TextureLayer(ortex);
+    TextureLayer l2 = new TextureLayer(orange);
     game.rootLayer.addAt(l2.setScale(1.5f).setRotation(FloatMath.PI/4), 150, 50);
     l2.events().connect(new Mover(l2).listener(game.input));
 
-    Bitmap mdb = game.assets.getRemoteBitmap("https://graph.facebook.com/samskivert/picture");
-    final TextureLayer l3 = new TextureLayer(mdb.toTextureAsync());
+    Image mdb = game.assets.getRemoteImage("https://graph.facebook.com/samskivert/picture");
+    final TextureLayer l3 = new TextureLayer(mdb);
     game.rootLayer.addAt(l3.setRotation(-FloatMath.PI/4), 50, 150);
     l3.events().connect(new Mover(l3).listener(game.input));
   }

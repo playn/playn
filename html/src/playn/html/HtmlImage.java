@@ -29,31 +29,31 @@ import playn.core.*;
 import react.RFuture;
 import react.RPromise;
 
-public class HtmlBitmap extends BitmapImpl {
+public class HtmlImage extends ImageImpl {
 
   private static native boolean isComplete (ImageElement img) /*-{ return img.complete; }-*/;
 
   private ImageElement img;
   CanvasElement canvas; // used for get/setRGB and by HtmlCanvas
 
-  public HtmlBitmap (Graphics gfx, Scale scale, CanvasElement elem) {
+  public HtmlImage (Graphics gfx, Scale scale, CanvasElement elem) {
     super(gfx, scale, elem.getWidth(), elem.getHeight(), elem);
     this.canvas = elem;
   }
 
-  public HtmlBitmap (Graphics gfx, Scale scale, ImageElement elem) {
-    super(gfx, RPromise.<Bitmap>create(), scale, elem.getWidth(), elem.getHeight());
+  public HtmlImage (Graphics gfx, Scale scale, ImageElement elem) {
+    super(gfx, RPromise.<Image>create(), scale, elem.getWidth(), elem.getHeight());
     img = elem;
 
     // we know that in this case, our state is a promise
-    final RPromise<Bitmap> pstate = ((RPromise<Bitmap>)state);
+    final RPromise<Image> pstate = ((RPromise<Image>)state);
     if (isComplete(img)) pstate.succeed(this);
     else {
       HtmlInput.addEventListener(img, "load", new EventHandler() {
         @Override public void handleEvent (NativeEvent evt) {
           pixelWidth = img.getWidth();
           pixelHeight = img.getHeight();
-          pstate.succeed(HtmlBitmap.this);
+          pstate.succeed(HtmlImage.this);
         }
       }, false);
       HtmlInput.addEventListener(img, "error", new EventHandler() {
@@ -64,8 +64,8 @@ public class HtmlBitmap extends BitmapImpl {
     }
   }
 
-  public HtmlBitmap (Graphics gfx, Throwable error) {
-    super(gfx, RFuture.<Bitmap>failure(error), Scale.ONE, 50, 50);
+  public HtmlImage (Graphics gfx, Throwable error) {
+    super(gfx, RFuture.<Image>failure(error), Scale.ONE, 50, 50);
     setBitmap(createErrorBitmap(pixelWidth, pixelHeight));
   }
 
@@ -73,14 +73,14 @@ public class HtmlBitmap extends BitmapImpl {
     * write custom backend code to do special stuff. No promises are made, caveat coder. */
   public ImageElement imageElement () { return img; }
 
-  HtmlBitmap preload (int prePixelWidth, int prePixelHeight) {
+  HtmlImage preload (int prePixelWidth, int prePixelHeight) {
     pixelWidth = prePixelWidth;
     pixelHeight = prePixelHeight;
     return this;
   }
 
-  @Override public Pattern toPattern (boolean repeatX, boolean repeatY) {
-    assert isLoaded() : "Cannot toPattern() a non-ready image";
+  @Override public Pattern createPattern (boolean repeatX, boolean repeatY) {
+    assert isLoaded() : "Cannot createPattern() a non-ready image";
     return new HtmlPattern(img, repeatX, repeatY);
   }
 
@@ -133,8 +133,8 @@ public class HtmlBitmap extends BitmapImpl {
     ctx.putImageData(imageData, startX, startY);
   }
 
-  @Override public Bitmap transform (BitmapTransformer xform) {
-    return new HtmlBitmap(gfx, scale, ((HtmlBitmapTransformer) xform).transform(img));
+  @Override public Image transform (BitmapTransformer xform) {
+    return new HtmlImage(gfx, scale, ((HtmlBitmapTransformer) xform).transform(img));
   }
 
   @Override public void draw(Object ctx, float x, float y, float width, float height) {
@@ -152,7 +152,7 @@ public class HtmlBitmap extends BitmapImpl {
   }
 
   @Override public String toString () {
-    return "HtmlBitmap[scale=" + scale + ", size=" + width() + "x" + height() +
+    return "HtmlImage[scale=" + scale + ", size=" + width() + "x" + height() +
       ", psize=" + pixelWidth + "x" + pixelHeight + ", img=" + img + ", canvas=" + canvas + "]";
   }
 

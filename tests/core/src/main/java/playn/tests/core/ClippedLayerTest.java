@@ -39,13 +39,13 @@ public class ClippedLayerTest extends Test {
   protected void addClippedLayers () {
     Canvas circle = game.graphics.createCanvas(100, 100);
     circle.setFillColor(0xFFCC99FF).fillCircle(50, 50, 50);
-    final Texture cirtex = circle.toTextureDispose();
+    final Texture cirtex = circle.toTexture();
 
     Canvas sausage = game.graphics.createCanvas(100, 50);
     Gradient linear = sausage.createGradient(new Gradient.Linear(
       0, 0, 100, 100, new int[] { 0xFF0000FF, 0xFF00FF00 }, new float[] { 0, 1 }));
     sausage.setFillGradient(linear).fillRoundRect(0, 0, 100, 50, 10);
-    final Texture saustex = sausage.toTextureDispose();
+    final Texture saustex = sausage.toTexture();
 
     // add an unclipped layer which will draw our background and outlines
     game.rootLayer.add(new Layer() {
@@ -106,7 +106,7 @@ public class ClippedLayerTest extends Test {
     Gradient linear = img.createGradient(new Gradient.Linear(
       0, 0, 100, 100, new int[] { 0xFF0000FF, 0xFF00FF00 }, new float[] { 0, 1 }));
     img.setFillGradient(linear).fillRoundRect(0, 0, 100, 50, 10);
-    final Texture tex = img.toTextureDispose();
+    final Texture tex = img.toTexture();
 
     // create a group layer with a static clip, and a rotating image inside
     final GroupLayer g1 = new GroupLayer(100, 100);

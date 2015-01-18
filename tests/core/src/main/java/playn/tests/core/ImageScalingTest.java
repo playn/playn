@@ -39,8 +39,8 @@ public class ImageScalingTest extends Test {
   }
 
   @Override public void init () {
-    final Bitmap princess = game.assets.getBitmap("images/princess.png");
-    final Bitmap star     = game.assets.getBitmap("images/star.png");
+    final Image princess = game.assets.getImage("images/princess.png");
+    final Image star     = game.assets.getImage("images/star.png");
 
     RFuture.collect(Arrays.asList(princess.state, star.state)).onSuccess(new UnitSlot() {
       public void onEmit () {
@@ -49,7 +49,7 @@ public class ImageScalingTest extends Test {
         final TextureLayer player1 = new TextureLayer(princess);
         player1.setOrigin(phwidth, phheight);
         game.rootLayer.addAt(player1, 100, 100);
-        final TextureLayer player2 = new TextureLayer(princess.toTexture(MIPMAPPED));
+        final TextureLayer player2 = new TextureLayer(princess.createTexture(MIPMAPPED));
         player2.setOrigin(phwidth, phheight);
         game.rootLayer.addAt(player2, 250, 100);
 
@@ -57,7 +57,7 @@ public class ImageScalingTest extends Test {
         final TextureLayer slayer1 = new TextureLayer(star);
         slayer1.setOrigin(shwidth, shheight);
         game.rootLayer.addAt(slayer1, 100, 250);
-        final TextureLayer slayer2 = new TextureLayer(star.toTexture(MIPMAPPED));
+        final TextureLayer slayer2 = new TextureLayer(star.createTexture(MIPMAPPED));
         slayer2.setOrigin(shwidth, shheight);
         game.rootLayer.addAt(slayer2, 250, 250);
 
@@ -75,7 +75,6 @@ public class ImageScalingTest extends Test {
           private float elapsed;
           public void onEmit (Clock clock) {
             if (!paused) {
-              System.out.println(clock.dt);
               elapsed += clock.dt/1000f;
               float scale = Math.abs(FloatMath.sin(elapsed));
               player1.setScale(scale);

@@ -82,8 +82,8 @@ public abstract class Canvas {
    */
   public static enum LineJoin { BEVEL, MITER, ROUND }
 
-  /** The bitmap that underlies this canvas. */
-  public final Bitmap bitmap;
+  /** The image that underlies this canvas. */
+  public final Image image;
 
   /** The width of this canvas. */
   public final float width;
@@ -92,14 +92,14 @@ public abstract class Canvas {
   public final float height;
 
   /**
-   * Returns an immutable snapshot of the bitmap that backs this canvas. Subsequent changes to this
-   * canvas will not be reflected in the returned bitmap. If you are going to render a canvas
-   * bitmap into another canvas bitmap a lot, using a snapshot can improve performance.
+   * Returns an immutable snapshot of the image that backs this canvas. Subsequent changes to this
+   * canvas will not be reflected in the returned image. If you are going to render a canvas
+   * image into another canvas image a lot, using a snapshot can improve performance.
    */
-  public abstract Bitmap snapshot ();
+  public abstract Image snapshot ();
 
   /**
-   * Informs the platform that this canvas, and its backing bitmap will no longer be used. On some
+   * Informs the platform that this canvas, and its backing image will no longer be used. On some
    * platforms this can free up memory earlier than if we waited for the canvas to be garbage
    * collected.
    */
@@ -124,38 +124,38 @@ public abstract class Canvas {
   public abstract Gradient createGradient (Gradient.Config config);
 
   /**
-   * Draws a bitmap at the specified location {@code (x, y)}.
+   * Draws {@code image} at the specified location {@code (x, y)}.
    */
-  public Canvas draw (Bitmap bitmap, float x, float y) {
-    return draw(bitmap, x, y, bitmap.width(), bitmap.height());
+  public Canvas draw (Image image, float x, float y) {
+    return draw(image, x, y, image.width(), image.height());
   }
 
   /**
-   * Draws a bitmap centered at the specified location. Subtracts {@code bitmap.width/2} from x
-   * and {@code bitmap.height/2} from y.
+   * Draws {@code image} centered at the specified location. Subtracts {@code image.width/2} from x
+   * and {@code image.height/2} from y.
    */
-  public Canvas drawCentered (Bitmap bitmap, float x, float y) {
-    return draw(bitmap, x - bitmap.width()/2, y - bitmap.height()/2);
+  public Canvas drawCentered (Image image, float x, float y) {
+    return draw(image, x - image.width()/2, y - image.height()/2);
   }
 
   /**
-   * Draws a scaled bitmap at the specified location {@code (x, y)} size {@code (w x h)}.
+   * Draws a scaled image at the specified location {@code (x, y)} size {@code (w x h)}.
    */
-  public Canvas draw (Bitmap bitmap, float x, float y, float w, float h) {
-    ((BitmapImpl)bitmap).draw(gc(), x, y, w, h);
+  public Canvas draw (Image image, float x, float y, float w, float h) {
+    ((ImageImpl)image).draw(gc(), x, y, w, h);
     isDirty = true;
     return this;
   }
 
   /**
-   * Draws a subregion of a bitmap {@code (sw x sh) @ (sx, sy)} at the specified size
+   * Draws a subregion of a image {@code (sw x sh) @ (sx, sy)} at the specified size
    * {@code (dw x dh)} and location {@code (dx, dy)}.
    *
    * TODO (jgw): Document whether out-of-bounds source coordinates clamp, repeat, or do nothing.
    */
-  public Canvas draw (Bitmap bitmap, float dx, float dy, float dw, float dh,
+  public Canvas draw (Image image, float dx, float dy, float dw, float dh,
                       float sx, float sy, float sw, float sh) {
-    ((BitmapImpl)bitmap).draw(gc(), dx, dy, dw, dh, sx, sy, sw, sh);
+    ((ImageImpl)image).draw(gc(), dx, dy, dw, dh, sx, sy, sw, sh);
     isDirty = true;
     return this;
   }
@@ -332,18 +332,14 @@ public abstract class Canvas {
    */
   public abstract Canvas strokeText (TextLayout text, float x, float y);
 
-  /** A helper function for creating a texture from this canvas's bitmap. Note: unless you're
-    * planning on further modifying this canvas and generating more textures from it, you may want
-    * to be using {@link #toTextureDispose}. */
-  public Texture toTexture () {
-    return bitmap.toTexture();
-  }
+  /** Calls {@link #toTexture(Texture.Config)} with the default texture config. */
+  public Texture toTexture () { return toTexture(Texture.Config.DEFAULT); }
 
-  /** A helper function for creating a texture from this canvas's bitmap, and then disposing this
+  /** A helper function for creating a texture from this canvas's image, and then disposing this
     * canvas. This is useful for situations where you create a canvas, draw something in it, turn
     * it into a texture and then never use the canvas again. */
-  public Texture toTextureDispose () {
-    try { return toTexture(); }
+  public Texture toTexture (Texture.Config config) {
+    try { return image.createTexture(config); }
     finally { dispose(); }
   }
 
@@ -357,16 +353,16 @@ public abstract class Canvas {
    */
   public abstract Canvas translate (float x, float y);
 
-  /** Used to track modifications to our underlying bitmap. */
+  /** Used to track modifications to our underlying image. */
   protected boolean isDirty;
 
   protected final Graphics gfx;
 
-  protected Canvas (Graphics gfx, Bitmap bitmap) {
+  protected Canvas (Graphics gfx, Image image) {
     this.gfx = gfx;
-    this.bitmap = bitmap;
-    this.width = bitmap.width();
-    this.height = bitmap.height();
+    this.image = image;
+    this.width = image.width();
+    this.height = image.height();
   }
 
   /** Returns the platform dependent graphics context for this canvas. */

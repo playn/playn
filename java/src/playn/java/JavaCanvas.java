@@ -42,12 +42,12 @@ class JavaCanvas extends Canvas {
   private Rectangle2D.Float rect = new Rectangle2D.Float();
   private RoundRectangle2D.Float roundRect = new RoundRectangle2D.Float();
 
-  public JavaCanvas (Graphics gfx, JavaBitmap bitmap) {
-    super(gfx, bitmap);
+  public JavaCanvas (Graphics gfx, JavaImage image) {
+    super(gfx, image);
 
-    g2d = bitmap.bufferedImage().createGraphics();
+    g2d = image.bufferedImage().createGraphics();
     g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-    float scale = bitmap.scale().factor;
+    float scale = image.scale().factor;
     g2d.scale(scale, scale);
 
     // push default state
@@ -62,13 +62,13 @@ class JavaCanvas extends Canvas {
   }
 
   @Override
-  public Bitmap snapshot() {
-    BufferedImage bmp = ((JavaBitmap)bitmap).bufferedImage();
+  public Image snapshot() {
+    BufferedImage bmp = ((JavaImage)image).bufferedImage();
     ColorModel cm = bmp.getColorModel();
     boolean isAlphaPremultiplied = bmp.isAlphaPremultiplied();
     WritableRaster raster = bmp.copyData(null);
     BufferedImage snap = new BufferedImage(cm, raster, isAlphaPremultiplied, null);
-    return new JavaBitmap(gfx, bitmap.scale(), snap);
+    return new JavaImage(gfx, image.scale(), snap);
   }
 
   @Override

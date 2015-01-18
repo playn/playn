@@ -93,8 +93,8 @@ public class RoboGraphics extends Graphics {
   @Override protected int defaultFramebuffer () { return defaultFramebuffer; }
 
   @Override protected Canvas createCanvasImpl (Scale scale, int pixelWidth, int pixelHeight) {
-    return new RoboCanvas(this, new RoboCanvasBitmap(this, scale, pixelWidth, pixelHeight,
-                                                     plat.config.interpolateCanvasDrawing));
+    return new RoboCanvas(this, new RoboCanvasImage(this, scale, pixelWidth, pixelHeight,
+                                                    plat.config.interpolateCanvasDrawing));
   }
 
   static CGBitmapContext createCGBitmap(int width, int height) {

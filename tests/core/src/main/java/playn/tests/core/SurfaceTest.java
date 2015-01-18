@@ -25,8 +25,8 @@ public class SurfaceTest extends Test {
   }
 
   @Override public void init() {
-    final Bitmap tile = game.assets.getBitmap("images/tile.png");
-    final Bitmap orange = game.assets.getBitmap("images/orange.png");
+    final Image tile = game.assets.getImage("images/tile.png");
+    final Image orange = game.assets.getImage("images/orange.png");
     Slot<Throwable> onError = new Slot<Throwable>() {
       float errY = 0;
       public void onEmit (Throwable err) {
@@ -50,9 +50,9 @@ public class SurfaceTest extends Test {
     }
   }
 
-  protected void addTests (final Bitmap orange, Bitmap tile) {
-    final Texture otex = orange.toTexture();
-    final Texture ttex = tile.toTexture(Texture.Config.DEFAULT.repeat(true, true));
+  protected void addTests (final Image orange, Image tile) {
+    final Texture otex = orange.texture();
+    final Texture ttex = tile.createTexture(Texture.Config.DEFAULT.repeat(true, true));
 
     // make samples big enough to force a buffer size increase
     final int samples = 128, hsamples = samples/2;

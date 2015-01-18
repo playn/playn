@@ -15,9 +15,9 @@ package playn.scene;
 
 import pythagoras.f.IDimension;
 
-import playn.core.Bitmap;
 import playn.core.Canvas;
 import playn.core.Graphics;
+import playn.core.Image;
 import playn.core.Texture;
 
 /**
@@ -55,7 +55,7 @@ public class CanvasLayer extends TextureLayer {
   public CanvasLayer (Graphics gfx, Canvas canvas) {
     this.gfx = gfx;
     this.canvas = canvas;
-    setTexture(canvas.bitmap.toTexture());
+    setTexture(canvas.image.createTexture(Texture.Config.DEFAULT));
   }
 
   /**
@@ -80,13 +80,13 @@ public class CanvasLayer extends TextureLayer {
     * is uploaded to the GPU. */
   public void end () {
     Texture tex = texture();
-    Bitmap bitmap = canvas.bitmap;
+    Image image = canvas.image;
     // if our texture is already the right size, just update it
-    if (tex != null && tex.pixelWidth == bitmap.pixelWidth() &&
-        tex.pixelHeight == bitmap.pixelHeight()) tex.update(bitmap);
+    if (tex != null && tex.pixelWidth == image.pixelWidth() &&
+        tex.pixelHeight == image.pixelHeight()) tex.update(image);
     // otherwise we need to create a new texture (setTexture will unreference the old texture which
     // will cause it to be destroyed)
-    else setTexture(canvas.bitmap.toTexture());
+    else setTexture(canvas.image.createTexture(Texture.Config.DEFAULT));
   }
 
   @Override public float width () {
