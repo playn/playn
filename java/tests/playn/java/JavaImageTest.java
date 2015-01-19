@@ -19,7 +19,7 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 import playn.core.Log;
-import playn.core.Bitmap;
+import playn.core.Image;
 
 /**
  * Tests various JavaImage behavior.
@@ -34,9 +34,9 @@ public class JavaImageTest extends AbstractPlayNTest {
       }
     });
 
-    Bitmap missing;
+    Image missing;
     try {
-      missing = plat.assets().getBitmapSync("missing.png");
+      missing = plat.assets().getImageSync("missing.png");
     } finally {
       plat.log().setCollector(null);
     }
