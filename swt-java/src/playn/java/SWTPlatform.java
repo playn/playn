@@ -20,10 +20,6 @@ import org.eclipse.swt.layout.*;
 import org.eclipse.swt.widgets.*;
 import org.eclipse.swt.events.*;
 
-import playn.core.Game;
-import playn.core.PlayN;
-import playn.core.TouchImpl;
-
 public class SWTPlatform extends JavaPlatform {
 
   protected static final long FRAME_MILLIS = 1000/60; // TODO: allow config?
@@ -34,21 +30,22 @@ public class SWTPlatform extends JavaPlatform {
   Shell shell;
   Composite comp;
 
-  public static SWTPlatform register (Config config) {
-    SWTPlatform instance = new SWTPlatform(config);
-    PlayN.setPlatform(instance);
-    return instance;
+  /** Returns the SWT shell in which the game is running. */
+  public Shell shell () { return shell; }
+
+  /** Returns the SWT composite that hosts the game view. */
+  public Composite composite () { return comp; }
+
+  /** Creates a new SWT platform and prepares it for operation. */
+  public SWTPlatform (Config config) {
+    super(config);
   }
 
-  @Override
-  public void setTitle(String title) {
-    shell.setText(title);
-  }
+  @Override public void setTitle (String title) { shell.setText(title); }
 
-  @Override
-  public void run(final Game game) {
-    init(game);
+  @Override public SWTGraphics graphics () { return (SWTGraphics)super.graphics(); }
 
+  @Override public void start () {
     // canvas.addListener(SWT.Paint, new Listener() {
     //   public void handleEvent (Event event) {
     //     run.run();
@@ -59,13 +56,14 @@ public class SWTPlatform extends JavaPlatform {
     while (!shell.isDisposed()) {
       long now = tick();
       if (now - lastFrame >= FRAME_MILLIS) {
-        processFrame(game);
+        graphics().onBeforeFrame();
+        emitFrame();
+        graphics().onAfterFrame();
         lastFrame = now;
       }
       if (!display.readAndDispatch()) {
-        try {
-          Thread.sleep(1);
-        } catch (InterruptedException ie) {} // no problem!
+        try { Thread.sleep(1); }
+        catch (InterruptedException ie) {} // no problem!
       }
     }
     display.dispose();
@@ -73,54 +71,26 @@ public class SWTPlatform extends JavaPlatform {
     shutdown();
   }
 
-  @Override
-  public SWTGraphics graphics () {
-    return (SWTGraphics)super.graphics();
+  @Override protected void finishInit () {
+    // don't do the LWJGL stuff
+    input().init();
   }
 
-  public Shell shell () {
-    return shell;
-  }
-
-  public Composite composite () {
-    return comp;
-  }
-
-  protected SWTPlatform (Config config) {
-    super(config);
-  }
-
-  @Override protected JavaGraphics createGraphics (Config config) {
+  @Override protected JavaGraphics createGraphics () {
     Display.setAppName(config.appName);
     display = new Display();
     shell = new Shell(display);
     shell.setLayout(new FillLayout());
     shell.addShellListener(new ShellAdapter() {
-      public void shellActivated (ShellEvent e) {
-        onResume();
-      }
-      public void shellDeactivated (ShellEvent e) {
-        onPause();
-      }
+      public void shellActivated (ShellEvent e) { lifecycle.emit(Lifecycle.RESUME); }
+      public void shellDeactivated (ShellEvent e) { lifecycle.emit(Lifecycle.PAUSE); }
     });
     comp = new Composite(shell, SWT.NONE);
     comp.setLayout(null);
-    return new SWTGraphics(this, config, comp);
+    return new SWTGraphics(this, comp);
   }
 
-  @Override protected TouchImpl createTouch (Config config) {
-    if (config.emulateTouch) {
-      return new SWTEmulatedTouch();
-    } else {
-      return super.createTouch(config);
-    }
-  }
-
-  @Override protected JavaMouse createMouse() {
-    return new SWTMouse(this);
-  }
-
-  @Override protected JavaKeyboard createKeyboard() {
-    return new SWTKeyboard(this);
+  @Override protected JavaInput createInput() {
+    return new SWTInput(this);
   }
 }

@@ -15,53 +15,101 @@
  */
 package playn.java;
 
-import org.eclipse.swt.SWT;
+import org.eclipse.swt.*;
+import org.eclipse.swt.widgets.*;
 
-import playn.core.Events;
+import pythagoras.f.Point;
+import react.RFuture;
+
 import playn.core.Key;
-import playn.core.util.Callback;
+import playn.core.Keyboard;
+import playn.core.Mouse;
 
-public class SWTKeyboard extends JavaKeyboard {
+public class SWTInput extends JavaInput {
 
-  private SWTPlatform platform;
+  private SWTPlatform plat;
 
-  public SWTKeyboard(SWTPlatform platform) {
-    this.platform = platform;
+  public SWTInput(SWTPlatform plat) {
+    super(plat);
+    this.plat = plat;
   }
 
-  // TODO
-
-  @Override
-  public void getText(TextType textType, String label, String initVal, Callback<String> callback) {
-    callback.onFailure(new Exception("TODO"));
-  }
-
-  void init(Listener platformListener) {
-    super.init(platformListener);
-
-    platform.display.addFilter(SWT.KeyDown, new org.eclipse.swt.widgets.Listener() {
-      public void handleEvent (org.eclipse.swt.widgets.Event event) {
-        Key key = translateKey(event.keyCode);
-        if (key != null) {
-          dispatch(new Event.Impl(new Events.Flags.Impl(), event.time, key), down);
-        } else {
-          System.err.println("KEY? " + event.keyCode + " / " + event.character);
+  @Override void init() {
+    // wire up mouse events
+    plat.display.addFilter(SWT.MouseDown, new org.eclipse.swt.widgets.Listener() {
+      public void handleEvent (Event event) {
+        if (event.widget == plat.graphics().canvas) {
+          Point xy = scaleCoord(event);
+          Mouse.ButtonEvent.Id btn = mapButton(event.button);
+          if (btn != null) emitMouseButton(event.time, xy.x, xy.y, btn, true);
         }
+      }
+    });
+    plat.display.addFilter(SWT.MouseUp, new org.eclipse.swt.widgets.Listener() {
+      public void handleEvent (Event event) {
+        if (event.widget == plat.graphics().canvas) {
+          Point xy = scaleCoord(event);
+          Mouse.ButtonEvent.Id btn = mapButton(event.button);
+          if (btn != null) emitMouseButton(event.time, xy.x, xy.y, btn, false);
+        }
+      }
+    });
+    plat.display.addFilter(SWT.MouseMove, new org.eclipse.swt.widgets.Listener() {
+      public void handleEvent (Event event) {
+        if (event.widget == plat.graphics().canvas) {
+          Point xy = scaleCoord(event);
+          float dx = xy.x - lastX, dy = xy.y - lastY;
+          emitMouseMotion(event.time, xy.x, xy.y, dx, dy);
+        }
+      }
+      private float lastX, lastY;
+    });
+    plat.display.addFilter(SWT.MouseWheel, new org.eclipse.swt.widgets.Listener() {
+      public void handleEvent (Event event) {
+        if (event.widget == plat.graphics().canvas) {
+          Point xy = scaleCoord(event);
+          emitMouseWheel(event.time, xy.x, xy.y, -event.count);
+        }
+      }
+    });
+
+    // wire up keyboard events
+    plat.display.addFilter(SWT.KeyDown, new org.eclipse.swt.widgets.Listener() {
+      public void handleEvent (Event event) {
+        Key key = translateKey(event.keyCode);
+        if (key != null) emitKeyPress(event.time, key, true);
+        else System.err.println("KEY? " + event.keyCode + " / " + event.character);
 
         char keyChar = event.character;
-        if (Character.isISOControl(keyChar)) {
-          dispatch(new TypedEvent.Impl(new Events.Flags.Impl(), event.time, keyChar), typed);
-        }
+        if (Character.isISOControl(keyChar)) emitKeyTyped(event.time, keyChar);
       }
     });
-    platform.display.addFilter(SWT.KeyUp, new org.eclipse.swt.widgets.Listener() {
-      public void handleEvent (org.eclipse.swt.widgets.Event event) {
+    plat.display.addFilter(SWT.KeyUp, new org.eclipse.swt.widgets.Listener() {
+      public void handleEvent (Event event) {
         Key key = translateKey(event.keyCode);
-        if (key != null) {
-          dispatch(new Event.Impl(new Events.Flags.Impl(), event.time, key), up);
-        }
+        if (key != null) emitKeyPress(event.time, key, false);
       }
     });
+  }
+
+  @Override void update() {} // not needed; don't call super as that does LWJGL stuff
+
+  @Override public RFuture<String> getText (Keyboard.TextType textType,
+                                            String label, String initVal) {
+    return RFuture.failure(new Exception("TODO"));
+  }
+
+  private Point scaleCoord (Event event) {
+    return plat.graphics().transformMouse(new Point(event.x, event.y));
+  }
+
+  private Mouse.ButtonEvent.Id mapButton(int swtButton) {
+    switch (swtButton) {
+    case 1:  return Mouse.ButtonEvent.Id.LEFT;
+    case 2:  return Mouse.ButtonEvent.Id.MIDDLE;
+    case 3:  return Mouse.ButtonEvent.Id.RIGHT;
+    default: return null; // TODO
+    }
   }
 
   public Key translateKey(int keyCode) {

@@ -11,7 +11,7 @@
   <name>PlayN Tests SWT Java</name>
 
   <properties>
-    <mainClass>playn.tests.java.TestsGameJava</mainClass>
+    <mainClass>playn.tests.java.TestsGameSWTJava</mainClass>
     <scaleFactor>1</scaleFactor>
   </properties>
 

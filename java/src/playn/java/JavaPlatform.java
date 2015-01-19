@@ -147,7 +147,7 @@ public class JavaPlatform extends Platform {
     Display.setTitle(title);
   }
 
-  void finishInit () {
+  protected void finishInit () {
     // set our starting display mode before we create our display
     graphics.preInit();
 

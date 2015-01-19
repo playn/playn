@@ -27,12 +27,12 @@ import org.lwjgl.LWJGLException;
 
 public class SWTGraphics extends JavaGraphics {
 
-  private final SWTPlatform platform;
+  private final SWTPlatform plat;
   GLCanvas canvas; // initialized in createGLContext
 
-  public SWTGraphics (SWTPlatform platform, JavaPlatform.Config config, final Composite comp) {
-    super(platform, config);
-    this.platform = platform;
+  public SWTGraphics (SWTPlatform plat, final Composite comp) {
+    super(plat);
+    this.plat = plat;
 
     // create our GLCanvas
     GLData data = new GLData ();
@@ -48,47 +48,28 @@ public class SWTGraphics extends JavaGraphics {
         comp.setBounds(bounds);
         canvas.setBounds(bounds);
         makeCurrent();
-        // SWTGraphics.this.platform.log().info("Resized " + bounds.width + "x" + bounds.height);
-        ctx.setSize(ctx.scale.invScaledFloor(bounds.width), ctx.scale.invScaledFloor(bounds.height));
+        // SWTGraphics.this.plat.log().info("Resized " + bounds.width + "x" + bounds.height);
+        viewSizeChanged(bounds.width, bounds.height);
       }
     });
 
-    // platform.log().info("Setting size " + config.width + "x" + config.height);
-    platform.comp.setSize(ctx.scale.scaledCeil(config.width), ctx.scale.scaledCeil(config.height));
-    platform.shell.pack();
+    // plat.log().info("Setting size " + config.width + "x" + config.height);
+    setSize(plat.config.width, plat.config.height, plat.config.fullscreen);
   }
 
-  @Override
-  public void setSize(int width, int height, boolean fullscreen) {
-    int rawWidth = ctx.scale.scaledCeil(width), rawHeight = ctx.scale.scaledCeil(height);
-    platform.comp.setSize(rawWidth, rawHeight);
-    platform.shell.setFullScreen(fullscreen);
-    platform.shell.pack();
+  public GLCanvas canvas () { return canvas; }
+
+  @Override public void setSize (float width, float height, boolean fullscreen) {
+    int rawWidth = scale.scaledCeil(width), rawHeight = scale.scaledCeil(height);
+    plat.comp.setSize(rawWidth, rawHeight);
+    plat.shell.setFullScreen(fullscreen);
+    plat.shell.pack();
+    // viewSizeChanged(rawWidth, rawHeight);
   }
 
-  public GLCanvas canvas () {
-    return canvas;
-  }
+  @Override protected void setDisplayMode (int width, int height, boolean fullscreen) {} // noop!
 
-  @Override
-  protected void init() {
-    // don't call super here, as we don't want to init LWJGL
-    ctx.init();
-  }
-
-  @Override
-  protected void paint () {
-    makeCurrent();
-    super.paint();
-    canvas.swapBuffers();
-  }
-
-  @Override
-  protected void setDisplayMode(int width, int height, boolean fullscreen) {
-    // nada
-  }
-
-  protected void makeCurrent () {
+  private void makeCurrent () {
     canvas.setCurrent();
     try {
       GLContext.useContext(canvas);
@@ -96,4 +77,7 @@ public class SWTGraphics extends JavaGraphics {
       throw new RuntimeException(e);
     }
   }
+
+  void onBeforeFrame () { makeCurrent(); }
+  void onAfterFrame () { canvas.swapBuffers(); }
 }
