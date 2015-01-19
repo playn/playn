@@ -63,20 +63,17 @@ public class JavaImage extends ImageImpl {
     return new JavaPattern(repeatX, repeatY, new TexturePaint(img, rect));
   }
 
-  @Override
-  public void getRgb(int startX, int startY, int width, int height, int[] rgbArray, int offset,
-                     int scanSize) {
+  @Override public void getRgb(int startX, int startY, int width, int height,
+                               int[] rgbArray, int offset, int scanSize) {
     img.getRGB(startX, startY, width, height, rgbArray, offset, scanSize);
   }
 
-  @Override
-  public void setRgb(int startX, int startY, int width, int height, int[] rgbArray, int offset,
-                     int scanSize) {
+  @Override public void setRgb(int startX, int startY, int width, int height,
+                               int[] rgbArray, int offset, int scanSize) {
     img.setRGB(startX, startY, width, height, rgbArray, offset, scanSize);
   }
 
-  @Override
-  public Image transform(BitmapTransformer xform) {
+  @Override public Image transform(BitmapTransformer xform) {
     return new JavaImage(gfx, scale, ((JavaBitmapTransformer) xform).transform(img));
   }
 
@@ -102,6 +99,8 @@ public class JavaImage extends ImageImpl {
                   null);
     gfx.setClip(oclip);
   }
+
+  @Override public String toString () { return "JavaImage[" + img + "]"; }
 
   @Override protected void upload (Graphics gfx, Texture tex) {
     // Convert the bitmap into a format for quick uploading (NOOPs if already optimized)
