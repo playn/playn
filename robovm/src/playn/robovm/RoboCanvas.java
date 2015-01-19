@@ -21,14 +21,12 @@ import org.robovm.apple.coregraphics.CGAffineTransform;
 import org.robovm.apple.coregraphics.CGBitmapContext;
 import org.robovm.apple.coregraphics.CGBlendMode;
 import org.robovm.apple.coregraphics.CGImage;
-import org.robovm.apple.coregraphics.CGInterpolationQuality;
 import org.robovm.apple.coregraphics.CGLineCap;
 import org.robovm.apple.coregraphics.CGLineJoin;
 import org.robovm.apple.coregraphics.CGMutablePath;
 import org.robovm.apple.coregraphics.CGRect;
 import org.robovm.apple.coregraphics.CGTextEncoding;
 import org.robovm.apple.coretext.CTFont;
-import org.robovm.rt.bro.ptr.VoidPtr;
 
 import playn.core.*;
 
@@ -102,7 +100,7 @@ public class RoboCanvas extends Canvas {
     else throw new IllegalArgumentException("Unknown config: " + cfg);
   }
 
-  @Override public void dispose () {
+  @Override public void close () {
     ((RoboCanvasImage)image).dispose();
   }
 

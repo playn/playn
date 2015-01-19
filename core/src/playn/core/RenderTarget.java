@@ -72,8 +72,8 @@ public abstract class RenderTarget implements Disposable {
 
   /** Deletes the framebuffer associated with this render target. */
   @Override public void close () {
-    if (!destroyed) {
-      destroyed = true;
+    if (!disposed) {
+      disposed = true;
       gfx.gl.glDeleteFramebuffer(id());
     }
   }
@@ -84,8 +84,8 @@ public abstract class RenderTarget implements Disposable {
   }
 
   @Override protected void finalize () {
-    if (!destroyed) gfx.queueForDestroy(this);
+    if (!disposed) gfx.queueForDispose(this);
   }
 
-  private boolean destroyed;
+  private boolean disposed;
 }

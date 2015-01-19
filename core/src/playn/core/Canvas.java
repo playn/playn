@@ -18,7 +18,7 @@ package playn.core;
 /**
  * A 2D drawing canvas. Rendering is performed by the CPU into a bitmap.
  */
-public abstract class Canvas {
+public abstract class Canvas implements Disposable {
 
   /**
    * Values that may be used with
@@ -112,7 +112,7 @@ public abstract class Canvas {
    * platforms this can free up memory earlier than if we waited for the canvas to be garbage
    * collected.
    */
-  public void dispose () {} // nada by default
+  @Override public void close () {} // nada by default
 
   /** Clears the entire canvas to {@code rgba(0, 0, 0, 0)}. */
   public abstract Canvas clear ();
@@ -349,7 +349,7 @@ public abstract class Canvas {
     * it into a texture and then never use the canvas again. */
   public Texture toTexture (Texture.Config config) {
     try { return image.createTexture(config); }
-    finally { dispose(); }
+    finally { close(); }
   }
 
   /**

@@ -37,10 +37,10 @@ import playn.core.*;
  * However, {@link GroupLayer}, {@link ImageLayer}, {@link ClippedLayer} etc. are provided to
  * make it easy to implement common use cases "out of the box".
  */
-public abstract class Layer {
+public abstract class Layer implements Disposable {
 
   /** Enumerates layer lifecycle states; see {@link #state}. */
-  public static enum State { REMOVED, ADDED, DESTROYED }
+  public static enum State { REMOVED, ADDED, DISPOSED }
 
   /** Used to customize a layer's hit testing mechanism. */
   public interface HitTester {
@@ -54,8 +54,8 @@ public abstract class Layer {
   /**
    * A reactive value which tracks this layer's lifecycle. It starts out {@link State#REMOVED}, and
    * transitions to {@link State#ADDED} when the layer is added to a scene graph root and back to
-   * {@link State#REMOVED} when removed, until it is finally {@link #destroy}ed at which point it
-   * transitions to {@link State#DESTROYED}.
+   * {@link State#REMOVED} when removed, until it is finally {@link #dispose}d at which point it
+   * transitions to {@link State#DISPOSED}.
    */
   public final ValueView<State> state = Value.create(State.REMOVED);
 
@@ -146,20 +146,20 @@ public abstract class Layer {
   }
 
   /**
-   * Whether this layer has been destroyed. If true, the layer can no longer be used.
+   * Whether this layer has been disposed. If true, the layer can no longer be used.
    */
-  public boolean destroyed() {
-    return state.get() == State.DESTROYED;
+  public boolean disposed() {
+    return state.get() == State.DISPOSED;
   }
 
   /**
-   * Destroys this layer, removing it from its parent layer. Any resources associated with this
-   * layer are freed, and it cannot be reused after being destroyed. Destroying a layer that has
-   * children will destroy them as well.
+   * Disposes this layer, removing it from its parent layer. Any resources associated with this
+   * layer are freed, and it cannot be reused after being disposed. Disposing a layer that has
+   * children will dispose them as well.
    */
-  public void destroy() {
+  @Override public void close() {
     if (parent != null) parent.remove(this);
-    setState(State.DESTROYED);
+    setState(State.DISPOSED);
     setBatch(null);
   }
 
@@ -643,7 +643,7 @@ public abstract class Layer {
   protected float alpha = 1;
 
   void onAdd() {
-    if (destroyed()) throw new IllegalStateException("Illegal to use destroyed layer: " + this);
+    if (disposed()) throw new IllegalStateException("Illegal to use disposed layer: " + this);
     setState(State.ADDED);
   }
   void onRemove() {

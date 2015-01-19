@@ -334,11 +334,11 @@ public class TriangleBatch extends QuadBatch {
     gl.checkError("TriangleBatch end");
   }
 
-  @Override public void destroy () {
-    super.destroy();
-    program.destroy();
+  @Override public void close () {
+    super.close();
+    program.close();
     gl.glDeleteBuffers(2, new int[] { verticesId, elementsId }, 0);
-    gl.checkError("TriangleBatch destroy");
+    gl.checkError("TriangleBatch close");
   }
 
   @Override public String toString () { return "tris/" + (elements.length/QUAD_INDICES.length); }

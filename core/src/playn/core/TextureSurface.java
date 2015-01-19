@@ -18,7 +18,7 @@ package playn.core;
  *
  * <p>Note: a {@code TextureSurface} makes use of three GPU resources: a framebuffer, a quad batch
  * and a texture. The framebuffer's lifecycle is tied to the lifecycle of the {@code
- * TextureSurface}. When you {@link close} it the framebuffer is destroyed.
+ * TextureSurface}. When you {@link close} it the framebuffer is disposed.
  *
  * <p>The quad batch's lifecycle is independent of the {@code TextureSurface}. Most likely you will
  * use the default quad batch for your game which lives for the lifetime of your game.

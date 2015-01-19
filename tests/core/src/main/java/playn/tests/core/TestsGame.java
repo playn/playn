@@ -197,7 +197,7 @@ public class TestsGame extends SceneGame {
 
   void displayMenu() {
     clearTest();
-    rootLayer.destroyAll();
+    rootLayer.disposeAll();
     rootLayer.add(createWhiteBackground());
 
     float gap = 20, x = gap, y = gap, maxHeight = 0;
@@ -235,7 +235,7 @@ public class TestsGame extends SceneGame {
     currentTest = test;
 
     // setup root layer for next test
-    rootLayer.destroyAll();
+    rootLayer.disposeAll();
     rootLayer.add(createWhiteBackground());
 
     log.info("Starting " + currentTest.name);

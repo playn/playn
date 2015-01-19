@@ -238,11 +238,11 @@ public class UniformQuadBatch extends QuadBatch {
     gl.checkError("UniformQuadBatch end");
   }
 
-  @Override public void destroy () {
-    super.destroy();
-    program.destroy();
+  @Override public void close () {
+    super.close();
+    program.close();
     gl.glDeleteBuffers(2, new int[] { verticesId, elementsId }, 0);
-    gl.checkError("UniformQuadBatch destroy");
+    gl.checkError("UniformQuadBatch close");
   }
 
   @Override public String toString () {

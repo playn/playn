@@ -115,7 +115,7 @@ public class Texture extends Tile implements Disposable {
   // needed to access GL20 and to queue our destruction on finalize
   private final Graphics gfx;
   private int refs;
-  private boolean destroyed;
+  private boolean disposed;
 
   public Texture (Graphics gfx, int id, Config config, int pixWidth, int pixHeight,
                   Scale scale, float dispWidth, float dispHeight) {
@@ -135,7 +135,7 @@ public class Texture extends Tile implements Disposable {
   }
 
   /** Decrements this texture's reference count. If the reference count of a managed texture goes
-    * to zero, the texture is destroyed (and is no longer usable). */
+    * to zero, the texture is disposed (and is no longer usable). */
   public void release () {
     if (config.managed) {
       assert refs > 0 : "Released a texture with no references!";
@@ -158,7 +158,7 @@ public class Texture extends Tile implements Disposable {
         Canvas scaled = gfx.createCanvasImpl(Scale.ONE, potWidth, potHeight);
         scaled.draw(image, 0, 0, potWidth, potHeight);
         scaled.image.upload(gfx, this);
-        scaled.dispose();
+        scaled.close();
       } else image.upload(gfx, this); // fast path, woo!
     }
     else image.upload(gfx, this); // fast path, woo!
@@ -197,9 +197,9 @@ public class Texture extends Tile implements Disposable {
     };
   }
 
-  /** Returns whether this texture is been destroyed. */
-  public boolean destroyed () {
-    return destroyed;
+  /** Returns whether this texture is been disposed. */
+  public boolean disposed () {
+    return disposed;
   }
 
   @Override public Texture texture () { return this; }
@@ -223,8 +223,8 @@ public class Texture extends Tile implements Disposable {
 
   /** Deletes this texture's GPU resources and renders it unusable. */
   @Override public void close () {
-    if (!destroyed) {
-      destroyed = true;
+    if (!disposed) {
+      disposed = true;
       gfx.gl.glDeleteTexture(id);
     }
   }
@@ -235,8 +235,8 @@ public class Texture extends Tile implements Disposable {
   }
 
   protected void finalize () {
-    // if we're not yet destroyed, queue ourselves up to be destroyed on the next frame tick
-    if (!destroyed) gfx.queueForDestroy(this);
+    // if we're not yet disposed, queue ourselves up to be disposed on the next frame tick
+    if (!disposed) gfx.queueForDispose(this);
   }
 
   // imageregiongl stuffs

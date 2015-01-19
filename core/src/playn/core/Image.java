@@ -126,11 +126,10 @@ public abstract class Image extends TileSource implements Canvas.Drawable {
   /**
    * Returns, creating if necessary, this image's default texture. When the texture is created, it
    * will use the {@link Texture.Config} set via {@link #setConfig}. If an image's default texture
-   * is {@link Texture#destroy}ed, a subsequent call to this method will create a new default
-   * texture.
+   * is {@link Texture#close}d, a subsequent call to this method will create a new default texture.
    */
   public Texture texture () {
-    if (texture == null || texture.destroyed()) texture = createTexture(texconf);
+    if (texture == null || texture.disposed()) texture = createTexture(texconf);
     return texture;
   }
 

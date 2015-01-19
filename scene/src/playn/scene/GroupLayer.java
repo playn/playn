@@ -125,23 +125,23 @@ public class GroupLayer extends ClippedLayer implements Iterable<Layer> {
   }
 
   /**
-   * Removes and destroys all child layers from this group.
+   * Removes and disposes all child layers from this group.
    */
-  public void destroyAll() {
-    Layer[] toDestroy = children.toArray(new Layer[children.size()]);
+  public void disposeAll() {
+    Layer[] toDispose = children.toArray(new Layer[children.size()]);
     // remove all of the children efficiently
     removeAll();
-    // now that the children have been detached, destroy them
-    for (Layer child : toDestroy) child.destroy();
+    // now that the children have been detached, dispose them
+    for (Layer child : toDispose) child.close();
   }
 
   @Override public Iterator<Layer> iterator () {
     return children.iterator();
   }
 
-  @Override public void destroy() {
-    super.destroy();
-    destroyAll();
+  @Override public void close() {
+    super.close();
+    disposeAll();
   }
 
   @Override public Layer hitTestDefault(Point point) {

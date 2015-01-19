@@ -17,7 +17,7 @@ package playn.core;
  * A batch manages the delivery of groups of drawing calls to the GPU. It is usually a combination
  * of a {@link GLProgram} and one or more buffers.
  */
-public abstract class GLBatch {
+public abstract class GLBatch implements Disposable {
 
   private boolean begun; // for great sanity checking
 
@@ -59,8 +59,8 @@ public abstract class GLBatch {
    * Releases any GPU resources retained by this batch. This should be called when the batch will
    * never again be used.
    */
-  public void destroy () {
+  @Override public void close () {
     if (begun) throw new IllegalStateException(
-      getClass().getSimpleName() + " destroy without end()");
+      getClass().getSimpleName() + " close() without end()");
   }
 }

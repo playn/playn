@@ -18,7 +18,7 @@ package playn.core;
 /**
  * Encapsulates a GL vertex and fragment shader program pair.
  */
-public class GLProgram {
+public class GLProgram implements Disposable {
 
   private final GL20 gl;
   private final int vertexShader, fragmentShader;
@@ -92,9 +92,9 @@ public class GLProgram {
     gl.glUseProgram(id);
   }
 
-  /** Frees this program and associated compiled shaders. The program must not be used after
-   * destruction. */
-  public void destroy () {
+  /** Frees this program and associated compiled shaders.
+    * The program must not be used after closure. */
+  @Override public void close () {
     gl.glDeleteShader(vertexShader);
     gl.glDeleteShader(fragmentShader);
     gl.glDeleteProgram(id);

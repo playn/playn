@@ -69,7 +69,7 @@ public class CanvasLayer extends ImageLayer {
    * the contents of the new canvas. Until then, it will display the old image data.
    */
   public void resize (float width, float height) {
-    if (canvas != null) canvas.dispose();
+    if (canvas != null) canvas.close();
     canvas = gfx.createCanvas(width, height);
   }
 
@@ -108,10 +108,10 @@ public class CanvasLayer extends ImageLayer {
     return (forceHeight < 0) ? canvas.height : forceHeight;
   }
 
-  @Override public void destroy () {
-    super.destroy();
+  @Override public void close () {
+    super.close();
     if (canvas != null) {
-      canvas.dispose();
+      canvas.close();
       canvas = null;
     }
   }

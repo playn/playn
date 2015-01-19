@@ -36,7 +36,7 @@ public class ClearBackgroundTest extends Test {
 
   @Override public void init () {
     // remove the background layer added by default
-    game.rootLayer.destroyAll();
+    game.rootLayer.disposeAll();
 
     // add a grey square
     TextureSurface surf = game.createSurface(width, height);

@@ -139,8 +139,8 @@ public class ImageLayer extends Layer {
     return (tile == null) ? 0 : tile.height();
   }
 
-  @Override public void destroy() {
-    super.destroy();
+  @Override public void close() {
+    super.close();
     setTile((Tile)null);
   }
 

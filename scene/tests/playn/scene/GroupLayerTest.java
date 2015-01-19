@@ -89,9 +89,9 @@ public class GroupLayerTest {
     // remove from an ADDED group and become REMOVED
     group.remove(leaf0);
     assertEquals(Layer.State.REMOVED, leaf0.state.get());
-    // destroy and become DESTROYED
-    leaf0.destroy();
-    assertEquals(Layer.State.DESTROYED, leaf0.state.get());
+    // destroy and become DISPOSED
+    leaf0.close();
+    assertEquals(Layer.State.DISPOSED, leaf0.state.get());
 
     // add to an ADDED group and we immediately become ADDED
     ImageLayer leaf1 = new ImageLayer();
@@ -104,10 +104,10 @@ public class GroupLayerTest {
     assertEquals(Layer.State.REMOVED, group.state.get());
     assertEquals(Layer.State.REMOVED, leaf1.state.get());
 
-    // destroy group and group and all children become DESTROYED
-    group.destroy();
-    assertEquals(Layer.State.DESTROYED, group.state.get());
-    assertEquals(Layer.State.DESTROYED, leaf1.state.get());
+    // destroy group and group and all children become DISPOSED
+    group.close();
+    assertEquals(Layer.State.DISPOSED, group.state.get());
+    assertEquals(Layer.State.DISPOSED, leaf1.state.get());
   }
 
   protected List<Layer> createLayers() {

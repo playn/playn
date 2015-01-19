@@ -51,7 +51,7 @@ public abstract class Graphics {
     public float xscale () { return scale.factor; }
     public float yscale () { return scale.factor; }
     public boolean flip () { return true; }
-    public void close () {} // disable normal destroy-on-close behavior
+    public void close () {} // disable normal dispose-on-close behavior
   };
 
   /**
@@ -106,11 +106,11 @@ public abstract class Graphics {
   public abstract TextLayout[] layoutText (String text, TextFormat format, TextWrap wrap);
 
   /**
-   * Queues the supplied graphics resource for destruction on the next frame tick. This is
-   * generally called from finalizers of graphics resource objects which discover that they are
-   * being garbage collected, but their GPU resources have not yet been freed.
+   * Queues the supplied graphics resource for disposal on the next frame tick. This is generally
+   * called from finalizers of graphics resource objects which discover that they are being garbage
+   * collected, but their GPU resources have not yet been freed.
    */
-  public void queueForDestroy (final Disposable resource) {
+  public void queueForDispose (final Disposable resource) {
     plat.frame.connect(new UnitSlot() {
       public void onEmit () { resource.close(); }
     }).once();
