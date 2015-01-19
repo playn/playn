@@ -93,7 +93,7 @@ public abstract class Platform {
 
   /**
    * Queues the supplied runnable for invocation on the game thread prior to the next frame. Note:
-   * this uses {@link #invokeLater(UnitSlot)} so feel free to cut out the middle man.
+   * this uses {@link #invokeLater(Slot)} so feel free to cut out the middle man.
    */
   public void invokeLater (final Runnable runnable) {
     invokeLater(new Slot<Platform>() { public void onEmit (Platform plat) { runnable.run(); }});
