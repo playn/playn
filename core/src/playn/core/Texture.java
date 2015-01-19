@@ -181,6 +181,10 @@ public class Texture extends Tile implements Disposable {
       @Override public Texture texture () { return Texture.this; }
       @Override public float width () { return tileWidth; }
       @Override public float height () { return tileHeight; }
+      @Override public float sx () { return tileX/displayWidth; }
+      @Override public float sy () { return tileY/displayHeight; }
+      @Override public float tx () { return (tileX+tileWidth)/displayHeight; }
+      @Override public float ty () { return (tileY+tileWidth)/displayHeight; }
       @Override public void addToBatch (QuadBatch batch, int tint, AffineTransform tx,
                                         float x, float y, float width, float height) {
         batch.addQuad(texture(), tint, tx, x, y, width, height, tileX, tileY, tileWidth, tileHeight);
@@ -201,6 +205,11 @@ public class Texture extends Tile implements Disposable {
   @Override public Texture texture () { return this; }
   @Override public float width () { return displayWidth; }
   @Override public float height () { return displayHeight; }
+
+  @Override public float sx () { return 0; }
+  @Override public float sy () { return 0; }
+  @Override public float tx () { return 1; }
+  @Override public float ty () { return 1; }
 
   @Override public void addToBatch (QuadBatch batch, int tint, AffineTransform tx,
                                     float x, float y, float width, float height) {

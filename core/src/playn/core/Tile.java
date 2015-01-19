@@ -30,6 +30,15 @@ public abstract class Tile extends TileSource {
   /** The height of this tile (in display units). */
   public abstract float height ();
 
+  /** Returns the {@code s} texture coordinate for the x-axis. */
+  public abstract float sx ();
+  /** Returns the {@code s} texture coordinate for the y-axis. */
+  public abstract float sy ();
+  /** Returns the {@code t} texture coordinate for the x-axis. */
+  public abstract float tx ();
+  /** Returns the {@code t} texture coordinate for the y-axis. */
+  public abstract float ty ();
+
   /** Adds this tile to the supplied quad batch. */
   public abstract void addToBatch (QuadBatch batch, int tint, AffineTransform tx,
                                    float x, float y, float width, float height);
