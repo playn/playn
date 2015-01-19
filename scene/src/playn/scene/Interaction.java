@@ -50,8 +50,9 @@ public class Interaction<E extends Event.XY> {
 
   /** Captures this interaction. See {@link Dispatcher}. */
   public void capture () {
-    if (captured()) throw new IllegalStateException("Interaction already captured.");
     assert dispatchLayer != null;
+    if (capturingLayer != dispatchLayer && captured()) throw new IllegalStateException(
+      "Interaction already captured by " + capturingLayer);
     capturingLayer = dispatchLayer;
     // TODO: notify all non-capturing layers of cancel
   }
