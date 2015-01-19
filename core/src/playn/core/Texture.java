@@ -178,17 +178,17 @@ public class Texture extends Tile implements Disposable {
   public Tile tile (float x, float y, float width, float height) {
     final float tileX = x, tileY = y, tileWidth = width, tileHeight = height;
     return new Tile() {
-      @Override public Texture atlas () { return Texture.this; }
+      @Override public Texture texture () { return Texture.this; }
       @Override public float width () { return tileWidth; }
       @Override public float height () { return tileHeight; }
       @Override public void addToBatch (QuadBatch batch, int tint, AffineTransform tx,
                                         float x, float y, float width, float height) {
-        batch.addQuad(atlas(), tint, tx, x, y, width, height, tileX, tileY, tileWidth, tileHeight);
+        batch.addQuad(texture(), tint, tx, x, y, width, height, tileX, tileY, tileWidth, tileHeight);
       }
       @Override public void addToBatch (QuadBatch batch, int tint, AffineTransform tx,
                                         float dx, float dy, float dw, float dh,
                                         float sx, float sy, float sw, float sh) {
-        batch.addQuad(atlas(), tint, tx, dx, dy, dw, dh, tileX+sx, tileY+sx, sw, sh);
+        batch.addQuad(texture(), tint, tx, dx, dy, dw, dh, tileX+sx, tileY+sx, sw, sh);
       }
     };
   }
@@ -198,7 +198,7 @@ public class Texture extends Tile implements Disposable {
     return destroyed;
   }
 
-  @Override public Texture atlas () { return this; }
+  @Override public Texture texture () { return this; }
   @Override public float width () { return displayWidth; }
   @Override public float height () { return displayHeight; }
 
@@ -206,7 +206,6 @@ public class Texture extends Tile implements Disposable {
                                     float x, float y, float width, float height) {
     batch.addQuad(this, tint, tx, x, y, width, height);
   }
-
   @Override public void addToBatch (QuadBatch batch, int tint, AffineTransform tx,
                                     float dx, float dy, float dw, float dh,
                                     float sx, float sy, float sw, float sh) {

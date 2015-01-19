@@ -15,14 +15,16 @@ package playn.core;
 
 import pythagoras.f.AffineTransform;
 
+import react.RFuture;
+
 /**
  * Represents a square region of a texture. This makes it easy to render tiles from texture
  * atlases.
  */
-public abstract class Tile {
+public abstract class Tile extends TileSource {
 
-  /** The atlas texture which contains this tile. */
-  public abstract Texture atlas ();
+  /** The texture which contains this tile. */
+  public abstract Texture texture ();
   /** The width of this tile (in display units). */
   public abstract float width ();
   /** The height of this tile (in display units). */
@@ -36,4 +38,8 @@ public abstract class Tile {
   public abstract void addToBatch (QuadBatch batch, int tint, AffineTransform tx,
                                    float dx, float dy, float dw, float dh,
                                    float sx, float sy, float sw, float sh);
+
+  @Override public boolean isLoaded () { return true; }
+  @Override public Tile tile () { return this; }
+  @Override public RFuture<Tile> tileAsync () { return RFuture.success(this); }
 }

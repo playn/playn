@@ -20,10 +20,10 @@ import react.RFuture;
 import react.Slot;
 
 import playn.core.Graphics;
-import playn.core.Image;
 import playn.core.QuadBatch;
 import playn.core.Surface;
 import playn.core.Tile;
+import playn.core.TileSource;
 
 /**
  * A layer that displays a texture or region of a texture (tile). By default, the layer is the same
@@ -58,12 +58,14 @@ public class ImageLayer extends Layer {
   }
 
   /**
-   * Generates {@code image}'s default texture and creates a layer with it.
+   * Obtains the tile from {@code source}, asynchronously if necessary, and displays it. If the
+   * source is not ready, this layer will display nothing until it becomes ready and delivers its
+   * tile.
    */
-  public ImageLayer (Image image) {
-    if (image.isLoaded()) setTile(image.texture());
-    else image.state.onSuccess(new Slot<Image>() {
-      public void onEmit (Image image) { setTile(image.texture()); }
+  public ImageLayer (TileSource source) {
+    if (source.isLoaded()) setTile(source.tile());
+    else source.tileAsync().onSuccess(new Slot<Tile>() {
+      public void onEmit (Tile tile) { setTile(tile); }
     });
   }
 
@@ -88,9 +90,9 @@ public class ImageLayer extends Layer {
   public ImageLayer setTile (Tile tile) {
     // avoid releasing and rereferencing texture if nothing changes
     if (this.tile != tile) {
-      if (this.tile != null) this.tile.atlas().release();
+      if (this.tile != null) this.tile.texture().release();
       this.tile = tile;
-      if (tile != null) tile.atlas().reference();
+      if (tile != null) tile.texture().reference();
     }
     return this;
   }

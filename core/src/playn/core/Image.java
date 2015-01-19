@@ -23,7 +23,7 @@ import react.RPromise;
  * Bitmapped image data. May be loaded via {@link Assets} or created dynamically as in the backing
  * image for a {@link Canvas}.
  */
-public abstract class Image {
+public abstract class Image extends TileSource {
 
   /** Reports the asynchronous loading of this image. This will be completed with success or
     * failure when the image's asynchronous load completes. */
@@ -172,6 +172,13 @@ public abstract class Image {
    * in use. See {@code JavaBitmapTransformer} for example.
    */
   public abstract Image transform (BitmapTransformer xform);
+
+  @Override public Tile tile () { return texture(); }
+  @Override public RFuture<Tile> tileAsync () {
+    return state.map(new Function<Image,Tile>() {
+      public Tile apply (Image image) { return texture(); }
+    });
+  }
 
   protected final Graphics gfx;
   protected Texture.Config texconf = Texture.Config.DEFAULT;
