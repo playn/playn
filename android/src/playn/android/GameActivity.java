@@ -44,7 +44,6 @@ public abstract class GameActivity extends Activity {
 
   private AndroidPlatform platform;
   private GameViewGL gameView;
-  private KeyEventHandler keyHandler;
 
   /**
    * The entry-point into a PlayN game activity. Create and initialize your game here. The platform
@@ -61,7 +60,6 @@ public abstract class GameActivity extends Activity {
     Context appctx = getApplicationContext();
     this.platform = createPlatform();
     this.gameView = new GameViewGL(appctx, platform);
-    this.keyHandler = new KeyEventHandler(platform);
 
     // Build the Window and View
     int windowFlags = makeWindowFlags();
@@ -100,13 +98,13 @@ public abstract class GameActivity extends Activity {
 
   @Override
   public boolean onKeyDown(int keyCode, KeyEvent event) {
-    keyHandler.onKeyDown(keyCode, event);
+    platform.input().onKeyDown(keyCode, event);
     return super.onKeyDown(keyCode, event);
   }
 
   @Override
   public boolean onKeyUp(int keyCode, KeyEvent event) {
-    keyHandler.onKeyUp(keyCode, event);
+    platform.input().onKeyUp(keyCode, event);
     return super.onKeyUp(keyCode, event);
   }
 
