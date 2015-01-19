@@ -62,39 +62,35 @@ public class JavaLWJGLInput extends JavaInput {
 
     // process keyboard events
     while (Keyboard.next()) {
-      double time = (double) (Keyboard.getEventNanoseconds() / 1000);
+      double time = (double) (Keyboard.getEventNanoseconds() / 1000000);
       int keyCode = Keyboard.getEventKey();
 
       if (Keyboard.getEventKeyState()) {
         Key key = translateKey(keyCode);
-        if (key != null) keyboardEvents.emit(new KeyEvent(0, time, key, true));
+        if (key != null) emitKeyPress(time, key, true);
         char keyChar = Keyboard.getEventCharacter();
-        if (!Character.isISOControl(keyChar)) keyboardEvents.emit(new TypedEvent(0, time, keyChar));
+        if (!Character.isISOControl(keyChar)) emitKeyTyped(time, keyChar);
       } else {
         Key key = translateKey(keyCode);
-        if (key != null) keyboardEvents.emit(new KeyEvent(0, time, key, false));
+        if (key != null) emitKeyPress(time, key, false);
       }
     }
 
     // process mouse events
     while (Mouse.next()) {
       double time = (double) (Mouse.getEventNanoseconds() / 1000000);
-      ButtonEvent.Id btn = getButton(Mouse.getEventButton());
       Point m = new Point(Mouse.getEventX(), Display.getHeight() - Mouse.getEventY() - 1);
       plat.graphics().transformMouse(m);
 
-      int dx = Mouse.getEventDX(), dy = -Mouse.getEventDY();
-      if (btn != null) {
-        if (Mouse.getEventButtonState()) {
-          onMouseDown(time, m.x, m.y, btn);
-        } else {
-          onMouseUp(time, m.x, m.y, btn);
-        }
-      } else if (Mouse.getEventDWheel() != 0) {
-        int delta = Mouse.getEventDWheel() > 0 ? -1 : 1;
-        onMouseWheelScroll(time, m.x, m.y, delta);
-      } else {
-        onMouseMove(time, m.x, m.y, dx, dy);
+      int btnIdx = Mouse.getEventButton();
+      if (btnIdx >= 0) {
+        ButtonEvent.Id btn = getButton(btnIdx);
+        if (btn != null) emitMouseButton(time, m.x, m.y, btn, Mouse.getEventButtonState());
+      }
+      else {
+        int wheel = Mouse.getEventDWheel();
+        if (wheel != 0) emitMouseWheel(time, m.x, m.y, wheel > 0 ? -1 : 1);
+        else emitMouseMotion(time, m.x, m.y, Mouse.getEventDX(), -Mouse.getEventDY());
       }
     }
   }

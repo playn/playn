@@ -45,16 +45,14 @@ public class JavaInput extends Input {
     * components. The event will be queued and dispatched on the next frame, after GL keyboard
     * events.
     *
-    * <p><em>Note</em>: the resulting event will be sent with time = 0, since the GL event time is
-    * inaccessible and platform dependent.</p>
-    *
+    * @param time the time (in millis since epoch) at which the event was generated, or 0 if N/A.
     * @param key the key that was pressed or released, or null for a char typed event
     * @param pressed whether the key was pressed or released, ignored if key is null
     * @param typedCh the character that was typed, ignored if key is not null
     */
-  public void postKey (Key key, boolean pressed, char typedCh) {
-    kevQueue.add(key == null ? new Keyboard.TypedEvent(0, 0, typedCh) :
-                 new Keyboard.KeyEvent(0, 0, key, pressed));
+  public void postKey (long time, Key key, boolean pressed, char typedCh) {
+    kevQueue.add(key == null ? new Keyboard.TypedEvent(0, time, typedCh) :
+                 new Keyboard.KeyEvent(0, time, key, pressed));
   }
 
   protected void emulateTouch () {
@@ -101,19 +99,6 @@ public class JavaInput extends Input {
     // dispatch any queued keyboard events
     Keyboard.Event kev;
     while ((kev = kevQueue.poll()) != null) keyboardEvents.emit(kev);
-  }
-
-  protected void onMouseDown (double time, float x, float y, Mouse.ButtonEvent.Id btn) {
-    mouseEvents.emit(new Mouse.ButtonEvent(0, time, x, y, btn, true));
-  }
-  protected void onMouseUp (double time, float x, float y, Mouse.ButtonEvent.Id btn) {
-    mouseEvents.emit(new Mouse.ButtonEvent(0, time, x, y, btn, false));
-  }
-  protected void onMouseMove (double time, float x, float y, float dx, float dy) {
-    mouseEvents.emit(new Mouse.MotionEvent(0, time, x, y, dx, dy));
-  }
-  protected void onMouseWheelScroll (double time, float x, float y, int delta) {
-    mouseEvents.emit(new Mouse.WheelEvent(0, time, x, y, delta));
   }
 
   private void dispatchTouch (Mouse.Event event, Touch.Event.Kind kind) {

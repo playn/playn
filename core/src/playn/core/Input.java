@@ -90,4 +90,22 @@ public class Input {
   public RFuture<String> getText (Keyboard.TextType textType, String label, String initialValue) {
     return RFuture.failure(new Exception("getText not supported"));
   }
+
+  protected void emitKeyPress (double time, Key key, boolean down) {
+    keyboardEvents.emit(new Keyboard.KeyEvent(0, time, key, down));
+  }
+  protected void emitKeyTyped (double time, char keyChar) {
+    keyboardEvents.emit(new Keyboard.TypedEvent(0, time, keyChar));
+  }
+
+  protected void emitMouseButton (double time, float x, float y, Mouse.ButtonEvent.Id btn,
+                                  boolean down) {
+    mouseEvents.emit(new Mouse.ButtonEvent(0, time, x, y, btn, down));
+  }
+  protected void emitMouseMotion (double time, float x, float y, float dx, float dy) {
+    mouseEvents.emit(new Mouse.MotionEvent(0, time, x, y, dx, dy));
+  }
+  protected void emitMouseWheel (double time, float x, float y, int delta) {
+    mouseEvents.emit(new Mouse.WheelEvent(0, time, x, y, delta));
+  }
 }
