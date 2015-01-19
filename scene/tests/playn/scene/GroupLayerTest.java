@@ -68,6 +68,48 @@ public class GroupLayerTest {
     }
   }
 
+  @Test public void testLifecycle () {
+    RootLayer root = new RootLayer();
+    GroupLayer group = new GroupLayer();
+    ImageLayer leaf0 = new ImageLayer();
+
+    // everything should start as REMOVED
+    assertEquals(Layer.State.REMOVED, group.state.get());
+    assertEquals(Layer.State.REMOVED, leaf0.state.get());
+
+    // adding a layer to a REMOVED group leaves it as REMOVED
+    group.add(leaf0);
+    assertEquals(Layer.State.REMOVED, leaf0.state.get());
+
+    // add the group to the root, everything becomes ADDED
+    root.add(group);
+    assertEquals(Layer.State.ADDED, group.state.get());
+    assertEquals(Layer.State.ADDED, leaf0.state.get());
+
+    // remove from an ADDED group and become REMOVED
+    group.remove(leaf0);
+    assertEquals(Layer.State.REMOVED, leaf0.state.get());
+    // destroy and become DESTROYED
+    leaf0.destroy();
+    assertEquals(Layer.State.DESTROYED, leaf0.state.get());
+
+    // add to an ADDED group and we immediately become ADDED
+    ImageLayer leaf1 = new ImageLayer();
+    assertEquals(Layer.State.REMOVED, leaf1.state.get());
+    group.add(leaf1);
+    assertEquals(Layer.State.ADDED, leaf1.state.get());
+
+    // remove group from root and everything becomes REMOVED
+    root.remove(group);
+    assertEquals(Layer.State.REMOVED, group.state.get());
+    assertEquals(Layer.State.REMOVED, leaf1.state.get());
+
+    // destroy group and group and all children become DESTROYED
+    group.destroy();
+    assertEquals(Layer.State.DESTROYED, group.state.get());
+    assertEquals(Layer.State.DESTROYED, leaf1.state.get());
+  }
+
   protected List<Layer> createLayers() {
     int[] zs = { 0, 0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3, 4 };
     Layer[] layers = new Layer[zs.length];

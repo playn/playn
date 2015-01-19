@@ -72,7 +72,7 @@ public class GroupLayer extends ClippedLayer implements Iterable<Layer> {
   public void add(Layer child) {
     // optimization if we're requested to add a child that's already added
     GroupLayer parent = child.parent();
-    if (parent == this) return; // findChild(child, child.depth());
+    if (parent == this) return;
 
     // if this child has equal or greater depth to the last child, we can append directly and avoid
     // a log(N) search; this is helpful when all children have the same depth
@@ -82,10 +82,10 @@ public class GroupLayer extends ClippedLayer implements Iterable<Layer> {
     else index = findInsertion(child.depth());
 
     // remove the child from any existing parent, preventing multiple parents
-    if (parent != null) child.parent().remove(child);
+    if (parent != null) parent.remove(child);
     children.add(index, child);
     child.setParent(this);
-    child.onAdd();
+    if (state.get() == State.ADDED) child.onAdd();
 
     // if this child is active, we need to become active
     if (child.interactive()) setInteractive(true);
@@ -211,16 +211,12 @@ public class GroupLayer extends ClippedLayer implements Iterable<Layer> {
 
   @Override void onAdd() {
     super.onAdd();
-    for (int ii = 0, ll = children.size(); ii < ll; ii++) {
-      children.get(ii).onAdd();
-    }
+    for (int ii = 0, ll = children.size(); ii < ll; ii++) children.get(ii).onAdd();
   }
 
   @Override void onRemove() {
     super.onRemove();
-    for (int ii = 0, ll = children.size(); ii < ll; ii++) {
-      children.get(ii).onRemove();
-    }
+    for (int ii = 0, ll = children.size(); ii < ll; ii++) children.get(ii).onRemove();
   }
 
   // group layers do not deactivate when their last event listener is removed; they may still have

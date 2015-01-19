@@ -109,8 +109,7 @@ public class LayerUtil {
    */
   public static Point parentToLayer(Layer parent, Layer layer, IPoint point, Point into) {
     Layer immediateParent = layer.parent();
-    if (immediateParent != parent)
-    point = parentToLayer(parent, immediateParent, point, into);
+    if (immediateParent != parent) point = parentToLayer(parent, immediateParent, point, into);
     parentToLayer(layer, point, into);
     return into;
   }
@@ -163,13 +162,9 @@ public class LayerUtil {
    */
   public static int indexInParent (Layer layer) {
     GroupLayer parent = layer.parent();
-    if (parent == null) {
-      return -1;
-    }
+    if (parent == null) return -1;
     for (int ii = parent.children()-1; ii >= 0; ii--) {
-      if (parent.childAt(ii) == layer) {
-        return ii;
-      }
+      if (parent.childAt(ii) == layer) return ii;
     }
     throw new AssertionError();
   }

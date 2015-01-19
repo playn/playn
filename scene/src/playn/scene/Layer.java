@@ -23,8 +23,11 @@ import pythagoras.f.Point;
 import pythagoras.f.XY;
 import pythagoras.util.NoninvertibleTransformException;
 
-import playn.core.*;
 import react.Signal;
+import react.Value;
+import react.ValueView;
+
+import playn.core.*;
 
 /**
  * A layer is a node in the scene graph. It has a transformation matrix and other properties which
@@ -36,6 +39,9 @@ import react.Signal;
  */
 public abstract class Layer {
 
+  /** Enumerates layer lifecycle states; see {@link #state}. */
+  public static enum State { REMOVED, ADDED, DESTROYED }
+
   /** Used to customize a layer's hit testing mechanism. */
   public interface HitTester {
     /** Returns {@code layer}, or a child of {@code layer} if the supplied coordinate (which is in
@@ -45,17 +51,21 @@ public abstract class Layer {
     Layer hitTest (Layer layer, Point p);
   }
 
+  /**
+   * A reactive value which tracks this layer's lifecycle. It starts out {@link State#REMOVED}, and
+   * transitions to {@link State#ADDED} when the layer is added to a scene graph root and back to
+   * {@link State#REMOVED} when removed, until it is finally {@link #destroy}ed at which point it
+   * transitions to {@link State#DESTROYED}.
+   */
+  public final ValueView<State> state = Value.create(State.REMOVED);
+
   /** Creates an unclipped layer. The {@link #paint} method must be overridden by the creator. */
   public Layer() {
     setFlag(Flag.VISIBLE, true);
   }
 
-  /**
-   * Returns the parent that contains this layer, or {@code null}.
-   */
-  public GroupLayer parent() {
-    return parent;
-  }
+  /** Returns the layer that contains this layer, or {@code null}. */
+  public GroupLayer parent() { return parent; }
 
   /**
    * Returns a signal via which events may be dispatched "on" this layer. The {@link Dispatcher}
@@ -111,8 +121,7 @@ public abstract class Layer {
   public Layer setInteractive(boolean interactive) {
     if (interactive() != interactive) {
       // if we're being made interactive, active our parent as well, if we have one
-      if (interactive && parent != null)
-        parent.setInteractive(interactive);
+      if (interactive && parent != null) parent.setInteractive(interactive);
       setFlag(Flag.INTERACTIVE, interactive);
     }
     return this;
@@ -140,7 +149,7 @@ public abstract class Layer {
    * Whether this layer has been destroyed. If true, the layer can no longer be used.
    */
   public boolean destroyed() {
-    return isSet(Flag.DESTROYED);
+    return state.get() == State.DESTROYED;
   }
 
   /**
@@ -149,10 +158,8 @@ public abstract class Layer {
    * children will destroy them as well.
    */
   public void destroy() {
-    if (parent() != null) {
-      parent().remove(this);
-    }
-    setFlag(Flag.DESTROYED, true);
+    if (parent != null) parent.remove(this);
+    setState(State.DESTROYED);
     setBatch(null);
   }
 
@@ -600,63 +607,11 @@ public abstract class Layer {
    */
   protected abstract void paintImpl (Surface surf);
 
-  // /**
-  //  * Registers a listener with this layer that will be notified if a click/touch event happens
-  //  * within its bounds. Events dispatched to this listener will have their {@code localX} and
-  //  * {@code localY} values set to the coordinates of the click/touch as transformed into this
-  //  * layer's coordinate system. {@code x} and {@code y} will always contain the screen (global)
-  //  * coordinates of the click/touch.
-  //  *
-  //  * <p>When a listener is added, the layer and all of its parents are marked as interactive.
-  //  * Interactive layers intercept touches/clicks. When all listeners are disconnected (including
-  //  * Mouse and Touch listeners), the layer will be marked non-interactive. Its parents are lazily
-  //  * marked non-interactive as it is discovered that they have no interactive children. Thus if you
-  //  * require that a layer continue to intercept click/touch events to prevent them from being
-  //  * dispatched to layers "below" it, you must register a NOOP listener on the layer, or manually
-  //  * call {@link #setInteractive} after removing the last listener.</p>
-  //  */
-  // public AutoCloseable addListener(Pointer.Listener listener) {
-  //   return addInteractor(Pointer.Listener.class, listener);
-  // }
+  protected void setState (State state) {
+    ((Value<State>)this.state).update(state);
+  }
 
-  // /**
-  //  * Registers a listener with this layer that will be notified if a mouse event happens within its
-  //  * bounds. Events dispatched to this listener will have their {@code localX} and {@code localY}
-  //  * values set to the coordinates of the mouse as transformed into this layer's coordinate system.
-  //  * {@code x} and {@code y} will always contain the screen (global) coordinates of the mouse.
-  //  *
-  //  * <p>When a listener is added, the layer and all of its parents are marked as interactive.
-  //  * Interactive layers intercept mice events. When all listeners are disconnected (including
-  //  * Pointer and Touch listeners), the layer will be marked non-interactive. Its parents are lazily
-  //  * marked non-interactive as it is discovered that they have no interactive children. Thus if you
-  //  * require that a layer continue to intercept mouse events to prevent them from being dispatched
-  //  * to layers "below" it, you must register a NOOP listener on the layer, or manually call {@link
-  //  * #setInteractive} after removing the last listener.</p>
-  //  */
-  // public AutoCloseable addListener(Mouse.LayerListener listener) {
-  //   return addInteractor(Mouse.LayerListener.class, listener);
-  // }
-
-  // /**
-  //  * Registers a listener with this layer that will be notified if a touch event happens within its
-  //  * bounds. Events dispatched to this listener will have their {@code localX} and {@code localY}
-  //  * values set to the coordinates of the touch as transformed into this layer's coordinate system.
-  //  * {@code x} and {@code y} will always contain the screen (global) coordinates of the touch.
-  //  *
-  //  * <p>When a listener is added, the layer and all of its parents are marked as interactive.
-  //  * Interactive layers intercept touches/clicks. When all listeners are disconnected (including
-  //  * Mouse and Touch listeners), the layer will be marked non-interactive. Its parents are lazily
-  //  * marked non-interactive as it is discovered that they have no interactive children. Thus if you
-  //  * require that a layer continue to intercept click/touch events to prevent them from being
-  //  * dispatched to layers "below" it, you must register a NOOP listener on the layer, or manually
-  //  * call {@link #setInteractive} after removing the last listener.</p>
-  //  */
-  // public AutoCloseable addListener(Touch.LayerListener listener) {
-  //   return addInteractor(Touch.LayerListener.class, listener);
-  // }
-
-  @Override
-  public String toString () {
+  @Override public String toString () {
     String cname = getClass().getName();
     StringBuilder bldr = new StringBuilder(cname.substring(cname.lastIndexOf(".")+1));
     bldr.append(" [hashCode=").append(hashCode());
@@ -665,12 +620,13 @@ public abstract class Layer {
     return bldr.toString();
   }
 
+  protected int flags;
+  protected float depth;
+
   private GroupLayer parent;
   private Signal<Object> events; // created lazily
   private HitTester hitTester;
   private QuadBatch batch;
-  protected int flags;
-  protected float depth;
 
   // these values are cached in the layer to make the getters return sane values rather than have
   // to extract the values from the affine transform matrix (which is expensive, doesn't preserve
@@ -688,21 +644,18 @@ public abstract class Layer {
 
   void onAdd() {
     if (destroyed()) throw new IllegalStateException("Illegal to use destroyed layer: " + this);
+    setState(State.ADDED);
   }
-
   void onRemove() {
+    setState(State.REMOVED);
   }
-
-  void setParent(GroupLayer parent) {
-    this.parent = parent;
-  }
+  void setParent(GroupLayer parent) { this.parent = parent; }
 
   /** Enumerates bit flags tracked by this layer. */
   protected static enum Flag {
-    DESTROYED(1 << 0),
-    VISIBLE(1 << 1),
-    INTERACTIVE(1 << 2),
-    XFDIRTY(1 << 3);
+    VISIBLE(1 << 0),
+    INTERACTIVE(1 << 1),
+    XFDIRTY(1 << 2);
 
     public final int bitmask;
 

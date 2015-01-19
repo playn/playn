@@ -23,7 +23,7 @@ public abstract class SceneGame extends Game {
 
   public final QuadBatch defaultBatch;
   public final Surface viewSurf;
-  public final GroupLayer rootLayer;
+  public final RootLayer rootLayer;
 
   public SceneGame (Platform plat, int updateRate) {
     super(plat, updateRate);
@@ -35,7 +35,7 @@ public abstract class SceneGame extends Game {
 
     defaultBatch = createDefaultBatch(gl);
     viewSurf = new Surface(plat.graphics(), plat.graphics().defaultRenderTarget, defaultBatch);
-    rootLayer = new GroupLayer();
+    rootLayer = new RootLayer();
 
     paint.connect(new Slot<Clock>() {
       public void onEmit (Clock clock) { paintScene(); }
