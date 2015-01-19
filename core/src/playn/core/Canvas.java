@@ -372,6 +372,8 @@ public abstract class Canvas {
     this.image = image;
     this.width = image.width();
     this.height = image.height();
+    if (width <= 0 || height <= 0) throw new IllegalArgumentException(
+      "Canvas must be > 0 in width and height: " + width + "x" + height);
   }
 
   /** Returns the platform dependent graphics context for this canvas. */

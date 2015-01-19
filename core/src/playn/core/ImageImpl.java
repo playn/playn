@@ -42,7 +42,9 @@ public abstract class ImageImpl extends Image {
   public synchronized void succeed (Data data) {
     scale = data.scale;
     pixelWidth = data.pixelWidth;
+    assert pixelWidth > 0;
     pixelHeight = data.pixelHeight;
+    assert pixelHeight > 0;
     setBitmap(data.bitmap);
     ((RPromise<Image>)state).succeed(this); // state is a deferred promise
   }
@@ -50,9 +52,9 @@ public abstract class ImageImpl extends Image {
   /** Notifies this image that its implementation bitmap failed to load.
     * This can be called from any thread. */
   public synchronized void fail (Throwable error) {
-    int errWidth = (pixelWidth == 0) ? 50 : pixelWidth;
-    int errHeight = (pixelHeight == 0) ? 50 : pixelHeight;
-    setBitmap(createErrorBitmap(errWidth, errHeight));
+    if (pixelWidth == 0) pixelWidth = 50;
+    if (pixelHeight == 0) pixelHeight = 50;
+    setBitmap(createErrorBitmap(pixelWidth, pixelHeight));
     ((RPromise<Image>)state).fail(error); // state is a deferred promise
   }
 
