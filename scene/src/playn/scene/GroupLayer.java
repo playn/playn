@@ -170,7 +170,7 @@ public class GroupLayer extends ClippedLayer implements Iterable<Layer> {
     // group, clear our own interactive flag; this lazily deactivates this group after its
     // interactive children have been deactivated or removed
     if (!sawInteractiveChild && !hasEventListeners()) setInteractive(false);
-    return null;
+    return super.hitTestDefault(point);
   }
 
   @Override protected boolean disableClip () {
