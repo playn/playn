@@ -41,15 +41,15 @@ public class SubImageTest extends Test {
         // tile a sub-image, oh my!
         ImageLayer tiled = new ImageLayer(subtex);
         tiled.setSize(100, 100);
-        addTest(10, 10, tiled, "ImageLayer tiled with sub-texture");
+        addTest(10, 10, tiled, "Tile to reptex to ImageLayer");
 
         // draw a subimage to a canvas
         Canvas split = game.graphics.createCanvas(orange.width(), orange.height());
-        split.draw(orange, phw, phh, phw, phh, 0, 0, phw, phh);
-        split.draw(orange,   0, phh, phw, phh, phw, 0, phw, phh);
-        split.draw(orange, phw,   0, phw, phh, 0, phh, phw, phh);
-        split.draw(orange,   0,   0, phw, phh, phw, phh, phw, phh);
-        addTest(140, 10, new ImageLayer(split.toTexture()), "draw subimg into Canvas", 80);
+        split.draw(orange.region(  0,   0, phw, phh), phw, phh);
+        split.draw(orange.region(phw,   0, phw, phh),   0, phh);
+        split.draw(orange.region(  0, phh, phw, phh), phw,   0);
+        split.draw(orange.region(phw, phh, phw, phh),   0,   0);
+        addTest(140, 10, new ImageLayer(split.toTexture()), "Canvas draw Image.Region", 80);
 
         // draw a subimage in an immediate layer
         addTest(130, 100, new Layer() {
@@ -59,7 +59,7 @@ public class SubImageTest extends Test {
             surf.draw(otile, 0 , phh);
             surf.draw(otile, pw, phh);
           }
-        }, 2*pw, 2*phh, "Draw sub-images immediate", 100);
+        }, 2*pw, 2*phh, "Surface draw Tile", 100);
 
         // draw an image layer whose image region oscillates
         final ImageLayer osci = new ImageLayer(otex);
@@ -100,7 +100,7 @@ public class SubImageTest extends Test {
     group.addAt(new ImageLayer(lr).setScale(2), xoff+2*dx, 2*dy);
 
     game.rootLayer.addAt(group, ox, oy);
-    addDescrip(source + " split into subimages, and scaled", ox, oy + tex.displayHeight*2 + 25,
+    addDescrip(source + " to Texture to Tiles, and scaled", ox, oy + tex.displayHeight*2 + 25,
                3*tex.displayWidth+40);
   }
 }

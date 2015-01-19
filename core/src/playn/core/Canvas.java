@@ -82,6 +82,15 @@ public abstract class Canvas {
    */
   public static enum LineJoin { BEVEL, MITER, ROUND }
 
+  /** Facilitates drawing images and image regions to a canvas. */
+  public interface Drawable {
+    float width ();
+    float height ();
+    void draw (Object gc, float x, float y, float width, float height);
+    void draw (Object gc, float dx, float dy, float dw, float dh,
+               float sx, float sy, float sw, float sh);
+  }
+
   /** The image that underlies this canvas. */
   public final Image image;
 
@@ -126,7 +135,7 @@ public abstract class Canvas {
   /**
    * Draws {@code image} at the specified location {@code (x, y)}.
    */
-  public Canvas draw (Image image, float x, float y) {
+  public Canvas draw (Drawable image, float x, float y) {
     return draw(image, x, y, image.width(), image.height());
   }
 
@@ -134,15 +143,15 @@ public abstract class Canvas {
    * Draws {@code image} centered at the specified location. Subtracts {@code image.width/2} from x
    * and {@code image.height/2} from y.
    */
-  public Canvas drawCentered (Image image, float x, float y) {
+  public Canvas drawCentered (Drawable image, float x, float y) {
     return draw(image, x - image.width()/2, y - image.height()/2);
   }
 
   /**
    * Draws a scaled image at the specified location {@code (x, y)} size {@code (w x h)}.
    */
-  public Canvas draw (Image image, float x, float y, float w, float h) {
-    ((ImageImpl)image).draw(gc(), x, y, w, h);
+  public Canvas draw (Drawable image, float x, float y, float w, float h) {
+    image.draw(gc(), x, y, w, h);
     isDirty = true;
     return this;
   }
@@ -153,9 +162,9 @@ public abstract class Canvas {
    *
    * TODO (jgw): Document whether out-of-bounds source coordinates clamp, repeat, or do nothing.
    */
-  public Canvas draw (Image image, float dx, float dy, float dw, float dh,
+  public Canvas draw (Drawable image, float dx, float dy, float dw, float dh,
                       float sx, float sy, float sw, float sh) {
-    ((ImageImpl)image).draw(gc(), dx, dy, dw, dh, sx, sy, sw, sh);
+    image.draw(gc(), dx, dy, dw, dh, sx, sy, sw, sh);
     isDirty = true;
     return this;
   }

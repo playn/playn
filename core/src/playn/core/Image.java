@@ -23,7 +23,7 @@ import react.RPromise;
  * Bitmapped image data. May be loaded via {@link Assets} or created dynamically as in the backing
  * image for a {@link Canvas}.
  */
-public abstract class Image extends TileSource {
+public abstract class Image extends TileSource implements Canvas.Drawable {
 
   /** Reports the asynchronous loading of this image. This will be completed with success or
     * failure when the image's asynchronous load completes. */
@@ -162,6 +162,39 @@ public abstract class Image extends TileSource {
                               scale(), width(), height());
     tex.update(this); // this will handle non-POT source image conversion
     return tex;
+  }
+
+  /** A region of an image which can be rendered to {@link Canvas}es and turned into a texture
+    * (which is a {@link Tile} of the original image's texture). */
+  public static abstract class Region extends TileSource implements Canvas.Drawable {}
+
+  /** Returns a region of this image which can be drawn independently. */
+  public Region region (final float rx, final float ry, final float rwidth, final float rheight) {
+    final Image image = this;
+    return new Region() {
+      private Tile tile;
+      @Override public boolean isLoaded () { return image.isLoaded(); }
+      @Override public Tile tile () {
+        if (tile == null) tile = image.texture().tile(rx, ry, rwidth, rheight);
+        return tile;
+      }
+      @Override public RFuture<Tile> tileAsync () {
+        return image.state.map(new Function<Image,Tile>() {
+          public Tile apply (Image image) { return tile(); }
+        });
+      }
+
+      @Override public float width () { return rwidth; }
+      @Override public float height () { return rheight; }
+
+      @Override public void draw (Object ctx, float x, float y, float width, float height) {
+        image.draw(ctx, x, y, width, height, rx, ry, rwidth, rheight);
+      }
+      @Override public void draw (Object ctx, float dx, float dy, float dw, float dh,
+                                  float sx, float sy, float sw, float sh) {
+        image.draw(ctx, dx, dy, dw, dh, rx+sx, ry+sy, sw, sh);
+      }
+    };
   }
 
   /** Used with {@link #transform}. */

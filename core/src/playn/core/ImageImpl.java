@@ -56,13 +56,6 @@ public abstract class ImageImpl extends Image {
     ((RPromise<Image>)state).fail(error); // state is a deferred promise
   }
 
-  /** Renders this image into a platform-specific drawing context. */
-  public abstract void draw (Object ctx, float dx, float dy, float dw, float dh);
-
-  /** Renders this image into a platform-specific drawing context. */
-  public abstract void draw (Object ctx, float dx, float dy, float dw, float dh,
-                             float sx, float sy, float sw, float sh);
-
   @Override public Scale scale () { return scale; }
   @Override public int pixelWidth () { return pixelWidth; }
   @Override public int pixelHeight () { return pixelHeight; }
