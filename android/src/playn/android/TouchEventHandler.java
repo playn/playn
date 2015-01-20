@@ -19,7 +19,6 @@ import android.view.MotionEvent;
 
 import pythagoras.f.IPoint;
 
-import playn.core.Pointer;
 import playn.core.Touch;
 
 class TouchEventHandler {

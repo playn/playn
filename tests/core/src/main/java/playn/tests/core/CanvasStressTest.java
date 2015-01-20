@@ -17,7 +17,6 @@ package playn.tests.core;
 
 import pythagoras.f.FloatMath;
 import pythagoras.f.IDimension;
-import react.Connection;
 import react.Slot;
 
 import playn.core.*;

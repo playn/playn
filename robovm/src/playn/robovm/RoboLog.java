@@ -15,7 +15,6 @@ package playn.robovm;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.io.Writer;
 
 import org.robovm.apple.foundation.Foundation;
 

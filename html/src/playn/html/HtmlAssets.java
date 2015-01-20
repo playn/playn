@@ -31,8 +31,6 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.xhr.client.ReadyStateChangeHandler;
 import com.google.gwt.xhr.client.XMLHttpRequest;
 
-import pythagoras.f.MathUtil;
-
 import playn.core.*;
 import playn.html.XDomainRequest.Handler;
 import react.RFuture;

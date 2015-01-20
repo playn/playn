@@ -24,7 +24,6 @@ import org.lwjgl.opengl.Display;
 import pythagoras.f.Point;
 import react.RFuture;
 
-import playn.core.Event;
 import playn.core.Key;
 import static playn.core.Keyboard.*; // to avoid clash with LWJGL Keyboard; meh
 import static playn.core.Mouse.*;    // to avoid clash with LWJGL Mouse; double meh

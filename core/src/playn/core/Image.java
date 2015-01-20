@@ -17,7 +17,6 @@ package playn.core;
 
 import react.Function;
 import react.RFuture;
-import react.RPromise;
 
 /**
  * Bitmapped image data. May be loaded via {@link Assets} or created dynamically as in the backing

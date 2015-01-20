@@ -16,7 +16,6 @@ package playn.html;
 import java.util.Map;
 import java.util.HashMap;
 
-import com.google.gwt.canvas.dom.client.CanvasGradient;
 import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.dom.client.CanvasElement;
 import com.google.gwt.dom.client.Document;

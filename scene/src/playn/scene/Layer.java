@@ -17,11 +17,8 @@ package playn.scene;
 
 import pythagoras.f.AffineTransform;
 import pythagoras.f.FloatMath;
-import pythagoras.f.IPoint;
 import pythagoras.f.MathUtil;
 import pythagoras.f.Point;
-import pythagoras.f.XY;
-import pythagoras.util.NoninvertibleTransformException;
 
 import react.Signal;
 import react.Value;

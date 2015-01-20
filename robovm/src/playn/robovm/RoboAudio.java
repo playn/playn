@@ -18,7 +18,6 @@ import java.io.File;
 import org.robovm.apple.avfoundation.AVAudioPlayer;
 import org.robovm.apple.avfoundation.AVAudioSession;
 import org.robovm.apple.avfoundation.AVAudioSessionSetActiveOptions;
-import org.robovm.apple.foundation.NSError;
 import org.robovm.apple.foundation.NSURL;
 
 import playn.core.Audio;

@@ -19,8 +19,6 @@ import pythagoras.f.Rectangle;
 import react.RFuture;
 import react.Slot;
 
-import playn.core.Graphics;
-import playn.core.QuadBatch;
 import playn.core.Surface;
 import playn.core.Tile;
 import playn.core.TileSource;

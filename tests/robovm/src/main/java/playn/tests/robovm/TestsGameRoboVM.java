@@ -22,8 +22,6 @@ import org.robovm.apple.uikit.UIInterfaceOrientationMask;
 import org.robovm.apple.uikit.UIScreen;
 import org.robovm.apple.uikit.UIWindow;
 
-import playn.core.GL20;
-import playn.robovm.OpenGLES;
 import playn.robovm.RoboPlatform;
 import playn.tests.core.TestsGame;
 

@@ -15,8 +15,6 @@
  */
 package playn.core;
 
-import react.Signal;
-
 /**
  * Defines and dispatches touch events.
  */

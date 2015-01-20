@@ -17,8 +17,6 @@ package playn.core;
 
 import pythagoras.f.Dimension;
 import pythagoras.f.IDimension;
-import react.Function;
-import react.RFuture;
 import react.UnitSlot;
 
 import static playn.core.GL20.*;

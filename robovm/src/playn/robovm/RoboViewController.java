@@ -23,14 +23,11 @@ import org.robovm.apple.opengles.EAGLRenderingAPI;
 import org.robovm.apple.uikit.UIEvent;
 import org.robovm.apple.uikit.UIInterfaceOrientation;
 import org.robovm.apple.uikit.UIInterfaceOrientationMask;
-import org.robovm.apple.uikit.UIScreen;
 import org.robovm.apple.uikit.UITouch;
 import org.robovm.objc.Selector;
 import org.robovm.objc.annotation.BindSelector;
 import org.robovm.objc.annotation.Method;
 import org.robovm.rt.bro.annotation.Callback;
-
-import playn.core.Game;
 
 /**
  * Manages the main PlayN view as well as all iOS and GL callbacks and lifecycle. This is the root

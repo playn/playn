@@ -13,9 +13,6 @@
  */
 package playn.core;
 
-import playn.core.Platform;
-import pythagoras.f.IDimension;
-
 public class GLUtil {
 
   /**

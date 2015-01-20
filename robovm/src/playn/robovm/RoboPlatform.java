@@ -26,7 +26,6 @@ import org.robovm.apple.uikit.UIApplication;
 import org.robovm.apple.uikit.UIDevice;
 import org.robovm.apple.uikit.UIInterfaceOrientation;
 import org.robovm.apple.uikit.UIInterfaceOrientationMask;
-import org.robovm.apple.uikit.UIScreen;
 import org.robovm.apple.uikit.UIWindow;
 import org.robovm.objc.Selector;
 import org.robovm.objc.annotation.BindSelector;

@@ -21,7 +21,6 @@ import react.Slot;
 
 import playn.core.*;
 import playn.scene.*;
-import playn.scene.Pointer;
 import static playn.tests.core.TestsGame.game;
 
 public abstract class Test {

@@ -15,7 +15,6 @@
  */
 package playn.core;
 
-import react.Signal;
 import react.Slot;
 
 /**

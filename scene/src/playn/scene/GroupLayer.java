@@ -21,11 +21,9 @@ import java.util.List;
 
 import pythagoras.f.AffineTransform;
 import pythagoras.f.Point;
-import pythagoras.f.Vector;
 import pythagoras.util.NoninvertibleTransformException;
 
 import playn.core.Surface;
-import playn.core.QuadBatch;
 
 /**
  * GroupLayer creates a Layer hierarchy by maintaining an ordered group of child Layers.

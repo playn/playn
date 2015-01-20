@@ -21,18 +21,13 @@ import java.util.Map;
 import java.util.WeakHashMap;
 
 import android.graphics.Bitmap;
-import android.graphics.LinearGradient;
 import android.graphics.Paint;
-import android.graphics.RadialGradient;
-import android.graphics.Shader.TileMode;
 import android.graphics.Typeface;
-import android.opengl.GLUtils;
 import android.util.Pair;
 
 import pythagoras.f.Dimension;
 import pythagoras.f.IDimension;
 import pythagoras.f.IPoint;
-import pythagoras.f.MathUtil;
 import pythagoras.f.Point;
 
 import playn.core.*;

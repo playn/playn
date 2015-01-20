@@ -13,9 +13,6 @@
  */
 package playn.core;
 
-import java.nio.FloatBuffer;
-import java.nio.ShortBuffer;
-import pythagoras.f.AffineTransform;
 import static playn.core.GL20.*;
 
 /**

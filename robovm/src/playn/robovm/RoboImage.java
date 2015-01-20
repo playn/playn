@@ -145,8 +145,7 @@ public class RoboImage extends ImageImpl {
     super(gfx, scale, pixelWidth, pixelHeight, null);
   }
 
-  @Override
-  protected void finalize() {
+  @Override protected void finalize () {
     dispose(); // meh
   }
 

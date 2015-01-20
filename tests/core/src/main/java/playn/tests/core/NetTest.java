@@ -185,7 +185,6 @@ public class NetTest extends Test {
     }
   };
 
-
   private abstract class TextCB extends Slot<String> {
     public void onEmit(String text) {
       if (text != null && text.length() > 0) gotText(text);

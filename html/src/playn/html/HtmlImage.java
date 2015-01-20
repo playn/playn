@@ -23,8 +23,6 @@ import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.ImageElement;
 import com.google.gwt.dom.client.NativeEvent;
 
-import pythagoras.f.MathUtil;
-
 import playn.core.*;
 import react.RFuture;
 import react.RPromise;

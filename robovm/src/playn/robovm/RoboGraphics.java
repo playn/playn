@@ -16,15 +16,12 @@ package playn.robovm;
 import org.robovm.apple.coregraphics.CGBitmapContext;
 import org.robovm.apple.coregraphics.CGBitmapInfo;
 import org.robovm.apple.coregraphics.CGColorSpace;
-import org.robovm.apple.coregraphics.CGImage;
 import org.robovm.apple.coregraphics.CGImageAlphaInfo;
 import org.robovm.apple.coregraphics.CGRect;
-import org.robovm.apple.coretext.CTFont;
 import org.robovm.apple.uikit.UIDevice;
 import org.robovm.apple.uikit.UIScreen;
 import org.robovm.apple.uikit.UIUserInterfaceIdiom;
 
-import org.robovm.rt.bro.ptr.VoidPtr;
 import playn.core.*;
 import pythagoras.f.Dimension;
 import pythagoras.f.IDimension;

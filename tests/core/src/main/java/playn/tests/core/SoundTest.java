@@ -8,7 +8,6 @@ import java.util.List;
 
 import playn.core.*;
 import playn.scene.*;
-import react.Slot;
 
 /**
  * Tests sound playback support.

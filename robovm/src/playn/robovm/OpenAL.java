@@ -382,7 +382,6 @@ public class OpenAL {
   // AL_API void* AL_APIENTRY alGetProcAddress( const ALchar* fname );
   // AL_API ALenum AL_APIENTRY alGetEnumValue( const ALchar* ename );
 
-
   /*
    * LISTENER
    * Listener represents the location and orientation of the

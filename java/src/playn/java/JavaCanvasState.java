@@ -24,7 +24,6 @@ import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
-import java.awt.TexturePaint;
 import java.awt.geom.AffineTransform;
 
 class JavaCanvasState {
