@@ -15,6 +15,7 @@
  */
 package playn.scene;
 
+import pythagoras.f.IDimension;
 import pythagoras.f.Rectangle;
 import react.RFuture;
 import react.Slot;
@@ -107,19 +108,20 @@ public class ImageLayer extends Layer {
     return this;
   }
 
-  /**
-   * Sets {@link #forceWidth} and {@link #forceHeight} and returns {@code this}, for convenient
-   * call chaining.
-   */
+  /** Sets {@link #forceWidth} and {@link #forceHeight}.
+    * @return {@code this}, for convenient call chaining. */
   public ImageLayer setSize (float width, float height) {
     forceWidth = width;
     forceHeight = height;
     return this;
   }
 
-  /**
-   * Sets {@link #region} and returns {@code this}, for convenient call chaining.
-   */
+  /** Sets {@link #forceWidth} and {@link #forceHeight}.
+    * @return {@code this}, for convenient call chaining. */
+  public ImageLayer setSize (IDimension size) { return setSize(size.width(), size.height()); }
+
+  /** Sets {@link #region}.
+    * @return {@code this}, for convenient call chaining. */
   public ImageLayer setRegion (Rectangle region) {
     this.region = region;
     return this;
