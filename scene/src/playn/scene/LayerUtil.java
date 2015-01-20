@@ -18,6 +18,12 @@ import pythagoras.f.Point;
 import pythagoras.f.XY;
 import pythagoras.util.NoninvertibleTransformException;
 
+import react.Closeable;
+import react.Signal;
+import react.Slot;
+
+import playn.core.Clock;
+
 /**
  * Utility class for transforming coordinates between {@link Layer}s.
  */
@@ -167,6 +173,40 @@ public class LayerUtil {
       if (parent.childAt(ii) == layer) return ii;
     }
     throw new AssertionError();
+  }
+
+  /**
+   * Automatically connects {@code onPaint} to {@code paint} when {@code layer} is added to a scene
+   * graph, and disconnects it when {@code layer} is removed.
+   */
+  public static void bind (Layer layer, final Signal<Clock> paint, final Slot<Clock> onPaint) {
+    layer.state.connectNotify(new Slot<Layer.State>() {
+      public void onEmit (Layer.State state) {
+        _pcon = Closeable.Util.close(_pcon);
+        if (state == Layer.State.ADDED) _pcon = paint.connect(onPaint);
+      }
+      private Closeable _pcon = Closeable.Util.NOOP;
+    });
+  }
+
+  /**
+   * Automatically connects {@code onUpdate} to {@code update}, and {@code onPaint} to {@code
+   * paint} when {@code layer} is added to a scene graph, and disconnects them when {@code layer}
+   * is removed.
+   */
+  public static void bind (Layer layer, final Signal<Clock> update, final Slot<Clock> onUpdate,
+                           final Signal<Clock> paint, final Slot<Clock> onPaint) {
+    layer.state.connectNotify(new Slot<Layer.State>() {
+      public void onEmit (Layer.State state) {
+        _pcon = Closeable.Util.close(_pcon);
+        _ucon = Closeable.Util.close(_ucon);
+        if (state == Layer.State.ADDED) {
+          _ucon = update.connect(onUpdate);
+          _pcon = paint.connect(onPaint);
+        }
+      }
+      private Closeable _ucon = Closeable.Util.NOOP, _pcon = Closeable.Util.NOOP;
+    });
   }
 
   /**
