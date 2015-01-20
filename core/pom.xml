@@ -16,12 +16,12 @@
     <dependency>
       <groupId>com.samskivert</groupId>
       <artifactId>pythagoras</artifactId>
-      <version>1.5-SNAPSHOT</version>
+      <version>1.4.1</version>
     </dependency>
     <dependency>
       <groupId>com.threerings</groupId>
       <artifactId>react</artifactId>
-      <version>1.6-SNAPSHOT</version>
+      <version>1.5.1</version>
     </dependency>
   </dependencies>
 
