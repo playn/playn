@@ -14,7 +14,6 @@
  * limitations under the License.
 -->
 <module rename-to="testsgame">
-  <inherits name="playn.Core"/>
   <inherits name="playn.Scene"/>
   <!--<inherits name="playn.logging.Enhanced" />-->
   <inherits name="TestsAssets" />
