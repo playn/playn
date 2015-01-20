@@ -62,10 +62,7 @@ public class ImageLayer extends Layer {
    * tile.
    */
   public ImageLayer (TileSource source) {
-    if (source.isLoaded()) setTile(source.tile());
-    else source.tileAsync().onSuccess(new Slot<Tile>() {
-      public void onEmit (Tile tile) { setTile(tile); }
-    });
+    setSource(source);
   }
 
   /**
@@ -93,6 +90,19 @@ public class ImageLayer extends Layer {
       this.tile = tile;
       if (tile != null) tile.texture().reference();
     }
+    return this;
+  }
+
+  /**
+   * Sets the texture rendered by this layer to the texture provided by {@code source}. If {@code
+   * source} is not yet ready, the texture will be set when it becomes ready. Until then any
+   * previous texture will continue to be displayed.
+   */
+  public ImageLayer setSource (TileSource source) {
+    if (source.isLoaded()) setTile(source.tile());
+    else source.tileAsync().onSuccess(new Slot<Tile>() {
+      public void onEmit (Tile tile) { setTile(tile); }
+    });
     return this;
   }
 
