@@ -57,6 +57,22 @@ public abstract class Game {
     });
   }
 
+  /** Called on every simulation update. The default implementation emits the clock to the {@link
+    * #updateClock} signal, but you can override this method to change or augment this behavior.
+    * @param clock a clock configured with the update timing information.
+    */
+  public void update (Clock clock) {
+    update.emit(clock);
+  }
+
+  /** Called on every frame. The default implementation emits the clock to the {@link #paintClock}
+    * signal, but you can override this method to change or augment this behavior.
+    * @param clock a clock configured with the frame timing information.
+    */
+  public void paint (Clock clock) {
+    paint.emit(paintClock);
+  }
+
   private void onFrame () {
     int nextUpdate = this.nextUpdate;
     int updateTick = plat.tick();
@@ -71,13 +87,13 @@ public abstract class Game {
       int updateDt = updates*updateRate;
       updateClock.tick += updateDt;
       updateClock.dt = updateDt;
-      update.emit(updateClock);
+      update(updateClock);
     }
 
     int paintTick = plat.tick();
     paintClock.dt = paintTick - paintClock.tick;
     paintClock.tick = paintTick;
     paintClock.alpha = 1 - (nextUpdate - paintTick) / (float)updateRate;
-    paint.emit(paintClock);
+    paint(paintClock);
   }
 }
