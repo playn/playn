@@ -38,10 +38,6 @@
       <modules><module>robovm</module></modules>
     </profile>
     <profile>
-      <id>ios</id>
-      <modules><module>ios</module></modules>
-    </profile>
-    <profile>
       <id>html</id>
       <modules><module>html</module></modules>
     </profile>

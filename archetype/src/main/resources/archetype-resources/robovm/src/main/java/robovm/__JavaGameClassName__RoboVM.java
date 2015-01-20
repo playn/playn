@@ -23,13 +23,15 @@ public class ${JavaGameClassName}RoboVM extends UIApplicationDelegateAdapter {
     CGRect bounds = UIScreen.getMainScreen().getBounds();
     UIWindow window = new UIWindow(bounds);
 
-    // configure and register the PlayN platform; start our game
+    // configure and create the PlayN platform
     RoboPlatform.Config config = new RoboPlatform.Config();
     config.orients = UIInterfaceOrientationMask.All;
-    RoboPlatform pf = RoboPlatform.register(window, config);
-    pf.run(new ${JavaGameClassName}());
+    RoboPlatform plat = RoboPlatform.create(window, config);
 
-    // make our main window visible
+    // create and initialize our game
+    new ${JavaGameClassName}(plat);
+
+    // make our main window visible (this starts the platform)
     window.makeKeyAndVisible();
     addStrongRef(window);
     return true;

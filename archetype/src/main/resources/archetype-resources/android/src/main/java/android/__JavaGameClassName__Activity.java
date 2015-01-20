@@ -4,14 +4,12 @@
 package ${package}.android;
 
 import playn.android.GameActivity;
-import playn.core.PlayN;
 
 import ${package}.core.${JavaGameClassName};
 
 public class ${JavaGameClassName}Activity extends GameActivity {
 
-  @Override
-  public void main(){
-    PlayN.run(new ${JavaGameClassName}());
+  @Override public void main () {
+    new ${JavaGameClassName}(platform());
   }
 }

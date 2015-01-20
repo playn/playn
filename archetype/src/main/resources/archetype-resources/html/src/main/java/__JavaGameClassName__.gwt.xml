@@ -2,7 +2,7 @@
 #set( $symbol_dollar = '$' )
 #set( $symbol_escape = '\' )
 <module rename-to='${rootArtifactId}'>
-  <inherits name='playn.PlayN'/>
+  <inherits name='playn.Scene'/>
   <inherits name='${JavaGameClassName}Assets'/>
 
   <source path='core'/>

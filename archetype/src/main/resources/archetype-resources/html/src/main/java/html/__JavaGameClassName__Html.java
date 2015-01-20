@@ -3,20 +3,18 @@
 #set( $symbol_escape = '\' )
 package ${package}.html;
 
-import playn.core.PlayN;
-import playn.html.HtmlGame;
+import com.google.gwt.core.client.EntryPoint;
 import playn.html.HtmlPlatform;
-
 import ${package}.core.${JavaGameClassName};
 
-public class ${JavaGameClassName}Html extends HtmlGame {
+public class ${JavaGameClassName}Html implements EntryPoint {
 
-  @Override
-  public void start() {
+  @Override public void onModuleLoad () {
     HtmlPlatform.Config config = new HtmlPlatform.Config();
     // use config to customize the HTML platform, if needed
-    HtmlPlatform platform = HtmlPlatform.register(config);
-    platform.assets().setPathPrefix("${rootArtifactId}/");
-    PlayN.run(new ${JavaGameClassName}());
+    HtmlPlatform plat = new HtmlPlatform(config);
+    plat.assets().setPathPrefix("${rootArtifactId}/");
+    new ${JavaGameClassName}(plat);
+    plat.start();
   }
 }
