@@ -207,7 +207,7 @@ public abstract class GameActivity extends Activity {
   }
 
   protected float scaleFactor() {
-    return 1; // TODO: determine scale factor automatically?
+    return getResources().getDisplayMetrics().density;
   }
 
   /** Configures the maximum simultaneous sounds that may be played back. */
