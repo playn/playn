@@ -86,7 +86,7 @@ public abstract class Graphics {
     return new Texture(this, id, config, texWidth, texHeight, scale, width, height);
   }
 
-  /** See {@link #createTexture(float,float,boolean,boolean)}. */
+  /** See {@link #createTexture(float,float,Texture.Config)}. */
   public Texture createTexture (IDimension size, Texture.Config config) {
     return createTexture(size.width(), size.height(), config);
   }

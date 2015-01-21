@@ -31,7 +31,6 @@ import react.Slot;
  * <ul><li> {@link #type} - reports {@link Platform.Type#STUB}
  * <li> {@link #time} - returns current time
  * <li> {@link #invokeLater} - invokes the supplied runnable immediately on the calling thread
- * <li> {@link #setLifecycleListener} - tracks the supplied listener, never generates events
  * <li> {@link #input} - allows listener registration, never generates events
  * <li> {@link #log} - writes logs to {@code stderr}
  * <li> {@link #json} - provides full JSON parsing and formatting

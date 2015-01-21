@@ -98,6 +98,6 @@ public abstract class Keyboard {
     public abstract void onEmit (TypedEvent event);
   }
 
-  /** Enumerates the different available mobile keyboard types. See {@link #getText}. */
+  /** Enumerates the different available mobile keyboard types. See {@link Input#getText}. */
   public static enum TextType { DEFAULT, NUMBER, EMAIL, URL; }
 }

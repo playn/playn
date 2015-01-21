@@ -165,6 +165,17 @@
 
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-javadoc-plugin</artifactId>
+          <version>2.7</version>
+          <configuration>
+            <quiet>true</quiet>
+            <show>public</show>
+            <additionalparam>-Xdoclint:all -Xdoclint:-missing</additionalparam>
+          </configuration>
+        </plugin>
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-source-plugin</artifactId>
           <version>2.1.2</version>
         </plugin>

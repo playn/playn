@@ -222,9 +222,7 @@ public class LayerUtil {
     return depth;
   }
 
-  /**
-   * Performs the recursion for {@link layerUnderPoint(float,float)}.
-   */
+  /** Performs the recursion for {@link #layerUnderPoint(Layer,float,float)}. */
   protected static Layer layerUnderPoint (Layer layer, Point pt) {
     float x = pt.x, y = pt.y;
     if (layer instanceof GroupLayer) {

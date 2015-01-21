@@ -16,7 +16,7 @@
 package playn.core;
 
 /**
- * A gradient fill pattern created by {@link Graphics#createGradient}.
+ * A gradient fill pattern created by {@link Canvas#createGradient}.
  */
 public abstract class Gradient {
 

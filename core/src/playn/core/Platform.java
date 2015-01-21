@@ -30,8 +30,8 @@ public abstract class Platform {
   /** A signal emitted with lifecycle events. */
   public Signal<Lifecycle> lifecycle = Signal.create();
 
-  /** This signal will be emitted at the start of every frame after the platform is {@link
-    * #start}ed. Games should connect to it to drive their main loop. */
+  /** This signal will be emitted at the start of every frame after the platform is started. Games
+    * should connect to it to drive their main loop. */
   public Signal<Platform> frame = Signal.create();
 
   /** Used by {@link #reportError}. */

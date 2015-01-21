@@ -129,7 +129,7 @@ public class Texture extends Tile implements Disposable {
     this.displayHeight = dispHeight;
   }
 
-  /** Increments this texture's reference count. NOOP unless {@link #managed}. */
+  /** Increments this texture's reference count. NOOP unless {@link Config#managed}. */
   public void reference () {
     if (config.managed) refs++;
   }
@@ -238,22 +238,4 @@ public class Texture extends Tile implements Disposable {
     // if we're not yet disposed, queue ourselves up to be disposed on the next frame tick
     if (!disposed) gfx.queueForDispose(this);
   }
-
-  // imageregiongl stuffs
-
-  // @Override
-  // void draw(GLShader shader, InternalTransform xform, int tint,
-  //           float dx, float dy, float dw, float dh, float sx, float sy, float sw, float sh) {
-  //   if (repeatX || repeatY) {
-  //     // if we're repeating, then we have our own texture and want to draw it normally
-  //     super.draw(shader, xform, tint, dx, dy, dw, dh, sx, sy, sw, sh);
-  //   } else {
-  //     float texWidth = (tex > 0) ? width : parent.width();
-  //     float texHeight = (tex > 0) ? height : parent.height();
-  //     sx += x();
-  //     sy += y();
-  //     parent.drawImpl(shader, xform, ensureTexture(), tint, dx, dy, dw, dh,
-  //                     sx / texWidth, sy / texHeight, (sx + sw) / texWidth, (sy + sh) / texHeight);
-  //   }
-  // }
 }

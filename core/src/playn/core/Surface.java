@@ -29,7 +29,7 @@ import pythagoras.i.Rectangle;
  * the main frame buffer, or a frame buffer bound to a texture.
  *
  * <p>Note: all rendering operations to a surface must be enclosed in calls to
- * {@link Surface#beginBatch} and {@link Surface#endBatch}. This ensures that the batch into which
+ * {@link Surface#begin} and {@link Surface#end}. This ensures that the batch into which
  * the surface is rendering is properly flushed to the GPU at the right times.
  */
 public class Surface implements Disposable {
@@ -101,7 +101,7 @@ public class Surface implements Disposable {
     return this;
   }
 
-  /** Restores the transform previously stored by {@link #save}. */
+  /** Restores the transform previously stored by {@link #saveTx}. */
   public Surface restoreTx () {
     assert transformStack.size() > 1 : "Unbalanced save/restore";
     transformStack.remove(transformStack.size() - 1);
@@ -189,10 +189,9 @@ public class Surface implements Disposable {
     return this;
   }
 
-  /** Sets the tint to be applied to draw operations, as {@code ARGB}.
-    * <p><em>NOTE:</em> this will overwrite any value configured via {@link #setAlpha}. incEither
-    * include your desired alpha in the high bits of {@code tint} or call {@link inc#setAlpha}
-    * after calling this method.
+  /** Sets the tint to be applied to draw operations, as {@code ARGB}. <em>NOTE:</em> this will
+    * overwrite any value configured via {@link #setAlpha}. Either include your desired alpha in
+    * the high bits of {@code tint} or call {@link #setAlpha} after calling this method.
     */
   public Surface setTint (int tint) {
     this.tint = tint;
