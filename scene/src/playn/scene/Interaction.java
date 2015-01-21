@@ -15,11 +15,12 @@ package playn.scene;
 
 import playn.core.Event;
 import pythagoras.f.Point;
+import pythagoras.f.XY;
 
 /**
  * Contains information about the interaction of which an event is a part.
  */
-public class Interaction<E extends Event.XY> {
+public class Interaction<E extends Event.XY> implements XY {
 
   private Layer dispatchLayer;
   private Layer capturingLayer;
@@ -34,14 +35,10 @@ public class Interaction<E extends Event.XY> {
   public E event;
 
   /** Returns {@link #event}'s x coordinate, for convenience. */
-  public float x () {
-    return event.x;
-  }
+  public float x () { return event.x; }
 
   /** Returns {@link #event}'s y coordinate, for convenience. */
-  public float y () {
-    return event.y;
-  }
+  public float y () { return event.y; }
 
   /** Returns whether this interaction is captured. */
   public boolean captured () {
