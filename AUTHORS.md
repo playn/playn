@@ -6,6 +6,7 @@ PlayN was originally developed at Google by the following people:
 * pdr (google.com) - Philip Rogers
 * cromwellian (google.com) - Ray Cromwell
 * fredsa (google.com) - Fred Sauer
+* stefan.haustein (gmail.com) - Stefan Haustein
 * jonagill (google.com) - Jon Gill
 * hukun (google.com) - Hu Kun
 
@@ -39,7 +40,6 @@ of the PlayN community:
 * rsennov (corp.finam.ru) - Ruslan Sennov
 * simen.is (gmail.com) - Simen Sandvaer
 * stefan (wokusch.de) - Stefan Wokusch
-* stefan.haustein (gmail.com) - Stefan Haustein
 * tom.x.fisher (gmail.com) - tomfisher
 * yc (leppoc.net) - Yohann Coppel
 
