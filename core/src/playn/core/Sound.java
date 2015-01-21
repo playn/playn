@@ -32,6 +32,19 @@ public class Sound {
   public final RFuture<Sound> state;
 
   /**
+   * Returns whether this sound is fully loaded. In general you'll want to react to {@link #state}
+   * to do things only after a sound is loaded, but this method is useful if you want to just skip
+   * playing a sound that's not fully loaded (because playing a sound that's not loaded will defer
+   * the play request until it has loaded, which may result in mismatched audio and visuals).
+   *
+   * <p>Note: this is different from {@link #prepare}. This has to do with loading the sound bytes
+   * from storage (or over the network in the case of the HTML backend). {@link #prepare} attempts
+   * to ensure that the sound bytes are then transferred from CPU memory into the appropriate audio
+   * buffers so that they can be played with the lowest possible latency.
+   */
+  public boolean isLoaded () { return state.isCompleteNow(); }
+
+  /**
    * Prepares this sound to be played by preloading it into audio buffers. This expresses a desire
    * to have subsequent calls to {@link #play} start emitting sound with the lowest possible
    * latency.
