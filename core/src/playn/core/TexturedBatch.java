@@ -77,6 +77,11 @@ public class TexturedBatch extends GLBatch {
     this.curTexId = texture.id;
   }
 
+  @Override public void end () {
+    super.end();
+    curTexId = 0;
+  }
+
   protected TexturedBatch (GL20 gl) {
     this.gl = gl;
   }
