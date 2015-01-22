@@ -29,7 +29,7 @@
     </dependency>
 
     <dependency>
-      <groupId>com.googlecode.playn</groupId>
+      <groupId>io.playn</groupId>
       <artifactId>playn-android</artifactId>
       <version>${playn.version}</version>
     </dependency>

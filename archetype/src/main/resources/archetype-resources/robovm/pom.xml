@@ -25,7 +25,7 @@
     </dependency>
 
     <dependency>
-      <groupId>com.googlecode.playn</groupId>
+      <groupId>io.playn</groupId>
       <artifactId>playn-robovm</artifactId>
       <version>${playn.version}</version>
     </dependency>
