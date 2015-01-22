@@ -171,6 +171,11 @@
             <quiet>true</quiet>
             <show>public</show>
             <additionalparam>-Xdoclint:all -Xdoclint:-missing</additionalparam>
+            <links>
+              <link>http://docs.oracle.com/javase/7/docs/api/</link>
+              <link>http://threerings.github.io/react/apidocs/</link>
+              <link>http://samskivert.github.io/pythagoras/apidocs/</link>
+            </links>
           </configuration>
         </plugin>
 

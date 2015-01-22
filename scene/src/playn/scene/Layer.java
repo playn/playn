@@ -51,7 +51,7 @@ public abstract class Layer implements Disposable {
   /**
    * A reactive value which tracks this layer's lifecycle. It starts out {@link State#REMOVED}, and
    * transitions to {@link State#ADDED} when the layer is added to a scene graph root and back to
-   * {@link State#REMOVED} when removed, until it is finally {@link #dispose}d at which point it
+   * {@link State#REMOVED} when removed, until it is finally {@link #close}d at which point it
    * transitions to {@link State#DISPOSED}.
    */
   public final ValueView<State> state = Value.create(State.REMOVED);
@@ -65,7 +65,7 @@ public abstract class Layer implements Disposable {
   public GroupLayer parent() { return parent; }
 
   /**
-   * Returns a signal via which events may be dispatched "on" this layer. The {@link Dispatcher}
+   * Returns a signal via which events may be dispatched "on" this layer. The {@code Dispatcher}
    * mechanism uses this to dispatch (and listen for) mouse, pointer and touch events to the layers
    * affected by them. A game can also use this to dispatch any other kinds of events on a
    * per-layer basis, with the caveat that all listeners are notified of every event and each must
@@ -73,7 +73,7 @@ public abstract class Layer implements Disposable {
    *
    * <p>Also, any layer that has one or more listeners on its events signal is marked as {@link
    * #interactive}. Further, any {@link GroupLayer} which has one or more interactive children is
-   * also marked as interactive. This allows {@link Dispatcher}s to be more efficient in their
+   * also marked as interactive. This allows {@code Dispatcher}s to be more efficient in their
    * dispatching of UI events.
    */
   public Signal<Object> events () {
@@ -188,8 +188,8 @@ public abstract class Layer implements Disposable {
    * Return the global alpha value for this layer.
    *
    * <p>The global alpha value for a layer controls the opacity of the layer but does not affect
-   * the current drawing operation. I.e., when {@link Game.Default#paint(float)} is called and the
-   * {@link Layer} is drawn, this alpha value is applied to the alpha channel of the Layer.</p>
+   * the current drawing operation. I.e., when {@link Game#paint} is called and the {@link Layer}
+   * is drawn, this alpha value is applied to the alpha channel of the Layer.</p>
    *
    * <p>By default, the alpha for a Layer is 1.0 (not transparent).</p>
    *
@@ -232,8 +232,8 @@ public abstract class Layer implements Disposable {
    * not possible to tint layers using the HTML5 canvas and Flash backends. </p>
    *
    * <p> The tint for a layer controls the opacity of the layer but does not affect the current
-   * drawing operation. I.e., when {@link Game.Default#paint(float)} is called and the {@link
-   * Layer} is drawn, this tint is applied when rendering the layer. </p>
+   * drawing operation. I.e., when {@link Game#paint} is called and the {@link Layer} is drawn,
+   * this tint is applied when rendering the layer. </p>
    *
    * @return a reference to this layer for call chaining.
    */
@@ -262,8 +262,8 @@ public abstract class Layer implements Disposable {
    * <p>
    * This sets the origin of the layer's transformation matrix.
    *
-   * @param x origin on x axis in pixels
-   * @param y origin on y axis in pixels
+   * @param x origin on x axis in pixels.
+   * @param y origin on y axis in pixels.
    *
    * @return a reference to this layer for call chaining.
    */
@@ -319,8 +319,6 @@ public abstract class Layer implements Disposable {
    * setting rotation and then setting scale will not flip the rotation like it would were these
    * applied to the transform matrix one operation at a time. </p>
    *
-   * @param tx translation on x axis
-   *
    * @return a reference to this layer for call chaining.
    */
   public Layer setTx(float x) {
@@ -337,8 +335,6 @@ public abstract class Layer implements Disposable {
    * setting rotation and then setting scale will not flip the rotation like it would were these
    * applied to the transform matrix one operation at a time. </p>
    *
-   * @param ty translation on y axis
-   *
    * @return a reference to this layer for call chaining.
    */
   public Layer setTy(float y) {
@@ -354,9 +350,6 @@ public abstract class Layer implements Disposable {
    * translation are composed into an affine transform matrix. This means that, for example,
    * setting rotation and then setting scale will not flip the rotation like it would were these
    * applied to the transform matrix one operation at a time. </p>
-   *
-   * @param x translation on x axis
-   * @param y translation on y axis
    *
    * @return a reference to this layer for call chaining.
    */
@@ -399,11 +392,11 @@ public abstract class Layer implements Disposable {
    * setting rotation and then setting scale will not flip the rotation like it would were these
    * applied to the transform matrix one operation at a time. </p>
    *
-   * @param scale non-zero scale value
+   * @param scale non-zero scale value.
    * @return a reference to this layer for call chaining.
    */
-  public Layer setScale(float s) {
-    return setScale(s, s);
+  public Layer setScale(float scale) {
+    return setScale(scale, scale);
   }
 
   /**
@@ -416,7 +409,7 @@ public abstract class Layer implements Disposable {
    * setting rotation and then setting scale will not flip the rotation like it would were these
    * applied to the transform matrix one operation at a time. </p>
    *
-   * @param scaleX non-zero scale value
+   * @param sx non-zero scale value.
    * @return a reference to this layer for call chaining.
    */
   public Layer setScaleX(float sx) {
@@ -437,7 +430,7 @@ public abstract class Layer implements Disposable {
    * setting rotation and then setting scale will not flip the rotation like it would were these
    * applied to the transform matrix one operation at a time. </p>
    *
-   * @param scaleY non-zero scale value
+   * @param sy non-zero scale value.
    * @return a reference to this layer for call chaining.
    */
   public Layer setScaleY(float sy) {
@@ -458,8 +451,8 @@ public abstract class Layer implements Disposable {
    * setting rotation and then setting scale will not flip the rotation like it would were these
    * applied to the transform matrix one operation at a time. </p>
    *
-   * @param scaleX non-zero scale value on the x axis
-   * @param scaleY non-zero scale value on the y axis
+   * @param sx non-zero scale value for the x axis.
+   * @param sy non-zero scale value for the y axis.
    *
    * @return a reference to this layer for call chaining.
    */
@@ -494,7 +487,7 @@ public abstract class Layer implements Disposable {
    * setting rotation and then setting scale will not flip the rotation like it would were these
    * applied to the transform matrix one operation at a time. </p>
    *
-   * @param angle angle to rotate, in radians
+   * @param angle angle to rotate, in radians.
    *
    * @return a reference to this layer for call chaining.
    */

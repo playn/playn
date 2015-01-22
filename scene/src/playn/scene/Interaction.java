@@ -45,7 +45,10 @@ public class Interaction<E extends Event.XY> implements XY {
     return capturingLayer != null;
   }
 
-  /** Captures this interaction. See {@link Dispatcher}. */
+  /** Captures this interaction. This causes subsequent events in this interaction to go only to
+    * the layer which is currently handling the interaction. Other layers in the interaction will
+    * receive a cancellation event and nothing further.
+    */
   public void capture () {
     assert dispatchLayer != null;
     if (capturingLayer != dispatchLayer && captured()) throw new IllegalStateException(

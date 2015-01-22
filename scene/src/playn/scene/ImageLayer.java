@@ -21,6 +21,7 @@ import react.RFuture;
 import react.Slot;
 
 import playn.core.Surface;
+import playn.core.Texture;
 import playn.core.Tile;
 import playn.core.TileSource;
 
