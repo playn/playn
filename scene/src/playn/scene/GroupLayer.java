@@ -91,16 +91,24 @@ public class GroupLayer extends ClippedLayer implements Iterable<Layer> {
 
   /**
    * Adds the supplied layer to this group layer, adjusting its translation (relative to this group
-   * layer) to the supplied values. This is equivalent to:
-   * <pre>{@code
-   * layer.setTranslation(tx, ty);
-   * group.add(layer);
-   * }</pre>
-   * but is such a common operation that this helper method is provided.
+   * layer) to the supplied values.
+   *
+   * <p>This is equivalent to: {@code add(child.setTranslation(tx, ty))}.
    */
   public void addAt(Layer child, float tx, float ty) {
-    child.setTranslation(tx, ty);
-    add(child);
+    add(child.setTranslation(tx, ty));
+  }
+
+  /**
+   * Adds {@code child} to this group layer, positioning it such that its center is at ({@code tx},
+   * {@code tx}). The layer must report a non-zero size, thus this will not work on an unclipped
+   * group layer.
+   *
+   * <p>This is equivalent to: {@code add(child.setTranslation(tx - child.width()/2,
+   * ty - child.height()/2))}.
+   */
+  public void addCenterAt (Layer child, float tx, float ty) {
+    add(child.setTranslation(tx - child.width()/2, ty - child.height()/2));
   }
 
   /**
