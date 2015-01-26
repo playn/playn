@@ -38,7 +38,10 @@ public class ImageLayer extends Layer {
   /** An explicit width and height for this layer. If the width or height exceeds the underlying
     * tile width or height, it will be scaled or repeated depending on the tile texture's repeat
     * configuration in the pertinent axis. If either value is {@code < 0} that indicates that the
-    * size of the tile being rendered should be used. */
+    * size of the tile being rendered should be used.
+    *
+    * <p>Note: if you use these sizes in conjunction with a logical origin, you must set them via
+    * {@link #setSize} to cause the origin to be recomputed. */
   public float forceWidth = -1, forceHeight = -1;
 
   /** The subregion of the tile to render. If this is {@code null} (the default) the entire tile is
@@ -47,7 +50,10 @@ public class ImageLayer extends Layer {
     *
     * <p> <em>Note:</em> when a subregion is configured, a texture will always be scaled, never
     * repeated. If you want to repeat a texture, you have to use the whole texture. This is a
-    * limitation of OpenGL. */
+    * limitation of OpenGL.
+    *
+    * <p>Note: if you use this region in conjunction with a logical origin, you must set it via
+    * {@link #setRegion} to cause the origin to be recomputed. */
   public Rectangle region;
 
   /**
@@ -89,6 +95,7 @@ public class ImageLayer extends Layer {
     if (this.tile != tile) {
       if (this.tile != null) this.tile.texture().release();
       this.tile = tile;
+      checkOrigin();
       if (tile != null) tile.texture().reference();
     }
     return this;
@@ -124,6 +131,7 @@ public class ImageLayer extends Layer {
   public ImageLayer setSize (float width, float height) {
     forceWidth = width;
     forceHeight = height;
+    checkOrigin();
     return this;
   }
 
@@ -135,6 +143,7 @@ public class ImageLayer extends Layer {
     * @return {@code this}, for convenient call chaining. */
   public ImageLayer setRegion (Rectangle region) {
     this.region = region;
+    checkOrigin();
     return this;
   }
 

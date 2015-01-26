@@ -49,18 +49,21 @@ public abstract class ClippedLayer extends Layer {
   public ClippedLayer setSize (float width, float height) {
     this.width = width;
     this.height = height;
+    checkOrigin();
     return this;
   }
 
   /** Updates the width of this group layer, and hence its clipping rectangle. */
   public ClippedLayer setWidth(float width) {
     this.width = width;
+    checkOrigin();
     return this;
   }
 
   /** Updates the height of this group layer, and hence its clipping rectangle. */
   public ClippedLayer setHeight(float height) {
     this.height = height;
+    checkOrigin();
     return this;
   }
 
@@ -72,6 +75,7 @@ public abstract class ClippedLayer extends Layer {
     if (disableClip()) paintClipped(surf);
     else {
       Transform tx = surf.tx();
+      float originX = originX(), originY = originY();
       tx.translate(originX, originY);
       tx.transform(pos.set(-originX, -originY), pos);
       tx.transform(size.set(width, height), size);

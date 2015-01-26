@@ -40,6 +40,72 @@ public abstract class Layer implements Disposable {
   /** Enumerates layer lifecycle states; see {@link #state}. */
   public static enum State { REMOVED, ADDED, DISPOSED }
 
+  /** Used to configure the origin of a layer based on its width/height. */
+  public static enum Origin {
+    /** Origin is manually specified via {@link #setOrigin(float,float)}. */
+    FIXED {
+      public float ox (float width) { return 0; } // not used
+      public float oy (float height) { return 0; } // not used
+    },
+
+    /** Origin is at layer's center. */
+    CENTER {
+      public float ox (float width) { return width/2; }
+      public float oy (float height) { return height/2; }
+    },
+
+    /** Origin is in upper left. */
+    UL {
+      public float ox (float width) { return 0; }
+      public float oy (float height) { return 0; }
+    },
+
+    /** Origin is in upper right. */
+    UR {
+      public float ox (float width) { return width; }
+      public float oy (float height) { return 0; }
+    },
+
+    /** Origin is in lower left. */
+    LL {
+      public float ox (float width) { return 0; }
+      public float oy (float height) { return height; }
+    },
+
+    /** Origin is in lower right. */
+    LR {
+      public float ox (float width) { return width; }
+      public float oy (float height) { return height; }
+    },
+
+    /** Origin is at top center. */
+    TC {
+      public float ox (float width) { return width/2; }
+      public float oy (float height) { return 0; }
+    },
+
+    /** Origin is at bottom center. */
+    BC {
+      public float ox (float width) { return width/2; }
+      public float oy (float height) { return height; }
+    },
+
+    /** Origin is at left center. */
+    LC {
+      public float ox (float width) { return 0; }
+      public float oy (float height) { return height/2; }
+    },
+
+    /** Origin is at right center. */
+    RC {
+      public float ox (float width) { return width; }
+      public float oy (float height) { return height/2; }
+    };
+
+    public abstract float ox (float width);
+    public abstract float oy (float height);
+  }
+
   /** Used to customize a layer's hit testing mechanism. */
   public interface HitTester {
     /** Returns {@code layer}, or a child of {@code layer} if the supplied coordinate (which is in
@@ -266,6 +332,14 @@ public abstract class Layer implements Disposable {
    * Returns the x-component of the layer's origin.
    */
   public float originX() {
+    if (isSet(Flag.ODIRTY)) {
+      float width = width();
+      if (width > 0) {
+        this.originX = origin.ox(width);
+        this.originY = origin.oy(height());
+        setFlag(Flag.ODIRTY, false);
+      }
+    }
     return originX;
   }
 
@@ -273,22 +347,43 @@ public abstract class Layer implements Disposable {
    * Returns the y-component of the layer's origin.
    */
   public float originY() {
+    if (isSet(Flag.ODIRTY)) {
+      float height = height();
+      if (height > 0) {
+        this.originX = origin.ox(width());
+        this.originY = origin.oy(height);
+        setFlag(Flag.ODIRTY, false);
+      }
+    }
     return originY;
   }
 
   /**
-   * Sets the origin of the layer.
-   * <p>
-   * This sets the origin of the layer's transformation matrix.
+   * Sets the origin of the layer to a fixed position. This automatically sets the layer's logical
+   * origin to {@link Origin#FIXED}.
    *
-   * @param x origin on x axis in pixels.
-   * @param y origin on y axis in pixels.
+   * @param x origin on x axis in display units.
+   * @param y origin on y axis in display units.
    *
    * @return a reference to this layer for call chaining.
    */
-  public Layer setOrigin(float x, float y) {
+  public Layer setOrigin (float x, float y) {
     this.originX = x;
     this.originY = y;
+    this.origin = Origin.FIXED;
+    setFlag(Flag.ODIRTY, false);
+    return this;
+  }
+
+  /**
+   * Configures the origin of this layer based on a logical location which is recomputed whenever
+   * the layer changes size.
+   *
+   * @return a reference to this layer for call chaining.
+   */
+  public Layer setOrigin (Origin origin) {
+    this.origin = origin;
+    setFlag(Flag.ODIRTY, true);
     return this;
   }
 
@@ -599,7 +694,7 @@ public abstract class Layer implements Disposable {
 
     int otint = surf.combineTint(tint);
     QuadBatch obatch = surf.pushBatch(batch);
-    surf.concatenate(transform(), originX, originY);
+    surf.concatenate(transform(), originX(), originY());
     try {
       paintImpl(surf);
     } finally {
@@ -644,7 +739,8 @@ public abstract class Layer implements Disposable {
   private final AffineTransform transform = new AffineTransform();
 
   private float clipWidth, clipHeight;
-  protected float originX, originY;
+  private Origin origin = Origin.FIXED;
+  private float originX, originY;
   protected int tint = Tint.NOOP_TINT;
   // we keep a copy of alpha as a float so that we can return the exact alpha passed to setAlpha()
   // from alpha() to avoid funny business in clients due to the quantization; the actual alpha as
@@ -664,7 +760,8 @@ public abstract class Layer implements Disposable {
   protected static enum Flag {
     VISIBLE(1 << 0),
     INTERACTIVE(1 << 1),
-    XFDIRTY(1 << 2);
+    XFDIRTY(1 << 2),
+    ODIRTY(1 << 3);
 
     public final int bitmask;
 
@@ -685,6 +782,10 @@ public abstract class Layer implements Disposable {
     } else {
       flags &= ~flag.bitmask;
     }
+  }
+
+  protected void checkOrigin () {
+    if (origin != Origin.FIXED) setFlag(Flag.ODIRTY, true); // trigger an origin recompute
   }
 
   /** Whether or not to deactivate this layer when its last event listener is removed. */
