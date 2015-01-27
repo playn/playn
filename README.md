@@ -25,9 +25,9 @@ mvn clean install
 
 This will install the latest snapshot version of PlayN into your local Maven repository. You can
 then modify the `playn.version` property of your game to reference that snapshot version and your
-game will use your local copy of PlayN instead of a version shipped to [Maven Central].
+game will use your local copy of PlayN instead of a version downloaded from [Maven Central].
 
-Instructions for building and running the PlayN samples can be found in the [Documentation].
+Instructions for building and running the PlayN sample games can be found in the [Documentation].
 
 Licensing
 ---------
