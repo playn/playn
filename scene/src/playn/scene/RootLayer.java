@@ -25,7 +25,7 @@ public class RootLayer extends GroupLayer {
     setState(State.ADDED);
   }
 
-  /** Creates an root layer clipped to the specified dimensions. This is rarely what you want. */
+  /** Creates a root layer clipped to the specified dimensions. This is rarely what you want. */
   public RootLayer (float width, float height) {
     super(width, height);
     setState(State.ADDED);
