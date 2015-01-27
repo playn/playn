@@ -4,11 +4,9 @@ PlayN
 PlayN is a cross-platform Java game development library written in [Java] that targets HTML5
 browsers (via [GWT]), desktop JVMs, [Android] and [iOS] devices.
 
-Information on PlayN can be found in in this README and on the PlayN project website:
-http://playn.github.io/
+Information on PlayN can be found in in this README and on the [PlayN project website].
 
-PlayN developers, contributors, and users regularly communicate on the PlayN Google Group:
-http://groups.google.com/group/playn
+PlayN developers, contributors, and users regularly communicate on the [PlayN Google Group].
 
 Building and Running
 --------------------
@@ -54,4 +52,6 @@ Unless otherwise stated, all source files are licensed under the Apache License,
 [Java]: http://www.java.com/
 [Maven Central]: http://search.maven.org/
 [Maven]: http://maven.apache.org/
+[PlayN Google Group]: http://groups.google.com/group/playn
+[PlayN project website]: http://playn.github.io/
 [iOS]: https://developer.apple.com/devcenter/ios/index.action
