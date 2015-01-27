@@ -20,6 +20,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import pythagoras.f.AffineTransform;
+import pythagoras.f.MathUtil;
 import pythagoras.f.Point;
 import pythagoras.util.NoninvertibleTransformException;
 
@@ -109,6 +110,15 @@ public class GroupLayer extends ClippedLayer implements Iterable<Layer> {
    */
   public void addCenterAt (Layer child, float tx, float ty) {
     add(child.setTranslation(tx - child.width()/2, ty - child.height()/2));
+  }
+
+  /**
+   * Adds {@code child} to this group layer, adjusting its translation (relative to this group
+   * layer) to {@code floor(tx), floor(ty)}. This is useful for adding layers which display text a
+   * text can become blurry if it is positioned on sub-pixel boundaries.
+   */
+  public void addFloorAt (Layer child, float tx, float ty) {
+    add(child.setTranslation(MathUtil.ifloor(tx), MathUtil.ifloor(ty)));
   }
 
   /**
