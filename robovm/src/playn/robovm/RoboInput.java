@@ -98,7 +98,7 @@ public class RoboInput extends Input {
     for (UITouch touch : touches) {
       CGPoint loc = touch.getLocationInView(touch.getView());
       // transform the point based on our current scale
-      IPoint xloc = plat.graphics().transformTouch((float)loc.x(), (float)loc.y());
+      IPoint xloc = plat.graphics().transformTouch((float)loc.getX(), (float)loc.getY());
       // on iOS the memory address of the UITouch object is the unique id
       int id = (int)touch.getHandle();
       events[idx++] = new Touch.Event(0, touch.getTimestamp() * 1000, xloc.x(), xloc.y(), kind, id);
