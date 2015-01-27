@@ -13,7 +13,23 @@ http://groups.google.com/group/playn
 Building and Running
 --------------------
 
-Instructions for building PlayN and running the samples can be found in the [Documentation].
+It is not necessary to build PlayN to use it. PlayN is shipped to [Maven Central] from where it
+will be automatically downloaded by projects that use it. However, you still may find it useful to
+build a local copy of PlayN in case you need to modify it when debugging your own game, to add new
+features, or to fix bugs you find in the PlayN code.
+
+Building PlayN locally is very easy using [Maven]:
+
+```
+cd playn
+mvn clean install
+```
+
+This will install the latest snapshot version of PlayN into your local Maven repository. You can
+then modify the `playn.version` property of your game to reference that snapshot version and your
+game will use your local copy of PlayN instead of a version shipped to [Maven Central].
+
+Instructions for building and running the PlayN samples can be found in the [Documentation].
 
 Licensing
 ---------
@@ -36,4 +52,6 @@ Unless otherwise stated, all source files are licensed under the Apache License,
 [Documentation]: http://playn.github.io/docs/
 [GWT]: http://code.google.com/webtoolkit/
 [Java]: http://www.java.com/
+[Maven Central]: http://search.maven.org/
+[Maven]: http://maven.apache.org/
 [iOS]: https://developer.apple.com/devcenter/ios/index.action
