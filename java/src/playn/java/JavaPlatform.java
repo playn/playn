@@ -151,15 +151,16 @@ public class JavaPlatform extends Platform {
     // set our starting display mode before we create our display
     graphics.preInit();
 
+    // if we're not headless, initialize our LWJGL display and input subsystems
     if (!config.headless) {
       try {
         Display.create();
       } catch (LWJGLException e) {
         throw new RuntimeException(e);
       }
-    }
 
-    input.init();
+      input.init();
+    }
   }
 
   /**
