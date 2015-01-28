@@ -133,6 +133,18 @@ public abstract class Image extends TileSource implements Canvas.Drawable {
   }
 
   /**
+   * Updates this image's default texture with the current contents of the image, and returns the
+   * texture. If the texture has not yet been created, then this simply creates it. This is only
+   * necessary if you want to update the default texture for an image associated with a {@link
+   * Canvas}, or if you have used {@link #setRgb} to change the contents of this image.
+   */
+  public Texture updateTexture () {
+    if (texture == null || texture.disposed()) texture = createTexture(texconf);
+    else texture.update(this);
+    return texture;
+  }
+
+  /**
    * Returns a future which will deliver the default texture for this image once its loading has
    * completed. Uses {@link #texture} to create the texture.
    */
