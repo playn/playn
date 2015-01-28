@@ -55,7 +55,13 @@ public class Pointer extends playn.core.Pointer {
 
   /** Used to dispatch pointer interactions to layers. */
   public static class Interaction extends playn.scene.Interaction<Event> {
-    Interaction (Layer hitLayer) { super(hitLayer); }
+    Interaction (Layer hitLayer, boolean bubble) { super(hitLayer, bubble); }
+
+    @Override protected Event newCancelEvent (Event source) {
+      return (source == null) ?
+        new Event(0, 0, 0, 0, Event.Kind.CANCEL, false) :
+        new Event(0, source.time, source.x, source.y, Event.Kind.CANCEL, source.isTouch);
+    }
   }
 
   /** Handles the dispatching of pointer events to layers. */
@@ -75,10 +81,10 @@ public class Pointer extends playn.core.Pointer {
       // start a new interaction on START, if we don't already have one
       if (currentIact == null && event.kind.isStart) {
         Layer hitLayer = LayerUtil.getHitLayer(root, scratch.set(event.x, event.y));
-        if (hitLayer != null) currentIact = new Interaction(hitLayer);
+        if (hitLayer != null) currentIact = new Interaction(hitLayer, bubble);
       }
       // dispatch the event to the interaction
-      if (currentIact != null) currentIact.dispatch(event, bubble);
+      if (currentIact != null) currentIact.dispatch(event);
       // if this is END or CANCEL, clear out the current interaction
       if (event.kind.isEnd) currentIact = null;
     }

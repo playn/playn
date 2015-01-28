@@ -57,7 +57,14 @@ public class Touch extends playn.core.Touch {
 
   /** Used to dispatch touch interactions to layers. */
   public static class Interaction extends playn.scene.Interaction<Event> {
-    Interaction (Layer hitLayer) { super(hitLayer); }
+    Interaction (Layer hitLayer, boolean bubble) { super(hitLayer, bubble); }
+
+    @Override protected Event newCancelEvent (Event source) {
+      return (source == null) ?
+        new Event(0, 0, 0, 0, Event.Kind.CANCEL, 0) :
+        new Event(0, source.time, source.x, source.y, Event.Kind.CANCEL,
+                  source.id, source.pressure, source.size);
+    }
   }
 
   /** Handles the dispatching of touch events to layers. */
@@ -80,11 +87,11 @@ public class Touch extends playn.core.Touch {
         Interaction iact = activeIacts.get(event.id);
         if (iact == null && event.kind.isStart) {
           Layer hitLayer = LayerUtil.getHitLayer(root, scratch.set(event.x, event.y));
-          if (hitLayer != null) activeIacts.put(event.id, iact = new Interaction(hitLayer));
+          if (hitLayer != null) activeIacts.put(event.id, iact = new Interaction(hitLayer, bubble));
         }
 
         // dispatch the event to the interaction
-        if (iact != null) iact.dispatch(event, bubble);
+        if (iact != null) iact.dispatch(event);
 
         // if this is END or CANCEL, clear out the interaction for this id
         if (event.kind.isEnd) activeIacts.remove(event.id);

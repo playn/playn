@@ -88,8 +88,8 @@ public class Mouse extends playn.core.Mouse {
   public static class Interaction extends playn.scene.Interaction<Event> {
 
     private final boolean solo;
-    Interaction (Layer hitLayer, boolean solo) {
-      super(hitLayer);
+    Interaction (Layer hitLayer, boolean bubble, boolean solo) {
+      super(hitLayer, bubble);
       this.solo = solo;
     }
 
@@ -115,6 +115,10 @@ public class Mouse extends playn.core.Mouse {
         lner.onWheel((WheelEvent)mevent, this);
       }
     }
+
+    @Override protected Event newCancelEvent (Event source) {
+      return cancelEvent;
+    }
   }
 
   /** Handles the dispatching of mouse events to layers. */
@@ -138,11 +142,11 @@ public class Mouse extends playn.core.Mouse {
           // if we have no current interaction, start one
           if (currentIact == null) {
             Layer hitLayer = LayerUtil.getHitLayer(root, scratch.set(event.x, event.y));
-            if (hitLayer != null) currentIact = new Interaction(hitLayer, false);
+            if (hitLayer != null) currentIact = new Interaction(hitLayer, bubble, false);
           }
           if (currentIact != null) {
             currentIact.add(bevent.button);
-            currentIact.dispatch(event, bubble);
+            currentIact.dispatch(event);
           }
         }
         // if we have no current interaction, that's weird, but maybe the app somehow missed the
@@ -152,7 +156,7 @@ public class Mouse extends playn.core.Mouse {
         // longer any buttons pressed therein
         else {
           boolean done = currentIact.remove(bevent.button);
-          currentIact.dispatch(event, bubble);
+          currentIact.dispatch(event);
           if (done) currentIact = null;
         }
 
@@ -160,26 +164,26 @@ public class Mouse extends playn.core.Mouse {
         // we always compute the hit layer because we need to hover events
         Layer hitLayer = LayerUtil.getHitLayer(root, scratch.set(event.x, event.y));
         // if we have a current interaction, dispatch a drag event
-        if (currentIact != null) currentIact.dispatch(event, bubble);
+        if (currentIact != null) currentIact.dispatch(event);
         // otherwise dispatch the mouse motion event solo
-        else if (hitLayer != null) new Interaction(hitLayer, true).dispatch(event, bubble);
+        else if (hitLayer != null) new Interaction(hitLayer, bubble, true).dispatch(event);
 
         // dispatch hover events if the hit layer changed
         if (hitLayer != hoverLayer) {
           if (hoverLayer != null) {
             HoverEvent hevent = new HoverEvent(0, event.time, event.x, event.y, false);
-            new Interaction(hoverLayer, true).dispatch(hevent, bubble);
+            new Interaction(hoverLayer, bubble, true).dispatch(hevent);
           }
           hoverLayer = hitLayer;
           if (hitLayer != null) {
             HoverEvent hevent = new HoverEvent(0, event.time, event.x, event.y, true);
-            new Interaction(hitLayer, true).dispatch(hevent, bubble);
+            new Interaction(hitLayer, bubble, true).dispatch(hevent);
           }
         }
 
       } else if (event instanceof WheelEvent) {
         // if we have a current interaction, dispatch to that
-        if (currentIact != null) currentIact.dispatch(event, bubble);
+        if (currentIact != null) currentIact.dispatch(event);
         // otherwise create a one-shot interaction and dispatch it
         else dispatchSolo(event);
       }
@@ -187,9 +191,12 @@ public class Mouse extends playn.core.Mouse {
 
     private void dispatchSolo (Event event) {
       Layer hitLayer = LayerUtil.getHitLayer(root, scratch.set(event.x, event.y));
-      if (hitLayer != null) new Interaction(hitLayer, true).dispatch(event, bubble);
+      if (hitLayer != null) new Interaction(hitLayer, bubble, true).dispatch(event);
     }
   }
 
-  protected static final Object cancelEvent = new Object();
+  protected static class CancelEvent extends Event {
+    public CancelEvent () { super(0, 0, 0, 0); }
+  }
+  protected static final CancelEvent cancelEvent = new CancelEvent();
 }
