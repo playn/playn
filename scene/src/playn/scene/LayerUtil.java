@@ -13,7 +13,6 @@
  */
 package playn.scene;
 
-import pythagoras.f.IPoint;
 import pythagoras.f.Point;
 import pythagoras.f.XY;
 import pythagoras.util.NoninvertibleTransformException;
@@ -33,7 +32,7 @@ public class LayerUtil {
    * Converts the supplied point from coordinates relative to the specified layer to screen
    * coordinates. The results are stored into {@code into}, which is returned for convenience.
    */
-  public static Point layerToScreen(Layer layer, IPoint point, Point into) {
+  public static Point layerToScreen(Layer layer, XY point, Point into) {
     return layerToParent(layer, null, point, into);
   }
 
@@ -51,7 +50,7 @@ public class LayerUtil {
    * child layer to coordinates relative to the specified parent layer. The
    * results are stored into {@code into}, which is returned for convenience.
    */
-  public static Point layerToParent(Layer layer, Layer parent, IPoint point, Point into) {
+  public static Point layerToParent(Layer layer, Layer parent, XY point, Point into) {
     into.set(point);
     while (layer != parent) {
       if (layer == null) {
@@ -81,9 +80,9 @@ public class LayerUtil {
    * relative to the specified layer. The results are stored into {@code into}
    * , which is returned for convenience.
    */
-  public static Point screenToLayer(Layer layer, IPoint point, Point into) {
+  public static Point screenToLayer(Layer layer, XY point, Point into) {
     Layer parent = layer.parent();
-    IPoint cur = (parent == null) ? point : screenToLayer(parent, point, into);
+    XY cur = (parent == null) ? point : screenToLayer(parent, point, into);
     return parentToLayer(layer, cur, into);
   }
 
@@ -101,8 +100,8 @@ public class LayerUtil {
    * to coordinates relative to the specified layer. The results are stored
    * into {@code into}, which is returned for convenience.
    */
-  public static Point parentToLayer(Layer layer, IPoint point, Point into) {
-    layer.transform().inverseTransform(point, into);
+  public static Point parentToLayer(Layer layer, XY point, Point into) {
+    layer.transform().inverseTransform(into.set(point), into);
     into.x += layer.originX();
     into.y += layer.originY();
     return into;
@@ -113,10 +112,11 @@ public class LayerUtil {
    * relative to the specified child layer. The results are stored into {@code into}, which is
    * returned for convenience.
    */
-  public static Point parentToLayer(Layer parent, Layer layer, IPoint point, Point into) {
+  public static Point parentToLayer(Layer parent, Layer layer, XY point, Point into) {
+    into.set(point);
     Layer immediateParent = layer.parent();
-    if (immediateParent != parent) point = parentToLayer(parent, immediateParent, point, into);
-    parentToLayer(layer, point, into);
+    if (immediateParent != parent) parentToLayer(parent, immediateParent, into, into);
+    parentToLayer(layer, into, into);
     return into;
   }
 
