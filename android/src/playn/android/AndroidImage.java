@@ -29,8 +29,8 @@ public class AndroidImage extends ImageImpl {
     // TODO: move elsewhere: ((AndroidGLContext) ctx).addRefreshable(this);
   }
 
-  public AndroidImage (AndroidPlatform plat, int preWidth, int preHeight) {
-    super(plat, Scale.ONE, preWidth, preHeight);
+  public AndroidImage (AndroidPlatform plat, boolean async, int preWidth, int preHeight) {
+    super(plat, async, Scale.ONE, preWidth, preHeight);
   }
 
   /**

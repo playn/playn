@@ -33,7 +33,7 @@ public abstract class Assets {
    * loading (HTML).
    */
   public Image getImageSync (String path) {
-    ImageImpl image = createImage(0, 0);
+    ImageImpl image = createImage(false, 0, 0);
     try {
       image.succeed(load(path));
     } catch (Exception e) {
@@ -51,7 +51,7 @@ public abstract class Assets {
    * @param path the path to the image asset.
    */
   public Image getImage (final String path) {
-    final ImageImpl image = createImage(0, 0);
+    final ImageImpl image = createImage(true, 0, 0);
     plat.invokeAsync(new Runnable() {
       public void run () {
         try {
@@ -83,7 +83,7 @@ public abstract class Assets {
   public Image getRemoteImage (String url, int width, int height) {
     Exception error = new Exception(
       "Remote image loading not yet supported: " + url + "@" + width + "x" + height);
-    ImageImpl image = createImage(width, height);
+    ImageImpl image = createImage(false, width, height);
     image.fail(error);
     return image;
   }
@@ -187,8 +187,10 @@ public abstract class Assets {
 
   /**
    * Creates an image with the specified width and height.
+   * @param async whether the image is being loaded synchronously or not. This should be passed
+   * through to the {@link ImageImpl} constructor.
    */
-  protected abstract ImageImpl createImage (int rawWidth, int rawHeight);
+  protected abstract ImageImpl createImage (boolean async, int rawWidth, int rawHeight);
 
   /**
    * Normalizes the path, by removing {@code foo/..} pairs until the path contains no {@code ..}s.

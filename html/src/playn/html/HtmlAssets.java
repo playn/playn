@@ -181,7 +181,7 @@ public class HtmlAssets extends Assets {
     throw new UnsupportedOperationException("unused");
   }
 
-  @Override protected ImageImpl createImage (int rawWidth, int rawHeight) {
+  @Override protected ImageImpl createImage (boolean async, int rawWidth, int rawHeight) {
     throw new UnsupportedOperationException("unused");
   }
 

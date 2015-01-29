@@ -45,7 +45,7 @@ public class RoboAssets extends Assets {
   }
 
   @Override public Image getRemoteImage(String url, int width, int height) {
-    final ImageImpl image = createImage(width, height);
+    final ImageImpl image = createImage(true, width, height);
     plat.net().req(url).execute().
       onSuccess(new Slot<Net.Response>() {
         public void onEmit (Net.Response rsp) {
@@ -114,8 +114,8 @@ public class RoboAssets extends Assets {
     throw error;
   }
 
-  @Override protected ImageImpl createImage (int rawWidth, int rawHeight) {
-    return new RoboImage(plat, rawWidth, rawHeight);
+  @Override protected ImageImpl createImage (boolean async, int rawWidth, int rawHeight) {
+    return new RoboImage(plat, async, rawWidth, rawHeight);
   }
 
   private ImageImpl.Data toData (Scale scale, UIImage image) {

@@ -133,7 +133,7 @@ public class AndroidAssets extends Assets {
 
   @Override
   public Image getRemoteImage(final String url, int width, int height) {
-    final ImageImpl image = createImage(width, height);
+    final ImageImpl image = createImage(true, width, height);
     plat.invokeAsync(new Runnable() {
       public void run () {
         try {
@@ -197,8 +197,8 @@ public class AndroidAssets extends Assets {
       }
   }
 
-  @Override protected ImageImpl createImage(int width, int height) {
-    return new AndroidImage(plat, width, height);
+  @Override protected ImageImpl createImage(boolean async, int width, int height) {
+    return new AndroidImage(plat, async, width, height);
   }
 
   @Override protected ImageImpl.Data load (String path) throws Exception {

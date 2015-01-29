@@ -45,8 +45,8 @@ public class JavaImage extends ImageImpl {
     super(gfx, scale, img.getWidth(), img.getHeight(), img);
   }
 
-  public JavaImage (JavaPlatform plat, int preWidth, int preHeight) {
-    super(plat, Scale.ONE, preWidth, preHeight);
+  public JavaImage (JavaPlatform plat, boolean async, int preWidth, int preHeight) {
+    super(plat, async, Scale.ONE, preWidth, preHeight);
   }
 
   /**

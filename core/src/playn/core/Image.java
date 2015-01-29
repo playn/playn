@@ -161,7 +161,8 @@ public abstract class Image extends TileSource implements Canvas.Drawable {
    * create the image's "default" texture which will be shared by all callers.
    */
   public Texture createTexture (Texture.Config config) {
-    if (!isLoaded()) throw new IllegalStateException("Cannot create texture from unready image.");
+    if (!isLoaded()) throw new IllegalStateException(
+      "Cannot create texture from unready image: " + this);
 
     int texWidth = config.toTexWidth(pixelWidth());
     int texHeight = config.toTexHeight(pixelHeight());

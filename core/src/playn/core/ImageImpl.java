@@ -80,8 +80,9 @@ public abstract class ImageImpl extends Image {
     pixelHeight = preHeight;
   }
 
-  protected ImageImpl (Platform plat, Scale preScale, int preWidth, int preHeight) {
-    this(plat.graphics(), plat.<Image>deferredPromise(), preScale, preWidth, preHeight);
+  protected ImageImpl (Platform plat, boolean async, Scale preScale, int preWidth, int preHeight) {
+    this(plat.graphics(), async ? plat.<Image>deferredPromise() : RPromise.<Image>create(),
+         preScale, preWidth, preHeight);
   }
 
   protected abstract void setBitmap (Object bitmap);

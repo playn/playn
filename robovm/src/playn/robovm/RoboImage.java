@@ -37,8 +37,8 @@ public class RoboImage extends ImageImpl {
     super(gfx, scale, (int)img.getWidth(), (int)img.getHeight(), img);
   }
 
-  public RoboImage (RoboPlatform plat, int preWidth, int preHeight) {
-    super(plat, Scale.ONE, preWidth, preHeight);
+  public RoboImage (RoboPlatform plat, boolean async, int preWidth, int preHeight) {
+    super(plat, async, Scale.ONE, preWidth, preHeight);
   }
 
   /** Returns the {@link CGImage} that underlies this image. This is public so that games that need
