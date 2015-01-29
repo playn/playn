@@ -226,8 +226,12 @@ public class Surface implements Disposable {
   }
 
   /** Clears the entire surface to transparent blackness. */
-  public Surface clear () {
-    batch.gl.glClearColor(0, 0, 0, 0);
+  public Surface clear () { return clear(0, 0, 0, 0); }
+
+  /** Clears the entire surface to the specified color.
+    * The channels are values in the range {@code [0,1]}. */
+  public Surface clear (float red, float green, float blue, float alpha) {
+    batch.gl.glClearColor(red, green, blue, alpha);
     batch.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
     return this;
   }
