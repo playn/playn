@@ -21,6 +21,8 @@ import react.Slot;
  */
 public abstract class SceneGame extends Game {
 
+  private float cred, cgreen, cblue, calpha; // default to zero
+
   public final QuadBatch defaultBatch;
   public final Surface viewSurf;
   public final RootLayer rootLayer;
@@ -43,12 +45,19 @@ public abstract class SceneGame extends Game {
   }
 
   /**
+   * Configures the color to which the frame buffer is cleared prior to painting the scene graph.
+   */
+  public void setClearColor (float red, float green, float blue, float alpha) {
+    cred = red; cgreen = green; cblue = blue; calpha = alpha;
+  }
+
+  /**
    * Renders the main scene graph into the OpenGL frame buffer.
    */
   protected void paintScene () {
     viewSurf.saveTx();
     viewSurf.begin();
-    viewSurf.clear();
+    viewSurf.clear(cred, cgreen, cblue, calpha);
     try {
       rootLayer.paint(viewSurf);
     } finally {
