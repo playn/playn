@@ -14,6 +14,7 @@
 package playn.core;
 
 import pythagoras.f.AffineTransform;
+import pythagoras.f.Points;
 
 import react.RFuture;
 
@@ -51,4 +52,10 @@ public abstract class Tile extends TileSource {
   @Override public boolean isLoaded () { return true; }
   @Override public Tile tile () { return this; }
   @Override public RFuture<Tile> tileAsync () { return RFuture.success(this); }
+
+  @Override public String toString () {
+    return "Tile[" + width() + "x" + height() +
+      "/" + Points.pointToString(sx(), sy()) + "/" + Points.pointToString(tx(), ty()) +
+      "] <- " + texture();
+  }
 }
