@@ -34,6 +34,7 @@ public class AndroidPlatform extends Platform {
 
   private final AndroidAssets assets;
   private final AndroidAudio audio;
+  private final AndroidExec exec;
   private final AndroidGraphics graphics;
   private final AndroidInput input;
   private final AndroidLog log;
@@ -45,13 +46,16 @@ public class AndroidPlatform extends Platform {
   public AndroidPlatform (GameActivity activity) {
     this.activity = activity;
 
-    log = new AndroidLog(activity);
+    log = new AndroidLog(activity.logIdent());
+    exec = new AndroidExec(log, frame, activity) {
+      @Override protected boolean isPaused () { return state == State.PAUSED; }
+    };
     audio = new AndroidAudio(this);
     graphics = new AndroidGraphics(this, activity.preferredBitmapConfig());
     assets = new AndroidAssets(this);
     json = new JsonImpl();
     input = new AndroidInput(this);
-    net = new AndroidNet(this);
+    net = new AndroidNet(exec);
     storage = new AndroidStorage(this);
   }
 
@@ -62,44 +66,6 @@ public class AndroidPlatform extends Platform {
   @Override public Type type() { return Type.ANDROID; }
   @Override public double time() { return System.currentTimeMillis(); }
   @Override public int tick() { return (int)((System.nanoTime() - start) / 1000000L); }
-
-  @Override public void invokeLater(Runnable runnable) {
-    switch (state) {
-    default:
-    case RUNNING:
-      super.invokeLater(runnable);
-      break;
-    case PAUSED:
-      // if we're paused, we need to run these on the main app thread instead of queueing them up
-      // for processing on the run queue, because the run queue isn't processed while we're paused;
-      // the main thread will ensure they're run serially, but also that they don't linger until the
-      // next time the app is resumed (if that happens at all)
-      activity.runOnUiThread(runnable);
-      break;
-    case EXITED:
-      // if our activity has already exited, we have to drop this runnable, because we don't want to
-      // conflict with another instance of our activity which may have already started up
-      // (especially not its GL thread)
-      break;
-    }
-  }
-
-  @Override public void invokeAsync(final Runnable action) {
-    activity.runOnUiThread(new Runnable() {
-      public void run () {
-        new AsyncTask<Void,Void,Void>() {
-          @Override public Void doInBackground(Void... params) {
-            try {
-              action.run();
-            } catch (Exception e) {
-              reportError("Async task failure [task=" + action + "]", e);
-            }
-            return null;
-          }
-        }.execute();
-      }
-    });
-  }
 
   @Override public void openURL(String url) {
     Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
@@ -113,6 +79,7 @@ public class AndroidPlatform extends Platform {
   @Override public AndroidLog log() { return log; }
   @Override public AndroidNet net() { return net; }
   @Override public AndroidStorage storage() { return storage; }
+  @Override public Exec exec() { return exec; }
   @Override public Json json() { return json; }
 
   // note: these are called by GameActivity

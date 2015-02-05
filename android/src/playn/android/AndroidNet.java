@@ -38,23 +38,24 @@ import org.apache.http.util.EntityUtils;
 import react.RFuture;
 import react.RPromise;
 
+import playn.core.Exec;
 import playn.core.Net;
 
 public class AndroidNet extends Net {
 
-  private final AndroidPlatform plat;
+  private final Exec exec;
 
-  public AndroidNet(AndroidPlatform plat) {
-    this.plat = plat;
+  public AndroidNet (Exec exec) {
+    this.exec = exec;
   }
 
   @Override public WebSocket createWebSocket(String url, WebSocket.Listener listener) {
-    return new AndroidWebSocket(plat, url, listener);
+    return new AndroidWebSocket(exec, url, listener);
   }
 
   @Override protected RFuture<Response> execute(final Builder req) {
-    final RPromise<Response> result = plat.deferredPromise();
-    plat.invokeAsync(new Runnable() {
+    final RPromise<Response> result = exec.deferredPromise();
+    exec.invokeAsync(new Runnable() {
       @Override public void run() {
         HttpParams params = new BasicHttpParams();
         HttpProtocolParams.setContentCharset(params, HTTP.UTF_8);

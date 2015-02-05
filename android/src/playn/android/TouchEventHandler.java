@@ -46,7 +46,7 @@ class TouchEventHandler {
       // extract the native event data while we're on the UI thread
       final Touch.Event[] touches = parseMotionEvent(nativeEvent, kind);
       // process it (issuing game callbacks) on the GL/Game thread
-      plat.invokeLater(new Runnable() {
+      plat.exec().invokeLater(new Runnable() {
         public void run() { plat.input().touchEvents.emit(touches); }
       });
     }

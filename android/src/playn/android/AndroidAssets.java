@@ -67,8 +67,8 @@ public class AndroidAssets extends Assets {
     public void adjustOptions(String path, BitmapOptions options) {} // noop!
   };
 
-  public AndroidAssets(AndroidPlatform plat) {
-    super(plat);
+  public AndroidAssets (AndroidPlatform plat) {
+    super(plat.exec());
     this.plat = plat;
     this.assetMgr = plat.activity.getResources().getAssets();
   }
@@ -131,10 +131,9 @@ public class AndroidAssets extends Assets {
     this.optionsAdjuster = optionsAdjuster;
   }
 
-  @Override
-  public Image getRemoteImage(final String url, int width, int height) {
+  @Override public Image getRemoteImage(final String url, int width, int height) {
     final ImageImpl image = createImage(true, width, height);
-    plat.invokeAsync(new Runnable() {
+    exec.invokeAsync(new Runnable() {
       public void run () {
         try {
           BitmapOptions options = createOptions(url, false, Scale.ONE);

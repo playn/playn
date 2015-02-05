@@ -47,7 +47,7 @@ public class AndroidAudio extends Audio {
     private int streamId;
 
     public PooledSound(int soundId) {
-      super(plat);
+      super(plat.exec());
       this.soundId = soundId;
     }
 
@@ -158,7 +158,7 @@ public class AndroidAudio extends Audio {
         // it was created; resolve() will be called from the main PlayN thread and we want
         // callbacks to be dispatched on that same thread
         final MediaPlayer mp = new MediaPlayer();
-        plat.invokeAsync(new Runnable() {
+        plat.exec().invokeAsync(new Runnable() {
           public void run () {
             try {
               AssetFileDescriptor fd = plat.assets().openAssetFd(path);

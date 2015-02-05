@@ -15,15 +15,13 @@
  */
 package playn.android;
 
+import playn.core.Exec;
 import playn.core.SoundImpl;
 
 public abstract class AndroidSound<I> extends SoundImpl<I> {
 
-  public AndroidSound (AndroidPlatform plat) {
-    super(plat);
-  }
+  public AndroidSound (Exec exec) { super(exec); }
 
   abstract void onPause();
-
   abstract void onResume();
 }

@@ -21,12 +21,11 @@ public class AndroidLog extends playn.core.Log {
 
   private final String logIdent;
 
-  public AndroidLog(GameActivity activity) {
-    this.logIdent = activity.logIdent();
+  public AndroidLog (String logIdent) {
+    this.logIdent = logIdent;
   }
 
-  @Override
-  protected void logImpl(Level level, String msg, Throwable e) {
+  @Override protected void logImpl (Level level, String msg, Throwable e) {
     switch (level) {
     case DEBUG: Log.d(logIdent, msg, e); break;
     default:    Log.i(logIdent, msg, e); break;

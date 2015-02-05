@@ -38,7 +38,7 @@ public class AndroidInput extends Input {
 
   @Override public RFuture<String> getText(final Keyboard.TextType ttype, final String label,
                                            final String initVal) {
-    final RPromise<String> result = plat.deferredPromise();
+    final RPromise<String> result = plat.exec().deferredPromise();
     plat.activity.runOnUiThread(new Runnable() {
       public void run () {
         final AlertDialog.Builder alert = new AlertDialog.Builder(plat.activity);
@@ -96,7 +96,7 @@ public class AndroidInput extends Input {
   }
 
   private void dispatch (final Keyboard.Event event) {
-    plat.invokeLater(new Runnable() {
+    plat.exec().invokeLater(new Runnable() {
       @Override public void run() { keyboardEvents.emit(event); }
     });
   }

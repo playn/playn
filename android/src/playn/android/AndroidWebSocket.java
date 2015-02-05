@@ -22,14 +22,14 @@ import java.nio.ByteBuffer;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
 
+import playn.core.Exec;
 import playn.core.Net;
-import playn.core.Platform;
 
 public class AndroidWebSocket implements Net.WebSocket {
 
   private final WebSocketClient socket;
 
-  public AndroidWebSocket(final Platform platform, String uri, final Listener listener) {
+  public AndroidWebSocket(final Exec exec, String uri, final Listener listener) {
     URI juri = null;
     try {
       juri = new URI(uri);
@@ -38,61 +38,30 @@ public class AndroidWebSocket implements Net.WebSocket {
     }
 
     socket = new WebSocketClient(juri) {
-      @Override
-      public void onMessage(final ByteBuffer buffer) {
-        platform.invokeLater(new Runnable() {
-          public void run() {
-            listener.onDataMessage(buffer);
-          }
-        });
+      @Override public void onMessage(final ByteBuffer buffer) {
+        exec.invokeLater(new Runnable() { public void run() { listener.onDataMessage(buffer); }});
       }
-
-      @Override
-      public void onMessage(final String msg) {
-        platform.invokeLater(new Runnable() {
-          public void run() {
-            listener.onTextMessage(msg);
-          }
-        });
+      @Override public void onMessage(final String msg) {
+        exec.invokeLater(new Runnable() { public void run() { listener.onTextMessage(msg); }});
       }
-
-      @Override
-      public void onError(final Exception e) {
-        platform.invokeLater(new Runnable() {
-          public void run() {
-            listener.onError(e.getMessage());
-          }
-        });
+      @Override public void onError(final Exception e) {
+        exec.invokeLater(new Runnable() { public void run() { listener.onError(e.getMessage()); }});
       }
-
-      @Override
-      public void onClose(int arg0, String arg1, boolean arg2) {
-        platform.invokeLater(new Runnable() {
-          public void run() {
-            listener.onClose();
-          }
-        });
+      @Override public void onClose(int arg0, String arg1, boolean arg2) {
+        exec.invokeLater(new Runnable() { public void run() { listener.onClose(); }});
       }
-
-      @Override
-      public void onOpen(ServerHandshake handshake) {
-        platform.invokeLater(new Runnable() {
-          public void run() {
-            listener.onOpen();
-          }
-        });
+      @Override public void onOpen(ServerHandshake handshake) {
+        exec.invokeLater(new Runnable() { public void run() { listener.onOpen(); }});
       }
     };
     socket.connect();
   }
 
-  @Override
-  public void close() {
+  @Override public void close() {
     socket.close();
   }
 
-  @Override
-  public void send(String data) {
+  @Override public void send(String data) {
     try {
       socket.getConnection().send(data);
     } catch (Throwable e) {
@@ -100,8 +69,7 @@ public class AndroidWebSocket implements Net.WebSocket {
     }
   }
 
-  @Override
-  public void send(ByteBuffer data) {
+  @Override public void send(ByteBuffer data) {
     try {
       socket.getConnection().send(data);
     } catch (Throwable e) {
