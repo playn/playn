@@ -33,7 +33,7 @@ public class RoboAssets extends Assets {
   private File assetRoot = new File(bundleRoot, "assets");
 
   public RoboAssets(RoboPlatform plat) {
-    super(plat);
+    super(plat.exec());
     this.plat = plat;
   }
 

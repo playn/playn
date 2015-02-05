@@ -41,7 +41,7 @@ public class RoboSoundAVAP extends SoundImpl<AVAudioPlayer> {
   };
 
   public RoboSoundAVAP (RoboPlatform plat) {
-    super(plat);
+    super(plat.exec());
   }
 
   @Override

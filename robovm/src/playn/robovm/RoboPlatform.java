@@ -117,17 +117,6 @@ public class RoboPlatform extends Platform {
   final int osVersion = getOSVersion();
   final Config config;
 
-  // create log early because other services use it in their ctor
-  private final RoboLog log = new RoboLog();
-  private final Json json = new JsonImpl();
-
-  private RoboAudio audio; // lazily initialized
-  private final RoboAssets assets;
-  private final RoboGraphics graphics;
-  private final RoboInput input;
-  private final RoboNet net;
-  private final RoboStorage storage;
-
   /** Used as a guard flag to avoid duplicated entries caused by the double dispatches of
     * GLKViewControllerDelegate.willPause in one cycle. That could be a bug of RoboVM.
     * TODO: remove this after we figure out a better solution. **/
@@ -137,17 +126,28 @@ public class RoboPlatform extends Platform {
   private final long gameStart = System.nanoTime();
   private final ExecutorService pool = Executors.newFixedThreadPool(3);
 
+  // create log early because other services use it in their ctor
+  private final RoboLog log = new RoboLog();
+  private final Json json = new JsonImpl();
+  private final Exec exec = new Exec.Default(log, frame) {
+    @Override public boolean isAsyncSupported () { return true; }
+    @Override public void invokeAsync (Runnable action) { pool.execute(action); }
+  };
+
+  private RoboAudio audio; // lazily initialized
+  private final RoboAssets assets;
+  private final RoboGraphics graphics;
+  private final RoboInput input;
+  private final RoboNet net;
+  private final RoboStorage storage;
+
   protected RoboPlatform(Config config, CGRect initBounds) {
     this.config = config;
     assets = new RoboAssets(this);
     graphics = new RoboGraphics(this, initBounds);
     input = new RoboInput(this);
-    net = new RoboNet(this);
+    net = new RoboNet(exec);
     storage = new RoboStorage(this);
-  }
-
-  @Override public void invokeAsync(Runnable action) {
-    pool.execute(action);
   }
 
   @Override public Type type() { return Type.IOS; }
@@ -165,6 +165,7 @@ public class RoboPlatform extends Platform {
     if (audio == null) audio = new RoboAudio(this, config.openALSources);
     return audio;
   }
+  @Override public Exec exec() { return exec; }
   @Override public Json json() { return json; }
   @Override public Log log() { return log; }
   @Override public Net net() { return net; }

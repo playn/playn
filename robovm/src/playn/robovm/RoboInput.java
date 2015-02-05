@@ -41,7 +41,7 @@ public class RoboInput extends Input {
 
   @Override public RFuture<String> getText(Keyboard.TextType textType, String label,
                                            String initVal) {
-    final RPromise<String> result = plat.deferredPromise();
+    final RPromise<String> result = plat.exec().deferredPromise();
 
     UIAlertView view = new UIAlertView();
     if (label != null)

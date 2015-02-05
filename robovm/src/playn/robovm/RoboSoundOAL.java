@@ -27,7 +27,7 @@ public class RoboSoundOAL extends SoundImpl<Integer> {
   private int sourceIdx;
 
   public RoboSoundOAL(RoboPlatform plat) {
-    super(plat);
+    super(plat.exec());
     this.audio = plat.audio();
   }
 

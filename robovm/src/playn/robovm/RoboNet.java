@@ -30,24 +30,25 @@ import org.robovm.apple.foundation.NSURLConnectionDataDelegateAdapter;
 import org.robovm.apple.foundation.NSURLRequest;
 import org.robovm.apple.foundation.NSURLResponse;
 
+import playn.core.Exec;
 import playn.core.Net;
 import react.RFuture;
 import react.RPromise;
 
 public class RoboNet extends Net {
 
-  private final RoboPlatform plat;
+  private final Exec exec;
 
-  public RoboNet(RoboPlatform plat) {
-    this.plat = plat;
+  public RoboNet(Exec exec) {
+    this.exec = exec;
   }
 
   @Override public WebSocket createWebSocket(String url, WebSocket.Listener listener) {
-    return new RoboWebSocket(plat, url, listener);
+    return new RoboWebSocket(exec, url, listener);
   }
 
   @Override protected RFuture<Response> execute(Builder req) {
-    RPromise<Response> result = plat.deferredPromise();
+    RPromise<Response> result = exec.deferredPromise();
 
     NSMutableURLRequest mreq = new NSMutableURLRequest();
     mreq.setURL(new NSURL(req.url));
