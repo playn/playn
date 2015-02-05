@@ -22,12 +22,13 @@ import com.allen_sauer.gwt.voices.client.Sound.LoadState;
 
 import com.allen_sauer.gwt.voices.client.Sound;
 
+import playn.core.Exec;
 import playn.core.SoundImpl;
 
 public class HtmlSound extends SoundImpl<Sound> {
 
-  public HtmlSound(HtmlPlatform plat, final Sound sound) {
-    super(plat);
+  public HtmlSound(Exec exec, final Sound sound) {
+    super(exec);
     sound.addEventHandler(new SoundHandler() {
       @Override
       public void onSoundLoadStateChange(SoundLoadStateChangeEvent event) {

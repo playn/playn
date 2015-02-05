@@ -45,7 +45,7 @@ public class HtmlAudio extends Audio {
   public HtmlSound createSound (String url) {
     Sound sound = soundController.createSound("audio/mpeg", url);
     // HtmlPlatform.log.debug(sound.getClass().getName() + " " + sound.getUrl());
-    return new HtmlSound(plat, sound);
+    return new HtmlSound(plat.exec(), sound);
   }
 
   /**

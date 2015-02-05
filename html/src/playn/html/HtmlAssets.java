@@ -186,7 +186,7 @@ public class HtmlAssets extends Assets {
   }
 
   HtmlAssets(HtmlPlatform plat) {
-    super(plat);
+    super(plat.exec());
     this.plat = plat;
   }
 

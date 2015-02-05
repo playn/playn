@@ -30,12 +30,6 @@ import react.RPromise;
 
 public class HtmlNet extends Net {
 
-  private final HtmlPlatform plat;
-
-  public HtmlNet(HtmlPlatform plat) {
-    this.plat = plat;
-  }
-
   @Override public WebSocket createWebSocket(String url, WebSocket.Listener listener) {
     return new HtmlWebSocket(url, listener);
   }

@@ -105,6 +105,7 @@ public class HtmlPlatform extends Platform {
   private final double start = initNow();
 
   private final HtmlLog log = GWT.create(HtmlLog.class);
+  private final Exec exec = new Exec.Default(log, frame);
   private final HtmlAssets assets;
   private final HtmlAudio audio;
   private final HtmlGraphics graphics;
@@ -133,7 +134,7 @@ public class HtmlPlatform extends Platform {
       input = new HtmlInput(this, graphics.rootElement);
       audio = new HtmlAudio(this);
       assets = new HtmlAssets(this);
-      net = new HtmlNet(this);
+      net = new HtmlNet();
       storage = new HtmlStorage(this);
 
     } catch (Throwable e) {
@@ -165,8 +166,9 @@ public class HtmlPlatform extends Platform {
   @Override public HtmlAssets assets() { return assets; }
   @Override public HtmlAudio audio() { return audio; }
   @Override public HtmlGraphics graphics() { return graphics; }
-  @Override public Json json() { return json; }
+  @Override public Exec exec() { return exec; }
   @Override public Input input() { return input; }
+  @Override public Json json() { return json; }
   @Override public Log log() { return log; }
   @Override public Net net() { return net; }
   @Override public Storage storage() { return storage; }
