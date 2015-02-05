@@ -80,6 +80,9 @@ public class StubPlatform extends Platform {
       e.printStackTrace(System.err);
     }
   };
+  private Exec exec = new Exec.Default(log, frame) {
+    @Override public void invokeLater (Runnable action) { action.run(); } // now is later!
+  };
   private final long start = System.currentTimeMillis();
 
   @Override public Platform.Type type () {
@@ -93,10 +96,6 @@ public class StubPlatform extends Platform {
     return (int)(System.currentTimeMillis() - start);
   }
 
-  @Override public void invokeLater (Slot<? super Platform> action) {
-    action.onEmit(this); // now is later!
-  }
-
   @Override public void openURL (String url) { throw new UnsupportedOperationException(); }
 
   @Override public Assets assets () { throw new UnsupportedOperationException(); }
@@ -104,6 +103,7 @@ public class StubPlatform extends Platform {
   @Override public Graphics graphics () { throw new UnsupportedOperationException(); }
   @Override public Net net () { throw new UnsupportedOperationException(); }
 
+  @Override public Exec exec () { return exec; }
   @Override public Input input () { return input; }
   @Override public Json json () { return json; }
   @Override public Log log () { return log; }

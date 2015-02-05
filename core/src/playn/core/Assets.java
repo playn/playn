@@ -52,7 +52,7 @@ public abstract class Assets {
    */
   public Image getImage (final String path) {
     final ImageImpl image = createImage(true, 0, 0);
-    plat.invokeAsync(new Runnable() {
+    exec.invokeAsync(new Runnable() {
       public void run () {
         try {
           image.succeed(load(path));
@@ -131,8 +131,8 @@ public abstract class Assets {
    * @param path the path to the text asset.
    */
   public RFuture<String> getText (final String path) {
-    final RPromise<String> result = plat.deferredPromise();
-    plat.invokeAsync(new Runnable() {
+    final RPromise<String> result = exec.deferredPromise();
+    exec.invokeAsync(new Runnable() {
       public void run () {
         try {
           result.succeed(getTextSync(path));
@@ -161,8 +161,8 @@ public abstract class Assets {
    * @param path the path to the binary asset.
    */
   public RFuture<byte[]> getBytes (final String path) {
-    final RPromise<byte[]> result = plat.deferredPromise();
-    plat.invokeAsync(new Runnable() {
+    final RPromise<byte[]> result = exec.deferredPromise();
+    exec.invokeAsync(new Runnable() {
       public void run () {
         try {
           result.succeed(getBytesSync(path));
@@ -174,10 +174,10 @@ public abstract class Assets {
     return result;
   }
 
-  protected final Platform plat;
+  protected final Exec exec;
 
-  protected Assets (Platform plat) {
-    this.plat = plat;
+  protected Assets (Exec exec) {
+    this.exec = exec;
   }
 
   /**

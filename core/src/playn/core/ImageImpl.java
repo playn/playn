@@ -81,7 +81,7 @@ public abstract class ImageImpl extends Image {
   }
 
   protected ImageImpl (Platform plat, boolean async, Scale preScale, int preWidth, int preHeight) {
-    this(plat.graphics(), async ? plat.<Image>deferredPromise() : RPromise.<Image>create(),
+    this(plat.graphics(), async ? plat.exec().<Image>deferredPromise() : RPromise.<Image>create(),
          preScale, preWidth, preHeight);
   }
 

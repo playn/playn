@@ -72,6 +72,9 @@ public abstract class Platform {
   /** Returns the {@link Audio} service. */
   public abstract Audio audio ();
 
+  /** Returns the {@link Exec} service. */
+  public abstract Exec exec ();
+
   /** Returns the {@link Graphics} service. */
   public abstract Graphics graphics ();
 
@@ -91,60 +94,6 @@ public abstract class Platform {
   public abstract Storage storage ();
 
   /**
-   * Queues the supplied runnable for invocation on the game thread prior to the next frame. Note:
-   * this uses {@link #invokeLater(Slot)} so feel free to cut out the middle man.
-   */
-  public void invokeLater (final Runnable runnable) {
-    invokeLater(new Slot<Platform>() { public void onEmit (Platform plat) { runnable.run(); }});
-  }
-
-  /**
-   * Connects {@code action} to the {@link #frame} signal at a high priority and for a single
-   * execution. This ensures that it runs before the game's normal callbacks.
-   */
-  public void invokeLater (Slot<? super Platform> action) {
-    frame.connect(action).atPrio(Short.MAX_VALUE).once();
-  }
-
-  /**
-   * Creates a promise which defers notification of success or failure to the game thread,
-   * regardless of what thread on which it is completed. Note that even if it is completed on the
-   * game thread, it will still defer completion until the next frame.
-   */
-  public <T> RPromise<T> deferredPromise () {
-    return new RPromise<T>() {
-      @Override public void succeed (final T value) {
-        invokeLater(new Slot<Platform>() {
-          public void onEmit (Platform plat) { superSucceed(value); }
-        });
-      }
-      @Override public void fail (final Throwable cause) {
-        invokeLater(new Slot<Platform>() {
-          public void onEmit (Platform plat) { superFail(cause); }
-        });
-      }
-      private void superSucceed (T value) { super.succeed(value); }
-      private void superFail (Throwable cause) { super.fail(cause); }
-    };
-  }
-
-  /**
-   * Returns whether this platform supports async (background) operations.
-   * HTML doesn't, most other platforms do.
-   */
-  public boolean isAsyncSupported  () {
-    return false;
-  }
-
-  /**
-   * Invokes the supplied action on a separate thread.
-   * @throws UnsupportedOperationException if the platform does not support async operations.
-   */
-  public void invokeAsync (Runnable action) {
-    throw new UnsupportedOperationException();
-  }
-
-  /**
    * Called when a backend (or other framework code) encounters an exception that it can recover
    * from, but which it would like to report in some orderly fashion. <em>NOTE:</em> this method
    * may be called from threads other than the main PlayN thread.
@@ -153,6 +102,13 @@ public abstract class Platform {
     errors.emit(new Error(message, cause));
     log().warn(message, cause);
   }
+
+  /** @deprecated Use {@link Exec#invokeLater}. */
+  @Deprecated public void invokeLater (Runnable runnable) { exec().invokeLater(runnable); }
+  /** @deprecated Use {@link Exec#isAsyncSupported}. */
+  @Deprecated public boolean isAsyncSupported  () { return exec().isAsyncSupported(); }
+  /** @deprecated Use {@link Exec#invokeAsync}. */
+  @Deprecated public void invokeAsync (Runnable action) { exec().invokeAsync(action); }
 
   protected void emitFrame () {
     try { frame.emit(this); }

@@ -25,8 +25,8 @@ public abstract class SoundImpl<I> extends Sound {
   protected float volume = 1;
   protected I impl;
 
-  public SoundImpl (Platform plat) {
-    super(plat.<Sound>deferredPromise());
+  public SoundImpl (Exec exec) {
+    super(exec.<Sound>deferredPromise());
   }
 
   /** Configures this sound with its platform implementation.
