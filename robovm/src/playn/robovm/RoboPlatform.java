@@ -33,6 +33,7 @@ import org.robovm.rt.bro.annotation.Callback;
 
 import playn.core.*;
 import playn.core.json.JsonImpl;
+import react.Signal;
 
 public class RoboPlatform extends Platform {
 
@@ -89,12 +90,6 @@ public class RoboPlatform extends Platform {
     public String storageFileName = "playn.db";
   }
 
-  /** Enables games to respond to device orientation changes. */
-  public static interface OrientationListener {
-    void willRotate(UIInterfaceOrientation toOrient, double duration);
-    void didRotate(UIInterfaceOrientation orientation);
-  }
-
   /**
    * Creates a RoboVM platform for operation in {@code window}.
    *
@@ -106,13 +101,11 @@ public class RoboPlatform extends Platform {
   public static RoboPlatform create (UIWindow window, Config config) {
     RoboViewController ctrl = new RoboViewController(window.getBounds(), config);
     window.setRootViewController(ctrl);
-    return ctrl.platform;
+    return ctrl.plat;
   }
 
-  /** Configures a listener to be notified when the device rotates. */
-  public void setListener(OrientationListener listener) {
-    orientListener = listener;
-  }
+  /** A signal emitted when the device rotates. */
+  public Signal<RoboOrientEvent> orient = Signal.create();
 
   final int osVersion = getOSVersion();
   final Config config;
@@ -122,7 +115,6 @@ public class RoboPlatform extends Platform {
     * TODO: remove this after we figure out a better solution. **/
   private boolean paused = false;
   private Game game;
-  private OrientationListener orientListener;
   private final long gameStart = System.nanoTime();
   private final ExecutorService pool = Executors.newFixedThreadPool(3);
 
@@ -175,17 +167,6 @@ public class RoboPlatform extends Platform {
 
   // NOTE: all of the below callbacks are called by RoboViewController which handles interfacing
   // with iOS for rotation notifications, game loop callbacks, and app lifecycle events
-
-  void willRotate(UIInterfaceOrientation toOrient, double duration) {
-    if (orientListener != null) {
-      orientListener.willRotate(toOrient, duration);
-    }
-  }
-  void didRotate (UIInterfaceOrientation fromOrient) {
-    if (orientListener != null) {
-      orientListener.didRotate(fromOrient);
-    }
-  }
 
   void processFrame() { emitFrame(); }
 

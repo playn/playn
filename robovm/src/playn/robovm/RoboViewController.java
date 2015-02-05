@@ -39,62 +39,62 @@ public class RoboViewController extends GLKViewController implements GLKViewCont
   private final GLKView view;
 
   /** The platform managed by this view controller. */
-  public final RoboPlatform platform;
+  public final RoboPlatform plat;
 
   /** Creates a game view controller with the given bounds and configuration **/
   public RoboViewController(CGRect bounds, RoboPlatform.Config config) {
     EAGLContext ctx = new EAGLContext(EAGLRenderingAPI.OpenGLES2);
     EAGLContext.setCurrentContext(ctx);
-    platform = new RoboPlatform(config, bounds);
+    plat = new RoboPlatform(config, bounds);
     view = new GLKView(bounds, ctx) {
       @Method(selector = "touchesBegan:withEvent:")
       public void touchesBegan(NSSet<UITouch> touches, UIEvent event) {
-        platform.input().onTouchesBegan(touches, event);
+        plat.input().onTouchesBegan(touches, event);
       }
       @Method(selector = "touchesCancelled:withEvent:")
       public void touchesCancelled(NSSet<UITouch> touches, UIEvent event) {
-        platform.input().onTouchesCancelled(touches, event);
+        plat.input().onTouchesCancelled(touches, event);
       }
       @Method(selector = "touchesEnded:withEvent:")
       public void touchesEnded(NSSet<UITouch> touches, UIEvent event) {
-        platform.input().onTouchesEnded(touches, event);
+        plat.input().onTouchesEnded(touches, event);
       }
       @Method(selector = "touchesMoved:withEvent:")
       public void touchesMoved(NSSet<UITouch> touches, UIEvent event) {
-        platform.input().onTouchesMoved(touches, event);
+        plat.input().onTouchesMoved(touches, event);
       }
     };
     view.setMultipleTouchEnabled(true);
-    view.setDrawableColorFormat(platform.config.glBufferFormat);
+    view.setDrawableColorFormat(plat.config.glBufferFormat);
     // view.setDrawableDepthFormat(GLKViewDrawableDepthFormat._16);
     // view.setDrawableStencilFormat(GLKViewDrawableStencilFormat.None);
     setView(view);
     setDelegate(this);
     setPreferredFramesPerSecond(config.targetFPS);
-    addStrongRef(platform);
+    addStrongRef(plat);
   }
 
   @Override // from GLKViewControllerDelegate
   public void update(GLKViewController self) {
-    platform.processFrame();
+    plat.processFrame();
   }
 
   @Override // from GLKViewControllerDelegate
   public void willPause(GLKViewController self, boolean paused) {
-    // platform.log().debug("willPause(" + paused + ")");
-    if (paused) platform.didEnterBackground();
+    // plat.log().debug("willPause(" + paused + ")");
+    if (paused) plat.didEnterBackground();
     else {
       view.bindDrawable();
-      platform.willEnterForeground();
+      plat.willEnterForeground();
     }
   }
 
   @Override // from ViewController
   public void viewDidAppear(boolean animated) {
     super.viewDidAppear(animated);
-    // platform.log().debug("viewDidAppear(" + animated + ")");
+    // plat.log().debug("viewDidAppear(" + animated + ")");
     view.bindDrawable();
-    platform.graphics().viewDidInit(getView().getBounds());
+    plat.graphics().viewDidInit(getView().getBounds());
   }
 
   @Override // from ViewController
@@ -106,20 +106,20 @@ public class RoboViewController extends GLKViewController implements GLKViewCont
   @Override // from ViewController
   public void willRotate(UIInterfaceOrientation toOrient, double duration) {
     super.willRotate(toOrient, duration);
-    platform.willRotate(toOrient, duration);
+    plat.orient.emit(new RoboOrientEvent.WillRotate(toOrient, duration));
   }
 
   @Override // from ViewController
   public void didRotate(UIInterfaceOrientation fromOrient) {
     super.didRotate(fromOrient);
-    // platform.log().debug("didRotate(" + fromOrient + "): " + bounds);
-    platform.graphics().setSize(getView().getBounds());
-    platform.didRotate(fromOrient);
+    // plat.log().debug("didRotate(" + fromOrient + "): " + bounds);
+    plat.graphics().setSize(getView().getBounds());
+    plat.orient.emit(new RoboOrientEvent.DidRotate(fromOrient));
   }
 
   @Override // from ViewController
   public UIInterfaceOrientationMask getSupportedInterfaceOrientations() {
-    return platform.config.orients;
+    return plat.config.orients;
   }
 
   @Override // from ViewController
@@ -133,8 +133,8 @@ public class RoboViewController extends GLKViewController implements GLKViewCont
 
   @Override protected void doDispose() {
     // shutdown the platform
-    platform.willTerminate();
-    removeStrongRef(platform);
+    plat.willTerminate();
+    removeStrongRef(plat);
     super.doDispose();
   }
 
