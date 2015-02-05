@@ -22,15 +22,16 @@ import playn.core.Log;
 
 public class RoboLog extends Log {
 
-  // printStackTrace only uses println(), so this hackery routes that to Foundation.log
-  private final PrintWriter logOut = new PrintWriter(new StringWriter()) {
-    @Override public void println (String text) {
-      Foundation.log(text);
-    }
-  };
+  private final StringWriter strOut = new StringWriter();
+  private final PrintWriter logOut = new PrintWriter(strOut);
 
   @Override protected void logImpl(Level level, String msg, Throwable e) {
     Foundation.log(level + ": " + msg);
-    if (e != null) e.printStackTrace(logOut);
+    if (e != null) {
+      e.printStackTrace(logOut);
+      StringBuffer buf = strOut.getBuffer();
+      for (String line : buf.toString().split("\n")) Foundation.log(line);
+      buf.setLength(0);
+    }
   }
 }
