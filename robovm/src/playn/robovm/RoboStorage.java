@@ -79,7 +79,7 @@ public class RoboStorage implements Storage {
       try (Statement stmt = conn.createStatement()) {
         ResultSet rs = stmt.executeQuery("select DataKey from Data");
         while (rs.next()) {
-          keys.add(rs.getString(0));
+          keys.add(rs.getString(1));
         }
       }
       return keys;
