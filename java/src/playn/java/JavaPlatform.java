@@ -95,18 +95,23 @@ public class JavaPlatform extends Platform {
   }
 
   final Config config;
+  private final ExecutorService pool = Executors.newFixedThreadPool(4);
 
   private final JavaLog log = new JavaLog();
-  private final JavaAudio audio = new JavaAudio(this);
-  private final JavaNet net = new JavaNet(this);
+  private final Exec exec = new Exec.Default(log, frame) {
+    @Override public boolean isAsyncSupported () { return true; }
+    @Override public void invokeAsync (Runnable action) { pool.execute(action); }
+  };
+  private final JavaAudio audio = new JavaAudio(exec);
+  private final JavaNet net = new JavaNet(exec);
   private final JavaStorage storage;
   private final JsonImpl json = new JsonImpl();
   private final JavaGraphics graphics;
   private final JavaInput input;
   private final JavaAssets assets = new JavaAssets(this);
+
   private boolean active = true;
 
-  private final ExecutorService _exec = Executors.newFixedThreadPool(4);
   private final long start = System.nanoTime();
 
   public JavaPlatform(final Config config) {
@@ -116,7 +121,7 @@ public class JavaPlatform extends Platform {
     }
     graphics = createGraphics();
     input = createInput();
-    storage = new JavaStorage(this);
+    storage = new JavaStorage(log, config.storageFileName);
 
     if (config.activationKey != null) {
       input.keyboardEvents.connect(new Slot<Keyboard.Event>() {
@@ -185,68 +190,21 @@ public class JavaPlatform extends Platform {
     shutdown();
   }
 
-  @Override
-  public void invokeAsync(Runnable action) {
-    _exec.execute(action);
-  }
+  @Override public double time() { return System.currentTimeMillis(); }
+  @Override public Type type() { return Type.JAVA; }
+  @Override public int tick() { return (int)((System.nanoTime() - start) / 1000000L); }
 
-  @Override
-  public Type type() {
-    return Type.JAVA;
-  }
+  @Override public JavaAssets assets() { return assets; }
+  @Override public JavaAudio audio() { return audio; }
+  @Override public Exec exec () { return exec; }
+  @Override public JavaGraphics graphics() { return graphics; }
+  @Override public JavaInput input() { return input; }
+  @Override public Json json() { return json; }
+  @Override public Log log() { return log; }
+  @Override public Net net() { return net; }
+  @Override public Storage storage() { return storage; }
 
-  @Override
-  public JavaAudio audio() {
-    return audio;
-  }
-
-  @Override
-  public JavaGraphics graphics() {
-    return graphics;
-  }
-
-  @Override
-  public Json json() {
-    return json;
-  }
-
-  @Override
-  public Log log() {
-    return log;
-  }
-
-  @Override
-  public JavaInput input() {
-    return input;
-  }
-
-  @Override
-  public Net net() {
-    return net;
-  }
-
-  @Override
-  public Storage storage() {
-    return storage;
-  }
-
-  @Override
-  public JavaAssets assets() {
-    return assets;
-  }
-
-  @Override
-  public double time() {
-    return System.currentTimeMillis();
-  }
-
-  @Override
-  public int tick() {
-    return (int)((System.nanoTime() - start) / 1000000L);
-  }
-
-  @Override
-  public void openURL(String url) {
+  @Override public void openURL(String url) {
     try {
       Desktop.getDesktop().browse(URI.create(url));
     } catch (Exception e) {
@@ -267,8 +225,8 @@ public class JavaPlatform extends Platform {
 
     // shutdown our thread pool
     try {
-      _exec.shutdown();
-      _exec.awaitTermination(1, TimeUnit.SECONDS);
+      pool.shutdown();
+      pool.awaitTermination(1, TimeUnit.SECONDS);
     } catch (InterruptedException ie) {
       // nothing to do here except go ahead and exit
     }

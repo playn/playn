@@ -21,13 +21,14 @@ import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
 
 import playn.core.Audio;
+import playn.core.Exec;
 
 public class JavaAudio extends Audio {
 
-  private final JavaPlatform plat;
+  private final Exec exec;
 
-  public JavaAudio(JavaPlatform plat) {
-    this.plat = plat;
+  public JavaAudio(Exec exec) {
+    this.exec = exec;
   }
 
   /**
@@ -39,8 +40,8 @@ public class JavaAudio extends Audio {
    * audio clips.
    */
   public JavaSound createSound(final JavaAssets.Resource rsrc, final boolean music) {
-    final JavaSound sound = new JavaSound(plat);
-    plat.invokeAsync(new Runnable() {
+    final JavaSound sound = new JavaSound(exec);
+    exec.invokeAsync(new Runnable() {
       public void run () {
         try {
           AudioInputStream ais = rsrc.openAudioStream();

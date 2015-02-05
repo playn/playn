@@ -51,7 +51,7 @@ public class JavaAssets extends Assets {
    * Creates a new java assets.
    */
   public JavaAssets(JavaPlatform plat) {
-    super(plat);
+    super(plat.exec());
     this.plat = plat;
   }
 
@@ -102,7 +102,7 @@ public class JavaAssets extends Assets {
 
   @Override public Image getRemoteImage(final String url, int width, int height) {
     final JavaImage image = new JavaImage(plat, true, width, height);
-    plat.invokeAsync(new Runnable() {
+    exec.invokeAsync(new Runnable() {
       public void run () {
         try {
           BufferedImage bmp = ImageIO.read(new URL(url));

@@ -16,13 +16,14 @@ package playn.java;
 import javax.sound.sampled.Clip;
 import javax.sound.sampled.FloatControl;
 
-import pythagoras.f.FloatMath;
+import playn.core.Exec;
 import playn.core.SoundImpl;
+import pythagoras.f.FloatMath;
 
 class JavaSound extends SoundImpl<Clip> {
 
-  public JavaSound (JavaPlatform plat) {
-    super(plat);
+  public JavaSound (Exec exec) {
+    super(exec);
   }
 
   @Override

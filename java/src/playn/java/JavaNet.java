@@ -23,27 +23,26 @@ import java.net.URL;
 import java.util.List;
 import java.util.Map;
 
+import playn.core.Exec;
 import playn.core.Net;
 import react.RFuture;
 import react.RPromise;
 
 public class JavaNet extends Net {
 
-  private final JavaPlatform plat;
+  private final Exec exec;
 
-  public JavaNet(JavaPlatform plat) {
-    this.plat = plat;
+  public JavaNet(Exec exec) {
+    this.exec = exec;
   }
 
-  @Override
-  public WebSocket createWebSocket(String url, WebSocket.Listener listener) {
-    return new JavaWebSocket(plat, url, listener);
+  @Override public WebSocket createWebSocket(String url, WebSocket.Listener listener) {
+    return new JavaWebSocket(exec, url, listener);
   }
 
-  @Override
-  protected RFuture<Response> execute(final Builder req) {
-    final RPromise<Response> result = plat.deferredPromise();
-    plat.invokeAsync(new Runnable() {
+  @Override protected RFuture<Response> execute(final Builder req) {
+    final RPromise<Response> result = exec.deferredPromise();
+    exec.invokeAsync(new Runnable() {
       @Override
       public void run() {
         try {

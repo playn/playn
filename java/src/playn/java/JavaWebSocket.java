@@ -23,13 +23,13 @@ import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
 
 import playn.core.Net;
-import playn.core.Platform;
+import playn.core.Exec;
 
 public class JavaWebSocket implements Net.WebSocket {
 
   private final WebSocketClient socket;
 
-  public JavaWebSocket(final Platform platform, String uri, final Listener listener) {
+  public JavaWebSocket(final Exec exec, String uri, final Listener listener) {
     URI juri = null;
     try {
       juri = new URI(uri);
@@ -40,46 +40,36 @@ public class JavaWebSocket implements Net.WebSocket {
     socket = new WebSocketClient(juri) {
       @Override
       public void onMessage(final ByteBuffer buffer) {
-        platform.invokeLater(new Runnable() {
-          public void run() {
-            listener.onDataMessage(buffer);
-          }
+        exec.invokeLater(new Runnable() {
+          public void run () { listener.onDataMessage(buffer); }
         });
       }
 
       @Override
       public void onMessage(final String msg) {
-        platform.invokeLater(new Runnable() {
-          public void run() {
-            listener.onTextMessage(msg);
-          }
+        exec.invokeLater(new Runnable() {
+          public void run () { listener.onTextMessage(msg); }
         });
       }
 
       @Override
       public void onError(final Exception e) {
-        platform.invokeLater(new Runnable() {
-          public void run() {
-            listener.onError(e.getMessage());
-          }
+        exec.invokeLater(new Runnable() {
+          public void run () { listener.onError(e.getMessage()); }
         });
       }
 
       @Override
       public void onClose(int arg0, String arg1, boolean arg2) {
-        platform.invokeLater(new Runnable() {
-          public void run() {
-            listener.onClose();
-          }
+        exec.invokeLater(new Runnable() {
+          public void run () { listener.onClose(); }
         });
       }
 
       @Override
       public void onOpen(ServerHandshake handshake) {
-        platform.invokeLater(new Runnable() {
-          public void run() {
-            listener.onOpen();
-          }
+        exec.invokeLater(new Runnable() {
+          public void run () { listener.onOpen(); }
         });
       }
     };

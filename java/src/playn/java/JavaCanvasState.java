@@ -33,10 +33,7 @@ class JavaCanvasState {
   }
 
   private static Clipper NOCLIP = new Clipper() {
-    @Override
-    public void setClip(Graphics2D gfx) {
-      gfx.setClip(null);
-    }
+    @Override public void setClip(Graphics2D gfx) { gfx.setClip(null); }
   };
 
   int fillColor;

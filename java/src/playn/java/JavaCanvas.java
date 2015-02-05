@@ -99,9 +99,7 @@ class JavaCanvas extends Canvas {
     final int cx = MathUtil.ifloor(x), cy = MathUtil.ifloor(y);
     final int cwidth = MathUtil.iceil(width), cheight = MathUtil.iceil(height);
     currentState().clipper = new JavaCanvasState.Clipper() {
-      public void setClip(Graphics2D g2d) {
-        g2d.clipRect(cx, cy, cwidth, cheight);
-      }
+      public void setClip(Graphics2D g2d) { g2d.setClip(cx, cy, cwidth, cheight); }
     };
     return this;
   }
