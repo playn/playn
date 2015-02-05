@@ -17,9 +17,11 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.text.InputType;
 import android.view.KeyEvent;
+import android.view.MotionEvent;
 import android.widget.EditText;
 
 import playn.core.*;
+import pythagoras.f.IPoint;
 import react.RFuture;
 import react.RPromise;
 
@@ -93,6 +95,22 @@ public class AndroidInput extends Input {
 
   void onKeyUp (int keyCode, KeyEvent nativeEvent) {
     dispatch(new Keyboard.KeyEvent(0, nativeEvent.getEventTime(), keyForCode(keyCode), false));
+  }
+
+  boolean onTouch (MotionEvent event) {
+    int actionType = event.getActionMasked();
+    Touch.Event.Kind kind = (actionType < TO_KIND.length) ? TO_KIND[actionType] : null;
+    if (kind != null) {
+      // extract the native event data while we're on the UI thread
+      final Touch.Event[] touches = parseMotionEvent(event, kind);
+      // process it (issuing game callbacks) on the GL/Game thread
+      plat.exec().invokeLater(new Runnable() {
+        public void run() { plat.input().touchEvents.emit(touches); }
+      });
+    }
+
+    // let our caller know whether we will be handling this event
+    return kind != null;
   }
 
   private void dispatch (final Keyboard.Event event) {
@@ -310,5 +328,36 @@ public class AndroidInput extends Input {
     // case KeyEvent.KEYCODE_ZOOM_OUT: return Key.ZOOM_OUT;
     default: return Key.UNKNOWN;
     }
+  }
+
+  private Touch.Event[] parseMotionEvent (MotionEvent event, Touch.Event.Kind kind) {
+    int actionType = event.getActionMasked();
+    boolean isChanged = (actionType == MotionEvent.ACTION_POINTER_UP ||
+                         actionType == MotionEvent.ACTION_POINTER_DOWN);
+    int changedIdx = isChanged ? event.getActionIndex() : 0;
+    int count = event.getPointerCount();
+    Touch.Event[] touches = new Touch.Event[isChanged ? 1 : count];
+    double time = event.getEventTime();
+    int tidx = 0;
+    for (int tt = 0; tt < count; tt++) {
+      // if this is a pointer up/down, we only want the changed touch
+      if (isChanged && tt != changedIdx) continue;
+      IPoint xy = plat.graphics().transformTouch(event.getX(tt), event.getY(tt));
+      float pressure = event.getPressure(tt);
+      float size = event.getSize(tt);
+      int id = event.getPointerId(tt);
+      touches[tidx++] = new Touch.Event(0, time, xy.x(), xy.y(), kind, id, pressure, size);
+    }
+    return touches;
+  }
+
+  private static Touch.Event.Kind[] TO_KIND = new Touch.Event.Kind[16];
+  static {
+    TO_KIND[MotionEvent.ACTION_DOWN]         = Touch.Event.Kind.START;
+    TO_KIND[MotionEvent.ACTION_UP]           = Touch.Event.Kind.END;
+    TO_KIND[MotionEvent.ACTION_POINTER_DOWN] = Touch.Event.Kind.START;
+    TO_KIND[MotionEvent.ACTION_POINTER_UP]   = Touch.Event.Kind.END;
+    TO_KIND[MotionEvent.ACTION_MOVE]         = Touch.Event.Kind.MOVE;
+    TO_KIND[MotionEvent.ACTION_CANCEL]       = Touch.Event.Kind.CANCEL;
   }
 }

@@ -25,15 +25,13 @@ import android.view.MotionEvent;
 
 public class GameViewGL extends GLSurfaceView {
 
-  private final AndroidPlatform platform;
-  private final TouchEventHandler touchHandler;
+  private final AndroidPlatform plat;
   private AtomicBoolean started = new AtomicBoolean(false);
   private AtomicBoolean paused = new AtomicBoolean(true);
 
-  public GameViewGL(Context context, AndroidPlatform plat) {
+  public GameViewGL(Context context, AndroidPlatform platform) {
     super(context);
-    this.platform = plat;
-    this.touchHandler = new TouchEventHandler(platform);
+    this.plat = platform;
 
     setFocusable(true);
     setEGLContextClientVersion(2);
@@ -42,22 +40,21 @@ public class GameViewGL extends GLSurfaceView {
     // set up our renderer
     setRenderer(new Renderer() {
       @Override public void onSurfaceCreated(GL10 gl, EGLConfig config) {
-        GameViewGL.this.platform.graphics().onSurfaceCreated();
+        plat.graphics().onSurfaceCreated();
       }
       @Override public void onSurfaceChanged(GL10 gl, int width, int height) {
-        GameViewGL.this.platform.graphics().onSizeChanged(width, height);
+        plat.graphics().onSizeChanged(width, height);
         // we defer the start of the game until we've received our initial surface size
         if (!started.get()) startGame();
       }
       @Override public void onDrawFrame(GL10 gl) {
-        if (!paused.get()) platform.processFrame();
+        if (!paused.get()) plat.processFrame();
       }
     });
     setRenderMode(RENDERMODE_CONTINUOUSLY);
   }
 
-  @Override
-  public void onPause() {
+  @Override public void onPause() {
     // pause our game updates
     paused.set(true);
 
@@ -68,21 +65,19 @@ public class GameViewGL extends GLSurfaceView {
     // our GL context at that point); so we have to assume that we ALWAYS lose our GL context when
     // paused; that's generally true, so we're probably safe in assuming so, but it sucks
     queueEvent(new Runnable() {
-      public void run () { platform.graphics().onSurfaceLost(); }
+      public void run () { plat.graphics().onSurfaceLost(); }
     });
     super.onPause();
   }
 
-  @Override
-  public void onResume() {
+  @Override public void onResume() {
     super.onResume();
     // unpause our game updates
     paused.set(false);
   }
 
-  @Override
-  public boolean onTouchEvent(MotionEvent event) {
-    return touchHandler.onMotionEvent(event);
+  @Override public boolean onTouchEvent(MotionEvent event) {
+    return plat.input().onTouch(event);
   }
 
   void startGame() {
@@ -90,7 +85,7 @@ public class GameViewGL extends GLSurfaceView {
     queueEvent(new Runnable() {
       @Override
       public void run() {
-        platform.activity.main();
+        plat.activity.main();
         paused.set(false);
       }
     });
