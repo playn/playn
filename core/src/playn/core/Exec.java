@@ -61,6 +61,7 @@ public abstract class Exec {
           log.warn("invokeLater Runnable failed: " + action, e);
         }
       }
+      running.clear();
     }
   }
 
