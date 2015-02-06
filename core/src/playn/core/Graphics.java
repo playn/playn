@@ -152,7 +152,6 @@ public abstract class Graphics {
     viewPixelHeight = viewHeight;
     viewSizeM.width = scale.invScaled(viewWidth);
     viewSizeM.height = scale.invScaled(viewHeight);
-    System.out.println("viewportChanged(" + scale + ", " + viewPixelWidth + ", " + viewPixelHeight + ") -> " + viewSizeM);
     // TODO: allow listening for view size change?
   }
 
