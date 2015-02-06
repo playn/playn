@@ -74,7 +74,7 @@ public class AndroidGraphics extends Graphics {
     screenSize.height = viewHeight / scale.factor;
     plat.log().info("Updating size " + viewWidth + "x" + viewHeight + " / " + scale.factor +
                     " -> " + screenSize);
-    viewSizeChanged(viewWidth, viewHeight);
+    viewportChanged(scale, viewWidth, viewHeight);
   }
 
   /**

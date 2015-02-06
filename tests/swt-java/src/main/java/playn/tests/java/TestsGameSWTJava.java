@@ -24,8 +24,8 @@ import org.lwjgl.opengl.DisplayMode;
 
 import playn.java.SWTPlatform;
 
+import playn.tests.core.FullscreenTest;
 import playn.tests.core.TestsGame;
-
 import static playn.tests.core.FullscreenTest.*;
 
 public class TestsGameSWTJava {
@@ -35,15 +35,15 @@ public class TestsGameSWTJava {
     config.width = 800;
     config.height = 600;
     config.appName = "Tests";
-    for (String arg : args) {
-      if (arg.startsWith("@") && arg.endsWith("x")) {
-        config.scaleFactor = Float.parseFloat(arg.substring(1, arg.length()-1));
-      }
-    }
+    // for (String arg : args) {
+    //   if (arg.startsWith("@") && arg.endsWith("x")) {
+    //     config.scaleFactor = Float.parseFloat(arg.substring(1, arg.length()-1));
+    //   }
+    // }
     final SWTPlatform platform = new SWTPlatform(config);
 
     // plug in a lwjgl implementation for fullscreen test
-    setHost(new Host() {
+    FullscreenTest.setHost(new FullscreenTest.Host() {
       @Override public void setMode (Mode mode) {
         platform.graphics().setSize(mode.width, mode.height, true);
       }

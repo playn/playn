@@ -121,7 +121,7 @@ public class TextTest extends Test {
     TextBlock block = new TextBlock(
       game.graphics.layoutText(sample, format, new TextWrap(wrapWidth)));
     float awidth = adjustWidth(block.bounds.width()), aheight = adjustHeight(block.bounds.height());
-    float pad = 1/game.graphics.scale.factor;
+    float pad = 1/game.graphics.scale().factor;
     Canvas canvas = game.graphics.createCanvas(awidth+2*pad, aheight+2*pad);
     canvas.translate(pad, pad);
     canvas.setStrokeColor(0xFFFFCCCC).strokeRect(0, 0, awidth, aheight);

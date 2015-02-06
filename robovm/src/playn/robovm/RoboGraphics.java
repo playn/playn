@@ -101,7 +101,7 @@ public class RoboGraphics extends Graphics {
 
   // called when our view appears
   void viewDidInit(CGRect bounds) {
-    System.err.println("viewDidInit(" + bounds + ") " + gl.glGetInteger(GL20.GL_MAX_TEXTURE_SIZE));
+    // System.err.println("viewDidInit(" + bounds + ")");
     defaultFramebuffer = gl.glGetInteger(GL20.GL_FRAMEBUFFER_BINDING);
     if (defaultFramebuffer == 0) throw new IllegalStateException(
       "Failed to determine defaultFramebuffer");
@@ -111,18 +111,17 @@ public class RoboGraphics extends Graphics {
 
   // called when our view changes size (at init, and when it rotates)
   void setSize(CGRect bounds) {
-    System.err.println("setSize(" + bounds + ")");
-
-    boolean useHalfSize = useHalfSize(plat);
+    // boolean useHalfSize = useHalfSize(plat);
     int viewWidth = scale.scaledCeil((float)bounds.getWidth());
     int viewHeight = scale.scaledCeil((float)bounds.getHeight());
-    viewSizeChanged(viewWidth, viewHeight);
+    viewportChanged(scale, viewWidth, viewHeight);
 
-    System.err.println("Screen size " + screenSize());
-    System.err.println("View size " + viewSize + " " + viewWidth + "x" + viewHeight);
-    System.err.println("View scale " + scale);
-    System.err.println("Touch scale " + touchScale);
-    System.err.println("DRT " + defaultRenderTarget);
+    // System.err.println("Screen size " + screenSize());
+    // System.err.println("View size " + viewSize + " " + viewWidth + "x" + viewHeight);
+    // System.err.println("View scale " + scale);
+    // System.err.println("Touch scale " + touchScale);
+    // System.err.println("DRT " + defaultRenderTarget);
+
     // TODO: anything else?
   }
 

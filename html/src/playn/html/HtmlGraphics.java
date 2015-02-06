@@ -143,7 +143,7 @@ public class HtmlGraphics extends Graphics {
     // displayed at the proper size in the page
     canvas.getStyle().setWidth(width, Style.Unit.PX);
     canvas.getStyle().setHeight(height, Style.Unit.PX);
-    viewSizeChanged(canvas.getWidth(), canvas.getHeight());
+    viewportChanged(scale, canvas.getWidth(), canvas.getHeight());
     plat.log().info("FB " + viewPixelWidth + "x" + viewPixelHeight + " LG " + viewSize);
   }
 

@@ -46,7 +46,7 @@ public class JavaGraphics extends Graphics {
   final FontRenderContext aaFontContext, aFontContext;
 
   public JavaGraphics(JavaPlatform plat) {
-    super(plat, new JavaGL20(), new Scale(plat.config.scaleFactor));
+    super(plat, new JavaGL20(), Scale.ONE); // real scale factor set in init()
     this.plat = plat;
 
     // set up the dummy font contexts
@@ -65,7 +65,7 @@ public class JavaGraphics extends Graphics {
    * @param path the path to the font resource (relative to the asset manager's path prefix).
    * Currently only TrueType ({@code .ttf}) fonts are supported.
    */
-  public void registerFont(String name, String path) {
+  public void registerFont (String name, String path) {
     try {
       fonts.put(name, plat.assets().requireResource(path).createFont());
     } catch (Exception e) {
@@ -75,11 +75,10 @@ public class JavaGraphics extends Graphics {
 
   /**
    * Changes the size of the PlayN window. The supplied size is in display units, it will be
-   * converted to pixels based on the configured scale factor.
+   * converted to pixels based on the display scale factor.
    */
-  public void setSize(float width, float height, boolean fullscreen) {
-    int pixWidth = scale.scaledCeil(width), pixHeight = scale.scaledCeil(height);
-    setDisplayMode(pixWidth, pixHeight, fullscreen);
+  public void setSize (int width, int height, boolean fullscreen) {
+    setDisplayMode(width, height, fullscreen);
   }
 
   protected void setDisplayMode(int width, int height, boolean fullscreen) {
@@ -87,38 +86,34 @@ public class JavaGraphics extends Graphics {
       // check if current mode is suitable
       DisplayMode mode = Display.getDisplayMode();
       if (fullscreen == Display.isFullscreen() &&
-          mode.getWidth() == width && mode.getHeight() == height)
-        return;
+          mode.getWidth() == width && mode.getHeight() == height) return;
 
-      if (fullscreen) {
+      if (!fullscreen) mode = new DisplayMode(width, height);
+      else {
         // try and find a mode matching width and height
         DisplayMode matching = null;
-        for (DisplayMode test : Display.getAvailableDisplayModes()) {
-          if (test.getWidth() == width && test.getHeight() == height && test.isFullscreenCapable()) {
-            matching = test;
+        for (DisplayMode dm : Display.getAvailableDisplayModes()) {
+          if (dm.getWidth() == width && dm.getHeight() == height && dm.isFullscreenCapable()) {
+            matching = dm;
           }
         }
-
-        if (matching == null) {
-          plat.log().info("Could not find a matching fullscreen mode, available: " +
-                          Arrays.asList(Display.getAvailableDisplayModes()));
-        } else {
-          mode = matching;
-        }
-
-      } else {
-        mode = new DisplayMode(width, height);
+        if (matching != null) mode = matching;
+        else plat.log().info("Could not find a matching fullscreen mode, available: " +
+                             Arrays.asList(Display.getAvailableDisplayModes()));
       }
 
       plat.log().debug("Updating display mode: " + mode + ", fullscreen: " + fullscreen);
       // TODO: fix crashes when fullscreen is toggled repeatedly
+      Scale scale;
       if (fullscreen) {
         Display.setDisplayModeAndFullscreen(mode);
+        scale = Scale.ONE;
         // TODO: fix alt-tab, maybe add a key listener or something?
       } else {
         Display.setDisplayMode(mode);
+        scale = new Scale(Display.getPixelScaleFactor());
       }
-      viewSizeChanged(mode.getWidth(), mode.getHeight());
+      updateViewport(scale, mode.getWidth(), mode.getHeight());
 
     } catch (LWJGLException ex) {
       throw new RuntimeException(ex);
@@ -179,22 +174,25 @@ public class JavaGraphics extends Graphics {
   }
 
   void preInit () {
-    int pixWidth = scale.scaledCeil(plat.config.width);
-    int pixHeight = scale.scaledCeil(plat.config.height);
-    if (plat.config.headless) viewSizeChanged(pixWidth, pixHeight);
-    else setDisplayMode(pixWidth, pixHeight, plat.config.fullscreen);
+    if (plat.config.headless) updateViewport(Scale.ONE, plat.config.width, plat.config.height);
+    else setDisplayMode(scale.scaledCeil(plat.config.width),
+                        scale.scaledCeil(plat.config.height), plat.config.fullscreen);
   }
 
-  Point transformMouse (Point point) {
-    point.x /= scale.factor;
-    point.y /= scale.factor;
-    return point;
+  void checkScaleFactor () {
+    float scaleFactor = Display.getPixelScaleFactor();
+    if (scaleFactor != scale.factor) updateViewport(
+      new Scale(scaleFactor), Display.getWidth(), Display.getHeight());
   }
 
   ByteBuffer checkGetImageBuffer (int byteSize) {
     if (imgBuf.capacity() >= byteSize) imgBuf.clear(); // reuse it!
     else imgBuf = createImageBuffer(byteSize);
     return imgBuf;
+  }
+
+  private void updateViewport (Scale scale, float displayWidth, float displayHeight) {
+    viewportChanged(scale, scale.scaledCeil(displayWidth), scale.scaledCeil(displayHeight));
   }
 
   private static ByteBuffer createImageBuffer (int byteSize) {

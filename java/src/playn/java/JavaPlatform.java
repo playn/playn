@@ -32,16 +32,14 @@ import react.Slot;
 
 /**
  * Implements the PlayN platform for Java, based on LWJGL. Due to the way LWJGL works, a game must
- * call {@link #init}, then perform any of its own initialization that requires access to GL
- * resources, and then call {@link #start} to start the game loop. The {@link #start} call does not
- * return until the game exits.
+ * create the platform instance, then perform any of its own initialization that requires access to
+ * GL resources, and then call {@link #start} to start the game loop. The {@link #start} call does
+ * not return until the game exits.
  */
 public class JavaPlatform extends Platform {
 
   /** Defines JavaPlatform configurable parameters. */
   public static class Config {
-    /** The graphics scale factor. Allows simulating HiDPI mode during testing. */
-    public float scaleFactor = getDefaultScaleFactor(); // default scale factor is 1
 
     /** Configures platform in headless mode; useful for unit testing. */
     public boolean headless = false;
@@ -84,17 +82,9 @@ public class JavaPlatform extends Platform {
     public boolean truePause;
   }
 
-  private static float getDefaultScaleFactor() {
-    String sfprop = System.getProperty("playn.scaleFactor", "1");
-    try {
-      return Float.parseFloat(sfprop);
-    } catch (Exception e) {
-      System.err.println("Invalid scaleFactor supplied '" + sfprop + "': " + e);
-      return 1;
-    }
-  }
-
   final Config config;
+  private boolean active = true;
+  private final long start = System.nanoTime();
   private final ExecutorService pool = Executors.newFixedThreadPool(4);
 
   private final JavaLog log = new JavaLog();
@@ -110,15 +100,9 @@ public class JavaPlatform extends Platform {
   private final JavaInput input;
   private final JavaAssets assets = new JavaAssets(this);
 
-  private boolean active = true;
-
-  private final long start = System.nanoTime();
-
   public JavaPlatform(final Config config) {
     this.config = config;
-    if (!config.headless) {
-      unpackNatives();
-    }
+    if (!config.headless) unpackNatives();
     graphics = createGraphics();
     input = createInput();
     storage = new JavaStorage(log, config.storageFileName);
@@ -135,38 +119,15 @@ public class JavaPlatform extends Platform {
         }
       });
     }
-    if (!config.headless) {
-      setTitle(config.appName);
-    }
+
+    if (!config.headless) setTitle(config.appName);
 
     // do the rest of init in an overridable method so that JavaSWTPlatform can hack it
     finishInit();
   }
 
-  /**
-   * Sets the title of the window.
-   *
-   * @param title the window title
-   */
-  public void setTitle(String title) {
-    Display.setTitle(title);
-  }
-
-  protected void finishInit () {
-    // set our starting display mode before we create our display
-    graphics.preInit();
-
-    // if we're not headless, initialize our LWJGL display and input subsystems
-    if (!config.headless) {
-      try {
-        Display.create();
-      } catch (LWJGLException e) {
-        throw new RuntimeException(e);
-      }
-
-      input.init();
-    }
-  }
+  /** Sets the title of the window to {@code title}. */
+  public void setTitle(String title) { Display.setTitle(title); }
 
   /**
    * Starts the game loop. This method will not return until the game exits.
@@ -180,6 +141,7 @@ public class JavaPlatform extends Platform {
         lifecycle.emit(wasActive ? Lifecycle.PAUSE : Lifecycle.RESUME);
         wasActive = newActive;
       }
+      graphics.checkScaleFactor();
       // process frame, if we don't need to provide true pausing
       if (newActive || !config.truePause) processFrame();
       Display.update();
@@ -190,19 +152,19 @@ public class JavaPlatform extends Platform {
     shutdown();
   }
 
-  @Override public double time() { return System.currentTimeMillis(); }
-  @Override public Type type() { return Type.JAVA; }
-  @Override public int tick() { return (int)((System.nanoTime() - start) / 1000000L); }
+  @Override public double time () { return System.currentTimeMillis(); }
+  @Override public Type type () { return Type.JAVA; }
+  @Override public int tick () { return (int)((System.nanoTime() - start) / 1000000L); }
 
-  @Override public JavaAssets assets() { return assets; }
-  @Override public JavaAudio audio() { return audio; }
+  @Override public JavaAssets assets () { return assets; }
+  @Override public JavaAudio audio () { return audio; }
   @Override public Exec exec () { return exec; }
-  @Override public JavaGraphics graphics() { return graphics; }
-  @Override public JavaInput input() { return input; }
-  @Override public Json json() { return json; }
-  @Override public Log log() { return log; }
-  @Override public Net net() { return net; }
-  @Override public Storage storage() { return storage; }
+  @Override public JavaGraphics graphics () { return graphics; }
+  @Override public JavaInput input () { return input; }
+  @Override public Json json () { return json; }
+  @Override public Log log () { return log; }
+  @Override public Net net () { return net; }
+  @Override public Storage storage () { return storage; }
 
   @Override public void openURL(String url) {
     try {
@@ -212,14 +174,28 @@ public class JavaPlatform extends Platform {
     }
   }
 
-  protected JavaGraphics createGraphics() {
-    return new JavaGraphics(this);
-  }
-  protected JavaInput createInput() {
-    return new JavaLWJGLInput(this);
+  protected JavaGraphics createGraphics () { return new JavaGraphics(this); }
+  protected JavaInput createInput () { return new JavaLWJGLInput(this); }
+
+  protected void finishInit () {
+    // set our starting display mode before we create our display
+    graphics.preInit();
+
+    // if we're not headless, initialize our LWJGL display and input subsystems
+    if (!config.headless) {
+      try {
+        System.setProperty("org.lwjgl.opengl.Display.enableHighDPI", "true");
+        Display.create();
+        graphics.checkScaleFactor();
+      } catch (LWJGLException e) {
+        throw new RuntimeException(e);
+      }
+
+      input.init();
+    }
   }
 
-  protected void shutdown() {
+  protected void shutdown () {
     // let the game run any of its exit hooks
     lifecycle.emit(Lifecycle.EXIT);
 
@@ -235,7 +211,7 @@ public class JavaPlatform extends Platform {
     System.exit(0);
   }
 
-  protected void processFrame() {
+  protected void processFrame () {
     // event handling
     try { input.update(); }
     catch (Exception e) { log.warn("Input exception", e); }
@@ -246,10 +222,9 @@ public class JavaPlatform extends Platform {
     active = !active;
   }
 
-  protected void unpackNatives() {
+  protected void unpackNatives () {
     // avoid native library unpacking if we're running in Java Web Start
-    if (isInJavaWebStart())
-      return;
+    if (isInJavaWebStart()) return;
 
     SharedLibraryExtractor extractor = new SharedLibraryExtractor();
     File nativesDir = null;
@@ -261,7 +236,7 @@ public class JavaPlatform extends Platform {
     System.setProperty("org.lwjgl.librarypath", nativesDir.getAbsolutePath());
   }
 
-  protected boolean isInJavaWebStart() {
+  protected boolean isInJavaWebStart () {
     try {
       Method method = Class.forName("javax.jnlp.ServiceManager").
         getDeclaredMethod("lookup", new Class<?>[] { String.class });

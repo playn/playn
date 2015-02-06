@@ -48,7 +48,7 @@
     <monotouch.version>6.0.6</monotouch.version>
     <gwt.version>2.6.1</gwt.version>
     <jbox2d.version>2.2.1.1</jbox2d.version>
-    <lwjgl.version>2.9.0</lwjgl.version>
+    <lwjgl.version>2.9.3</lwjgl.version>
     <robovm.version>1.0.0-beta-03</robovm.version>
     <robovm.maven.version>1.0.0-beta-03</robovm.maven.version>
     <!--

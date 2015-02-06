@@ -202,7 +202,7 @@ public class JavaAssets extends Assets {
   }
 
   protected Scale assetScale() {
-    return (assetScale != null) ? assetScale : plat.graphics().scale;
+    return (assetScale != null) ? assetScale : plat.graphics().scale();
   }
 
   abstract static class Resource {
@@ -270,7 +270,7 @@ public class JavaAssets extends Assets {
       try {
         BufferedImage image = requireResource(rsrc.path).readImage();
         // if image is at a higher scale factor than the view, scale to the view display factor
-        Scale viewScale = plat.graphics().scale, imageScale = rsrc.scale;
+        Scale viewScale = plat.graphics().scale(), imageScale = rsrc.scale;
         float viewImageRatio = viewScale.factor / imageScale.factor;
         if (viewImageRatio < 1) {
           image = scaleImage(image, viewImageRatio);

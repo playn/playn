@@ -18,7 +18,6 @@ package playn.java;
 import org.eclipse.swt.*;
 import org.eclipse.swt.widgets.*;
 
-import pythagoras.f.Point;
 import react.RFuture;
 
 import playn.core.Key;
@@ -39,27 +38,24 @@ public class SWTInput extends JavaInput {
     plat.display.addFilter(SWT.MouseDown, new org.eclipse.swt.widgets.Listener() {
       public void handleEvent (Event event) {
         if (event.widget == plat.graphics().canvas) {
-          Point xy = scaleCoord(event);
           Mouse.ButtonEvent.Id btn = mapButton(event.button);
-          if (btn != null) emitMouseButton(event.time, xy.x, xy.y, btn, true);
+          if (btn != null) emitMouseButton(event.time, event.x, event.y, btn, true);
         }
       }
     });
     plat.display.addFilter(SWT.MouseUp, new org.eclipse.swt.widgets.Listener() {
       public void handleEvent (Event event) {
         if (event.widget == plat.graphics().canvas) {
-          Point xy = scaleCoord(event);
           Mouse.ButtonEvent.Id btn = mapButton(event.button);
-          if (btn != null) emitMouseButton(event.time, xy.x, xy.y, btn, false);
+          if (btn != null) emitMouseButton(event.time, event.x, event.y, btn, false);
         }
       }
     });
     plat.display.addFilter(SWT.MouseMove, new org.eclipse.swt.widgets.Listener() {
       public void handleEvent (Event event) {
         if (event.widget == plat.graphics().canvas) {
-          Point xy = scaleCoord(event);
-          float dx = xy.x - lastX, dy = xy.y - lastY;
-          emitMouseMotion(event.time, xy.x, xy.y, dx, dy);
+          float dx = event.x - lastX, dy = event.y - lastY;
+          emitMouseMotion(event.time, event.x, event.y, dx, dy);
         }
       }
       private float lastX, lastY;
@@ -67,8 +63,7 @@ public class SWTInput extends JavaInput {
     plat.display.addFilter(SWT.MouseWheel, new org.eclipse.swt.widgets.Listener() {
       public void handleEvent (Event event) {
         if (event.widget == plat.graphics().canvas) {
-          Point xy = scaleCoord(event);
-          emitMouseWheel(event.time, xy.x, xy.y, -event.count);
+          emitMouseWheel(event.time, event.x, event.y, -event.count);
         }
       }
     });
@@ -97,10 +92,6 @@ public class SWTInput extends JavaInput {
   @Override public RFuture<String> getText (Keyboard.TextType textType,
                                             String label, String initVal) {
     return RFuture.failure(new Exception("TODO"));
-  }
-
-  private Point scaleCoord (Event event) {
-    return plat.graphics().transformMouse(new Point(event.x, event.y));
   }
 
   private Mouse.ButtonEvent.Id mapButton(int swtButton) {

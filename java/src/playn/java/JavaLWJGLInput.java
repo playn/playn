@@ -79,7 +79,6 @@ public class JavaLWJGLInput extends JavaInput {
     while (Mouse.next()) {
       double time = (double) (Mouse.getEventNanoseconds() / 1000000);
       Point m = new Point(Mouse.getEventX(), Display.getHeight() - Mouse.getEventY() - 1);
-      plat.graphics().transformMouse(m);
 
       int btnIdx = Mouse.getEventButton();
       if (btnIdx >= 0) {

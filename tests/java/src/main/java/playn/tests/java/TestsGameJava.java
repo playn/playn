@@ -26,16 +26,17 @@ public class TestsGameJava {
     config.width = 800;
     config.height = 600;
     config.appName = "Tests";
-    for (String arg : args) {
-      if (arg.startsWith("@") && arg.endsWith("x")) {
-        config.scaleFactor = Float.parseFloat(arg.substring(1, arg.length()-1));
-      }
-    }
+    // for (String arg : args) {
+    //   if (arg.startsWith("@") && arg.endsWith("x")) {
+    //     config.scaleFactor = Float.parseFloat(arg.substring(1, arg.length()-1));
+    //   }
+    // }
     JavaPlatform plat = new JavaPlatform(config);
 
     // let the caller know that we accept some args
     plat.log().info("Usage: TestsGameJava [@Nx] [test#]");
-    plat.log().info("  [@Nx] specifies a scale factor: @2x, @1.5x");
+    // plat.log().info("Usage: TestsGameJava [test#]");
+    // plat.log().info("  [@Nx] specifies a scale factor: @2x, @1.5x");
     plat.log().info("  [test#] specifies a test to launch directly: test0, test12 ");
 
     // create our the game, initialization happens in ctor

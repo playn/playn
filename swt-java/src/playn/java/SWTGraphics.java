@@ -49,7 +49,7 @@ public class SWTGraphics extends JavaGraphics {
         canvas.setBounds(bounds);
         makeCurrent();
         // SWTGraphics.this.plat.log().info("Resized " + bounds.width + "x" + bounds.height);
-        viewSizeChanged(bounds.width, bounds.height);
+        viewportChanged(scale, bounds.width, bounds.height);
       }
     });
 
@@ -59,7 +59,7 @@ public class SWTGraphics extends JavaGraphics {
 
   public GLCanvas canvas () { return canvas; }
 
-  @Override public void setSize (float width, float height, boolean fullscreen) {
+  @Override public void setSize (int width, int height, boolean fullscreen) {
     int rawWidth = scale.scaledCeil(width), rawHeight = scale.scaledCeil(height);
     plat.comp.setSize(rawWidth, rawHeight);
     plat.shell.setFullScreen(fullscreen);

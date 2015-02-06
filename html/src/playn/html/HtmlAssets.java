@@ -191,7 +191,7 @@ public class HtmlAssets extends Assets {
   }
 
   private Scale assetScale() {
-    return (assetScale != null) ? assetScale : plat.graphics().scale;
+    return (assetScale != null) ? assetScale : plat.graphics().scale();
   }
 
   private void doXdr(final String path, final RPromise<String> result) {

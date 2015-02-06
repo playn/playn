@@ -92,7 +92,7 @@ public class RoboAssets extends Assets {
 
   @Override protected ImageImpl.Data load (String path) throws Exception {
     Exception error = null;
-    for (Scale.ScaledResource rsrc : plat.graphics().scale.getScaledResources(path)) {
+    for (Scale.ScaledResource rsrc : plat.graphics().scale().getScaledResources(path)) {
       File fullPath = resolvePath(rsrc.path);
       if (!fullPath.exists()) continue;
 

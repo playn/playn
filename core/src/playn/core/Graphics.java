@@ -28,15 +28,12 @@ public abstract class Graphics {
 
   protected final Platform plat;
   protected final Dimension viewSizeM = new Dimension();
+  protected Scale scale;
   protected int viewPixelWidth, viewPixelHeight;
   private Texture colorTex; // created lazily
 
   /** Provides access to GL services. */
   public final GL20 gl;
-
-  /** The display scale factor. This will be {@link Scale#ONE} except on HiDPI devices that have
-    * been configured to use HiDPI mode. */
-  public final Scale scale;
 
   /** The current size of the graphics viewport. */
   public final IDimension viewSize = viewSizeM;
@@ -51,6 +48,10 @@ public abstract class Graphics {
     public boolean flip () { return true; }
     public void close () {} // disable normal dispose-on-close behavior
   };
+
+  /** Returns the display scale factor. This will be {@link Scale#ONE} except on HiDPI devices that
+    * have been configured to use HiDPI mode. */
+  public Scale scale () { return scale; }
 
   /**
    * Returns the size of the screen in display units. On some platforms (like the desktop) the
@@ -142,14 +143,16 @@ public abstract class Graphics {
   protected abstract Canvas createCanvasImpl (Scale scale, int pixelWidth, int pixelHeight);
 
   /**
-   * Informs the graphics system that the main viewport size has changed. The supplied size should
-   * be in physical pixels.
+   * Informs the graphics system that the main viewport size or scale has changed. The supplied
+   * size should be in physical pixels.
    */
-  protected void viewSizeChanged (int viewWidth, int viewHeight) {
+  protected void viewportChanged (Scale scale, int viewWidth, int viewHeight) {
+    this.scale = scale;
     viewPixelWidth = viewWidth;
     viewPixelHeight = viewHeight;
     viewSizeM.width = scale.invScaled(viewWidth);
     viewSizeM.height = scale.invScaled(viewHeight);
+    System.out.println("viewportChanged(" + scale + ", " + viewPixelWidth + ", " + viewPixelHeight + ") -> " + viewSizeM);
     // TODO: allow listening for view size change?
   }
 

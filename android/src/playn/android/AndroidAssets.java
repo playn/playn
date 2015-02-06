@@ -234,7 +234,7 @@ public class AndroidAssets extends Assets {
   }
 
   protected Scale assetScale () {
-    return (assetScale != null) ? assetScale : plat.graphics().scale;
+    return (assetScale != null) ? assetScale : plat.graphics().scale();
   }
 
   /**
