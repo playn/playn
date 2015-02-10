@@ -19,7 +19,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import playn.core.json.JsonImpl;
-import react.Slot;
 
 /**
  * A stub implementation of {@link Platform} that provides implementations of those services that

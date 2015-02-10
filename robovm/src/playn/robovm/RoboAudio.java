@@ -82,7 +82,7 @@ public class RoboAudio extends Audio {
 
   Sound createAVAP(final NSURL url) {
     final RoboSoundAVAP sound = new RoboSoundAVAP(plat);
-    plat.invokeAsync(new Runnable() {
+    plat.exec().invokeAsync(new Runnable() {
       public void run () {
         try {
           sound.succeed(new AVAudioPlayer(url));
@@ -97,7 +97,7 @@ public class RoboAudio extends Audio {
 
   Sound createOAL(final File assetPath) {
     final RoboSoundOAL sound = new RoboSoundOAL(plat);
-    plat.invokeAsync(new Runnable() {
+    plat.exec().invokeAsync(new Runnable() {
       public void run () {
         int bufferId = 0;
         try {

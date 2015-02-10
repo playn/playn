@@ -32,7 +32,6 @@ import org.lwjgl.opengl.DisplayMode;
 import playn.core.*;
 import pythagoras.f.Dimension;
 import pythagoras.f.IDimension;
-import pythagoras.f.Point;
 
 public class JavaGraphics extends Graphics {
 

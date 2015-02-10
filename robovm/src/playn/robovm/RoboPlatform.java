@@ -114,7 +114,6 @@ public class RoboPlatform extends Platform {
     * GLKViewControllerDelegate.willPause in one cycle. That could be a bug of RoboVM.
     * TODO: remove this after we figure out a better solution. **/
   private boolean paused = false;
-  private Game game;
   private final long gameStart = System.nanoTime();
   private final ExecutorService pool = Executors.newFixedThreadPool(3);
 
@@ -173,7 +172,7 @@ public class RoboPlatform extends Platform {
   void willEnterForeground () {
     if (!paused) return;
     paused = false;
-    invokeLater(new Runnable() {
+    exec.invokeLater(new Runnable() {
       public void run() { lifecycle.emit(Lifecycle.RESUME); }
     });
   }

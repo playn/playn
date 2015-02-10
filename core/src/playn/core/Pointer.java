@@ -63,8 +63,6 @@ public class Pointer {
     }
   }
 
-  private final Platform plat;
-
   /** Allows pointer interaction to be temporarily disabled.
     * No pointer events will be dispatched whilst this big switch is in the off position. */
   public boolean enabled = true;
@@ -73,8 +71,6 @@ public class Pointer {
   public Signal<Event> events = Signal.create();
 
   public Pointer (Platform plat) {
-    this.plat = plat;
-
     // listen for mouse events and convert them to pointer events
     plat.input().mouseEvents.connect(new Slot<Mouse.Event>() {
       private boolean dragging;

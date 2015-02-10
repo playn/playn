@@ -15,9 +15,7 @@
  */
 package playn.core;
 
-import react.RPromise;
 import react.Signal;
-import react.Slot;
 
 /**
  * Provides access to all PlayN cross-platform services.

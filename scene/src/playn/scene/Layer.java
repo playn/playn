@@ -738,7 +738,6 @@ public abstract class Layer implements Disposable {
   private float scaleX = 1, scaleY = 1, rotation = 0;
   private final AffineTransform transform = new AffineTransform();
 
-  private float clipWidth, clipHeight;
   private Origin origin = Origin.FIXED;
   private float originX, originY;
   protected int tint = Tint.NOOP_TINT;
