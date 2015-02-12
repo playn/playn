@@ -178,6 +178,11 @@ public class Surface implements Disposable {
     return this;
   }
 
+  /** Returns the currently configured alpha. */
+  public float alpha () {
+    return ((tint >> 24) & 0xFF) / 255f;
+  }
+
   /** Set the alpha component of this surface's current tint. Note that this value will be
     * quantized to an integer between 0 and 255. Also see {@link #setTint}.
     * <p>Values outside the range [0,1] will be clamped to the range [0,1].
@@ -187,6 +192,11 @@ public class Surface implements Disposable {
     int ialpha = (int)(0xFF * MathUtil.clamp(alpha, 0, 1));
     this.tint = (ialpha << 24) | (tint & 0xFFFFFF);
     return this;
+  }
+
+  /** Returns the currently configured tint. */
+  public int tint () {
+    return tint;
   }
 
   /** Sets the tint to be applied to draw operations, as {@code ARGB}. <em>NOTE:</em> this will
