@@ -45,7 +45,6 @@
     <android.version>4.1.1.4</android.version>
     <android.maven.version>4.0.0</android.maven.version>
     <swt.version>4.3</swt.version>
-    <monotouch.version>6.0.6</monotouch.version>
     <gwt.version>2.6.1</gwt.version>
     <jbox2d.version>2.2.1.1</jbox2d.version>
     <lwjgl.version>2.9.3</lwjgl.version>
