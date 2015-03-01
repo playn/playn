@@ -22,10 +22,9 @@ import playn.core.Gradient;
 
 public abstract class RoboGradient extends Gradient {
 
-  // TODO: use both options once RoboVM fixes their API
-  private static final CGGradientDrawingOptions gdOptions =
-    CGGradientDrawingOptions.BeforeStartLocation;
-    // CGGradientDrawingOptions.AfterEndLocation);
+  private static final CGGradientDrawingOptions gdOptions = new CGGradientDrawingOptions(
+    CGGradientDrawingOptions.BeforeStartLocation.value() |
+    CGGradientDrawingOptions.AfterEndLocation.value());
 
   final CGGradient cgGradient;
 
