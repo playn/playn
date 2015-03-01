@@ -266,7 +266,7 @@ public class RoboCanvas extends Canvas {
   @Override public Canvas setFillPattern(Pattern pattern) {
     currentState().gradient = null;
     // TODO: this anchors the fill pattern in the lower left; sigh
-    bctx.setFillColorWithColor(((RoboPattern) pattern).colorWithPattern);
+    bctx.setFillColor(((RoboPattern) pattern).colorWithPattern);
     return this;
   }
 

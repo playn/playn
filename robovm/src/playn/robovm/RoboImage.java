@@ -22,7 +22,7 @@ import org.robovm.apple.coregraphics.CGInterpolationQuality;
 import org.robovm.apple.coregraphics.CGRect;
 import org.robovm.apple.uikit.UIColor;
 import org.robovm.apple.uikit.UIImage;
-import org.robovm.rt.bro.ptr.VoidPtr;
+import org.robovm.rt.bro.ptr.IntPtr;
 
 import playn.core.*;
 import playn.robovm.OpenGLES;
@@ -165,7 +165,7 @@ public class RoboImage extends ImageImpl {
     bctx.dispose();
   }
 
-  protected void upload (Graphics gfx, int tex, int width, int height, VoidPtr data) {
+  protected void upload (Graphics gfx, int tex, int width, int height, IntPtr data) {
     gfx.gl.glBindTexture(GL20.GL_TEXTURE_2D, tex);
     gfx.gl.glPixelStorei(GL20.GL_UNPACK_ALIGNMENT, 1);
     OpenGLES.glTexImage2Dp(GL20.GL_TEXTURE_2D, 0, GL20.GL_RGBA, width, height, 0,
