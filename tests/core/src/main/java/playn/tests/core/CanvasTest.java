@@ -231,6 +231,19 @@ public class CanvasTest extends Test {
           Math.abs(FloatMath.sin(clock.tick/2000f)) * 100);
       }
     }));
+
+    final Canvas cancan = createCanvas(50, 50, new Drawer() {
+      public void draw (Canvas canvas) {
+        canvas.setFillGradient(radial).fillRect(0, 0, canvas.width, canvas.height);
+      }
+    });
+    addTestCanvas("canvas drawn on canvas", 100, 100, new Drawer() {
+      public void draw(Canvas canvas) {
+        canvas.translate(50, 25);
+        canvas.rotate(FloatMath.PI/4);
+        canvas.draw(cancan.image, 0, 0);
+      }
+    });
   }
 
   private interface Drawer {
