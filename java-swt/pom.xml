@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>io.playn</groupId>
+    <artifactId>playn-project</artifactId>
+    <version>2.0-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>playn-java-swt</artifactId>
+  <packaging>jar</packaging>
+  <name>PlayN Java via SWT</name>
+  <description>The PlayN Java (JVM) backend hosted by SWT</description>
+
+  <properties>
+    <swt.artifactId>org.eclipse.swt.cocoa.macosx.x86_64</swt.artifactId>
+  </properties>
+
+  <repositories>
+    <repository>
+      <id>swt-repo</id>
+      <url>https://swt-repo.googlecode.com/svn/repo/</url>
+    </repository>
+  </repositories>
+
+  <dependencies>
+    <dependency>
+      <groupId>io.playn</groupId>
+      <artifactId>playn-java-lwjgl</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.eclipse.swt</groupId>
+      <artifactId>${swt.artifactId}</artifactId>
+      <version>${swt.version}</version>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <sourceDirectory>src</sourceDirectory>
+    <testSourceDirectory>tests</testSourceDirectory>
+  </build>
+
+  <!-- a bunch of profile jiggery pokery to pick the appropriate SWT jar -->
+
+  <!-- NOTE: this only works for the developer's workstation; if you are going to deploy a real app
+       using the swt-java backend, you have to include all of the jars and select the right one
+       outside of Java, or do even more jiggery pokery as described here:
+       http://stackoverflow.com/questions/2706222/create-cross-platform-java-swt-application -->
+  <profiles>
+    <profile> <!-- Linux -->
+      <id>gtk_linux_x86</id>
+      <activation><os><name>linux</name><arch>i386</arch></os></activation>
+      <properties><swt.artifactId>org.eclipse.swt.gtk.linux.x86</swt.artifactId></properties>
+    </profile>
+    <profile>
+      <id>gtk_linux_x86_64</id>
+      <activation><os><name>linux</name><arch>x86_64</arch></os></activation>
+      <properties><swt.artifactId>org.eclipse.swt.gtk.linux.x86_64</swt.artifactId></properties>
+    </profile>
+    <profile>
+      <id>gtk_linux_amd64</id>
+      <activation><os><name>linux</name><arch>amd64</arch></os></activation>
+      <properties><swt.artifactId>org.eclipse.swt.gtk.linux.x86_64</swt.artifactId></properties>
+    </profile>
+    <profile> <!-- Windows -->
+      <id>win32_x86</id>
+      <activation><os><family>windows</family><arch>x86</arch></os></activation>
+      <properties><swt.artifactId>org.eclipse.swt.win32.win32.x86</swt.artifactId></properties>
+    </profile>
+    <profile>
+      <id>win32_x86_64</id>
+      <activation><os><family>windows</family><arch>x86_64</arch></os></activation>
+      <properties><swt.artifactId>org.eclipse.swt.win32.win32.x86_64</swt.artifactId></properties>
+    </profile>
+    <profile> <!-- Mac OS X -->
+      <id>cocoa_macosx_x86</id>
+      <activation><os><name>mac os x</name><arch>i386</arch></os></activation>
+      <properties><swt.artifactId>org.eclipse.swt.cocoa.macosx</swt.artifactId></properties>
+    </profile>
+    <profile>
+      <id>cocoa_macosx_x86_64</id>
+      <activation><os><name>mac os x</name><arch>x86_64</arch></os></activation>
+      <properties><swt.artifactId>org.eclipse.swt.cocoa.macosx.x86_64</swt.artifactId></properties>
+    </profile>
+  </profiles>
+</project>

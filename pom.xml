@@ -30,12 +30,13 @@
     <module>android</module>
     <module>archetype</module>
     <module>core</module>
-    <module>scene</module>
     <module>html</module>
-    <module>java</module>
+    <module>java-base</module>
+    <module>java-lwjgl</module>
+    <module>java-swt</module>
     <module>jbox2d</module>
     <module>robovm</module>
-    <module>swt-java</module>
+    <module>scene</module>
     <module>tests</module>
     <module>webgl</module>
   </modules>

@@ -1,39 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>${groupId}</groupId>
-    <artifactId>${rootArtifactId}</artifactId>
-    <version>${version}</version>
+    <groupId>io.playn</groupId>
+    <artifactId>playn-tests</artifactId>
+    <version>2.0-SNAPSHOT</version>
   </parent>
 
-  <artifactId>${artifactId}-java</artifactId>
-  <packaging>jar</packaging>
-  <name>${JavaGameClassName} Java</name>
+  <artifactId>playn-tests-java-lwjgl</artifactId>
+  <name>PlayN Tests Java</name>
 
   <properties>
-    <mainClass>${package}.java.${JavaGameClassName}Java</mainClass>
+    <mainClass>playn.tests.java.TestsGameJavaLWJGL</mainClass>
+    <scaleFactor>1</scaleFactor>
   </properties>
 
   <dependencies>
     <dependency>
-      <groupId>${groupId}</groupId>
-      <artifactId>${rootArtifactId}-core</artifactId>
+      <groupId>io.playn</groupId>
+      <artifactId>playn-tests-core</artifactId>
       <version>${project.version}</version>
     </dependency>
 
     <dependency>
-      <groupId>${groupId}</groupId>
-      <artifactId>${rootArtifactId}-assets</artifactId>
+      <groupId>io.playn</groupId>
+      <artifactId>playn-tests-assets</artifactId>
       <version>${project.version}</version>
     </dependency>
 
     <dependency>
       <groupId>io.playn</groupId>
       <artifactId>playn-java-lwjgl</artifactId>
-      <version>${playn.version}</version>
+      <version>${project.version}</version>
     </dependency>
   </dependencies>
 
@@ -86,6 +84,9 @@
             </executions>
             <configuration>
               <mainClass>${mainClass}</mainClass>
+              <arguments>
+                <argument>${scaleFactor}</argument>
+              </arguments>
             </configuration>
           </plugin>
         </plugins>

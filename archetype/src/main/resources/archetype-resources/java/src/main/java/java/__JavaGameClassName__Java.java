@@ -3,16 +3,16 @@
 #set( $symbol_escape = '\' )
 package ${package}.java;
 
-import playn.java.JavaPlatform;
+import playn.java.LWJGLPlatform;
 
 import ${package}.core.${JavaGameClassName};
 
 public class ${JavaGameClassName}Java {
 
   public static void main (String[] args) {
-    JavaPlatform.Config config = new JavaPlatform.Config();
+    LWJGLPlatform.Config config = new LWJGLPlatform.Config();
     // use config to customize the Java platform, if needed
-    JavaPlatform plat = new JavaPlatform(config);
+    LWJGLPlatform plat = new LWJGLPlatform(config);
     new ${JavaGameClassName}(plat);
     plat.start();
   }

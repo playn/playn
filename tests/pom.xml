@@ -18,13 +18,13 @@
   <modules>
     <module>assets</module>
     <module>core</module>
-    <module>java</module>
+    <module>java-lwjgl</module>
   </modules>
 
   <profiles>
     <profile>
-      <id>swt-java</id>
-      <modules><module>swt-java</module></modules>
+      <id>java-swt</id>
+      <modules><module>java-swt</module></modules>
     </profile>
     <profile>
       <id>android</id>

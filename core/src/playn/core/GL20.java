@@ -159,11 +159,14 @@ public abstract class GL20 {
   public static final int GL_ALPHA                                   = 0x1906;
   public static final int GL_RGB                                     = 0x1907;
   public static final int GL_RGBA                                    = 0x1908;
+  public static final int GL_BGRA                                    = 0x80E1;
   public static final int GL_LUMINANCE                               = 0x1909;
   public static final int GL_LUMINANCE_ALPHA                         = 0x190A;
   public static final int GL_UNSIGNED_SHORT_4_4_4_4                  = 0x8033;
   public static final int GL_UNSIGNED_SHORT_5_5_5_1                  = 0x8034;
   public static final int GL_UNSIGNED_SHORT_5_6_5                    = 0x8363;
+  public static final int GL_UNSIGNED_INT_8_8_8_8                    = 0x8035;
+  public static final int GL_UNSIGNED_INT_8_8_8_8_REV                = 0x8367;
   public static final int GL_FRAGMENT_SHADER                         = 0x8B30;
   public static final int GL_VERTEX_SHADER                           = 0x8B31;
   public static final int GL_MAX_VERTEX_ATTRIBS                      = 0x8869;
