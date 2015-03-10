@@ -394,10 +394,7 @@ public final class HtmlGL20 extends GL20 {
   }
 
   @Override public String glGetString(int id) {
-    // TODO: Where is getParameter()?
-    // String s = glc.getParameter(id);
-    //return s == null ? "" : s;
-    return "glGetString not implemented";
+    return glc.getParameterString(id);
   }
 
   @Override public void glPixelStorei(int i, int j) {
