@@ -19,6 +19,8 @@ import pythagoras.f.AffineTransform;
 import pythagoras.f.FloatMath;
 import pythagoras.f.MathUtil;
 import pythagoras.f.Point;
+import pythagoras.f.Vector;
+import pythagoras.f.XY;
 
 import react.Signal;
 import react.Slot;
@@ -158,18 +160,12 @@ public abstract class Layer implements Disposable {
   /** Returns true if {@link #events} has at least one listener. Use this instead of calling {@link
     * Signal#hasConnections} on {@code events} because {@code events} is created lazily this method
     * avoids creating it unnecessarily. */
-  public boolean hasEventListeners () {
-    return events != null && events.hasConnections();
-  }
+  public boolean hasEventListeners () { return events != null && events.hasConnections(); }
 
-  /**
-   * Returns true if this layer reacts to clicks and touches. If a layer is interactive, it will
-   * respond to {@link #hitTest}, which forms the basis for the click and touch processing provided
-   * by the {@code Dispatcher}s.
-   */
-  public boolean interactive() {
-    return isSet(Flag.INTERACTIVE);
-  }
+  /** Returns whether this layer reacts to clicks and touches. If a layer is interactive, it will
+    * respond to {@link #hitTest}, which forms the basis for the click and touch processing
+    * provided by the {@code Dispatcher}s.*/
+  public boolean interactive() { return isSet(Flag.INTERACTIVE); }
 
   /**
    * Configures this layer as reactive to clicks and touches, or not. You usually don't have to do
@@ -191,12 +187,8 @@ public abstract class Layer implements Disposable {
     return this;
   }
 
-  /**
-   * Returns true if this layer is visible (i.e. it is being rendered).
-   */
-  public boolean visible() {
-    return isSet(Flag.VISIBLE);
-  }
+  /** Returns true if this layer is visible (i.e. it is being rendered). */
+  public boolean visible() { return isSet(Flag.VISIBLE); }
 
   /**
    * Configures this layer's visibility: if true, it will be rendered as normal, if false it and
@@ -209,12 +201,8 @@ public abstract class Layer implements Disposable {
     return this;
   }
 
-  /**
-   * Whether this layer has been disposed. If true, the layer can no longer be used.
-   */
-  public boolean disposed() {
-    return state.get() == State.DISPOSED;
-  }
+  /** Whether this layer has been disposed. If true, the layer can no longer be used. */
+  public boolean disposed() { return state.get() == State.DISPOSED; }
 
   /** Connects {@code action} to {@link #state} such that it is triggered when this layer is added
     * to a rooted scene graph. */
@@ -280,9 +268,7 @@ public abstract class Layer implements Disposable {
    *
    * @return alpha in range [0,1] where 0 is transparent and 1 is opaque
    */
-  public float alpha() {
-    return alpha;
-  }
+  public float alpha() { return alpha; }
 
   /**
    * Sets the alpha component of this layer's current tint. Note that this value will be quantized
@@ -302,9 +288,7 @@ public abstract class Layer implements Disposable {
   }
 
   /** Returns the current tint for this layer, as {@code ARGB}. */
-  public int tint() {
-    return tint;
-  }
+  public int tint() { return tint; }
 
   /**
    * Sets the tint for this layer, as {@code ARGB}.
@@ -328,10 +312,8 @@ public abstract class Layer implements Disposable {
     return this;
   }
 
-  /**
-   * Returns the x-component of the layer's origin.
-   */
-  public float originX() {
+  /** Returns the x-component of the layer's origin. */
+  public float originX () {
     if (isSet(Flag.ODIRTY)) {
       float width = width();
       if (width > 0) {
@@ -342,11 +324,8 @@ public abstract class Layer implements Disposable {
     }
     return originX;
   }
-
-  /**
-   * Returns the y-component of the layer's origin.
-   */
-  public float originY() {
+  /** Returns the y-component of the layer's origin. */
+  public float originY () {
     if (isSet(Flag.ODIRTY)) {
       float height = height();
       if (height > 0) {
@@ -357,6 +336,12 @@ public abstract class Layer implements Disposable {
     }
     return originY;
   }
+  /** Writes this layer's origin into {@code into}.
+    * @return {@code into} for easy call chaining. */
+  public Point origin (Point into) { return into.set(originX(), originY()); }
+  /** Writes this layer's origin into {@code into}.
+    * @return {@code into} for easy call chaining. */
+  public Vector origin (Vector into) { return into.set(originX(), originY()); }
 
   /**
    * Sets the origin of the layer to a fixed position. This automatically sets the layer's logical
@@ -387,12 +372,8 @@ public abstract class Layer implements Disposable {
     return this;
   }
 
-  /**
-   * Returns this layer's current depth.
-   */
-  public float depth() {
-    return depth;
-  }
+  /** Returns this layer's current depth. */
+  public float depth () { return depth; }
 
   /**
    * Sets the depth of this layer.
@@ -410,19 +391,17 @@ public abstract class Layer implements Disposable {
     return this;
   }
 
-  /**
-   * Returns this layer's current translation in the x direction.
-   */
-  public float tx() {
-    return transform.tx();
-  }
+  /** Returns this layer's current translation in the x direction. */
+  public float tx () { return transform.tx(); }
+  /** Returns this layer's current translation in the y direction. */
+  public float ty () { return transform.ty(); }
 
-  /**
-   * Returns this layer's current translation in the y direction.
-   */
-  public float ty() {
-    return transform.ty();
-  }
+  /** Writes this layer's translation into {@code into}.
+    * @return {@code into} for easy call chaining. */
+  public Point translation (Point into) { return into.set(transform.tx(), transform.ty()); }
+  /** Writes this layer's translation into {@code into}.
+    * @return {@code into} for easy call chaining. */
+  public Vector translation (Vector into) { return into.set(transform.tx(), transform.ty()); }
 
   /**
    * Sets the x translation of this layer.
@@ -473,28 +452,31 @@ public abstract class Layer implements Disposable {
   }
 
   /**
-   * Returns this layer's current scale in the x direction. <em>Note:</em> this is the most recent
-   * value supplied to {@link #setScale(float)} or {@link #setScale(float,float)}, it is
-   * <em>not</em> extracted from the underlying transform. Thus the sign of the scale returned by
-   * this method is preserved. It's also substantially cheaper than extracting the scale from the
-   * affine transform matrix. This also means that if you change the scale directly on the {@link
-   * #transform} that scale <em>will not</em> be returned by this method.
+   * A variant of {@link #setTranslation(float,float)} that takes an {@code XY}.
    */
-  public float scaleX() {
-    return scaleX;
+  public Layer setTranslation(XY trans) {
+    return setTranslation(trans.x(), trans.y());
   }
 
-  /**
-   * Returns this layer's current scale in the y direction. <em>Note:</em> this is the most recent
-   * value supplied to {@link #setScale(float)} or {@link #setScale(float,float)}, it is
-   * <em>not</em> extracted from the underlying transform. Thus the sign of the scale returned by
-   * this method is preserved. It's also substantially cheaper than extracting the scale from the
-   * affine transform matrix. This also means that if you change the scale directly on the {@link
-   * #transform} that scale <em>will not</em> be returned by this method.
-   */
-  public float scaleY() {
-    return scaleY;
-  }
+  /** Returns this layer's current scale in the x direction.
+    * <p><em>Note:</em> this is the most recent value supplied to {@link #setScale(float)} or
+    * {@link #setScale(float,float)}, it is <em>not</em> extracted from the underlying transform.
+    * Thus the sign of the scale returned by this method is preserved. It's also substantially
+    * cheaper than extracting the scale from the affine transform matrix. This also means that if
+    * you change the scale directly on the {@link #transform} that scale <em>will not</em> be
+    * returned by this method. */
+  public float scaleX() { return scaleX; }
+  /** Returns this layer's current scale in the y direction.
+    * <p><em>Note:</em> this is the most recent value supplied to {@link #setScale(float)} or
+    * {@link #setScale(float,float)}, it is <em>not</em> extracted from the underlying transform.
+    * Thus the sign of the scale returned by this method is preserved. It's also substantially
+    * cheaper than extracting the scale from the affine transform matrix. This also means that if
+    * you change the scale directly on the {@link #transform} that scale <em>will not</em> be
+    * returned by this method. */
+  public float scaleY() {return scaleY; }
+  /** Writes this layer's scale into {@code into}.
+    * @return {@code into} for easy call chaining. */
+  public Vector scale (Vector into) { return into.set(scaleX, scaleY); }
 
   /**
    * Sets the current x and y scale of this layer to {@code scale}.. Note that a scale of {@code 1}
@@ -579,17 +561,14 @@ public abstract class Layer implements Disposable {
     return this;
   }
 
-  /**
-   * Returns this layer's current rotation. <em>Note:</em> this is the most recent value supplied
-   * to {@link #setRotation}, it is <em>not</em> extracted from the underlying transform. Thus the
-   * value may lie outside the range [-pi, pi] and the most recently set value is preserved. It's
-   * also substantially cheaper than extracting the rotation from the affine transform matrix. This
-   * also means that if you change the scale directly on the {@link #transform} that rotation
-   * <em>will not</em> be returned by this method.
-   */
-  public float rotation() {
-    return rotation;
-  }
+  /** Returns this layer's current rotation.
+    * <p><em>Note:</em> this is the most recent value supplied to {@link #setRotation}, it is
+    * <em>not</em> extracted from the underlying transform. Thus the value may lie outside the
+    * range [-pi, pi] and the most recently set value is preserved. It's also substantially cheaper
+    * than extracting the rotation from the affine transform matrix. This also means that if you
+    * change the scale directly on the {@link #transform} that rotation <em>will not</em> be
+    * returned by this method. */
+  public float rotation() { return rotation; }
 
   /**
    * Sets the current rotation of this layer, in radians. The rotation is done around the currently
@@ -613,29 +592,19 @@ public abstract class Layer implements Disposable {
     return this;
   }
 
-  /** Returns the width of the layer.
-    * NOTE: not all layers know their size. Those that don't return 0. */
-  public float width () {
-    return 0;
-  }
-
-  /** Returns the height of the layer.
-    * NOTE: not all layers know their size. Those that don't return 0. */
-  public float height () {
-    return 0;
-  }
+  /** Returns the width of this layer.
+    * <em>Note:</em> not all layers know their size. Those that don't return 0. */
+  public float width () { return 0; }
+  /** Returns the height of this layer.
+    * <em>Note:</em> not all layers know their size. Those that don't return 0. */
+  public float height () { return 0; }
 
   /** Returns the width of the layer multiplied by its x scale.
-    * NOTE: not all layers know their size. Those that don't return 0. */
-  public float scaledWidth () {
-    return scaleX() * width();
-  }
-
+    * <em>Note:</em> not all layers know their size. Those that don't return 0. */
+  public float scaledWidth () { return scaleX() * width(); }
   /** Returns the height of the layer multiplied by its y scale.
-    * NOTE: not all layers know their size. Those that don't return 0. */
-  public float scaledHeight () {
-    return scaleX() * height();
-  }
+    * <em>Note:</em> not all layers know their size. Those that don't return 0. */
+  public float scaledHeight () { return scaleX() * height(); }
 
   /**
    * Tests whether the supplied (layer relative) point "hits" this layer or any of its children. By
