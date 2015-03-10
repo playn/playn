@@ -152,5 +152,5 @@ public class CAFLoader {
   }
 
   private static final NSDataReadingOptions READ_OPTS = new NSDataReadingOptions(
-    NSDataReadingOptions.MappedRead.value()|NSDataReadingOptions.UncachedRead.value());
+    NSDataReadingOptions.MappedIfSafe.value()|NSDataReadingOptions.Uncached.value());
 }
