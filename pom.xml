@@ -46,7 +46,7 @@
     <android.version>4.1.1.4</android.version>
     <android.maven.version>4.0.0</android.maven.version>
     <swt.version>4.3</swt.version>
-    <gwt.version>2.6.1</gwt.version>
+    <gwt.version>2.7.0</gwt.version>
     <jbox2d.version>2.2.1.1</jbox2d.version>
     <lwjgl.version>2.9.3</lwjgl.version>
     <robovm.version>1.0.0</robovm.version>
@@ -90,7 +90,7 @@
         <plugin>
           <groupId>org.codehaus.mojo</groupId>
           <artifactId>gwt-maven-plugin</artifactId>
-          <version>2.6.1</version>
+          <version>${gwt.version}</version>
           <configuration>
             <logLevel>${gwt.loglevel}</logLevel>
             <style>${gwt.outputstyle}</style>
