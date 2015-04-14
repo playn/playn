@@ -16,14 +16,13 @@
   <description>Cross platform game library for N≥4 platforms.</description>
 
   <issueManagement>
-    <system>Google Code</system>
-    <url>http://code.google.com/p/playn/issues/list</url>
+    <url>http://github.com/playn/playn/issues</url>
   </issueManagement>
 
   <scm>
-    <connection>scm:git:git://github.com/threerings/playn.git</connection>
-    <developerConnection>scm:git:git@github.com:threerings/playn.git</developerConnection>
-    <url>https://github.com/threerings/playn/</url>
+    <connection>scm:git:git://github.com/playn/playn.git</connection>
+    <developerConnection>scm:git:git@github.com:playn/playn.git</developerConnection>
+    <url>https://github.com/playn/playn/</url>
   </scm>
 
   <modules>
