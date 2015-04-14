@@ -34,7 +34,7 @@ public class JavaAudio extends Audio {
   /**
    * Creates a sound instance from the audio data available via {@code in}.
    *
-   * @param in an input stream via which the audio data can be read.
+   * @param rsrc an resource instance via which the audio data can be read.
    * @param music if true, a custom {@link Clip} implementation will be used which can handle long
    * audio clips; if false, the default Java clip implementation is used which cannot handle long
    * audio clips.

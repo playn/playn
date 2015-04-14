@@ -22,7 +22,7 @@ import react.Slot;
 
 /**
  * Handles execution of units of code, both on background threads ({@link #invokeAsync}) and on the
- * main PlayN game thread ({@link #invokelater}).
+ * main PlayN game thread ({@link #invokeLater}).
  */
 public abstract class Exec {
 
@@ -66,9 +66,9 @@ public abstract class Exec {
   }
 
   /**
-   * Invokes {@code action} on the next {@link #frame} signal. The default implementation listens
-   * to the frame signal at a very high priority so that invoke later actions will run before the
-   * game's normal callbacks.
+   * Invokes {@code action} on the next {@link Platform#frame} signal. The default implementation
+   * listens to the frame signal at a very high priority so that invoke later actions will run
+   * before the game's normal callbacks.
    */
   public abstract void invokeLater (Runnable action);
 

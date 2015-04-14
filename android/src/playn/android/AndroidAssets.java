@@ -93,8 +93,8 @@ public class AndroidAssets extends Assets {
    * resources.
    *
    * <p>Expansion resources do not make an assumption that the resources are in a directory named
-   * 'assets' in contrast to the Android resource manager. Use {@link setPathPrefix(String)} to
-   * configure the path within the expansion files.</p>
+   * 'assets' in contrast to the Android resource manager. Use {@link #setPathPrefix} to configure
+   * the path within the expansion files.</p>
    *
    * <p>Expansion files are expected to be existing and zipped, following the
    * <a href="http://developer.android.com/google/play/expansion-files.html">Android expansion
