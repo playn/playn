@@ -48,8 +48,8 @@
     <gwt.version>2.7.0</gwt.version>
     <jbox2d.version>2.2.1.1</jbox2d.version>
     <lwjgl.version>2.9.3</lwjgl.version>
-    <robovm.version>1.0.0</robovm.version>
-    <robovm.maven.version>1.0.0</robovm.maven.version>
+    <robovm.version>1.1.0</robovm.version>
+    <robovm.maven.version>1.1.0</robovm.maven.version>
     <!--
       GWT log levels:
       ERROR, WARN, INFO, TRACE, DEBUG, SPAM, or ALL
