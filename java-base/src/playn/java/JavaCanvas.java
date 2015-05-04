@@ -68,7 +68,7 @@ class JavaCanvas extends Canvas {
     boolean isAlphaPremultiplied = bmp.isAlphaPremultiplied();
     WritableRaster raster = bmp.copyData(null);
     BufferedImage snap = new BufferedImage(cm, raster, isAlphaPremultiplied, null);
-    return new JavaImage(gfx, image.scale(), snap);
+    return new JavaImage(gfx, image.scale(), snap, "<canvas>");
   }
 
   @Override

@@ -34,6 +34,7 @@ public abstract class ImageImpl extends Image {
     }
   }
 
+  protected final String source;
   protected Scale scale;
   protected int pixelWidth, pixelHeight;
 
@@ -62,10 +63,12 @@ public abstract class ImageImpl extends Image {
   @Override public int pixelWidth () { return pixelWidth; }
   @Override public int pixelHeight () { return pixelHeight; }
 
-  protected ImageImpl (Graphics gfx, Scale scale, int pixelWidth, int pixelHeight, Object bitmap) {
+  protected ImageImpl (Graphics gfx, Scale scale, int pixelWidth, int pixelHeight, String source,
+                       Object bitmap) {
     super(gfx);
     if (pixelWidth == 0 || pixelHeight == 0) throw new IllegalArgumentException(
       "Invalid size for ready image: " + pixelWidth + "x" + pixelHeight + " bitmap: " + bitmap);
+    this.source = source;
     this.scale = scale;
     this.pixelWidth = pixelWidth;
     this.pixelHeight = pixelHeight;
@@ -73,16 +76,18 @@ public abstract class ImageImpl extends Image {
   }
 
   protected ImageImpl (Graphics gfx, RFuture<Image> state, Scale preScale,
-                       int preWidth, int preHeight) {
+                       int preWidth, int preHeight, String source) {
     super(gfx, state);
-    scale = preScale;
-    pixelWidth = preWidth;
-    pixelHeight = preHeight;
+    this.source = source;
+    this.scale = preScale;
+    this.pixelWidth = preWidth;
+    this.pixelHeight = preHeight;
   }
 
-  protected ImageImpl (Platform plat, boolean async, Scale preScale, int preWidth, int preHeight) {
+  protected ImageImpl (Platform plat, boolean async, Scale preScale, int preWidth, int preHeight,
+                       String source) {
     this(plat.graphics(), async ? plat.exec().<Image>deferredPromise() : RPromise.<Image>create(),
-         preScale, preWidth, preHeight);
+         preScale, preWidth, preHeight, source);
   }
 
   protected abstract void setBitmap (Object bitmap);

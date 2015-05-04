@@ -84,7 +84,7 @@ public abstract class JavaGraphics extends Graphics {
   @Override protected Canvas createCanvasImpl (Scale scale, int pixelWidth, int pixelHeight) {
     BufferedImage bitmap = new BufferedImage(
       pixelWidth, pixelHeight, BufferedImage.TYPE_INT_ARGB_PRE);
-    return new JavaCanvas(this, new JavaImage(this, scale, bitmap));
+    return new JavaCanvas(this, new JavaImage(this, scale, bitmap, "<canvas>"));
   }
 
   /** Initializes things after the rest of the platform is created. */

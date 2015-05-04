@@ -101,7 +101,7 @@ public class JavaAssets extends Assets {
   }
 
   @Override public Image getRemoteImage(final String url, int width, int height) {
-    final JavaImage image = new JavaImage(plat, true, width, height);
+    final JavaImage image = new JavaImage(plat, true, width, height, url);
     exec.invokeAsync(new Runnable() {
       public void run () {
         try {
@@ -292,8 +292,8 @@ public class JavaAssets extends Assets {
     throw error != null ? error : new FileNotFoundException(path);
   }
 
-  @Override protected ImageImpl createImage (boolean async, int rawWidth, int rawHeight) {
-    return new JavaImage(plat, async, rawWidth, rawHeight);
+  @Override protected ImageImpl createImage (boolean async, int rwid, int rhei, String source) {
+    return new JavaImage(plat, async, rwid, rhei, source);
   }
 
   protected static final String[] SUFFIXES = { ".wav", ".mp3" };

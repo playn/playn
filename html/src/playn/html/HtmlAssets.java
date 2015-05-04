@@ -181,7 +181,7 @@ public class HtmlAssets extends Assets {
     throw new UnsupportedOperationException("unused");
   }
 
-  @Override protected ImageImpl createImage (boolean async, int rawWidth, int rawHeight) {
+  @Override protected ImageImpl createImage (boolean async, int rwid, int rhei, String source) {
     throw new UnsupportedOperationException("unused");
   }
 
@@ -277,7 +277,7 @@ public class HtmlAssets extends Assets {
     // allow images to be served cross origin on supported, CORS enabled, browsers
     setCrossOrigin(img, "anonymous");
     img.setSrc(url);
-    return new HtmlImage(plat.graphics(), scale, img);
+    return new HtmlImage(plat.graphics(), scale, img, url);
   }
 
   /**

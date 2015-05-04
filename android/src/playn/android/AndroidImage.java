@@ -24,13 +24,14 @@ public class AndroidImage extends ImageImpl {
 
   protected Bitmap bitmap;
 
-  public AndroidImage(Graphics gfx, Scale scale, Bitmap bitmap) {
-    super(gfx, scale, bitmap.getWidth(), bitmap.getHeight(), bitmap);
+  public AndroidImage(Graphics gfx, Scale scale, Bitmap bitmap, String source) {
+    super(gfx, scale, bitmap.getWidth(), bitmap.getHeight(), source, bitmap);
     // TODO: move elsewhere: ((AndroidGLContext) ctx).addRefreshable(this);
   }
 
-  public AndroidImage (AndroidPlatform plat, boolean async, int preWidth, int preHeight) {
-    super(plat, async, Scale.ONE, preWidth, preHeight);
+  public AndroidImage (AndroidPlatform plat, boolean async, int preWidth, int preHeight,
+                       String source) {
+    super(plat, async, Scale.ONE, preWidth, preHeight, source);
   }
 
   /**
@@ -56,7 +57,8 @@ public class AndroidImage extends ImageImpl {
   }
 
   @Override public Image transform(BitmapTransformer xform) {
-    return new AndroidImage(gfx, scale, ((AndroidBitmapTransformer) xform).transform(bitmap));
+    Bitmap nbitmap = ((AndroidBitmapTransformer) xform).transform(bitmap);
+    return new AndroidImage(gfx, scale, nbitmap, source);
   }
 
   @Override public void draw (Object ctx, float x, float y, float w, float h) {
@@ -71,6 +73,10 @@ public class AndroidImage extends ImageImpl {
     sw *= scale.factor;
     sh *= scale.factor;
     ((AndroidCanvas)ctx).draw(bitmap, dx, dy, dw, dh, sx, sy, sw, sh);
+  }
+
+  @Override public String toString () {
+    return "Image[src=" + source + ", bitmap=" + bitmap + "]";
   }
 
   @Override protected void upload (Graphics gfx, Texture tex) {

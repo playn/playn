@@ -33,12 +33,12 @@ public class RoboImage extends ImageImpl {
   // CGBitmapContext and CGImage don't completely place nicely together
   private CGImage image;
 
-  public RoboImage (Graphics gfx, Scale scale, CGImage img) {
-    super(gfx, scale, (int)img.getWidth(), (int)img.getHeight(), img);
+  public RoboImage (Graphics gfx, Scale scale, CGImage img, String source) {
+    super(gfx, scale, (int)img.getWidth(), (int)img.getHeight(), source, img);
   }
 
-  public RoboImage (RoboPlatform plat, boolean async, int preWidth, int preHeight) {
-    super(plat, async, Scale.ONE, preWidth, preHeight);
+  public RoboImage (RoboPlatform plat, boolean async, int preWidth, int preHeight, String source) {
+    super(plat, async, Scale.ONE, preWidth, preHeight, source);
   }
 
   /** Returns the {@link CGImage} that underlies this image. This is public so that games that need
@@ -96,7 +96,7 @@ public class RoboImage extends ImageImpl {
 
   @Override public Image transform(BitmapTransformer xform) {
     UIImage ximage = new UIImage(((RoboBitmapTransformer) xform).transform(cgImage()));
-    return new RoboImage(gfx, scale, ximage.getCGImage());
+    return new RoboImage(gfx, scale, ximage.getCGImage(), source);
   }
 
   @Override public void draw(Object ctx, float x, float y, float width, float height) {
@@ -134,6 +134,8 @@ public class RoboImage extends ImageImpl {
     bctx.restoreGState();
   }
 
+  @Override public String toString () { return "Image[src=" + source + ", cgimg=" + image + "]"; }
+
   public void dispose () {
     if (image != null) {
       image.dispose();
@@ -141,8 +143,8 @@ public class RoboImage extends ImageImpl {
     }
   }
 
-  protected RoboImage (Graphics gfx, Scale scale, int pixelWidth, int pixelHeight) {
-    super(gfx, scale, pixelWidth, pixelHeight, null);
+  protected RoboImage (Graphics gfx, Scale scale, int pixelWidth, int pixelHeight, String source) {
+    super(gfx, scale, pixelWidth, pixelHeight, null, source);
   }
 
   @Override protected void finalize () {

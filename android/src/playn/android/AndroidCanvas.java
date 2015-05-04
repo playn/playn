@@ -221,7 +221,7 @@ public class AndroidCanvas extends Canvas {
 
   @Override public Image snapshot() {
     Bitmap bitmap = ((AndroidImage)this.image).bitmap();
-    return new AndroidImage(gfx, image.scale(), bitmap.copy(bitmap.getConfig(), false));
+    return new AndroidImage(gfx, image.scale(), bitmap.copy(bitmap.getConfig(), false), "<canvas>");
   }
 
   @Override public Canvas strokeCircle(float x, float y, float radius) {

@@ -38,12 +38,12 @@ public class JavaImage extends ImageImpl {
 
   protected BufferedImage img;
 
-  public JavaImage (Graphics gfx, Scale scale, BufferedImage img) {
-    super(gfx, scale, img.getWidth(), img.getHeight(), img);
+  public JavaImage (Graphics gfx, Scale scale, BufferedImage img, String source) {
+    super(gfx, scale, img.getWidth(), img.getHeight(), source, img);
   }
 
-  public JavaImage (JavaPlatform plat, boolean async, int preWidth, int preHeight) {
-    super(plat, async, Scale.ONE, preWidth, preHeight);
+  public JavaImage (JavaPlatform plat, boolean async, int preWidth, int preHeight, String source) {
+    super(plat, async, Scale.ONE, preWidth, preHeight, source);
   }
 
   /**
@@ -71,7 +71,7 @@ public class JavaImage extends ImageImpl {
   }
 
   @Override public Image transform(BitmapTransformer xform) {
-    return new JavaImage(gfx, scale, ((JavaBitmapTransformer) xform).transform(img));
+    return new JavaImage(gfx, scale, ((JavaBitmapTransformer) xform).transform(img), source);
   }
 
   @Override public void draw (Object ctx, float x, float y, float w, float h) {
@@ -97,7 +97,7 @@ public class JavaImage extends ImageImpl {
     gfx.setClip(oclip);
   }
 
-  @Override public String toString () { return "JavaImage[" + img + "]"; }
+  @Override public String toString () { return "Image[src=" + source + ", img=" + img + "]"; }
 
   @Override protected void upload (Graphics gfx, Texture tex) {
     ((JavaGraphics)gfx).upload(img, tex);
