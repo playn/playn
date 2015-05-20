@@ -254,20 +254,17 @@ public class AutoClientBundleGenerator extends Generator {
 
   /**
    * Get all related resources of the auto resource bundler.
-   * 
    */
   private HashSet<Resource> getResources(GeneratorContext context, JClassType userType, FileFilter filter) {
-    Map<String, Resource> map = context.getResourcesOracle().getResourceMap();
     final String pack = userType.getPackage().getName().replace('.', '/');
-   
+
     HashSet<Resource> resourceList = new HashSet<Resource>();
-    for (Entry<String, Resource> entry : map.entrySet()) {
-      String path = entry.getKey();
+    for (String path : context.getResourcesOracle().getPathNames()) {
       if (!path.startsWith(pack))
         continue;
       String ext = getExtension(path);
       if (EXTENSION_MAP.containsKey(ext))
-        resourceList.add(entry.getValue());
+        resourceList.add(context.getResourcesOracle().getResource(path));
     }
 
     return resourceList;
