@@ -26,6 +26,8 @@ public class HtmlCanvas extends Canvas {
   public HtmlCanvas(Graphics gfx, HtmlImage image) {
     super(gfx, image);
     this.ctx = image.canvas.getContext2d();
+    float scale = image.scale().factor;
+    ctx.scale(scale, scale);
   }
 
   @Override public Canvas clear() {
