@@ -74,6 +74,11 @@ public abstract class Interaction<E extends Event.XY> implements XY {
     this.bubble = bubble;
   }
 
+  @Override public String toString () {
+    return "Interaction[bubble=" + bubble + ", canceled=" + canceled + "]" +
+      "\n event=" + event + "\n hit=" + hitLayer;
+  }
+
   void dispatch (E event) {
     // if this interaction has been manually canceled, ignore further dispatch requests
     if (canceled) return;
