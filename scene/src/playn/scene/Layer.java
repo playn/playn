@@ -659,6 +659,23 @@ public abstract class Layer implements Disposable {
   }
 
   /**
+   * Configures a hit tester for this layer which hits this layer any time a hit does not hit a
+   * child of this layer. This absorbs all hits that would otherwise propagate up to this layer's
+   * parent. Note that this does not do any calculations to determine whether the hit is within the
+   * bounds of this layer, as those may or may not be known. <em>All</em> all hits that are checked
+   * against this layer are absorbed.
+   */
+  public Layer absorbHits () {
+    return setHitTester(new Layer.HitTester() {
+      public Layer hitTest (Layer layer, Point p) {
+        Layer hit = hitTestDefault(p);
+        return (hit == null) ? Layer.this : hit;
+      }
+      @Override public String toString () { return "<all>"; }
+    });
+  }
+
+  /**
    * Configures a custom batch (i.e. shader) for use when rendering this layer (and its children).
    * Passing null will cause the default batch to be used. Configuring a batch on a group layer
    * will cause that shader to be used when rendering the group layer's children, unless the child
