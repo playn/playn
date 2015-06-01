@@ -130,6 +130,22 @@ public abstract class Layer implements Disposable {
     setFlag(Flag.VISIBLE, true);
   }
 
+  /** Returns the name of this layer. This defaults to the simple name of the class, but can be set
+    * programmatically to aid in debugging. See {@link #setName}. */
+  public String name () {
+    // lazily init name if it's not been set
+    if (name == null) {
+      name = getClass().getName();
+      name = name.substring(name.lastIndexOf(".")+1).intern();
+    }
+    return name;
+  }
+
+  /** Sets the name of this layer. See {@link #name}. */
+  public void setName (String name) {
+    this.name = name;
+  }
+
   /** Returns the layer that contains this layer, or {@code null}. */
   public GroupLayer parent() { return parent; }
 
@@ -685,17 +701,17 @@ public abstract class Layer implements Disposable {
   }
 
   @Override public String toString () {
-    String cname = getClass().getName();
-    StringBuilder bldr = new StringBuilder(cname.substring(cname.lastIndexOf(".")+1));
-    bldr.append(" [hashCode=").append(hashCode());
-    bldr.append(", tx=").append(transform());
+    StringBuilder bldr = new StringBuilder(name());
+    bldr.append(" @ ").append(hashCode());
+    bldr.append(" [tx=").append(transform());
     if (hitTester != null) bldr.append(", hitTester=").append(hitTester);
-    return bldr.toString();
+    return bldr.append("]").toString();
   }
 
   protected int flags;
   protected float depth;
 
+  private String name;
   private GroupLayer parent;
   private Signal<Object> events; // created lazily
   private HitTester hitTester;
