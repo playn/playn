@@ -128,7 +128,8 @@ public class GroupLayer extends ClippedLayer implements Iterable<Layer> {
     int index = findChild(child, child.depth());
     if (index < 0) {
       throw new UnsupportedOperationException(
-        "Could not remove Layer because it is not a child of the GroupLayer");
+        "Could not remove Layer because it is not a child of the GroupLayer " +
+          "[group=" + this + ", layer=" + child + "]");
     }
     remove(index);
   }
