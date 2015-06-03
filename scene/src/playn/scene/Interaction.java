@@ -22,10 +22,29 @@ import pythagoras.f.XY;
  */
 public abstract class Interaction<E extends Event.XY> implements XY {
 
+  /** Used to configure {@link #capture}. */
+  public enum CaptureMode {
+    /** Events are only sent to the capturing layer. */
+    ONLY {
+      public boolean allow (Depth depth) { return depth == Depth.AT; }
+    },
+    /** Events are sent to the capturing layer and its parents. */
+    ABOVE {
+      public boolean allow (Depth depth) { return depth != Depth.BELOW; }
+    },
+    /** Events are sent to the capturing layer and its children. */
+    BELOW {
+      public boolean allow (Depth depth) { return depth != Depth.ABOVE; }
+    };
+
+    public abstract boolean allow (Depth depth);
+  }
+
   private final boolean bubble;
   private boolean canceled;
   private Layer dispatchLayer;
   private Layer capturingLayer;
+  private CaptureMode captureMode;
 
   /** The layer that was hit at the start of this interaction. */
   public final Layer hitLayer;
@@ -47,23 +66,32 @@ public abstract class Interaction<E extends Event.XY> implements XY {
     return capturingLayer != null;
   }
 
-  /** Captures this interaction. This causes subsequent events in this interaction to go only to
-    * the layer which is currently handling the interaction. Other layers in the interaction will
-    * receive a cancellation event and nothing further. */
+  /** Captures this interaction in {@code ONLY} mode. This causes subsequent events in this
+    * interaction to go only to the layer which is currently handling the interaction. Other layers
+    * in the interaction will receive a cancellation event and nothing further. */
   public void capture () {
+    capture(CaptureMode.ONLY);
+  }
+
+  /** Captures this interaction in the specified capture mode. Depending on the mode, subsequent
+    * events will go only to the current layer, or that layer and its parents, or that layer and
+    * its children. Other layers in the interaction will receive a cancellation event and nothing
+    * further. */
+  public void capture (CaptureMode mode) {
     assert dispatchLayer != null;
     if (canceled) throw new IllegalStateException("Cannot capture canceled interaction.");
     if (capturingLayer != dispatchLayer && captured()) throw new IllegalStateException(
       "Interaction already captured by " + capturingLayer);
     capturingLayer = dispatchLayer;
-    notifyCancel(capturingLayer, event);
+    captureMode = mode;
+    notifyCancel(capturingLayer, captureMode, event);
   }
 
   /** Cancels this interaction. All layers which normally participate in the action will be
     * notified of the cancellation. */
   public void cancel () {
     if (!canceled) {
-      notifyCancel(null, event);
+      notifyCancel(null, null, event);
       canceled = true;
     }
   }
@@ -75,7 +103,8 @@ public abstract class Interaction<E extends Event.XY> implements XY {
   }
 
   @Override public String toString () {
-    return "Interaction[bubble=" + bubble + ", canceled=" + canceled + "]" +
+    return "Interaction[bubble=" + bubble + ", canceled=" + canceled +
+      ", capmode=" + captureMode + "]" +
       "\n event=" + event + "\n hit=" + hitLayer;
   }
 
@@ -88,38 +117,52 @@ public abstract class Interaction<E extends Event.XY> implements XY {
     this.event = event;
     try {
       if (bubble) {
+        Depth depth = Depth.BELOW;
         for (Layer target = hitLayer; target != null; target = target.parent()) {
-          if (capturingLayer != null && target != capturingLayer) continue;
-          if (target.hasEventListeners()) dispatch(target);
+          if (target == capturingLayer) depth = Depth.AT;
+          else if (depth == Depth.AT) depth = Depth.ABOVE;
+          if (captureMode != null && !captureMode.allow(depth)) continue;
+          dispatch(target);
+          // the above dispatch may have caused a capture, in which case capturing layer will have
+          // just been set and we need to update our depth accordingly
+          if (target == capturingLayer) depth = Depth.AT;
         }
       } else {
-        if (hitLayer.hasEventListeners()) dispatch(hitLayer);
+        dispatch(hitLayer);
       }
     } finally { this.event = null; }
     local.set(0, 0);
   }
 
   void dispatch (Layer layer) {
+    if (!layer.hasEventListeners()) return;
+    Layer odispatchLayer = dispatchLayer;
     dispatchLayer = layer;
     try { layer.events().emit(this); }
-    finally { dispatchLayer = null; }
+    finally { dispatchLayer = odispatchLayer; }
   }
 
   /** Creates a cancel event using data from {@code source} if available. {@code source} will be
     * null if this cancellation was initiated outside normal event dispatch. */
   protected abstract E newCancelEvent (E source);
 
-  private void notifyCancel (Layer except, E source) {
+  private void notifyCancel (Layer except, CaptureMode exceptMode, E source) {
     E oldEvent = event;
     event = newCancelEvent(source);
     try {
       if (bubble) {
+        Depth depth = Depth.BELOW;
         for (Layer target = hitLayer; target != null; target = target.parent()) {
-          if (target != except && target.hasEventListeners()) dispatch(target);
+          if (target == except) depth = Depth.AT;
+          else if (depth == Depth.AT) depth = Depth.ABOVE;
+          if (exceptMode != null && exceptMode.allow(depth)) continue;
+          dispatch(target);
         }
       } else {
-        if (hitLayer != except && hitLayer.hasEventListeners()) dispatch(hitLayer);
+        if (hitLayer != except) dispatch(hitLayer);
       }
     } finally { this.event = oldEvent; }
   }
+
+  private static enum Depth { BELOW, AT, ABOVE; }
 }
