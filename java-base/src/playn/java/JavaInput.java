@@ -88,6 +88,11 @@ public class JavaInput extends Input {
         }
       }
     });
+
+    // TODO: it's pesky that both mouse and touch events are dispatched when touch is emulated, it
+    // would be nice to throw away the mouse events and only have touch, but we rely on something
+    // generating the mouse events so we can't throw them away just yet... plus it could be useful
+    // to keep wheel events... blah
   }
 
   @Override public boolean hasHardwareKeyboard() { return true; }
