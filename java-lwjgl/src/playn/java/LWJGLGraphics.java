@@ -13,11 +13,6 @@
  */
 package playn.java;
 
-import java.awt.Graphics2D;
-import java.awt.Shape;
-import java.awt.TexturePaint;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBuffer;
 import java.awt.image.DataBufferByte;
@@ -34,7 +29,6 @@ import org.lwjgl.opengl.GL12;
 import playn.core.*;
 import pythagoras.f.Dimension;
 import pythagoras.f.IDimension;
-import pythagoras.f.MathUtil;
 
 public class LWJGLGraphics extends JavaGraphics {
 

@@ -21,13 +21,10 @@ import java.awt.font.FontRenderContext;
 import java.awt.image.BufferedImage;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
 import playn.core.*;
-import pythagoras.f.Dimension;
-import pythagoras.f.IDimension;
 
 public abstract class JavaGraphics extends Graphics {
 

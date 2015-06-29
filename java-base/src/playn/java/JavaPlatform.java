@@ -17,8 +17,6 @@ package playn.java;
 
 import java.awt.Desktop;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.lang.reflect.Method;
 import java.net.URI;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;

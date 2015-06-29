@@ -21,11 +21,6 @@ import java.awt.TexturePaint;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
-import java.awt.image.DataBuffer;
-import java.awt.image.DataBufferByte;
-import java.awt.image.DataBufferInt;
-import java.nio.ByteBuffer;
-
 import playn.core.Image;
 import playn.core.ImageImpl;
 import playn.core.Graphics;

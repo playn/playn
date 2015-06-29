@@ -18,7 +18,6 @@ package playn.java;
 import java.io.File;
 import java.lang.reflect.Method;
 
-import org.lwjgl.LWJGLException;
 import org.lwjgl.opengl.Display;
 
 /**
