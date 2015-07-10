@@ -19,6 +19,7 @@ import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.NativeEvent;
 import com.google.gwt.event.dom.client.KeyCodes;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.Window;
 
 import pythagoras.f.Point;
@@ -220,22 +221,59 @@ public class HtmlInput extends Input {
     }
   }
 
-  static native void addEventListener (JavaScriptObject target, String name,
-                                       EventHandler handler, boolean capture) /*-{
-    target.addEventListener(name, function(e) {
-    handler.@playn.html.EventHandler::handleEvent(Lcom/google/gwt/dom/client/NativeEvent;)(e);
-    }, capture);
-  }-*/;
+  static class EventCloseHandler implements HandlerRegistration {
+    private final JavaScriptObject target;
+    private final String name;
+    private final boolean capture;
+    private JavaScriptObject listener;
+
+    EventCloseHandler(JavaScriptObject target, String name,
+                      EventHandler eventHandler, boolean capture) {
+      this.target = target;
+      this.name = name;
+      this.capture = capture;
+      addEventListener(this, target, name, eventHandler, capture);
+    }
+
+    void setListener(JavaScriptObject listener) {
+      this.listener = listener;
+    }
+
+    @Override
+    public void removeHandler() {
+      removeEventListener(target, name, listener, capture);
+    }
+
+    private native void addEventListener(EventCloseHandler closeHandler,
+                                         JavaScriptObject target, String name,
+                                         EventHandler handler, boolean capture) /*-{
+      var listener = function(e) {
+        handler.@playn.html.EventHandler::handleEvent(Lcom/google/gwt/dom/client/NativeEvent;)(e);
+      };
+      target.addEventListener(name, listener, capture);
+      closeHandler.@playn.html.HtmlInput.EventCloseHandler::setListener(Lcom/google/gwt/core/client/JavaScriptObject;)(listener);
+    }-*/;
+
+    private native void removeEventListener(JavaScriptObject target, String name,
+                                            JavaScriptObject listener, boolean capture)/*-{
+      target.removeEventListener(name, listener, capture);
+    }-*/;
+  }
+
+  static HandlerRegistration addEventListener (JavaScriptObject target, String name,
+                                       EventHandler handler, boolean capture) {
+    return new EventCloseHandler(target, name, handler, capture);
+  };
 
   /** Capture events that occur anywhere on the page. Event values will be relative to the page
     * (not the rootElement) {@see #getRelativeX(NativeEvent, Element)} and
     * {@see #getRelativeY(NativeEvent, Element)}. */
-  static void capturePageEvent(String name, EventHandler handler) {
-    addEventListener(Document.get(), name, handler, true);
+  static HandlerRegistration capturePageEvent(String name, EventHandler handler) {
+    return addEventListener(Document.get(), name, handler, true);
   }
 
-  static void captureEvent (Element target, String name, EventHandler handler) {
-    addEventListener(target, name, handler, true);
+  static HandlerRegistration captureEvent (Element target, String name, EventHandler handler) {
+    return addEventListener(target, name, handler, true);
   }
 
   /**
