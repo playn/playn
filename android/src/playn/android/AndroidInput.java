@@ -33,13 +33,12 @@ public class AndroidInput extends Input {
     this.plat = plat;
   }
 
-  @Override
-  public boolean hasHardwareKeyboard() {
+  @Override public boolean hasHardwareKeyboard () {
     return false; // TODO: return true for devices that have a hardware keyboard
   }
 
-  @Override public RFuture<String> getText(final Keyboard.TextType ttype, final String label,
-                                           final String initVal) {
+  @Override public RFuture<String> getText (final Keyboard.TextType ttype, final String label,
+                                            final String initVal) {
     final RPromise<String> result = plat.exec().deferredPromise();
     plat.activity.runOnUiThread(new Runnable() {
       public void run () {
@@ -88,13 +87,18 @@ public class AndroidInput extends Input {
 
   void onKeyDown (int keyCode, KeyEvent nativeEvent) {
     long time = nativeEvent.getEventTime();
-    dispatch(new Keyboard.KeyEvent(0, time, keyForCode(keyCode), true));
+    Keyboard.KeyEvent event = new Keyboard.KeyEvent(0, time, keyForCode(keyCode), true);
+    event.setFlag(mods(nativeEvent));
+    dispatch(event);
     int unicodeChar = nativeEvent.getUnicodeChar();
     if (unicodeChar != 0) dispatch(new Keyboard.TypedEvent(0, time, (char)unicodeChar));
   }
 
   void onKeyUp (int keyCode, KeyEvent nativeEvent) {
-    dispatch(new Keyboard.KeyEvent(0, nativeEvent.getEventTime(), keyForCode(keyCode), false));
+    long time = nativeEvent.getEventTime();
+    Keyboard.KeyEvent event = new Keyboard.KeyEvent(0, time, keyForCode(keyCode), false);
+    event.setFlag(mods(nativeEvent));
+    dispatch(event);
   }
 
   boolean onTouch (MotionEvent event) {
@@ -111,6 +115,11 @@ public class AndroidInput extends Input {
 
     // let our caller know whether we will be handling this event
     return kind != null;
+  }
+
+  private int mods (KeyEvent event) {
+    return modifierFlags(event.isAltPressed(), event.isCtrlPressed(), event.isMetaPressed(),
+                         event.isShiftPressed());
   }
 
   private void dispatch (final Keyboard.Event event) {

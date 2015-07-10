@@ -269,8 +269,14 @@ public class HtmlInput extends Input {
     }
   }
 
+  private int mods (NativeEvent event) {
+    return modifierFlags(event.getAltKey(), event.getCtrlKey(), event.getMetaKey(),
+                         event.getShiftKey());
+  }
+
   private void dispatch (Keyboard.Event event, NativeEvent nevent) {
     try {
+      event.setFlag(mods(nevent));
       keyboardEvents.emit(event);
     } finally {
       if (event.isSet(Event.F_PREVENT_DEFAULT)) nevent.preventDefault();
@@ -279,6 +285,7 @@ public class HtmlInput extends Input {
 
   private void dispatch (Mouse.Event event, NativeEvent nevent) {
     try {
+      event.setFlag(mods(nevent));
       mouseEvents.emit(event);
     } finally {
       if (event.isSet(Event.F_PREVENT_DEFAULT)) nevent.preventDefault();

@@ -91,21 +91,38 @@ public class Input {
     return RFuture.failure(new Exception("getText not supported"));
   }
 
-  protected void emitKeyPress (double time, Key key, boolean down) {
-    keyboardEvents.emit(new Keyboard.KeyEvent(0, time, key, down));
+  protected int modifierFlags (boolean altP, boolean ctrlP, boolean metaP, boolean shiftP) {
+    int flags = 0;
+    if (altP)   flags |= Event.F_ALT_PRESSED;
+    if (ctrlP)  flags |= Event.F_CTRL_PRESSED;
+    if (metaP)  flags |= Event.F_META_PRESSED;
+    if (shiftP) flags |= Event.F_SHIFT_PRESSED;
+    return flags;
+  }
+
+  protected void emitKeyPress (double time, Key key, boolean down, int flags) {
+    Keyboard.KeyEvent event = new Keyboard.KeyEvent(0, time, key, down);
+    event.setFlag(flags);
+    keyboardEvents.emit(event);
   }
   protected void emitKeyTyped (double time, char keyChar) {
     keyboardEvents.emit(new Keyboard.TypedEvent(0, time, keyChar));
   }
 
   protected void emitMouseButton (double time, float x, float y, Mouse.ButtonEvent.Id btn,
-                                  boolean down) {
-    mouseEvents.emit(new Mouse.ButtonEvent(0, time, x, y, btn, down));
+                                  boolean down, int flags) {
+    Mouse.ButtonEvent event = new Mouse.ButtonEvent(0, time, x, y, btn, down);
+    event.setFlag(flags);
+    mouseEvents.emit(event);
   }
-  protected void emitMouseMotion (double time, float x, float y, float dx, float dy) {
-    mouseEvents.emit(new Mouse.MotionEvent(0, time, x, y, dx, dy));
+  protected void emitMouseMotion (double time, float x, float y, float dx, float dy, int flags) {
+    Mouse.MotionEvent event = new Mouse.MotionEvent(0, time, x, y, dx, dy);
+    event.setFlag(flags);
+    mouseEvents.emit(event);
   }
-  protected void emitMouseWheel (double time, float x, float y, int delta) {
-    mouseEvents.emit(new Mouse.WheelEvent(0, time, x, y, delta));
+  protected void emitMouseWheel (double time, float x, float y, int delta, int flags) {
+    Mouse.WheelEvent event = new Mouse.WheelEvent(0, time, x, y, delta);
+    event.setFlag(flags);
+    mouseEvents.emit(event);
   }
 }

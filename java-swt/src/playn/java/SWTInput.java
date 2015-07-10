@@ -39,7 +39,7 @@ public class SWTInput extends JavaInput {
       public void handleEvent (Event event) {
         if (event.widget == plat.graphics().canvas) {
           Mouse.ButtonEvent.Id btn = mapButton(event.button);
-          if (btn != null) emitMouseButton(event.time, event.x, event.y, btn, true);
+          if (btn != null) emitMouseButton(event.time, event.x, event.y, btn, true, mods(event));
         }
       }
     });
@@ -47,7 +47,7 @@ public class SWTInput extends JavaInput {
       public void handleEvent (Event event) {
         if (event.widget == plat.graphics().canvas) {
           Mouse.ButtonEvent.Id btn = mapButton(event.button);
-          if (btn != null) emitMouseButton(event.time, event.x, event.y, btn, false);
+          if (btn != null) emitMouseButton(event.time, event.x, event.y, btn, false, mods(event));
         }
       }
     });
@@ -55,7 +55,7 @@ public class SWTInput extends JavaInput {
       public void handleEvent (Event event) {
         if (event.widget == plat.graphics().canvas) {
           float dx = event.x - lastX, dy = event.y - lastY;
-          emitMouseMotion(event.time, event.x, event.y, dx, dy);
+          emitMouseMotion(event.time, event.x, event.y, dx, dy, mods(event));
         }
       }
       private float lastX, lastY;
@@ -63,7 +63,7 @@ public class SWTInput extends JavaInput {
     plat.display.addFilter(SWT.MouseWheel, new org.eclipse.swt.widgets.Listener() {
       public void handleEvent (Event event) {
         if (event.widget == plat.graphics().canvas) {
-          emitMouseWheel(event.time, event.x, event.y, -event.count);
+          emitMouseWheel(event.time, event.x, event.y, -event.count, mods(event));
         }
       }
     });
@@ -72,7 +72,7 @@ public class SWTInput extends JavaInput {
     plat.display.addFilter(SWT.KeyDown, new org.eclipse.swt.widgets.Listener() {
       public void handleEvent (Event event) {
         Key key = translateKey(event.keyCode);
-        if (key != null) emitKeyPress(event.time, key, true);
+        if (key != null) emitKeyPress(event.time, key, true, mods(event));
         else System.err.println("KEY? " + event.keyCode + " / " + event.character);
 
         char keyChar = event.character;
@@ -82,7 +82,7 @@ public class SWTInput extends JavaInput {
     plat.display.addFilter(SWT.KeyUp, new org.eclipse.swt.widgets.Listener() {
       public void handleEvent (Event event) {
         Key key = translateKey(event.keyCode);
-        if (key != null) emitKeyPress(event.time, key, false);
+        if (key != null) emitKeyPress(event.time, key, false, mods(event));
       }
     });
   }
@@ -92,6 +92,13 @@ public class SWTInput extends JavaInput {
   @Override public RFuture<String> getText (Keyboard.TextType textType,
                                             String label, String initVal) {
     return RFuture.failure(new Exception("TODO"));
+  }
+
+  private int mods (org.eclipse.swt.widgets.Event event) {
+    return modifierFlags((event.stateMask & SWT.ALT) == SWT.ALT,
+                         (event.stateMask & SWT.CTRL) == SWT.CTRL,
+                         (event.stateMask & SWT.COMMAND) == SWT.COMMAND,
+                         (event.stateMask & SWT.SHIFT) == SWT.SHIFT);
   }
 
   private Mouse.ButtonEvent.Id mapButton(int swtButton) {
