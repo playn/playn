@@ -73,12 +73,14 @@ public abstract class Event {
       return builder.append(']').toString();
     }
 
-    /** A helper function used by platform input code to set the modifier flags. */
-    void setModifiers (boolean altP, boolean ctrlP, boolean shiftP, boolean metaP) {
-      if (altP) setFlag(F_ALT_DOWN);
-      if (ctrlP) setFlag(F_CTRL_DOWN);
-      if (shiftP) setFlag(F_SHIFT_DOWN);
-      if (metaP) setFlag(F_META_DOWN);
+    /** A helper function used by platform input code to compose modifier flags. */
+    public static int modifierFlags (boolean altP, boolean ctrlP, boolean metaP, boolean shiftP) {
+      int flags = 0;
+      if (altP)   flags |= F_ALT_DOWN;
+      if (ctrlP)  flags |= F_CTRL_DOWN;
+      if (metaP)  flags |= F_META_DOWN;
+      if (shiftP) flags |= F_SHIFT_DOWN;
+      return flags;
     }
 
     protected Input (int flags, double time) {
