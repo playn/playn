@@ -25,8 +25,6 @@ public abstract class Event {
 
   /** The base for all input events. */
   public static class Input extends Event {
-    // TODO(mdb): a mechanism to determine which modifier keys are pressed, if any
-
     /**
      * The flags set for this event. See {@link #isSet}, {@link #setFlag} and {@link #clearFlag}.
      */
@@ -39,14 +37,14 @@ public abstract class Event {
      */
     public final double time;
 
-    /** Returns true if the {@code alt} key was pressed when this event was generated. */
-    public boolean isAltPressed () { return isSet(F_ALT_PRESSED); }
-    /** Returns true if the {@code ctrl} key was pressed when this event was generated. */
-    public boolean isCtrlPressed () { return isSet(F_CTRL_PRESSED); }
-    /** Returns true if the {@code shift} key was pressed when this event was generated. */
-    public boolean isShiftPressed () { return isSet(F_SHIFT_PRESSED); }
-    /** Returns true if the {@code meta} key was pressed when this event was generated. */
-    public boolean isMetaPressed () { return isSet(F_META_PRESSED); }
+    /** Returns true if the {@code alt} key was down when this event was generated. */
+    public boolean isAltDown () { return isSet(F_ALT_DOWN); }
+    /** Returns true if the {@code ctrl} key was down when this event was generated. */
+    public boolean isCtrlDown () { return isSet(F_CTRL_DOWN); }
+    /** Returns true if the {@code shift} key was down when this event was generated. */
+    public boolean isShiftDown () { return isSet(F_SHIFT_DOWN); }
+    /** Returns true if the {@code meta} key was down when this event was generated. */
+    public boolean isMetaDown () { return isSet(F_META_DOWN); }
 
     /** Returns whether the {@code flag} bit is set. */
     public boolean isSet (int flag) {
@@ -77,10 +75,10 @@ public abstract class Event {
 
     /** A helper function used by platform input code to set the modifier flags. */
     void setModifiers (boolean altP, boolean ctrlP, boolean shiftP, boolean metaP) {
-      if (altP) setFlag(F_ALT_PRESSED);
-      if (ctrlP) setFlag(F_CTRL_PRESSED);
-      if (shiftP) setFlag(F_SHIFT_PRESSED);
-      if (metaP) setFlag(F_META_PRESSED);
+      if (altP) setFlag(F_ALT_DOWN);
+      if (ctrlP) setFlag(F_CTRL_DOWN);
+      if (shiftP) setFlag(F_SHIFT_DOWN);
+      if (metaP) setFlag(F_META_DOWN);
     }
 
     protected Input (int flags, double time) {
@@ -129,8 +127,8 @@ public abstract class Event {
     }
   }
 
-  protected static final int F_ALT_PRESSED   = 1 << 1;
-  protected static final int F_CTRL_PRESSED  = 1 << 2;
-  protected static final int F_SHIFT_PRESSED = 1 << 3;
-  protected static final int F_META_PRESSED  = 1 << 4;
+  protected static final int F_ALT_DOWN   = 1 << 1;
+  protected static final int F_CTRL_DOWN  = 1 << 2;
+  protected static final int F_SHIFT_DOWN = 1 << 3;
+  protected static final int F_META_DOWN  = 1 << 4;
 }

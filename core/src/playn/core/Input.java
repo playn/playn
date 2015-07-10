@@ -93,10 +93,10 @@ public class Input {
 
   protected int modifierFlags (boolean altP, boolean ctrlP, boolean metaP, boolean shiftP) {
     int flags = 0;
-    if (altP)   flags |= Event.F_ALT_PRESSED;
-    if (ctrlP)  flags |= Event.F_CTRL_PRESSED;
-    if (metaP)  flags |= Event.F_META_PRESSED;
-    if (shiftP) flags |= Event.F_SHIFT_PRESSED;
+    if (altP)   flags |= Event.F_ALT_DOWN;
+    if (ctrlP)  flags |= Event.F_CTRL_DOWN;
+    if (metaP)  flags |= Event.F_META_DOWN;
+    if (shiftP) flags |= Event.F_SHIFT_DOWN;
     return flags;
   }
 
