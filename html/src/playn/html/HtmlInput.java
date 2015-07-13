@@ -227,26 +227,25 @@ public class HtmlInput extends Input {
     private final boolean capture;
     private JavaScriptObject listener;
 
-    EventCloseHandler(JavaScriptObject target, String name,
-                      EventHandler eventHandler, boolean capture) {
+    EventCloseHandler (JavaScriptObject target, String name,
+                       EventHandler eventHandler, boolean capture) {
       this.target = target;
       this.name = name;
       this.capture = capture;
       addEventListener(this, target, name, eventHandler, capture);
     }
 
-    void setListener(JavaScriptObject listener) {
+    void setListener (JavaScriptObject listener) {
       this.listener = listener;
     }
 
-    @Override
-    public void removeHandler() {
+    @Override public void removeHandler () {
       removeEventListener(target, name, listener, capture);
     }
 
-    private native void addEventListener(EventCloseHandler closeHandler,
-                                         JavaScriptObject target, String name,
-                                         EventHandler handler, boolean capture) /*-{
+    private native void addEventListener (EventCloseHandler closeHandler,
+                                          JavaScriptObject target, String name,
+                                          EventHandler handler, boolean capture) /*-{
       var listener = function(e) {
         handler.@playn.html.EventHandler::handleEvent(Lcom/google/gwt/dom/client/NativeEvent;)(e);
       };
@@ -254,21 +253,21 @@ public class HtmlInput extends Input {
       closeHandler.@playn.html.HtmlInput.EventCloseHandler::setListener(Lcom/google/gwt/core/client/JavaScriptObject;)(listener);
     }-*/;
 
-    private native void removeEventListener(JavaScriptObject target, String name,
-                                            JavaScriptObject listener, boolean capture)/*-{
+    private native void removeEventListener (JavaScriptObject target, String name,
+                                             JavaScriptObject listener, boolean capture)/*-{
       target.removeEventListener(name, listener, capture);
     }-*/;
   }
 
   static HandlerRegistration addEventListener (JavaScriptObject target, String name,
-                                       EventHandler handler, boolean capture) {
+                                               EventHandler handler, boolean capture) {
     return new EventCloseHandler(target, name, handler, capture);
   };
 
   /** Capture events that occur anywhere on the page. Event values will be relative to the page
     * (not the rootElement) {@see #getRelativeX(NativeEvent, Element)} and
     * {@see #getRelativeY(NativeEvent, Element)}. */
-  static HandlerRegistration capturePageEvent(String name, EventHandler handler) {
+  static HandlerRegistration capturePageEvent (String name, EventHandler handler) {
     return addEventListener(Document.get(), name, handler, true);
   }
 
@@ -283,7 +282,7 @@ public class HtmlInput extends Input {
    * @param target the element whose coordinate system is to be used
    * @return the relative x-position
    */
-  static float getRelativeX(NativeEvent e, Element target) {
+  static float getRelativeX (NativeEvent e, Element target) {
     return (e.getClientX() - target.getAbsoluteLeft() + target.getScrollLeft() +
             target.getOwnerDocument().getScrollLeft()) / HtmlGraphics.experimentalScale;
   }
@@ -295,12 +294,12 @@ public class HtmlInput extends Input {
    * @param target the element whose coordinate system is to be used
    * @return the relative y-position
    */
-  static float getRelativeY(NativeEvent e, Element target) {
+  static float getRelativeY (NativeEvent e, Element target) {
     return (e.getClientY() - target.getAbsoluteTop() + target.getScrollTop() +
             target.getOwnerDocument().getScrollTop()) / HtmlGraphics.experimentalScale;
   }
 
-  void handleRequestsInUserEventContext() {
+  void handleRequestsInUserEventContext () {
     // hack to allow requesting mouse lock from non-mouse/key handler event
     if (isRequestingMouseLock && !isMouseLocked()) {
       requestMouseLockImpl(rootElement);
@@ -342,24 +341,24 @@ public class HtmlInput extends Input {
     }
   }
 
-  private native int getMovementX(NativeEvent nevent) /*-{
+  private native int getMovementX (NativeEvent nevent) /*-{
     return nevent.webkitMovementX;
   }-*/;
 
-  private native int getMovementY(NativeEvent nevent) /*-{
+  private native int getMovementY (NativeEvent nevent) /*-{
       return nevent.webkitMovementY;
   }-*/;
 
-  native void requestMouseLockImpl(Element element) /*-{
+  native void requestMouseLockImpl (Element element) /*-{
      element.requestPointerLock = (element.requestPointerLock || element.webkitRequestPointerLock ||
-                                  element.mozRequestPointerLock);
+                                   element.mozRequestPointerLock);
     if (element.requestPointerLock) element.requestPointerLock();
   }-*/;
 
   /**
    * Return the mouse wheel velocity for the event
    */
-  private static native float getMouseWheelVelocity(NativeEvent evt) /*-{
+  private static native float getMouseWheelVelocity (NativeEvent evt) /*-{
     var delta = 0.0;
     var agentInfo = @playn.html.HtmlPlatform::agentInfo;
 
@@ -395,7 +394,7 @@ public class HtmlInput extends Input {
    *
    * @return return the mouse wheel event name for the current browser
    */
-  protected static native String getMouseWheelEvent() /*-{
+  protected static native String getMouseWheelEvent () /*-{
     if (navigator.userAgent.toLowerCase().indexOf('firefox') != -1) {
       return "DOMMouseScroll";
     } else {
@@ -403,7 +402,7 @@ public class HtmlInput extends Input {
     }
   }-*/;
 
-  protected static Mouse.ButtonEvent.Id getMouseButton(NativeEvent evt) {
+  protected static Mouse.ButtonEvent.Id getMouseButton (NativeEvent evt) {
     switch (evt.getButton()) {
     case (NativeEvent.BUTTON_LEFT):   return Mouse.ButtonEvent.Id.LEFT;
     case (NativeEvent.BUTTON_MIDDLE): return Mouse.ButtonEvent.Id.MIDDLE;
@@ -412,12 +411,12 @@ public class HtmlInput extends Input {
     }
   }
 
-  private native void unlockImpl() /*-{
+  private native void unlockImpl () /*-{
     $doc.exitPointerLock = $doc.exitPointerLock || $doc.webkitExitPointerLock || $doc.mozExitPointerLock;
     $doc.exitPointerLock && $doc.exitPointerLock();
   }-*/;
 
-  private Touch.Event[] toTouchEvents(Touch.Event.Kind kind, NativeEvent nevent) {
+  private Touch.Event[] toTouchEvents (Touch.Event.Kind kind, NativeEvent nevent) {
     // Convert the JsArray<Native Touch> to an array of Touch.Events
     JsArray<com.google.gwt.dom.client.Touch> nativeTouches = nevent.getChangedTouches();
     int nativeTouchesLen = nativeTouches.length();
@@ -435,11 +434,11 @@ public class HtmlInput extends Input {
   }
 
   /** Returns the unique identifier of a touch, or 0. */
-  private static native int getTouchIdentifier(NativeEvent evt, int index) /*-{
+  private static native int getTouchIdentifier (NativeEvent evt, int index) /*-{
     return evt.changedTouches[index].identifier || 0;
   }-*/;
 
-  private static Key keyForCode(int keyCode) {
+  private static Key keyForCode (int keyCode) {
     switch (keyCode) {
     case KeyCodes.KEY_ALT: return Key.ALT;
     case KeyCodes.KEY_BACKSPACE: return Key.BACKSPACE;
