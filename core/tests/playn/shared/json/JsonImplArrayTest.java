@@ -31,8 +31,7 @@ public class JsonImplArrayTest extends AbstractJsonTest {
     a.remove(0);
     assertEquals(1, a.length());
 
-    a.remove(-1);
-    a.remove(10);
+    a.remove(-1).remove(10);
     assertEquals(1, a.length());
   }
 
@@ -55,8 +54,7 @@ public class JsonImplArrayTest extends AbstractJsonTest {
     a.set(0, null);
     a.set(1, "abcdef");
 
-    a.add(0, 123);
-    a.add(0, true);
+    a.add(0, 123).add(0, true);
     a.add(0, json().createArray());
 
     assertEquals(6, a.length());
@@ -68,8 +66,7 @@ public class JsonImplArrayTest extends AbstractJsonTest {
   public void testArrayAppend() {
     Json.Array a = json().createArray();
     a.add(json().createArray());
-    a.add(true);
-    a.add(123);
+    a.add(true).add(123);
     a.add(null);
     a.add("abcdef");
     a.add(json().createObject());
@@ -82,8 +79,7 @@ public class JsonImplArrayTest extends AbstractJsonTest {
     Json.Array a = json().createArray();
     a.set(5, json().createObject());
     assertEquals(6, a.length());
-    a.set(1, true);
-    a.set(2, 123);
+    a.set(1, true).set(2, 123);
     a.set(3, null);
     a.set(4, "abcdef");
     a.set(0, json().createArray());

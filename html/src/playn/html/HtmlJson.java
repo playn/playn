@@ -33,17 +33,20 @@ public class HtmlJson extends JsonImpl implements Json {
     }
 
     @Override
-    public void add(int index, java.lang.Object value) {
+    public Json.Array add(int index, java.lang.Object value) {
       // splice won't work as expected if the index is past the end of the array - it appends in
       // that case. Using set here instead to be more consistent.
       if (index > length())
         set0(index, wrapNative(value));
       else
         splice0(index, 0, wrapNative(value));
+      return this;
     }
 
-    public void add(java.lang.Object value) {
+    @Override
+    public Json.Array add(java.lang.Object value) {
       push0(wrapNative(value));
+      return this;
     }
 
     @Override
@@ -171,14 +174,20 @@ public class HtmlJson extends JsonImpl implements Json {
     }-*/;
 
     @Override
-    public native void remove(int index) /*-{
+    public Json.Array remove(int index) {
+      remove0(index);
+      return this;
+    };
+
+    private native void remove0(int index) /*-{
       // splice removes from the end if negative numbers are passed in
       index >= 0 && this.splice(index, 1);
     }-*/;
 
     @Override
-    public void set(int index, java.lang.Object value) {
+    public Json.Array set(int index, java.lang.Object value) {
       set0(index, wrapNative(value));
+      return this;
     }
 
     @Override
@@ -353,12 +362,18 @@ public class HtmlJson extends JsonImpl implements Json {
     }
 
     @Override
-    public void put(String key, java.lang.Object value) {
+    public Json.Object put(String key, java.lang.Object value) {
       put0(key, wrapNative(value));
+      return this;
     }
 
     @Override
-    public native void remove(String key) /*-{
+    public Json.Object remove(String key) {
+      remove0(key);
+      return this;
+    };
+
+    private native void remove0(String key) /*-{
       delete this[key];
     }-*/;
 
@@ -382,11 +397,11 @@ public class HtmlJson extends JsonImpl implements Json {
       return sink;
     }
 
-    private final native JavaScriptObject get0(String key) /*-{
+    private native JavaScriptObject get0(String key) /*-{
       return @com.google.gwt.core.client.GWT::isProdMode()() ? this[key] : [ this[key] ];
     }-*/;
 
-    private final native Array getNativeKeys() /*-{
+    private native Array getNativeKeys() /*-{
       if (Object.prototype.keys) {
         return this.keys();
       }

@@ -285,25 +285,33 @@ public interface Json {
 
     /**
      * Appends a JSON boolean, null, number, object, or array value.
+     *
+     * @return  a reference to this, allowing the calls to be chained together.
      */
-    void add(java.lang.Object value);
+    Array add(java.lang.Object value);
 
     /**
      * Inserts a JSON boolean, null, number, object, or array value at the given index. If the index
      * is past the end of the array, the array is null-padded to the given index.
+     *
+     * @return  a reference to this, allowing the calls to be chained together.
      */
-    void add(int index, java.lang.Object value);
+    Array add(int index, java.lang.Object value);
 
     /**
      * Removes a JSON value from the given index. If the index is out of bounds, this is a no-op.
+     *
+     * @return  a reference to this, allowing the calls to be chained together.
      */
-    void remove(int index);
+    Array remove(int index);
 
     /**
      * Sets a JSON boolean, null, number, object, or array value at the given index. If the index
      * is past the end of the array, the array is null-padded to the given index.
+     *
+     * @return  a reference to this, allowing the calls to be chained together.
      */
-    void set(int index, java.lang.Object value);
+    Array set(int index, java.lang.Object value);
 
     /**
      * Writes this object to a {@link JsonSink}.
@@ -468,13 +476,17 @@ public interface Json {
 
     /**
      * Inserts a JSON null, object, array or string value at the given key.
+     *
+     * @return  a reference to this, allowing the calls to be chained together.
      */
-    void put(String key, java.lang.Object value);
+    Object put(String key, java.lang.Object value);
 
     /**
      * Removes a JSON value at the given key.
+     *
+     * @return  a reference to this, allowing the calls to be chained together.
      */
-    void remove(String key);
+    Object remove(String key);
 
     /**
      * Writes this object to a {@link JsonSink}.

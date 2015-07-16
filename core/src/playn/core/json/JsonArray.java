@@ -54,17 +54,19 @@ class JsonArray implements Json.Array {
     return new JsonBuilder<JsonArray>(new JsonArray());
   }
   
-  public void add(java.lang.Object value) {
+  public JsonArray add(java.lang.Object value) {
     JsonImpl.checkJsonType(value);
     list.add(value);
+    return this;
   }
   
-  public void add(int index, java.lang.Object value) {
+  public JsonArray add(int index, java.lang.Object value) {
     JsonImpl.checkJsonType(value);
     // TODO(mmastrac): Use an array rather than ArrayList to make this more efficient
     while (list.size() < index)
       list.add(null);
     list.add(index, value);
+    return this;
   }
 
   /**
@@ -242,19 +244,21 @@ class JsonArray implements Json.Array {
   }
 
   @Override
-  public void remove(int index) {
+  public JsonArray remove(int index) {
     if (index < 0 || index >= list.size())
-      return;
+      return this;
     list.remove(index);
+    return this;
   }
   
   @Override
-  public void set(int index, java.lang.Object value) {
+  public JsonArray set(int index, java.lang.Object value) {
     JsonImpl.checkJsonType(value);
     // TODO(mmastrac): Use an array rather than ArrayList to make this more efficient
     while (list.size() <= index)
       list.add(null);
     list.set(index, value);
+    return this;
   }
 
   @Override
