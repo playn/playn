@@ -240,14 +240,16 @@ class JsonObject implements Json.Object {
   }
 
   @Override
-  public void put(String key, Object value) {
+  public JsonObject put(String key, Object value) {
     JsonImpl.checkJsonType(value);
     map.put(key, value);
+    return this;
   }
 
   @Override
-  public void remove(String key) {
+  public JsonObject remove(String key) {
     map.remove(key);
+    return this;
   }
 
   @Override

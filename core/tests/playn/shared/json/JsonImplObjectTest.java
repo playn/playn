@@ -45,12 +45,14 @@ public class JsonImplObjectTest extends AbstractJsonTest {
     }
     assertEquals(2, keys.length());
 
-    o.put("b", "string");
+    o.put("b", "string").put("c", Boolean.FALSE);
     assertTrue(o.isString("b"));
+    assertTrue(o.isBoolean("c"));
 
     o.remove("b");
     assertFalse(o.isString("b"));
     assertTrue(o.isNull("b"));
+    o.remove("c");
 
     assertEquals(1, o.keys().length());
   }
