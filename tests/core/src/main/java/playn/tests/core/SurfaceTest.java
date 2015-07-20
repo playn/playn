@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import pythagoras.f.AffineTransform;
 import pythagoras.f.FloatMath;
 import pythagoras.f.Rectangle;
 import react.RFuture;
@@ -95,21 +96,23 @@ public class SurfaceTest extends Test {
 
     ypos = 10;
 
+    final TriangleBatch triangleBatch = new TriangleBatch(game.graphics.gl);
+    final AffineTransform af = new AffineTransform().translate(160, ygap + 150);
+
     ypos = ygap + addTest(160, ypos, new Layer() {
       protected void paintImpl (Surface surf) {
         // fill some shapes with patterns
         surf.setFillPattern(ttex).fillRect(10, 0, 100, 100);
-        // use same fill pattern for the triangles
-        surf.translate(0, 160);
-        // TODO: triangles
         // render a sliding window of half of our triangles to test the slice rendering
-        // surf.fillTriangles(verts, offset*4, (hsamples+1)*4, indices, offset*6, hsamples*6, offset*2);
+        triangleBatch.addTris(ttex, Tint.NOOP_TINT, af,
+          verts, offset*4, (hsamples+1)*4, ttex.width(), ttex.height(),
+          indices, offset*6, hsamples*6, offset*2);
         offset += doff;
         if (offset == 0) doff = 1;
         else if (offset == hsamples) doff = -1;
       }
       private int offset = 0, doff = 1;
-    }, 120, 210, "ImmediateLayer patterned fillRect, fillTriangles");
+    }.setBatch(triangleBatch), 120, 210, "ImmediateLayer patterned fillRect, fillTriangles");
 
     TextureSurface patted = game.createSurface(100, 100);
     patted.begin().clear().setFillPattern(ttex).fillRect(0, 0, 100, 100).end().close();
