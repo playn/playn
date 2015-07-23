@@ -97,7 +97,9 @@ public class SurfaceTest extends Test {
     ypos = 10;
 
     final TriangleBatch triangleBatch = new TriangleBatch(game.graphics.gl);
-    final AffineTransform af = new AffineTransform().translate(160, ygap + 150);
+    final AffineTransform af = new AffineTransform().
+      scale(game.graphics.scale().factor, game.graphics.scale().factor).
+      translate(160, (ygap + 150));
 
     ypos = ygap + addTest(160, ypos, new Layer() {
       protected void paintImpl (Surface surf) {
