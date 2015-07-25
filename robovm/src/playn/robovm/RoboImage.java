@@ -144,7 +144,7 @@ public class RoboImage extends ImageImpl {
   }
 
   protected RoboImage (Graphics gfx, Scale scale, int pixelWidth, int pixelHeight, String source) {
-    super(gfx, scale, pixelWidth, pixelHeight, null, source);
+    super(gfx, scale, pixelWidth, pixelHeight, source, null);
   }
 
   @Override protected void finalize () {
