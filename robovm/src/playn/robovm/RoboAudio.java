@@ -18,6 +18,7 @@ import java.io.File;
 import org.robovm.apple.avfoundation.AVAudioPlayer;
 import org.robovm.apple.avfoundation.AVAudioSession;
 import org.robovm.apple.avfoundation.AVAudioSessionSetActiveOptions;
+import org.robovm.apple.foundation.NSErrorException;
 import org.robovm.apple.foundation.NSURL;
 
 import playn.core.Audio;
@@ -39,7 +40,11 @@ public class RoboAudio extends Audio {
     this.plat = plat;
 
     session = AVAudioSession.getSharedInstance();
-    session.setActive(true, AVAudioSessionSetActiveOptions.None);
+    try {
+      session.setActive(true, AVAudioSessionSetActiveOptions.None);
+    } catch (NSErrorException e) {
+      plat.log().error("Unable to activate audio session:" + e);
+    }
 
     oalDevice = alcOpenDevice(null);
     if (oalDevice != 0) {
