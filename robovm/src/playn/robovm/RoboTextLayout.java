@@ -13,16 +13,16 @@
  */
 package playn.robovm;
 
-import org.robovm.apple.corefoundation.CFArray;
+import java.util.List;
+
 import org.robovm.apple.corefoundation.CFRange;
 import org.robovm.apple.coregraphics.CGAffineTransform;
 import org.robovm.apple.coregraphics.CGBitmapContext;
 import org.robovm.apple.coregraphics.CGPath;
 import org.robovm.apple.coregraphics.CGRect;
 import org.robovm.apple.coretext.CTFont;
-// TODO: restore these when stock CTFrame binding is no longer broken
-// import org.robovm.apple.coretext.CTFrame;
-// import org.robovm.apple.coretext.CTFramesetter;
+import org.robovm.apple.coretext.CTFrame;
+import org.robovm.apple.coretext.CTFramesetter;
 import org.robovm.apple.coretext.CTLine;
 import org.robovm.apple.foundation.NSAttributedString;
 import org.robovm.apple.uikit.NSAttributedStringAttributes;
@@ -49,11 +49,11 @@ class RoboTextLayout extends TextLayout {
 
     final CTFont font = RoboFont.resolveFont(format.font);
     NSAttributedStringAttributes attribs = createAttribs(font);
-    CFArray lines = wrapLines(new NSAttributedString(text, attribs), wrap.width);
+    List<CTLine> lines = wrapLines(new NSAttributedString(text, attribs), wrap.width);
 
     RoboTextLayout[] layouts = new RoboTextLayout[(int)lines.size()];
     for (int ii = 0; ii < layouts.length; ii++) {
-      CTLine line = lines.get(ii, CTLine.class);
+      CTLine line = lines.get(ii);
       CFRange range = line.getStringRange();
       String ltext = text.substring((int)range.getLocation(),
                                     (int)(range.getLocation()+range.getLength()));
@@ -78,7 +78,7 @@ class RoboTextLayout extends TextLayout {
     attribs.setStrokeColor(toUIColor(strokeColor));
   }
 
-  private static CFArray wrapLines(NSAttributedString astring, float wrapWidth) {
+  private static List<CTLine> wrapLines(NSAttributedString astring, float wrapWidth) {
     CTFramesetter fs = CTFramesetter.create(astring);
     try {
       // iOS lays things out from max-y up to zero (inverted coordinate system); so we need to
