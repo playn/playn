@@ -43,7 +43,7 @@ public class RoboAudio extends Audio {
     try {
       session.setActive(true, AVAudioSessionSetActiveOptions.None);
     } catch (NSErrorException e) {
-      plat.log().error("Unable to activate audio session:" + e);
+      plat.log().error("Unable to activate audio session: " + e);
     }
 
     oalDevice = alcOpenDevice(null);
