@@ -23,7 +23,6 @@ import pythagoras.f.Vector;
 import pythagoras.f.XY;
 
 import react.Signal;
-import react.Slot;
 import react.Value;
 import react.ValueView;
 
@@ -222,16 +221,19 @@ public abstract class Layer implements Disposable {
 
   /** Connects {@code action} to {@link #state} such that it is triggered when this layer is added
     * to a rooted scene graph. */
-  public void onAdded (final Slot<? super Layer> action) { onState(State.ADDED, action); }
+  public void onAdded (final Signal.Listener<? super Layer> action) {
+    onState(State.ADDED, action); }
   /** Connects {@code action} to {@link #state} such that it is triggered when this layer is
     * removed from a rooted scene graph. */
-  public void onRemoved (final Slot<? super Layer> action) { onState(State.REMOVED, action); }
+  public void onRemoved (final Signal.Listener<? super Layer> action) {
+    onState(State.REMOVED, action); }
   /** Connects {@code action} to {@link #state} such that it is triggered when this layer is
     * disposed. */
-  public void onDisposed (final Slot<? super Layer> action) { onState(State.DISPOSED, action); }
+  public void onDisposed (final Signal.Listener<? super Layer> action) {
+    onState(State.DISPOSED, action); }
 
-  private void onState (final State tgtState, final Slot<? super Layer> action) {
-    state.connect(new Slot<State>() {
+  private void onState (final State tgtState, final Signal.Listener<? super Layer> action) {
+    state.connect(new Signal.Listener<State>() {
       public void onEmit (State state) {
         if (state == tgtState) action.onEmit(Layer.this);
       }
