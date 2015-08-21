@@ -173,7 +173,7 @@ public class RoboPlatform extends Platform {
     if (!paused) return;
     paused = false;
     exec.invokeLater(new Runnable() {
-      public void run() { lifecycle.emit(Lifecycle.RESUME); }
+      public void run() { dispatchEvent(lifecycle, Lifecycle.RESUME); }
     });
   }
 
@@ -183,14 +183,14 @@ public class RoboPlatform extends Platform {
     // we call this directly rather than via invokeLater() because the PlayN thread is already
     // stopped at this point so a) there's no point in worrying about racing with that thread,
     // and b) onPause would never get called, since the PlayN thread is not processing events
-    lifecycle.emit(Lifecycle.PAUSE);
+    dispatchEvent(lifecycle, Lifecycle.PAUSE);
   }
 
   void willTerminate () {
     // shutdown the GL and AL systems
     ResourceCleaner.terminate(this);
     // let the app know that we're terminating
-    lifecycle.emit(Lifecycle.EXIT);
+    dispatchEvent(lifecycle, Lifecycle.EXIT);
   }
 
   private int getOSVersion () {

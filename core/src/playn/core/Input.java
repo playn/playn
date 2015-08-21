@@ -23,6 +23,8 @@ import react.Signal;
  */
 public class Input {
 
+  private Platform plat;
+
   /** Enables or disables mouse interaction.
     * No mouse events will be dispatched whilst this big switch is in the off position. */
   public boolean mouseEnabled = true;
@@ -91,6 +93,10 @@ public class Input {
     return RFuture.failure(new Exception("getText not supported"));
   }
 
+  protected Input (Platform plat) {
+    this.plat = plat;
+  }
+
   protected int modifierFlags (boolean altP, boolean ctrlP, boolean metaP, boolean shiftP) {
     return Event.Input.modifierFlags(altP, ctrlP, metaP, shiftP);
   }
@@ -98,26 +104,26 @@ public class Input {
   protected void emitKeyPress (double time, Key key, boolean down, int flags) {
     Keyboard.KeyEvent event = new Keyboard.KeyEvent(0, time, key, down);
     event.setFlag(flags);
-    keyboardEvents.emit(event);
+    plat.dispatchEvent(keyboardEvents, event);
   }
   protected void emitKeyTyped (double time, char keyChar) {
-    keyboardEvents.emit(new Keyboard.TypedEvent(0, time, keyChar));
+    plat.dispatchEvent(keyboardEvents, new Keyboard.TypedEvent(0, time, keyChar));
   }
 
   protected void emitMouseButton (double time, float x, float y, Mouse.ButtonEvent.Id btn,
                                   boolean down, int flags) {
     Mouse.ButtonEvent event = new Mouse.ButtonEvent(0, time, x, y, btn, down);
     event.setFlag(flags);
-    mouseEvents.emit(event);
+    plat.dispatchEvent(mouseEvents, event);
   }
   protected void emitMouseMotion (double time, float x, float y, float dx, float dy, int flags) {
     Mouse.MotionEvent event = new Mouse.MotionEvent(0, time, x, y, dx, dy);
     event.setFlag(flags);
-    mouseEvents.emit(event);
+    plat.dispatchEvent(mouseEvents, event);
   }
   protected void emitMouseWheel (double time, float x, float y, int delta, int flags) {
     Mouse.WheelEvent event = new Mouse.WheelEvent(0, time, x, y, delta);
     event.setFlag(flags);
-    mouseEvents.emit(event);
+    plat.dispatchEvent(mouseEvents, event);
   }
 }

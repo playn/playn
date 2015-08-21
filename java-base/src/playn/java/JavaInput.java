@@ -34,6 +34,7 @@ public class JavaInput extends Input {
   private int currentId;
 
   public JavaInput (JavaPlatform plat) {
+    super(plat);
     this.plat = plat;
 
     // if touch emulation is configured, wire it up
@@ -107,7 +108,7 @@ public class JavaInput extends Input {
   void update () {
     // dispatch any queued keyboard events
     Keyboard.Event kev;
-    while ((kev = kevQueue.poll()) != null) keyboardEvents.emit(kev);
+    while ((kev = kevQueue.poll()) != null) plat.dispatchEvent(keyboardEvents, kev);
   }
 
   private void dispatchTouch (Mouse.Event event, Touch.Event.Kind kind) {
@@ -116,7 +117,7 @@ public class JavaInput extends Input {
     Touch.Event[] evs = (pivot == null) ?
       new Touch.Event[] { main } :
       new Touch.Event[] { main, toTouch(event.time, 2*pivot.x-ex, 2*pivot.y-ey, kind, 1) };
-    touchEvents.emit(evs);
+    plat.dispatchEvent(touchEvents, evs);
   }
 
   private Touch.Event toTouch (double time, float x, float y, Touch.Event.Kind kind, int idoff) {

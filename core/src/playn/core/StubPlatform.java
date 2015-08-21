@@ -61,7 +61,7 @@ public class StubPlatform extends Platform {
     }
   };
 
-  private Input input = new Input();
+  private Input input = new Input(this);
   private Json json = new JsonImpl();
   private Log log = new Log() {
     @Override

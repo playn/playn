@@ -85,15 +85,15 @@ public class AndroidPlatform extends Platform {
   // note: these are called by GameActivity
   void onPause() {
     state = State.PAUSED;
-    lifecycle.emit(Lifecycle.PAUSE);
+    dispatchEvent(lifecycle, Lifecycle.PAUSE);
   }
   void onResume() {
     state = State.RUNNING;
-    lifecycle.emit(Lifecycle.RESUME);
+    dispatchEvent(lifecycle, Lifecycle.RESUME);
   }
   void onExit() {
     state = State.EXITED;
-    lifecycle.emit(Lifecycle.EXIT);
+    dispatchEvent(lifecycle, Lifecycle.EXIT);
   }
 
   void processFrame() { emitFrame(); }

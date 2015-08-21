@@ -179,7 +179,7 @@ public abstract class JavaPlatform extends Platform {
 
   protected void shutdown () {
     // let the game run any of its exit hooks
-    lifecycle.emit(Lifecycle.EXIT);
+    dispatchEvent(lifecycle, Lifecycle.EXIT);
 
     // shutdown our thread pool
     try {
@@ -194,9 +194,7 @@ public abstract class JavaPlatform extends Platform {
   }
 
   protected void processFrame () {
-    // event handling
-    try { input.update(); }
-    catch (Exception e) { log.warn("Input exception", e); }
+    input.update(); // event handling
     emitFrame();
   }
 

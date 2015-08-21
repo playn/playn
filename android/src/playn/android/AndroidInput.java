@@ -30,6 +30,7 @@ public class AndroidInput extends Input {
   private final AndroidPlatform plat;
 
   public AndroidInput (AndroidPlatform plat) {
+    super(plat);
     this.plat = plat;
   }
 
@@ -109,7 +110,7 @@ public class AndroidInput extends Input {
       final Touch.Event[] touches = parseMotionEvent(event, kind);
       // process it (issuing game callbacks) on the GL/Game thread
       plat.exec().invokeLater(new Runnable() {
-        public void run() { plat.input().touchEvents.emit(touches); }
+        public void run() { plat.dispatchEvent(touchEvents, touches); }
       });
     }
 
@@ -124,7 +125,7 @@ public class AndroidInput extends Input {
 
   private void dispatch (final Keyboard.Event event) {
     plat.exec().invokeLater(new Runnable() {
-      @Override public void run() { keyboardEvents.emit(event); }
+      @Override public void run() { plat.dispatchEvent(keyboardEvents, event); }
     });
   }
 

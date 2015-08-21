@@ -77,8 +77,8 @@ public class SWTPlatform extends JavaPlatform {
     shell = new Shell(display);
     shell.setLayout(new FillLayout());
     shell.addShellListener(new ShellAdapter() {
-      public void shellActivated (ShellEvent e) { lifecycle.emit(Lifecycle.RESUME); }
-      public void shellDeactivated (ShellEvent e) { lifecycle.emit(Lifecycle.PAUSE); }
+      public void shellActivated (ShellEvent e) { dispatchEvent(lifecycle, Lifecycle.RESUME); }
+      public void shellDeactivated (ShellEvent e) { dispatchEvent(lifecycle, Lifecycle.PAUSE); }
     });
     comp = new Composite(shell, SWT.NONE);
     comp.setLayout(null);

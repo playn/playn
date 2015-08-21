@@ -40,7 +40,7 @@ public class LWJGLPlatform extends JavaPlatform {
       // notify the app if lose or regain focus (treat said as pause/resume)
       boolean newActive = Display.isActive();
       if (wasActive != newActive) {
-        lifecycle.emit(wasActive ? Lifecycle.PAUSE : Lifecycle.RESUME);
+        dispatchEvent(lifecycle, wasActive ? Lifecycle.PAUSE : Lifecycle.RESUME);
         wasActive = newActive;
       }
       ((LWJGLGraphics)graphics()).checkScaleFactor();

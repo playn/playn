@@ -41,6 +41,7 @@ public class HtmlInput extends Input {
   private boolean inTouchSequence = false;
 
   public HtmlInput (HtmlPlatform hplat, Element root) {
+    super(hplat);
     this.plat = hplat;
     this.rootElement = root;
 
@@ -314,7 +315,7 @@ public class HtmlInput extends Input {
   private void dispatch (Keyboard.Event event, NativeEvent nevent) {
     try {
       event.setFlag(mods(nevent));
-      keyboardEvents.emit(event);
+      plat.dispatchEvent(keyboardEvents, event);
     } finally {
       if (event.isSet(Event.F_PREVENT_DEFAULT)) nevent.preventDefault();
     }
@@ -323,7 +324,7 @@ public class HtmlInput extends Input {
   private void dispatch (Mouse.Event event, NativeEvent nevent) {
     try {
       event.setFlag(mods(nevent));
-      mouseEvents.emit(event);
+      plat.dispatchEvent(mouseEvents, event);
     } finally {
       if (event.isSet(Event.F_PREVENT_DEFAULT)) nevent.preventDefault();
     }
@@ -331,7 +332,7 @@ public class HtmlInput extends Input {
 
   private void dispatch (Touch.Event[] events, NativeEvent nevent) {
     try {
-      touchEvents.emit(events);
+      plat.dispatchEvent(touchEvents, events);
     } finally {
       // TODO: is there a better alternative to being so extravagant? I don't want to go back to
       // having all touch events share a mutable Flags instance

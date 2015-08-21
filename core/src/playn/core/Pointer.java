@@ -71,6 +71,7 @@ public class Pointer {
   public Signal<Event> events = Signal.create();
 
   public Pointer (Platform plat) {
+    this.plat = plat;
     // listen for mouse events and convert them to pointer events
     plat.input().mouseEvents.connect(new Slot<Mouse.Event>() {
       private boolean dragging;
@@ -104,7 +105,10 @@ public class Pointer {
 
   protected void forward (Event.Kind kind, boolean isTouch, playn.core.Event.XY source) {
     if (!enabled || !events.hasConnections()) return;
-    events.emit(new Event(source.flags, source.time, source.x, source.y, kind, isTouch));
+    Event event = new Event(source.flags, source.time, source.x, source.y, kind, isTouch);
+    plat.dispatchEvent(events, event);
     // TODO: propagate prevent default back to original event
   }
+
+  private Platform plat;
 }
