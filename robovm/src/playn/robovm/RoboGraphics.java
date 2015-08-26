@@ -36,7 +36,8 @@ public class RoboGraphics extends Graphics {
   // a shared colorspace instance for use all over the place
   static final CGColorSpace colorSpace = CGColorSpace.createDeviceRGB();
 
-  final RoboPlatform plat;
+  final Platform plat;
+  final private RoboPlatform.Config config;
   private final float touchScale;
   private final Point touchTemp = new Point();
   private final Dimension screenSize = new Dimension();
@@ -46,20 +47,21 @@ public class RoboGraphics extends Graphics {
   private static final int S_SIZE = 10;
   final CGBitmapContext scratchCtx = createCGBitmap(S_SIZE, S_SIZE);
 
-  private static boolean useHalfSize (RoboPlatform plat) {
+  private static boolean useHalfSize (RoboPlatform.Config config) {
     boolean isPad = UIDevice.getCurrentDevice().getUserInterfaceIdiom() == UIUserInterfaceIdiom.Pad;
-    return isPad && plat.config.iPadLikePhone;
+    return isPad && config.iPadLikePhone;
   }
-  private static Scale viewScale (RoboPlatform plat) {
+  private static Scale viewScale (RoboPlatform.Config config) {
     float deviceScale = (float)UIScreen.getMainScreen().getScale();
-    boolean useHalfSize = useHalfSize(plat);
+    boolean useHalfSize = useHalfSize(config);
     return new Scale((useHalfSize ? 2 : 1) * deviceScale);
   }
 
-  public RoboGraphics(RoboPlatform plat, CGRect bounds) {
-    super(plat, new RoboGL20(), viewScale(plat));
+  public RoboGraphics(Platform plat,RoboPlatform.Config config, CGRect bounds) {
+    super(plat, new RoboGL20(), viewScale(config));
     this.plat = plat;
-    this.touchScale = useHalfSize(plat) ? 2 : 1;
+    this.config = config;
+    this.touchScale = useHalfSize(config) ? 2 : 1;
     setSize(bounds);
   }
 
@@ -72,7 +74,7 @@ public class RoboGraphics extends Graphics {
     // tODO: (plat.osVersion < 8) manually flip width/height when in landscape?
     screenSize.width = (int)screenBounds.getWidth();
     screenSize.height = (int)screenBounds.getHeight();
-    if (useHalfSize(plat)) {
+    if (useHalfSize(config)) {
       screenSize.width /= 2;
       screenSize.height /= 2;
     }
@@ -91,7 +93,7 @@ public class RoboGraphics extends Graphics {
 
   @Override protected Canvas createCanvasImpl (Scale scale, int pixelWidth, int pixelHeight) {
     return new RoboCanvas(this, new RoboCanvasImage(this, scale, pixelWidth, pixelHeight,
-                                                    plat.config.interpolateCanvasDrawing));
+                                                    config.interpolateCanvasDrawing));
   }
 
   static CGBitmapContext createCGBitmap(int width, int height) {

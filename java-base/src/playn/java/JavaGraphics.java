@@ -31,15 +31,16 @@ public abstract class JavaGraphics extends Graphics {
   private ByteBuffer imgBuf = createImageBuffer(1024);
   private Map<String,java.awt.Font> fonts = new HashMap<String,java.awt.Font>();
 
-  protected final JavaPlatform plat;
+  protected final Platform plat;
+  protected final JavaPlatform.Config config;
 
   // antialiased font context and aliased font context
   final FontRenderContext aaFontContext, aFontContext;
 
-  protected JavaGraphics(JavaPlatform plat, GL20 gl20, Scale scale) {
+  protected JavaGraphics(Platform plat, JavaPlatform.Config config, GL20 gl20, Scale scale) {
     super(plat, gl20, scale);
     this.plat = plat;
-
+    this.config = config;
     // set up the dummy font contexts
     Graphics2D aaGfx = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB).createGraphics();
     aaGfx.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
@@ -53,15 +54,11 @@ public abstract class JavaGraphics extends Graphics {
    * Registers a font with the graphics system.
    *
    * @param name the name under which to register the font.
-   * @param path the path to the font resource (relative to the asset manager's path prefix).
-   * Currently only TrueType ({@code .ttf}) fonts are supported.
+   * @param font the AWT font which can be loaded from a path via {@code plat.assets().getFont(path)}
    */
-  public void registerFont (String name, String path) {
-    try {
-      fonts.put(name, plat.assets().requireResource(path).createFont());
-    } catch (Exception e) {
-      plat.reportError("Failed to load font [name=" + name + ", path=" + path + "]", e);
-    }
+  public void registerFont (String name, java.awt.Font font) {
+    if (font == null) return;
+    fonts.put(name, font);
   }
 
   /**

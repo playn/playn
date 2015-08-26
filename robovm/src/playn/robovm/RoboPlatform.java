@@ -24,7 +24,6 @@ import org.robovm.apple.glkit.GLKViewDrawableColorFormat;
 import org.robovm.apple.opengles.EAGLContext;
 import org.robovm.apple.uikit.UIApplication;
 import org.robovm.apple.uikit.UIDevice;
-import org.robovm.apple.uikit.UIInterfaceOrientation;
 import org.robovm.apple.uikit.UIInterfaceOrientationMask;
 import org.robovm.apple.uikit.UIWindow;
 import org.robovm.objc.Selector;
@@ -135,7 +134,7 @@ public class RoboPlatform extends Platform {
   protected RoboPlatform(Config config, CGRect initBounds) {
     this.config = config;
     assets = new RoboAssets(this);
-    graphics = new RoboGraphics(this, initBounds);
+    graphics = new RoboGraphics(this, config, initBounds);
     input = new RoboInput(this);
     net = new RoboNet(exec);
     storage = new RoboStorage(this);

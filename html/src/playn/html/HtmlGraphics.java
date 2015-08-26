@@ -56,7 +56,7 @@ public class HtmlGraphics extends Graphics {
   // Temporary hack to fix mouse coordinates for scaled fullscreen mode.
   static float experimentalScale = 1;
 
-  public HtmlGraphics(HtmlPlatform plat, HtmlPlatform.Config config) {
+  public HtmlGraphics(Platform plat, HtmlPlatform.Config config) {
     super(plat, new HtmlGL20(), new Scale(config.scaleFactor));
 
     Document doc = Document.get();

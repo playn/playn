@@ -43,7 +43,7 @@ public class AndroidGraphics extends Graphics {
     void onSurfaceCreated();
   }
 
-  private final AndroidPlatform plat;
+  private final Platform plat;
   private final Point touchTemp = new Point();
 
   private Map<Refreshable, Void> refreshables =
@@ -63,8 +63,8 @@ public class AndroidGraphics extends Graphics {
 
   final Bitmap.Config preferredBitmapConfig;
 
-  public AndroidGraphics(AndroidPlatform plat, Bitmap.Config bitmapConfig) {
-    super(plat, new AndroidGL20(), new Scale(plat.activity.scaleFactor()));
+  public AndroidGraphics(Platform plat, Bitmap.Config bitmapConfig, float scaleFactor) {
+    super(plat, new AndroidGL20(), new Scale(scaleFactor));
     this.plat = plat;
     this.preferredBitmapConfig = bitmapConfig;
   }
@@ -80,29 +80,7 @@ public class AndroidGraphics extends Graphics {
   /**
    * Registers a font with the graphics system.
    *
-   * @param path the path to the font resource (relative to the asset manager's path prefix).
-   * @param name the name under which to register the font.
-   * @param style the style variant of the specified name provided by the font file. For example
-   * one might {@code registerFont("myfont.ttf", "My Font", Font.Style.PLAIN)} and
-   * {@code registerFont("myfontb.ttf", "My Font", Font.Style.BOLD)} to provide both the plain and
-   * bold variants of a particular font.
-   * @param ligatureGlyphs any known text sequences that are converted into a single ligature
-   * character in this font. This works around an Android bug where measuring text for wrapping
-   * that contains character sequences that are converted into ligatures (e.g. "fi" or "ae")
-   * incorrectly reports the number of characters "consumed" from the to-be-wrapped string.
-   */
-  public void registerFont(String path, String name, Font.Style style, String... ligatureGlyphs) {
-    try {
-      registerFont(plat.assets().getTypeface(path), name, style, ligatureGlyphs);
-    } catch (Exception e) {
-      plat.reportError("Failed to load font [name=" + name + ", path=" + path + "]", e);
-    }
-  }
-
-  /**
-   * Registers a font with the graphics system.
-   *
-   * @param face the typeface to be registered.
+   * @param face the typeface to be registered. It can be loaded via {@code plat.assets().getTypeface}.
    * @param name the name under which to register the font.
    * @param style the style variant of the specified name provided by the font file. For example
    * one might {@code registerFont("myfont.ttf", "My Font", Font.Style.PLAIN)} and
