@@ -112,7 +112,7 @@ public class RoboGraphics extends Graphics {
   }
 
   // called when our view changes size (at init, and when it rotates)
-  void setSize(CGRect bounds) {
+  public void setSize(CGRect bounds) {
     // boolean useHalfSize = useHalfSize(plat);
     int viewWidth = scale.scaledCeil((float)bounds.getWidth());
     int viewHeight = scale.scaledCeil((float)bounds.getHeight());

@@ -69,7 +69,7 @@ public class AndroidGraphics extends Graphics {
     this.preferredBitmapConfig = bitmapConfig;
   }
 
-  void onSizeChanged(int viewWidth, int viewHeight) {
+  public void setSize(int viewWidth, int viewHeight) {
     screenSize.width = viewWidth / scale.factor;
     screenSize.height = viewHeight / scale.factor;
     plat.log().info("Updating size " + viewWidth + "x" + viewHeight + " / " + scale.factor +
