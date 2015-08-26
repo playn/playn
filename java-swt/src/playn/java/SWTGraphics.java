@@ -15,15 +15,15 @@
  */
 package playn.java;
 
-import org.eclipse.swt.*;
-import org.eclipse.swt.graphics.*;
-import org.eclipse.swt.widgets.*;
-
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.opengl.GLCanvas;
 import org.eclipse.swt.opengl.GLData;
-
-import org.lwjgl.opengl.GLContext;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
 import org.lwjgl.LWJGLException;
+import org.lwjgl.opengl.GLContext;
 
 public class SWTGraphics extends LWJGLGraphics {
 
@@ -48,8 +48,7 @@ public class SWTGraphics extends LWJGLGraphics {
         comp.setBounds(bounds);
         canvas.setBounds(bounds);
         makeCurrent();
-        // SWTGraphics.this.plat.log().info("Resized " + bounds.width + "x" + bounds.height);
-        viewportChanged(scale, bounds.width, bounds.height);
+        setSize(bounds.width, bounds.height);
       }
     });
 

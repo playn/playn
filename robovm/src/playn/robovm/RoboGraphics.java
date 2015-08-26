@@ -107,16 +107,15 @@ public class RoboGraphics extends Graphics {
     defaultFramebuffer = gl.glGetInteger(GL20.GL_FRAMEBUFFER_BINDING);
     if (defaultFramebuffer == 0) throw new IllegalStateException(
       "Failed to determine defaultFramebuffer");
-    setSize(bounds);
+    setSize(scale.scaledCeil((float)bounds.getWidth()), scale.scaledCeil((float)bounds.getHeight()));
     // TODO: anything else?
   }
 
-  // called when our view changes size (at init, and when it rotates)
-  public void setSize(CGRect bounds) {
+  void setSize(CGRect bounds) {
     // boolean useHalfSize = useHalfSize(plat);
     int viewWidth = scale.scaledCeil((float)bounds.getWidth());
     int viewHeight = scale.scaledCeil((float)bounds.getHeight());
-    viewportChanged(scale, viewWidth, viewHeight);
+    setSize(viewWidth, viewHeight);
 
     // System.err.println("Screen size " + screenSize());
     // System.err.println("View size " + viewSize + " " + viewWidth + "x" + viewHeight);

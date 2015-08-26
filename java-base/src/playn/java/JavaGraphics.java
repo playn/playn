@@ -88,7 +88,8 @@ public abstract class JavaGraphics extends Graphics {
   protected abstract void upload (BufferedImage img, Texture tex);
 
   protected void updateViewport (Scale scale, float displayWidth, float displayHeight) {
-    viewportChanged(scale, scale.scaledCeil(displayWidth), scale.scaledCeil(displayHeight));
+    this.scale = scale;
+    setSize(scale.scaledCeil(displayWidth), scale.scaledCeil(displayHeight));
   }
 
   java.awt.Font resolveFont(Font font) {

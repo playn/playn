@@ -43,7 +43,6 @@ public class AndroidGraphics extends Graphics {
     void onSurfaceCreated();
   }
 
-  private final Platform plat;
   private final Point touchTemp = new Point();
 
   private Map<Refreshable, Void> refreshables =
@@ -65,16 +64,13 @@ public class AndroidGraphics extends Graphics {
 
   public AndroidGraphics(Platform plat, Bitmap.Config bitmapConfig, float scaleFactor) {
     super(plat, new AndroidGL20(), new Scale(scaleFactor));
-    this.plat = plat;
     this.preferredBitmapConfig = bitmapConfig;
   }
 
-  public void setSize(int viewWidth, int viewHeight) {
+  @Override public void setSize(int viewWidth, int viewHeight) {
     screenSize.width = viewWidth / scale.factor;
     screenSize.height = viewHeight / scale.factor;
-    plat.log().info("Updating size " + viewWidth + "x" + viewHeight + " / " + scale.factor +
-                    " -> " + screenSize);
-    viewportChanged(scale, viewWidth, viewHeight);
+    super.setSize(viewWidth, viewHeight);
   }
 
   /**
