@@ -28,8 +28,8 @@ public abstract class Graphics {
 
   protected final Platform plat;
   protected final Dimension viewSizeM = new Dimension();
-  protected Scale scale;
-  protected int viewPixelWidth, viewPixelHeight;
+  private Scale scale;
+  private int viewPixelWidth, viewPixelHeight;
   private Texture colorTex; // created lazily
 
   /** Provides access to GL services. */
@@ -143,9 +143,16 @@ public abstract class Graphics {
   protected abstract Canvas createCanvasImpl (Scale scale, int pixelWidth, int pixelHeight);
 
   /**
+   * Informs the graphics system that the main framebuffer scaled has changed.
+   */
+  protected void scaledChanged (Scale scale) {
+    // TODO: should we allow this to be reacted to? it only happens on the desktop Java backend...
+    this.scale = scale;
+  }
+
+  /**
    * Informs the graphics system that the main framebuffer size has changed. The supplied size
    * should be in physical pixels.
-   * tell PlayN when the platform decided to change the view size.
    */
   protected void viewportChanged (int pixelWidth, int pixelHeight) {
     viewPixelWidth = pixelWidth;

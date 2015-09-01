@@ -135,7 +135,7 @@ public class TextBlock {
    * extra space to do its work.
    */
   public Canvas toCanvas(Graphics gfx, Align align, int fillColor) {
-    float pad = 1/gfx.scale.factor;
+    float pad = 1/gfx.scale().factor;
     Canvas canvas = gfx.createCanvas(bounds.width()+2*pad, bounds.height()+2*pad);
     canvas.setFillColor(fillColor);
     fill(canvas, align, pad, pad);

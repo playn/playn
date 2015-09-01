@@ -113,7 +113,7 @@ public class RoboViewController extends GLKViewController implements GLKViewCont
   public void didRotate(UIInterfaceOrientation fromOrient) {
     super.didRotate(fromOrient);
     // plat.log().debug("didRotate(" + fromOrient + "): " + bounds);
-    plat.graphics().setSize(getView().getBounds());
+    plat.graphics().boundsChanged(getView().getBounds());
     plat.orient.emit(new RoboOrientEvent.DidRotate(fromOrient));
   }
 

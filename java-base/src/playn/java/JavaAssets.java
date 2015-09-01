@@ -100,6 +100,17 @@ public class JavaAssets extends Assets {
     this.assetScale = new Scale(scaleFactor);
   }
 
+  /**
+   * Loads a Java font from {@code path}. Currently only TrueType ({@code .ttf}) fonts are
+   * supported.
+   *
+   * @param path the path to the font resource (relative to the asset manager's path prefix).
+   * @throws Exception if an error occurs loading or decoding the font.
+   */
+  public Font getFont(String path) throws Exception {
+    return requireResource(path).createFont();
+  }
+
   @Override public Image getRemoteImage(final String url, int width, int height) {
     final JavaImage image = new JavaImage(plat, true, width, height, url);
     exec.invokeAsync(new Runnable() {
@@ -150,21 +161,6 @@ public class JavaAssets extends Assets {
   }
 
   /**
-   * Get a font from the given path.
-   *  
-   * @param path the path to the font resource (relative to the asset manager's path prefix).
-   * Currently only TrueType ({@code .ttf}) fonts are supported.
-   */
-  public Font getFont(String path) throws IOException{
-    try {
-      return requireResource(path).createFont();
-    } catch (Exception e) {
-      plat.reportError("Failed to load font from "  + path, e);
-      return null;
-    }
-  }
-  
-  /**
    * Attempts to locate the resource at the given path, and returns a wrapper which allows its data
    * to be efficiently read.
    *
@@ -172,7 +168,7 @@ public class JavaAssets extends Assets {
    * loader checked. If not found, then the extra directories, if any, are checked, in order. If
    * the file is not found in any of the extra directories either, then an exception is thrown.
    */
-  public Resource requireResource(String path) throws IOException {
+  protected Resource requireResource(String path) throws IOException {
     URL url = getClass().getClassLoader().getResource(pathPrefix + path);
     if (url != null) {
       return url.getProtocol().equals("file") ?

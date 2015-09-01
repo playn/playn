@@ -137,8 +137,8 @@ public class HtmlGraphics extends Graphics {
     rootElement.getStyle().setWidth(width, Unit.PX);
     rootElement.getStyle().setHeight(height, Unit.PX);
     // set the canvas size to the pixel size, this controls the framebuffer size
-    canvas.setWidth(scale.scaledCeil(width));
-    canvas.setHeight(scale.scaledCeil(height));
+    canvas.setWidth(scale().scaledCeil(width));
+    canvas.setHeight(scale().scaledCeil(height));
     // set the canvas's CSS size to the display unit size, this ensures that hi-dpi canvases are
     // displayed at the proper size in the page
     canvas.getStyle().setWidth(width, Style.Unit.PX);

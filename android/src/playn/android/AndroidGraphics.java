@@ -70,7 +70,8 @@ public class AndroidGraphics extends Graphics {
   /**
    * Registers a font with the graphics system.
    *
-   * @param face the typeface to be registered. It can be loaded via {@code plat.assets().getTypeface}.
+   * @param face the typeface to be registered. It can be loaded via
+   * {@link AndroidAssets#getTypeface}.
    * @param name the name under which to register the font.
    * @param style the style variant of the specified name provided by the font file. For example
    * one might {@code registerFont("myfont.ttf", "My Font", Font.Style.PLAIN)} and
@@ -144,7 +145,7 @@ public class AndroidGraphics extends Graphics {
   @Override public IDimension screenSize () { return screenSize; }
 
   @Override public Canvas createCanvas (float width, float height) {
-    Scale scale = canvasScaleFunc.computeScale(width, height, this.scale);
+    Scale scale = canvasScaleFunc.computeScale(width, height, scale());
     return createCanvasImpl(scale, scale.scaledCeil(width), scale.scaledCeil(height));
   }
 
@@ -181,6 +182,7 @@ public class AndroidGraphics extends Graphics {
 
   IPoint transformTouch(float x, float y) {
     // TODO: return ctx.rootTransform().inverseTransform(touchTemp.set(x, y), touchTemp);
-    return touchTemp.set(x / scale.factor, y / scale.factor);
+    float factor = scale().factor;
+    return touchTemp.set(x / factor, y / factor);
   }
 }

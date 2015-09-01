@@ -131,6 +131,14 @@ public class AndroidAssets extends Assets {
     this.optionsAdjuster = optionsAdjuster;
   }
 
+  /**
+   * Loads a typeface from {@code path}. This can then be registered via
+   * {@link AndroidGraphics#registerFont}.
+   */
+  public Typeface getTypeface(String path) {
+    return Typeface.createFromAsset(assetMgr, normalizePath(pathPrefix + path));
+  }
+
   @Override public Image getRemoteImage(final String url, int width, int height) {
     final ImageImpl image = createImage(true, width, height, url);
     exec.invokeAsync(new Runnable() {
@@ -221,10 +229,6 @@ public class AndroidAssets extends Assets {
     }
     plat.log().warn("Could not load image: " + pathPrefix + path, error);
     throw error != null ? error : new FileNotFoundException(path);
-  }
-
-  public Typeface getTypeface(String path) {
-    return Typeface.createFromAsset(assetMgr, normalizePath(pathPrefix + path));
   }
 
   protected AssetFileDescriptor openAssetFd(String path) throws IOException {

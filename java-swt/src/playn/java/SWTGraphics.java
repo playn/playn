@@ -59,7 +59,7 @@ public class SWTGraphics extends LWJGLGraphics {
   public GLCanvas canvas () { return canvas; }
 
   @Override public void setSize (int width, int height, boolean fullscreen) {
-    int rawWidth = scale.scaledCeil(width), rawHeight = scale.scaledCeil(height);
+    int rawWidth = scale().scaledCeil(width), rawHeight = scale().scaledCeil(height);
     plat.comp.setSize(rawWidth, rawHeight);
     plat.shell.setFullScreen(fullscreen);
     plat.shell.pack();

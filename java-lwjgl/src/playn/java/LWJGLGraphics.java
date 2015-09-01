@@ -32,22 +32,24 @@ import pythagoras.f.IDimension;
 
 public class LWJGLGraphics extends JavaGraphics {
 
-  private Dimension screenSize = new Dimension();
+  private final Dimension screenSize = new Dimension();
+  private final JavaPlatform.Config config;
 
   public LWJGLGraphics(JavaPlatform plat) {
-    super(plat, plat.config, new LWJGLGL20(), Scale.ONE); // real scale factor set in init()
+    super(plat, new LWJGLGL20(), Scale.ONE); // real scale factor set in init()
+    this.config = plat.config;
   }
 
   void checkScaleFactor () {
     float scaleFactor = Display.getPixelScaleFactor();
-    if (scaleFactor != scale.factor) updateViewport(
+    if (scaleFactor != scale().factor) updateViewport(
       new Scale(scaleFactor), Display.getWidth(), Display.getHeight());
   }
 
   @Override public IDimension screenSize() {
     DisplayMode mode = Display.getDesktopDisplayMode();
-    screenSize.width = scale.invScaled(mode.getWidth());
-    screenSize.height = scale.invScaled(mode.getHeight());
+    screenSize.width = scale().invScaled(mode.getWidth());
+    screenSize.height = scale().invScaled(mode.getHeight());
     return screenSize;
   }
 
@@ -56,7 +58,8 @@ public class LWJGLGraphics extends JavaGraphics {
   }
 
   @Override protected void init () {
-    setDisplayMode(scale.scaledCeil(config.width), scale.scaledCeil(config.height), config.fullscreen);
+    setDisplayMode(scale().scaledCeil(config.width), scale().scaledCeil(config.height),
+                   config.fullscreen);
     try {
       System.setProperty("org.lwjgl.opengl.Display.enableHighDPI", "true");
       Display.create();
@@ -141,5 +144,10 @@ public class LWJGLGraphics extends JavaGraphics {
     } catch (LWJGLException ex) {
       throw new RuntimeException(ex);
     }
+  }
+
+  private void updateViewport (Scale scale, float displayWidth, float displayHeight) {
+    scaledChanged(scale);
+    viewportChanged(scale.scaledCeil(displayWidth), scale.scaledCeil(displayHeight));
   }
 }
