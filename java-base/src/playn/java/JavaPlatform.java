@@ -99,13 +99,13 @@ public abstract class JavaPlatform extends Platform {
     @Override public void setTitle (String title) {} // noop!
     @Override protected void preInit () {}
     @Override protected JavaGraphics createGraphics () {
-      return new JavaGraphics(this, null, Scale.ONE) {
-        /*ctor*/ { setSize(plat.config.width, plat.config.height, plat.config.fullscreen); }
+      return new JavaGraphics(this,config, null, Scale.ONE) {
+        /*ctor*/ { setSize(config.width, config.height, config.fullscreen); }
         @Override public void setSize (int width, int height, boolean fullscreen) {
           updateViewport(Scale.ONE, width, height);
         }
         @Override public IDimension screenSize () {
-          return new Dimension(plat.config.width, plat.config.height);
+          return new Dimension(config.width, config.height);
         }
         @Override protected void init () {} // noop!
         @Override protected void upload (BufferedImage img, Texture tex) {} // noop!

@@ -17,7 +17,6 @@ package playn.android;
 
 import android.content.Intent;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.util.Log;
 
 import playn.core.*;
@@ -51,7 +50,7 @@ public class AndroidPlatform extends Platform {
       @Override protected boolean isPaused () { return state == State.PAUSED; }
     };
     audio = new AndroidAudio(this);
-    graphics = new AndroidGraphics(this, activity.preferredBitmapConfig());
+    graphics = new AndroidGraphics(this, activity.preferredBitmapConfig(), activity.scaleFactor());
     assets = new AndroidAssets(this);
     json = new JsonImpl();
     input = new AndroidInput(this);

@@ -35,7 +35,7 @@ public class LWJGLGraphics extends JavaGraphics {
   private Dimension screenSize = new Dimension();
 
   public LWJGLGraphics(JavaPlatform plat) {
-    super(plat, new LWJGLGL20(), Scale.ONE); // real scale factor set in init()
+    super(plat, plat.config, new LWJGLGL20(), Scale.ONE); // real scale factor set in init()
   }
 
   void checkScaleFactor () {
@@ -56,8 +56,7 @@ public class LWJGLGraphics extends JavaGraphics {
   }
 
   @Override protected void init () {
-    setDisplayMode(scale.scaledCeil(plat.config.width), scale.scaledCeil(plat.config.height),
-                   plat.config.fullscreen);
+    setDisplayMode(scale.scaledCeil(config.width), scale.scaledCeil(config.height), config.fullscreen);
     try {
       System.setProperty("org.lwjgl.opengl.Display.enableHighDPI", "true");
       Display.create();

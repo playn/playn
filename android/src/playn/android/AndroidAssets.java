@@ -223,7 +223,7 @@ public class AndroidAssets extends Assets {
     throw error != null ? error : new FileNotFoundException(path);
   }
 
-  Typeface getTypeface(String path) {
+  public Typeface getTypeface(String path) {
     return Typeface.createFromAsset(assetMgr, normalizePath(pathPrefix + path));
   }
 
