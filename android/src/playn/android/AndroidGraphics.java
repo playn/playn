@@ -67,12 +67,6 @@ public class AndroidGraphics extends Graphics {
     this.preferredBitmapConfig = bitmapConfig;
   }
 
-  @Override public void setSize(int viewWidth, int viewHeight) {
-    screenSize.width = viewWidth / scale.factor;
-    screenSize.height = viewHeight / scale.factor;
-    super.setSize(viewWidth, viewHeight);
-  }
-
   /**
    * Registers a font with the graphics system.
    *
@@ -122,6 +116,31 @@ public class AndroidGraphics extends Graphics {
     canvasScaleFunc = scaleFunc;
   }
 
+  /**
+   * Informs the graphics system that the surface into which it is rendering was created.
+   */
+  public void onSurfaceCreated () {
+    // TODO: incrementEpoch(); // increment our GL context epoch
+    // TODO: init(); // reinitialize GL
+    for (Refreshable ref : refreshables.keySet()) ref.onSurfaceCreated();
+  }
+
+  /**
+   * Informs the graphics system that the surface into which it is rendering has changed size. The
+   * supplied width and height are in pixels, not display units.
+   */
+  public void onSurfaceChanged (int pixelWidth, int pixelHeight) {
+    viewportChanged(pixelWidth, pixelHeight);
+    screenSize.setSize(viewSize);
+  }
+
+  /**
+   * Informs the graphics system that the surface into which it is rendering was lost.
+   */
+  public void onSurfaceLost () {
+    for (Refreshable ref : refreshables.keySet()) ref.onSurfaceLost();
+  }
+
   @Override public IDimension screenSize () { return screenSize; }
 
   @Override public Canvas createCanvas (float width, float height) {
@@ -148,16 +167,6 @@ public class AndroidGraphics extends Graphics {
     Typeface face = fonts.get(key);
     if (face == null) fonts.put(key, face = AndroidFont.create(font));
     return new AndroidFont(face, font.size, ligatureHacks.get(key));
-  }
-
-  void onSurfaceCreated() {
-    // TODO: incrementEpoch(); // increment our GL context epoch
-    // TODO: init(); // reinitialize GL
-    for (Refreshable ref : refreshables.keySet()) ref.onSurfaceCreated();
-  }
-
-  void onSurfaceLost() {
-    for (Refreshable ref : refreshables.keySet()) ref.onSurfaceLost();
   }
 
   void addRefreshable(Refreshable ref) {

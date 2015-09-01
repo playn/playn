@@ -89,7 +89,7 @@ public abstract class JavaGraphics extends Graphics {
 
   protected void updateViewport (Scale scale, float displayWidth, float displayHeight) {
     this.scale = scale;
-    setSize(scale.scaledCeil(displayWidth), scale.scaledCeil(displayHeight));
+    viewportChanged(scale.scaledCeil(displayWidth), scale.scaledCeil(displayHeight));
   }
 
   java.awt.Font resolveFont(Font font) {

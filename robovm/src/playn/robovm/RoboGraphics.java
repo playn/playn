@@ -107,7 +107,7 @@ public class RoboGraphics extends Graphics {
     defaultFramebuffer = gl.glGetInteger(GL20.GL_FRAMEBUFFER_BINDING);
     if (defaultFramebuffer == 0) throw new IllegalStateException(
       "Failed to determine defaultFramebuffer");
-    setSize(scale.scaledCeil((float)bounds.getWidth()), scale.scaledCeil((float)bounds.getHeight()));
+    setSize(bounds);
     // TODO: anything else?
   }
 
@@ -115,7 +115,7 @@ public class RoboGraphics extends Graphics {
     // boolean useHalfSize = useHalfSize(plat);
     int viewWidth = scale.scaledCeil((float)bounds.getWidth());
     int viewHeight = scale.scaledCeil((float)bounds.getHeight());
-    setSize(viewWidth, viewHeight);
+    viewportChanged(viewWidth, viewHeight);
 
     // System.err.println("Screen size " + screenSize());
     // System.err.println("View size " + viewSize + " " + viewWidth + "x" + viewHeight);

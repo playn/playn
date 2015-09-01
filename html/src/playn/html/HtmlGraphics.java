@@ -133,7 +133,7 @@ public class HtmlGraphics extends Graphics {
    * understood by page elements. If the page is actually being dispalyed on a HiDPI (Retina)
    * device, the actual framebuffer may be 2x (or larger) the specified size.
    */
-  @Override public void setSize (int width, int height) {
+  public void setSize (int width, int height) {
     rootElement.getStyle().setWidth(width, Unit.PX);
     rootElement.getStyle().setHeight(height, Unit.PX);
     // set the canvas size to the pixel size, this controls the framebuffer size
@@ -143,8 +143,7 @@ public class HtmlGraphics extends Graphics {
     // displayed at the proper size in the page
     canvas.getStyle().setWidth(width, Style.Unit.PX);
     canvas.getStyle().setHeight(height, Style.Unit.PX);
-    super.setSize(canvas.getWidth(), canvas.getHeight());
-    plat.log().info("FB " + viewPixelWidth + "x" + viewPixelHeight + " LG " + viewSize);
+    viewportChanged(canvas.getWidth(), canvas.getHeight());
   }
 
   /**

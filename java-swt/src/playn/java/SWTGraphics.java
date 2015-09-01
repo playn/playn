@@ -48,7 +48,7 @@ public class SWTGraphics extends LWJGLGraphics {
         comp.setBounds(bounds);
         canvas.setBounds(bounds);
         makeCurrent();
-        setSize(bounds.width, bounds.height);
+        viewportChanged(bounds.width, bounds.height);
       }
     });
 

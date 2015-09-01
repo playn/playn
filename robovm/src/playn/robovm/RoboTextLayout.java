@@ -51,7 +51,7 @@ class RoboTextLayout extends TextLayout {
     NSAttributedStringAttributes attribs = createAttribs(font);
     List<CTLine> lines = wrapLines(new NSAttributedString(text, attribs), wrap.width);
 
-    RoboTextLayout[] layouts = new RoboTextLayout[(int)lines.size()];
+    RoboTextLayout[] layouts = new RoboTextLayout[lines.size()];
     for (int ii = 0; ii < layouts.length; ii++) {
       CTLine line = lines.get(ii);
       CFRange range = line.getStringRange();

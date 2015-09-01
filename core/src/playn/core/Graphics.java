@@ -60,20 +60,6 @@ public abstract class Graphics {
   public abstract IDimension screenSize ();
 
   /**
-   * Changes the size of the PlayN window. The supplied size is in display units, it will be
-   * converted to pixels based on the display scale factor.
-   */
-  public void setSize (int width, int height){
-    plat.log().info("Updating size " + width + "x" + height + " / " + scale.factor +
-        " -> " + screenSize());
-    
-    viewPixelWidth = width;
-    viewPixelHeight = height;
-    viewSizeM.width = scale.invScaled(width);
-    viewSizeM.height = scale.invScaled(height);
-  }
-
-  /**
    * Creates a {@link Canvas} with the specified display unit size.
    */
   public Canvas createCanvas (float width, float height) {
@@ -157,9 +143,18 @@ public abstract class Graphics {
   protected abstract Canvas createCanvasImpl (Scale scale, int pixelWidth, int pixelHeight);
 
   /**
-   * Informs the graphics system that the main viewport size or scale has changed. The supplied
-   * size should be in physical pixels.
+   * Informs the graphics system that the main framebuffer size has changed. The supplied size
+   * should be in physical pixels.
+   * tell PlayN when the platform decided to change the view size.
    */
+  protected void viewportChanged (int pixelWidth, int pixelHeight) {
+    viewPixelWidth = pixelWidth;
+    viewPixelHeight = pixelHeight;
+    viewSizeM.width = scale.invScaled(pixelWidth);
+    viewSizeM.height = scale.invScaled(pixelHeight);
+    plat.log().info("viewPortChanged " + pixelWidth + "x" + pixelHeight + " / " + scale.factor +
+                    " -> " + viewSize);
+  }
 
   int createTexture (Texture.Config config) {
     int id = gl.glGenTexture();
