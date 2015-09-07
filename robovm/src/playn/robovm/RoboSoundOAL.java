@@ -69,7 +69,6 @@ public class RoboSoundOAL extends SoundImpl<Integer> {
 
   @Override
   protected void releaseImpl() {
-    // TODO
-    // AL.DeleteBuffer(impl);
+    audio.delete(this);
   }
 }
