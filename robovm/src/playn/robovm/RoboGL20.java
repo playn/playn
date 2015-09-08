@@ -37,7 +37,7 @@ public class RoboGL20 extends GL20 {
   }
 
   @Override public String getPlatformGLExtensions() {
-    throw new RuntimeException("Not implemented");
+    return OpenGLES.glGetString(GL_EXTENSIONS);
   }
   @Override public int getSwapInterval() {
     throw new RuntimeException("Not implemented");
@@ -49,7 +49,7 @@ public class RoboGL20 extends GL20 {
     OpenGLES.glAttachShader(program, shader);
   }
   @Override public void glBindAttribLocation(int program, int index, String name) {
-    throw new RuntimeException("Not implemented");
+    OpenGLES.glBindAttribLocation(program, index, name);
   }
   @Override public void glBindBuffer(int target, int buffer) {
     OpenGLES.glBindBuffer(target, buffer);
@@ -58,34 +58,34 @@ public class RoboGL20 extends GL20 {
     OpenGLES.glBindFramebuffer(target, frameBuffer);
   }
   @Override public void glBindRenderbuffer(int target, int renderBuffer) {
-    throw new RuntimeException("Not implemented");
+    OpenGLES.glBindRenderbuffer(target, renderBuffer);
   }
   @Override public void glBindTexture(int target, int texture) {
     OpenGLES.glBindTexture(target, texture);
   }
   @Override public void glBlendColor(float red, float green, float blue, float alpha) {
-    throw new RuntimeException("Not implemented");
+    OpenGLES.glBlendColor(red, green, blue, alpha);
   }
   @Override public void glBlendEquation(int mode) {
-    throw new RuntimeException("Not implemented");
+    OpenGLES.glBlendEquation(mode);
   }
   @Override public void glBlendEquationSeparate(int modeRGB, int modeAlpha) {
-    throw new RuntimeException("Not implemented");
+    OpenGLES.glBlendEquationSeparate(modeRGB, modeAlpha);
   }
   @Override public void glBlendFunc(int sfactor, int dfactor) {
     OpenGLES.glBlendFunc(sfactor, dfactor);
   }
   @Override public void glBlendFuncSeparate(int srcRGB, int dstRGB, int srcAlpha, int dstAlpha) {
-    throw new RuntimeException("Not implemented");
+    OpenGLES.glBlendFuncSeparate(srcRGB, dstRGB, srcAlpha, dstAlpha);
   }
   @Override public void glBufferData(int target, int size, Buffer data, int usage) {
     OpenGLES.glBufferData(target, size, data, usage);
   }
   @Override public void glBufferSubData(int target, int offset, int size, Buffer data) {
-    throw new RuntimeException("Not implemented");
+    OpenGLES.glBufferSubData(target, offset, size, data);
   }
   @Override public int glCheckFramebufferStatus(int target) {
-    throw new RuntimeException("Not implemented");
+    return OpenGLES.glCheckFramebufferStatus(target);
   }
   @Override public void glClear(int mask) {
     OpenGLES.glClear(mask);
@@ -94,22 +94,22 @@ public class RoboGL20 extends GL20 {
     OpenGLES.glClearColor(red, green, blue, alpha);
   }
   @Override public void glClearDepth(double depth) {
-    throw new RuntimeException("Not implemented");
+    OpenGLES.glClearDepthf((float)depth);
   }
   @Override public void glClearDepthf(float depth) {
-    throw new RuntimeException("Not implemented");
+    OpenGLES.glClearDepthf(depth);
   }
   @Override public void glClearStencil(int s) {
-    throw new RuntimeException("Not implemented");
+    OpenGLES.glClearStencil(s);
   }
   @Override public void glColorMask(boolean red, boolean green, boolean blue, boolean alpha) {
-    throw new RuntimeException("Not implemented");
+    OpenGLES.glColorMask(red, green, blue, alpha);
   }
   @Override public void glCompileShader(int shader) {
     OpenGLES.glCompileShader(shader);
   }
   @Override public void glCompressedTexImage2D(int target, int level, int internalformat, int width, int height, int border, int imageSize, Buffer data) {
-    throw new RuntimeException("Not implemented");
+    OpenGLES.glCompressedTexImage2D(target, level, internalformat, width, height, border, imageSize, data);
   }
   @Override public void glCompressedTexImage2D(int arg0, int arg1, int arg2, int arg3, int arg4, int arg5, int arg6, int arg7) {
     throw new RuntimeException("Not implemented");
@@ -121,7 +121,7 @@ public class RoboGL20 extends GL20 {
     throw new RuntimeException("Not implemented");
   }
   @Override public void glCompressedTexSubImage2D(int target, int level, int xoffset, int yoffset, int width, int height, int format, int imageSize, Buffer data) {
-    throw new RuntimeException("Not implemented");
+    OpenGLES.glCompressedTexSubImage2D(target, level, xoffset, yoffset, width, height, format, imageSize, data);
   }
   @Override public void glCompressedTexSubImage2D(int arg0, int arg1, int arg2, int arg3, int arg4, int arg5, int arg6, int arg7, int arg8) {
     throw new RuntimeException("Not implemented");
@@ -133,10 +133,10 @@ public class RoboGL20 extends GL20 {
     throw new RuntimeException("Not implemented");
   }
   @Override public void glCopyTexImage2D(int target, int level, int internalformat, int x, int y, int width, int height, int border) {
-    throw new RuntimeException("Not implemented");
+    OpenGLES.glCopyTexImage2D(target, level, internalformat, x, y, width, height, border);
   }
   @Override public void glCopyTexSubImage2D(int target, int level, int xoffset, int yoffset, int x, int y, int width, int height) {
-    throw new RuntimeException("Not implemented");
+    OpenGLES.glCopyTexSubImage2D(target, level, xoffset, yoffset, x, y, width, height);
   }
   @Override public void glCopyTexSubImage3D(int arg0, int arg1, int arg2, int arg3, int arg4, int arg5, int arg6, int arg7, int arg8) {
     throw new RuntimeException("Not implemented");
@@ -147,8 +147,8 @@ public class RoboGL20 extends GL20 {
   @Override public int glCreateShader(int type) {
     return OpenGLES.glCreateShader(type);
   }
-  @Override public void glCullFace(int mode) {
-    throw new RuntimeException("Not implemented");
+  @Override public void glCullFace(int mode) { 
+    OpenGLES.glCullFace(mode);
   }
   @Override public void glDeleteBuffers(int n, IntBuffer buffers) {
     OpenGLES.glDeleteBuffers(n, buffers);
@@ -160,7 +160,7 @@ public class RoboGL20 extends GL20 {
     OpenGLES.glDeleteProgram(program);
   }
   @Override public void glDeleteRenderbuffers(int n, IntBuffer renderbuffers) {
-    throw new RuntimeException("Not implemented");
+    OpenGLES.glDeleteRenderbuffers(n, renderbuffers);
   }
   @Override public void glDeleteShader(int shader) {
     OpenGLES.glDeleteShader(shader);
@@ -169,19 +169,19 @@ public class RoboGL20 extends GL20 {
     OpenGLES.glDeleteTextures(n, textures);
   }
   @Override public void glDepthFunc(int func) {
-    throw new RuntimeException("Not implemented");
+    OpenGLES.glDepthFunc(func);
   }
   @Override public void glDepthMask(boolean flag) {
-    throw new RuntimeException("Not implemented");
+    OpenGLES.glDepthMask(flag);
   }
   @Override public void glDepthRange(double zNear, double zFar) {
-    throw new RuntimeException("Not implemented");
+    OpenGLES.glDepthRangef((float)zNear, (float)zFar);
   }
   @Override public void glDepthRangef(float zNear, float zFar) {
-    throw new RuntimeException("Not implemented");
+    OpenGLES.glDepthRangef(zNear, zFar);
   }
   @Override public void glDetachShader(int program, int shader) {
-    throw new RuntimeException("Not implemented");
+    OpenGLES.glDetachShader(program, shader);
   }
   @Override public void glDisable(int cap) {
     OpenGLES.glDisable(cap);
@@ -190,7 +190,7 @@ public class RoboGL20 extends GL20 {
     OpenGLES.glDisableVertexAttribArray(index);
   }
   @Override public void glDrawArrays(int mode, int first, int count) {
-    throw new RuntimeException("Not implemented");
+    OpenGLES.glDrawArrays(mode, first, count);
   }
   @Override public void glDrawElements(int mode, int count, int type, Buffer indices) {
     OpenGLES.glDrawElements(mode, count, type, indices);
@@ -211,7 +211,7 @@ public class RoboGL20 extends GL20 {
     OpenGLES.glFlush();
   }
   @Override public void glFramebufferRenderbuffer(int target, int attachment, int renderbuffertarget, int renderbuffer) {
-    throw new RuntimeException("Not implemented");
+    OpenGLES.glFramebufferRenderbuffer(target, attachment, renderbuffertarget, renderbuffer);
   }
   @Override public void glFramebufferTexture2D(int target, int attachment, int textarget, int texture, int level) {
     OpenGLES.glFramebufferTexture2D(target, attachment, textarget, texture, level);
@@ -220,7 +220,7 @@ public class RoboGL20 extends GL20 {
     throw new RuntimeException("Not implemented");
   }
   @Override public void glFrontFace(int mode) {
-    throw new RuntimeException("Not implemented");
+    OpenGLES.glFrontFace(mode);
   }
   @Override public void glGenBuffers(int n, IntBuffer buffers) {
     OpenGLES.glGenBuffers(n, buffers);
@@ -250,7 +250,7 @@ public class RoboGL20 extends GL20 {
     throw new RuntimeException("Not implemented");
   }
   @Override public void glGetAttachedShaders(int program, int maxcount, IntBuffer count, IntBuffer shaders) {
-    throw new RuntimeException("Not implemented");
+    OpenGLES.glGetAttachedShaders(program, maxcount, count, shaders);
   }
   @Override public int glGetAttribLocation(int program, String name) {
     return OpenGLES.glGetAttribLocation(program, name);
@@ -263,13 +263,13 @@ public class RoboGL20 extends GL20 {
     throw new RuntimeException("Not implemented");
   }
   @Override public void glGetBooleanv(int pname, ByteBuffer params) {
-    throw new RuntimeException("Not implemented");
+    OpenGLES.glGetBooleanv(pname, params);
   }
   @Override public int glGetBoundBuffer(int arg0) {
     throw new RuntimeException("Not implemented");
   }
   @Override public void glGetBufferParameteriv(int target, int pname, IntBuffer params) {
-    throw new RuntimeException("Not implemented");
+    OpenGLES.glGetBufferParameteriv(target, pname, params);
   }
   @Override public int glGetError() {
     return OpenGLES.glGetError();
@@ -282,7 +282,7 @@ public class RoboGL20 extends GL20 {
     OpenGLES.glGetFloatv(pname, params);
   }
   @Override public void glGetFramebufferAttachmentParameteriv(int target, int attachment, int pname, IntBuffer params) {
-    throw new RuntimeException("Not implemented");
+    OpenGLES.glGetFramebufferAttachmentParameteriv(target, attachment, pname, params);
   }
   @Override public int glGetInteger(int pname) {
     OpenGLES.glGetIntegerv(pname, bufs.intBuffer);
@@ -306,10 +306,10 @@ public class RoboGL20 extends GL20 {
     OpenGLES.glGetProgramiv(program, pname, params);
   }
   @Override public void glGetRenderbufferParameteriv(int target, int pname, IntBuffer params) {
-    throw new RuntimeException("Not implemented");
+    OpenGLES.glGetRenderbufferParameteriv(target, pname, params);
   }
   @Override public void glGetShaderInfoLog(int shader, int bufsize, IntBuffer length, ByteBuffer infolog) {
-    throw new RuntimeException("Not implemented");
+    OpenGLES.glGetShaderInfoLog(shader, bufsize, length, infolog);
   }
   @Override public String glGetShaderInfoLog(int shader) {
     ByteBuffer bbuf = bufs.createByteBuffer(MAX_LOG_SIZE);
@@ -323,7 +323,7 @@ public class RoboGL20 extends GL20 {
     throw new RuntimeException("Not implemented");
   }
   @Override public void glGetShaderPrecisionFormat(int shadertype, int precisiontype, IntBuffer range, IntBuffer precision) {
-    throw new RuntimeException("Not implemented");
+    OpenGLES.glGetShaderPrecisionFormat(shadertype, precisiontype, range, precision);
   }
   @Override public void glGetShaderSource(int shader, int bufsize, int[] length, int lengthOffset, byte[] source, int sourceOffset) {
     throw new RuntimeException("Not implemented");
@@ -398,25 +398,25 @@ public class RoboGL20 extends GL20 {
     OpenGLES.glPixelStorei(pname, param);
   }
   @Override public void glPolygonOffset(float factor, float units) {
-    throw new RuntimeException("Not implemented");
+    OpenGLES.glPolygonOffset(factor, units);
   }
   @Override public void glProgramBinary(int arg0, int arg1, Buffer arg2, int arg3) {
     throw new RuntimeException("Not implemented");
   }
   @Override public void glReadPixels(int x, int y, int width, int height, int format, int type, Buffer pixels) {
-    throw new RuntimeException("Not implemented");
+    OpenGLES.glReadPixels(x, y, width, height, format, type, pixels);
   }
   @Override public void glReadPixels(int x, int y, int width, int height, int format, int type, int pixelsBufferOffset) {
     throw new RuntimeException("Not implemented");
   }
   @Override public void glReleaseShaderCompiler() {
-    throw new RuntimeException("Not implemented");
+    OpenGLES.glReleaseShaderCompiler();
   }
   @Override public void glRenderbufferStorage(int target, int internalformat, int width, int height) {
-    throw new RuntimeException("Not implemented");
+    OpenGLES.glRenderbufferStorage(target, internalformat, width, height);
   }
   @Override public void glSampleCoverage(float value, boolean invert) {
-    throw new RuntimeException("Not implemented");
+    OpenGLES.glSampleCoverage(value, invert);
   }
   @Override public void glScissor(int x, int y, int width, int height) {
     OpenGLES.glScissor(x, y, width, height);
@@ -425,7 +425,7 @@ public class RoboGL20 extends GL20 {
     throw new RuntimeException("Not implemented");
   }
   @Override public void glShaderBinary(int n, IntBuffer shaders, int binaryformat, Buffer binary, int length) {
-    throw new RuntimeException("Not implemented");
+    OpenGLES.glShaderBinary(n, shaders, binaryformat, binary, length);
   }
   @Override public void glShaderSource(int shader, int count, String[] strings, int[] length, int lengthOffset) {
     throw new RuntimeException("Not implemented");
@@ -439,22 +439,22 @@ public class RoboGL20 extends GL20 {
     OpenGLES.glShaderSource(shader, 1, sources, null);
   }
   @Override public void glStencilFunc(int func, int ref, int mask) {
-    throw new RuntimeException("Not implemented");
+    OpenGLES.glStencilFunc(func, ref, mask);
   }
   @Override public void glStencilFuncSeparate(int face, int func, int ref, int mask) {
-    throw new RuntimeException("Not implemented");
+    OpenGLES.glStencilFuncSeparate(face, func, ref, mask);
   }
   @Override public void glStencilMask(int mask) {
-    throw new RuntimeException("Not implemented");
+    OpenGLES.glStencilMask(mask);
   }
   @Override public void glStencilMaskSeparate(int face, int mask) {
     throw new RuntimeException("Not implemented");
   }
   @Override public void glStencilOp(int fail, int zfail, int zpass) {
-    throw new RuntimeException("Not implemented");
+    OpenGLES.glStencilOp(fail, zfail, zpass);
   }
   @Override public void glStencilOpSeparate(int face, int fail, int zfail, int zpass) {
-    throw new RuntimeException("Not implemented");
+    OpenGLES.glStencilOpSeparate(face, fail, zfail, zpass);
   }
   @Override public void glTexImage2D(int target, int level, int internalformat, int width, int height, int border, int format, int type, Buffer pixels) {
     OpenGLES.glTexImage2D(target, level, internalformat, width, height, border, format, type, pixels);
@@ -469,16 +469,16 @@ public class RoboGL20 extends GL20 {
     throw new RuntimeException("Not implemented");
   }
   @Override public void glTexParameterf(int target, int pname, float param) {
-    throw new RuntimeException("Not implemented");
+    OpenGLES.glTexParameterf(target, pname, param);
   }
   @Override public void glTexParameterfv(int target, int pname, FloatBuffer params) {
-    throw new RuntimeException("Not implemented");
+    OpenGLES.glTexParameterfv(target, pname, params);
   }
   @Override public void glTexParameteri(int target, int pname, int param) {
-    OpenGLES.glTexParameteri(target, pname, param);
+    OpenGLES.glTexParameterf(target, pname, param);
   }
   @Override public void glTexParameteriv(int target, int pname, IntBuffer params) {
-    throw new RuntimeException("Not implemented");
+    OpenGLES.glTexParameteriv(target, pname, params);
   }
   @Override public void glTexSubImage2D(int target, int level, int xoffset, int yoffset, int width, int height, int format, int type, Buffer pixels) {
     OpenGLES.glTexSubImage2D(target, level, xoffset, yoffset, width, height, format, type, pixels);
@@ -514,7 +514,7 @@ public class RoboGL20 extends GL20 {
     OpenGLES.glUniform2i(location, x, y);
   }
   @Override public void glUniform2iv(int location, int count, IntBuffer v) {
-    throw new RuntimeException("Not implemented");
+    OpenGLES.glUniform2iv(location, count, v);
   }
   @Override public void glUniform3f(int location, float x, float y, float z) {
     OpenGLES.glUniform3f(location, x, y, z);
@@ -526,7 +526,7 @@ public class RoboGL20 extends GL20 {
     OpenGLES.glUniform3i(location, x, y, z);
   }
   @Override public void glUniform3iv(int location, int count, IntBuffer v) {
-    throw new RuntimeException("Not implemented");
+    OpenGLES.glUniform3iv(location, count, v);
   }
   @Override public void glUniform4f(int location, float x, float y, float z, float w) {
     OpenGLES.glUniform4f(location, x, y, z, w);
@@ -538,7 +538,7 @@ public class RoboGL20 extends GL20 {
     OpenGLES.glUniform4i(location, x, y, z, w);
   }
   @Override public void glUniform4iv(int location, int count, IntBuffer v) {
-    throw new RuntimeException("Not implemented");
+    OpenGLES.glUniform4iv(location, count, v);
   }
   @Override public void glUniformMatrix2fv(int location, int count, boolean transpose, FloatBuffer value) {
     OpenGLES.glUniformMatrix2fv(location, count, transpose, value);
@@ -556,31 +556,31 @@ public class RoboGL20 extends GL20 {
     OpenGLES.glUseProgram(program);
   }
   @Override public void glValidateProgram(int program) {
-    throw new RuntimeException("Not implemented");
+    OpenGLES.glValidateProgram(program);
   }
   @Override public void glVertexAttrib1f(int indx, float x) {
-    throw new RuntimeException("Not implemented");
+    OpenGLES.glVertexAttrib1f(indx, x);
   }
   @Override public void glVertexAttrib1fv(int indx, FloatBuffer values) {
-    throw new RuntimeException("Not implemented");
+    OpenGLES.glVertexAttrib1fv(indx, values);
   }
   @Override public void glVertexAttrib2f(int indx, float x, float y) {
-    throw new RuntimeException("Not implemented");
+    OpenGLES.glVertexAttrib2f(indx, x, y);
   }
   @Override public void glVertexAttrib2fv(int indx, FloatBuffer values) {
-    throw new RuntimeException("Not implemented");
+    OpenGLES.glVertexAttrib2fv(indx, values);
   }
   @Override public void glVertexAttrib3f(int indx, float x, float y, float z) {
-    throw new RuntimeException("Not implemented");
+    OpenGLES.glVertexAttrib3f(indx, x, y, z);
   }
   @Override public void glVertexAttrib3fv(int indx, FloatBuffer values) {
-    throw new RuntimeException("Not implemented");
+    OpenGLES.glVertexAttrib3fv(indx, values);
   }
   @Override public void glVertexAttrib4f(int indx, float x, float y, float z, float w) {
-    throw new RuntimeException("Not implemented");
+    OpenGLES.glVertexAttrib4f(indx, x, y, z, w);
   }
   @Override public void glVertexAttrib4fv(int indx, FloatBuffer values) {
-    throw new RuntimeException("Not implemented");
+    OpenGLES.glVertexAttrib4fv(indx, values);
   }
   @Override public void glVertexAttribPointer(int indx, int size, int type, boolean normalized, int stride, Buffer ptr) {
     OpenGLES.glVertexAttribPointer(indx, size, type, normalized, stride, ptr);
