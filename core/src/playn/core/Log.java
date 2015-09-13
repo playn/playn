@@ -40,6 +40,19 @@ public abstract class Log {
   }
 
   /**
+   * Formats the supplied key/value arguments into the supplied string builder as
+   * {@code key=value, key=value, ...}.
+   * @return the supplied string builder.
+   */
+  public static StringBuilder format (StringBuilder into, Object... args) {
+    for (int ii = 0, ll = args.length/2; ii < ll; ii++) {
+      if (ii > 0) into.append(", ");
+      into.append(args[2*ii]).append("=").append(args[2*ii+1]);
+    }
+    return into;
+  }
+
+  /**
    * Configures a log message collector. This allows games to intercept (and record and submit with
    * bug reports, for example) all messages logged via the PlayN logging system. This will include
    * errors logged internally by PlayN code.
@@ -63,9 +76,13 @@ public abstract class Log {
     debug(msg, (Throwable)null);
   }
 
-  /** Logs {@code msg} at the debug level. */
+  /** Logs {@code msg} at the debug level.
+    * @param args additional arguments formatted via {@link #format} and appended to the message.
+    * {@code args} may contain an exception as its lone final argument which will be logged long
+    * with the formatted message.
+    */
   public void debug (String msg, Object... args) {
-    debug(format(msg, args), (Throwable)null);
+    debug(format(msg, args), getCause(args));
   }
 
   /** Logs {@code msg} and {@code e} at the debug level. */
@@ -78,9 +95,13 @@ public abstract class Log {
     info(msg, (Throwable)null);
   }
 
-  /** Logs {@code msg} at the info level. */
+  /** Logs {@code msg} at the info level.
+    * @param args additional arguments formatted via {@link #format} and appended to the message.
+    * {@code args} may contain an exception as its lone final argument which will be logged long
+    * with the formatted message.
+    */
   public void info (String msg, Object... args) {
-    info(format(msg, args), (Throwable)null);
+    info(format(msg, args), getCause(args));
   }
 
   /** Logs {@code msg} and {@code e} at the info level. */
@@ -93,9 +114,13 @@ public abstract class Log {
     warn(msg, (Throwable)null);
   }
 
-  /** Logs {@code msg} at the warn level. */
+  /** Logs {@code msg} at the warn level.
+    * @param args additional arguments formatted via {@link #format} and appended to the message.
+    * {@code args} may contain an exception as its lone final argument which will be logged long
+    * with the formatted message.
+    */
   public void warn (String msg, Object... args) {
-    warn(format(msg, args), (Throwable)null);
+    warn(format(msg, args), getCause(args));
   }
 
   /** Logs {@code msg} and {@code e} at the warn level. */
@@ -108,9 +133,13 @@ public abstract class Log {
     error(msg, (Throwable)null);
   }
 
-  /** Logs {@code msg} at the error level. */
+  /** Logs {@code msg} at the error level.
+    * @param args additional arguments formatted via {@link #format} and appended to the message.
+    * {@code args} may contain an exception as its lone final argument which will be logged long
+    * with the formatted message.
+    */
   public void error (String msg, Object... args) {
-    error(format(msg, args), (Throwable)null);
+    error(format(msg, args), getCause(args));
   }
 
   /** Logs {@code msg} and {@code e} at the error level. */
@@ -119,12 +148,18 @@ public abstract class Log {
   }
 
   protected String format (String msg, Object[] args) {
-    return msg; // TODO
+    return format(new StringBuilder().append(msg).append(" ["), args).append("]").toString();
   }
 
   protected void log (Level level, String msg, Throwable e) {
     if (collector != null) collector.logged(level, msg, e);
     if (level.ordinal() >= minLevel.ordinal()) logImpl(level, msg, e);
+  }
+
+  private Throwable getCause (Object[] args) {
+    int acount = args.length;
+    return (acount % 2 == 1 && args[acount-1] instanceof Throwable) ?
+      (Throwable)args[acount-1] : null;
   }
 
   protected abstract void logImpl (Level level, String msg, Throwable e);
