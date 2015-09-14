@@ -14,6 +14,7 @@
 package playn.scene;
 
 import playn.core.Surface;
+import pythagoras.f.IDimension;
 import pythagoras.f.Point;
 import pythagoras.f.Transform;
 import pythagoras.f.Vector;
@@ -45,12 +46,17 @@ public abstract class ClippedLayer extends Layer {
     return this.height;
   }
 
-  /** Updates the size of this group layer, and hence its clipping rectangle. */
+  /** Updates the size of this clipped layer, and hence its clipping rectangle. */
   public ClippedLayer setSize (float width, float height) {
     this.width = width;
     this.height = height;
     checkOrigin();
     return this;
+  }
+
+  /** Updates the size of this clipped layer, and hence its clipping rectangle. */
+  public ClippedLayer setSize (IDimension size) {
+    return setSize(size.width(), size.height());
   }
 
   /** Updates the width of this group layer, and hence its clipping rectangle. */
