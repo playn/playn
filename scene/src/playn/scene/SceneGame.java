@@ -52,6 +52,17 @@ public abstract class SceneGame extends Game {
   }
 
   /**
+   * Configures the color to which the frame buffer is cleared prior to painting the scene graph.
+   */
+  public void setClearColor (int argb) {
+    float red   = ((argb >> 16) & 0xFF) / 255f;
+    float green = ((argb >>  8) & 0xFF) / 255f;
+    float blue  = ((argb >>  0) & 0xFF) / 255f;
+    float alpha = ((argb >> 24) & 0xFF) / 255f;
+    setClearColor(red, green, blue, alpha);
+  }
+
+  /**
    * Renders the main scene graph into the OpenGL frame buffer.
    */
   protected void paintScene () {

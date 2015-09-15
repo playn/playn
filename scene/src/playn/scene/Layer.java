@@ -22,6 +22,7 @@ import pythagoras.f.Point;
 import pythagoras.f.Vector;
 import pythagoras.f.XY;
 
+import react.Closeable;
 import react.Signal;
 import react.Value;
 import react.ValueView;
@@ -36,7 +37,7 @@ import playn.core.*;
  * However, {@link GroupLayer}, {@link ImageLayer}, {@link ClippedLayer} etc. are provided to
  * make it easy to implement common use cases "out of the box".
  */
-public abstract class Layer implements Disposable {
+public abstract class Layer implements Closeable {
 
   /** Enumerates layer lifecycle states; see {@link #state}. */
   public static enum State { REMOVED, ADDED, DISPOSED }

@@ -15,10 +15,12 @@
  */
 package playn.core;
 
+import react.Closeable;
+
 /**
  * Encapsulates a GL vertex and fragment shader program pair.
  */
-public class GLProgram implements Disposable {
+public class GLProgram implements Closeable {
 
   private final GL20 gl;
   private final int vertexShader, fragmentShader;

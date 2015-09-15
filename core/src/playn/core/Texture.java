@@ -16,6 +16,7 @@ package playn.core;
 import pythagoras.f.AffineTransform;
 import pythagoras.f.IRectangle;
 
+import react.Closeable;
 import react.Slot;
 import react.UnitSlot;
 
@@ -27,7 +28,7 @@ import static playn.core.GL20.*;
  * A handle to an OpenGL texture. A texture is also a {@link Tile} which contains the entire
  * texture, which allows rendering methods to operate uniformly on tiles.
  */
-public class Texture extends Tile implements Disposable {
+public class Texture extends Tile implements Closeable {
 
   /** Used to configure texture at creation time. */
   public final static class Config {

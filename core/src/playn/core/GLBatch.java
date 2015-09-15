@@ -13,11 +13,13 @@
  */
 package playn.core;
 
+import react.Closeable;
+
 /**
  * A batch manages the delivery of groups of drawing calls to the GPU. It is usually a combination
  * of a {@link GLProgram} and one or more buffers.
  */
-public abstract class GLBatch implements Disposable {
+public abstract class GLBatch implements Closeable {
 
   private boolean begun; // for great sanity checking
 

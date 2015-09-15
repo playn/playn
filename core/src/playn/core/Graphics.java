@@ -17,6 +17,7 @@ package playn.core;
 
 import pythagoras.f.Dimension;
 import pythagoras.f.IDimension;
+import react.Closeable;
 import react.UnitSlot;
 
 import static playn.core.GL20.*;
@@ -109,7 +110,7 @@ public abstract class Graphics {
    * called from finalizers of graphics resource objects which discover that they are being garbage
    * collected, but their GPU resources have not yet been freed.
    */
-  public void queueForDispose (final Disposable resource) {
+  public void queueForDispose (final Closeable resource) {
     plat.frame.connect(new UnitSlot() {
       public void onEmit () { resource.close(); }
     }).once();

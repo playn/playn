@@ -24,6 +24,8 @@ import pythagoras.f.MathUtil;
 import pythagoras.f.Transforms;
 import pythagoras.i.Rectangle;
 
+import react.Closeable;
+
 /**
  * A surface provides a simple drawing API to a GPU accelerated render target. This can be either
  * the main frame buffer, or a frame buffer bound to a texture.
@@ -32,7 +34,7 @@ import pythagoras.i.Rectangle;
  * {@link Surface#begin} and {@link Surface#end}. This ensures that the batch into which
  * the surface is rendering is properly flushed to the GPU at the right times.
  */
-public class Surface implements Disposable {
+public class Surface implements Closeable {
 
   private final List<AffineTransform> transformStack = new ArrayList<>();
   private final Texture colorTex;

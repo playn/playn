@@ -13,13 +13,15 @@
  */
 package playn.core;
 
+import react.Closeable;
+
 import static playn.core.GL20.*;
 
 /**
  * Encapsulates an OpenGL render target (i.e. a framebuffer).
  * @see Graphics#defaultRenderTarget
  */
-public abstract class RenderTarget implements Disposable {
+public abstract class RenderTarget implements Closeable {
 
   /** Creates a render target that renders to {@code texture}. */
   public static RenderTarget create (Graphics gfx, final Texture tex) {

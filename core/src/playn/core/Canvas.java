@@ -15,10 +15,12 @@
  */
 package playn.core;
 
+import react.Closeable;
+
 /**
  * A 2D drawing canvas. Rendering is performed by the CPU into a bitmap.
  */
-public abstract class Canvas implements Disposable {
+public abstract class Canvas implements Closeable {
 
   /**
    * Values that may be used with
