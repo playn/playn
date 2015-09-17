@@ -22,6 +22,7 @@ import pythagoras.f.AffineTransform;
 import pythagoras.f.FloatMath;
 import pythagoras.f.MathUtil;
 import pythagoras.f.Transforms;
+import pythagoras.f.XY;
 import pythagoras.i.Rectangle;
 
 import react.Closeable;
@@ -276,6 +277,13 @@ public class Surface implements Closeable {
    */
   public Surface drawCentered (Tile tile, float x, float y) {
     return draw(tile, x - tile.width()/2, y - tile.height()/2);
+  }
+
+  /**
+   * Fills a line between the specified coordinates, of the specified display unit width.
+   */
+  public Surface drawLine (XY a, XY b, float width) {
+    return drawLine(a.x(), a.y(), b.x(), b.y(), width);
   }
 
   /**
