@@ -49,7 +49,7 @@ public class RoboAssets extends Assets {
     plat.net().req(url).execute().
       onSuccess(new Slot<Net.Response>() {
         public void onEmit (Net.Response rsp) {
-          image.succeed(toData(Scale.ONE, UIImage.create(new NSData(rsp.payload()))));
+          image.succeed(toData(Scale.ONE, new UIImage(new NSData(rsp.payload()))));
         }
       }).
       onFailure(new Slot<Throwable>() {
@@ -97,7 +97,7 @@ public class RoboAssets extends Assets {
       if (!fullPath.exists()) continue;
 
       // plat.log().debug("Loading image: " + fullPath);
-      UIImage img = UIImage.create(fullPath);
+      UIImage img = new UIImage(fullPath);
       if (img != null) return toData(rsrc.scale, img);
 
       // note this error if this is the lowest resolution image, but fall back to lower resolution
