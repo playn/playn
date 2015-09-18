@@ -41,6 +41,12 @@ public class RoboSoundAVAP extends SoundImpl<AVAudioPlayer> {
   }
 
   @Override
+  public void succeed (AVAudioPlayer impl) {
+    super.succeed(impl);
+    impl.setDelegate(delegate);
+  }
+
+  @Override
   protected boolean prepareImpl() {
     return impl.prepareToPlay();
   }
