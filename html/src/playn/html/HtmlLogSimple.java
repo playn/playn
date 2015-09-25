@@ -30,6 +30,7 @@ class HtmlLogSimple extends HtmlLog {
 
   @Override protected void logImpl(Level level, String msg, Throwable e) {
     String lmsg = level + ": " + msg;
+    if (e != null) lmsg += ": " + e.getMessage();
     // keep console output intact by using System.out for both
     System.out.println(lmsg);
     if (e != null) {
