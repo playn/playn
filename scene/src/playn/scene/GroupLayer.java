@@ -91,6 +91,15 @@ public class GroupLayer extends ClippedLayer implements Iterable<Layer> {
   }
 
   /**
+   * Adds all supplied children to this layer, in order. See {@link #add(Layer)}.
+   */
+  public void add(Layer child0, Layer child1, Layer... childN) {
+    add(child0);
+    add(child1);
+    for (Layer child : childN) add(child);
+  }
+
+  /**
    * Adds the supplied layer to this group layer, adjusting its translation (relative to this group
    * layer) to the supplied values.
    *
@@ -132,6 +141,15 @@ public class GroupLayer extends ClippedLayer implements Iterable<Layer> {
           "[group=" + this + ", layer=" + child + "]");
     }
     remove(index);
+  }
+
+  /**
+   * Removes all supplied children from this layer, in order. See {@link #remove(Layer)}.
+   */
+  public void remove(Layer child0, Layer child1, Layer... childN) {
+    remove(child0);
+    remove(child1);
+    for (Layer child : childN) remove(child);
   }
 
   /**
