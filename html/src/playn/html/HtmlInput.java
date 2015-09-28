@@ -197,16 +197,32 @@ public class HtmlInput extends Input {
 
   @Override public RFuture<String> getText(Keyboard.TextType textType, String label,
                                            String initVal) {
-    return RFuture.success(Window.prompt(label, initVal));
+    String result = Window.prompt(label, initVal);
+    emitFakeMouseUp();
+    return RFuture.success(result);
   }
 
   @Override public RFuture<Boolean> sysDialog(String title, String message,
                                               String ok, String cancel) {
-    if (cancel != null) return RFuture.success(Window.confirm(message));
+    boolean result;
+    if (cancel != null) result = Window.confirm(message);
     else {
       Window.alert(message);
-      return RFuture.success(true);
+      result = true;
     }
+    emitFakeMouseUp();
+    return RFuture.success(result);
+  }
+
+  // HACK HACK HACK HACK!
+  // Chrome and Firefox on Mac OS (at least) fail to deliver the MOUSE UP event that should be
+  // delivered after a system dialog completes, assuming the dialog was triggered on MOUSE DOWN; so
+  // we emit a fake mouse up event here just to avoid causing the Pointer system to fail to
+  // terminate the current pointer interaction if it happens to have triggered a system dialog; if
+  // the dialog was not shown on mouse down, a spurious mouse up is not likely to do much damage; a
+  // better devil for sure than failing to deliver a needed mouse up
+  private void emitFakeMouseUp () {
+    mouseEvents.emit(new Mouse.ButtonEvent(0, plat.time(), 0, 0, Mouse.ButtonEvent.Id.LEFT, false));
   }
 
   @Override public native boolean isMouseLocked() /*-{
