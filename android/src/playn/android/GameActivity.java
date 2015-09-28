@@ -40,7 +40,8 @@ import android.widget.LinearLayout;
 public abstract class GameActivity extends Activity {
 
   private final int REQUIRED_CONFIG_CHANGES = (ActivityInfo.CONFIG_ORIENTATION |
-                                               ActivityInfo.CONFIG_KEYBOARD_HIDDEN);
+                                               ActivityInfo.CONFIG_KEYBOARD_HIDDEN |
+                                               ActivityInfo.CONFIG_SCREEN_SIZE);
 
   private AndroidPlatform platform;
   private GameViewGL gameView;
@@ -67,9 +68,6 @@ public abstract class GameActivity extends Activity {
 
     // Create our layout and configure the window.
     setContentView(gameView);
-
-    // Set the preferred orientation.
-    setRequestedOrientation(orientation());
 
     // Make sure the AndroidManifest.xml is set up correctly.
     try {
@@ -153,26 +151,6 @@ public abstract class GameActivity extends Activity {
  protected int makeWindowFlags () {
     return (WindowManager.LayoutParams.FLAG_FULLSCREEN |
             WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED);
-  }
-
-  /**
-   * Determines whether or not a game should run in portrait orientation or not. Defaults to false.
-   * Override this method to return true to use portrait.
-   *
-   * @return Whether or not the game will run in portrait orientation
-   */
-  protected boolean usePortraitOrientation() {
-    return false;
-  }
-
-  /**
-   * Returns the orientation. Defaults to {@code ActivityInfo.SCREEN_ORIENTATION_PORTRAIT} or
-   * {@code ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE} based off the response from
-   * {@link #usePortraitOrientation()}.
-   */
-  protected int orientation() {
-    return usePortraitOrientation() ? ActivityInfo.SCREEN_ORIENTATION_PORTRAIT :
-      ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE;
   }
 
   /**
