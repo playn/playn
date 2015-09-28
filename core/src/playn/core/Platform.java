@@ -122,6 +122,6 @@ public abstract class Platform {
 
   protected void emitFrame () {
     try { frame.emit(this); }
-    catch (Throwable e) { log().warn("Frame tick exception", e); }
+    catch (Throwable e) { reportError("Frame tick exception", e); }
   }
 }
