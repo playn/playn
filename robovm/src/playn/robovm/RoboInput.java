@@ -80,6 +80,26 @@ public class RoboInput extends Input {
     return result;
   }
 
+  @Override public RFuture<Boolean> sysDialog(String title, String text, String ok, String cancel) {
+    final RPromise<Boolean> result = plat.exec().deferredPromise();
+
+    UIAlertView view = new UIAlertView();
+    view.setTitle(title);
+    view.setMessage(text);
+    if (cancel != null) view.addButton(cancel);
+    view.addButton(ok);
+    view.setAlertViewStyle(UIAlertViewStyle.Default);
+
+    view.setDelegate(new UIAlertViewDelegateAdapter() {
+      public void clicked(UIAlertView view, long buttonIndex) {
+        result.succeed(buttonIndex == 1);
+      }
+    });
+    view.show();
+
+    return result;
+  }
+
   void onTouchesBegan(NSSet<UITouch> touches, UIEvent event) {
     plat.dispatchEvent(touchEvents, toEvents(touches, event, Touch.Event.Kind.START));
   }

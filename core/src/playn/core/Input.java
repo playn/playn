@@ -86,11 +86,37 @@ public class Input {
    * keyboard customized to the particular type of text.
    * @param label a label to display over the text entry interface, may be null.
    * @param initialValue the initial value to display in the text input field, may be null.
+   *
    * @return a future which provides the text when it becomes available. If the user cancels the
    * text entry process, null is supplied. Otherwise the entered text is supplied.
    */
   public RFuture<String> getText (Keyboard.TextType textType, String label, String initialValue) {
     return RFuture.failure(new Exception("getText not supported"));
+  }
+
+  /**
+   * Displays a system dialog with the specified title and text, an OK button and optionally a
+   * Cancel button.
+   *
+   * @param title the title for the dialog window. Note: some platforms (mainly mobile) do not
+   * display the title, so be sure your dialog makes sense if only {@code text} is showing.
+   * @param text the text of the dialog. The text will be wrapped by the underlying platform, but
+   * PlayN will do its utmost to ensure that newlines are honored by the platform in question so
+   * that hard line breaks and blank lines are reproduced correctly.
+   * @param ok the text of the button which will deliver a {@code true} result and be placed in
+   * "OK" position for the platform. Note: the HTML platform does not support customizing this
+   * label, so on that platform the label will be "OK". Yay for HTML5.
+   * @param cancel the text of the button that will deliver a {@code false} result and be placed in
+   * "Cancel" position. If {@code null} is supplied, the dialog will only have an OK button. Note:
+   * the HTML platform does not support customizing this label, so on that platform a non-null
+   * cancel string will result in the button reading "Cancel". Yay for HTML5.
+   *
+   * @return a future which delivers {@code true} or {@code false} when the user clicks the OK or
+   * cancel buttons respectively. If some unexpected error occurs displaying the dialog (unlikley),
+   * it will be reported by failing the future.
+   */
+  public RFuture<Boolean> sysDialog (String title, String text, String ok, String cancel) {
+    return RFuture.failure(new Exception("sysDialog not supported"));
   }
 
   protected Input (Platform plat) {

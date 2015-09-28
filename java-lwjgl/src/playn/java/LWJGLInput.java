@@ -43,6 +43,17 @@ public class LWJGLInput extends JavaInput {
     return RFuture.success((String)result);
   }
 
+  @Override public RFuture<Boolean> sysDialog (String title, String text,
+                                               String ok, String cancel) {
+    int optType = JOptionPane.OK_CANCEL_OPTION;
+    int msgType = cancel == null ? JOptionPane.INFORMATION_MESSAGE : JOptionPane.QUESTION_MESSAGE;
+    Object[] options = (cancel == null) ? new Object[] { ok } : new Object[] { ok, cancel };
+    Object defOption = (cancel == null) ? ok : cancel;
+    int result = JOptionPane.showOptionDialog(
+      frame, text, title, optType, msgType, null, options, defOption);
+    return RFuture.success(result == 0);
+  }
+
   @Override public boolean hasMouseLock () { return true; }
   @Override public boolean isMouseLocked() { return Mouse.isGrabbed(); }
   @Override public void setMouseLocked (boolean locked) { Mouse.setGrabbed(locked); }

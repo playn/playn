@@ -86,6 +86,29 @@ public class AndroidInput extends Input {
     return result;
   }
 
+  @Override public RFuture<Boolean> sysDialog (final String title, final String text,
+                                               final String ok, final String cancel) {
+    final RPromise<Boolean> result = plat.exec().deferredPromise();
+    plat.activity.runOnUiThread(new Runnable() {
+      public void run () {
+        AlertDialog.Builder alert = new AlertDialog.Builder(plat.activity).
+          setTitle(title).setMessage(text);
+        alert.setPositiveButton(ok, new DialogInterface.OnClickListener() {
+          public void onClick(DialogInterface dialog, int whichButton) {
+            result.succeed(true);
+          }
+        });
+        if (cancel != null) alert.setNegativeButton(cancel, new DialogInterface.OnClickListener() {
+          public void onClick(DialogInterface dialog, int whichButton) {
+            result.succeed(false);
+          }
+        });
+        alert.show();
+      }
+    });
+    return result;
+  }
+
   void onKeyDown (int keyCode, KeyEvent nativeEvent) {
     long time = nativeEvent.getEventTime();
     Keyboard.KeyEvent event = new Keyboard.KeyEvent(0, time, keyForCode(keyCode), true);

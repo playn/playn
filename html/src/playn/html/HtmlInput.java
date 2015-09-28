@@ -200,6 +200,15 @@ public class HtmlInput extends Input {
     return RFuture.success(Window.prompt(label, initVal));
   }
 
+  @Override public RFuture<Boolean> sysDialog(String title, String message,
+                                              String ok, String cancel) {
+    if (cancel != null) return RFuture.success(Window.confirm(message));
+    else {
+      Window.alert(message);
+      return RFuture.success(true);
+    }
+  }
+
   @Override public native boolean isMouseLocked() /*-{
     return !!($doc.pointerLockElement || $doc.webkitPointerLockElement ||
               $doc.mozPointerLockElement);
