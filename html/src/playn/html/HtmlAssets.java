@@ -16,6 +16,7 @@
 package playn.html;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.google.gwt.core.client.GWT;
@@ -100,7 +101,9 @@ public class HtmlAssets extends Assets {
   }
 
   @Override public Image getImage (String path) {
-    return getImage(path, Scale.ONE);
+    Scale assetScale = (this.assetScale == null) ? Scale.ONE : this.assetScale;
+    List<Scale.ScaledResource> rsrcs = assetScale.getScaledResources(path);
+    return getImage(rsrcs.get(0).path, rsrcs.get(0).scale);
   }
 
   protected HtmlImage getImage (String path, Scale scale) {
