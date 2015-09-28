@@ -90,8 +90,8 @@ public class HtmlNet extends Net {
       } else {
         xhr.send();
       }
-    } catch (Exception e) {
-      result.fail(e);
+    } catch (Throwable t) {
+      result.fail(t);
     }
     return result;
   }

@@ -147,7 +147,7 @@ public class AndroidAssets extends Assets {
           BitmapOptions options = createOptions(url, false, Scale.ONE);
           Bitmap bmp = downloadBitmap(url, options);
           image.succeed(new ImageImpl.Data(options.scale, bmp, bmp.getWidth(), bmp.getHeight()));
-        } catch (Exception error) {
+        } catch (Throwable error) {
           image.fail(error);
         }
       }

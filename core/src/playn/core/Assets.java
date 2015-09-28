@@ -36,8 +36,8 @@ public abstract class Assets {
     ImageImpl image = createImage(false, 0, 0, path);
     try {
       image.succeed(load(path));
-    } catch (Exception e) {
-      image.fail(e);
+    } catch (Throwable t) {
+      image.fail(t);
     }
     return image;
   }
@@ -56,8 +56,8 @@ public abstract class Assets {
       public void run () {
         try {
           image.succeed(load(path));
-        } catch (Exception e) {
-          image.fail(e);
+        } catch (Throwable t) {
+          image.fail(t);
         }
       }
     });

@@ -120,8 +120,8 @@ public class AndroidNet extends Net {
           }
 
           result.succeed(impl);
-        } catch (Exception e) {
-          result.fail(e);
+        } catch (Throwable t) {
+          result.fail(t);
         }
       }
 

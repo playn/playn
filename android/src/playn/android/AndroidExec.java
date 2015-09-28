@@ -49,8 +49,8 @@ public class AndroidExec extends Exec.Default {
           @Override public Void doInBackground(Void... params) {
             try {
               action.run();
-            } catch (Exception e) {
-              plat.reportError("Async task failure [task=" + action + "]", e);
+            } catch (Throwable t) {
+              plat.reportError("Async task failure [task=" + action + "]", t);
             }
             return null;
           }

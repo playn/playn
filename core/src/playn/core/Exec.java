@@ -57,7 +57,7 @@ public abstract class Exec {
         Runnable action = running.get(ii);
         try {
           action.run();
-        } catch (Exception e) {
+        } catch (Throwable e) {
           plat.reportError("invokeLater Runnable failed: " + action, e);
         }
       }

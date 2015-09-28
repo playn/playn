@@ -176,9 +176,9 @@ public class AndroidAudio extends Audio {
                 }
               });
               mp.prepareAsync();
-            } catch (Exception e) {
-              plat.reportError("Sound load error '" + path + "'", e);
-              sound.fail(e);
+            } catch (Throwable t) {
+              plat.reportError("Sound load error '" + path + "'", t);
+              sound.fail(t);
             }
           }
         });

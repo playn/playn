@@ -108,7 +108,7 @@ public abstract class Platform {
   public <E> void dispatchEvent (Signal<E> signal, E event) {
     try {
       signal.emit(event);
-    } catch (Exception cause) {
+    } catch (Throwable cause) {
       reportError("Event dispatch failure", cause);
     }
   }
@@ -122,6 +122,6 @@ public abstract class Platform {
 
   protected void emitFrame () {
     try { frame.emit(this); }
-    catch (Exception e) { log().warn("Frame tick exception", e); }
+    catch (Throwable e) { log().warn("Frame tick exception", e); }
   }
 }
