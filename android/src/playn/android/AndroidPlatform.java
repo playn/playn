@@ -46,7 +46,7 @@ public class AndroidPlatform extends Platform {
     this.activity = activity;
 
     log = new AndroidLog(activity.logIdent());
-    exec = new AndroidExec(log, frame, activity) {
+    exec = new AndroidExec(this, activity) {
       @Override protected boolean isPaused () { return state == State.PAUSED; }
     };
     audio = new AndroidAudio(this);

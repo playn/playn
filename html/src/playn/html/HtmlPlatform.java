@@ -105,7 +105,7 @@ public class HtmlPlatform extends Platform {
   private final double start = initNow();
 
   private final HtmlLog log = GWT.create(HtmlLog.class);
-  private final Exec exec = new Exec.Default(log, frame);
+  private final Exec exec = new Exec.Default(this);
   private final HtmlAssets assets;
   private final HtmlAudio audio;
   private final HtmlGraphics graphics;

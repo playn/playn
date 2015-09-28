@@ -30,11 +30,11 @@ public abstract class Exec {
   public static class Default extends Exec {
     private final List<Runnable> pending = new ArrayList<>();
     private final List<Runnable> running = new ArrayList<>();
-    protected final Log log;
+    protected final Platform plat;
 
-    public Default (Log log, Signal<? extends Object> frame) {
-      this.log = log;
-      frame.connect(new Slot<Object>() {
+    public Default (Platform plat) {
+      this.plat = plat;
+      plat.frame.connect(new Slot<Object>() {
         public void onEmit (Object unused) { dispatch(); }
       }).atPrio(Short.MAX_VALUE);
     }
@@ -58,7 +58,7 @@ public abstract class Exec {
         try {
           action.run();
         } catch (Exception e) {
-          log.warn("invokeLater Runnable failed: " + action, e);
+          plat.reportError("invokeLater Runnable failed: " + action, e);
         }
       }
       running.clear();

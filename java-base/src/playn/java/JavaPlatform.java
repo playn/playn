@@ -81,7 +81,7 @@ public abstract class JavaPlatform extends Platform {
   private final ExecutorService pool = Executors.newFixedThreadPool(4);
 
   private final JavaLog log = new JavaLog();
-  private final Exec exec = new Exec.Default(log, frame) {
+  private final Exec exec = new Exec.Default(this) {
     @Override public boolean isAsyncSupported () { return true; }
     @Override public void invokeAsync (Runnable action) { pool.execute(action); }
   };

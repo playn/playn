@@ -79,7 +79,7 @@ public class StubPlatform extends Platform {
       e.printStackTrace(System.err);
     }
   };
-  private Exec exec = new Exec.Default(log, frame) {
+  private Exec exec = new Exec.Default(this) {
     @Override public void invokeLater (Runnable action) { action.run(); } // now is later!
   };
   private final long start = System.currentTimeMillis();

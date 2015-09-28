@@ -118,7 +118,7 @@ public class RoboPlatform extends Platform {
   // create log early because other services use it in their ctor
   private final RoboLog log = new RoboLog();
   private final Json json = new JsonImpl();
-  private final Exec exec = new Exec.Default(log, frame) {
+  private final Exec exec = new Exec.Default(this) {
     @Override public boolean isAsyncSupported () { return true; }
     @Override public void invokeAsync (Runnable action) { pool.execute(action); }
   };

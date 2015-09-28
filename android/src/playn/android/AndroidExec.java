@@ -16,17 +16,16 @@ package playn.android;
 import android.app.Activity;
 import android.os.AsyncTask;
 
-import react.Signal;
-
 import playn.core.Exec;
 import playn.core.Log;
+import playn.core.Platform;
 
 public class AndroidExec extends Exec.Default {
 
   private final Activity activity;
 
-  public AndroidExec (Log log, Signal<? extends Object> frame, Activity activity) {
-    super(log, frame);
+  public AndroidExec (Platform plat, Activity activity) {
+    super(plat);
     this.activity = activity;
   }
 
@@ -51,7 +50,7 @@ public class AndroidExec extends Exec.Default {
             try {
               action.run();
             } catch (Exception e) {
-              log.warn("Async task failure [task=" + action + "]", e);
+              plat.reportError("Async task failure [task=" + action + "]", e);
             }
             return null;
           }
