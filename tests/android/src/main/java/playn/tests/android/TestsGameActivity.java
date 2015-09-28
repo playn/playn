@@ -32,10 +32,6 @@ public class TestsGameActivity extends GameActivity {
     if (!game.onHardwardBack()) super.onBackPressed();
   }
 
-  @Override protected boolean usePortraitOrientation() {
-    return true;
-  }
-
   protected float scaleFactor () {
     DisplayMetrics dm = getResources().getDisplayMetrics();
     return Math.min(2, dm.density);
