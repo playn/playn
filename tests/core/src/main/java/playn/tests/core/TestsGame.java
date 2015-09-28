@@ -121,7 +121,7 @@ public class TestsGame extends SceneGame {
       new PauseResumeTest(this),
       new TextTest(this),
       new ScaledTextTest(this),
-      new GetTextTest(this),
+      new DialogTest(this),
       new LayerClickTest(this),
       new PointerMouseTouchTest(this),
       new MouseWheelTest(this),
@@ -188,7 +188,7 @@ public class TestsGame extends SceneGame {
   // defers display of menu by one frame to avoid the right click or touch being processed by the
   // menu when it is displayed
   void displayMenuLater() {
-    plat.invokeLater(new Runnable() {
+    plat.exec().invokeLater(new Runnable() {
       public void run() {
         displayMenu();
       }
