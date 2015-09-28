@@ -227,7 +227,7 @@ public class AndroidAssets extends Assets {
         break; // the image was broken not missing, stop here
       }
     }
-    plat.log().warn("Could not load image: " + pathPrefix + path, error);
+    plat.reportError("Could not load image: " + pathPrefix + path, error);
     throw error != null ? error : new FileNotFoundException(path);
   }
 
