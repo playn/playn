@@ -120,8 +120,8 @@ public class HtmlPlatform extends Platform {
    */
   public HtmlPlatform(Config config) {
     GWT.setUncaughtExceptionHandler(new GWT.UncaughtExceptionHandler() {
-      @Override public void onUncaughtException(Throwable e) {
-        log.error("Uncaught Exception: ", e);
+      @Override public void onUncaughtException (Throwable e) {
+        reportError("Uncaught Exception: ", e);
       }
     });
 
