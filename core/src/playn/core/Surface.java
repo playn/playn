@@ -101,7 +101,7 @@ public class Surface implements Closeable {
 
   /** Saves the current transform. */
   public Surface saveTx () {
-    transformStack.add(lastTrans = tx().copy());
+    transformStack.add(lastTrans = lastTrans.copy());
     return this;
   }
 
