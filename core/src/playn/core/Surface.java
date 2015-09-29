@@ -48,6 +48,7 @@ public class Surface implements Closeable {
   private int fillColor;
   private int tint = Tint.NOOP_TINT;
   private Texture patternTex;
+  private AffineTransform lastTrans;
 
   /**
    * Creates a surface which will render to {@code target} using {@code defaultBatch} as its
@@ -56,7 +57,7 @@ public class Surface implements Closeable {
   public Surface (Graphics gfx, RenderTarget target, QuadBatch defaultBatch) {
     this.target = target;
     this.batch = defaultBatch;
-    transformStack.add(new AffineTransform());
+    transformStack.add(lastTrans = new AffineTransform());
     colorTex = gfx.colorTex();
     scale(target.xscale(), target.yscale());
   }
@@ -95,19 +96,20 @@ public class Surface implements Closeable {
 
   /** Returns the current transform. */
   public AffineTransform tx () {
-    return transformStack.get(transformStack.size()-1);
+    return lastTrans;
   }
 
   /** Saves the current transform. */
   public Surface saveTx () {
-    transformStack.add(tx().copy());
+    transformStack.add(lastTrans = tx().copy());
     return this;
   }
 
   /** Restores the transform previously stored by {@link #saveTx}. */
   public Surface restoreTx () {
     assert transformStack.size() > 1 : "Unbalanced save/restore";
-    transformStack.remove(transformStack.size() - 1);
+    transformStack.remove(lastTrans);
+    lastTrans = transformStack.isEmpty() ? null : transformStack.get(transformStack.size() -1);
     return this;
   }
 
