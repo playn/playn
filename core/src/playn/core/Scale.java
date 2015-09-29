@@ -92,15 +92,17 @@ public class Scale {
 
   /**
    * Returns an ordered series of scaled resources to try when loading an asset. The highest
-   * resolution will be tried first, then half that resolution and so forth down to a normal
-   * resolution image. In general this is simply {@code 2, 1}, but on a Retina iPad, it could be
-   * {@code 4, 2, 1}.
+   * (presumably native) resolution will be tried first, then that will be stepped down to all
+   * whole integers less than the native resolution. Often this is simply {@code 2, 1}, but on a
+   * Retina iPad, it could be {@code 4, 3, 2, 1}, and on Android devices it may often be something
+   * like {@code 3, 2, 1} or {@code 2.5, 2, 1}.
    */
   public List<ScaledResource> getScaledResources(String path) {
     List<ScaledResource> rsrcs = new ArrayList<ScaledResource>();
     rsrcs.add(new ScaledResource(this, computePath(path, factor)));
-    for (float rscale = factor/2; rscale > 1; rscale /= 2) {
-      rsrcs.add(new ScaledResource(new Scale(rscale), computePath(path, rscale)));
+    for (float rscale = MathUtil.ifloor(factor); rscale > 1; rscale -= 1) {
+      if (rscale != factor) rsrcs.add(
+        new ScaledResource(new Scale(rscale), computePath(path, rscale)));
     }
     rsrcs.add(new ScaledResource(ONE, path));
     return rsrcs;
