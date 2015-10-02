@@ -107,9 +107,10 @@ public class Surface implements Closeable {
 
   /** Restores the transform previously stored by {@link #saveTx}. */
   public Surface restoreTx () {
-    assert transformStack.size() > 1 : "Unbalanced save/restore";
-    transformStack.remove(lastTrans);
-    lastTrans = transformStack.isEmpty() ? null : transformStack.get(transformStack.size() -1);
+    int tsSize = transformStack.size();
+    assert tsSize > 1 : "Unbalanced save/restore";
+    transformStack.remove(--tsSize);
+    lastTrans = transformStack.isEmpty() ? null : transformStack.get(tsSize-1);
     return this;
   }
 
