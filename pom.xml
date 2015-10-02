@@ -41,6 +41,7 @@
   </modules>
 
   <properties>
+    <source.level>1.7</source.level>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <android.version>4.1.1.4</android.version>
     <android.maven.version>4.2.1</android.maven.version>
@@ -141,8 +142,8 @@
           <artifactId>maven-compiler-plugin</artifactId>
           <version>3.3</version>
           <configuration>
-            <source>1.7</source>
-            <target>1.7</target>
+            <source>${source.level}</source>
+            <target>${source.level}</target>
             <showDeprecation>true</showDeprecation>
             <showWarnings>true</showWarnings>
             <compilerArgs>
