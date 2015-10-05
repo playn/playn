@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.sonatype.oss</groupId>
     <artifactId>oss-parent</artifactId>
-    <version>7</version>
+    <version>9</version>
   </parent>
 
   <groupId>io.playn</groupId>
@@ -24,6 +24,10 @@
     <developerConnection>scm:git:git@github.com:playn/playn.git</developerConnection>
     <url>https://github.com/playn/playn/</url>
   </scm>
+
+  <prerequisites>
+    <maven>3.3.0</maven>
+  </prerequisites>
 
   <modules>
     <module>android</module>
@@ -123,7 +127,7 @@
 
         <plugin>
           <artifactId>maven-clean-plugin</artifactId>
-          <version>2.4.1</version>
+          <version>2.6.1</version>
           <configuration>
             <filesets>
               <fileset><directory>src/main/webapp/${gwt.module}</directory></fileset>
@@ -157,7 +161,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-resources-plugin</artifactId>
-          <version>2.6</version>
+          <version>2.7</version>
           <configuration>
             <encoding>UTF-8</encoding>
           </configuration>
@@ -166,7 +170,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-javadoc-plugin</artifactId>
-          <version>2.7</version>
+          <version>2.10.3</version>
           <configuration>
             <quiet>true</quiet>
             <show>public</show>
@@ -182,7 +186,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-source-plugin</artifactId>
-          <version>2.1.2</version>
+          <version>2.4</version>
         </plugin>
 
         <!-- this shuts m2eclipse up about various Maven plugins -->

@@ -13,12 +13,16 @@
   <name>PlayN Project Archetype</name>
   <description>Archetype for PlayN game projects.</description>
 
+  <properties>
+    <archetype.plugin.version>2.4</archetype.plugin.version>
+  </properties>
+
   <build>
     <extensions>
       <extension>
         <groupId>org.apache.maven.archetype</groupId>
         <artifactId>archetype-packaging</artifactId>
-        <version>2.0</version>
+        <version>${archetype.plugin.version}</version>
       </extension>
     </extensions>
 
@@ -26,12 +30,12 @@
       <plugins>
         <plugin>
           <artifactId>maven-archetype-plugin</artifactId>
-          <version>2.0</version>
+          <version>${archetype.plugin.version}</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-resources-plugin</artifactId>
-          <version>2.6</version>
+          <version>2.7</version>
           <configuration>
             <escapeString>\</escapeString>
           </configuration>
