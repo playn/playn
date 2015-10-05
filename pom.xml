@@ -88,6 +88,21 @@
   </dependencies>
 
   <build>
+    <plugins>
+      <plugin>
+        <groupId>org.sonatype.plugins</groupId>
+        <artifactId>nexus-staging-maven-plugin</artifactId>
+        <version>1.6.6</version>
+        <extensions>true</extensions>
+        <inherited>false</inherited>
+        <configuration>
+          <serverId>ossrh-releases</serverId>
+          <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+          <stagingProfileId>a00df38d03dd2c</stagingProfileId>
+        </configuration>
+      </plugin>
+    </plugins>
+
     <!-- Common plugin configuration for all children -->
     <pluginManagement>
       <plugins>
@@ -188,78 +203,6 @@
           <artifactId>maven-source-plugin</artifactId>
           <version>2.4</version>
         </plugin>
-
-        <!-- this shuts m2eclipse up about various Maven plugins -->
-        <plugin>
-          <groupId>org.eclipse.m2e</groupId>
-          <artifactId>lifecycle-mapping</artifactId>
-          <version>1.0.0</version>
-          <configuration>
-            <lifecycleMappingMetadata>
-              <pluginExecutions>
-                <pluginExecution>
-                  <pluginExecutionFilter>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-dependency-plugin</artifactId>
-                    <versionRange>[2.0,)</versionRange>
-                    <goals>
-                      <goal>unpack</goal>
-                    </goals>
-                  </pluginExecutionFilter>
-                  <action>
-                    <ignore />
-                  </action>
-                </pluginExecution>
-                <pluginExecution>
-                  <pluginExecutionFilter>
-                    <groupId>
-                      com.jayway.maven.plugins.android.generation2
-                    </groupId>
-                    <artifactId>
-                      android-maven-plugin
-                    </artifactId>
-                    <versionRange>
-                      [3.1.1,)
-                    </versionRange>
-                    <goals>
-                      <goal>generate-sources</goal>
-                      <goal>unpack</goal>
-                    </goals>
-                  </pluginExecutionFilter>
-                  <action>
-                    <ignore />
-                  </action>
-                </pluginExecution>
-                <pluginExecution>
-                  <pluginExecutionFilter>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-enforcer-plugin</artifactId>
-                    <versionRange>[1.0,)</versionRange>
-                    <goals>
-                      <goal>enforce</goal>
-                    </goals>
-                  </pluginExecutionFilter>
-                  <action>
-                    <ignore />
-                  </action>
-                </pluginExecution>
-                <pluginExecution>
-                  <pluginExecutionFilter>
-                    <groupId>com.pyx4j</groupId>
-                    <artifactId>maven-junction-plugin</artifactId>
-                    <versionRange>[1.0.3,)</versionRange>
-                    <goals>
-                      <goal>link</goal>
-                    </goals>
-                  </pluginExecutionFilter>
-                  <action>
-                    <ignore />
-                  </action>
-                </pluginExecution>
-              </pluginExecutions>
-            </lifecycleMappingMetadata>
-          </configuration>
-        </plugin>
       </plugins>
     </pluginManagement>
   </build>
@@ -280,6 +223,95 @@
           <url>${deploy-local.dir}</url>
         </snapshotRepository>
       </distributionManagement>
+    </profile>
+
+    <!-- this shuts m2eclipse up about various Maven plugins -->
+    <profile>
+      <id>only-eclipse</id>
+      <activation>
+        <property>
+          <name>m2e.version</name>
+        </property>
+      </activation>
+      <build>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <groupId>org.eclipse.m2e</groupId>
+              <artifactId>lifecycle-mapping</artifactId>
+              <version>1.0.0</version>
+              <configuration>
+                <lifecycleMappingMetadata>
+                  <pluginExecutions>
+                    <pluginExecution>
+                      <pluginExecutionFilter>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-dependency-plugin</artifactId>
+                        <versionRange>[2.0,)</versionRange>
+                        <goals>
+                          <goal>unpack</goal>
+                        </goals>
+                      </pluginExecutionFilter>
+                      <action>
+                        <ignore />
+                      </action>
+                    </pluginExecution>
+
+                    <pluginExecution>
+                      <pluginExecutionFilter>
+                        <groupId>
+                          com.jayway.maven.plugins.android.generation2
+                        </groupId>
+                        <artifactId>
+                          android-maven-plugin
+                        </artifactId>
+                        <versionRange>
+                          [3.1.1,)
+                        </versionRange>
+                        <goals>
+                          <goal>generate-sources</goal>
+                          <goal>unpack</goal>
+                        </goals>
+                      </pluginExecutionFilter>
+                      <action>
+                        <ignore />
+                      </action>
+                    </pluginExecution>
+
+                    <pluginExecution>
+                      <pluginExecutionFilter>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-enforcer-plugin</artifactId>
+                        <versionRange>[1.0,)</versionRange>
+                        <goals>
+                          <goal>enforce</goal>
+                        </goals>
+                      </pluginExecutionFilter>
+                      <action>
+                        <ignore />
+                      </action>
+                    </pluginExecution>
+
+                    <pluginExecution>
+                      <pluginExecutionFilter>
+                        <groupId>com.pyx4j</groupId>
+                        <artifactId>maven-junction-plugin</artifactId>
+                        <versionRange>[1.0.3,)</versionRange>
+                        <goals>
+                          <goal>link</goal>
+                        </goals>
+                      </pluginExecutionFilter>
+                      <action>
+                        <ignore />
+                      </action>
+                    </pluginExecution>
+                  </pluginExecutions>
+                </lifecycleMappingMetadata>
+              </configuration>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+      </build>
     </profile>
   </profiles>
 </project>
