@@ -100,6 +100,7 @@ public class JavaInput extends Input {
     // to keep wheel events... blah
   }
 
+  @Override public boolean hasMouse () { return true; }
   @Override public boolean hasHardwareKeyboard() { return true; }
   @Override public boolean hasTouch () { return plat.config.emulateTouch; }
 
