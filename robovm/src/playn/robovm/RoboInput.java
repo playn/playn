@@ -40,6 +40,8 @@ public class RoboInput extends Input {
     this.plat = plat;
   }
 
+  @Override public boolean hasTouch () { return true; }
+
   @Override public RFuture<String> getText(Keyboard.TextType textType, String label,
                                            String initVal) {
     final RPromise<String> result = plat.exec().deferredPromise();

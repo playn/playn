@@ -34,6 +34,12 @@ public class AndroidInput extends Input {
     this.plat = plat;
   }
 
+  // public boolean hasMouse () { return false; }
+  // TODO: there seems to be no way to tell if android has mouse, but motion events have extra
+  // info when they come from a mouse, so maybe we can dispatch those differently?
+
+  @Override public boolean hasTouch () { return true; }
+
   @Override public boolean hasHardwareKeyboard () {
     return false; // TODO: return true for devices that have a hardware keyboard
   }
