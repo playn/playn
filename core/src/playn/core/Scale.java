@@ -48,6 +48,10 @@ public class Scale {
       this.scale = scale;
       this.path = path;
     }
+
+    @Override public String toString () {
+      return scale + ": " + path;
+    }
   }
 
   /** An unscaled scale factor singleton. */
@@ -114,6 +118,7 @@ public class Scale {
   }
 
   private String computePath(String path, float scale) {
+    if (scale <= 1) return path;
     int scaleFactor = (int)(scale * 10);
     if (scaleFactor % 10 == 0)
       scaleFactor /= 10;
