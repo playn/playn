@@ -77,7 +77,7 @@ public abstract class GameActivity extends Activity {
         new AlertDialog.Builder(this).setMessage(
           "Unable to guarantee application will handle configuration changes. " +
           "Please add the following line to the Activity manifest: " +
-          "      android:configChanges=\"keyboardHidden|orientation\"").show();
+          "      android:configChanges=\"keyboardHidden|orientation|screenSize\"").show();
       }
     } catch (NameNotFoundException e) {
       platform.log().warn("Cannot access game AndroidManifest.xml file.");
