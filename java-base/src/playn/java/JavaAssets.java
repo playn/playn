@@ -13,15 +13,16 @@
  */
 package playn.java;
 
+import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
-import java.awt.Font;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.net.URLDecoder;
 
 import java.util.Arrays;
 import javax.imageio.ImageIO;
@@ -172,7 +173,7 @@ public class JavaAssets extends Assets {
     URL url = getClass().getClassLoader().getResource(pathPrefix + path);
     if (url != null) {
       return url.getProtocol().equals("file") ?
-        new FileResource(new File(url.getPath())) :
+        new FileResource(new File(URLDecoder.decode(url.getPath(), "UTF-8"))) :
         new URLResource(url);
     }
     for (File dir : directories) {
