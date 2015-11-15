@@ -44,12 +44,17 @@ public class RoboAssets extends Assets {
     this.assetRoot = new File(bundleRoot, pathPrefix);
   }
 
-  @Override public Image getRemoteImage(String url, int width, int height) {
+  @Override public Image getRemoteImage(final String url, int width, int height) {
     final ImageImpl image = createImage(true, width, height, url);
     plat.net().req(url).execute().
       onSuccess(new Slot<Net.Response>() {
         public void onEmit (Net.Response rsp) {
-          image.succeed(toData(Scale.ONE, new UIImage(new NSData(rsp.payload()))));
+          try {
+            image.succeed(toData(Scale.ONE, new UIImage(new NSData(rsp.payload()))));
+          } catch (Throwable t) {
+            plat.log().warn("Failed to decode remote image [url=" + url + "]", t);
+            image.fail(t);
+          }
         }
       }).
       onFailure(new Slot<Throwable>() {
