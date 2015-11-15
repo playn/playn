@@ -42,7 +42,7 @@ class LayerClickTest extends Test {
     game.rootLayer.addAt(l2.setScale(1.5f).setRotation(FloatMath.PI/4), 150, 50);
     l2.events().connect(new Mover(l2).listener(game.input));
 
-    Image mdb = game.assets.getRemoteImage("https://graph.facebook.com/samskivert/picture");
+    Image mdb = game.assets.getRemoteImage("https://graph.facebook.com/10153516625660820/picture");
     final ImageLayer l3 = new ImageLayer(mdb);
     game.rootLayer.addAt(l3.setRotation(-FloatMath.PI/4), 50, 150);
     l3.events().connect(new Mover(l3).listener(game.input));
