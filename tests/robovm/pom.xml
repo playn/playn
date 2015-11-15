@@ -34,13 +34,13 @@
             <artifactId>robovm-maven-plugin</artifactId>
             <version>${robovm.maven.version}</version>
             <configuration>
-              <deviceName>iPad-Air</deviceName>
+              <deviceName>iPhone-6-Plus</deviceName>
             </configuration>
             <executions>
               <execution>
                 <phase>test</phase>
                 <goals>
-                  <goal>ipad-sim</goal>
+                  <goal>iphone-sim</goal>
                 </goals>
               </execution>
             </executions>
@@ -48,6 +48,7 @@
         </plugins>
       </build>
     </profile>
+
     <profile>
       <id>robodev</id>
       <build>
