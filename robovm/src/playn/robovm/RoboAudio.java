@@ -107,9 +107,10 @@ public class RoboAudio extends Audio {
         int bufferId = 0;
         try {
           bufferId = alGenBuffer();
-          CAFLoader.load(assetPath, bufferId);
+          CAFLoader.load(assetPath, bufferId, plat.log());
           sound.succeed(bufferId);
         } catch (Throwable t) {
+          plat.log().warn("Error loading sound [" + assetPath.getName() + "]", t);
           if (bufferId != 0) alDeleteBuffer(bufferId);
           sound.fail(t);
         }

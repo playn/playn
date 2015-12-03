@@ -23,6 +23,8 @@ import org.robovm.apple.foundation.NSDataReadingOptions;
 import org.robovm.apple.foundation.NSErrorException;
 import org.robovm.apple.foundation.NSRange;
 
+import playn.core.Log;
+
 import static playn.robovm.OpenAL.*;
 
 /**
@@ -112,12 +114,12 @@ public class CAFLoader {
     }
   }
 
-  public static void load(File path, int bufferId) {
+  public static void load(File path, int bufferId, Log log) {
     try {
       // mmap (if possible) the audio file for efficient reading/uploading
       NSData data = NSData.read(path, READ_OPTS);
 
-      load(data, path.getName(), bufferId);
+      load(data, path.getName(), bufferId, log);
 
       // now dispose the mmap'd file to free up resources
       data.dispose();
@@ -128,7 +130,7 @@ public class CAFLoader {
 
   }
 
-  public static void load(NSData data, String source, int bufferId) {
+  public static void load(NSData data, String source, int bufferId, Log log) {
 
     // read the CAFF metdata to find out the audio format and the data offset/length
     ByteBuffer buf = data.asByteBuffer().order(ByteOrder.BIG_ENDIAN);
@@ -150,12 +152,16 @@ public class CAFLoader {
         desc = new CAFDesc(buf);
         if ("ima4".equalsIgnoreCase(desc.formatID))
           throw new RuntimeException(
-              "Cannot use compressed CAFF. " + "Use AIFC for compressed audio on iOS.");
+              "Cannot use compressed CAFF. Use AIFC for compressed audio on iOS.");
       }
 
       offset += size;
       buf.position(offset);
     } while (dataOffset == 0);
+
+    log.debug("CAF description : " + desc.toString());
+    log.debug("offset=" + dataOffset + " ; length=" + dataLength);
+    log.debug("buffer.position=" + buf.position() + " ; buffer.capacity=" + buf.capacity());
 
     // upload the audio data to OpenAL straight from the mmap'd file
     ByteBuffer adata = data.getSubdata(new NSRange(dataOffset, dataLength)).asByteBuffer();
