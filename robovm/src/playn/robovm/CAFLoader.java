@@ -116,6 +116,12 @@ public class CAFLoader {
         offset += 12;
 
         if (type.equals("data")) {
+
+          // FIX : "data" chunk size may be unspecified : in that case it means the rest of file is the "data" chunk.
+          if (size <= 0) {
+            size = buf.limit() - offset;
+          }
+
           dataOffset = offset;
           dataLength = size;
         } else if (type.equals("desc")) {
