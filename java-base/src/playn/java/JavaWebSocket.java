@@ -61,7 +61,7 @@ public class JavaWebSocket implements Net.WebSocket {
       }
 
       @Override
-      public void onClose(int arg0, String arg1, boolean arg2) {
+      public void onClose(int code, String reason, boolean remote) {
         exec.invokeLater(new Runnable() {
           public void run () { listener.onClose(); }
         });
