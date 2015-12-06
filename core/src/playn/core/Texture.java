@@ -196,7 +196,7 @@ public class Texture extends Tile implements Closeable {
       @Override public void addToBatch (QuadBatch batch, int tint, AffineTransform tx,
                                         float dx, float dy, float dw, float dh,
                                         float sx, float sy, float sw, float sh) {
-        batch.addQuad(texture(), tint, tx, dx, dy, dw, dh, tileX+sx, tileY+sx, sw, sh);
+        batch.addQuad(texture(), tint, tx, dx, dy, dw, dh, tileX+sx, tileY+sy, sw, sh);
       }
     };
   }
