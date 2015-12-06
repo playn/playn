@@ -151,7 +151,6 @@ public class CAFLoader {
     // upload the audio data to OpenAL straight from the buffer
     data.position(dataOffset);
     data.limit(dataLength);
-    data.compact();
     alBufferData(bufferId, desc.getALFormat(), data, dataLength, (int)desc.sampleRate);
 
     // finally freak out if OpenAL didn't like what we sent it
