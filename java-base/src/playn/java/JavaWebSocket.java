@@ -20,6 +20,7 @@ import java.net.URISyntaxException;
 import java.nio.ByteBuffer;
 
 import org.java_websocket.client.WebSocketClient;
+import org.java_websocket.drafts.Draft_17;
 import org.java_websocket.handshake.ServerHandshake;
 
 import playn.core.Net;
@@ -37,7 +38,7 @@ public class JavaWebSocket implements Net.WebSocket {
       throw new RuntimeException(e);
     }
 
-    socket = new WebSocketClient(juri) {
+    socket = new WebSocketClient(juri, new Draft_17()) {
       @Override
       public void onMessage(final ByteBuffer buffer) {
         exec.invokeLater(new Runnable() {
@@ -60,7 +61,7 @@ public class JavaWebSocket implements Net.WebSocket {
       }
 
       @Override
-      public void onClose(int arg0, String arg1, boolean arg2) {
+      public void onClose(int code, String reason, boolean remote) {
         exec.invokeLater(new Runnable() {
           public void run () { listener.onClose(); }
         });
