@@ -41,6 +41,10 @@ public class HtmlPlatform extends Platform {
     /** The id of the {@code <div>} element where the game will be inserted. */
     public String rootId = "playn-root";
 
+    /** If {@code > 0}, the period (in milliseconds) at which to fire frame signals when paused.
+      * If {@code 0} (the default) no frame signals will be fired when paused. */
+    public int backgroundFrameMillis = 0;
+
     // Scale up the canvas on fullscreen. Highly experimental.
     public boolean experimentalFullscreen = false;
   }
@@ -104,8 +108,7 @@ public class HtmlPlatform extends Platform {
   // installs backwards compat Date.now() if needed and calls it
   private final double start = initNow();
 
-  // used to track updates / background updates
-  private double lastUpdate = 0;
+  private int backgroundFrameMillis = 0;
 
   private final HtmlLog log = GWT.create(HtmlLog.class);
   private final Exec exec = new Exec.Default(this);
@@ -133,6 +136,7 @@ public class HtmlPlatform extends Platform {
     // wrap these calls in try-catch, a the UncaughtExceptionHandler installed above won't take
     // effect until we yield to the browser event loop
     try {
+      backgroundFrameMillis = config.backgroundFrameMillis;
       graphics = new HtmlGraphics(this, config);
       input = new HtmlInput(this, graphics.rootElement);
       audio = new HtmlAudio(this);
@@ -157,19 +161,7 @@ public class HtmlPlatform extends Platform {
     requestAnimationFrame(new Runnable() {
       @Override public void run() {
         requestAnimationFrame(this);
-        lastUpdate = now();
         emitFrame();
-      }
-    });
-
-    startBackgroundUpdate(new Runnable() {
-      @Override public void run() {
-     // only run if there wasn't an update in 500 ms
-     // (means page rendering is disabled)
-        if (now() - lastUpdate > 500) {
-          lastUpdate = now();
-          emitFrame();
-        }
       }
     });
   }
@@ -195,7 +187,21 @@ public class HtmlPlatform extends Platform {
   }-*/;
 
   private void visibilityChanged() {
-    dispatchEvent(lifecycle, isHidden() ? Lifecycle.PAUSE : Lifecycle.RESUME);
+    boolean isHidden = isHidden();
+    dispatchEvent(lifecycle, isHidden ? Lifecycle.PAUSE : Lifecycle.RESUME);
+
+    // if we are configured to update while backgrounded, schedule a background frame
+    if (isHidden && backgroundFrameMillis > 0) {
+      scheduleBackgroundFrame(backgroundFrameMillis, new Runnable() {
+        @Override public void run() {
+          // if we're still hidden, emit this background frame and schedule another
+          if (isHidden()) {
+            scheduleBackgroundFrame(backgroundFrameMillis, this);
+            emitFrame();
+          }
+        }
+      });
+    }
   }
   private native boolean isHidden() /*-{ return $doc.hidden; }-*/;
 
@@ -220,11 +226,10 @@ public class HtmlPlatform extends Platform {
     }
   }-*/;
 
-  private native void startBackgroundUpdate(Runnable callback) /*-{
-    var fn = function() {
+  private native void scheduleBackgroundFrame(int millis, Runnable callback) /*-{
+    $wnd.setTimeout(function() {
       callback.@java.lang.Runnable::run()();
-    };
-    $wnd.setInterval(fn, 1000);
+    }, millis);
   }-*/;
 
   private static native AgentInfo computeAgentInfo() /*-{
