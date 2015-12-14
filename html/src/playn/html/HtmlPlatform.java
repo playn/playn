@@ -103,6 +103,10 @@ public class HtmlPlatform extends Platform {
 
   // installs backwards compat Date.now() if needed and calls it
   private final double start = initNow();
+  
+  // used to track updates / background updates
+  private double lastUpdate = 0;
+  
 
   private final HtmlLog log = GWT.create(HtmlLog.class);
   private final Exec exec = new Exec.Default(this);
@@ -152,7 +156,19 @@ public class HtmlPlatform extends Platform {
     requestAnimationFrame(new TimerCallback() {
       @Override public void fire () {
         requestAnimationFrame(this);
+        lastUpdate = now();
         emitFrame();
+      }
+    });
+    
+    startBackgroundUpdate(new TimerCallback() {
+      @Override public void fire () {
+    	// only run if there wasn't an update in 500 ms
+    	// (means page rendering is disabled)
+        if (now() - lastUpdate > 500) {
+          lastUpdate = now();
+          emitFrame();
+        }
       }
     });
   }
@@ -191,7 +207,14 @@ public class HtmlPlatform extends Platform {
       $wnd.setTimeout(fn, 20); // 20ms => 50fps
     }
   }-*/;
-
+  
+  private native void startBackgroundUpdate(TimerCallback callback) /*-{
+    var fn = function() {
+      callback.@playn.html.TimerCallback::fire()();
+    };
+    $wnd.setInterval(fn, 1000);
+}-*/;
+  
   private static native AgentInfo computeAgentInfo() /*-{
     var userAgent = navigator.userAgent.toLowerCase();
     return {
