@@ -194,13 +194,14 @@ public class HtmlPlatform extends Platform {
     return $wnd;
   }-*/;
 
-  private void setVisible(boolean isVisible) {
-    dispatchEvent(lifecycle, isVisible ? Lifecycle.RESUME : Lifecycle.PAUSE);
+  private void visibilityChanged() {
+    dispatchEvent(lifecycle, isHidden() ? Lifecycle.PAUSE : Lifecycle.RESUME);
   }
+  private native boolean isHidden() /*-{ return $doc.hidden; }-*/;
 
   private native void listenForVisibilityChange(HtmlPlatform plat) /*-{
     $doc.addEventListener("visibilitychange", function () {
-      plat.@playn.html.HtmlPlatform::setVisible(Z)(!$doc.hidden);
+      plat.@playn.html.HtmlPlatform::visibilityChanged()();
     }, false);
   }-*/;
 
