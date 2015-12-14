@@ -154,16 +154,16 @@ public class HtmlPlatform extends Platform {
   public void start () {
     listenForVisibilityChange(this);
 
-    requestAnimationFrame(new TimerCallback() {
-      @Override public void fire () {
+    requestAnimationFrame(new Runnable() {
+      @Override public void run() {
         requestAnimationFrame(this);
         lastUpdate = now();
         emitFrame();
       }
     });
 
-    startBackgroundUpdate(new TimerCallback() {
-      @Override public void fire () {
+    startBackgroundUpdate(new Runnable() {
+      @Override public void run() {
      // only run if there wasn't an update in 500 ms
      // (means page rendering is disabled)
         if (now() - lastUpdate > 500) {
@@ -204,9 +204,9 @@ public class HtmlPlatform extends Platform {
     }, false);
   }-*/;
 
-  private native void requestAnimationFrame(TimerCallback callback) /*-{
+  private native void requestAnimationFrame(Runnable callback) /*-{
     var fn = function() {
-      callback.@playn.html.TimerCallback::fire()();
+      callback.@java.lang.Runnable::run()();
     };
     if ($wnd.requestAnimationFrame) {
       $wnd.requestAnimationFrame(fn);
@@ -219,9 +219,9 @@ public class HtmlPlatform extends Platform {
     }
   }-*/;
 
-  private native void startBackgroundUpdate(TimerCallback callback) /*-{
+  private native void startBackgroundUpdate(Runnable callback) /*-{
     var fn = function() {
-      callback.@playn.html.TimerCallback::fire()();
+      callback.@java.lang.Runnable::run()();
     };
     $wnd.setInterval(fn, 1000);
   }-*/;
