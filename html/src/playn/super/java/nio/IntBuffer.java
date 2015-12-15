@@ -125,8 +125,7 @@ public final class IntBuffer extends Buffer
      * @return a duplicated buffer that shares its content with this buffer.
      */
     public IntBuffer duplicate () {
-      IntBuffer buf = new IntBuffer(
-        (ByteBuffer)byteBuffer.duplicate());
+      IntBuffer buf = new IntBuffer(byteBuffer.duplicate());
       buf.limit = limit;
       buf.position = position;
       buf.mark = mark;

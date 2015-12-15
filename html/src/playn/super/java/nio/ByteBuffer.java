@@ -285,7 +285,7 @@ public final class ByteBuffer extends Buffer implements Comparable<ByteBuffer>, 
 // if (position == limit) {
 // throw new BufferUnderflowException();
 // }
-        return (byte)byteArray.get(position++);
+        return byteArray.get(position++);
     }
     /** Reads bytes from the current position into the specified byte array and increases the
      * position by the number of bytes read.
@@ -340,7 +340,7 @@ public final class ByteBuffer extends Buffer implements Comparable<ByteBuffer>, 
 // if (index < 0 || index >= limit) {
 // throw new IndexOutOfBoundsException();
 // }
-        return (byte)byteArray.get(index);
+        return byteArray.get(index);
     }
 
     /** Returns the char at the current position and increases the position by 2.
