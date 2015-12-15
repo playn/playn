@@ -146,7 +146,7 @@ public abstract class Graphics {
   /**
    * Informs the graphics system that the main framebuffer scaled has changed.
    */
-  protected void scaledChanged (Scale scale) {
+  protected void scaleChanged (Scale scale) {
     // TODO: should we allow this to be reacted to? it only happens on the desktop Java backend...
     this.scale = scale;
   }

@@ -147,7 +147,7 @@ public class LWJGLGraphics extends JavaGraphics {
   }
 
   private void updateViewport (Scale scale, float displayWidth, float displayHeight) {
-    scaledChanged(scale);
+    scaleChanged(scale);
     viewportChanged(scale.scaledCeil(displayWidth), scale.scaledCeil(displayHeight));
   }
 }
