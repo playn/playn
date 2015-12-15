@@ -23,6 +23,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLDecoder;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
 
 import java.util.Arrays;
 import javax.imageio.ImageIO;
@@ -143,7 +145,7 @@ public class JavaAssets extends Assets {
   }
 
   @Override
-  public byte[] getBytesSync(String path) throws Exception {
+  public ByteBuffer getBytesSync(String path) throws Exception {
     return requireResource(path).readBytes();
   }
 
@@ -226,11 +228,11 @@ public class JavaAssets extends Assets {
     public Font createFont() throws Exception {
       return Font.createFont(Font.TRUETYPE_FONT, openStream());
     }
-    public byte[] readBytes() throws IOException {
-      return toByteArray(openStream());
+    public ByteBuffer readBytes() throws IOException {
+      return ByteBuffer.wrap(toByteArray(openStream()));
     }
     public String readString() throws Exception {
-      return new String(readBytes(), "UTF-8");
+      return new String(toByteArray(openStream()), "UTF-8");
     }
   }
 
@@ -252,7 +254,7 @@ public class JavaAssets extends Assets {
     public FileResource(File file) {
       this.file = file;
     }
-    public InputStream openStream() throws IOException {
+    public FileInputStream openStream() throws IOException {
       return new FileInputStream(file);
     }
     public BufferedImage readImage() throws IOException {
@@ -264,14 +266,12 @@ public class JavaAssets extends Assets {
     @Override public Font createFont() throws Exception {
       return Font.createFont(Font.TRUETYPE_FONT, file);
     }
-    @Override public byte[] readBytes() throws IOException {
-      InputStream in = openStream();
-      try {
-        byte[] buffer = new byte[(int)file.length()]; // no >2GB files
-        in.read(buffer);
-        return buffer;
-      } finally {
-        in.close();
+    @Override public ByteBuffer readBytes() throws IOException {
+      try (FileInputStream in = openStream();
+           FileChannel fc = in.getChannel()) {
+        ByteBuffer buf = ByteBuffer.allocateDirect((int)fc.size()); // no >2GB files
+        fc.read(buf);
+        return buf;
       }
     }
   }

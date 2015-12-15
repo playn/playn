@@ -17,10 +17,13 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 
 import org.robovm.apple.coregraphics.CGImage;
 import org.robovm.apple.foundation.NSBundle;
 import org.robovm.apple.foundation.NSData;
+import org.robovm.apple.foundation.NSDataReadingOptions;
+import org.robovm.apple.foundation.NSErrorException;
 import org.robovm.apple.uikit.UIImage;
 
 import playn.core.*;
@@ -76,23 +79,19 @@ public class RoboAssets extends Assets {
   @Override
   public String getTextSync(String path) throws Exception {
     plat.log().debug("Loading text " + path);
-    return new String(getBytesSync(path), "UTF-8");
+    ByteBuffer data = getBytesSync(path);
+    byte[] bytes;
+    if (data.hasArray()) bytes = data.array();
+    else data.get(bytes = new byte[data.remaining()]);
+    return new String(bytes, "UTF-8");
   }
 
   @Override
-  public byte[] getBytesSync(String path) throws Exception {
+  public ByteBuffer getBytesSync(String path) throws Exception {
     File fullPath = resolvePath(path);
     plat.log().debug("Loading bytes " + fullPath);
-    FileInputStream in = new FileInputStream(fullPath);
-    try {
-      byte[] data = new byte[(int)fullPath.length()];
-      if (in.read(data) != data.length) {
-        throw new IOException("Failed to read entire file: " + fullPath);
-      }
-      return data;
-    } finally {
-      in.close();
-    }
+    // this NSData will release resources when garbage collected
+    return NSData.read(fullPath, READ_OPTS).asByteBuffer();
   }
 
   @Override protected ImageImpl.Data load (String path) throws Exception {
@@ -143,4 +142,7 @@ public class RoboAssets extends Assets {
     plat.log().warn("Missing sound: " + path);
     return new Sound.Error(new FileNotFoundException(path));
   }
+
+  protected static final NSDataReadingOptions READ_OPTS = new NSDataReadingOptions(
+    NSDataReadingOptions.MappedIfSafe.value()|NSDataReadingOptions.Uncached.value());
 }
