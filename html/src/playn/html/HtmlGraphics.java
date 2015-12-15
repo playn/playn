@@ -136,9 +136,11 @@ public class HtmlGraphics extends Graphics {
   public void setSize (int width, int height) {
     rootElement.getStyle().setWidth(width, Unit.PX);
     rootElement.getStyle().setHeight(height, Unit.PX);
-    // set the canvas size to the pixel size, this controls the framebuffer size
-    canvas.setWidth(scale().scaledCeil(width));
-    canvas.setHeight(scale().scaledCeil(height));
+    // the canvas size dictates the frame bufer size; we always want the frame buffer to contain as
+    // many pixels are needed for maximum native resolution, so we scale by the device pixel ratio
+    Scale deviceScale = new Scale(HtmlPlatform.devicePixelRatio());
+    canvas.setWidth(deviceScale.scaledCeil(width));
+    canvas.setHeight(deviceScale.scaledCeil(height));
     // set the canvas's CSS size to the display unit size, this ensures that hi-dpi canvases are
     // displayed at the proper size in the page
     canvas.getStyle().setWidth(width, Style.Unit.PX);
