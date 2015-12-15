@@ -72,7 +72,7 @@ public abstract class GameActivity extends Activity {
     // Make sure the AndroidManifest.xml is set up correctly.
     try {
       ActivityInfo info = this.getPackageManager().getActivityInfo(
-        new ComponentName(appctx, this.getPackageName() + "." + this.getLocalClassName()), 0);
+        new ComponentName(appctx, this.getClass()), 0);
       if ((info.configChanges & REQUIRED_CONFIG_CHANGES) != REQUIRED_CONFIG_CHANGES) {
         new AlertDialog.Builder(this).setMessage(
           "Unable to guarantee application will handle configuration changes. " +

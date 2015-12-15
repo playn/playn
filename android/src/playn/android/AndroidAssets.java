@@ -21,6 +21,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.ByteBuffer;
 
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
@@ -185,23 +186,16 @@ public class AndroidAssets extends Assets {
   }
 
   @Override
-  public byte[] getBytesSync(String path) throws Exception {
-      InputStream is = openAsset(path);
-      try {
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        byte[] buf = new byte[1024];
-        while (true) {
-          int r = is.read(buf);
-          if (r == -1) {
-            break;
-          }
-          out.write(buf, 0, r);
-        }
-
-        return out.toByteArray();
-      } finally {
-        is.close();
-      }
+  public ByteBuffer getBytesSync(String path) throws Exception {
+    InputStream is = openAsset(path);
+    try {
+      int size = is.available();
+      byte[] data = new byte[size];
+      is.read(data);
+      return ByteBuffer.wrap(data);
+    } finally {
+      is.close();
+    }
   }
 
   @Override protected ImageImpl createImage(boolean async, int rwid, int rhei, String source) {

@@ -20,9 +20,7 @@ import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-
 import org.robovm.apple.foundation.NSData;
-import org.robovm.apple.foundation.NSDataReadingOptions;
 import org.robovm.apple.foundation.NSErrorException;
 
 import static playn.robovm.OpenAL.*;
@@ -101,7 +99,7 @@ public class CAFLoader {
     NSData data = null;
     try {
       // mmap (if possible) the audio file for efficient reading/uploading
-      data = NSData.read(path, READ_OPTS);
+      data = NSData.read(path, RoboAssets.READ_OPTS);
       load(data.asByteBuffer(), path.getName(), bufferId);
     } catch (NSErrorException e) {
       throw new RuntimeException(e.toString());
@@ -169,7 +167,4 @@ public class CAFLoader {
       throw new RuntimeException(uee);
     }
   }
-
-  private static final NSDataReadingOptions READ_OPTS = new NSDataReadingOptions(
-    NSDataReadingOptions.MappedIfSafe.value()|NSDataReadingOptions.Uncached.value());
 }

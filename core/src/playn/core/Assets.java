@@ -15,6 +15,8 @@
  */
 package playn.core;
 
+import java.nio.ByteBuffer;
+
 import react.RFuture;
 import react.RPromise;
 
@@ -152,7 +154,7 @@ public abstract class Assets {
    * @throws UnsupportedOperationException on platforms that cannot support synchronous asset
    * loading (e.g. HTML5 and Flash).
    */
-  public abstract byte[] getBytesSync (String path) throws Exception;
+  public abstract ByteBuffer getBytesSync (String path) throws Exception;
 
   /**
    * Loads binary data asynchronously. The returned state instance provides a means to listen for
@@ -160,8 +162,8 @@ public abstract class Assets {
    *
    * @param path the path to the binary asset.
    */
-  public RFuture<byte[]> getBytes (final String path) {
-    final RPromise<byte[]> result = exec.deferredPromise();
+  public RFuture<ByteBuffer> getBytes (final String path) {
+    final RPromise<ByteBuffer> result = exec.deferredPromise();
     exec.invokeAsync(new Runnable() {
       public void run () {
         try {
