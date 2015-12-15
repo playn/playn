@@ -163,11 +163,12 @@ public class HtmlAssets extends Assets {
      * running on IE.
      */
     try {
-      return doXhr(fullPath,  XMLHttpRequest.ResponseType.Default).map(new Function<XMLHttpRequest,String>() {
-        public String apply (XMLHttpRequest xhr) {
-          return xhr.getResponseText();
-        }
-      });
+      return doXhr(fullPath, XMLHttpRequest.ResponseType.Default).
+        map(new Function<XMLHttpRequest,String>() {
+          public String apply (XMLHttpRequest xhr) {
+            return xhr.getResponseText();
+          }
+        });
     } catch (JavaScriptException e) {
       if (Window.Navigator.getUserAgent().indexOf("MSIE") != -1) {
         return doXdr(fullPath).map(new Function<XDomainRequest,String>() {
@@ -190,11 +191,12 @@ public class HtmlAssets extends Assets {
   public RFuture<ByteBuffer> getBytes(final String path) {
     if (!TypedArrays.isSupported()) return RFuture.failure(
       new UnsupportedOperationException("TypedArrays not supported by this browser."));
-    return doXhr(pathPrefix + path, XMLHttpRequest.ResponseType.ArrayBuffer).map(new Function<XMLHttpRequest,ByteBuffer>() {
-      public ByteBuffer apply (XMLHttpRequest xhr) {
-        return TypedArrayHelper.wrap(xhr.getResponseArrayBuffer());
-      }
-    });
+    return doXhr(pathPrefix + path, XMLHttpRequest.ResponseType.ArrayBuffer).
+      map(new Function<XMLHttpRequest,ByteBuffer>() {
+        public ByteBuffer apply (XMLHttpRequest xhr) {
+          return TypedArrayHelper.wrap(xhr.getResponseArrayBuffer());
+        }
+      });
   }
 
   @Override protected ImageImpl.Data load (String path) throws Exception {
@@ -244,17 +246,15 @@ public class HtmlAssets extends Assets {
     return result;
   }
 
-  private RFuture<XMLHttpRequest> doXhr(final String path, final XMLHttpRequest.ResponseType responseType) {
+  private RFuture<XMLHttpRequest> doXhr(final String path, XMLHttpRequest.ResponseType rtype) {
     final RPromise<XMLHttpRequest> result = RPromise.create();
     XMLHttpRequest xhr = XMLHttpRequest.create();
-    
-    // Strangely, IE needs the XHR to be opened before setting the response type.
+
+    // IE needs the XHR to be opened before setting the response type
     if (LOG_XHR_SUCCESS) plat.log().debug("xhr.open('GET', '" + path + "')...");
     xhr.open("GET", path);
 
-    // Sets the desired response type.
-    xhr.setResponseType(responseType);
-
+    xhr.setResponseType(rtype);
     xhr.setOnReadyStateChange(new ReadyStateChangeHandler() {
       @Override public void onReadyStateChange(XMLHttpRequest xhr) {
         int readyState = xhr.getReadyState();
@@ -274,8 +274,7 @@ public class HtmlAssets extends Assets {
         }
       }
     });
-//    if (LOG_XHR_SUCCESS) plat.log().debug("xhr.open('GET', '" + path + "')...");
-//    xhr.open("GET", path);
+
     if (LOG_XHR_SUCCESS) plat.log().debug("xhr.send()...");
     xhr.send();
     return result;
