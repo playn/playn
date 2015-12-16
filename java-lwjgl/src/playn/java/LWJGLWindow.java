@@ -60,10 +60,7 @@ public class LWJGLWindow {
     glfwShowWindow(window);
   }
 
-  public void update() {
-    glfwPollEvents();
-    glfwSwapBuffers(window);    
-  }
+  public void update() { glfwPollEvents(); }
   
   public void shutdown (){
     glfwDestroyWindow(window);   
@@ -78,14 +75,7 @@ public class LWJGLWindow {
   public boolean isCloseRequested () { return glfwWindowShouldClose(window) == GL_TRUE; }
 
 
-  public void sync(int interval) {
-    //TODO: do we really need this?
-    try {
-      Thread.currentThread().wait(interval);
-    } catch (Exception e) {
-      throw new RuntimeException(e);
-    }
-  }
+  public void sync(int interval) {glfwSwapInterval(interval);}
 
   public float calPixelScaleFactor() {
     long monitor = glfwGetPrimaryMonitor();
