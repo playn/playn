@@ -18,15 +18,12 @@ import java.awt.image.DataBuffer;
 import java.awt.image.DataBufferByte;
 import java.awt.image.DataBufferInt;
 import java.nio.ByteBuffer;
-import java.util.Arrays;
 
-import org.lwjgl.LWJGLException;
-import org.lwjgl.opengl.Display;
-import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 
-import playn.core.*;
+import playn.core.Scale;
+import playn.core.Texture;
 import pythagoras.f.Dimension;
 import pythagoras.f.IDimension;
 
@@ -34,22 +31,25 @@ public class LWJGLGraphics extends JavaGraphics {
 
   private final Dimension screenSize = new Dimension();
   private final JavaPlatform.Config config;
-
-  public LWJGLGraphics(JavaPlatform plat) {
+  private final LWJGLWindow window;
+  
+  public LWJGLGraphics(JavaPlatform plat, LWJGLWindow window) {
     super(plat, new LWJGLGL20(), Scale.ONE); // real scale factor set in init()
     this.config = plat.config;
+    this.window = window;
   }
 
   void checkScaleFactor () {
-    float scaleFactor = Display.getPixelScaleFactor();
+    float scaleFactor = window.calPixelScaleFactor();
+    Dimension dim = window.size();
     if (scaleFactor != scale().factor) updateViewport(
-      new Scale(scaleFactor), Display.getWidth(), Display.getHeight());
+        new Scale(scaleFactor), dim.width, dim.height);
   }
 
   @Override public IDimension screenSize() {
-    DisplayMode mode = Display.getDesktopDisplayMode();
-    screenSize.width = scale().invScaled(mode.getWidth());
-    screenSize.height = scale().invScaled(mode.getHeight());
+    IDimension size = window.destopSize();
+    screenSize.width = scale().invScaled(size.width());
+    screenSize.height = scale().invScaled(size.height());
     return screenSize;
   }
 
@@ -58,15 +58,11 @@ public class LWJGLGraphics extends JavaGraphics {
   }
 
   @Override protected void init () {
-    setDisplayMode(scale().scaledCeil(config.width), scale().scaledCeil(config.height),
-                   config.fullscreen);
-    try {
-      System.setProperty("org.lwjgl.opengl.Display.enableHighDPI", "true");
-      Display.create();
-      checkScaleFactor();
-    } catch (LWJGLException e) {
-      throw new RuntimeException(e);
-    }
+    int width = scale().scaledCeil(config.width);
+    int height = scale().scaledCeil(config.height);
+    setDisplayMode(width, height,config.fullscreen);
+    window.init();
+    checkScaleFactor();
   }
 
   @Override protected void upload (BufferedImage img, Texture tex) {
@@ -108,42 +104,10 @@ public class LWJGLGraphics extends JavaGraphics {
   }
 
   protected void setDisplayMode(int width, int height, boolean fullscreen) {
-    try {
-      // check if current mode is suitable
-      DisplayMode mode = Display.getDisplayMode();
-      if (fullscreen == Display.isFullscreen() &&
-          mode.getWidth() == width && mode.getHeight() == height) return;
-
-      if (!fullscreen) mode = new DisplayMode(width, height);
-      else {
-        // try and find a mode matching width and height
-        DisplayMode matching = null;
-        for (DisplayMode dm : Display.getAvailableDisplayModes()) {
-          if (dm.getWidth() == width && dm.getHeight() == height && dm.isFullscreenCapable()) {
-            matching = dm;
-          }
-        }
-        if (matching != null) mode = matching;
-        else plat.log().info("Could not find a matching fullscreen mode, available: " +
-                             Arrays.asList(Display.getAvailableDisplayModes()));
-      }
-
-      plat.log().debug("Updating display mode: " + mode + ", fullscreen: " + fullscreen);
-      // TODO: fix crashes when fullscreen is toggled repeatedly
-      Scale scale;
-      if (fullscreen) {
-        Display.setDisplayModeAndFullscreen(mode);
-        scale = Scale.ONE;
-        // TODO: fix alt-tab, maybe add a key listener or something?
-      } else {
-        Display.setDisplayMode(mode);
-        scale = new Scale(Display.getPixelScaleFactor());
-      }
-      updateViewport(scale, mode.getWidth(), mode.getHeight());
-
-    } catch (LWJGLException ex) {
-      throw new RuntimeException(ex);
-    }
+    if (!window.setSize(width, height, fullscreen)) return;
+    Scale scale = fullscreen ? Scale.ONE : new Scale(window.calPixelScaleFactor());
+    IDimension size = window.size();
+    updateViewport(scale, size.width(), size.height());
   }
 
   private void updateViewport (Scale scale, float displayWidth, float displayHeight) {

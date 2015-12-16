@@ -18,8 +18,6 @@ package playn.java;
 import java.io.File;
 import java.lang.reflect.Method;
 
-import org.lwjgl.opengl.Display;
-
 /**
  * Implements the PlayN platform for Java, based on LWJGL. Due to the way LWJGL works, a game must
  * create the platform instance, then perform any of its own initialization that requires access to
@@ -27,18 +25,20 @@ import org.lwjgl.opengl.Display;
  * not return until the game exits.
  */
 public class LWJGLPlatform extends JavaPlatform {
-
+  final private LWJGLWindow window;
+  
   public LWJGLPlatform (Config config) {
     super(config);
+    window = new LWJGLWindow(config, log());
   }
 
-  @Override public void setTitle (String title) { Display.setTitle(title); }
+  @Override public void setTitle (String title) { window.setTitle(title); }
 
   @Override public void start () {
-    boolean wasActive = Display.isActive();
-    while (!Display.isCloseRequested()) {
+    boolean wasActive = window.isActive();
+    while (!window.isCloseRequested()) {
       // notify the app if lose or regain focus (treat said as pause/resume)
-      boolean newActive = Display.isActive();
+      boolean newActive = window.isActive();
       if (wasActive != newActive) {
         dispatchEvent(lifecycle, wasActive ? Lifecycle.PAUSE : Lifecycle.RESUME);
         wasActive = newActive;
@@ -46,11 +46,12 @@ public class LWJGLPlatform extends JavaPlatform {
       ((LWJGLGraphics)graphics()).checkScaleFactor();
       // process frame, if we don't need to provide true pausing
       if (newActive || !config.truePause) processFrame();
-      Display.update();
+      window.update();
       // sleep until it's time for the next frame
-      Display.sync(60);
+      window.sync(60);
     }
-
+    
+    window.shutdown();
     shutdown();
   }
 
@@ -68,7 +69,7 @@ public class LWJGLPlatform extends JavaPlatform {
     }
   }
 
-  @Override protected JavaGraphics createGraphics () { return new LWJGLGraphics(this); }
+  @Override protected JavaGraphics createGraphics () { return new LWJGLGraphics(this, window); }
   @Override protected JavaInput createInput () { return new LWJGLInput(this); }
 
   private boolean isInJavaWebStart () {
