@@ -29,6 +29,9 @@ public class TestsGameHtml implements EntryPoint {
     try {
       config.scaleFactor = Float.parseFloat(Window.Location.getParameter("scale"));
     } catch (Exception e) {} // oh well
+    try {
+      config.frameBufferPixelRatio = Float.parseFloat(Window.Location.getParameter("fbpr"));
+    } catch (Exception e) {} // oh well
     HtmlPlatform plat = new HtmlPlatform(config);
     plat.setTitle("Tests");
     plat.assets().setPathPrefix("testsgame/");

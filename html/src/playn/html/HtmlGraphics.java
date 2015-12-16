@@ -47,6 +47,7 @@ public class HtmlGraphics extends Graphics {
   private final CanvasElement canvas;
   private final Point mousePoint = new Point();
   private final Dimension screenSize = new Dimension();
+  private final float frameBufferPixelRatio;
   private final float mouseScale;
 
   private static final String HEIGHT_TEXT =
@@ -58,6 +59,18 @@ public class HtmlGraphics extends Graphics {
 
   public HtmlGraphics(Platform plat, HtmlPlatform.Config config) {
     super(plat, new HtmlGL20(), new Scale(config.scaleFactor));
+
+    // note our frame buffer pixel ratio; this is probably either equal to config.scaleFactor (1 ==
+    // 1 on a normal display with no funny business, or 2 == 2 on a HiDPI display with standard two
+    // frame buffer pixels to one logical pixel, or 1 == 1 on a HiDPI display where we've chosen
+    // to "scale down" the frame buffer to reduce strain on the GPU), but it could also be 2x
+    // config.scaleFactor in cases where we're on a HiDPI display but we want to treat it like a
+    // *really* high resolution normal display and just have super tiny pixels
+    frameBufferPixelRatio = config.frameBufferPixelRatio;
+
+    // our mouse scale is our configured scale divided by our device scale factor; when we're
+    // displaying at our device scale factor, then it's one and everything is simple
+    mouseScale = config.scaleFactor / frameBufferPixelRatio;
 
     Document doc = Document.get();
     dummyCanvas = doc.createCanvasElement();
@@ -82,10 +95,6 @@ public class HtmlGraphics extends Graphics {
     measureElement.getStyle().setOverflow(Style.Overflow.VISIBLE);
     measureElement.getStyle().setWhiteSpace(Style.WhiteSpace.NOWRAP);
     root.appendChild(measureElement);
-
-    // our mouse scale is our configured scale divided by our device scale factor; when we're
-    // displaying at our device scale factor, then it's one and everything is simple
-    mouseScale = config.scaleFactor / HtmlPlatform.devicePixelRatio();
 
     canvas = Document.get().createCanvasElement();
     root.appendChild(canvas);
@@ -136,13 +145,13 @@ public class HtmlGraphics extends Graphics {
   public void setSize (int width, int height) {
     rootElement.getStyle().setWidth(width, Unit.PX);
     rootElement.getStyle().setHeight(height, Unit.PX);
-    // the canvas size dictates the frame bufer size; we always want the frame buffer to contain as
-    // many pixels are needed for maximum native resolution, so we scale by the device pixel ratio
-    Scale deviceScale = new Scale(HtmlPlatform.devicePixelRatio());
-    canvas.setWidth(deviceScale.scaledCeil(width));
-    canvas.setHeight(deviceScale.scaledCeil(height));
-    // set the canvas's CSS size to the display unit size, this ensures that hi-dpi canvases are
-    // displayed at the proper size in the page
+    // the frame buffer may be larger (or smaller) than the logical size, depending on whether
+    // we're on a HiDPI display, or how the game has configured things (maybe they're scaling down
+    // from native resolution to improve performance)
+    Scale fbScale = new Scale(frameBufferPixelRatio);
+    canvas.setWidth(fbScale.scaledCeil(width));
+    canvas.setHeight(fbScale.scaledCeil(height));
+    // set the canvas's CSS size to the logical size; the browser works in logical pixels
     canvas.getStyle().setWidth(width, Style.Unit.PX);
     canvas.getStyle().setHeight(height, Style.Unit.PX);
     viewportChanged(canvas.getWidth(), canvas.getHeight());

@@ -38,6 +38,9 @@ public class HtmlPlatform extends Platform {
     /** The HiDPI scale factor to use. */
     public float scaleFactor = devicePixelRatio();
 
+    /** The number of frame buffer pixels per logical pixel. */
+    public float frameBufferPixelRatio = devicePixelRatio();
+
     /** The id of the {@code <div>} element where the game will be inserted. */
     public String rootId = "playn-root";
 
