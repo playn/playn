@@ -25,7 +25,8 @@ import java.lang.reflect.Method;
  * not return until the game exits.
  */
 public class LWJGLPlatform extends JavaPlatform {
-  final private LWJGLWindow window;
+  final LWJGLWindow window;
+  private LWJGLInput input;
   
   public LWJGLPlatform (Config config) {
     super(config);
@@ -50,7 +51,7 @@ public class LWJGLPlatform extends JavaPlatform {
       // sleep until it's time for the next frame
       window.sync(60);
     }
-    
+    if (input != null) input.shutdown();
     window.shutdown();
     shutdown();
   }

@@ -14,10 +14,10 @@ import pythagoras.f.IDimension;
 
 public class LWJGLWindow {
   
+  final private Dimension desktopSize;
   private final Config config;
   private final Log log;
-  private long window;
-  final private Dimension desktopSize;
+  protected long handle;
   
   public LWJGLWindow (Config config, Log logger) {
     this.config = config;
@@ -52,27 +52,27 @@ public class LWJGLWindow {
         width = vidMode.width();
         height = vidMode.height();
     }
-    window = glfwCreateWindow(width, height, config.appName, monitor, 
+    handle = glfwCreateWindow(width, height, config.appName, monitor, 
         config.fullscreen ? 1:0 );
-    if(window == 0) throw new RuntimeException("Failed to create window");
-    glfwMakeContextCurrent(window);
+    if(handle == 0) throw new RuntimeException("Failed to create window");
+    glfwMakeContextCurrent(handle);
     //TODO: do we need this GLContext.createFromCurrent();
-    glfwShowWindow(window);
+    glfwShowWindow(handle);
   }
 
   public void update() { glfwPollEvents(); }
   
   public void shutdown (){
-    glfwDestroyWindow(window);   
+    glfwDestroyWindow(handle);   
     glfwTerminate();
   }
 
 
-  public void setTitle (String title) { glfwSetWindowTitle(window, title);}
+  public void setTitle (String title) { glfwSetWindowTitle(handle, title);}
 
-  public boolean isActive () { return glfwGetWindowAttrib(window, GLFW_VISIBLE) > 0; }
+  public boolean isActive () { return glfwGetWindowAttrib(handle, GLFW_VISIBLE) > 0; }
 
-  public boolean isCloseRequested () { return glfwWindowShouldClose(window) == GL_TRUE; }
+  public boolean isCloseRequested () { return glfwWindowShouldClose(handle) == GL_TRUE; }
 
 
   public void sync(int interval) {glfwSwapInterval(interval);}
@@ -88,7 +88,7 @@ public class LWJGLWindow {
   public Dimension size(){
     IntBuffer wBuf = IntBuffer.allocate(1);
     IntBuffer hBuf = IntBuffer.allocate(1);
-    glfwGetWindowSize(window, wBuf, hBuf);
+    glfwGetWindowSize(handle, wBuf, hBuf);
     return new Dimension(wBuf.get(0), hBuf.get(0));
   }
 
@@ -99,9 +99,7 @@ public class LWJGLWindow {
       log.warn("fullscreen cannot be changed via setSize, use config.fullscreen instead");
       return false;
     }
-    glfwSetWindowSize(window, width, height);
+    glfwSetWindowSize(handle, width, height);
     return true;
   }
-
-
 }
