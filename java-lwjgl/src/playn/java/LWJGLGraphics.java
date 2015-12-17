@@ -18,55 +18,156 @@ import java.awt.image.DataBuffer;
 import java.awt.image.DataBufferByte;
 import java.awt.image.DataBufferInt;
 import java.nio.ByteBuffer;
-import java.util.Arrays;
+import java.nio.IntBuffer;
 
-import org.lwjgl.LWJGLException;
-import org.lwjgl.opengl.Display;
-import org.lwjgl.opengl.DisplayMode;
+import org.lwjgl.BufferUtils;
+import org.lwjgl.opengl.GL30;
+import org.lwjgl.opengl.GL11;
+
+import org.lwjgl.glfw.GLFWErrorCallback;
+import org.lwjgl.glfw.GLFWFramebufferSizeCallback;
+import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
+import org.lwjgl.opengl.GL;
+import static org.lwjgl.glfw.GLFW.*;
 
-import playn.core.*;
+import playn.core.Scale;
+import playn.core.Texture;
 import pythagoras.f.Dimension;
 import pythagoras.f.IDimension;
 
 public class LWJGLGraphics extends JavaGraphics {
 
+  // we have to keep strong references to GLFW callbacks
+  private final GLFWErrorCallback errorCallback;
+  private final GLFWFramebufferSizeCallback fbSizeCallback = new GLFWFramebufferSizeCallback() {
+    public void invoke (long window, int width, int height) {
+      viewportAndScaleChanged(width, height);
+    }
+  };
+
+  private final Dimension desktopSize = new Dimension();
   private final Dimension screenSize = new Dimension();
   private final JavaPlatform.Config config;
 
-  public LWJGLGraphics(JavaPlatform plat) {
-    super(plat, new LWJGLGL20(), Scale.ONE); // real scale factor set in init()
-    this.config = plat.config;
+  protected long window;
+  // private final JavaPlatform.Config config;
+  // private final Log log;
+
+  public LWJGLGraphics(JavaPlatform jplat) {
+    super(jplat, new LWJGLGL20(), Scale.ONE); // real scale factor set in init()
+    this.config = jplat.config;
+
+    if (glfwInit() != GL11.GL_TRUE) throw new RuntimeException("Failed to init GLFW.");
+    glfwSetErrorCallback(errorCallback = new GLFWErrorCallback() {
+      @Override public void invoke(int error, long description) {
+        plat.log().error("GL Error (" + error + "):" + getDescription(description));
+      }
+    });
+
+    long monitor = glfwGetPrimaryMonitor();
+    GLFWVidMode vidMode = glfwGetVideoMode(monitor);
+    desktopSize.setSize(vidMode.width(), vidMode.height());
+
+    glfwDefaultWindowHints();
+    glfwWindowHint(GLFW_RESIZABLE, GL11.GL_FALSE);
+    glfwWindowHint(GLFW_VISIBLE, GL11.GL_FALSE);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
+    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, 1);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
   }
 
-  void checkScaleFactor () {
-    float scaleFactor = Display.getPixelScaleFactor();
-    if (scaleFactor != scale().factor) updateViewport(
-      new Scale(scaleFactor), Display.getWidth(), Display.getHeight());
+  public void update () {
+    glfwPollEvents();
   }
 
-  @Override public IDimension screenSize() {
-    DisplayMode mode = Display.getDesktopDisplayMode();
-    screenSize.width = scale().invScaled(mode.getWidth());
-    screenSize.height = scale().invScaled(mode.getHeight());
+  public void shutdown () {
+    glfwDestroyWindow(window);
+    glfwTerminate();
+  }
+
+  public void setTitle (String title) {
+    if (window != 0L) glfwSetWindowTitle(window, title);
+  }
+
+  public boolean isActive () {
+    return glfwGetWindowAttrib(window, GLFW_VISIBLE) > 0;
+  }
+
+  public boolean isCloseRequested () {
+    return glfwWindowShouldClose(window) == GL11.GL_TRUE;
+  }
+
+  public void sync () {
+    glfwSwapBuffers(window);
+  }
+
+  public Dimension size () {
+    IntBuffer wBuf = BufferUtils.createIntBuffer(1), hBuf = BufferUtils.createIntBuffer(1);
+    glfwGetWindowSize(window, wBuf, hBuf);
+    return new Dimension(wBuf.get(0), hBuf.get(0));
+  }
+
+  public Dimension framebufferSize () {
+    IntBuffer fbWid = BufferUtils.createIntBuffer(1), fbHei = BufferUtils.createIntBuffer(1);
+    glfwGetFramebufferSize(window, fbWid, fbHei);
+    return new Dimension(fbWid.get(0), fbHei.get(0));
+  }
+
+  @Override public IDimension screenSize () {
+    screenSize.width = scale().invScaled(desktopSize.width);
+    screenSize.height = scale().invScaled(desktopSize.height);
     return screenSize;
   }
 
   @Override public void setSize (int width, int height, boolean fullscreen) {
-    setDisplayMode(width, height, fullscreen);
+    if (config.fullscreen != fullscreen) {
+      plat.log().warn("fullscreen cannot be changed via setSize, use config.fullscreen instead");
+      return;
+    }
+    glfwSetWindowSize(window, width, height);
+    plat.log().info("setSize: " + width + "x" + height);
+    viewSizeM.setSize(width, height);
+    viewportAndScaleChanged();
+  }
+
+  private void viewportAndScaleChanged () {
+    IntBuffer fbWid = BufferUtils.createIntBuffer(1), fbHei = BufferUtils.createIntBuffer(1);
+    glfwGetFramebufferSize(window, fbWid, fbHei);
+    viewportAndScaleChanged(fbWid.get(0), fbHei.get(0));
+  }
+
+  private void viewportAndScaleChanged (int fbWidth, int fbHeight) {
+    float scale = fbWidth / viewSizeM.width;
+    plat.log().info("viewportAndScaleChanged: " + fbWidth + "x" + fbHeight + "@" + scale);
+    if (scale != scale().factor) scaleChanged(new Scale(scale));
+    viewportChanged(fbWidth, fbHeight);
   }
 
   @Override protected void init () {
-    setDisplayMode(scale().scaledCeil(config.width), scale().scaledCeil(config.height),
-                   config.fullscreen);
-    try {
-      System.setProperty("org.lwjgl.opengl.Display.enableHighDPI", "true");
-      Display.create();
-      checkScaleFactor();
-    } catch (LWJGLException e) {
-      throw new RuntimeException(e);
+    int width = config.width, height = config.height;
+    long monitor = 0;
+    if (config.fullscreen) {
+      monitor = glfwGetPrimaryMonitor();
+      GLFWVidMode vidMode = glfwGetVideoMode(monitor);
+      width = vidMode.width();
+      height = vidMode.height();
     }
+    window = glfwCreateWindow(width, height, config.appName, monitor, 0);
+    if (window == 0) throw new RuntimeException("Failed to create window; see error log.");
+
+    glfwSetFramebufferSizeCallback(window, fbSizeCallback);
+    glfwMakeContextCurrent(window);
+    glfwSwapInterval(1);
+    setSize(config.width, config.height, config.fullscreen);
+    glfwShowWindow(window);
+
+    GL.createCapabilities();
+    IntBuffer vao = BufferUtils.createIntBuffer(1);
+    GL30.glGenVertexArrays(vao);
+    GL30.glBindVertexArray(vao.get(0));
   }
 
   @Override protected void upload (BufferedImage img, Texture tex) {
@@ -105,49 +206,5 @@ public class LWJGLGraphics extends JavaGraphics {
     GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA, bitmap.getWidth(), bitmap.getHeight(),
                       0, format, type, bbuf);
     gl.checkError("updateTexture");
-  }
-
-  protected void setDisplayMode(int width, int height, boolean fullscreen) {
-    try {
-      // check if current mode is suitable
-      DisplayMode mode = Display.getDisplayMode();
-      if (fullscreen == Display.isFullscreen() &&
-          mode.getWidth() == width && mode.getHeight() == height) return;
-
-      if (!fullscreen) mode = new DisplayMode(width, height);
-      else {
-        // try and find a mode matching width and height
-        DisplayMode matching = null;
-        for (DisplayMode dm : Display.getAvailableDisplayModes()) {
-          if (dm.getWidth() == width && dm.getHeight() == height && dm.isFullscreenCapable()) {
-            matching = dm;
-          }
-        }
-        if (matching != null) mode = matching;
-        else plat.log().info("Could not find a matching fullscreen mode, available: " +
-                             Arrays.asList(Display.getAvailableDisplayModes()));
-      }
-
-      plat.log().debug("Updating display mode: " + mode + ", fullscreen: " + fullscreen);
-      // TODO: fix crashes when fullscreen is toggled repeatedly
-      Scale scale;
-      if (fullscreen) {
-        Display.setDisplayModeAndFullscreen(mode);
-        scale = Scale.ONE;
-        // TODO: fix alt-tab, maybe add a key listener or something?
-      } else {
-        Display.setDisplayMode(mode);
-        scale = new Scale(Display.getPixelScaleFactor());
-      }
-      updateViewport(scale, mode.getWidth(), mode.getHeight());
-
-    } catch (LWJGLException ex) {
-      throw new RuntimeException(ex);
-    }
-  }
-
-  private void updateViewport (Scale scale, float displayWidth, float displayHeight) {
-    scaleChanged(scale);
-    viewportChanged(scale.scaledCeil(displayWidth), scale.scaledCeil(displayHeight));
   }
 }

@@ -22,8 +22,8 @@ import org.eclipse.swt.opengl.GLData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
-import org.lwjgl.LWJGLException;
-import org.lwjgl.opengl.GLContext;
+// import org.lwjgl.LWJGLException;
+// import org.lwjgl.opengl.GLContext;
 
 public class SWTGraphics extends LWJGLGraphics {
 
@@ -66,16 +66,18 @@ public class SWTGraphics extends LWJGLGraphics {
     // viewSizeChanged(rawWidth, rawHeight);
   }
 
+  // TODO: all this hackery needs rethinking for LWJGL3
+
   @Override protected void init () {} // noop!
-  @Override protected void setDisplayMode (int width, int height, boolean fullscreen) {} // noop!
+  // @Override protected void setDisplayMode (int width, int height, boolean fullscreen) {} // noop!
 
   private void makeCurrent () {
     canvas.setCurrent();
-    try {
-      GLContext.useContext(canvas);
-    } catch (LWJGLException e) {
-      throw new RuntimeException(e);
-    }
+    // try {
+    //   GLContext.useContext(canvas);
+    // } catch (LWJGLException e) {
+    //   throw new RuntimeException(e);
+    // }
   }
 
   void onBeforeFrame () { makeCurrent(); }

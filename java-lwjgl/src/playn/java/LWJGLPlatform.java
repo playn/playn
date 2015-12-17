@@ -18,8 +18,6 @@ package playn.java;
 import java.io.File;
 import java.lang.reflect.Method;
 
-import org.lwjgl.opengl.Display;
-
 /**
  * Implements the PlayN platform for Java, based on LWJGL. Due to the way LWJGL works, a game must
  * create the platform instance, then perform any of its own initialization that requires access to
@@ -28,29 +26,36 @@ import org.lwjgl.opengl.Display;
  */
 public class LWJGLPlatform extends JavaPlatform {
 
+  private LWJGLInput input;
+
   public LWJGLPlatform (Config config) {
     super(config);
   }
 
-  @Override public void setTitle (String title) { Display.setTitle(title); }
+  @Override public void setTitle (String title) {
+    ((LWJGLGraphics)graphics()).setTitle(title);
+  }
 
   @Override public void start () {
-    boolean wasActive = Display.isActive();
-    while (!Display.isCloseRequested()) {
+    LWJGLGraphics gfx = (LWJGLGraphics) graphics();
+    boolean wasActive = gfx.isActive();
+    while (!gfx.isCloseRequested()) {
       // notify the app if lose or regain focus (treat said as pause/resume)
-      boolean newActive = Display.isActive();
+      boolean newActive = gfx.isActive();
       if (wasActive != newActive) {
         dispatchEvent(lifecycle, wasActive ? Lifecycle.PAUSE : Lifecycle.RESUME);
         wasActive = newActive;
       }
-      ((LWJGLGraphics)graphics()).checkScaleFactor();
       // process frame, if we don't need to provide true pausing
-      if (newActive || !config.truePause) processFrame();
-      Display.update();
+      if (newActive || !config.truePause) {
+        gfx.update();
+        processFrame();
+      }
       // sleep until it's time for the next frame
-      Display.sync(60);
+      gfx.sync();
     }
-
+    if (input != null) input.shutdown();
+    gfx.shutdown();
     shutdown();
   }
 
@@ -61,6 +66,7 @@ public class LWJGLPlatform extends JavaPlatform {
       File nativesDir = null;
       try {
         nativesDir = extractor.extractLibrary("lwjgl", null).getParentFile();
+        extractor.extractLibrary("glfw", nativesDir.getName());
       } catch (Throwable ex) {
         throw new RuntimeException("Unable to extract LWJGL native libraries.", ex);
       }
