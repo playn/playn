@@ -22,8 +22,6 @@ import org.eclipse.swt.opengl.GLData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
-import org.lwjgl.LWJGLException;
-import org.lwjgl.opengl.GLContext;
 
 public class SWTGraphics extends LWJGLGraphics {
 
@@ -71,11 +69,6 @@ public class SWTGraphics extends LWJGLGraphics {
 
   private void makeCurrent () {
     canvas.setCurrent();
-    try {
-      GLContext.useContext(canvas);
-    } catch (LWJGLException e) {
-      throw new RuntimeException(e);
-    }
   }
 
   void onBeforeFrame () { makeCurrent(); }

@@ -31,12 +31,12 @@ public class LWJGLGraphics extends JavaGraphics {
 
   private final Dimension screenSize = new Dimension();
   private final JavaPlatform.Config config;
-  private final LWJGLWindow window;
+  protected final LWJGLWindow window;
   
-  public LWJGLGraphics(JavaPlatform plat, LWJGLWindow window) {
+  public LWJGLGraphics(JavaPlatform plat) {
     super(plat, new LWJGLGL20(), Scale.ONE); // real scale factor set in init()
     this.config = plat.config;
-    this.window = window;
+    this.window = new LWJGLWindow(config, plat.log());
   }
 
   void checkScaleFactor () {

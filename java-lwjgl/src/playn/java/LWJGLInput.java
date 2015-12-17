@@ -46,7 +46,7 @@ public class LWJGLInput extends JavaInput {
   
   public LWJGLInput (LWJGLPlatform plat) {
     super(plat);
-    this.window = plat.window;
+    this.window = ((LWJGLGraphics) plat.graphics()).window;
   }
 
   @Override public RFuture<String> getText(TextType textType, String label, String initVal) {

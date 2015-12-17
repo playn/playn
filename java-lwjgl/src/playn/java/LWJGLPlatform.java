@@ -25,17 +25,19 @@ import java.lang.reflect.Method;
  * not return until the game exits.
  */
 public class LWJGLPlatform extends JavaPlatform {
-  final LWJGLWindow window;
+  
   private LWJGLInput input;
   
   public LWJGLPlatform (Config config) {
     super(config);
-    window = new LWJGLWindow(config, log());
   }
 
-  @Override public void setTitle (String title) { window.setTitle(title); }
+  @Override public void setTitle (String title) {
+    ((LWJGLGraphics) graphics()).window.setTitle(title); 
+  }
 
   @Override public void start () {
+    LWJGLWindow window = ((LWJGLGraphics) graphics()).window;
     boolean wasActive = window.isActive();
     while (!window.isCloseRequested()) {
       // notify the app if lose or regain focus (treat said as pause/resume)
@@ -70,7 +72,7 @@ public class LWJGLPlatform extends JavaPlatform {
     }
   }
 
-  @Override protected JavaGraphics createGraphics () { return new LWJGLGraphics(this, window); }
+  @Override protected JavaGraphics createGraphics () { return new LWJGLGraphics(this); }
   @Override protected JavaInput createInput () { return new LWJGLInput(this); }
 
   private boolean isInJavaWebStart () {
