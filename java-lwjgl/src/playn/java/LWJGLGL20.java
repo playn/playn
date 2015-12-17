@@ -61,6 +61,11 @@ final class LWJGLGL20 extends playn.core.GL20 {
   }
 
   @Override
+  public int glslVersion () {
+    return 120;
+  }
+
+  @Override
   public void glAttachShader(int program, int shader) {
     GL20.glAttachShader(program, shader);
   }

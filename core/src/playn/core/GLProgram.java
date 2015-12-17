@@ -36,17 +36,18 @@ public class GLProgram implements Closeable {
   public GLProgram (GL20 gl, String vertexSource, String fragmentSource) {
     this.gl = gl;
 
+    String versionPre = "#version " + gl.glslVersion() + "\n";
     int id = 0, vertexShader = 0, fragmentShader = 0;
     try {
       id = gl.glCreateProgram();
       if (id == 0) throw new RuntimeException("Failed to create program: " + gl.glGetError());
       gl.checkError("glCreateProgram");
 
-      vertexShader = compileShader(GL20.GL_VERTEX_SHADER, vertexSource);
+      vertexShader = compileShader(GL20.GL_VERTEX_SHADER, versionPre + vertexSource);
       gl.glAttachShader(id, vertexShader);
       gl.checkError("glAttachShader / vertex");
 
-      fragmentShader = compileShader(GL20.GL_FRAGMENT_SHADER, fragmentSource);
+      fragmentShader = compileShader(GL20.GL_FRAGMENT_SHADER, versionPre + fragmentSource);
       gl.glAttachShader(id, fragmentShader);
       gl.checkError("glAttachShader / fragment");
 
