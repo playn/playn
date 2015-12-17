@@ -104,8 +104,6 @@ public class JavaInput extends Input {
   @Override public boolean hasHardwareKeyboard() { return true; }
   @Override public boolean hasTouch () { return plat.config.emulateTouch; }
 
-  void init () {} // nothing by default
-
   void update () {
     // dispatch any queued keyboard events
     Keyboard.Event kev;

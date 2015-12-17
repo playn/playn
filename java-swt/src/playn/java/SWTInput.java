@@ -26,16 +26,14 @@ import playn.core.Mouse;
 
 public class SWTInput extends JavaInput {
 
-  private SWTPlatform plat;
+  private final SWTPlatform plat;
 
-  public SWTInput(SWTPlatform plat) {
-    super(plat);
-    this.plat = plat;
-  }
+  public SWTInput(SWTPlatform splat) {
+    super(splat);
+    this.plat = splat;
 
-  @Override void init() {
     // wire up mouse events
-    plat.display.addFilter(SWT.MouseDown, new org.eclipse.swt.widgets.Listener() {
+    plat.display().addFilter(SWT.MouseDown, new org.eclipse.swt.widgets.Listener() {
       public void handleEvent (Event event) {
         if (event.widget == plat.graphics().canvas) {
           Mouse.ButtonEvent.Id btn = mapButton(event.button);
@@ -43,7 +41,7 @@ public class SWTInput extends JavaInput {
         }
       }
     });
-    plat.display.addFilter(SWT.MouseUp, new org.eclipse.swt.widgets.Listener() {
+    plat.display().addFilter(SWT.MouseUp, new org.eclipse.swt.widgets.Listener() {
       public void handleEvent (Event event) {
         if (event.widget == plat.graphics().canvas) {
           Mouse.ButtonEvent.Id btn = mapButton(event.button);
@@ -51,7 +49,7 @@ public class SWTInput extends JavaInput {
         }
       }
     });
-    plat.display.addFilter(SWT.MouseMove, new org.eclipse.swt.widgets.Listener() {
+    plat.display().addFilter(SWT.MouseMove, new org.eclipse.swt.widgets.Listener() {
       public void handleEvent (Event event) {
         if (event.widget == plat.graphics().canvas) {
           float dx = event.x - lastX, dy = event.y - lastY;
@@ -60,7 +58,7 @@ public class SWTInput extends JavaInput {
       }
       private float lastX, lastY;
     });
-    plat.display.addFilter(SWT.MouseWheel, new org.eclipse.swt.widgets.Listener() {
+    plat.display().addFilter(SWT.MouseWheel, new org.eclipse.swt.widgets.Listener() {
       public void handleEvent (Event event) {
         if (event.widget == plat.graphics().canvas) {
           emitMouseWheel(event.time, event.x, event.y, -event.count, mods(event));
@@ -69,7 +67,7 @@ public class SWTInput extends JavaInput {
     });
 
     // wire up keyboard events
-    plat.display.addFilter(SWT.KeyDown, new org.eclipse.swt.widgets.Listener() {
+    plat.display().addFilter(SWT.KeyDown, new org.eclipse.swt.widgets.Listener() {
       public void handleEvent (Event event) {
         Key key = translateKey(event.keyCode);
         if (key != null) emitKeyPress(event.time, key, true, mods(event));
@@ -79,15 +77,13 @@ public class SWTInput extends JavaInput {
         if (Character.isISOControl(keyChar)) emitKeyTyped(event.time, keyChar);
       }
     });
-    plat.display.addFilter(SWT.KeyUp, new org.eclipse.swt.widgets.Listener() {
+    plat.display().addFilter(SWT.KeyUp, new org.eclipse.swt.widgets.Listener() {
       public void handleEvent (Event event) {
         Key key = translateKey(event.keyCode);
         if (key != null) emitKeyPress(event.time, key, false, mods(event));
       }
     });
   }
-
-  @Override void update() {} // not needed; don't call super as that does LWJGL stuff
 
   @Override public RFuture<String> getText (Keyboard.TextType textType,
                                             String label, String initVal) {

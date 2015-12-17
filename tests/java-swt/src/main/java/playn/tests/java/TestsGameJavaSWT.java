@@ -18,15 +18,14 @@ package playn.tests.java;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.lwjgl.LWJGLException;
-import org.lwjgl.opengl.Display;
-import org.lwjgl.opengl.DisplayMode;
+// import org.lwjgl.opengl.Display;
+// import org.lwjgl.opengl.DisplayMode;
 
 import playn.java.SWTPlatform;
 
-import playn.tests.core.FullscreenTest;
+// import playn.tests.core.FullscreenTest;
 import playn.tests.core.TestsGame;
-import static playn.tests.core.FullscreenTest.*;
+// import static playn.tests.core.FullscreenTest.*;
 
 public class TestsGameJavaSWT {
 
@@ -42,34 +41,34 @@ public class TestsGameJavaSWT {
     // }
     final SWTPlatform platform = new SWTPlatform(config);
 
-    // plug in a lwjgl implementation for fullscreen test
-    FullscreenTest.setHost(new FullscreenTest.Host() {
-      @Override public void setMode (Mode mode) {
-        platform.graphics().setSize(mode.width, mode.height, true);
-      }
+    // // plug in a lwjgl implementation for fullscreen test
+    // FullscreenTest.setHost(new FullscreenTest.Host() {
+    //   @Override public void setMode (Mode mode) {
+    //     platform.graphics().setSize(mode.width, mode.height, true);
+    //   }
 
-      @Override public Mode[] enumerateModes () {
-        List<Mode> modes = new ArrayList<Mode>();
-        try {
-          DisplayMode desktop = Display.getDesktopDisplayMode();
-          int bpp = desktop.getBitsPerPixel();
-          for (DisplayMode dmode : Display.getAvailableDisplayModes()) {
-            if (dmode.getBitsPerPixel() != bpp) {
-              continue;
-            }
-            Mode mode = new Mode();
-            mode.width = dmode.getWidth();
-            mode.height = dmode.getHeight();
-            mode.depth = dmode.getBitsPerPixel();
-            modes.add(mode);
-          }
-        }
-        catch (LWJGLException ex) {
-          throw new RuntimeException(ex);
-        }
-        return modes.toArray(new Mode[modes.size()]);
-      }
-    });
+    //   @Override public Mode[] enumerateModes () {
+    //     List<Mode> modes = new ArrayList<Mode>();
+    //     try {
+    //       DisplayMode desktop = Display.getDesktopDisplayMode();
+    //       int bpp = desktop.getBitsPerPixel();
+    //       for (DisplayMode dmode : Display.getAvailableDisplayModes()) {
+    //         if (dmode.getBitsPerPixel() != bpp) {
+    //           continue;
+    //         }
+    //         Mode mode = new Mode();
+    //         mode.width = dmode.getWidth();
+    //         mode.height = dmode.getHeight();
+    //         mode.depth = dmode.getBitsPerPixel();
+    //         modes.add(mode);
+    //       }
+    //     }
+    //     catch (LWJGLException ex) {
+    //       throw new RuntimeException(ex);
+    //     }
+    //     return modes.toArray(new Mode[modes.size()]);
+    //   }
+    // });
 
     // create our the game, initialization happens in ctor
     new TestsGame(platform, args);

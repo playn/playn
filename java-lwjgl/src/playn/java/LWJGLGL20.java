@@ -26,8 +26,6 @@ import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
 
 import org.lwjgl.BufferUtils;
-import org.lwjgl.MemoryUtil;
-import org.lwjgl.opengl.EXTFramebufferObject;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 import org.lwjgl.opengl.GL13;
@@ -36,15 +34,10 @@ import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
 import org.lwjgl.opengl.GL41;
+import org.lwjgl.system.MemoryUtil;
 
 /**
- * An implementation of the {@link GL20} interface based on Jogl. Note that Jogl
- * shaders and OpenGL ES shaders will not be 100% compatible. Some glGetXXX
- * methods are not implemented.
- *
- * Based on LIBGDX code by mzechner. Some code from LWJGL's GLES20.java
- *
- * @author mzechner
+ * An implementation of the {@link GL20} interface based on LWJGL3 and OpenGL ~3.0.
  */
 final class LWJGLGL20 extends playn.core.GL20 {
 
@@ -58,11 +51,6 @@ final class LWJGLGL20 extends playn.core.GL20 {
 
   public void glActiveTexture(int texture) {
     GL13.glActiveTexture(texture);
-  }
-
-  @Override
-  public int glslVersion () {
-    return 120;
   }
 
   @Override
@@ -82,12 +70,12 @@ final class LWJGLGL20 extends playn.core.GL20 {
 
   @Override
   public void glBindFramebuffer(int target, int framebuffer) {
-    EXTFramebufferObject.glBindFramebufferEXT(target, framebuffer);
+    GL30.glBindFramebuffer(target, framebuffer);
   }
 
   @Override
   public void glBindRenderbuffer(int target, int renderbuffer) {
-    EXTFramebufferObject.glBindRenderbufferEXT(target, renderbuffer);
+    GL30.glBindRenderbuffer(target, renderbuffer);
   }
 
   @Override
@@ -191,7 +179,7 @@ final class LWJGLGL20 extends playn.core.GL20 {
   }
 
   public int glCheckFramebufferStatus(int target) {
-    return EXTFramebufferObject.glCheckFramebufferStatusEXT(target);
+    return GL30.glCheckFramebufferStatus(target);
   }
 
   @Override
@@ -273,7 +261,7 @@ final class LWJGLGL20 extends playn.core.GL20 {
 
   @Override
   public void glDeleteFramebuffers(int n, IntBuffer framebuffers) {
-    EXTFramebufferObject.glDeleteFramebuffersEXT(framebuffers);
+    GL30.glDeleteFramebuffers(framebuffers);
   }
 
   @Override
@@ -283,7 +271,7 @@ final class LWJGLGL20 extends playn.core.GL20 {
 
   @Override
   public void glDeleteRenderbuffers(int n, IntBuffer renderbuffers) {
-    EXTFramebufferObject.glDeleteRenderbuffersEXT(renderbuffers);
+    GL30.glDeleteRenderbuffers(renderbuffers);
   }
 
   @Override
@@ -370,15 +358,13 @@ final class LWJGLGL20 extends playn.core.GL20 {
   @Override
   public void glFramebufferRenderbuffer(int target, int attachment,
                                         int renderbuffertarget, int renderbuffer) {
-    EXTFramebufferObject.glFramebufferRenderbufferEXT(
-      target, attachment, renderbuffertarget, renderbuffer);
+    GL30.glFramebufferRenderbuffer(target, attachment, renderbuffertarget, renderbuffer);
   }
 
   @Override
   public void glFramebufferTexture2D(int target, int attachment,
                                      int textarget, int texture, int level) {
-    EXTFramebufferObject.glFramebufferTexture2DEXT(
-      target, attachment, textarget, texture, level);
+    GL30.glFramebufferTexture2D(target, attachment, textarget, texture, level);
   }
 
   @Override
@@ -393,12 +379,12 @@ final class LWJGLGL20 extends playn.core.GL20 {
 
   @Override
   public void glGenFramebuffers(int n, IntBuffer framebuffers) {
-    EXTFramebufferObject.glGenFramebuffersEXT(framebuffers);
+    GL30.glGenFramebuffers(framebuffers);
   }
 
   @Override
   public void glGenRenderbuffers(int n, IntBuffer renderbuffers) {
-    EXTFramebufferObject.glGenRenderbuffersEXT(renderbuffers);
+    GL30.glGenRenderbuffers(renderbuffers);
   }
 
   @Override
@@ -408,7 +394,7 @@ final class LWJGLGL20 extends playn.core.GL20 {
 
   @Override
   public void glGenerateMipmap(int target) {
-    EXTFramebufferObject.glGenerateMipmapEXT(target);
+    GL30.glGenerateMipmap(target);
   }
 
   @Override
@@ -418,7 +404,7 @@ final class LWJGLGL20 extends playn.core.GL20 {
 
   @Override
   public void glGetBufferParameteriv(int target, int pname, IntBuffer params) {
-    GL15.glGetBufferParameter(target, pname, params);
+    GL15.glGetBufferParameteriv(target, pname, params);
   }
 
   @Override
@@ -428,19 +414,18 @@ final class LWJGLGL20 extends playn.core.GL20 {
 
   @Override
   public void glGetFloatv(int pname, FloatBuffer params) {
-    GL11.glGetFloat(pname, params);
+    GL11.glGetFloatv(pname, params);
   }
 
   @Override
   public void glGetFramebufferAttachmentParameteriv(int target, int attachment, int pname,
                                                     IntBuffer params) {
-    EXTFramebufferObject.glGetFramebufferAttachmentParameterEXT(
-      target, attachment, pname, params);
+    GL30.glGetFramebufferAttachmentParameteriv(target, attachment, pname, params);
   }
 
   @Override
   public void glGetIntegerv(int pname, IntBuffer params) {
-    GL11.glGetInteger(pname, params);
+    GL11.glGetIntegerv(pname, params);
   }
 
   @Override
@@ -460,13 +445,12 @@ final class LWJGLGL20 extends playn.core.GL20 {
 
   @Override
   public void glGetProgramiv(int program, int pname, IntBuffer params) {
-    GL20.glGetProgram(program, pname, params);
+    GL20.glGetProgramiv(program, pname, params);
   }
 
   @Override
   public void glGetRenderbufferParameteriv(int target, int pname, IntBuffer params) {
-    EXTFramebufferObject.glGetRenderbufferParameterEXT(
-      target, pname, params);
+    GL30.glGetRenderbufferParameteriv(target, pname, params);
   }
 
   @Override
@@ -492,7 +476,7 @@ final class LWJGLGL20 extends playn.core.GL20 {
 
   @Override
   public void glGetShaderiv(int shader, int pname, IntBuffer params) {
-    GL20.glGetShader(shader, pname, params);
+    GL20.glGetShaderiv(shader, pname, params);
   }
 
   @Override
@@ -502,12 +486,12 @@ final class LWJGLGL20 extends playn.core.GL20 {
 
   @Override
   public void glGetTexParameterfv(int target, int pname, FloatBuffer params) {
-    GL11.glGetTexParameter(target, pname, params);
+    GL11.glGetTexParameterfv(target, pname, params);
   }
 
   @Override
   public void glGetTexParameteriv(int target, int pname, IntBuffer params) {
-    GL11.glGetTexParameter(target, pname, params);
+    GL11.glGetTexParameteriv(target, pname, params);
   }
 
   @Override
@@ -517,22 +501,22 @@ final class LWJGLGL20 extends playn.core.GL20 {
 
   @Override
   public void glGetUniformfv(int program, int location, FloatBuffer params) {
-    GL20.glGetUniform(program, location, params);
+    GL20.glGetUniformfv(program, location, params);
   }
 
   @Override
   public void glGetUniformiv(int program, int location, IntBuffer params) {
-    GL20.glGetUniform(program, location, params);
+    GL20.glGetUniformiv(program, location, params);
   }
 
   @Override
   public void glGetVertexAttribfv(int index, int pname, FloatBuffer params) {
-    GL20.glGetVertexAttrib(index, pname, params);
+    GL20.glGetVertexAttribfv(index, pname, params);
   }
 
   @Override
   public void glGetVertexAttribiv(int index, int pname, IntBuffer params) {
-    GL20.glGetVertexAttrib(index, pname, params);
+    GL20.glGetVertexAttribiv(index, pname, params);
   }
 
   @Override
@@ -552,7 +536,7 @@ final class LWJGLGL20 extends playn.core.GL20 {
 
   @Override
   public boolean glIsFramebuffer(int framebuffer) {
-    return EXTFramebufferObject.glIsFramebufferEXT(framebuffer);
+    return GL30.glIsFramebuffer(framebuffer);
   }
 
   @Override
@@ -562,7 +546,7 @@ final class LWJGLGL20 extends playn.core.GL20 {
 
   @Override
   public boolean glIsRenderbuffer(int renderbuffer) {
-    return EXTFramebufferObject.glIsRenderbufferEXT(renderbuffer);
+    return GL30.glIsRenderbuffer(renderbuffer);
   }
 
   @Override
@@ -622,7 +606,7 @@ final class LWJGLGL20 extends playn.core.GL20 {
 
   @Override
   public void glRenderbufferStorage(int target, int internalformat, int width, int height) {
-    EXTFramebufferObject.glRenderbufferStorageEXT(target, internalformat, width, height);
+    GL30.glRenderbufferStorage(target, internalformat, width, height);
   }
 
   @Override
@@ -707,7 +691,7 @@ final class LWJGLGL20 extends playn.core.GL20 {
 
   @Override
   public void glTexParameterfv(int target, int pname, FloatBuffer params) {
-    GL11.glTexParameter(target, pname, params);
+    GL11.glTexParameterfv(target, pname, params);
   }
 
   @Override
@@ -717,7 +701,7 @@ final class LWJGLGL20 extends playn.core.GL20 {
 
   @Override
   public void glTexParameteriv(int target, int pname, IntBuffer params) {
-    GL11.glTexParameter(target, pname, params);
+    GL11.glTexParameteriv(target, pname, params);
   }
 
   @Override
@@ -754,7 +738,7 @@ final class LWJGLGL20 extends playn.core.GL20 {
   public void glUniform1fv(int location, int count, FloatBuffer buffer) {
     int oldLimit = buffer.limit();
     buffer.limit(buffer.position() + count);
-    GL20.glUniform1(location, buffer);
+    GL20.glUniform1fv(location, buffer);
     buffer.limit(oldLimit);
   }
 
@@ -767,7 +751,7 @@ final class LWJGLGL20 extends playn.core.GL20 {
   public void glUniform1iv(int location, int count, IntBuffer buffer) {
     int oldLimit = buffer.limit();
     buffer.limit(buffer.position() + count);
-    GL20.glUniform1(location, buffer);
+    GL20.glUniform1iv(location, buffer);
     buffer.limit(oldLimit);
   }
 
@@ -780,7 +764,7 @@ final class LWJGLGL20 extends playn.core.GL20 {
   public void glUniform2fv(int location, int count, FloatBuffer buffer) {
     int oldLimit = buffer.limit();
     buffer.limit(buffer.position() + 2*count);
-    GL20.glUniform2(location, buffer);
+    GL20.glUniform2fv(location, buffer);
     buffer.limit(oldLimit);
   }
 
@@ -793,7 +777,7 @@ final class LWJGLGL20 extends playn.core.GL20 {
   public void glUniform2iv(int location, int count, IntBuffer buffer) {
     int oldLimit = buffer.limit();
     buffer.limit(buffer.position() + 2*count);
-    GL20.glUniform2(location, buffer);
+    GL20.glUniform2iv(location, buffer);
     buffer.limit(oldLimit);
   }
 
@@ -806,7 +790,7 @@ final class LWJGLGL20 extends playn.core.GL20 {
   public void glUniform3fv(int location, int count, FloatBuffer buffer) {
     int oldLimit = buffer.limit();
     buffer.limit(buffer.position() + 3*count);
-    GL20.glUniform3(location, buffer);
+    GL20.glUniform3fv(location, buffer);
     buffer.limit(oldLimit);
   }
 
@@ -819,7 +803,7 @@ final class LWJGLGL20 extends playn.core.GL20 {
   public void glUniform3iv(int location, int count, IntBuffer buffer) {
     int oldLimit = buffer.limit();
     buffer.limit(buffer.position() + 3*count);
-    GL20.glUniform3(location, buffer);
+    GL20.glUniform3iv(location, buffer);
     buffer.limit(oldLimit);
   }
 
@@ -832,7 +816,7 @@ final class LWJGLGL20 extends playn.core.GL20 {
   public void glUniform4fv(int location, int count, FloatBuffer buffer) {
     int oldLimit = buffer.limit();
     buffer.limit(buffer.position() + 4*count);
-    GL20.glUniform4(location, buffer);
+    GL20.glUniform4fv(location, buffer);
     buffer.limit(oldLimit);
   }
 
@@ -845,7 +829,7 @@ final class LWJGLGL20 extends playn.core.GL20 {
   public void glUniform4iv(int location, int count, IntBuffer buffer) {
     int oldLimit = buffer.limit();
     buffer.limit(buffer.position() + 4*count);
-    GL20.glUniform4(location, buffer);
+    GL20.glUniform4iv(location, buffer);
     buffer.limit(oldLimit);
   }
 
@@ -853,7 +837,7 @@ final class LWJGLGL20 extends playn.core.GL20 {
   public void glUniformMatrix2fv(int location, int count, boolean transpose, FloatBuffer buffer) {
     int oldLimit = buffer.limit();
     buffer.limit(buffer.position() + 2*2*count);
-    GL20.glUniformMatrix2(location, transpose, buffer);
+    GL20.glUniformMatrix2fv(location, transpose, buffer);
     buffer.limit(oldLimit);
   }
 
@@ -861,7 +845,7 @@ final class LWJGLGL20 extends playn.core.GL20 {
   public void glUniformMatrix3fv(int location, int count, boolean transpose, FloatBuffer buffer) {
     int oldLimit = buffer.limit();
     buffer.limit(buffer.position() + 3*3*count);
-    GL20.glUniformMatrix3(location, transpose, buffer);
+    GL20.glUniformMatrix3fv(location, transpose, buffer);
     buffer.limit(oldLimit);
   }
 
@@ -869,7 +853,7 @@ final class LWJGLGL20 extends playn.core.GL20 {
   public void glUniformMatrix4fv(int location, int count, boolean transpose, FloatBuffer buffer) {
     int oldLimit = buffer.limit();
     buffer.limit(buffer.position() + 4*4*count);
-    GL20.glUniformMatrix4(location, transpose, buffer);
+    GL20.glUniformMatrix4fv(location, transpose, buffer);
     buffer.limit(oldLimit);
   }
 
@@ -927,33 +911,14 @@ final class LWJGLGL20 extends playn.core.GL20 {
   @Override
   public void glVertexAttribPointer(int indx, int size, int type, boolean normalized, int stride,
                                     Buffer ptr) {
-    // GL20.glVertexAttribPointer(indx, size, type, normalized, stride,
-    // BufferUtils.getOffset(ptr));
     if (ptr instanceof FloatBuffer) {
-      GL20.glVertexAttribPointer(indx, size, normalized, stride, (FloatBuffer) ptr);
+      GL20.glVertexAttribPointer(indx, size, type, normalized, stride, (FloatBuffer) ptr);
     } else if (ptr instanceof ByteBuffer) {
-      switch (type) {
-      case GL_BYTE:
-        GL20.glVertexAttribPointer(indx, size, false, normalized, stride, ((ByteBuffer) ptr));
-        break;
-      case GL_FLOAT:
-        GL20.glVertexAttribPointer(indx, size, normalized, stride,
-                                   ((ByteBuffer) ptr).asFloatBuffer());
-        break;
-      case GL_UNSIGNED_BYTE:
-        GL20.glVertexAttribPointer(indx, size, true, normalized, stride, (ByteBuffer) ptr);
-        break;
-      case GL_UNSIGNED_SHORT:
-        GL20.glVertexAttribPointer(indx, size, true, normalized, stride, (ByteBuffer) ptr);
-        break;
-      case GL_SHORT:
-        GL20.glVertexAttribPointer(indx, size, false, normalized, stride, (ByteBuffer) ptr);
-        break;
-      default:
-        throw new RuntimeException("NYI for type " + Integer.toHexString(type));
-      }
+      GL20.glVertexAttribPointer(indx, size, type, normalized, stride, ((ByteBuffer) ptr));
     } else if (ptr instanceof ShortBuffer) {
-      throw new RuntimeException("LWJGL does not support short buffers in glVertexAttribPointer.");
+      GL20.glVertexAttribPointer(indx, size, type, normalized, stride, ((ShortBuffer) ptr));
+    } else if (ptr instanceof IntBuffer) {
+      GL20.glVertexAttribPointer(indx, size, type, normalized, stride, ((IntBuffer) ptr));
     } else {
       throw new RuntimeException("NYI for " + ptr.getClass());
     }
@@ -1002,7 +967,7 @@ final class LWJGLGL20 extends playn.core.GL20 {
                                      int width, int height, int depth, int border,
                                      int imageSize, Buffer data) {
     GL13.glCompressedTexImage3D(target, level, internalformat, width, height, depth, border,
-                                imageSize, MemoryUtil.getAddress((ByteBuffer) data));
+                                imageSize, MemoryUtil.memAddress((ByteBuffer) data));
   }
 
   @Override
@@ -1068,7 +1033,7 @@ final class LWJGLGL20 extends playn.core.GL20 {
     bufs.resizeIntBuffer(2);
 
     // Return name, length
-    final String nameString = GL20.glGetActiveAttrib(program, index, bufsize, bufs.intBuffer);
+    final String nameString = GL20.glGetActiveAttrib(program, index, BufferUtils.createIntBuffer(bufsize), bufs.intBuffer);
     try {
       final byte[] nameBytes = nameString.getBytes("UTF-8");
       final int nameLength = nameBytes.length - nameOffset;
@@ -1088,7 +1053,7 @@ final class LWJGLGL20 extends playn.core.GL20 {
   public void glGetActiveAttrib(int program, int index, int bufsize,
                                 IntBuffer length, IntBuffer size, IntBuffer type, ByteBuffer name) {
     IntBuffer typeTmp = BufferUtils.createIntBuffer(2);
-    GL20.glGetActiveAttrib(program, index, 256, typeTmp);
+    GL20.glGetActiveAttrib(program, index, BufferUtils.createIntBuffer(256), typeTmp);
     type.put(typeTmp.get(0));
     type.rewind();
   }
@@ -1100,7 +1065,7 @@ final class LWJGLGL20 extends playn.core.GL20 {
     bufs.resizeIntBuffer(2);
 
     // Return name, length
-    final String nameString = GL20.glGetActiveUniform(program, index, 256, bufs.intBuffer);
+    final String nameString = GL20.glGetActiveUniform(program, index, BufferUtils.createIntBuffer(256), bufs.intBuffer);
     try {
       final byte[] nameBytes = nameString.getBytes("UTF-8");
       final int nameLength = nameBytes.length - nameOffset;
@@ -1120,7 +1085,7 @@ final class LWJGLGL20 extends playn.core.GL20 {
   public void glGetActiveUniform(int program, int index, int bufsize, IntBuffer length,
                                  IntBuffer size, IntBuffer type, ByteBuffer name) {
     IntBuffer typeTmp = BufferUtils.createIntBuffer(2);
-    GL20.glGetActiveAttrib(program, index, 256, typeTmp);
+    GL20.glGetActiveAttrib(program, index, BufferUtils.createIntBuffer(256), typeTmp);
     type.put(typeTmp.get(0));
     type.rewind();
   }
@@ -1137,7 +1102,7 @@ final class LWJGLGL20 extends playn.core.GL20 {
 
   @Override
   public void glGetBooleanv(int pname, ByteBuffer params) {
-    GL11.glGetBoolean(pname, params);
+    GL11.glGetBooleanv(pname, params);
   }
 
   @Override

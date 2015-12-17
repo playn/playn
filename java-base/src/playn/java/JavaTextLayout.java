@@ -39,7 +39,7 @@ class JavaTextLayout extends playn.core.TextLayout {
     if (format.font != null) {
       astring.addAttribute(TextAttribute.FONT, gfx.resolveFont(format.font));
     }
-    FontRenderContext frc = format.antialias ? gfx.aaFontContext : gfx.aFontContext;
+    FontRenderContext frc = format.antialias ? gfx.aaFontContext() : gfx.aFontContext();
     return new JavaTextLayout(text, format, new TextLayout(astring.getIterator(), frc));
   }
 
@@ -58,7 +58,7 @@ class JavaTextLayout extends playn.core.TextLayout {
     }
 
     List<JavaTextLayout> layouts = new ArrayList<JavaTextLayout>();
-    FontRenderContext frc = format.antialias ? gfx.aaFontContext : gfx.aFontContext;
+    FontRenderContext frc = format.antialias ? gfx.aaFontContext() : gfx.aFontContext();
     LineBreakMeasurer measurer = new LineBreakMeasurer(astring.getIterator(), frc);
     int lastPos = ltext.length(), curPos = 0;
     char eol = '\n';

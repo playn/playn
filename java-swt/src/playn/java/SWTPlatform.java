@@ -20,58 +20,22 @@ import org.eclipse.swt.layout.*;
 import org.eclipse.swt.widgets.*;
 import org.eclipse.swt.events.*;
 
+/**
+ * Implements the PlayN platform for Java, based on LWJGL and SWT.
+ */
 public class SWTPlatform extends JavaPlatform {
 
-  protected static final long FRAME_MILLIS = 1000/60; // TODO: allow config?
-  private long lastFrame;
+  private final Display display;
+  private final Shell shell;
+  private final Composite comp;
 
-  // these are initialized in createGraphics(), sigh
-  Display display;
-  Shell shell;
-  Composite comp;
-
-  /** Returns the SWT shell in which the game is running. */
-  public Shell shell () { return shell; }
-
-  /** Returns the SWT composite that hosts the game view. */
-  public Composite composite () { return comp; }
+  private final SWTGraphics graphics;
+  private final SWTInput input;
 
   /** Creates a new SWT platform and prepares it for operation. */
   public SWTPlatform (Config config) {
     super(config);
-  }
 
-  @Override public void setTitle (String title) { shell.setText(title); }
-
-  @Override public SWTGraphics graphics () { return (SWTGraphics)super.graphics(); }
-
-  @Override public void start () {
-    // canvas.addListener(SWT.Paint, new Listener() {
-    //   public void handleEvent (Event event) {
-    //     run.run();
-    //   }
-    // });
-    shell.open();
-
-    while (!shell.isDisposed()) {
-      long now = tick();
-      if (now - lastFrame >= FRAME_MILLIS) {
-        graphics().onBeforeFrame();
-        emitFrame();
-        graphics().onAfterFrame();
-        lastFrame = now;
-      }
-      if (!display.readAndDispatch()) {
-        try { Thread.sleep(1); }
-        catch (InterruptedException ie) {} // no problem!
-      }
-    }
-    display.dispose();
-
-    shutdown();
-  }
-
-  @Override protected void preInit () {
     Display.setAppName(config.appName);
     display = new Display();
     shell = new Shell(display);
@@ -82,8 +46,42 @@ public class SWTPlatform extends JavaPlatform {
     });
     comp = new Composite(shell, SWT.NONE);
     comp.setLayout(null);
+
+    graphics = new SWTGraphics(this, comp);
+    input = new SWTInput(this);
   }
 
-  @Override protected JavaGraphics createGraphics () { return new SWTGraphics(this, comp); }
-  @Override protected JavaInput createInput() { return new SWTInput(this); }
+  /** Returns the SWT display on which the game is running. */
+  public Display display () { return display; }
+  /** Returns the SWT shell in which the game is running. */
+  public Shell shell () { return shell; }
+  /** Returns the SWT composite that hosts the game view. */
+  public Composite composite () { return comp; }
+
+  @Override public SWTGraphics graphics () { return graphics; }
+  @Override public SWTInput input () { return input; }
+
+  @Override protected void loop () {
+    shell.setText(config.appName);
+    shell.open();
+
+    // this callback processes a single frame and queues itself up again for exec
+    display.asyncExec(new Runnable() {
+      public void run() {
+        if (!shell.isDisposed()) {
+          graphics.onBeforeFrame();
+          emitFrame();
+          graphics.onAfterFrame();
+          display.asyncExec(this);
+        }
+      }
+    });
+
+    // now let SWT run the main loop
+    while (!shell.isDisposed()) {
+      if (!display.readAndDispatch())
+      display.sleep();
+    }
+    display.dispose();
+  }
 }

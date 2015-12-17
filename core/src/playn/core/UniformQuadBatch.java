@@ -264,7 +264,14 @@ public class UniformQuadBatch extends QuadBatch {
     // this returns the maximum number of vec4s; then we subtract one vec2 to account for the
     // uHScreenSize uniform, and two more because some GPUs seem to need one for our vec3 attr
     int maxVecs = gl.glGetInteger(GL_MAX_VERTEX_UNIFORM_VECTORS) - 3;
-    gl.checkError("glGetInteger(GL_MAX_VERTEX_UNIFORM_VECTORS)");
+    // we have to check errors always in this case, because if GL failed to return a value we would
+    // otherwise return the value of uninitialized memory which could be some huge number which we
+    // might turn around and try to compile into a shader causing GL to crash (you might think from
+    // such a careful description that such a thing has in fact come to pass, and you would not be
+    // incorrect)
+    int glErr = gl.glGetError();
+    if (glErr != GL20.GL_NO_ERROR) throw new RuntimeException(
+      "Unable to query GL_MAX_VERTEX_UNIFORM_VECTORS,  error " + glErr);
     return maxVecs;
   }
 

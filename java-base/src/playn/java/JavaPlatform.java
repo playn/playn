@@ -75,58 +75,57 @@ public abstract class JavaPlatform extends Platform {
     public boolean truePause;
   }
 
-  final Config config;
-  private boolean active = true;
+  protected final Config config;
   private final long start = System.nanoTime();
-  private final ExecutorService pool = Executors.newFixedThreadPool(4);
 
-  private final JavaLog log = new JavaLog();
+  private boolean active = true;
+
+  private final ExecutorService pool = Executors.newFixedThreadPool(4);
   private final Exec exec = new Exec.Default(this) {
     @Override public boolean isAsyncSupported () { return true; }
     @Override public void invokeAsync (Runnable action) { pool.execute(action); }
   };
+
+  private final JavaLog log = new JavaLog();
   private final JavaAudio audio = new JavaAudio(exec);
   private final JavaNet net = new JavaNet(exec);
   private final JavaStorage storage;
   private final JsonImpl json = new JsonImpl();
-  private final JavaGraphics graphics;
-  private final JavaInput input;
   private final JavaAssets assets = new JavaAssets(this);
 
   public static class Headless extends JavaPlatform {
+    private JavaGraphics graphics = new JavaGraphics(this, null, Scale.ONE) {
+      /*ctor*/ { setSize(config.width, config.height, config.fullscreen); }
+      @Override public void setSize (int width, int height, boolean fullscreen) {
+        viewportChanged(width, height);
+      }
+      @Override public IDimension screenSize () {
+        return new Dimension(config.width, config.height);
+      }
+      @Override void setTitle (String title) {} // noop!
+      @Override void upload (BufferedImage img, Texture tex) {} // noop!
+    };
+    private JavaInput input = new JavaInput(this);
     public Headless (Config config) { super(config); }
-    @Override public void start () {} // noop!
-    @Override public void setTitle (String title) {} // noop!
-    @Override protected void preInit () {}
-    @Override protected JavaGraphics createGraphics () {
-      return new JavaGraphics(this, null, Scale.ONE) {
-        /*ctor*/ { setSize(config.width, config.height, config.fullscreen); }
-        @Override public void setSize (int width, int height, boolean fullscreen) {
-          viewportChanged(width, height);
-        }
-        @Override public IDimension screenSize () {
-          return new Dimension(config.width, config.height);
-        }
-        @Override protected void init () {} // noop!
-        @Override protected void upload (BufferedImage img, Texture tex) {} // noop!
-      };
-    }
-    @Override protected JavaInput createInput () { return new JavaInput(this); }
+    @Override public JavaGraphics graphics () { return graphics; }
+    @Override public JavaInput input () { return input; }
+    @Override protected void loop () {} // noop!
   }
 
   public JavaPlatform(final Config config) {
     this.config = config;
-
-    // give platform a chance to do things before initializing services
-    preInit();
-
-    // create and initialize our various services
-    graphics = createGraphics();
-    input = createInput();
     storage = new JavaStorage(log, config.storageFileName);
+  }
 
+  /** Sets the title of the window to {@code title}. */
+  public void setTitle(String title) {
+    graphics().setTitle(title);
+  }
+
+  /** Starts the game loop. This method will not return until the game exits. */
+  public void start () {
     if (config.activationKey != null) {
-      input.keyboardEvents.connect(new Slot<Keyboard.Event>() {
+      input().keyboardEvents.connect(new Slot<Keyboard.Event>() {
         public void onEmit (Keyboard.Event event) {
           if (event instanceof Keyboard.KeyEvent) {
             Keyboard.KeyEvent kevent = (Keyboard.KeyEvent)event;
@@ -138,46 +137,9 @@ public abstract class JavaPlatform extends Platform {
       });
     }
 
-    setTitle(config.appName);
-    graphics.init();
-    input.init();
-  }
+    // run the game loop
+    loop();
 
-  /** Sets the title of the window to {@code title}. */
-  public abstract void setTitle(String title);
-
-  /**
-   * Starts the game loop. This method will not return until the game exits.
-   */
-  public abstract void start ();
-
-  @Override public double time () { return System.currentTimeMillis(); }
-  @Override public Type type () { return Type.JAVA; }
-  @Override public int tick () { return (int)((System.nanoTime() - start) / 1000000L); }
-
-  @Override public JavaAssets assets () { return assets; }
-  @Override public JavaAudio audio () { return audio; }
-  @Override public Exec exec () { return exec; }
-  @Override public JavaGraphics graphics () { return graphics; }
-  @Override public JavaInput input () { return input; }
-  @Override public Json json () { return json; }
-  @Override public Log log () { return log; }
-  @Override public Net net () { return net; }
-  @Override public Storage storage () { return storage; }
-
-  @Override public void openURL(String url) {
-    try {
-      Desktop.getDesktop().browse(URI.create(url));
-    } catch (Exception e) {
-      reportError("Failed to open URL [url=" + url + "]", e);
-    }
-  }
-
-  protected abstract void preInit ();
-  protected abstract JavaGraphics createGraphics ();
-  protected abstract JavaInput createInput ();
-
-  protected void shutdown () {
     // let the game run any of its exit hooks
     dispatchEvent(lifecycle, Lifecycle.EXIT);
 
@@ -193,8 +155,33 @@ public abstract class JavaPlatform extends Platform {
     System.exit(0);
   }
 
+  @Override public double time () { return System.currentTimeMillis(); }
+  @Override public Type type () { return Type.JAVA; }
+  @Override public int tick () { return (int)((System.nanoTime() - start) / 1000000L); }
+
+  @Override public JavaAssets assets () { return assets; }
+  @Override public JavaAudio audio () { return audio; }
+  @Override public Exec exec () { return exec; }
+  @Override public abstract JavaGraphics graphics ();
+  @Override public abstract JavaInput input ();
+  @Override public Json json () { return json; }
+  @Override public Log log () { return log; }
+  @Override public Net net () { return net; }
+  @Override public Storage storage () { return storage; }
+
+  @Override public void openURL(String url) {
+    try {
+      Desktop.getDesktop().browse(URI.create(url));
+    } catch (Exception e) {
+      reportError("Failed to open URL [url=" + url + "]", e);
+    }
+  }
+
+  /** Runs the game loop. */
+  protected abstract void loop ();
+
   protected void processFrame () {
-    input.update(); // event handling
+    input().update(); // event handling
     emitFrame();
   }
 

@@ -15,70 +15,104 @@
  */
 package playn.java;
 
-import java.io.File;
-import java.lang.reflect.Method;
+import java.nio.IntBuffer;
 
-import org.lwjgl.opengl.Display;
+import org.lwjgl.BufferUtils;
+import org.lwjgl.glfw.GLFWErrorCallback;
+import org.lwjgl.glfw.GLFWVidMode;
+import org.lwjgl.opengl.GL30;
+import org.lwjgl.opengl.GL;
+import static org.lwjgl.glfw.GLFW.*;
+import static org.lwjgl.opengl.GL11.GL_FALSE;
+import static org.lwjgl.opengl.GL11.GL_TRUE;
 
 /**
- * Implements the PlayN platform for Java, based on LWJGL. Due to the way LWJGL works, a game must
- * create the platform instance, then perform any of its own initialization that requires access to
- * GL resources, and then call {@link #start} to start the game loop. The {@link #start} call does
- * not return until the game exits.
+ * Implements the PlayN platform for Java, based on LWJGL and GLFW.
+ *
+ * Due to the way LWJGL works, a game must create the platform instance, then perform any of its
+ * own initialization that requires access to GL resources, and then call {@link #start} to start
+ * the game loop. The {@link #start} call does not return until the game exits.
  */
 public class LWJGLPlatform extends JavaPlatform {
 
+  // we have to keep strong references to GLFW callbacks
+  private final GLFWErrorCallback errorCallback;
+
+  private final GLFWGraphics graphics;
+  private final GLFWInput input;
+
+  /** The handle on our GLFW window; also used by GLFWInput. */
+  private final long window;
+
   public LWJGLPlatform (Config config) {
     super(config);
+
+    glfwSetErrorCallback(errorCallback = new GLFWErrorCallback() {
+      @Override public void invoke(int error, long description) {
+        log().error("GL Error (" + error + "):" + getDescription(description));
+      }
+    });
+    if (glfwInit() != GL_TRUE) throw new RuntimeException("Failed to init GLFW.");
+
+    long monitor = glfwGetPrimaryMonitor();
+    GLFWVidMode vidMode = glfwGetVideoMode(monitor);
+
+    int width = config.width, height = config.height;
+    if (config.fullscreen) {
+      width = vidMode.width();
+      height = vidMode.height();
+    } else {
+      monitor = 0; // monitor == 0 means non-fullscreen window
+    }
+
+    glfwDefaultWindowHints();
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
+    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, 1);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    glfwWindowHint(GLFW_VISIBLE, GL_FALSE);
+    glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
+    window = glfwCreateWindow(width, height, config.appName, monitor, 0);
+    if (window == 0) throw new RuntimeException("Failed to create window; see error log.");
+
+    graphics = new GLFWGraphics(this, window);
+    input = new GLFWInput(this, window);
+
+    glfwSetWindowPos(window, (vidMode.width() - width) / 2, (vidMode.height() - height) / 2);
+    glfwMakeContextCurrent(window);
+    glfwSwapInterval(1);
+    graphics.setSize(config.width, config.height, config.fullscreen);
+    glfwShowWindow(window);
+
+    GL.createCapabilities();
+    IntBuffer vao = BufferUtils.createIntBuffer(1);
+    GL30.glGenVertexArrays(vao);
+    GL30.glBindVertexArray(vao.get(0));
   }
 
-  @Override public void setTitle (String title) { Display.setTitle(title); }
+  @Override public JavaGraphics graphics () { return graphics; }
+  @Override public JavaInput input () { return input; }
 
-  @Override public void start () {
-    boolean wasActive = Display.isActive();
-    while (!Display.isCloseRequested()) {
+  @Override protected void loop () {
+    boolean wasActive = glfwGetWindowAttrib(window, GLFW_VISIBLE) > 0;
+    while (glfwWindowShouldClose(window) != GL_TRUE) {
       // notify the app if lose or regain focus (treat said as pause/resume)
-      boolean newActive = Display.isActive();
+      boolean newActive = glfwGetWindowAttrib(window, GLFW_VISIBLE) > 0;
       if (wasActive != newActive) {
         dispatchEvent(lifecycle, wasActive ? Lifecycle.PAUSE : Lifecycle.RESUME);
         wasActive = newActive;
       }
-      ((LWJGLGraphics)graphics()).checkScaleFactor();
       // process frame, if we don't need to provide true pausing
-      if (newActive || !config.truePause) processFrame();
-      Display.update();
-      // sleep until it's time for the next frame
-      Display.sync(60);
-    }
-
-    shutdown();
-  }
-
-  @Override protected void preInit () {
-    // unpack our native libraries, unless we're running in Java Web Start
-    if (!isInJavaWebStart()) {
-      SharedLibraryExtractor extractor = new SharedLibraryExtractor();
-      File nativesDir = null;
-      try {
-        nativesDir = extractor.extractLibrary("lwjgl", null).getParentFile();
-      } catch (Throwable ex) {
-        throw new RuntimeException("Unable to extract LWJGL native libraries.", ex);
+      if (newActive || !config.truePause) {
+        processFrame();
       }
-      System.setProperty("org.lwjgl.librarypath", nativesDir.getAbsolutePath());
+      // sleep until it's time for the next frame
+      glfwSwapBuffers(window);
     }
-  }
-
-  @Override protected JavaGraphics createGraphics () { return new LWJGLGraphics(this); }
-  @Override protected JavaInput createInput () { return new LWJGLInput(this); }
-
-  private boolean isInJavaWebStart () {
-    try {
-      Method method = Class.forName("javax.jnlp.ServiceManager").
-        getDeclaredMethod("lookup", new Class<?>[] { String.class });
-      method.invoke(null, "javax.jnlp.PersistenceService");
-      return true;
-    } catch (Throwable ignored) {
-      return false;
-    }
+    input.shutdown();
+    graphics.shutdown();
+    errorCallback.release();
+    glfwDestroyWindow(window);
+    glfwTerminate();
   }
 }
