@@ -61,6 +61,7 @@ public class Scale {
   public final float factor;
 
   public Scale (float factor) {
+    assert factor > 0 : "Scale factor must be > 0.";
     this.factor = factor;
   }
 
