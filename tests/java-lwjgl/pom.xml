@@ -78,13 +78,18 @@
               <execution>
                 <phase>test</phase>
                 <goals>
-                  <goal>java</goal>
+                  <goal>exec</goal>
                 </goals>
               </execution>
             </executions>
             <configuration>
-              <mainClass>${mainClass}</mainClass>
+              <longClasspath>true</longClasspath>
+              <executable>java</executable>
               <arguments>
+                <argument>-XstartOnFirstThread</argument>
+                <argument>-classpath</argument>
+                <classpath/>
+                <argument>${mainClass}</argument>
                 <argument>${scaleFactor}</argument>
               </arguments>
             </configuration>
