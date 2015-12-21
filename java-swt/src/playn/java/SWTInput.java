@@ -16,9 +16,14 @@
 package playn.java;
 
 import org.eclipse.swt.*;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.*;
 
 import react.RFuture;
+import react.RPromise;
 
 import playn.core.Key;
 import playn.core.Keyboard;
@@ -87,7 +92,80 @@ public class SWTInput extends JavaInput {
 
   @Override public RFuture<String> getText (Keyboard.TextType textType,
                                             String label, String initVal) {
-    return RFuture.failure(new Exception("TODO"));
+    final RPromise<String> result = RPromise.create();
+
+    final Shell shell = new Shell(plat.shell(), SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
+    GridLayout layout = new GridLayout(2, true);
+    layout.marginTop = 10;
+    layout.marginLeft = 10;
+    layout.marginBottom = 10;
+    layout.marginRight = 10;
+    layout.verticalSpacing = 10;
+    shell.setLayout(layout);
+    shell.addListener(SWT.Traverse, new Listener() {
+      public void handleEvent(Event event) {
+        if (event.detail == SWT.TRAVERSE_ESCAPE) {
+          result.succeed(null);
+        }
+      }
+    });
+
+    Label info = new Label(shell, SWT.NULL);
+    GridData idata = new GridData();
+    idata.horizontalSpan = 2;
+    info.setLayoutData(idata);
+    info.setText(label);
+
+    final Text text = new Text(shell, SWT.SINGLE | SWT.BORDER);
+    GridData tdata = new GridData(GridData.FILL_HORIZONTAL);
+    tdata.horizontalSpan = 2;
+    text.setLayoutData(tdata);
+    if (initVal != null) text.setText(initVal);
+
+    final Button ok = new Button(shell, SWT.PUSH);
+    ok.setText("OK");
+    ok.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_END));
+    ok.addListener(SWT.Selection, new Listener() {
+      public void handleEvent(Event event) {
+        String r = text.getText();
+        shell.dispose();
+        result.succeed(r);
+      }
+    });
+    shell.setDefaultButton(ok);
+
+    Button cancel = new Button(shell, SWT.PUSH);
+    cancel.setText("Cancel");
+    cancel.addListener(SWT.Selection, new Listener() {
+      public void handleEvent(Event event) {
+        shell.dispose();
+        result.succeed(null);
+      }
+    });
+
+    shell.pack();
+    Rectangle psize = plat.shell().getBounds(), ssize = shell.getBounds();
+    shell.setLocation(new Point(psize.x + (psize.width - ssize.width)/2,
+                                psize.y + (psize.height - ssize.height)/2));
+    shell.open();
+
+    // HACK HACK HACK: SWT drops any pending mouse up event when we open this shell (even if we
+    // defer it via Display.asyncExec) so we have to fake a mouse up here lest all input processing
+    // get totally hosed; sigh
+    mouseEvents.emit(new Mouse.ButtonEvent(0, plat.time(), 0, 0, Mouse.ButtonEvent.Id.LEFT, false));
+
+    return result;
+  }
+
+  @Override public RFuture<Boolean> sysDialog (String title, String text,
+                                               String ok, String cancel) {
+    int style = (cancel == null) ?
+      SWT.ICON_INFORMATION|SWT.OK : SWT.ICON_QUESTION|SWT.OK|SWT.CANCEL;
+    MessageBox box = new MessageBox(plat.shell(), style);
+    box.setText(title);
+    box.setMessage(text);
+    int button = box.open();
+    return RFuture.success(button == SWT.OK);
   }
 
   private int mods (org.eclipse.swt.widgets.Event event) {
