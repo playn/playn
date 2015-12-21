@@ -61,7 +61,7 @@ final class LWJGLGL20 extends playn.core.GL20 {
 
   @Override
   public int glslVersion () {
-    return 120;
+    return 100;
   }
 
   @Override
