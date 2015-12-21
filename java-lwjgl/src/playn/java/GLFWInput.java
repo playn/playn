@@ -13,8 +13,6 @@
  */
 package playn.java;
 
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
 import java.nio.ByteBuffer;
 
 import org.lwjgl.BufferUtils;
@@ -37,7 +35,6 @@ import static playn.core.Mouse.*;
 public class GLFWInput extends JavaInput {
 
   private final long window;
-  private JFrame frame; // TODO: set this from somewhere?
   private float lastMouseX = -1, lastMouseY = -1;
 
   // we have to keep strong references to GLFW callbacks
@@ -113,21 +110,17 @@ public class GLFWInput extends JavaInput {
     scrollCallback.release();
   }
 
+  private static String NO_UI_ERROR =
+    "The java-lwjgl backend does not allow interop with other UI toolkits. " +
+    "Use the java-swt backend if you need native dialogs.";
+
   @Override public RFuture<String> getText(TextType textType, String label, String initVal) {
-    Object result = JOptionPane.showInputDialog(
-      frame, label, "", JOptionPane.QUESTION_MESSAGE, null, null, initVal);
-    return RFuture.success((String)result);
+    return RFuture.failure(new UnsupportedOperationException(NO_UI_ERROR));
   }
 
   @Override public RFuture<Boolean> sysDialog(String title, String text,
                                               String ok, String cancel) {
-    int optType = JOptionPane.OK_CANCEL_OPTION;
-    int msgType = cancel == null ? JOptionPane.INFORMATION_MESSAGE : JOptionPane.QUESTION_MESSAGE;
-    Object[] options = (cancel == null) ? new Object[] { ok } : new Object[] { ok, cancel };
-    Object defOption = (cancel == null) ? ok : cancel;
-    int result = JOptionPane.showOptionDialog(
-      frame, text, title, optType, msgType, null, options, defOption);
-    return RFuture.success(result == 0);
+    return RFuture.failure(new UnsupportedOperationException(NO_UI_ERROR));
   }
 
   @Override public boolean hasMouseLock() { return true; }
