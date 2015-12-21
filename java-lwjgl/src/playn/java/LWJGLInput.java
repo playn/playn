@@ -48,21 +48,21 @@ public class LWJGLInput extends JavaInput {
   private GLFWScrollCallback scrollCallback;
   private float lastMouseX = -1, lastMouseY = -1;
 
-  public LWJGLInput (LWJGLPlatform plat) {
+  public LWJGLInput(LWJGLPlatform plat) {
     super(plat);
     this.gfx = (LWJGLGraphics) plat.graphics();
   }
 
   @Override void init() {
-    glfwSetCharCallback(gfx.window, charCallback = new GLFWCharCallback(){
+    glfwSetCharCallback(gfx.window, charCallback = new GLFWCharCallback() {
       @Override public void invoke(long window, int codepoint) {
         emitKeyTyped(System.currentTimeMillis(), (char) codepoint);
       }
     });
 
-    glfwSetKeyCallback(gfx.window, keyCallback = new GLFWKeyCallback(){
+    glfwSetKeyCallback(gfx.window, keyCallback = new GLFWKeyCallback() {
       @Override public void invoke(long window, int keyCode, int scancode, int action, int mods) {
-        int flags = calModifierFlags();
+        int flags = modifierFlags();
         double time = System.currentTimeMillis();
         Key key = translateKey(keyCode);
         boolean pressed = action == GLFW_PRESS || action == GLFW_REPEAT;
@@ -71,7 +71,7 @@ public class LWJGLInput extends JavaInput {
       }
     });
 
-    glfwSetMouseButtonCallback(gfx.window, mouseBtnCallback = new GLFWMouseButtonCallback(){
+    glfwSetMouseButtonCallback(gfx.window, mouseBtnCallback = new GLFWMouseButtonCallback() {
       @Override public void invoke(long handle, int btnIdx, int action, int mods) {
         double time = System.currentTimeMillis();
         Point m = queryCursorPosition();
@@ -82,7 +82,7 @@ public class LWJGLInput extends JavaInput {
     });
 
     glfwSetCursorPosCallback(gfx.window, cursorPosCallback = new GLFWCursorPosCallback() {
-      @Override public void invoke (long handle, double xpos, double ypos) {
+      @Override public void invoke(long handle, double xpos, double ypos) {
         double time = System.currentTimeMillis();
         float x = (float)xpos, y = (float)ypos;
         if (lastMouseX == -1) {
@@ -90,13 +90,13 @@ public class LWJGLInput extends JavaInput {
           lastMouseY = y;
         }
         float dx = x - lastMouseX, dy = y - lastMouseY;
-        emitMouseMotion(time, x, y, dx, dy, calModifierFlags());
+        emitMouseMotion(time, x, y, dx, dy, modifierFlags());
         lastMouseX = x;
         lastMouseY = y;
       }
     });
 
-    glfwSetScrollCallback(gfx.window, scrollCallback = new GLFWScrollCallback(){
+    glfwSetScrollCallback(gfx.window, scrollCallback = new GLFWScrollCallback() {
       @Override public void invoke(long handle, double xoffset, double yoffset) {
         Point m = queryCursorPosition();
         double time = System.currentTimeMillis();
@@ -108,12 +108,12 @@ public class LWJGLInput extends JavaInput {
     });
   }
 
-  void shutdown () {
+  void shutdown() {
     if (charCallback != null) glfwSetCharCallback(gfx.window, charCallback = null);
     if (keyCallback != null) glfwSetKeyCallback(gfx.window, keyCallback = null);
-    if (mouseBtnCallback != null ) glfwSetMouseButtonCallback(gfx.window, mouseBtnCallback = null);
-    if (cursorPosCallback != null ) glfwSetCursorPosCallback(gfx.window, cursorPosCallback = null);
-    if (scrollCallback != null ) glfwSetScrollCallback(gfx.window, scrollCallback = null);
+    if (mouseBtnCallback != null) glfwSetMouseButtonCallback(gfx.window, mouseBtnCallback = null);
+    if (cursorPosCallback != null) glfwSetCursorPosCallback(gfx.window, cursorPosCallback = null);
+    if (scrollCallback != null) glfwSetScrollCallback(gfx.window, scrollCallback = null);
   }
 
   @Override public RFuture<String> getText(TextType textType, String label, String initVal) {
@@ -122,8 +122,8 @@ public class LWJGLInput extends JavaInput {
     return RFuture.success((String)result);
   }
 
-  @Override public RFuture<Boolean> sysDialog (String title, String text,
-                                               String ok, String cancel) {
+  @Override public RFuture<Boolean> sysDialog(String title, String text,
+                                              String ok, String cancel) {
     int optType = JOptionPane.OK_CANCEL_OPTION;
     int msgType = cancel == null ? JOptionPane.INFORMATION_MESSAGE : JOptionPane.QUESTION_MESSAGE;
     Object[] options = (cancel == null) ? new Object[] { ok } : new Object[] { ok, cancel };
@@ -133,13 +133,13 @@ public class LWJGLInput extends JavaInput {
     return RFuture.success(result == 0);
   }
 
-  @Override public boolean hasMouseLock () { return true; }
+  @Override public boolean hasMouseLock() { return true; }
 
   @Override public boolean isMouseLocked() {
     return glfwGetInputMode(gfx.window, GLFW_CURSOR) == GLFW_CURSOR_DISABLED;
   }
 
-  @Override public void setMouseLocked (boolean locked) {
+  @Override public void setMouseLocked(boolean locked) {
     glfwSetInputMode(gfx.window, GLFW_CURSOR, locked ? GLFW_CURSOR_DISABLED : GLFW_CURSOR_NORMAL);
   }
 
@@ -152,19 +152,18 @@ public class LWJGLInput extends JavaInput {
     return cpos;
   }
 
-  /* Determine the current state of the modifier keys (note: the code assumes the current state
-   * of the modifier keys is "correct" for all events that have arrived since the last call to
-   * update; since that happens pretty frequently, 60fps, that's probably good enough) */
-  private int calModifierFlags() {
-    int flags = modifierFlags(
-        isKeyDown(GLFW_KEY_LEFT_ALT) || isKeyDown(GLFW_KEY_LEFT_ALT),
-        isKeyDown(GLFW_KEY_LEFT_CONTROL) || isKeyDown(GLFW_KEY_RIGHT_CONTROL),
-        isKeyDown(GLFW_KEY_LEFT_SUPER) || isKeyDown(GLFW_KEY_RIGHT_SUPER),
-        isKeyDown(GLFW_KEY_LEFT_SHIFT) || isKeyDown(GLFW_KEY_RIGHT_SHIFT));
-    return flags;
+  /** Returns the current state of the modifier keys. Note: the code assumes the current state of
+    * the modifier keys is "correct" for all events that have arrived since the last call to
+    * update; since that happens pretty frequently, 60fps, that's probably good enough. */
+  private int modifierFlags() {
+    return modifierFlags(
+      isKeyDown(GLFW_KEY_LEFT_ALT)     || isKeyDown(GLFW_KEY_LEFT_ALT),
+      isKeyDown(GLFW_KEY_LEFT_CONTROL) || isKeyDown(GLFW_KEY_RIGHT_CONTROL),
+      isKeyDown(GLFW_KEY_LEFT_SUPER)   || isKeyDown(GLFW_KEY_RIGHT_SUPER),
+      isKeyDown(GLFW_KEY_LEFT_SHIFT)   || isKeyDown(GLFW_KEY_RIGHT_SHIFT));
   }
 
-  private boolean isKeyDown(int key){
+  private boolean isKeyDown(int key) {
     return glfwGetKey(gfx.window, key) == GLFW_PRESS;
   }
 
@@ -311,8 +310,7 @@ public class LWJGLInput extends JavaInput {
       //case GLFW_KEY_APPS         : return Key.
       //TODO: case GLFW_KEY_POWER  : return Key.POWER;
       //case Keyboard.KEY_SLEEP    : return Key.
+      default:                     return null;
     }
-
-    return null;
   }
 }
