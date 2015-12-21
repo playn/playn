@@ -33,13 +33,13 @@ class DialogTest extends Test {
     y += 20;
 
     String last = game.storage.getItem("last_text");
-    if (last == null) last = "...";
+    if (last == null || last.length() == 0) last = "...";
 
     final ImageLayer outputLayer = new ImageLayer(game.ui.formatText(last, false));
     final Slot<Object> onDialogResult = new Slot<Object>() {
       public void onEmit(Object result) {
         String text = result == null ? "canceled" : String.valueOf(result);
-        outputLayer.setTile(game.ui.formatText(text, false));
+        if (text.length() > 0) outputLayer.setTile(game.ui.formatText(text, false));
         if (result instanceof String) game.storage.setItem("last_text", (String)result);
       }
     };
