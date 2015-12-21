@@ -20,7 +20,7 @@ import java.nio.IntBuffer;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWVidMode;
-import org.lwjgl.opengl.GL30;
+// import org.lwjgl.opengl.GL30;
 import org.lwjgl.opengl.GL;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.GL_FALSE;
@@ -65,13 +65,15 @@ public class LWJGLPlatform extends JavaPlatform {
       monitor = 0; // monitor == 0 means non-fullscreen window
     }
 
+    // NOTE: it's easier to co-exist with GSLES2 if we leave the GLContext in "old and busted"
+    // mode; so all the GL3.2 "new hotness" is commented out
     glfwDefaultWindowHints();
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
-    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, 1);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    // glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    // glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
+    // glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, 1);
+    // glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_VISIBLE, GL_FALSE);
-    glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
+    glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
     window = glfwCreateWindow(width, height, config.appName, monitor, 0);
     if (window == 0) throw new RuntimeException("Failed to create window; see error log.");
 
@@ -85,9 +87,9 @@ public class LWJGLPlatform extends JavaPlatform {
     glfwShowWindow(window);
 
     GL.createCapabilities();
-    IntBuffer vao = BufferUtils.createIntBuffer(1);
-    GL30.glGenVertexArrays(vao);
-    GL30.glBindVertexArray(vao.get(0));
+    // IntBuffer vao = BufferUtils.createIntBuffer(1);
+    // GL30.glGenVertexArrays(vao);
+    // GL30.glBindVertexArray(vao.get(0));
   }
 
   @Override public JavaGraphics graphics () { return graphics; }

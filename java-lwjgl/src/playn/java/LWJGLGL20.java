@@ -26,6 +26,7 @@ import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
 
 import org.lwjgl.BufferUtils;
+import org.lwjgl.opengl.EXTFramebufferObject;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 import org.lwjgl.opengl.GL13;
@@ -70,12 +71,12 @@ final class LWJGLGL20 extends playn.core.GL20 {
 
   @Override
   public void glBindFramebuffer(int target, int framebuffer) {
-    GL30.glBindFramebuffer(target, framebuffer);
+    EXTFramebufferObject.glBindFramebufferEXT(target, framebuffer);
   }
 
   @Override
   public void glBindRenderbuffer(int target, int renderbuffer) {
-    GL30.glBindRenderbuffer(target, renderbuffer);
+    EXTFramebufferObject.glBindRenderbufferEXT(target, renderbuffer);
   }
 
   @Override
@@ -179,7 +180,7 @@ final class LWJGLGL20 extends playn.core.GL20 {
   }
 
   public int glCheckFramebufferStatus(int target) {
-    return GL30.glCheckFramebufferStatus(target);
+    return EXTFramebufferObject.glCheckFramebufferStatusEXT(target);
   }
 
   @Override
@@ -261,7 +262,7 @@ final class LWJGLGL20 extends playn.core.GL20 {
 
   @Override
   public void glDeleteFramebuffers(int n, IntBuffer framebuffers) {
-    GL30.glDeleteFramebuffers(framebuffers);
+    EXTFramebufferObject.glDeleteFramebuffersEXT(framebuffers);
   }
 
   @Override
@@ -271,7 +272,7 @@ final class LWJGLGL20 extends playn.core.GL20 {
 
   @Override
   public void glDeleteRenderbuffers(int n, IntBuffer renderbuffers) {
-    GL30.glDeleteRenderbuffers(renderbuffers);
+    EXTFramebufferObject.glDeleteRenderbuffersEXT(renderbuffers);
   }
 
   @Override
@@ -358,13 +359,14 @@ final class LWJGLGL20 extends playn.core.GL20 {
   @Override
   public void glFramebufferRenderbuffer(int target, int attachment,
                                         int renderbuffertarget, int renderbuffer) {
-    GL30.glFramebufferRenderbuffer(target, attachment, renderbuffertarget, renderbuffer);
+    EXTFramebufferObject.glFramebufferRenderbufferEXT(
+      target, attachment, renderbuffertarget, renderbuffer);
   }
 
   @Override
   public void glFramebufferTexture2D(int target, int attachment,
                                      int textarget, int texture, int level) {
-    GL30.glFramebufferTexture2D(target, attachment, textarget, texture, level);
+    EXTFramebufferObject.glFramebufferTexture2DEXT(target, attachment, textarget, texture, level);
   }
 
   @Override
@@ -379,12 +381,12 @@ final class LWJGLGL20 extends playn.core.GL20 {
 
   @Override
   public void glGenFramebuffers(int n, IntBuffer framebuffers) {
-    GL30.glGenFramebuffers(framebuffers);
+    EXTFramebufferObject.glGenFramebuffersEXT(framebuffers);
   }
 
   @Override
   public void glGenRenderbuffers(int n, IntBuffer renderbuffers) {
-    GL30.glGenRenderbuffers(renderbuffers);
+    EXTFramebufferObject.glGenRenderbuffersEXT(renderbuffers);
   }
 
   @Override
@@ -394,7 +396,7 @@ final class LWJGLGL20 extends playn.core.GL20 {
 
   @Override
   public void glGenerateMipmap(int target) {
-    GL30.glGenerateMipmap(target);
+    EXTFramebufferObject.glGenerateMipmapEXT(target);
   }
 
   @Override
@@ -420,7 +422,7 @@ final class LWJGLGL20 extends playn.core.GL20 {
   @Override
   public void glGetFramebufferAttachmentParameteriv(int target, int attachment, int pname,
                                                     IntBuffer params) {
-    GL30.glGetFramebufferAttachmentParameteriv(target, attachment, pname, params);
+    EXTFramebufferObject.glGetFramebufferAttachmentParameterivEXT(target, attachment, pname, params);
   }
 
   @Override
@@ -450,7 +452,7 @@ final class LWJGLGL20 extends playn.core.GL20 {
 
   @Override
   public void glGetRenderbufferParameteriv(int target, int pname, IntBuffer params) {
-    GL30.glGetRenderbufferParameteriv(target, pname, params);
+    EXTFramebufferObject.glGetRenderbufferParameterivEXT(target, pname, params);
   }
 
   @Override
@@ -536,7 +538,7 @@ final class LWJGLGL20 extends playn.core.GL20 {
 
   @Override
   public boolean glIsFramebuffer(int framebuffer) {
-    return GL30.glIsFramebuffer(framebuffer);
+    return EXTFramebufferObject.glIsFramebufferEXT(framebuffer);
   }
 
   @Override
@@ -546,7 +548,7 @@ final class LWJGLGL20 extends playn.core.GL20 {
 
   @Override
   public boolean glIsRenderbuffer(int renderbuffer) {
-    return GL30.glIsRenderbuffer(renderbuffer);
+    return EXTFramebufferObject.glIsRenderbufferEXT(renderbuffer);
   }
 
   @Override
@@ -606,7 +608,7 @@ final class LWJGLGL20 extends playn.core.GL20 {
 
   @Override
   public void glRenderbufferStorage(int target, int internalformat, int width, int height) {
-    GL30.glRenderbufferStorage(target, internalformat, width, height);
+    EXTFramebufferObject.glRenderbufferStorageEXT(target, internalformat, width, height);
   }
 
   @Override
@@ -1021,7 +1023,8 @@ final class LWJGLGL20 extends playn.core.GL20 {
   @Override
   public void glFramebufferTexture3D(int target, int attachment, int textarget, int texture,
                                      int level, int zoffset) {
-    GL30.glFramebufferTexture3D(target, attachment, textarget, texture, level, zoffset);
+    EXTFramebufferObject.glFramebufferTexture3DEXT(
+      target, attachment, textarget, texture, level, zoffset);
   }
 
   @Override

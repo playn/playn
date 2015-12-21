@@ -427,14 +427,6 @@ public abstract class GL20 {
   public final Buffers bufs;
   public final boolean checkErrors;
 
-  /**
-   * Returns the GLSL version to use in shaders. This should be 100 everywhere, except 100 is not
-   * supported on the Mac OS (and maybe other desktops), so we have to have this hackery. Sigh.
-   */
-  public int glslVersion () {
-    return 100;
-  }
-
   protected GL20 (Buffers buffers, boolean checkErrors) {
     this.bufs = buffers;
     this.checkErrors = checkErrors;
