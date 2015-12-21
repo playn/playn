@@ -43,7 +43,7 @@ public class LWJGLInput extends JavaInput {
   // we have to keep strong references to GLFW callbacks
   private GLFWCharCallback charCallback;
   private GLFWKeyCallback keyCallback;
-  private GLFWMouseButtonCallback mouseCallback;
+  private GLFWMouseButtonCallback mouseBtnCallback;
   private GLFWCursorPosCallback cursorPosCallback;
   private GLFWScrollCallback scrollCallback;
   private float lastMouseX = -1, lastMouseY = -1;
@@ -71,7 +71,7 @@ public class LWJGLInput extends JavaInput {
       }
     });
 
-    glfwSetMouseButtonCallback(gfx.window, mouseCallback = new GLFWMouseButtonCallback(){
+    glfwSetMouseButtonCallback(gfx.window, mouseBtnCallback = new GLFWMouseButtonCallback(){
       @Override public void invoke(long handle, int btnIdx, int action, int mods) {
         double time = System.currentTimeMillis();
         Point m = queryCursorPosition();
@@ -111,7 +111,8 @@ public class LWJGLInput extends JavaInput {
   void shutdown () {
     if (charCallback != null) glfwSetCharCallback(gfx.window, charCallback = null);
     if (keyCallback != null) glfwSetKeyCallback(gfx.window, keyCallback = null);
-    if (mouseCallback != null ) glfwSetMouseButtonCallback(gfx.window, mouseCallback = null);
+    if (mouseBtnCallback != null ) glfwSetMouseButtonCallback(gfx.window, mouseBtnCallback = null);
+    if (cursorPosCallback != null ) glfwSetCursorPosCallback(gfx.window, cursorPosCallback = null);
     if (scrollCallback != null ) glfwSetScrollCallback(gfx.window, scrollCallback = null);
   }
 
