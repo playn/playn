@@ -87,8 +87,8 @@ public class SharedLibraryExtractor {
 
   /** Maps a platform independent library name to one or more platform dependent names. */
   private String[] platformNames(String libraryName) {
-    if (isWindows) return new String[] { libraryName + (is64Bit ? "64.dll" : ".dll") };
-    if (isLinux) return new String[] { "lib" + libraryName + (is64Bit ? "64.so" : ".so") };
+    if (isWindows) return new String[] { libraryName + (is64Bit ? ".dll" : "32.dll") };
+    if (isLinux) return new String[] { "lib" + libraryName + (is64Bit ? ".so" : "32.so") };
     if (isMac) return new String[] { "lib" + libraryName + ".jnilib",
                                      "lib" + libraryName + ".dylib" };
     return new String[] { libraryName };
