@@ -71,28 +71,29 @@
         <plugins>
           <!-- allows testing of Java backend via: mvn test -Pjava -->
           <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>exec-maven-plugin</artifactId>
-            <version>1.2.1</version>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <version>1.6</version>
             <executions>
               <execution>
                 <phase>test</phase>
+                <configuration>
+                  <target>
+                    <!-- these shenanigans are needed to pass -XstartOnFirstThread on Mac OS
+                         but not on other OSes where they would cause the JVM to fail, yay -->
+                    <condition property="jvmarg" value="-XstartOnFirstThread" else="-Dfoo=bar">
+                      <os family="mac"/>
+                    </condition>
+                    <java fork="true" classname="${mainClass}" classpathref="maven.test.classpath">
+                      <jvmarg value="${jvmarg}"/>
+                      <arg value="${scaleFactor}"/>
+                    </java>
+                  </target>
+                </configuration>
                 <goals>
-                  <goal>exec</goal>
+                  <goal>run</goal>
                 </goals>
               </execution>
             </executions>
-            <configuration>
-              <longClasspath>true</longClasspath>
-              <executable>java</executable>
-              <arguments>
-                <argument>-XstartOnFirstThread</argument>
-                <argument>-classpath</argument>
-                <classpath/>
-                <argument>${mainClass}</argument>
-                <argument>${scaleFactor}</argument>
-              </arguments>
-            </configuration>
           </plugin>
         </plugins>
       </build>
