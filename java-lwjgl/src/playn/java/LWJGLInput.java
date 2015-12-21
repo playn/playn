@@ -19,6 +19,7 @@ import java.nio.ByteBuffer;
 
 import org.lwjgl.BufferUtils;
 import org.lwjgl.glfw.GLFWCharCallback;
+import org.lwjgl.glfw.GLFWCursorPosCallback;
 import org.lwjgl.glfw.GLFWKeyCallback;
 import org.lwjgl.glfw.GLFWMouseButtonCallback;
 import org.lwjgl.glfw.GLFWScrollCallback;
@@ -43,7 +44,9 @@ public class LWJGLInput extends JavaInput {
   private GLFWCharCallback charCallback;
   private GLFWKeyCallback keyCallback;
   private GLFWMouseButtonCallback mouseCallback;
+  private GLFWCursorPosCallback cursorPosCallback;
   private GLFWScrollCallback scrollCallback;
+  private float lastMouseX = -1, lastMouseY = -1;
 
   public LWJGLInput (LWJGLPlatform plat) {
     super(plat);
@@ -75,6 +78,21 @@ public class LWJGLInput extends JavaInput {
         ButtonEvent.Id btn = getButton(btnIdx);
         if (btn == null) return;
         emitMouseButton(time, m.x, m.y, btn, action == GLFW_PRESS, mods);
+      }
+    });
+
+    glfwSetCursorPosCallback(gfx.window, cursorPosCallback = new GLFWCursorPosCallback() {
+      @Override public void invoke (long handle, double xpos, double ypos) {
+        double time = System.currentTimeMillis();
+        float x = (float)xpos, y = (float)ypos;
+        if (lastMouseX == -1) {
+          lastMouseX = x;
+          lastMouseY = y;
+        }
+        float dx = x - lastMouseX, dy = y - lastMouseY;
+        emitMouseMotion(time, x, y, dx, dy, calModifierFlags());
+        lastMouseX = x;
+        lastMouseY = y;
       }
     });
 
