@@ -118,8 +118,7 @@ public class GLFWInput extends JavaInput {
     "Use the java-swt backend if you need native dialogs.";
 
   @Override public RFuture<String> getText(TextType textType, String label, String initVal) {
-    if (plat.needsHeadless()) return RFuture.failure(
-      new UnsupportedOperationException(NO_UI_ERROR));
+    if (plat.needsHeadless()) throw new UnsupportedOperationException(NO_UI_ERROR);
 
     Object result = JOptionPane.showInputDialog(
       null, label, "", JOptionPane.QUESTION_MESSAGE, null, null, initVal);
@@ -128,8 +127,7 @@ public class GLFWInput extends JavaInput {
 
   @Override public RFuture<Boolean> sysDialog(String title, String text,
                                               String ok, String cancel) {
-    if (plat.needsHeadless()) return RFuture.failure(
-      new UnsupportedOperationException(NO_UI_ERROR));
+    if (plat.needsHeadless()) throw new UnsupportedOperationException(NO_UI_ERROR);
 
     int optType = JOptionPane.OK_CANCEL_OPTION;
     int msgType = cancel == null ? JOptionPane.INFORMATION_MESSAGE : JOptionPane.QUESTION_MESSAGE;
