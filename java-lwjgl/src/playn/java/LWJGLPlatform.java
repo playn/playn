@@ -47,6 +47,11 @@ public class LWJGLPlatform extends JavaPlatform {
   public LWJGLPlatform (Config config) {
     super(config);
 
+    // on the Mac we have to force AWT into headless mode to avoid conflicts with GLFW
+    if (needsHeadless()) {
+      System.setProperty("java.awt.headless", "true");
+    }
+
     glfwSetErrorCallback(errorCallback = new GLFWErrorCallback() {
       @Override public void invoke(int error, long description) {
         log().error("GL Error (" + error + "):" + getDescription(description));
@@ -90,6 +95,10 @@ public class LWJGLPlatform extends JavaPlatform {
     // IntBuffer vao = BufferUtils.createIntBuffer(1);
     // GL30.glGenVertexArrays(vao);
     // GL30.glBindVertexArray(vao.get(0));
+  }
+
+  boolean needsHeadless() {
+    return System.getProperty("os.name").equals("Mac OS X");
   }
 
   @Override public JavaGraphics graphics () { return graphics; }

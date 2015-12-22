@@ -13,6 +13,7 @@
  */
 package playn.java;
 
+import javax.swing.JOptionPane;
 import java.nio.ByteBuffer;
 
 import org.lwjgl.BufferUtils;
@@ -34,6 +35,7 @@ import static playn.core.Mouse.*;
 
 public class GLFWInput extends JavaInput {
 
+  private final LWJGLPlatform plat;
   private final long window;
   private float lastMouseX = -1, lastMouseY = -1;
 
@@ -89,6 +91,7 @@ public class GLFWInput extends JavaInput {
 
   public GLFWInput(LWJGLPlatform plat, long window) {
     super(plat);
+    this.plat = plat;
     this.window = window;
     glfwSetCharCallback(window, charCallback);
     glfwSetKeyCallback(window, keyCallback);
@@ -111,16 +114,30 @@ public class GLFWInput extends JavaInput {
   }
 
   private static String NO_UI_ERROR =
-    "The java-lwjgl backend does not allow interop with other UI toolkits. " +
+    "The java-lwjgl backend does not allow interop with AWT on Mac OS X. " +
     "Use the java-swt backend if you need native dialogs.";
 
   @Override public RFuture<String> getText(TextType textType, String label, String initVal) {
-    return RFuture.failure(new UnsupportedOperationException(NO_UI_ERROR));
+    if (plat.needsHeadless()) return RFuture.failure(
+      new UnsupportedOperationException(NO_UI_ERROR));
+
+    Object result = JOptionPane.showInputDialog(
+      null, label, "", JOptionPane.QUESTION_MESSAGE, null, null, initVal);
+    return RFuture.success((String)result);
   }
 
   @Override public RFuture<Boolean> sysDialog(String title, String text,
                                               String ok, String cancel) {
-    return RFuture.failure(new UnsupportedOperationException(NO_UI_ERROR));
+    if (plat.needsHeadless()) return RFuture.failure(
+      new UnsupportedOperationException(NO_UI_ERROR));
+
+    int optType = JOptionPane.OK_CANCEL_OPTION;
+    int msgType = cancel == null ? JOptionPane.INFORMATION_MESSAGE : JOptionPane.QUESTION_MESSAGE;
+    Object[] options = (cancel == null) ? new Object[] { ok } : new Object[] { ok, cancel };
+    Object defOption = (cancel == null) ? ok : cancel;
+    int result = JOptionPane.showOptionDialog(
+      null, text, title, optType, msgType, null, options, defOption);
+    return RFuture.success(result == 0);
   }
 
   @Override public boolean hasMouseLock() { return true; }

@@ -31,12 +31,6 @@ public abstract class LWJGLGraphics extends JavaGraphics {
 
   protected LWJGLGraphics(JavaPlatform jplat) {
     super(jplat, new LWJGLGL20(), Scale.ONE); // real scale factor set later
-
-    // we have to force AWT into headless mode to avoid GLFW/AWT conflicts; note that JavaGraphics
-    // has been tweaked to avoid doing *any* AWT stuff at startup, so this is safe to do here;
-    // event if we passed this sysprop on the command line, it is still critical that no AWT stuff
-    // be done before the call to glfwInit() below
-    System.setProperty("java.awt.headless", "true");
   }
 
   @Override void upload (BufferedImage img, Texture tex) {
