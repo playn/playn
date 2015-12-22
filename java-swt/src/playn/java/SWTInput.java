@@ -152,7 +152,7 @@ public class SWTInput extends JavaInput {
     // HACK HACK HACK: SWT drops any pending mouse up event when we open this shell (even if we
     // defer it via Display.asyncExec) so we have to fake a mouse up here lest all input processing
     // get totally hosed; sigh
-    mouseEvents.emit(new Mouse.ButtonEvent(0, plat.time(), 0, 0, Mouse.ButtonEvent.Id.LEFT, false));
+    emitFakeMouseUp();
 
     return result;
   }
@@ -164,8 +164,14 @@ public class SWTInput extends JavaInput {
     MessageBox box = new MessageBox(plat.shell(), style);
     box.setText(title);
     box.setMessage(text);
+    // HACK HACK HACK: see above hand wringing
+    emitFakeMouseUp();
     int button = box.open();
     return RFuture.success(button == SWT.OK);
+  }
+
+  private void emitFakeMouseUp () {
+    mouseEvents.emit(new Mouse.ButtonEvent(0, plat.time(), 0, 0, Mouse.ButtonEvent.Id.LEFT, false));
   }
 
   private int mods (org.eclipse.swt.widgets.Event event) {
