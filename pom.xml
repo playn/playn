@@ -68,14 +68,6 @@
     <maven.test.skip>false</maven.test.skip>
   </properties>
 
-  <repositories>
-    <!-- TEMP: obtain some artifacts from legacy forplay maven repository -->
-    <repository>
-      <id>forplay-legacy</id>
-      <url>http://forplay.googlecode.com/svn/mavenrepo</url>
-    </repository>
-  </repositories>
-
   <!-- Common dependencies for all modules -->
   <dependencies>
     <dependency>
