@@ -721,11 +721,15 @@ public abstract class Layer implements Closeable {
   }
 
   @Override public String toString () {
-    StringBuilder bldr = new StringBuilder(name());
-    bldr.append(" @ ").append(hashCode());
-    bldr.append(" [tx=").append(transform());
-    if (hitTester != null) bldr.append(", hitTester=").append(hitTester);
-    return bldr.append("]").toString();
+    StringBuilder buf = new StringBuilder(name());
+    buf.append(" @ ").append(hashCode()).append(" [");
+    toString(buf);
+    return buf.append("]").toString();
+  }
+
+  protected void toString (StringBuilder buf) {
+    buf.append("tx=").append(transform());
+    if (hitTester != null) buf.append(", hitTester=").append(hitTester);
   }
 
   protected int flags;

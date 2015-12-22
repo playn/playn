@@ -212,6 +212,11 @@ public class GroupLayer extends ClippedLayer implements Iterable<Layer> {
     return disableClip;
   }
 
+  @Override protected void toString (StringBuilder buf) {
+    super.toString(buf);
+    buf.append(", children=").append(children.size());
+  }
+
   @Override protected void paintClipped (Surface surf) {
     // save our current transform and restore it before painting each child
     paintTx.set(surf.tx());
