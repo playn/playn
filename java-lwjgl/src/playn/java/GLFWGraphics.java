@@ -68,7 +68,7 @@ public class GLFWGraphics extends LWJGLGraphics {
   }
 
   @Override public IDimension screenSize () {
-    GLFWVidMode vidMode = glfwGetVideoMode(glfwGetWindowMonitor(window));
+    GLFWVidMode vidMode = glfwGetVideoMode(glfwGetPrimaryMonitor());
     screenSize.width = vidMode.width();
     screenSize.height = vidMode.height();
     return screenSize;
