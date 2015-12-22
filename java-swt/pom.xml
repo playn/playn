@@ -30,18 +30,20 @@
       <version>${project.version}</version>
     </dependency>
 
-    <dependency>
-      <groupId>org.eclipse.swt</groupId>
-      <artifactId>${swt.artifactId}</artifactId>
-      <version>${swt.version}</version>
-    </dependency>
-
-    <!-- this is just needed to compile the special mac hack class -->
+    <!-- this is just needed to compile the special mac hack class; NOTE: it has to be before the
+         real dependency below so that it gets used during the build even though the appropriate
+         platform dependency will be used at runtime; don't try this at home kids! -->
     <dependency>
       <groupId>org.eclipse.swt</groupId>
       <artifactId>org.eclipse.swt.cocoa.macosx.x86_64</artifactId>
       <version>${swt.version}</version>
       <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.eclipse.swt</groupId>
+      <artifactId>${swt.artifactId}</artifactId>
+      <version>${swt.version}</version>
     </dependency>
   </dependencies>
 
