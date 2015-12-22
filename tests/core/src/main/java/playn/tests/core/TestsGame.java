@@ -202,7 +202,9 @@ public class TestsGame extends SceneGame {
 
     float gap = 20, x = gap, y = gap, maxHeight = 0;
 
-    String info = "Renderer: gl (batch=" + defaultBatch + ") / Viewport: " + graphics.viewSize;
+    String info = "Renderer: gl (batch=" + defaultBatch + ")" +
+      " / Screen: " + graphics.screenSize() +
+      " / Window: " + graphics.viewSize;
     Texture infoTex = ui.formatText(info, false);
     rootLayer.addAt(new ImageLayer(infoTex), x, y);
     y += infoTex.displayHeight + gap;
