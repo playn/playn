@@ -25,22 +25,36 @@ import org.eclipse.swt.widgets.Listener;
 
 import org.lwjgl.opengl.GL;
 
+import playn.core.Scale;
 import pythagoras.f.Dimension;
 import pythagoras.f.IDimension;
 
 public class SWTGraphics extends LWJGLGraphics {
 
+  public static class Hack {
+    public Scale hackScale () { return Scale.ONE; }
+    public void hackCanvas (GLCanvas canvas) {}
+    public void convertToBacking (GLCanvas canvas, Rectangle bounds) {}
+  }
+
   private final SWTPlatform plat;
   GLCanvas canvas; // initialized in createGLContext
 
-  public SWTGraphics (SWTPlatform plat, final Composite comp) {
-    super(plat);
-    this.plat = plat;
+  public SWTGraphics (SWTPlatform splat, final Composite comp) {
+    super(splat);
+    this.plat = splat;
+
+    boolean isMac = "Mac OS X".equals(System.getProperty("os.name"));
+    final Hack hack = isMac ? new SWTMacHack() : new Hack();
+
+    // special scale fiddling on Mac
+    scaleChanged(hack.hackScale());
 
     // create our GLCanvas
     GLData data = new GLData();
     data.doubleBuffer = true;
     canvas = new GLCanvas(comp, SWT.NO_BACKGROUND | SWT.NO_REDRAW_RESIZE, data);
+    hack.hackCanvas(canvas);
     canvas.setCurrent();
     GL.createCapabilities();
 
@@ -52,6 +66,7 @@ public class SWTGraphics extends LWJGLGraphics {
         comp.setBounds(bounds);
         canvas.setBounds(bounds);
         canvas.setCurrent();
+        hack.convertToBacking(canvas, bounds);
         viewportChanged(bounds.width, bounds.height);
       }
     });
@@ -63,15 +78,14 @@ public class SWTGraphics extends LWJGLGraphics {
   public GLCanvas canvas () { return canvas; }
 
   @Override public IDimension screenSize () {
-    return new Dimension(); // TODO
+    Rectangle db = plat.display().getBounds();
+    return new Dimension(db.width, db.height);
   }
 
   @Override public void setSize (int width, int height, boolean fullscreen) {
-    int rawWidth = scale().scaledCeil(width), rawHeight = scale().scaledCeil(height);
-    plat.composite().setSize(rawWidth, rawHeight);
+    plat.composite().setSize(width, height);
     plat.shell().setFullScreen(fullscreen);
     plat.shell().pack();
-    // viewSizeChanged(rawWidth, rawHeight);
   }
 
   @Override void setTitle (String title) { plat.shell().setText(title); }
