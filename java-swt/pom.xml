@@ -35,6 +35,14 @@
       <artifactId>${swt.artifactId}</artifactId>
       <version>${swt.version}</version>
     </dependency>
+
+    <!-- this is just needed to compile the special mac hack class -->
+    <dependency>
+      <groupId>org.eclipse.swt</groupId>
+      <artifactId>org.eclipse.swt.cocoa.macosx.x86_64</artifactId>
+      <version>${swt.version}</version>
+      <scope>provided</scope>
+    </dependency>
   </dependencies>
 
   <build>
