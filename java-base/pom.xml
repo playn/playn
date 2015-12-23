@@ -20,9 +20,9 @@
     </dependency>
 
     <dependency>
-      <groupId>jlayer</groupId>
+      <groupId>com.googlecode.soundlibs</groupId>
       <artifactId>mp3spi</artifactId>
-      <version>1.9.5</version>
+      <version>1.9.5-1</version>
     </dependency>
 
     <dependency>
