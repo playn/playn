@@ -13,6 +13,11 @@
   <packaging>jar</packaging>
 
   <repositories>
+    <!-- needed for apk-expansion; Google helpfully doesn't publish that to Maven Central -->
+    <repository>
+      <id>forplay-legacy</id>
+      <url>http://forplay.googlecode.com/svn/mavenrepo</url>
+    </repository>
   </repositories>
 
   <dependencies>
