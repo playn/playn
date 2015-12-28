@@ -1,5 +1,5 @@
 language: java
-after_success: tools/travis-deploy.sh
+after_success: etc/travis-deploy.sh
 sudo: false
 
 jdk:
