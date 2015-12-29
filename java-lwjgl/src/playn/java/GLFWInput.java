@@ -47,11 +47,10 @@ public class GLFWInput extends JavaInput {
   };
   private final GLFWKeyCallback keyCallback = new GLFWKeyCallback() {
     @Override public void invoke(long window, int keyCode, int scancode, int action, int mods) {
-      int flags = modifierFlags();
       double time = System.currentTimeMillis();
       Key key = translateKey(keyCode);
       boolean pressed = action == GLFW_PRESS || action == GLFW_REPEAT;
-      if (key != null) emitKeyPress(time, key, pressed, flags);
+      if (key != null) emitKeyPress(time, key, pressed, toModifierFlags(mods));
       else plat.log().warn("Unknown keyCode:" + keyCode);
     }
   };
@@ -61,7 +60,7 @@ public class GLFWInput extends JavaInput {
       Point m = queryCursorPosition();
       ButtonEvent.Id btn = getButton(btnIdx);
       if (btn == null) return;
-      emitMouseButton(time, m.x, m.y, btn, action == GLFW_PRESS, mods);
+      emitMouseButton(time, m.x, m.y, btn, action == GLFW_PRESS, toModifierFlags(mods));
     }
   };
   private final GLFWCursorPosCallback cursorPosCallback = new GLFWCursorPosCallback() {
@@ -73,7 +72,7 @@ public class GLFWInput extends JavaInput {
         lastMouseY = y;
       }
       float dx = x - lastMouseX, dy = y - lastMouseY;
-      emitMouseMotion(time, x, y, dx, dy, modifierFlags());
+      emitMouseMotion(time, x, y, dx, dy, pollModifierFlags());
       lastMouseX = x;
       lastMouseY = y;
     }
@@ -160,12 +159,20 @@ public class GLFWInput extends JavaInput {
   /** Returns the current state of the modifier keys. Note: the code assumes the current state of
     * the modifier keys is "correct" for all events that have arrived since the last call to
     * update; since that happens pretty frequently, 60fps, that's probably good enough. */
-  private int modifierFlags() {
+  private int pollModifierFlags() {
     return modifierFlags(
       isKeyDown(GLFW_KEY_LEFT_ALT)     || isKeyDown(GLFW_KEY_LEFT_ALT),
       isKeyDown(GLFW_KEY_LEFT_CONTROL) || isKeyDown(GLFW_KEY_RIGHT_CONTROL),
       isKeyDown(GLFW_KEY_LEFT_SUPER)   || isKeyDown(GLFW_KEY_RIGHT_SUPER),
       isKeyDown(GLFW_KEY_LEFT_SHIFT)   || isKeyDown(GLFW_KEY_RIGHT_SHIFT));
+  }
+
+  /** Converts GLFW modifier key flags into PlayN modifier key flags. */
+  private int toModifierFlags (int mods) {
+    return modifierFlags((mods & GLFW_MOD_ALT) != 0,
+                         (mods & GLFW_MOD_CONTROL) != 0,
+                         (mods & GLFW_MOD_SUPER) != 0,
+                         (mods & GLFW_MOD_SHIFT) != 0);
   }
 
   private boolean isKeyDown(int key) {
