@@ -116,7 +116,8 @@ public abstract class Graphics {
     }).once();
   }
 
-  Texture colorTex () {
+  /** Get the underling color texture for the root graphic. **/
+  public Texture colorTex () {
     if (colorTex == null) {
       Canvas canvas = createCanvas(1, 1);
       canvas.setFillColor(0xFFFFFFFF).fillRect(0, 0, canvas.width, canvas.height);
