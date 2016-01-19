@@ -22,6 +22,7 @@ import react.Signal;
 import react.Slot;
 
 import playn.core.Clock;
+import playn.core.Log;
 
 /**
  * Utility class for transforming coordinates between {@link Layer}s.
@@ -222,6 +223,13 @@ public class LayerUtil {
     return depth;
   }
 
+  /**
+   * Prints the layer heirarchy starting at {@code layer}, using {@link Log#debug}.
+   */
+  public static void print (Log log, Layer layer) {
+    print(log, layer, "");
+  }
+
   /** Performs the recursion for {@link #layerUnderPoint(Layer,float,float)}. */
   protected static Layer layerUnderPoint (Layer layer, Point pt) {
     float x = pt.x, y = pt.y;
@@ -247,5 +255,16 @@ public class LayerUtil {
       return layer;
     }
     return null;
+  }
+
+  private static void print (Log log, Layer layer, String prefix) {
+    log.debug(prefix + layer);
+    if (layer instanceof GroupLayer) {
+      String gprefix = prefix + "  ";
+      GroupLayer glayer = (GroupLayer)layer;
+      for (int ii = 0, ll = glayer.children(); ii < ll; ii++) {
+        print(log, glayer.childAt(ii), gprefix);
+      }
+    }
   }
 }
