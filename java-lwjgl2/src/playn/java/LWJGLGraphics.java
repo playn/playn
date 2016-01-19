@@ -111,8 +111,20 @@ public class LWJGLGraphics extends JavaGraphics {
       if (fullscreen == Display.isFullscreen() &&
           mode.getWidth() == width && mode.getHeight() == height) return;
 
-      if (!fullscreen) mode = new DisplayMode(width, height);
-      else {
+      if (!fullscreen) {
+        DisplayMode deskMode = Display.getDesktopDisplayMode();
+        if (width > deskMode.getWidth()) {
+          plat.log().debug("Capping window width at desktop width: " + width + " -> " +
+                           deskMode.getWidth());
+          width = deskMode.getWidth();
+        }
+        if (height > deskMode.getHeight()) {
+          plat.log().debug("Capping window height at desktop height: " + height + " -> " +
+                           deskMode.getHeight());
+          height = deskMode.getHeight();
+        }
+        mode = new DisplayMode(width, height);
+      } else {
         // try and find a mode matching width and height
         DisplayMode matching = null;
         for (DisplayMode dm : Display.getAvailableDisplayModes()) {

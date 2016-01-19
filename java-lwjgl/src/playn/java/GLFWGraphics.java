@@ -57,6 +57,17 @@ public class GLFWGraphics extends LWJGLGraphics {
       plat.log().warn("fullscreen cannot be changed via setSize, use config.fullscreen instead");
       return;
     }
+    GLFWVidMode vidMode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+    if (width > vidMode.width()) {
+      plat.log().debug("Capping window width at desktop width: " + width + " -> " +
+                       vidMode.width());
+      width = vidMode.width();
+    }
+    if (height > vidMode.height()) {
+      plat.log().debug("Capping window height at desktop height: " + height + " -> " +
+                       vidMode.height());
+      height = vidMode.height();
+    }
     glfwSetWindowSize(window, width, height);
     // plat.log().info("setSize: " + width + "x" + height);
     viewSizeM.setSize(width, height);
