@@ -20,7 +20,6 @@ import java.util.List;
 
 import pythagoras.f.AffineTransform;
 import pythagoras.f.FloatMath;
-import pythagoras.f.MathUtil;
 import pythagoras.f.Transforms;
 import pythagoras.f.XY;
 import pythagoras.i.Rectangle;
@@ -186,7 +185,7 @@ public class Surface implements Closeable {
 
   /** Returns the currently configured alpha. */
   public float alpha () {
-    return ((tint >> 24) & 0xFF) / 255f;
+    return Tint.getAlpha(tint);
   }
 
   /** Set the alpha component of this surface's current tint. Note that this value will be
@@ -195,8 +194,7 @@ public class Surface implements Closeable {
     * @param alpha value in range [0,1] where 0 is transparent and 1 is opaque.
     */
   public Surface setAlpha (float alpha) {
-    int ialpha = (int)(0xFF * MathUtil.clamp(alpha, 0, 1));
-    this.tint = (ialpha << 24) | (tint & 0xFFFFFF);
+    tint = Tint.setAlpha(tint, alpha);
     return this;
   }
 

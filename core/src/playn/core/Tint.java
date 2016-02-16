@@ -15,6 +15,8 @@
  */
 package playn.core;
 
+import pythagoras.f.MathUtil;
+
 /**
  * Tinting related utility methods.
  */
@@ -35,5 +37,17 @@ public class Tint {
     int newG =  (((curTint >>  8) & 0xFF) * (((tint >>  8) & 0xFF)+1)) & 0xFF00;
     int newB =  (((curTint        & 0xFF) * ((tint         & 0xFF)+1)) >> 8) & 0xFF;
     return newA | newR | newG | newB;
+  }
+
+  /** Sets the alpha component of {@code tint} to {@code alpha}.
+    * @return the new tint. */
+  public static int setAlpha(int tint, float alpha) {
+    int ialpha = (int)(0xFF * MathUtil.clamp(alpha, 0, 1));
+    return (ialpha << 24) | (tint & 0xFFFFFF);
+  }
+
+  /** Returns the alpha component of {@code tint} as a float between {@code [0, 1]}. */
+  public static float getAlpha(int tint) {
+    return ((tint >> 24) & 0xFF) / 255f;
   }
 }
