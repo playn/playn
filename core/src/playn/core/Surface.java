@@ -266,25 +266,21 @@ public class Surface implements Closeable {
   }
 
   /**
-   * Draws a scaled subset of an image (defined by {@code (sx, sy)} and {@code (w x h)}) at the
-   * specified location {@code (dx, dy)} and size {@code (dw x dh)}.
+   * Draws a tile at the specified location {@code (x, y)} and size {@code (w x h)}, with tint
+   * {@code tint}. <em>Note:</em> this will override any tint and alpha currently configured on
+   * this surface.
    */
-  public Surface draw (Tile tile, float dx, float dy, float dw, float dh,
-                       float sx, float sy, float sw, float sh) {
-    tile.addToBatch(batch, tint, tx(), dx, dy, dw, dh, sx, sy, sw, sh);
+  public Surface draw (Tile tile, int tint, float x, float y, float w, float h) {
+    tile.addToBatch(batch, tint, tx(), x, y, w, h);
     return this;
   }
 
   /**
    * Draws a scaled subset of an image (defined by {@code (sx, sy)} and {@code (w x h)}) at the
-   * specified location {@code (dx, dy)} and size {@code (dw x dh)}, at {@code alpha}.
-   * <em>Note:</em> this will override any alpha currently configured on this surface, but will use
-   * the currently configured {@code tint}.
+   * specified location {@code (dx, dy)} and size {@code (dw x dh)}.
    */
-  public Surface draw (Tile tile, float alpha, float dx, float dy, float dw, float dh,
+  public Surface draw (Tile tile, float dx, float dy, float dw, float dh,
                        float sx, float sy, float sw, float sh) {
-    int ialpha = (int)(0xFF * MathUtil.clamp(alpha, 0, 1));
-    int tint = (ialpha << 24) | (this.tint & 0xFFFFFF);
     tile.addToBatch(batch, tint, tx(), dx, dy, dw, dh, sx, sy, sw, sh);
     return this;
   }
