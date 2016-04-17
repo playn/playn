@@ -1,0 +1,25 @@
+<config>
+  <executableName>${app.executable}</executableName>
+  <mainClass>${app.mainclass}</mainClass>
+  <os>ios</os>
+  <arch>thumbv7</arch>
+  <resources>
+    <resource>
+      <directory>resources</directory>
+    </resource>
+  </resources>
+  <target>ios</target>
+  <iosInfoPList>Info.plist.xml</iosInfoPList>
+  <forceLinkClasses>
+    <!-- these are needed for Storage -->
+    <pattern>SQLite.JDBCDriver</pattern>
+    <pattern>SQLite.JDBC2z.JDBCConnection</pattern>
+    <!-- these are needed for WebSocket support in Net -->
+    <pattern>com.android.org.conscrypt.OpenSSLProvider</pattern>
+    <pattern>org.apache.harmony.security.provider.cert.DRLCertFactory</pattern>
+    <pattern>com.android.org.bouncycastle.jce.provider.BouncyCastleProvider</pattern>
+    <pattern>org.apache.harmony.security.provider.crypto.CryptoProvider</pattern>
+    <pattern>com.android.org.conscrypt.JSSEProvider</pattern>
+    <pattern>com.android.org.conscrypt.OpenSSLMessageDigestJDK$SHA1</pattern>
+  </forceLinkClasses>
+</config>
