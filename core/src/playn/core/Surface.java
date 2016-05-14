@@ -121,7 +121,7 @@ public class Surface implements Closeable {
     * to skip their drawing if this returns false, but they must still call {@link #endClipped}. */
   public boolean startClipped (int x, int y, int width, int height) {
     batch.flush(); // flush any pending unclipped calls
-    Rectangle r = pushScissorState(x, target.height()-y-height, width, height);
+    Rectangle r = pushScissorState(x, target.flip() ? target.height()-y-height : y, width, height);
     batch.gl.glScissor(r.x, r.y, r.width, r.height);
     if (scissorDepth == 1) batch.gl.glEnable(GL20.GL_SCISSOR_TEST);
     batch.gl.checkError("startClipped");
