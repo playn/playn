@@ -20,7 +20,9 @@ import java.util.List;
 
 import pythagoras.f.AffineTransform;
 import pythagoras.f.FloatMath;
+import pythagoras.f.Point;
 import pythagoras.f.Transforms;
+import pythagoras.f.Vector;
 import pythagoras.f.XY;
 import pythagoras.i.Rectangle;
 
@@ -48,6 +50,10 @@ public class Surface implements Closeable {
   private int tint = Tint.NOOP_TINT;
   private Texture patternTex;
   private AffineTransform lastTrans;
+  
+  private pythagoras.f.Rectangle targetArea;
+  private Point intersectionTestPoint = new Point();
+  private Vector intersectionTestSize = new Vector();
 
   /**
    * Creates a surface which will render to {@code target} using {@code defaultBatch} as its
@@ -56,6 +62,7 @@ public class Surface implements Closeable {
   public Surface (Graphics gfx, RenderTarget target, QuadBatch defaultBatch) {
     this.target = target;
     this.batch = defaultBatch;
+    this.targetArea = new pythagoras.f.Rectangle(0, 0, this.target.width(), this.target.height());
     transformStack.add(lastTrans = new AffineTransform());
     colorTex = gfx.colorTex();
     scale(target.xscale(), target.yscale());
@@ -249,6 +256,21 @@ public class Surface implements Closeable {
     batch.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
     return this;
   }
+  
+  /** Decides whether the given corrdinates/size is inside our current render target area. */
+  private boolean intersects(float x, float y, float w, float h) {
+    tx().transform(intersectionTestPoint.set(x, y), intersectionTestPoint);
+	tx().transform(intersectionTestSize.set(w, h), intersectionTestSize);
+	
+	if (scissorDepth > 0) {
+		Rectangle scissor = scissors.get(scissorDepth - 1);
+		return scissor.intersects((int) intersectionTestPoint.x, (int) intersectionTestPoint.y,
+				(int) intersectionTestSize.x, (int) intersectionTestSize.y);
+	}
+	
+	return targetArea.intersects(intersectionTestPoint.x, intersectionTestPoint.y,
+			intersectionTestSize.x, intersectionTestSize.y);
+  }
 
   /** Draws a tile at the specified location: {@code x, y}. */
   public Surface draw (Tile tile, float x, float y) {
@@ -259,7 +281,9 @@ public class Surface implements Closeable {
    * Draws a tile at the specified location {@code (x, y)} and size {@code (w x h)}.
    */
   public Surface draw (Tile tile, float x, float y, float w, float h) {
-    tile.addToBatch(batch, tint, tx(), x, y, w, h);
+	if (intersects(x, y, w, h)) {
+		tile.addToBatch(batch, tint, tx(), x, y, w, h);
+	}
     return this;
   }
 
@@ -269,7 +293,9 @@ public class Surface implements Closeable {
    * this surface.
    */
   public Surface draw (Tile tile, int tint, float x, float y, float w, float h) {
-    tile.addToBatch(batch, tint, tx(), x, y, w, h);
+    if (intersects(x, y, w, h)) {
+    	tile.addToBatch(batch, tint, tx(), x, y, w, h);
+    }
     return this;
   }
 
@@ -279,7 +305,9 @@ public class Surface implements Closeable {
    */
   public Surface draw (Tile tile, float dx, float dy, float dw, float dh,
                        float sx, float sy, float sw, float sh) {
-    tile.addToBatch(batch, tint, tx(), dx, dy, dw, dh, sx, sy, sw, sh);
+	if (intersects(dx, dy, dw, dh)) {
+		tile.addToBatch(batch, tint, tx(), dx, dy, dw, dh, sx, sy, sw, sh);
+	}
     return this;
   }
 
@@ -290,7 +318,9 @@ public class Surface implements Closeable {
    */
   public Surface draw (Tile tile, int tint, float dx, float dy, float dw, float dh,
                        float sx, float sy, float sw, float sh) {
-    tile.addToBatch(batch, tint, tx(), dx, dy, dw, dh, sx, sy, sw, sh);
+    if (intersects(dx, dy, dw, dh)) {
+      tile.addToBatch(batch, tint, tx(), dx, dy, dw, dh, sx, sy, sw, sh);
+    }
     return this;
   }
 
