@@ -52,7 +52,6 @@ public class Surface implements Closeable {
   private AffineTransform lastTrans;
 
   private boolean checkIntersection;
-  private pythagoras.f.Rectangle targetArea;
   private Point intersectionTestPoint = new Point();
   private Vector intersectionTestSize = new Vector();
 
@@ -63,7 +62,6 @@ public class Surface implements Closeable {
   public Surface (Graphics gfx, RenderTarget target, QuadBatch defaultBatch) {
     this.target = target;
     this.batch = defaultBatch;
-    this.targetArea = new pythagoras.f.Rectangle(0, 0, this.target.width(), this.target.height());
     transformStack.add(lastTrans = new AffineTransform());
     colorTex = gfx.colorTex();
     scale(target.xscale(), target.yscale());
@@ -260,15 +258,16 @@ public class Surface implements Closeable {
   public boolean intersects (float x, float y, float w, float h) {
     tx().transform(intersectionTestPoint.set(x, y), intersectionTestPoint);
     tx().transform(intersectionTestSize.set(w, h), intersectionTestSize);
+    float ix = intersectionTestPoint.x, iy = intersectionTestPoint.y;
+    float iw = intersectionTestSize.x, ih = intersectionTestSize.y;
 
     if (scissorDepth > 0) {
       Rectangle scissor = scissors.get(scissorDepth - 1);
-      return scissor.intersects((int)intersectionTestPoint.x, (int)intersectionTestPoint.y,
-                                (int)intersectionTestSize.x, (int)intersectionTestSize.y);
+      return scissor.intersects((int)ix, (int)iy, (int)iw, (int)ih);
     }
 
-    return targetArea.intersects(intersectionTestPoint.x, intersectionTestPoint.y,
-                                 intersectionTestSize.x, intersectionTestSize.y);
+    float tw = target.width(), th = target.height();
+    return (ix + iw > 0) && (ix < tw) && (iy + ih > 0) && (iy < th);
   }
 
   /** Clears the entire surface to transparent blackness. */
