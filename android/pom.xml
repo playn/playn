@@ -12,14 +12,6 @@
   <name>PlayN Android</name>
   <packaging>jar</packaging>
 
-  <repositories>
-    <!-- needed for apk-expansion; Google helpfully doesn't publish that to Maven Central -->
-    <repository>
-      <id>forplay-legacy</id>
-      <url>http://forplay.googlecode.com/svn/mavenrepo</url>
-    </repository>
-  </repositories>
-
   <dependencies>
     <dependency>
       <groupId>io.playn</groupId>
@@ -38,12 +30,6 @@
       <groupId>org.java-websocket</groupId>
       <artifactId>Java-WebSocket</artifactId>
       <version>1.3.0</version>
-    </dependency>
-
-    <dependency>
-      <groupId>com.google.android</groupId>
-      <artifactId>apk-expansion</artifactId>
-      <version>r3</version>
     </dependency>
   </dependencies>
 
