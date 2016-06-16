@@ -98,7 +98,7 @@ public final class HtmlGL20 extends GL20 {
   private WebGLBuffer boundElementArrayBuffer;
   private WebGLBuffer requestedElementArrayBuffer;
 
-  private WebGLRenderingContext glc;
+  private WebGLRenderingContext gl;
 
   public HtmlGL20 () {
     super(new Buffers() {
@@ -286,10 +286,10 @@ protected WebGLObject genObject(WebGLObjectType type) {
     return (WebGLUniformLocation) webGLObjects.get(index);
   }
 
-  void init (WebGLRenderingContext glc) {
+  void init (WebGLRenderingContext gl) {
     // TODO: do we always want to do this?
     gl.pixelStorei(UNPACK_PREMULTIPLY_ALPHA_WEBGL, ONE);
-    this.glc = glc;
+    this.gl = gl;
 
     webGLObjects.push(null);
     webGLObjectTypes.push(WebGLObjectType.NULL.ordinal());
