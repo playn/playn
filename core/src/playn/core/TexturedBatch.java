@@ -67,6 +67,7 @@ public class TexturedBatch extends GLBatch {
 
   public final GL20 gl;
   protected int curTexId;
+  protected boolean textureChanged = true;
 
   /** Prepares this batch to render using the supplied texture. If pending operations have been
     * added to this batch for a different texture, this call will trigger a {@link #flush}.
@@ -74,7 +75,10 @@ public class TexturedBatch extends GLBatch {
     * method manually. Only if you're adding bare primitives is it needed. */
   public void setTexture (Texture texture) {
     if (curTexId != 0 && curTexId != texture.id) flush();
-    this.curTexId = texture.id;
+    if (this.curTexId != texture.id) {
+    	this.curTexId = texture.id;
+    	textureChanged = true;
+    }
   }
 
   @Override public void end () {
@@ -88,7 +92,10 @@ public class TexturedBatch extends GLBatch {
 
   /** Binds our current texture. Subclasses need to call this in {@link #flush}. */
   protected void bindTexture () {
-    gl.glBindTexture(GL20.GL_TEXTURE_2D, curTexId);
-    gl.checkError("QuadBatch glBindTexture");
+	if (textureChanged) {
+		textureChanged = false;
+		gl.glBindTexture(GL20.GL_TEXTURE_2D, curTexId);
+    	gl.checkError("QuadBatch glBindTexture");
+	}
   }
 }
