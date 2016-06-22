@@ -24,15 +24,14 @@ import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
 
-import com.google.gwt.core.client.JsArray;
-import com.google.gwt.core.client.JsArrayInteger;
+import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.typedarrays.shared.ArrayBufferView;
 import com.google.gwt.typedarrays.shared.Float32Array;
+import com.google.gwt.typedarrays.shared.Int16Array;
 import com.google.gwt.typedarrays.shared.Int32Array;
 import com.google.gwt.typedarrays.shared.TypedArrays;
 import com.google.gwt.webgl.client.WebGLBuffer;
 import com.google.gwt.webgl.client.WebGLFramebuffer;
-import com.google.gwt.webgl.client.WebGLObject;
 import com.google.gwt.webgl.client.WebGLProgram;
 import com.google.gwt.webgl.client.WebGLRenderbuffer;
 import com.google.gwt.webgl.client.WebGLRenderingContext;
@@ -64,11 +63,7 @@ import playn.core.GL20;
  */
 public final class HtmlGL20 extends GL20 {
 
-  enum WebGLObjectType {
-    NULL, BUFFER, FRAME_BUFFER, PROGRAM, RENDER_BUFFER, SHADER, TEXTURE, UNIFORM_LOCATION,
-  }
-
-  class VertexAttribArrayState {
+  static class VertexAttribArrayState {
     int type;
     int size;
     int stride;
@@ -79,7 +74,45 @@ public final class HtmlGL20 extends GL20 {
     WebGLBuffer webGlBuffer;
   }
 
+  static final class IntMap<T extends JavaScriptObject> extends JavaScriptObject {
+    protected IntMap() {
+      super();
+    }
+
+    public static native <T extends JavaScriptObject> IntMap<T> create() /*-{
+      return [undefined];
+    }-*/;
+
+    public native T get(int key) /*-{
+      return this[key];
+    }-*/;
+
+    public native void put(int key, T value) /*-{
+      this[key] = value;
+    }-*/;
+
+    public native int add(T value) /*-{
+      this.push(value);
+      return this.length - 1;
+    }-*/;
+
+    public native T remove(int key) /*-{
+      var value = this[key];
+      delete this[key];
+      return value;
+      }-*/;
+  }
+
   static final int VERTEX_ATTRIB_ARRAY_COUNT = 5; //  position, color, texture0, texture1, normals
+
+  private final IntMap<WebGLProgram> programs = IntMap.create();
+  private final IntMap<WebGLShader> shaders = IntMap.create();
+  private final IntMap<WebGLBuffer> buffers = IntMap.create();
+  private final IntMap<WebGLFramebuffer> frameBuffers = IntMap.create();
+  private final IntMap<WebGLRenderbuffer> renderBuffers = IntMap.create();
+  private final IntMap<WebGLTexture> textures = IntMap.create();
+  private final IntMap<IntMap<WebGLUniformLocation>> uniforms = IntMap.create();
+  private int currProgram = 0;
 
   private int enabledArrays = 0;
   private int previouslyEnabledArrays = 0;
@@ -87,10 +120,6 @@ public final class HtmlGL20 extends GL20 {
 
   private VertexAttribArrayState[] vertexAttribArrayState =
     new VertexAttribArrayState[VERTEX_ATTRIB_ARRAY_COUNT];
-
-  @SuppressWarnings("unchecked")
-  private JsArray<WebGLObject> webGLObjects = (JsArray<WebGLObject>) JsArray.createArray();
-  private JsArrayInteger webGLObjectTypes = (JsArrayInteger) JsArrayInteger.createArray();
 
   private WebGLBuffer elementBuffer;
   private WebGLBuffer boundArrayBuffer;
@@ -110,122 +139,23 @@ public final class HtmlGL20 extends GL20 {
     }, HtmlUrlParameters.checkGLErrors);
   }
 
-  protected int createObject(WebGLObject object, WebGLObjectType type) {
-    // TODO (haustein) keep track of empty positions.
-//    for (int i = 0; i < webGLObjects.size(); i++) {
-//      if (webGLObjects.get(i) == null) {
-//        webGLObjects.set(i, container);
-//        return i;
-//      }
-//    }
-    webGLObjects.push(object);
-    webGLObjectTypes.push(type.ordinal());
-    return webGLObjects.length() - 1;
+  public Float32Array copy (FloatBuffer buffer) {
+    return ((Float32Array)((HasArrayBufferView)buffer).getTypedArray()).subarray(buffer.position(), buffer.remaining());
   }
 
-  protected void deleteObject(int index, WebGLObjectType type) {
-    WebGLObject object = webGLObjects.get(index);
-    webGLObjects.set(index, null);
-    webGLObjectTypes.set(index, WebGLObjectType.NULL.ordinal());
-    switch(type) {
-      case BUFFER:
-        gl.deleteBuffer((WebGLBuffer) object);
-        break;
-      case FRAME_BUFFER:
-        gl.deleteFramebuffer((WebGLFramebuffer) object);
-        break;
-      case PROGRAM:
-        gl.deleteProgram((WebGLProgram) object);
-        break;
-      case RENDER_BUFFER:
-        gl.deleteRenderbuffer((WebGLRenderbuffer) object);
-        break;
-      case SHADER:
-        gl.deleteShader((WebGLShader) object);
-        break;
-      case TEXTURE:
-        gl.deleteTexture((WebGLTexture) object);
-        break;
-      default:
-        break;
-    }
+  public Int16Array copy (ShortBuffer buffer) {
+    return ((Int16Array)((HasArrayBufferView)buffer).getTypedArray()).subarray(buffer.position(), buffer.remaining());
   }
 
-  protected void deleteObjects(int count, IntBuffer indices, WebGLObjectType type) {
-    for (int i = 0; i < count; i++) {
-      int index = indices.get(indices.position() + i);
-      deleteObject(index, type);
-    }
-  }
-
-  protected void deleteObjects(int count, int[] indices, int offset, WebGLObjectType type) {
-    for (int i = 0; i < count; i++) {
-      deleteObject(indices[offset+i], type);
-    }
-  }
-
-protected WebGLObject genObject(WebGLObjectType type) {
-    switch(type) {
-      case BUFFER:
-        return gl.createBuffer();
-      case FRAME_BUFFER:
-        return gl.createFramebuffer();
-      case PROGRAM:
-        return gl.createProgram();
-      case RENDER_BUFFER:
-        return gl.createRenderbuffer();
-      case TEXTURE:
-        return gl.createTexture();
-      default:
-        throw new RuntimeException("genObject(s) not supported for type " + type);
-    }
-  }
-
-  protected void genObjects(int count, int[] names, int offset, WebGLObjectType type) {
-    // createObject loop
-    for (int i = 0; i < count; i++) {
-      WebGLObject object = genObject(type);
-      names[i + offset] = createObject(object, type);
-    }
-  }
-
-  protected void genObjects(int count, IntBuffer names, WebGLObjectType type) {
-    // createObject loop
-    for (int i = 0; i < count; i++) {
-      WebGLObject object = genObject(type);
-      names.put(i + names.position(), createObject(object, type));
-    }
-  }
-
-  private WebGLBuffer getBuffer (int index) {
-    return (WebGLBuffer) webGLObjects.get(index);
-  }
+  public Int32Array copy (IntBuffer buffer) {
+    return ((Int32Array)((HasArrayBufferView)buffer).getTypedArray()).subarray(buffer.position(), buffer.remaining());
+	}
 
   private static int getElementSize(Buffer buffer) {
     if ((buffer instanceof FloatBuffer) || (buffer instanceof IntBuffer)) return 4;
     else if (buffer instanceof ShortBuffer) return 2;
     else if (buffer instanceof ByteBuffer) return 1;
     else throw new RuntimeException("Unrecognized buffer type: " + buffer.getClass());
-  }
-
-  private WebGLFramebuffer getFramebuffer (int index) {
-    return (WebGLFramebuffer) webGLObjects.get(index);
-  }
-
-  private WebGLProgram getProgram (int index) {
-    return (WebGLProgram) webGLObjects.get(index);
-  }
-
-  private WebGLRenderbuffer getRenderbuffer(int index) {
-    return (WebGLRenderbuffer) webGLObjects.get(index);
-  }
-
-  private WebGLShader getShader(int index) {
-    return (WebGLShader) webGLObjects.get(index);
-  }
-
-  protected WebGLTexture getTexture(int index) {
-    return (WebGLTexture) webGLObjects.get(index);
   }
 
   /**
@@ -282,8 +212,8 @@ protected WebGLObject genObject(WebGLObjectType type) {
     }
   }
 
-  protected WebGLUniformLocation getUniformLocation(int index) {
-    return (WebGLUniformLocation) webGLObjects.get(index);
+  private WebGLUniformLocation getUniformLocation (int location) {
+    return uniforms.get(currProgram).get(location);
   }
 
   void init (WebGLRenderingContext gl) {
@@ -291,8 +221,6 @@ protected WebGLObject genObject(WebGLObjectType type) {
     gl.pixelStorei(UNPACK_PREMULTIPLY_ALPHA_WEBGL, ONE);
     this.gl = gl;
 
-    webGLObjects.push(null);
-    webGLObjectTypes.push(WebGLObjectType.NULL.ordinal());
     elementBuffer = gl.createBuffer();
 
     for (int ii = 0; ii < VERTEX_ATTRIB_ARRAY_COUNT; ii++) {
@@ -300,10 +228,6 @@ protected WebGLObject genObject(WebGLObjectType type) {
       data.webGlBuffer = gl.createBuffer();
       vertexAttribArrayState[ii] = data;
     }
-  }
-
-  protected boolean isObjectType (int index,  WebGLObjectType type) {
-    return webGLObjectTypes.get(index) == type.ordinal();
   }
 
   /**
@@ -365,13 +289,12 @@ protected WebGLObject genObject(WebGLObjectType type) {
         }
       }
     }
-
     previouslyEnabledArrays = enabledArrays;
   }
 
   //
   //
-  // Public methods. Please keep ordered -----------------------------------------------------------------------------
+  // Public methods. Please keep ordered -----------------------------------------------------------------------------
   //
   //
 
@@ -387,19 +310,21 @@ protected WebGLObject genObject(WebGLObjectType type) {
 
   @Override
   public void glAttachShader(int program, int shader) {
-    gl.attachShader((WebGLProgram) webGLObjects.get(program),
-            (WebGLShader) webGLObjects.get(shader));
+    WebGLProgram glProgram = programs.get(program);
+    WebGLShader glShader = shaders.get(shader);
+    gl.attachShader(glProgram, glShader);
   }
 
   @Override
   public void glBindAttribLocation(int program, int index, String name) {
-    gl.bindAttribLocation((WebGLProgram) webGLObjects.get(program), index, name);
+    WebGLProgram glProgram = programs.get(program);
+    gl.bindAttribLocation(glProgram, index, name);
   }
 
   @Override
   public void glBindBuffer(int target, int buffer) {
     // Yes, bindBuffer is so expensive that this makes sense..
-    WebGLBuffer webGlBuf = getBuffer(buffer);
+    WebGLBuffer webGlBuf = buffers.get(buffer);
     if (target == GL_ARRAY_BUFFER) {
       requestedArrayBuffer = webGlBuf;
     } else if (target == GL_ELEMENT_ARRAY_BUFFER) {
@@ -411,17 +336,17 @@ protected WebGLObject genObject(WebGLObjectType type) {
 
   @Override
   public void glBindFramebuffer(int target, int framebuffer) {
-    gl.bindFramebuffer(target, getFramebuffer(framebuffer));
+    gl.bindFramebuffer(target, frameBuffers.get(framebuffer));
   }
 
   @Override
   public void glBindRenderbuffer(int target, int renderbuffer) {
-    gl.bindRenderbuffer(target, getRenderbuffer(renderbuffer));
+    gl.bindRenderbuffer(target, renderBuffers.get(renderbuffer));
   }
 
   @Override
-  public void glBindTexture(int target, int textureId) {
-    gl.bindTexture(target, getTexture(textureId));
+  public void glBindTexture (int target, int texture) {
+    gl.bindTexture(target, textures.get(texture));
   }
 
   @Override
@@ -440,8 +365,8 @@ protected WebGLObject genObject(WebGLObjectType type) {
   }
 
   @Override
-  public final void glBlendFunc(int a, int b) {
-    gl.blendFunc(a, b);
+  public void glBlendFunc (int sfactor, int dfactor) {
+    gl.blendFunc(sfactor, dfactor);
   }
 
   @Override
@@ -486,13 +411,13 @@ protected WebGLObject genObject(WebGLObjectType type) {
   }
 
   @Override
-  public final void glClearColor(float f, float g, float h, float i) {
-    gl.clearColor(f, g, h, i);
+  public final void glClearColor(float red, float green, float blue, float alpha) {
+    gl.clearColor(red, green, blue, alpha);
   }
 
   @Override
   public void glClearDepth(double depth) {
-    throw new RuntimeException("NYI glClearDepth");
+    gl.clearDepth((float) depth);
   }
 
   @Override
@@ -512,7 +437,8 @@ protected WebGLObject genObject(WebGLObjectType type) {
 
   @Override
   public void glCompileShader(int shader) {
-    gl.compileShader(getShader(shader));
+    WebGLShader glShader = shaders.get(shader);
+    gl.compileShader(glShader);
   }
 
   @Override
@@ -564,6 +490,7 @@ protected WebGLObject genObject(WebGLObjectType type) {
   public void glCopyTexImage2D(int target, int level, int internalformat, int x, int y, int width, int height, int border) {
     gl.copyTexImage2D(target, level, internalformat, x, y, width, height, border);
   }
+
   @Override
   public void glCopyTexSubImage2D(int target, int level, int xoffset, int yoffset, int x, int y, int width, int height) {
     gl.copyTexSubImage2D(target, level, xoffset, yoffset, x, y, width, height);
@@ -571,23 +498,104 @@ protected WebGLObject genObject(WebGLObjectType type) {
 
   @Override
   public int glCreateProgram() {
-    return createObject(gl.createProgram(), WebGLObjectType.PROGRAM);
+    WebGLProgram program = gl.createProgram();
+    return programs.add(program);
   }
 
   @Override
   public int glCreateShader(int type) {
-    return createObject(gl.createShader(type), WebGLObjectType.SHADER);
+    WebGLShader shader = gl.createShader(type);
+    return shaders.add(shader);
   }
 
   @Override
-  public final void glCullFace(int c) {
-    gl.cullFace(c);
+  public final void glCullFace(int mode) {
+    gl.cullFace(mode);
   }
 
   @Override
-  public void glDrawArrays(int mode, int first, int count) {
-    prepareDraw();
-    gl.drawArrays(mode, first, count);
+  public void glDeleteBuffers(int n, IntBuffer buffers) {
+    for (int i = 0; i < n; i++) {
+      int id = buffers.get();
+      WebGLBuffer buffer = this.buffers.remove(id);
+      gl.deleteBuffer(buffer);
+    }
+  }
+
+  @Override
+  public void glDeleteBuffers(int n, int[] buffers, int offset) {
+    for (int i = 0; i < n; i++) {
+      int id = buffers[i + offset];
+      WebGLBuffer buffer = this.buffers.remove(id);
+      gl.deleteBuffer(buffer);
+    }
+  }
+
+  @Override
+  public void glDeleteFramebuffers(int n, IntBuffer framebuffers) {
+    for (int i = 0; i < n; i++) {
+      int id = framebuffers.get();
+      WebGLFramebuffer fb = this.frameBuffers.remove(id);
+      gl.deleteFramebuffer(fb);
+    }
+  }
+
+  @Override
+  public void glDeleteFramebuffers(int n, int[] framebuffers, int offset) {
+    for (int i = 0; i < n; i++) {
+      int id = framebuffers[i + offset];
+      WebGLFramebuffer fb = this.frameBuffers.remove(id);
+      gl.deleteFramebuffer(fb);
+     }
+  }
+
+  @Override
+  public void glDeleteProgram(int program) {
+    WebGLProgram prog = programs.remove(program);
+    gl.deleteProgram(prog);
+  }
+
+  @Override
+  public void glDeleteRenderbuffers(int n, IntBuffer renderbuffers) {
+    for (int i = 0; i < n; i++) {
+      int id = renderbuffers.get();
+      WebGLRenderbuffer rb = this.renderBuffers.remove(id);
+      gl.deleteRenderbuffer(rb);
+    }
+  }
+
+
+  @Override
+  public void glDeleteRenderbuffers(int n, int[] renderbuffers, int offset) {
+    for (int i = 0; i < n; i++) {
+      int id = renderbuffers[i + offset];
+      WebGLRenderbuffer rb = this.renderBuffers.remove(id);
+      gl.deleteRenderbuffer(rb);
+    }
+  }
+
+  @Override
+  public void glDeleteShader(int shader) {
+    WebGLShader sh = shaders.remove(shader);
+    gl.deleteShader(sh);
+  }
+
+  @Override
+  public void glDeleteTextures(int n, IntBuffer textures) {
+    for (int i = 0; i < n; i++) {
+      int id = textures.get();
+      WebGLTexture texture = this.textures.remove(id);
+      gl.deleteTexture(texture);
+    }
+  }
+
+  @Override
+  public void glDeleteTextures(int n, int[] textures, int offset) {
+    for (int i = 0; i < n; i++) {
+      int id = textures[i + offset];
+      WebGLTexture texture = this.textures.remove(id);
+      gl.deleteTexture(texture);
+    }
   }
 
   @Override
@@ -596,8 +604,40 @@ protected WebGLObject genObject(WebGLObjectType type) {
   }
 
   @Override
-  public void glDepthMask(boolean b) {
-    gl.depthMask(b);
+ public void glDepthMask (boolean flag) {
+    gl.depthMask(flag);
+  }
+
+
+  @Override
+  public void glDepthRange(double zNear, double zFar) {
+    gl.depthRange((float) zNear, (float) zFar);
+  }
+
+  @Override
+  public void glDepthRangef(float zNear, float zFar) {
+    gl.depthRange(zNear, zFar);
+  }
+
+  @Override
+  public void glDetachShader(int program, int shader) {
+    gl.detachShader(programs.get(program), shaders.get(shader));
+  }
+
+  @Override
+  public void glDisable(int cap) {
+    gl.disable(cap);
+  }
+
+  @Override
+  public void glDisableVertexAttribArray(int index) {
+    enabledArrays &= ~(1 << index);
+  }
+
+  @Override
+  public void glDrawArrays(int mode, int first, int count) {
+    prepareDraw();
+    gl.drawArrays(mode, first, count);
   }
 
   @Override
@@ -614,80 +654,7 @@ protected WebGLObject genObject(WebGLObjectType type) {
 //    }
     gl.drawElements(mode, count, type, 0);
   }
-  @Override
-  public void glDepthRangef(float zNear, float zFar) {
-    gl.depthRange(zNear, zFar);
-  }
 
-  @Override
-  public void glDeleteBuffers(int n, IntBuffer buffers) {
-    deleteObjects(n, buffers, WebGLObjectType.BUFFER);
-  }
-
-  @Override
-  public void glDeleteBuffers(int n, int[] buffers, int offset) {
-    deleteObjects(n, buffers, offset, WebGLObjectType.BUFFER);
-  }
-
-  @Override
-  public void glDeleteFramebuffers(int n, IntBuffer framebuffers) {
-    deleteObjects(n, framebuffers, WebGLObjectType.FRAME_BUFFER);
-  }
-
-  @Override
-  public void glDeleteFramebuffers(int n, int[] framebuffers, int offset) {
-    deleteObjects(n, framebuffers, offset, WebGLObjectType.FRAME_BUFFER);
-  }
-
-  @Override
-  public void glDeleteProgram(int program) {
-    deleteObject(program, WebGLObjectType.PROGRAM);
-  }
-
-  @Override
-  public void glDeleteRenderbuffers(int n, IntBuffer renderbuffers) {
-    deleteObjects(n, renderbuffers, WebGLObjectType.RENDER_BUFFER);
-  }
-
-  @Override
-  public void glDeleteTextures(int n, IntBuffer texnumBuffer) {
-    deleteObjects(n, texnumBuffer, WebGLObjectType.TEXTURE);
-  }
-
-  @Override
-  public void glDeleteRenderbuffers(int n, int[] renderbuffers, int offset) {
-    deleteObjects(n, renderbuffers, offset, WebGLObjectType.RENDER_BUFFER);
-  }
-
-  @Override
-  public void glDeleteShader(int shader) {
-    deleteObject(shader, WebGLObjectType.SHADER);
-  }
-
-  @Override
-  public void glDeleteTextures(int n, int[] textures, int offset) {
-    deleteObjects(n, textures, offset, WebGLObjectType.TEXTURE);
-  }
-
-  @Override
-  public void glDepthRange(double zNear, double zFar) {
-    throw new RuntimeException("NYI glDepthRange");
-  }
-
-  @Override
-  public void glDetachShader(int program, int shader) {
-    gl.detachShader(getProgram(program), getShader(shader));
-  }
-
-  @Override
-  public void glDisable(int cap) {
-    gl.disable(cap);
-  }
-
-  @Override
-  public void glDisableVertexAttribArray(int index) {
-    enabledArrays &= ~(1 << index);
-  }
 
   @Override
   public void glDrawElements(int mode, int count, int type, int indices) {
@@ -721,12 +688,12 @@ protected WebGLObject genObject(WebGLObjectType type) {
 
   @Override
   public void glFramebufferRenderbuffer(int target, int attachment, int renderbuffertarget, int renderbuffer) {
-    gl.framebufferRenderbuffer(target, attachment, renderbuffertarget,
-            getRenderbuffer(renderbuffer));
+		gl.framebufferRenderbuffer(target, attachment, renderbuffertarget, renderBuffers.get(renderbuffer));
   }
+
   @Override
   public void glFramebufferTexture2D(int target, int attachment, int textarget, int texture, int level) {
-    gl.framebufferTexture2D(target, attachment, textarget, getTexture(texture), level);
+    gl.framebufferTexture2D(target, attachment, textarget, textures.get(texture), level);
   }
 
   @Override
@@ -740,52 +707,96 @@ protected WebGLObject genObject(WebGLObjectType type) {
   }
 
   @Override
-  public void glGenerateMipmap(int t) {
-    gl.generateMipmap(t);
+  public int glGenBuffer () {
+    WebGLBuffer buffer = gl.createBuffer();
+    return buffers.add(buffer);
   }
 
   @Override
   public void glGenBuffers(int n, IntBuffer buffers) {
-    genObjects(n, buffers, WebGLObjectType.BUFFER);
-  }
-
-  @Override
-  public void glGenFramebuffers(int n, IntBuffer framebuffers) {
-    genObjects(n, framebuffers, WebGLObjectType.FRAME_BUFFER);
-  }
-  @Override
-  public void glGenRenderbuffers(int n, IntBuffer renderbuffers) {
-    genObjects(n, renderbuffers, WebGLObjectType.RENDER_BUFFER);
-  }
-  @Override
-  public void glGenTextures(int n, IntBuffer textures) {
-    genObjects(n, textures, WebGLObjectType.TEXTURE);
+    for (int i = 0; i < n; i++) {
+      WebGLBuffer buffer = gl.createBuffer();
+      int id = this.buffers.add(buffer);
+      buffers.put(id);
+    }
   }
 
   @Override
   public void glGenBuffers(int n, int[] buffers, int offset) {
-    genObjects(n, buffers, offset, WebGLObjectType.BUFFER);
-  }
-  @Override
-  public void glGenFramebuffers(int n, int[] framebuffers, int offset) {
-    genObjects(n, framebuffers, offset, WebGLObjectType.FRAME_BUFFER);
-  }
-  @Override
-  public void glGenRenderbuffers(int n, int[] renderbuffers, int offset) {
-    genObjects(n, renderbuffers, offset, WebGLObjectType.RENDER_BUFFER);
-  }
-  @Override
-  public void glGenTextures(int n, int[] textures, int offset) {
-    genObjects(n, textures, offset, WebGLObjectType.TEXTURE);
+    for (int i = 0; i < n; i++) {
+      WebGLBuffer buffer = gl.createBuffer();
+      int id = this.buffers.add(buffer);
+      buffers[i + offset] = id;
+    }
   }
 
   @Override
-  public void glGetActiveAttrib(int program, int index, int bufsize, int[] length, int lengthOffset, int[] size, int sizeOffset, int[] type, int typeOffset, byte[] name, int nameOffset) {
+  public void glGenerateMipmap (int target) {
+    gl.generateMipmap(target);
+  }
+
+  @Override
+  public void glGenFramebuffers (int n, IntBuffer framebuffers) {
+    for (int i = 0; i < n; i++) {
+      WebGLFramebuffer fb = gl.createFramebuffer();
+      int id = this.frameBuffers.add(fb);
+      framebuffers.put(id);
+    }
+  }
+
+  @Override
+  public void glGenFramebuffers(int n, int[] framebuffers, int offset) {
+    for (int i = 0; i < n; i++) {
+      WebGLFramebuffer fb = gl.createFramebuffer();
+      int id = this.frameBuffers.add(fb);
+      framebuffers[i + offset] = id;
+    }
+  }
+
+  @Override
+  public void glGenRenderbuffers(int n, IntBuffer renderbuffers) {
+    for (int i = 0; i < n; i++) {
+      WebGLRenderbuffer rb = gl.createRenderbuffer();
+      int id = this.renderBuffers.add(rb);
+      renderbuffers.put(id);
+    }
+  }
+
+  @Override
+  public void glGenRenderbuffers(int n, int[] renderbuffers, int offset) {
+    for (int i = 0; i < n; i++) {
+      WebGLRenderbuffer rb = gl.createRenderbuffer();
+      int id = this.renderBuffers.add(rb);
+      renderbuffers[i + offset] = id;
+    }
+  }
+
+  @Override
+  public void glGenTextures(int n, IntBuffer textures) {
+    for (int i = 0; i < n; i++) {
+      WebGLTexture texture = gl.createTexture();
+      int id = this.textures.add(texture);
+      textures.put(id);
+    }
+  }
+
+  @Override
+  public void glGenTextures(int n, int[] textures, int offset) {
+    for (int i = 0; i < n; i++) {
+      WebGLTexture texture = gl.createTexture();
+      int id = this.textures.add(texture);
+      textures[i + offset] = id;
+    }
+  }
+
+
+  @Override
+  public void glGetActiveAttrib(int program, int index, int bufsize, IntBuffer length, IntBuffer size, IntBuffer type, ByteBuffer name) {
     throw new RuntimeException("NYI glGetActiveAttrib");
   }
 
   @Override
-  public void glGetActiveAttrib(int program, int index, int bufsize, IntBuffer length, IntBuffer size, IntBuffer type, ByteBuffer name) {
+  public void glGetActiveAttrib(int program, int index, int bufsize, int[] length, int lengthOffset, int[] size, int sizeOffset, int[] type, int typeOffset, byte[] name, int nameOffset) {
     throw new RuntimeException("NYI glGetActiveAttrib");
   }
 
@@ -811,13 +822,15 @@ protected WebGLObject genObject(WebGLObjectType type) {
 
   @Override
   public int glGetAttribLocation(int program, String name) {
-    return gl.getAttribLocation(getProgram(program), name);
+    WebGLProgram prog = programs.get(program);
+    return gl.getAttribLocation(prog, name);
   }
 
   @Override
   public boolean glGetBoolean(int pname) {
     return gl.getParameterb(pname);
   }
+
   @Override
   public void glGetBooleanv(int pname, ByteBuffer params) {
     throw new RuntimeException("NYI glGetBooleanv");
@@ -827,6 +840,7 @@ protected WebGLObject genObject(WebGLObjectType type) {
   public int glGetBoundBuffer(int arg0) {
     throw new RuntimeException("NYI glGetBoundBuffer");
   }
+
   @Override
   public void glGetBufferParameteriv(int target, int pname, IntBuffer params) {
     params.put(params.position(), gl.getBufferParameter(target, pname));
@@ -871,7 +885,7 @@ protected WebGLObject genObject(WebGLObjectType type) {
   @Override
   public void glGetProgramiv(int program, int pname, IntBuffer params) {
     if (pname == GL_LINK_STATUS) {
-      params.put(gl.getProgramParameterb(getProgram(program), LINK_STATUS) ? GL_TRUE : GL_FALSE);
+      params.put(gl.getProgramParameterb(programs.get(program), LINK_STATUS) ? GL_TRUE : GL_FALSE);
     } else {
       throw new RuntimeException("NYI glGetProgramiv");
     }
@@ -879,13 +893,14 @@ protected WebGLObject genObject(WebGLObjectType type) {
 
   @Override
   public String glGetProgramInfoLog(int program) {
-    return gl.getProgramInfoLog(getProgram(program));
+    return gl.getProgramInfoLog(programs.get(program));
   }
 
   @Override
   public void glGetProgramBinary(int arg0, int arg1, IntBuffer arg2, IntBuffer arg3, Buffer arg4) {
     throw new RuntimeException("NYI glGetProgramBinary");
   }
+
   @Override
   public void glGetProgramInfoLog(int program, int bufsize, IntBuffer length, ByteBuffer infolog) {
     throw new RuntimeException("NYI glGetProgramInfoLog");
@@ -893,7 +908,7 @@ protected WebGLObject genObject(WebGLObjectType type) {
 
   @Override
   public void glGetProgramiv(int program, int pname, int[] params, int offset) {
-    if (pname == GL_LINK_STATUS) params[offset] = gl.getProgramParameterb(getProgram(program), LINK_STATUS) ? GL_TRUE : GL_FALSE;
+    if (pname == GL_LINK_STATUS) params[offset] = gl.getProgramParameterb(programs.get(program), LINK_STATUS) ? GL_TRUE : GL_FALSE;
     else throw new RuntimeException("NYI glGetProgramiv: " + pname);
   }
 
@@ -909,7 +924,7 @@ protected WebGLObject genObject(WebGLObjectType type) {
 
   @Override
   public void glGetShaderiv(int shader, int pname, int[] params, int offset) {
-    if (pname == GL_COMPILE_STATUS) params[offset] = gl.getShaderParameterb(getShader(shader), COMPILE_STATUS) ? GL_TRUE : GL_FALSE;
+    if (pname == GL_COMPILE_STATUS) params[offset] = gl.getShaderParameterb(shaders.get(shader), COMPILE_STATUS) ? GL_TRUE : GL_FALSE;
     else throw new RuntimeException("NYI glGetShaderiv: " + pname);
   }
 
@@ -929,7 +944,7 @@ protected WebGLObject genObject(WebGLObjectType type) {
   @Override
   public void glGetShaderiv(int shader, int pname, IntBuffer params) {
     if (pname == GL_COMPILE_STATUS) {
-      params.put(gl.getShaderParameterb(getShader(shader), COMPILE_STATUS) ? GL_TRUE : GL_FALSE);
+      params.put(gl.getShaderParameterb(shaders.get(shader), COMPILE_STATUS) ? GL_TRUE : GL_FALSE);
     } else {
       throw new RuntimeException("NYI glGetShaderiv: " + pname);
     }
@@ -937,7 +952,7 @@ protected WebGLObject genObject(WebGLObjectType type) {
 
   @Override
   public String glGetShaderInfoLog(int shader) {
-    return gl.getShaderInfoLog(getShader(shader));
+    return gl.getShaderInfoLog(shaders.get(shader));
   }
 
   @Override
@@ -955,6 +970,7 @@ protected WebGLObject genObject(WebGLObjectType type) {
   public void glGetTexParameterfv(int target, int pname, FloatBuffer params) {
     params.put(params.position(), gl.getTexParameter(target, pname));
   }
+
   @Override
   public void glGetTexParameteriv(int target, int pname, IntBuffer params) {
     params.put(params.position(), gl.getTexParameter(target, pname));
@@ -962,14 +978,14 @@ protected WebGLObject genObject(WebGLObjectType type) {
 
   @Override
   public void glGetUniformfv(int program, int location, FloatBuffer params) {
-    Float32Array v = gl.getUniformv(getProgram(program), getUniformLocation(location));
+    Float32Array v = gl.getUniformv(programs.get(program), uniforms.get(program).get(location));
     for (int i = 0; i < v.length(); i++) {
       params.put(params.position() + i, v.get(i));
     }
   }
   @Override
   public void glGetUniformiv(int program, int location, IntBuffer params) {
-    Int32Array v = gl.getUniformv(getProgram(program), getUniformLocation(location));
+    Int32Array v = gl.getUniformv(programs.get(program), uniforms.get(program).get(location));
     for (int i = 0; i < v.length(); i++) {
       params.put(params.position() + i, v.get(i));
     }
@@ -977,8 +993,15 @@ protected WebGLObject genObject(WebGLObjectType type) {
 
   @Override
   public int glGetUniformLocation(int program, String name) {
-    return createObject(gl.getUniformLocation(getProgram(program), name),
-            WebGLObjectType.UNIFORM_LOCATION);
+    WebGLUniformLocation location = gl.getUniformLocation(programs.get(program), name);
+    IntMap<WebGLUniformLocation> progUniforms = uniforms.get(program);
+    if (progUniforms == null) {
+      progUniforms = IntMap.<WebGLUniformLocation>create();
+      uniforms.put(program, progUniforms);
+    }
+    // FIXME check if uniform already stored.
+    int id = progUniforms.add(location);
+    return id;
   }
 
   @Override
@@ -1001,7 +1024,7 @@ protected WebGLObject genObject(WebGLObjectType type) {
 
   @Override
   public boolean glIsBuffer(int buffer) {
-    return isObjectType(buffer, WebGLObjectType.BUFFER);
+    return gl.isBuffer(buffers.get(buffer));
   }
 
   @Override
@@ -1011,27 +1034,29 @@ protected WebGLObject genObject(WebGLObjectType type) {
 
   @Override
   public boolean glIsFramebuffer(int framebuffer) {
-    return isObjectType(framebuffer, WebGLObjectType.FRAME_BUFFER);
-  }
-
-  @Override
-  public boolean glIsShader(int shader) {
-    return isObjectType(shader, WebGLObjectType.SHADER);
-  }
-  @Override
-  public boolean glIsTexture(int texture) {
-    return isObjectType(texture, WebGLObjectType.TEXTURE);
+    return gl.isFramebuffer(frameBuffers.get(framebuffer));
   }
 
   @Override
   public boolean glIsProgram(int program) {
-    return isObjectType(program, WebGLObjectType.PROGRAM);
+    return gl.isProgram(programs.get(program));
   }
 
   @Override
   public boolean glIsRenderbuffer(int renderbuffer) {
-    return isObjectType(renderbuffer, WebGLObjectType.FRAME_BUFFER);
+    return gl.isRenderbuffer(renderBuffers.get(renderbuffer));
   }
+
+  @Override
+  public boolean glIsShader(int shader) {
+    return gl.isShader(shaders.get(shader));
+  }
+
+  @Override
+  public boolean glIsTexture(int texture) {
+    return gl.isTexture(textures.get(texture));
+  }
+
   @Override
   public boolean glIsVBOArrayEnabled() {
     throw new RuntimeException("NYI glIsVBOArrayEnabled");
@@ -1049,7 +1074,7 @@ protected WebGLObject genObject(WebGLObjectType type) {
 
   @Override
   public void glLinkProgram(int program) {
-    gl.linkProgram(getProgram(program));
+    gl.linkProgram(programs.get(program));
   }
 
   @Override
@@ -1104,8 +1129,8 @@ protected WebGLObject genObject(WebGLObjectType type) {
   }
 
   @Override
-  public final void glScissor(int i, int j, int width, int height) {
-    gl.scissor(i, j, width, height);
+  public final void glScissor(int x, int y, int width, int height) {
+    gl.scissor(x, y, width, height);
   }
 
   @Override
@@ -1130,7 +1155,7 @@ protected WebGLObject genObject(WebGLObjectType type) {
 
   @Override
   public void glShaderSource(int shader, String string) {
-    gl.shaderSource(getShader(shader), string);
+    gl.shaderSource(shaders.get(shader), string);
   }
 
   @Override
@@ -1344,12 +1369,13 @@ protected WebGLObject genObject(WebGLObjectType type) {
 
   @Override
   public void glUseProgram(int program) {
-    gl.useProgram(getProgram(program));
+    currProgram = program;
+    gl.useProgram(programs.get(program));
   }
 
   @Override
   public void glValidateProgram(int program) {
-    gl.validateProgram(getProgram(program));
+		gl.validateProgram(programs.get(program));
   }
 
   @Override
@@ -1359,8 +1385,9 @@ protected WebGLObject genObject(WebGLObjectType type) {
 
   @Override
   public void glVertexAttrib1fv(int indx, FloatBuffer values) {
-    throw new RuntimeException("NYI glVertexAttrib1fv");
+    gl.vertexAttrib1fv(indx, copy(values));
   }
+
   @Override
   public void glVertexAttrib2f(int indx, float x, float y) {
     gl.vertexAttrib2f(indx, x, y);
@@ -1368,7 +1395,7 @@ protected WebGLObject genObject(WebGLObjectType type) {
 
   @Override
   public void glVertexAttrib2fv(int indx, FloatBuffer values) {
-    throw new RuntimeException("NYI glVertexAttrib2fv");
+    gl.vertexAttrib2fv(indx, copy(values));
   }
 
   @Override
@@ -1378,7 +1405,7 @@ protected WebGLObject genObject(WebGLObjectType type) {
 
   @Override
   public void glVertexAttrib3fv(int indx, FloatBuffer values) {
-    throw new RuntimeException("NYI glVertexAttrib3fv");
+    gl.vertexAttrib3fv(indx, copy(values));
   }
 
   @Override
@@ -1388,7 +1415,7 @@ protected WebGLObject genObject(WebGLObjectType type) {
 
   @Override
   public void glVertexAttrib4fv(int indx, FloatBuffer values) {
-    throw new RuntimeException("NYI glVertexAttrib4fv");
+    gl.vertexAttrib4fv(indx, copy(values));
   }
 
   // arrayId (index) is in the range 0..GL_MAX_VERTEX_ATTRIBS-1
@@ -1423,7 +1450,6 @@ protected WebGLObject genObject(WebGLObjectType type) {
   @Override
   public void glViewport(int x, int y, int w, int h) {
     gl.viewport(x, y, w, h);
-//    checkError("glViewport");
   }
 
   @Override
