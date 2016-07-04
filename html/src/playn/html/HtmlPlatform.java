@@ -43,6 +43,12 @@ public class HtmlPlatform extends Platform {
     /** If {@code > 0}, the period (in milliseconds) at which to fire frame signals when paused.
       * If {@code 0} (the default) no frame signals will be fired when paused. */
     public int backgroundFrameMillis = 0;
+    
+    /** If {@code > 0}, the period (in milliseconds) at which to fire frame signals when running.
+     * Setting this disables using the browser's built-in requestAnimationFrame functionality.
+     * This allows fine-grained control over framerate.
+     * Setting this also disables separate background updates. */
+    public int forceRenderFrameMillis = 0;
 
     // Scale up the canvas on fullscreen. Highly experimental.
     public boolean experimentalFullscreen = false;
@@ -103,6 +109,7 @@ public class HtmlPlatform extends Platform {
   private final double start = initNow();
 
   private int backgroundFrameMillis = 0;
+  private int forceRenderFrameMillis = 0;
 
   private final HtmlLog log = GWT.create(HtmlLog.class);
   private final Exec exec = new Exec.Default(this);
@@ -131,6 +138,7 @@ public class HtmlPlatform extends Platform {
     // effect until we yield to the browser event loop
     try {
       backgroundFrameMillis = config.backgroundFrameMillis;
+      forceRenderFrameMillis = config.forceRenderFrameMillis;
       graphics = new HtmlGraphics(this, config);
       input = new HtmlInput(this, graphics.rootElement);
       audio = new HtmlAudio(this);
@@ -154,10 +162,10 @@ public class HtmlPlatform extends Platform {
 
     requestAnimationFrame(new Runnable() {
       @Override public void run() {
-        requestAnimationFrame(this);
+        requestAnimationFrame(this, forceRenderFrameMillis);
         emitFrame();
       }
-    });
+    }, forceRenderFrameMillis);
   }
 
   @Override public Type type() { return Type.HTML; }
@@ -185,7 +193,7 @@ public class HtmlPlatform extends Platform {
     dispatchEvent(lifecycle, isHidden ? Lifecycle.PAUSE : Lifecycle.RESUME);
 
     // if we are configured to update while backgrounded, schedule a background frame
-    if (isHidden && backgroundFrameMillis > 0) {
+    if (isHidden && backgroundFrameMillis > 0 && forceRenderFrameMillis == 0) {
       scheduleBackgroundFrame(backgroundFrameMillis, new Runnable() {
         @Override public void run() {
           // if we're still hidden, emit this background frame and schedule another
@@ -205,18 +213,23 @@ public class HtmlPlatform extends Platform {
     }, false);
   }-*/;
 
-  private native void requestAnimationFrame(Runnable callback) /*-{
+  private native void requestAnimationFrame(Runnable callback, int forceRenderFrameMillis) /*-{
     var fn = function() {
       callback.@java.lang.Runnable::run()();
     };
-    if ($wnd.requestAnimationFrame) {
-      $wnd.requestAnimationFrame(fn);
-    } else if ($wnd.mozRequestAnimationFrame) {
-      $wnd.mozRequestAnimationFrame(fn);
-    } else if ($wnd.webkitRequestAnimationFrame) {
-      $wnd.webkitRequestAnimationFrame(fn);
+    
+    if (forceRenderFrameMillis > 0) {
+      $wnd.setTimeout(fn, forceRenderFrameMillis);
     } else {
-      $wnd.setTimeout(fn, 20); // 20ms => 50fps
+      if ($wnd.requestAnimationFrame) {
+        $wnd.requestAnimationFrame(fn);
+      } else if ($wnd.mozRequestAnimationFrame) {
+        $wnd.mozRequestAnimationFrame(fn);
+      } else if ($wnd.webkitRequestAnimationFrame) {
+        $wnd.webkitRequestAnimationFrame(fn);
+      } else {
+        $wnd.setTimeout(fn, 20); // 20ms => 50fps
+      }
     }
   }-*/;
 
