@@ -20,15 +20,11 @@ import com.google.gwt.dom.client.Style.Cursor;
 import com.google.gwt.user.client.Window;
 
 import playn.core.*;
-import playn.html.HtmlUrlParameters.Renderer;
 
 public class HtmlPlatform extends Platform {
 
   /** Configures the PlayN HTML platform. */
   public static class Config {
-    /** Whether to use GL or Canvas mode, or to auto-detect. */
-    public Mode mode = Renderer.requestedMode();
-
     /** Whether the canvas that contains the game should be transparent. */
     public boolean transparentCanvas = false;
 
@@ -50,11 +46,6 @@ public class HtmlPlatform extends Platform {
 
     // Scale up the canvas on fullscreen. Highly experimental.
     public boolean experimentalFullscreen = false;
-  }
-
-  /** Used for {@link Config#mode}. */
-  public static enum Mode {
-    WEBGL, CANVAS, AUTODETECT;
   }
 
   /** Returned by {@link #agentInfo}. */
