@@ -103,6 +103,7 @@ public final class HtmlGL20 extends GL20 {
       }-*/;
   }
 
+
   static final int VERTEX_ATTRIB_ARRAY_COUNT = 5; //  position, color, texture0, texture1, normals
 
   private final IntMap<WebGLProgram> programs = IntMap.create();
@@ -149,7 +150,7 @@ public final class HtmlGL20 extends GL20 {
 
   public Int32Array copy (IntBuffer buffer) {
     return ((Int32Array)((HasArrayBufferView)buffer).getTypedArray()).subarray(buffer.position(), buffer.remaining());
-	}
+  }
 
   private static int getElementSize(Buffer buffer) {
     if ((buffer instanceof FloatBuffer) || (buffer instanceof IntBuffer)) return 4;
@@ -515,8 +516,9 @@ public final class HtmlGL20 extends GL20 {
 
   @Override
   public void glDeleteBuffers(int n, IntBuffer buffers) {
+    int pos = buffers.position();
     for (int i = 0; i < n; i++) {
-      int id = buffers.get();
+      int id = buffers.get(pos + i);
       WebGLBuffer buffer = this.buffers.remove(id);
       gl.deleteBuffer(buffer);
     }
@@ -533,8 +535,9 @@ public final class HtmlGL20 extends GL20 {
 
   @Override
   public void glDeleteFramebuffers(int n, IntBuffer framebuffers) {
+    int pos = framebuffers.position();
     for (int i = 0; i < n; i++) {
-      int id = framebuffers.get();
+      int id = framebuffers.get(pos + i);
       WebGLFramebuffer fb = this.frameBuffers.remove(id);
       gl.deleteFramebuffer(fb);
     }
@@ -557,8 +560,9 @@ public final class HtmlGL20 extends GL20 {
 
   @Override
   public void glDeleteRenderbuffers(int n, IntBuffer renderbuffers) {
+    int pos = renderbuffers.position();
     for (int i = 0; i < n; i++) {
-      int id = renderbuffers.get();
+      int id = renderbuffers.get(pos + i);
       WebGLRenderbuffer rb = this.renderBuffers.remove(id);
       gl.deleteRenderbuffer(rb);
     }
@@ -582,8 +586,9 @@ public final class HtmlGL20 extends GL20 {
 
   @Override
   public void glDeleteTextures(int n, IntBuffer textures) {
+    int pos = textures.position();
     for (int i = 0; i < n; i++) {
-      int id = textures.get();
+      int id = textures.get(pos + i);
       WebGLTexture texture = this.textures.remove(id);
       gl.deleteTexture(texture);
     }
@@ -688,7 +693,7 @@ public final class HtmlGL20 extends GL20 {
 
   @Override
   public void glFramebufferRenderbuffer(int target, int attachment, int renderbuffertarget, int renderbuffer) {
-		gl.framebufferRenderbuffer(target, attachment, renderbuffertarget, renderBuffers.get(renderbuffer));
+    gl.framebufferRenderbuffer(target, attachment, renderbuffertarget, renderBuffers.get(renderbuffer));
   }
 
   @Override
@@ -714,10 +719,11 @@ public final class HtmlGL20 extends GL20 {
 
   @Override
   public void glGenBuffers(int n, IntBuffer buffers) {
+    int pos = buffers.position();
     for (int i = 0; i < n; i++) {
       WebGLBuffer buffer = gl.createBuffer();
       int id = this.buffers.add(buffer);
-      buffers.put(id);
+      buffers.put(pos + i, id);
     }
   }
 
@@ -737,10 +743,11 @@ public final class HtmlGL20 extends GL20 {
 
   @Override
   public void glGenFramebuffers (int n, IntBuffer framebuffers) {
-    for (int i = 0; i < n; i++) {
+   int pos = framebuffers.position();
+   for (int i = 0; i < n; i++) {
       WebGLFramebuffer fb = gl.createFramebuffer();
       int id = this.frameBuffers.add(fb);
-      framebuffers.put(id);
+      framebuffers.put(pos + i, id);
     }
   }
 
@@ -755,10 +762,11 @@ public final class HtmlGL20 extends GL20 {
 
   @Override
   public void glGenRenderbuffers(int n, IntBuffer renderbuffers) {
+    int pos = renderbuffers.position();
     for (int i = 0; i < n; i++) {
       WebGLRenderbuffer rb = gl.createRenderbuffer();
       int id = this.renderBuffers.add(rb);
-      renderbuffers.put(id);
+      renderbuffers.put(pos + i, id);
     }
   }
 
@@ -773,10 +781,11 @@ public final class HtmlGL20 extends GL20 {
 
   @Override
   public void glGenTextures(int n, IntBuffer textures) {
+    int pos = textures.position();
     for (int i = 0; i < n; i++) {
       WebGLTexture texture = gl.createTexture();
       int id = this.textures.add(texture);
-      textures.put(id);
+      textures.put(pos + i, id);
     }
   }
 
@@ -983,6 +992,7 @@ public final class HtmlGL20 extends GL20 {
       params.put(params.position() + i, v.get(i));
     }
   }
+
   @Override
   public void glGetUniformiv(int program, int location, IntBuffer params) {
     Int32Array v = gl.getUniformv(programs.get(program), uniforms.get(program).get(location));
@@ -1375,7 +1385,7 @@ public final class HtmlGL20 extends GL20 {
 
   @Override
   public void glValidateProgram(int program) {
-		gl.validateProgram(programs.get(program));
+    gl.validateProgram(programs.get(program));
   }
 
   @Override
