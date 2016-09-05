@@ -57,7 +57,7 @@ public class LWJGLPlatform extends JavaPlatform {
         log().error("GL Error (" + error + "):" + getDescription(description));
       }
     });
-    if (glfwInit() != GL_TRUE) throw new RuntimeException("Failed to init GLFW.");
+    if (!glfwInit()) throw new RuntimeException("Failed to init GLFW.");
 
     long monitor = glfwGetPrimaryMonitor();
     GLFWVidMode vidMode = glfwGetVideoMode(monitor);
@@ -106,7 +106,7 @@ public class LWJGLPlatform extends JavaPlatform {
 
   @Override protected void loop () {
     boolean wasActive = glfwGetWindowAttrib(window, GLFW_VISIBLE) > 0;
-    while (glfwWindowShouldClose(window) != GL_TRUE) {
+    while (!glfwWindowShouldClose(window)) {
       // notify the app if lose or regain focus (treat said as pause/resume)
       boolean newActive = glfwGetWindowAttrib(window, GLFW_VISIBLE) > 0;
       if (wasActive != newActive) {
@@ -122,7 +122,7 @@ public class LWJGLPlatform extends JavaPlatform {
     }
     input.shutdown();
     graphics.shutdown();
-    errorCallback.release();
+    errorCallback.close();
     glfwDestroyWindow(window);
     glfwTerminate();
   }

@@ -12,6 +12,10 @@
   <name>PlayN Java via LWJGL</name>
   <description>The PlayN Java (JVM) backend hosted by LWJGL</description>
 
+  <properties>
+    <source.level>1.8</source.level>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>io.playn</groupId>

@@ -13,8 +13,9 @@
  */
 package playn.java;
 
-import javax.swing.JOptionPane;
 import java.nio.ByteBuffer;
+import java.nio.DoubleBuffer;
+import javax.swing.JOptionPane;
 
 import org.lwjgl.BufferUtils;
 import org.lwjgl.glfw.GLFWCharCallback;
@@ -105,11 +106,11 @@ public class GLFWInput extends JavaInput {
   }
 
   void shutdown() {
-    charCallback.release();
-    keyCallback.release();
-    mouseBtnCallback.release();
-    cursorPosCallback.release();
-    scrollCallback.release();
+    charCallback.close();
+    keyCallback.close();
+    mouseBtnCallback.close();
+    cursorPosCallback.close();
+    scrollCallback.close();
   }
 
   private static String NO_UI_ERROR =
@@ -147,12 +148,13 @@ public class GLFWInput extends JavaInput {
     glfwSetInputMode(window, GLFW_CURSOR, locked ? GLFW_CURSOR_DISABLED : GLFW_CURSOR_NORMAL);
   }
 
-  private ByteBuffer xpos = BufferUtils.createByteBuffer(8), ypos = BufferUtils.createByteBuffer(8);
+  private DoubleBuffer xpos = BufferUtils.createByteBuffer(8).asDoubleBuffer();
+  private DoubleBuffer ypos = BufferUtils.createByteBuffer(8).asDoubleBuffer();
   private Point cpos = new Point();
   private Point queryCursorPosition () {
     xpos.rewind(); ypos.rewind();
     glfwGetCursorPos(window, xpos, ypos);
-    cpos.set((float)xpos.getDouble(), (float)ypos.getDouble());
+    cpos.set((float)xpos.get(), (float)ypos.get());
     return cpos;
   }
 

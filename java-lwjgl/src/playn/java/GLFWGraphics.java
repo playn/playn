@@ -45,7 +45,7 @@ public class GLFWGraphics extends LWJGLGraphics {
   }
 
   void shutdown () {
-    fbSizeCallback.release();
+    fbSizeCallback.close();
   }
 
   @Override void setTitle (String title) {
