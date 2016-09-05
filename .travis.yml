@@ -3,7 +3,7 @@ after_success: etc/travis-deploy.sh
 sudo: false
 
 jdk:
-  - openjdk8
+  - oraclejdk8
 
 cache:
   directories:
