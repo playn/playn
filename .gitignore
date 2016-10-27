@@ -1,4 +1,8 @@
 target
+.classpath
+.project
+.settings
+.DS_Store
 
 # /html/
 /html/tests/playn/shared/json
