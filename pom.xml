@@ -11,8 +11,50 @@
   <artifactId>playn-project</artifactId>
   <packaging>pom</packaging>
   <version>2.0-SNAPSHOT</version>
+
+
+  <properties>
+    <createChecksum>false</createChecksum>
+    <!--<github.user>playn</github.user>-->
+    <github.user>raisercostin</github.user>
+    <github.repo>playn</github.repo>
+    <github.url>https://github.com/${github.user}/${github.repo}</github.url>
+    <bintray.user>raisercostin</bintray.user>
+    <bintray.repo>maven</bintray.repo>
+    <bintray.package>${github.repo}</bintray.package>
+    <maven.build.timestamp.format>yyyyMMdd'T'HHmmss</maven.build.timestamp.format>
+
+    <source.level>1.7</source.level>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <android.version>4.1.1.4</android.version>
+    <android.maven.version>4.2.1</android.maven.version>
+    <swt.version>4.5.1</swt.version>
+    <gwt.version>2.7.0</gwt.version>
+    <jbox2d.version>2.2.1.1</jbox2d.version>
+    <lwjgl.version>3.0.0</lwjgl.version>
+    <lwjgl2.version>2.9.3</lwjgl2.version>
+    <robovm.version>1.12.0</robovm.version>
+    <robovm.maven.version>1.12.0</robovm.maven.version>
+    <bugvm.version>1.1.5</bugvm.version>
+    <bugvm.maven.version>1.0.10-SNAPSHOT</bugvm.maven.version>
+    <!--
+      GWT log levels:
+      ERROR, WARN, INFO, TRACE, DEBUG, SPAM, or ALL
+    -->
+    <gwt.loglevel>INFO</gwt.loglevel>
+    <gwt.outputstyle>PRETTY</gwt.outputstyle>
+    <gwt.modulesuffix />
+    <gwt.inplace>false</gwt.inplace>
+    <gwt.xdisable>true</gwt.xdisable>
+    <gwt.draft>false</gwt.draft>
+    <gwt.workers />
+    <maven.test.skip>false</maven.test.skip>
+  </properties>
+
+
+
   <name>PlayN Project</name>
-  <url>http://code.google.com/p/playn</url>
+  <url>${github.url}</url>
   <description>Cross platform game library for N≥4 platforms.</description>
 
   <issueManagement>
@@ -20,14 +62,17 @@
   </issueManagement>
 
   <scm>
-    <connection>scm:git:git://github.com/playn/playn.git</connection>
-    <developerConnection>scm:git:git@github.com:playn/playn.git</developerConnection>
-    <url>https://github.com/playn/playn/</url>
+    <connection>scm:git:${github.url}.git</connection>
+    <developerConnection>scm:git:${github.url}.git</developerConnection>
+    <url>${github.url}</url>
+    <tag>${project.artifactId}-${project.version}</tag>
   </scm>
-
-  <prerequisites>
-    <maven>3.3.0</maven>
-  </prerequisites>
+  <distributionManagement>
+    <repository>
+      <id>bintray</id>
+      <url>https://api.bintray.com/maven/${bintray.user}/${bintray.repo}/${bintray.package}/;publish=1</url>
+    </repository>
+  </distributionManagement>
 
   <modules>
     <module>android</module>
@@ -44,34 +89,6 @@
     <module>scene</module>
     <module>webgl</module>
   </modules>
-
-  <properties>
-    <source.level>1.7</source.level>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <android.version>4.1.1.4</android.version>
-    <android.maven.version>4.2.1</android.maven.version>
-    <swt.version>4.5.1</swt.version>
-    <gwt.version>2.7.0</gwt.version>
-    <jbox2d.version>2.2.1.1</jbox2d.version>
-    <lwjgl.version>3.0.0</lwjgl.version>
-    <lwjgl2.version>2.9.3</lwjgl2.version>
-    <robovm.version>1.12.0</robovm.version>
-    <robovm.maven.version>1.12.0</robovm.maven.version>
-    <bugvm.version>1.0.9</bugvm.version>
-    <bugvm.maven.version>1.0.10-SNAPSHOT</bugvm.maven.version>
-    <!--
-      GWT log levels:
-      ERROR, WARN, INFO, TRACE, DEBUG, SPAM, or ALL
-    -->
-    <gwt.loglevel>INFO</gwt.loglevel>
-    <gwt.outputstyle>PRETTY</gwt.outputstyle>
-    <gwt.modulesuffix />
-    <gwt.inplace>false</gwt.inplace>
-    <gwt.xdisable>true</gwt.xdisable>
-    <gwt.draft>false</gwt.draft>
-    <gwt.workers />
-    <maven.test.skip>false</maven.test.skip>
-  </properties>
 
   <!-- Common dependencies for all modules -->
   <dependencies>
@@ -322,5 +339,50 @@
         </pluginManagement>
       </build>
     </profile>
+    <profile>
+        <id>release</id>
+        <build>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-javadoc-plugin</artifactId>
+                    <executions>
+                        <execution>
+                            <id>attach-javadocs</id>
+                            <goals>
+                                <goal>jar</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-source-plugin</artifactId>
+                    <executions>
+                        <execution>
+                            <id>attach-sources</id>
+                            <goals>
+                                <goal>jar</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+            </plugins>
+        </build>
+    </profile>
   </profiles>
+  <repositories>
+    <repository>
+      <id>jcenter-bintray</id>
+      <name>Bintray JCenter Maven Repository</name>
+      <layout>default</layout>
+      <url>https://jcenter.bintray.com/</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </repository>
+  </repositories>
 </project>

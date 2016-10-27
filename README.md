@@ -16,7 +16,7 @@ will be automatically downloaded by projects that use it. However, you still may
 build a local copy of PlayN in case you need to modify it when debugging your own game, to add new
 features, or to fix bugs you find in the PlayN code.
 
-Building PlayN locally is very easy using [Maven]:
+- Building PlayN locally is very easy using [Maven]:
 
 ```
 cd playn
@@ -28,6 +28,19 @@ then modify the `playn.version` property of your game to reference that snapshot
 game will use your local copy of PlayN instead of a version downloaded from [Maven Central].
 
 Instructions for building and running the PlayN sample games can be found in the [Documentation].
+
+- To deploy artifacts to bintray
+```
+cd playn
+mvn versions:set
+mvn deploy -Prelease -DskipTests
+```
+
+- To release
+```
+cd playn
+mvn release:prepare release:perform -DskipTests=true -Prelease -Darguments="-DskipTests=true -Prelease"
+```
 
 Licensing
 ---------
