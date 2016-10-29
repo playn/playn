@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>io.playn.tests</groupId>
+    <artifactId>playn-tests</artifactId>
+    <version>2.0-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>playn-tests-java7-swt-lwjgl2</artifactId>
+   <name>PlayN Tests Java7 SWT via LWJGL2</name>
+
+  <properties>
+    <mainClass>playn.tests.java.TestsGameJavaSWT</mainClass>
+    <scaleFactor>1</scaleFactor>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>playn-tests-core</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>playn-tests-assets</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>io.playn</groupId>
+      <artifactId>playn-java-swt</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+     <dependency>
+      <groupId>io.playn</groupId>
+      <artifactId>playn-java-lwjgl2</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <version>1.6</version>
+        <executions>
+          <execution>
+            <phase>test</phase>
+            <configuration>
+			 <target name="run-swt-lwjgl2-if-tests" unless="skipExec">
+               <!-- these shenanigans are needed to pass -XstartOnFirstThread on Mac OS
+                     but not on other OSes where they would cause the JVM to fail, yay -->
+                <condition property="jvmarg" value="-XstartOnFirstThread" else="-Dfoo=bar">
+                  <os family="mac"/>
+                </condition>
+                <java fork="true" classname="${mainClass}" classpathref="maven.test.classpath">
+                  <jvmarg value="${jvmarg}"/>
+                  <arg value="${scaleFactor}"/>
+                </java>
+              </target>
+            </configuration>
+            <goals>
+              <goal>run</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+      <!-- builds a standalone jar file during 'mvn package' -->
+      <plugin>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <version>2.4</version>
+        <configuration>
+          <descriptorRefs>
+            <descriptorRef>jar-with-dependencies</descriptorRef>
+          </descriptorRefs>
+          <archive>
+            <manifest>
+              <mainClass>${mainClass}</mainClass>
+            </manifest>
+          </archive>
+        </configuration>
+        <executions>
+          <execution>
+            <id>make-assembly</id>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+</project>

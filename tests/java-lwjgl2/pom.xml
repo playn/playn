@@ -7,13 +7,13 @@
     <version>2.0-SNAPSHOT</version>
   </parent>
 
-  <artifactId>playn-tests-java-lwjgl</artifactId>
-  <name>PlayN Tests Java8 LWJGL3</name>
+  <artifactId>playn-tests-java-lwjgl2</artifactId>
+  <name>PlayN Tests Java7 LWJGL2</name>
 
   <properties>
     <mainClass>playn.tests.java.TestsGameJavaLWJGL</mainClass>
     <scaleFactor>1</scaleFactor>
-	<source.level>1.8</source.level>
+	<source.level>1.7</source.level>
   </properties>
 
   <dependencies>
@@ -31,7 +31,7 @@
 
     <dependency>
       <groupId>io.playn</groupId>
-      <artifactId>playn-java-lwjgl</artifactId>
+      <artifactId>playn-java-lwjgl2</artifactId>
       <version>${project.version}</version>
     </dependency>
   </dependencies>

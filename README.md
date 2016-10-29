@@ -20,7 +20,7 @@ features, or to fix bugs you find in the PlayN code.
 
 ```
 cd playn
-mvn clean install
+mvn clean install 
 ```
 
 This will install the latest snapshot version of PlayN into your local Maven repository. You can
@@ -28,21 +28,26 @@ then modify the `playn.version` property of your game to reference that snapshot
 game will use your local copy of PlayN instead of a version downloaded from [Maven Central].
 
 Instructions for building and running the PlayN sample games can be found in the [Documentation].
-
+- To install without executing or deploying anything on devices
+	```mvn clean install -DskipTests -DskipExec -Pall```
 - To deploy artifacts to bintray
-```
-cd playn
-mvn versions:set
-mvn deploy -Prelease -DskipTests
-#to continue deployment in case it failed in the middle (for example for playn-webgl)
-mvn deploy -Prelease -DskipTests -rf io.playn:playn-webgl
-```
+	```
+	cd playn
+	mvn versions:set
+	mvn deploy -Prelease -DskipTests
+	#to continue deployment in case it failed in the middle (for example for playn-webgl)
+	mvn deploy -Prelease -DskipTests -rf io.playn:playn-webgl
+	```
 
 - To release
-```
-cd playn
-mvn release:prepare release:perform -DskipTests=true -Prelease -Darguments="-DskipTests=true -Prelease"
-```
+	```
+	cd playn
+	mvn release:prepare release:perform -DskipTests=true -Prelease -Darguments="-DskipTests=true -Prelease"
+	```
+
+There are several profiles:
+- all - includes all modules including android and ios that require special dev environment: osx, codex, android ide
+
 
 Licensing
 ---------

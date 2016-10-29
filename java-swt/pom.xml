@@ -28,6 +28,13 @@
       <groupId>io.playn</groupId>
       <artifactId>playn-java-lwjgl</artifactId>
       <version>${project.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.playn</groupId>
+      <artifactId>playn-java-lwjgl2</artifactId>
+      <version>${project.version}</version>
+       <scope>provided</scope>
     </dependency>
 
     <!-- this is just needed to compile the special mac hack class; NOTE: it has to be before the
