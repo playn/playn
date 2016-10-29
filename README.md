@@ -8,6 +8,14 @@ Information on PlayN can be found in in this README and on the [PlayN project we
 
 PlayN developers, contributors, and users regularly communicate on the [PlayN Google Group].
 
+
+= Trying current builds
+
+You can try the sample test app from here:
+- android - https://dl.bintray.com/raisercostin/maven/io/playn/tests/playn-tests-android/2.0.0/:playn-tests-android-2.0.0.apk
+- ios - TODO
+
+
 Building and Running
 --------------------
 
@@ -35,8 +43,6 @@ Instructions for building and running the PlayN sample games can be found in the
 	cd playn
 	mvn versions:set
 	mvn deploy -Prelease -Pall -DskipTests -DskipExec
-	#to continue deployment in case it failed in the middle (for example for playn-webgl)
-	mvn deploy -Prelease -Pall -DskipExec -DskipTests -rf io.playn:playn-webgl
 	```
 
 - To release
@@ -45,8 +51,8 @@ Instructions for building and running the PlayN sample games can be found in the
 	mvn release:prepare release:perform -DskipTests=true -Prelease -Darguments="-DskipTests=true -Prelease"
 	```
 
-There are several profiles:
-- all - includes all modules including android and ios that require special dev environment: osx, codex, android ide
+- There are several profiles:
+  - all - includes all modules including android and ios that require special dev environment: osx, codex, android ide
 
 
 Licensing
