@@ -34,9 +34,9 @@ Instructions for building and running the PlayN sample games can be found in the
 	```
 	cd playn
 	mvn versions:set
-	mvn deploy -Prelease -DskipTests
+	mvn deploy -Prelease -Pall -DskipTests -DskipExec
 	#to continue deployment in case it failed in the middle (for example for playn-webgl)
-	mvn deploy -Prelease -DskipTests -rf io.playn:playn-webgl
+	mvn deploy -Prelease -Pall -DskipExec -DskipTests -rf io.playn:playn-webgl
 	```
 
 - To release
