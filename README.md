@@ -51,6 +51,14 @@ Instructions for building and running the PlayN sample games can be found in the
 	mvn release:prepare release:perform -DskipTests=true -Prelease -Darguments="-DskipTests=true -Prelease"
 	```
 
+- Useful for maven
+     - bugvm plugin goals: ```mvn bugvm:```
+	- bugvm plugin description: ```mvn help:describe -Dcmd=bugvm:archive``` 
+	- bugvm plugin detailed description: ```mvn help:describe -Dcmd=bugvm:archive -Ddetail``` 
+
+- Useful for bugvm
+	- create *.ipa archive for distribution ```mvn bugvm:archive```
+
 - There are several profiles:
   - all - includes all modules including android and ios that require special dev environment: osx, codex, android ide
 

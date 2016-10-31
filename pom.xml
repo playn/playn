@@ -36,7 +36,7 @@
     <robovm.version>1.12.0</robovm.version>
     <robovm.maven.version>1.12.0</robovm.maven.version>
     <bugvm.version>1.1.5</bugvm.version>
-    <bugvm.maven.version>1.0.10-SNAPSHOT</bugvm.maven.version>
+    <bugvm.maven.version>1.1.5</bugvm.maven.version>
     <!--
       GWT log levels:
       ERROR, WARN, INFO, TRACE, DEBUG, SPAM, or ALL
@@ -70,7 +70,7 @@
   <distributionManagement>
     <repository>
       <id>bintray</id>
-      <url>https://api.bintray.com/maven/${bintray.user}/${bintray.repo}/${bintray.package}/;publish=1</url>
+      <url>https://api.bintray.com/maven/${bintray.user}/${bintray.repo}/${bintray.package}/;publish=0</url>
     </repository>
   </distributionManagement>
 
