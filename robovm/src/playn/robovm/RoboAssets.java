@@ -101,7 +101,7 @@ public class RoboAssets extends Assets {
       if (!fullPath.exists()) continue;
 
       // plat.log().debug("Loading image: " + fullPath);
-      UIImage img = UIImage.getImage(fullPath);
+      UIImage img = UIImage.getImage(fullPath.toString());
       if (img != null) return toData(rsrc.scale, img);
 
       // note this error if this is the lowest resolution image, but fall back to lower resolution
