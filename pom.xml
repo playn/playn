@@ -57,8 +57,7 @@
     <lwjgl2.version>2.9.3</lwjgl2.version>
     <robovm.version>1.12.0</robovm.version>
     <robovm.maven.version>1.12.0</robovm.maven.version>
-    <bugvm.version>1.0.9</bugvm.version>
-    <bugvm.maven.version>1.0.10-SNAPSHOT</bugvm.maven.version>
+    <bugvm.version>1.1.5</bugvm.version>
     <!--
       GWT log levels:
       ERROR, WARN, INFO, TRACE, DEBUG, SPAM, or ALL

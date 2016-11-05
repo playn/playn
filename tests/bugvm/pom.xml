@@ -31,8 +31,8 @@
         <plugins>
           <plugin>
             <groupId>com.bugvm</groupId>
-            <artifactId>bugvm-maven-plugin</artifactId>
-            <version>${bugvm.maven.version}</version>
+            <artifactId>bugvm-maven</artifactId>
+            <version>${bugvm.version}</version>
             <configuration>
               <deviceName>iPhone-6-Plus</deviceName>
             </configuration>
@@ -55,8 +55,8 @@
         <plugins>
           <plugin>
             <groupId>org.bugvm</groupId>
-            <artifactId>bugvm-maven-plugin</artifactId>
-            <version>${bugvm.maven.version}</version>
+            <artifactId>bugvm-maven</artifactId>
+            <version>${bugvm.version}</version>
             <executions>
               <execution>
                 <phase>install</phase>
