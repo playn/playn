@@ -52,7 +52,7 @@
       <modules><module>html</module></modules>
     </profile>
   </profiles>
-
+<!--
   <build>
     <plugins>
       <plugin>
@@ -65,4 +65,5 @@
       </plugin>
     </plugins>
   </build>
+  -->
 </project>

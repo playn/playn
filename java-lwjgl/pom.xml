@@ -9,7 +9,7 @@
 
   <artifactId>playn-java-lwjgl</artifactId>
   <packaging>jar</packaging>
-  <name>PlayN Java via LWJGL</name>
+  <name>PlayN Java8 via LWJGL3</name>
   <description>The PlayN Java (JVM) backend hosted by LWJGL</description>
 
   <properties>
