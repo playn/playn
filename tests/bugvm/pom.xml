@@ -23,7 +23,55 @@
       <version>${project.version}</version>
     </dependency>
   </dependencies>
-
+  <build>
+<!--	<pluginGroups>-->
+<!--		<pluginGroup>com.bugvm</pluginGroup>-->
+<!--	</pluginGroups>-->
+	<plugins>
+		<plugin>
+<!--            <groupId>org.bugvm</groupId>-->
+<!--            <artifactId>bugvm-maven-plugin</artifactId>-->
+ 			<groupId>com.bugvm</groupId>
+			<artifactId>bugvm-maven</artifactId>
+			<version>${bugvm.maven.version}</version>
+			<configuration>
+				<deviceName>iPhone-6-Plus</deviceName>
+			</configuration>
+		</plugin>
+		<!--
+		<plugin>
+		  <groupId>org.codehaus.mojo</groupId>
+		  <artifactId>build-helper-maven-plugin</artifactId>
+		  <version>1.5</version>
+		  <executions>
+		    <execution>
+		      <id>attach-artifacts</id>
+		      <phase>package</phase>
+		      <goals>
+		        <goal>attach-artifact</goal>
+		      </goals>
+		      <configuration>
+		        <artifacts>
+		          <artifact>
+		            <file>target/bugvm/TestsGameBugVM.ipa</file>
+		            <type>ipa</type>
+		          </artifact>
+		          <artifact>
+		            <file>TestsGameBugVM.plist</file>
+		            <type>plist</type>
+		          </artifact>
+		          <artifact>
+		            <file>TestsGameBugVM.html</file>
+		            <type>html</type>
+		          </artifact>
+		        </artifacts>
+		      </configuration>
+		    </execution>
+		  </executions>
+		</plugin>
+		-->
+	</plugins>
+  </build>
   <profiles>
     <profile>
       <id>bugsim</id>
@@ -32,8 +80,7 @@
           <plugin>
             <groupId>com.bugvm</groupId>
             <artifactId>bugvm-maven-plugin</artifactId>
-            <version>${bugvm.maven.version}</version>
-            <configuration>
+            <version>${bugvm.maven.version}</version>            <configuration>
               <deviceName>iPhone-6-Plus</deviceName>
             </configuration>
             <executions>
@@ -54,10 +101,9 @@
       <build>
         <plugins>
           <plugin>
-            <groupId>org.bugvm</groupId>
+            <groupId>com.bugvm</groupId>
             <artifactId>bugvm-maven-plugin</artifactId>
-            <version>${bugvm.maven.version}</version>
-            <executions>
+            <version>${bugvm.maven.version}</version>            <executions>
               <execution>
                 <phase>install</phase>
                 <goals>

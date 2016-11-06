@@ -28,6 +28,37 @@ then modify the `playn.version` property of your game to reference that snapshot
 game will use your local copy of PlayN instead of a version downloaded from [Maven Central].
 
 Instructions for building and running the PlayN sample games can be found in the [Documentation].
+- To install without executing or deploying anything on devices
+	```mvn clean install -DskipTests -DskipExec -Pall```
+- To deploy artifacts to bintray
+	```
+	cd playn
+	mvn clean -Pall
+	mvn versions:set -Pall -DnewVersion=2.0.1
+	git tag playn-2.0.1
+	git push --tags
+	mvn install -Pall -DskipTests -DskipExec
+	mvn deploy -Prelease -Pall -DskipTests -DskipExec
+	mvn versions:set -Pall -DnewVersion=2.0.2-SNAPSHOT
+	```
+
+- To release
+	```
+	cd playn
+	mvn release:prepare release:perform -DskipTests=true -Prelease -Darguments="-DskipTests=true -Prelease"
+	```
+
+- Useful for maven
+     - bugvm plugin goals: ```mvn bugvm:```
+	- bugvm plugin description: ```mvn help:describe -Dcmd=bugvm:archive``` 
+	- bugvm plugin detailed description: ```mvn help:describe -Dcmd=bugvm:archive -Ddetail``` 
+
+- Useful for bugvm
+	- create *.ipa archive for distribution ```mvn bugvm:archive```
+
+- There are several profiles:
+  - all - includes all modules including android and ios that require special dev environment: osx, codex, android ide
+
 
 Licensing
 ---------
