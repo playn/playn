@@ -64,9 +64,9 @@
       <build>
         <plugins>
           <plugin>
-            <groupId>org.robovm</groupId>
+            <groupId>com.mobidevelop.robovm</groupId>
             <artifactId>robovm-maven-plugin</artifactId>
-            <version>${robovm.maven.version}</version>
+            <version>${robovm.version}</version>
             <configuration>
               <deviceName>iPhone-6</deviceName>
             </configuration>
@@ -87,9 +87,9 @@
       <build>
         <plugins>
           <plugin>
-            <groupId>org.robovm</groupId>
+            <groupId>com.mobidevelop.robovm</groupId>
             <artifactId>robovm-maven-plugin</artifactId>
-            <version>${robovm.maven.version}</version>
+            <version>${robovm.version}</version>
             <executions>
               <execution>
                 <phase>install</phase>
