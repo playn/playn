@@ -41,8 +41,13 @@ Instructions for building and running the PlayN sample games can be found in the
 - To deploy artifacts to bintray
 	```
 	cd playn
-	mvn versions:set
+	mvn clean -Pall
+	mvn versions:set -Pall -DnewVersion=2.0.1
+	git tag playn-2.0.1
+	git push --tags
+	mvn install -Pall -DskipTests -DskipExec
 	mvn deploy -Prelease -Pall -DskipTests -DskipExec
+	mvn versions:set -Pall -DnewVersion=2.0.2-SNAPSHOT
 	```
 
 - To release

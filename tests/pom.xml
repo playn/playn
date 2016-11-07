@@ -27,19 +27,21 @@
 
   <profiles>
     <profile>
-      <id>all</id>
-      <modules>
-		<module>java-swt-lwjgl</module>
-		<module>java-swt-lwjgl2</module>
-       	<module>java-lwjgl</module>
-        	<module>java-lwjgl2</module>
-       	<module>android</module>
-      	<module>bugvm</module>
-      	<module>robovm</module>
-      	<module>html</module>
-      </modules>
+		<id>all</id>
+		<modules>
+			<module>android</module>
+			<module>assets</module>
+			<module>bugvm</module>
+			<module>core</module>
+			<module>html</module>
+			<module>java-lwjgl</module>
+			<module>java-lwjgl2</module>
+			<module>java-swt-lwjgl</module>
+			<module>java-swt-lwjgl2</module>
+			<module>robovm</module>
+		</modules>
     </profile>
-     <profile>
+    <profile>
       <id>java-swt</id>
       <modules>
 		<module>java-swt-lwjgl</module>

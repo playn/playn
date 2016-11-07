@@ -8,20 +8,19 @@
   </parent>
 
   <artifactId>playn-tests-bugvm</artifactId>
-  <version>2.0.1</version>
   <name>PlayN Tests BugVM</name>
 
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>playn-tests-core</artifactId>
-      <version>2.0.0</version>
+      <version>${project.version}</version>
     </dependency>
 
     <dependency>
       <groupId>io.playn</groupId>
       <artifactId>playn-bugvm</artifactId>
-      <version>2.0.0</version>
+      <version>${project.version}</version>
     </dependency>
   </dependencies>
   <build>
@@ -39,6 +38,7 @@
 				<deviceName>iPhone-6-Plus</deviceName>
 			</configuration>
 		</plugin>
+		<!--
 		<plugin>
 		  <groupId>org.codehaus.mojo</groupId>
 		  <artifactId>build-helper-maven-plugin</artifactId>
@@ -69,6 +69,7 @@
 		    </execution>
 		  </executions>
 		</plugin>
+		-->
 	</plugins>
   </build>
   <profiles>
@@ -78,7 +79,11 @@
         <plugins>
           <plugin>
             <groupId>com.bugvm</groupId>
-            <artifactId>bugvm-maven-plugin</artifactId>
+            <artifactId>bugvm-maven</artifactId>
+            <version>${bugvm.version}</version>
+            <configuration>
+              <deviceName>iPhone-6-Plus</deviceName>
+            </configuration>
             <executions>
               <execution>
                 <phase>test</phase>
@@ -99,6 +104,7 @@
           <plugin>
             <groupId>com.bugvm</groupId>
             <artifactId>bugvm-maven</artifactId>
+            <version>${bugvm.version}</version>
             <executions>
               <execution>
                 <phase>install</phase>

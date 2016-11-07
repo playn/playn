@@ -13,48 +13,8 @@
   <version>2.0.0</version>
 
 
-  <properties>
-    <createChecksum>false</createChecksum>
-    <!--<github.user>playn</github.user>-->
-    <github.user>raisercostin</github.user>
-    <github.repo>playn</github.repo>
-    <github.url>https://github.com/${github.user}/${github.repo}</github.url>
-    <bintray.user>raisercostin</bintray.user>
-    <bintray.repo>maven</bintray.repo>
-    <bintray.package>${github.repo}</bintray.package>
-    <maven.build.timestamp.format>yyyyMMdd'T'HHmmss</maven.build.timestamp.format>
-
-    <source.level>1.7</source.level>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <android.version>4.1.1.4</android.version>
-    <android.maven.version>4.2.1</android.maven.version>
-    <swt.version>4.5.1</swt.version>
-    <gwt.version>2.7.0</gwt.version>
-    <jbox2d.version>2.2.1.1</jbox2d.version>
-    <lwjgl.version>3.0.0</lwjgl.version>
-    <lwjgl2.version>2.9.3</lwjgl2.version>
-    <robovm.version>1.12.0</robovm.version>
-    <robovm.maven.version>1.12.0</robovm.maven.version>
-    <bugvm.version>1.1.5</bugvm.version>
-    <bugvm.maven.version>1.1.5</bugvm.maven.version>
-    <!--
-      GWT log levels:
-      ERROR, WARN, INFO, TRACE, DEBUG, SPAM, or ALL
-    -->
-    <gwt.loglevel>INFO</gwt.loglevel>
-    <gwt.outputstyle>PRETTY</gwt.outputstyle>
-    <gwt.modulesuffix />
-    <gwt.inplace>false</gwt.inplace>
-    <gwt.xdisable>true</gwt.xdisable>
-    <gwt.draft>false</gwt.draft>
-    <gwt.workers />
-    <maven.test.skip>false</maven.test.skip>
-  </properties>
-
-
-
   <name>PlayN Project</name>
-  <url>${github.url}</url>
+  <url>http://playn.io/</url>
   <description>Cross platform game library for N≥4 platforms.</description>
 
   <issueManagement>
@@ -74,6 +34,10 @@
     </repository>
   </distributionManagement>
 
+  <prerequisites>
+    <maven>3.3.0</maven>
+  </prerequisites>
+
   <modules>
     <module>android</module>
     <module>archetype</module>
@@ -89,6 +53,39 @@
     <module>scene</module>
     <module>webgl</module>
   </modules>
+
+  <properties>
+    <createChecksum>false</createChecksum>
+    <github.user>playn</github.user>
+    <github.repo>playn</github.repo>
+    <github.url>https://github.com/${github.user}/${github.repo}</github.url>
+    <bintray.user>raisercostin</bintray.user>
+    <bintray.repo>maven</bintray.repo>
+    <bintray.package>${github.repo}</bintray.package>
+    <source.level>1.7</source.level>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <android.version>4.1.1.4</android.version>
+    <android.maven.version>4.2.1</android.maven.version>
+    <swt.version>4.5.1</swt.version>
+    <gwt.version>2.7.0</gwt.version>
+    <jbox2d.version>2.2.1.1</jbox2d.version>
+    <lwjgl.version>3.0.0</lwjgl.version>
+    <lwjgl2.version>2.9.3</lwjgl2.version>
+    <robovm.version>2.2.1-SNAPSHOT</robovm.version>
+    <bugvm.version>1.1.5</bugvm.version>
+    <!--
+      GWT log levels:
+      ERROR, WARN, INFO, TRACE, DEBUG, SPAM, or ALL
+    -->
+    <gwt.loglevel>INFO</gwt.loglevel>
+    <gwt.outputstyle>PRETTY</gwt.outputstyle>
+    <gwt.modulesuffix />
+    <gwt.inplace>false</gwt.inplace>
+    <gwt.xdisable>true</gwt.xdisable>
+    <gwt.draft>false</gwt.draft>
+    <gwt.workers />
+    <maven.test.skip>false</maven.test.skip>
+  </properties>
 
   <!-- Common dependencies for all modules -->
   <dependencies>
@@ -124,8 +121,7 @@
           <releaseProfiles>release</releaseProfiles>
           <autoVersionSubmodules>true</autoVersionSubmodules>
         </configuration>
-      </plugin>
-    </plugins>
+      </plugin>    </plugins>
 
     <!-- Common plugin configuration for all children -->
     <pluginManagement>
@@ -227,12 +223,12 @@
           <artifactId>maven-source-plugin</artifactId>
           <version>2.4</version>
         </plugin>
-	       <plugin>
-	      	<artifactId>maven-deploy-plugin</artifactId>
-	      	<version>2.8.2</version>
-	      </plugin>
+       <plugin>
+      	<artifactId>maven-deploy-plugin</artifactId>
+      	<version>2.8.2</version>
+      </plugin>
       </plugins>
-   </pluginManagement>
+    </pluginManagement>
   </build>
 
   <profiles>
