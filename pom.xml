@@ -73,6 +73,7 @@
     <lwjgl2.version>2.9.3</lwjgl2.version>
     <robovm.version>2.2.1-SNAPSHOT</robovm.version>
     <bugvm.version>1.1.5</bugvm.version>
+    -->
     <!--
       GWT log levels:
       ERROR, WARN, INFO, TRACE, DEBUG, SPAM, or ALL
@@ -121,7 +122,8 @@
           <releaseProfiles>release</releaseProfiles>
           <autoVersionSubmodules>true</autoVersionSubmodules>
         </configuration>
-      </plugin>    </plugins>
+      </plugin>
+    </plugins>
 
     <!-- Common plugin configuration for all children -->
     <pluginManagement>
