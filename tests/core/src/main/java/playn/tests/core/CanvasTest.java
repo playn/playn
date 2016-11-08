@@ -227,7 +227,7 @@ public class CanvasTest extends Test {
         }
 
         // round the width so that it goes to zero sometimes (which should be fine)
-        if (tileLayer != null) tileLayer.forceWidth = Math.round(
+        /*if (tileLayer != null) */tileLayer.forceWidth = Math.round(
           Math.abs(FloatMath.sin(clock.tick/2000f)) * 100);
       }
     }));
