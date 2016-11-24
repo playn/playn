@@ -50,6 +50,33 @@ Instructions for building and running the PlayN sample games can be found in the
 	mvn versions:set -Pall -DnewVersion=2.0.2-SNAPSHOT
 	```
 
+- To deploy on devices for development test
+  - android
+		```
+		cd tests\android
+		mvn android:deploy (or mvn install)
+		```
+		Other tasks for android plugin (try `mvn android:xxx`) : aar, apk, apklib, clean, connect, deploy, deploy-apk, 
+		deploy-dependencies, devices, dex, disconnect, emma, emulator-start, emulator-stop, 
+		emulator-stop-all, generate-sources, help, instrument, internal-integration-test, 
+		internal-pre-integration-test, lint, manifest-merger, manifest-update, monkey, 
+		monkeyrunner, ndk-build, proguard, publish-apk, publish-listing, pull, push, 
+		redeploy, redeploy-apk, run, uiautomator, undeploy, undeploy-apk, unpack, zipalign
+
+  - ios (via robovm)
+		```
+		cd tests\robovm
+		mvn robovm:ios-device (or mvn install)
+		```
+	    Other tasks for ios (try `mvn bugvm:xxx`) :
+
+  - ios (via bugvm - deprecated)
+		```
+		cd tests\bugvm
+		mvn bugvm:ios-device (or mvn install)
+		```
+	    Other tasks for ios (try `mvn bugvm:xxx`) :
+
 - To release
 	```
 	cd playn

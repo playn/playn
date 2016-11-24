@@ -396,5 +396,21 @@
         <enabled>false</enabled>
       </snapshots>
     </repository>
+    <repository>
+      <id>raisercostin-bintray</id>
+      <layout>default</layout>
+      <url>https://dl.bintray.com/raisercostin/maven/</url>
+      <releases><enabled>true</enabled></releases>
+      <snapshots><enabled>false</enabled></snapshots>
+    </repository>
   </repositories>
+  <pluginRepositories>
+    <pluginRepository >
+      <id>raisercostin-bintray</id>
+      <layout>default</layout>
+      <url>https://dl.bintray.com/raisercostin/maven/</url>
+      <releases><enabled>true</enabled></releases>
+      <snapshots><enabled>false</enabled></snapshots>
+    </pluginRepository >
+  </pluginRepositories>
 </project>
