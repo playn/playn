@@ -384,7 +384,7 @@ public class AndroidInput extends Input {
       IPoint xy = plat.graphics().transformTouch(event.getX(tt), event.getY(tt));
       float pressure = event.getPressure(tt);
       float size = event.getSize(tt);
-      int id = event.getPointerId(tt);
+      int id = event.getPointerId(tt)+1;
       touches[tidx++] = new Touch.Event(0, time, xy.x(), xy.y(), kind, id, pressure, size);
     }
     return touches;
