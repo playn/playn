@@ -90,6 +90,9 @@
             <groupId>com.mobidevelop.robovm</groupId>
             <artifactId>robovm-maven-plugin</artifactId>
             <version>${robovm.version}</version>
+            <configuration>
+              <arch>arm64</arch>
+            </configuration>
             <executions>
               <execution>
                 <phase>install</phase>
