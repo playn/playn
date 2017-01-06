@@ -51,7 +51,7 @@
     <android.version>4.1.1.4</android.version>
     <android.maven.version>4.2.1</android.maven.version>
     <swt.version>4.5.1</swt.version>
-    <gwt.version>2.7.0</gwt.version>
+    <gwt.version>2.8.0</gwt.version>
     <jbox2d.version>2.2.1.1</jbox2d.version>
     <lwjgl.version>3.0.0</lwjgl.version>
     <lwjgl2.version>2.9.3</lwjgl2.version>
