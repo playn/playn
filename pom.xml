@@ -55,7 +55,7 @@
     <jbox2d.version>2.2.1.1</jbox2d.version>
     <lwjgl.version>3.0.0</lwjgl.version>
     <lwjgl2.version>2.9.3</lwjgl2.version>
-    <robovm.version>2.2.1-SNAPSHOT</robovm.version>
+    <robovm.version>2.3.0</robovm.version>
     <bugvm.version>1.1.5</bugvm.version>
     <!--
       GWT log levels:
