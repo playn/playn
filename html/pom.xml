@@ -134,7 +134,7 @@
         <artifactId>gwt-maven-plugin</artifactId>
         <configuration>
           <mode>htmlunit</mode>
-          <sourceLevel>${source.level}</sourceLevel>
+          <sourceLevel>auto</sourceLevel>
           <extraJvmArgs>-mx1024m</extraJvmArgs>
         </configuration>
         <executions>
