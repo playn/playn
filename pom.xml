@@ -11,8 +11,10 @@
   <artifactId>playn-project</artifactId>
   <packaging>pom</packaging>
   <version>2.0-SNAPSHOT</version>
+
+
   <name>PlayN Project</name>
-  <url>http://code.google.com/p/playn</url>
+  <url>http://playn.io/</url>
   <description>Cross platform game library for N≥4 platforms.</description>
 
   <issueManagement>
@@ -20,10 +22,17 @@
   </issueManagement>
 
   <scm>
-    <connection>scm:git:git://github.com/playn/playn.git</connection>
-    <developerConnection>scm:git:git@github.com:playn/playn.git</developerConnection>
-    <url>https://github.com/playn/playn/</url>
+    <connection>scm:git:${github.url}.git</connection>
+    <developerConnection>scm:git:${github.url}.git</developerConnection>
+    <url>${github.url}</url>
+    <tag>${project.artifactId}-${project.version}</tag>
   </scm>
+  <distributionManagement>
+    <repository>
+      <id>bintray</id>
+      <url>https://api.bintray.com/maven/${bintray.user}/${bintray.repo}/${bintray.package}/;publish=0</url>
+    </repository>
+  </distributionManagement>
 
   <prerequisites>
     <maven>3.3.0</maven>
@@ -46,6 +55,13 @@
   </modules>
 
   <properties>
+    <createChecksum>false</createChecksum>
+    <github.user>playn</github.user>
+    <github.repo>playn</github.repo>
+    <github.url>https://github.com/${github.user}/${github.repo}</github.url>
+    <bintray.user>raisercostin</bintray.user>
+    <bintray.repo>maven</bintray.repo>
+    <bintray.package>${github.repo}</bintray.package>
     <source.level>1.7</source.level>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <android.version>4.1.1.4</android.version>
@@ -83,6 +99,7 @@
 
   <build>
     <plugins>
+      <!--
       <plugin>
         <groupId>org.sonatype.plugins</groupId>
         <artifactId>nexus-staging-maven-plugin</artifactId>
@@ -95,6 +112,7 @@
           <stagingProfileId>a00df38d03dd2c</stagingProfileId>
         </configuration>
       </plugin>
+      -->
     </plugins>
 
     <!-- Common plugin configuration for all children -->
@@ -197,6 +215,10 @@
           <artifactId>maven-source-plugin</artifactId>
           <version>2.4</version>
         </plugin>
+       <plugin>
+      	<artifactId>maven-deploy-plugin</artifactId>
+      	<version>2.8.2</version>
+      </plugin>
       </plugins>
     </pluginManagement>
   </build>
@@ -320,5 +342,50 @@
         </pluginManagement>
       </build>
     </profile>
+    <profile>
+        <id>release</id>
+        <build>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-javadoc-plugin</artifactId>
+                    <executions>
+                        <execution>
+                            <id>attach-javadocs</id>
+                            <goals>
+                                <goal>jar</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-source-plugin</artifactId>
+                    <executions>
+                        <execution>
+                            <id>attach-sources</id>
+                            <goals>
+                                <goal>jar-no-fork</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+            </plugins>
+        </build>
+    </profile>
   </profiles>
+  <repositories>
+    <repository>
+      <id>jcenter-bintray</id>
+      <name>Bintray JCenter Maven Repository</name>
+      <layout>default</layout>
+      <url>https://jcenter.bintray.com/</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </repository>
+  </repositories>
 </project>

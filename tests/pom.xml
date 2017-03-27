@@ -24,6 +24,19 @@
 
   <profiles>
     <profile>
+		<id>all</id>
+		<modules>
+			<module>android</module>
+			<module>assets</module>
+			<module>bugvm</module>
+			<module>core</module>
+			<module>html</module>
+			<module>java-lwjgl</module>
+			<module>java-swt</module>
+			<module>robovm</module>
+		</modules>
+    </profile>
+    <profile>
       <id>java-swt</id>
       <modules><module>java-swt</module></modules>
     </profile>
@@ -52,7 +65,7 @@
       <modules><module>html</module></modules>
     </profile>
   </profiles>
-
+<!--
   <build>
     <plugins>
       <plugin>
@@ -65,4 +78,5 @@
       </plugin>
     </plugins>
   </build>
+  -->
 </project>

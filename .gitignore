@@ -1,4 +1,5 @@
 target
+pom.xml.versionsBackup
 
 # /html/
 /html/tests/playn/shared/json
