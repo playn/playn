@@ -46,7 +46,7 @@
   </modules>
 
   <properties>
-    <source.level>1.7</source.level>
+    <source.level>1.8</source.level>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <android.version>4.1.1.4</android.version>
     <android.maven.version>4.2.1</android.maven.version>
