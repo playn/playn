@@ -49,14 +49,12 @@ public class HtmlImage extends ImageImpl {
     else {
       HtmlInput.addEventListener(img, "load", new EventHandler() {
         @Override public void handleEvent (NativeEvent evt) {
-          pixelWidth = img.getWidth();
-          pixelHeight = img.getHeight();
-          pstate.succeed(HtmlImage.this);
+          succeed(new ImageImpl.Data(Scale.ONE, img, img.getWidth(), img.getHeight()));
         }
       }, false);
       HtmlInput.addEventListener(img, "error", new EventHandler() {
         @Override public void handleEvent(NativeEvent evt) {
-          pstate.fail(new RuntimeException("Error loading image " + img.getSrc()));
+          fail(new RuntimeException("Error loading image " + img.getSrc()));
         }
       }, false);
     }
