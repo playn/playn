@@ -68,26 +68,28 @@ public class GroupLayer extends ClippedLayer implements Iterable<Layer> {
    * {@code child} is already a child of another {@link GroupLayer}, it will be removed before
    * being added to this {@link GroupLayer}.
    */
-  public void add(Layer child) {
-    // optimization if we're requested to add a child that's already added
-    GroupLayer parent = child.parent();
-    if (parent == this) return;
+  public void add(Layer... childrenForAdd) {
+    for (Layer child : childrenForAdd) {
+      // optimization if we're requested to add a child that's already added
+      GroupLayer parent = child.parent();
+      if (parent == this) return;
 
-    // if this child has equal or greater depth to the last child, we can append directly and avoid
-    // a log(N) search; this is helpful when all children have the same depth
-    int count = children.size(), index;
-    if (count == 0 || children.get(count-1).depth() <= child.depth()) index = count;
-    // otherwise find the appropriate insertion point via binary search
-    else index = findInsertion(child.depth());
+      // if this child has equal or greater depth to the last child, we can append directly and avoid
+      // a log(N) search; this is helpful when all children have the same depth
+      int count = children.size(), index;
+      if (count == 0 || children.get(count - 1).depth() <= child.depth()) index = count;
+        // otherwise find the appropriate insertion point via binary search
+      else index = findInsertion(child.depth());
 
-    // remove the child from any existing parent, preventing multiple parents
-    if (parent != null) parent.remove(child);
-    children.add(index, child);
-    child.setParent(this);
-    if (state.get() == State.ADDED) child.onAdd();
+      // remove the child from any existing parent, preventing multiple parents
+      if (parent != null) parent.remove(child);
+      children.add(index, child);
+      child.setParent(this);
+      if (state.get() == State.ADDED) child.onAdd();
 
-    // if this child is active, we need to become active
-    if (child.interactive()) setInteractive(true);
+      // if this child is active, we need to become active
+      if (child.interactive()) setInteractive(true);
+    }
   }
 
   /**
@@ -133,14 +135,16 @@ public class GroupLayer extends ClippedLayer implements Iterable<Layer> {
   /**
    * Removes a layer from the group.
    */
-  public void remove(Layer child) {
-    int index = findChild(child, child.depth());
-    if (index < 0) {
-      throw new UnsupportedOperationException(
-        "Could not remove Layer because it is not a child of the GroupLayer " +
-          "[group=" + this + ", layer=" + child + "]");
+  public void remove(Layer... childrenForRemove) {
+    for (Layer child : childrenForRemove) {
+      int index = findChild(child, child.depth());
+      if (index < 0) {
+        throw new UnsupportedOperationException(
+                "Could not remove Layer because it is not a child of the GroupLayer " +
+                        "[group=" + this + ", layer=" + child + "]");
+      }
+      remove(index);
     }
-    remove(index);
   }
 
   /**
