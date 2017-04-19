@@ -15,8 +15,6 @@ package playn.html;
 
 import com.google.gwt.user.client.Window;
 
-import playn.html.HtmlPlatform.Mode;
-
 /**
  * Interface providing a central place to document all URL query parameters and values which affect
  * the HTML platform.
@@ -34,22 +32,6 @@ public interface HtmlUrlParameters {
     static final String PARAM_NAME = "log_level";
     static final String TRACE = "TRACE";
     static final String WARN = "WARN";
-  }
-
-  public static class Renderer {
-    static final String CANVAS = "canvas";
-    static final String GL = "gl";
-    static final String PARAM_NAME = "renderer";
-
-    static Mode requestedMode() {
-      String renderer = Window.Location.getParameter(PARAM_NAME);
-      if (CANVAS.equals(renderer)) {
-        return Mode.CANVAS;
-      } else if (GL.equals(renderer)) {
-        return Mode.WEBGL;
-      }
-      return Mode.AUTODETECT;
-    }
   }
 
   /**
