@@ -32,14 +32,6 @@
       <modules><module>android</module></modules>
     </profile>
     <profile>
-      <id>bugsim</id>
-      <modules><module>bugvm</module></modules>
-    </profile>
-    <profile>
-      <id>bugdev</id>
-      <modules><module>bugvm</module></modules>
-    </profile>
-    <profile>
       <id>robosim</id>
       <modules><module>robovm</module></modules>
     </profile>

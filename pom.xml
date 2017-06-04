@@ -40,7 +40,6 @@
     <module>java-swt</module>
     <module>jbox2d</module>
     <module>robovm</module>
-    <module>bugvm</module>
     <module>scene</module>
     <module>webgl</module>
   </modules>
@@ -56,7 +55,6 @@
     <lwjgl.version>3.1.2</lwjgl.version>
     <lwjgl2.version>2.9.3</lwjgl2.version>
     <robovm.version>2.3.1</robovm.version>
-    <bugvm.version>1.1.5</bugvm.version>
     <!--
       GWT log levels:
       ERROR, WARN, INFO, TRACE, DEBUG, SPAM, or ALL
