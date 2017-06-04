@@ -1100,7 +1100,7 @@ final class LWJGLGL20 extends playn.core.GL20 {
 
   @Override
   public boolean glGetBoolean(int pname) {
-    return GL11.glGetBoolean(pname) == GL_TRUE;
+    return GL11.glGetBoolean(pname);
   }
 
   @Override
