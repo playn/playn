@@ -10,7 +10,7 @@
   <groupId>io.playn</groupId>
   <artifactId>playn-project</artifactId>
   <packaging>pom</packaging>
-  <version>2.1-SNAPSHOT</version>
+  <version>2.0-SNAPSHOT</version>
   <name>PlayN Project</name>
   <url>http://code.google.com/p/playn</url>
   <description>Cross platform game library for N≥4 platforms.</description>
@@ -18,6 +18,13 @@
   <issueManagement>
     <url>http://github.com/playn/playn/issues</url>
   </issueManagement>
+
+  <distributionManagement>
+    <repository>
+      <id>bintray-repo-maven</id>
+      <url>https://api.bintray.com/maven/playn/playn/playn/;publish=1</url>
+    </repository>
+  </distributionManagement>
 
   <scm>
     <connection>scm:git:git://github.com/playn/playn.git</connection>
@@ -80,21 +87,6 @@
   </dependencies>
 
   <build>
-    <plugins>
-      <plugin>
-        <groupId>org.sonatype.plugins</groupId>
-        <artifactId>nexus-staging-maven-plugin</artifactId>
-        <version>1.6.6</version>
-        <extensions>true</extensions>
-        <inherited>false</inherited>
-        <configuration>
-          <serverId>ossrh-releases</serverId>
-          <nexusUrl>https://oss.sonatype.org/</nexusUrl>
-          <stagingProfileId>a00df38d03dd2c</stagingProfileId>
-        </configuration>
-      </plugin>
-    </plugins>
-
     <!-- Common plugin configuration for all children -->
     <pluginManagement>
       <plugins>
