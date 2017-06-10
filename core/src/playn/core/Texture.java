@@ -240,7 +240,13 @@ public class Texture extends Tile implements Closeable {
   @Override public void close () {
     if (!disposed) {
       disposed = true;
-      gfx.gl.glDeleteTexture(id);
+      if (gfx.exec().isMainThread()) {
+        gfx.gl.glDeleteTexture(id);
+      } else {
+        gfx.exec().invokeLater(new Runnable() {
+          public void run () { gfx.gl.glDeleteTexture(id); }
+        });
+      }
     }
   }
 
@@ -250,7 +256,6 @@ public class Texture extends Tile implements Closeable {
   }
 
   protected void finalize () {
-    // if we're not yet disposed, queue ourselves up to be disposed on the next frame tick
-    if (!disposed) gfx.queueForDispose(this);
+    this.close();
   }
 }

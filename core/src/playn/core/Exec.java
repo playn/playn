@@ -27,7 +27,7 @@ import react.Slot;
 public abstract class Exec {
 
   /** A default exec implementation which processes {@link #invokeLater} via the frame tick. */
-  public static class Default extends Exec {
+  public static abstract class Default extends Exec {
     private final List<Runnable> pending = new ArrayList<>();
     private final List<Runnable> running = new ArrayList<>();
     protected final Platform plat;
@@ -39,10 +39,6 @@ public abstract class Exec {
       }).atPrio(Short.MAX_VALUE);
     }
 
-    @Override public boolean isAsyncSupported  () { return false; }
-    @Override public void invokeAsync (Runnable action) {
-      throw new UnsupportedOperationException();
-    }
     @Override public synchronized void invokeLater (Runnable action) {
       pending.add(action);
     }
@@ -64,6 +60,11 @@ public abstract class Exec {
       running.clear();
     }
   }
+
+  /**
+   * Returns true if the caller is running on the 'main' game thread, false otherwise.
+   */
+  public abstract boolean isMainThread ();
 
   /**
    * Invokes {@code action} on the next {@link Platform#frame} signal. The default implementation
@@ -98,7 +99,9 @@ public abstract class Exec {
    * Returns whether this platform supports async (background) operations.
    * HTML doesn't, most other platforms do.
    */
-  public abstract boolean isAsyncSupported  ();
+  public boolean isAsyncSupported () {
+    return false;
+  }
 
   /**
    * Invokes the supplied action on a separate thread.

@@ -114,7 +114,9 @@ public class HtmlPlatform extends Platform {
   private int backgroundFrameMillis = 0;
 
   private final HtmlLog log = GWT.create(HtmlLog.class);
-  private final Exec exec = new Exec.Default(this);
+  private final Exec exec = new Exec.Default(this) {
+    @Override public boolean isMainThread () { return true; }
+  };
   private final HtmlAssets assets;
   private final HtmlAudio audio;
   private final HtmlGraphics graphics;

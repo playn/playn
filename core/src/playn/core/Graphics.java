@@ -105,15 +105,8 @@ public abstract class Graphics {
    */
   public abstract TextLayout[] layoutText (String text, TextFormat format, TextWrap wrap);
 
-  /**
-   * Queues the supplied graphics resource for disposal on the next frame tick. This is generally
-   * called from finalizers of graphics resource objects which discover that they are being garbage
-   * collected, but their GPU resources have not yet been freed.
-   */
-  public void queueForDispose (final Closeable resource) {
-    plat.frame.connect(new UnitSlot() {
-      public void onEmit () { resource.close(); }
-    }).once();
+  Exec exec () {
+    return plat.exec();
   }
 
   Texture colorTex () {

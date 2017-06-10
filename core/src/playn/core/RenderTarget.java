@@ -76,7 +76,13 @@ public abstract class RenderTarget implements Closeable {
   @Override public void close () {
     if (!disposed) {
       disposed = true;
-      gfx.gl.glDeleteFramebuffer(id());
+      if (gfx.exec().isMainThread()) {
+        gfx.gl.glDeleteFramebuffer(id());
+      } else {
+        gfx.exec().invokeLater(new Runnable() {
+          public void run () { gfx.gl.glDeleteFramebuffer(id()); }
+        });
+      }
     }
   }
 
@@ -86,7 +92,7 @@ public abstract class RenderTarget implements Closeable {
   }
 
   @Override protected void finalize () {
-    if (!disposed) gfx.queueForDispose(this);
+    this.close();
   }
 
   private boolean disposed;

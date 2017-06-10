@@ -78,10 +78,12 @@ public abstract class JavaPlatform extends Platform {
   protected final Config config;
   private final long start = System.nanoTime();
 
+  private Thread mainThread;
   private boolean active = true;
 
   private final ExecutorService pool = Executors.newFixedThreadPool(4);
   private final Exec exec = new Exec.Default(this) {
+    @Override public boolean isMainThread () { return Thread.currentThread() == mainThread; }
     @Override public boolean isAsyncSupported () { return true; }
     @Override public void invokeAsync (Runnable action) { pool.execute(action); }
   };
@@ -135,6 +137,11 @@ public abstract class JavaPlatform extends Platform {
           }
         }
       });
+    }
+
+    // make a note of the main thread
+    synchronized (this) {
+      mainThread = Thread.currentThread();
     }
 
     // run the game loop

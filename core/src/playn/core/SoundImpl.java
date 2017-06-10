@@ -21,12 +21,14 @@ import react.RPromise;
  */
 public abstract class SoundImpl<I> extends Sound {
 
+  protected final Exec exec;
   protected boolean playing, looping;
   protected float volume = 1;
   protected I impl;
 
   public SoundImpl (Exec exec) {
     super(exec.<Sound>deferredPromise());
+    this.exec = exec;
   }
 
   /** Configures this sound with its platform implementation.
@@ -94,7 +96,11 @@ public abstract class SoundImpl<I> extends Sound {
 
   @Override
   protected void finalize() {
-    release();
+    if (impl != null) {
+      exec.invokeLater(new Runnable() {
+        public void run() { release(); }
+      });
+    }
   }
 
   protected boolean prepareImpl() {

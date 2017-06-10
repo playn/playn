@@ -18,6 +18,7 @@ import java.util.concurrent.Executors;
 
 import org.robovm.apple.coregraphics.CGRect;
 import org.robovm.apple.foundation.NSObject;
+import org.robovm.apple.foundation.NSThread;
 import org.robovm.apple.foundation.NSTimer;
 import org.robovm.apple.foundation.NSURL;
 import org.robovm.apple.glkit.GLKViewDrawableColorFormat;
@@ -119,6 +120,7 @@ public class RoboPlatform extends Platform {
   private final RoboLog log = new RoboLog();
   private final Json json = new JsonImpl();
   private final Exec exec = new Exec.Default(this) {
+    @Override public boolean isMainThread () { return NSThread.getCurrentThread().isMainThread(); }
     @Override public boolean isAsyncSupported () { return true; }
     @Override public void invokeAsync (Runnable action) { pool.execute(action); }
   };
