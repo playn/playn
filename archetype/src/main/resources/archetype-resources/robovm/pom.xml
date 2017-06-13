@@ -34,26 +34,23 @@
   <build>
     <plugins>
       <plugin>
-        <groupId>com.pyx4j</groupId>
-        <artifactId>maven-junction-plugin</artifactId>
-        <version>1.0.3</version>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <version>1.6</version>
         <executions>
           <execution>
-            <phase>generate-sources</phase>
+            <phase>generate-resources</phase>
+            <configuration>
+              <target>
+                <!-- generate a symlink to our assets directory in the proper location -->
+                <symlink overwrite="true" link="${basedir}/resources/assets"
+                         resource="${basedir}/../assets/src/main/resources/assets"/>
+              </target>
+            </configuration>
             <goals>
-              <goal>link</goal>
+              <goal>run</goal>
             </goals>
           </execution>
         </executions>
-        <!-- generate a symlink to our assets directory in the proper location -->
-        <configuration>
-          <links>
-            <link>
-              <src>${basedir}/../assets/src/main/resources/assets</src>
-              <dst>${basedir}/resources/assets</dst>
-            </link>
-          </links>
-        </configuration>
       </plugin>
     </plugins>
   </build>

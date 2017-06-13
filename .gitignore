@@ -5,4 +5,4 @@ target
 
 # /tests/
 /tests/android/assets
-/tests/ios/assets
+/tests/robovm/resources/assets
