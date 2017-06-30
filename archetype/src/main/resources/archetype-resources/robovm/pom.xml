@@ -56,6 +56,7 @@
   </build>
 
   <profiles>
+    <!-- Test on the simluator like so: mvn test -Probosim -->
     <profile>
       <id>robosim</id>
       <build>
@@ -79,6 +80,8 @@
         </plugins>
       </build>
     </profile>
+
+    <!-- Install a dev build in your device like so: mvn install -Probodev -->
     <profile>
       <id>robodev</id>
       <build>
@@ -95,6 +98,33 @@
                 <phase>install</phase>
                 <goals>
                   <goal>ios-device</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+    <!-- Build your IPAs for the app store like so: mvn package -Proboipa -->
+    <profile>
+      <id>roboipa</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>com.mobidevelop.robovm</groupId>
+            <artifactId>robovm-maven-plugin</artifactId>
+            <version>${robovm.version}</version>
+            <configuration>
+              <iosSignIdentity>${robovm.app.signer}</iosSignIdentity>
+              <iosProvisioningProfile>${robovm.app.cert}</iosProvisioningProfile>
+              <ipaArchs>thumbv7:arm64</ipaArchs>
+            </configuration>
+            <executions>
+              <execution>
+                <phase>package</phase>
+                <goals>
+                  <goal>create-ipa</goal>
                 </goals>
               </execution>
             </executions>
