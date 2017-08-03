@@ -271,6 +271,7 @@ public class JavaAssets extends Assets {
            FileChannel fc = in.getChannel()) {
         ByteBuffer buf = ByteBuffer.allocateDirect((int)fc.size()); // no >2GB files
         fc.read(buf);
+        buf.flip();
         return buf;
       }
     }
