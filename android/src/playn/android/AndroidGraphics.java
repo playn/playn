@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.WeakHashMap;
 
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Paint;
 import android.graphics.Typeface;
@@ -130,9 +131,20 @@ public class AndroidGraphics extends Graphics {
    * Informs the graphics system that the surface into which it is rendering has changed size. The
    * supplied width and height are in pixels, not display units.
    */
-  public void onSurfaceChanged (int pixelWidth, int pixelHeight) {
+  public void onSurfaceChanged (int pixelWidth, int pixelHeight, int orient) {
     viewportChanged(pixelWidth, pixelHeight);
     screenSize.setSize(viewSize);
+    switch (orient) {
+    case Configuration.ORIENTATION_LANDSCAPE:
+      orientDetailM.update(OrientationDetail.LANDSCAPE_LEFT);
+      break;
+    case Configuration.ORIENTATION_PORTRAIT:
+      orientDetailM.update(OrientationDetail.PORTRAIT);
+      break;
+    default: // Configuration.ORIENTATION_UNDEFINED
+      orientDetailM.update(OrientationDetail.UNKNOWN);
+      break;
+    }
   }
 
   /**

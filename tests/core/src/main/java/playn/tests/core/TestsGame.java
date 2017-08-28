@@ -107,6 +107,12 @@ public class TestsGame extends SceneGame {
     input.touchEvents.connect(new playn.scene.Touch.Dispatcher(rootLayer, true));
     input.mouseEvents.connect(new playn.scene.Mouse.Dispatcher(rootLayer, true));
 
+    graphics.deviceOrient.connect(new Slot<Graphics.Orientation>() {
+      public void onEmit (Graphics.Orientation orient) {
+        displayMenu();
+      }
+    });
+
     tests = new Test[] {
       new CanvasTest(this),
       new SurfaceTest(this),

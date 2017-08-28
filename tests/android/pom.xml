@@ -52,6 +52,7 @@
               <jvmArgument>-Xmx1024m</jvmArgument>
             </jvmArguments>
           </dex>
+          <sdk><platform>21</platform></sdk>
         </configuration>
         <extensions>true</extensions>
         <executions>

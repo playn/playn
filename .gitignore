@@ -4,5 +4,4 @@ target
 /html/tests/playn/shared/json
 
 # /tests/
-/tests/android/assets
 /tests/robovm/resources/assets

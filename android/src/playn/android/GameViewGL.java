@@ -43,7 +43,8 @@ public class GameViewGL extends GLSurfaceView {
         plat.graphics().onSurfaceCreated();
       }
       @Override public void onSurfaceChanged(GL10 gl, int width, int height) {
-        plat.graphics().onSurfaceChanged(width, height);
+        int orient = getResources().getConfiguration().orientation;
+        plat.graphics().onSurfaceChanged(width, height, orient);
         // we defer the start of the game until we've received our initial surface size
         if (!started.get()) startGame();
       }

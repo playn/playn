@@ -17,8 +17,7 @@ package playn.core;
 
 import pythagoras.f.Dimension;
 import pythagoras.f.IDimension;
-import react.Closeable;
-import react.UnitSlot;
+import react.*;
 
 import static playn.core.GL20.*;
 
@@ -29,15 +28,55 @@ public abstract class Graphics {
 
   protected final Platform plat;
   protected final Dimension viewSizeM = new Dimension();
+  protected final Value<OrientationDetail> orientDetailM = Value.create(OrientationDetail.UNKNOWN);
+
   private Scale scale;
   private int viewPixelWidth, viewPixelHeight;
   private Texture colorTex; // created lazily
+
+  /** Enumerates detailed device orientations. */
+  public static enum OrientationDetail {
+    /** Current device orientation is not known. */
+    UNKNOWN,
+    /** Perpendicular to the ground, top of device up. */
+    PORTRAIT,
+    /** Perpendicular to the ground, top of device down. */
+    PORTRAIT_UPSIDE_DOWN,
+    /** Perpendicular to the ground, top of device to the left. */
+    LANDSCAPE_LEFT,
+    /** Perpendicular to the ground, top of device to the right. */
+    LANDSCAPE_RIGHT,
+    /** Parallel to the ground, face up. */
+    FACE_UP,
+    /** Parallel to the ground, face down. */
+    FACE_DOWN
+  };
+
+  /** Enumerates simplified device orientations. */
+  public static enum Orientation { PORTRAIT, LANDSCAPE };
 
   /** Provides access to GL services. */
   public final GL20 gl;
 
   /** The current size of the graphics viewport. */
   public final IDimension viewSize = viewSizeM;
+
+  /** The current orientation of the device. Devices that do not support orientation will always be
+    * {@code PORTRAIT}. */
+  public final ValueView<Orientation> deviceOrient = orientDetailM.map(
+    new Function<OrientationDetail,Orientation>() {
+      public Orientation apply(OrientationDetail detail) {
+        switch (detail) {
+        case LANDSCAPE_LEFT: return Orientation.LANDSCAPE;
+        case LANDSCAPE_RIGHT: return Orientation.LANDSCAPE;
+        default: return Orientation.PORTRAIT;
+        }
+      }
+    });
+
+  /** The current orientation of the device in more detailed form. Devices that do not support
+    * orientation will always be {@code UNKNOWN}. */
+  public final ValueView<OrientationDetail> orientDetail = orientDetailM;
 
   /** The render target for the default framebuffer. */
   public RenderTarget defaultRenderTarget = new RenderTarget(this) {

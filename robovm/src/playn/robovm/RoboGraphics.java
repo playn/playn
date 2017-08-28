@@ -19,6 +19,7 @@ import org.robovm.apple.coregraphics.CGColorSpace;
 import org.robovm.apple.coregraphics.CGImageAlphaInfo;
 import org.robovm.apple.coregraphics.CGRect;
 import org.robovm.apple.uikit.UIDevice;
+import org.robovm.apple.uikit.UIDeviceOrientation;
 import org.robovm.apple.uikit.UIScreen;
 import org.robovm.apple.uikit.UIUserInterfaceIdiom;
 
@@ -101,6 +102,18 @@ public class RoboGraphics extends Graphics {
       CGImageAlphaInfo.PremultipliedLast.value()));
   }
 
+  static OrientationDetail toOrientationDetail(UIDeviceOrientation orient) {
+    switch (orient) {
+    case Portrait: return OrientationDetail.PORTRAIT;
+    case PortraitUpsideDown: return OrientationDetail.PORTRAIT_UPSIDE_DOWN;
+    case LandscapeLeft: return OrientationDetail.LANDSCAPE_LEFT;
+    case LandscapeRight: return OrientationDetail.LANDSCAPE_RIGHT;
+    case FaceUp: return OrientationDetail.FACE_UP;
+    case FaceDown: return OrientationDetail.FACE_DOWN;
+    default: return OrientationDetail.UNKNOWN;
+    }
+  }
+
   // called when our view appears
   void viewDidInit(CGRect bounds) {
     defaultFramebuffer = gl.glGetInteger(GL20.GL_FRAMEBUFFER_BINDING);
@@ -112,6 +125,7 @@ public class RoboGraphics extends Graphics {
   void boundsChanged(CGRect bounds) {
     viewportChanged(scale().scaledCeil((float)bounds.getWidth()),
                     scale().scaledCeil((float)bounds.getHeight()));
+    orientDetailM.update(toOrientationDetail(UIDevice.getCurrentDevice().getOrientation()));
   }
 
   IPoint transformTouch(float x, float y) {
