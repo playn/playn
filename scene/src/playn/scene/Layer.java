@@ -267,8 +267,8 @@ public abstract class Layer implements Closeable {
   public AffineTransform transform() {
     if (isSet(Flag.XFDIRTY)) {
       float sina = FloatMath.sin(rotation), cosa = FloatMath.cos(rotation);
-      float m00 =  cosa * scaleX, m01 = sina * scaleY;
-      float m10 = -sina * scaleX, m11 = cosa * scaleY;
+      float m00 =  cosa * scaleX, m01 = sina * scaleX;
+      float m10 = -sina * scaleY, m11 = cosa * scaleY;
       float tx = transform.tx(), ty = transform.ty();
       transform.setTransform(m00, m01, m10, m11, tx, ty);
       setFlag(Flag.XFDIRTY, false);
