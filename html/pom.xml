@@ -108,25 +108,22 @@
       <!-- this symlinks some shared test code into tests/...; we can't commit
            a symlink in Git (breaks on Windows), so this should be more robust -->
       <plugin>
-        <groupId>com.pyx4j</groupId>
-        <artifactId>maven-junction-plugin</artifactId>
-        <version>1.0.3</version>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <version>1.6</version>
         <executions>
           <execution>
-            <phase>generate-sources</phase>
+            <phase>generate-resources</phase>
+            <configuration>
+              <target>
+                <symlink overwrite="true" link="${basedir}/tests/playn/shared/json"
+                         resource="${basedir}/../core/tests/playn/shared/json"/>
+              </target>
+            </configuration>
             <goals>
-              <goal>link</goal>
+              <goal>run</goal>
             </goals>
           </execution>
         </executions>
-        <configuration>
-          <links>
-            <link>
-              <src>${basedir}/../core/tests/playn/shared/json</src>
-              <dst>${basedir}/tests/playn/shared/json</dst>
-            </link>
-          </links>
-        </configuration>
       </plugin>
 
       <plugin>
