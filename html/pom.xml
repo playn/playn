@@ -105,27 +105,6 @@
         </configuration>
       </plugin>
 
-      <!-- this symlinks some shared test code into tests/...; we can't commit
-           a symlink in Git (breaks on Windows), so this should be more robust -->
-      <plugin>
-        <artifactId>maven-antrun-plugin</artifactId>
-        <version>1.6</version>
-        <executions>
-          <execution>
-            <phase>generate-test-resources</phase>
-            <configuration>
-              <target>
-                <symlink overwrite="true" link="${basedir}/tests/playn/shared/json"
-                         resource="${basedir}/../core/tests/playn/shared/json"/>
-              </target>
-            </configuration>
-            <goals>
-              <goal>run</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>gwt-maven-plugin</artifactId>

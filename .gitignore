@@ -1,7 +1,4 @@
 target
 
-# /html/
-/html/tests/playn/shared/json
-
 # /tests/
 /tests/robovm/resources/assets
