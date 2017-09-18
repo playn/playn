@@ -112,7 +112,7 @@
         <version>1.6</version>
         <executions>
           <execution>
-            <phase>generate-resources</phase>
+            <phase>generate-test-resources</phase>
             <configuration>
               <target>
                 <symlink overwrite="true" link="${basedir}/tests/playn/shared/json"
