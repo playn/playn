@@ -15,8 +15,6 @@
  */
 package playn.scene;
 
-import java.io.PrintWriter;
-
 import pythagoras.f.AffineTransform;
 import pythagoras.f.FloatMath;
 import pythagoras.f.MathUtil;
@@ -25,6 +23,7 @@ import pythagoras.f.Vector;
 import pythagoras.f.XY;
 
 import react.Closeable;
+import react.Function;
 import react.Signal;
 import react.Value;
 import react.ValueView;
@@ -117,6 +116,11 @@ public abstract class Layer implements Closeable {
      * layer to customize the default hit testing approach, which is to simply check whether the
      * point intersects a layer's bounds. See {@link Layer#hitTest}. */
     Layer hitTest (Layer layer, Point p);
+  }
+
+  /** Used by {@link #visit}. */
+  public interface Visitor {
+    void visit (Layer layer, int depth);
   }
 
   /** Controls rendering of debug rectangles around views. */
@@ -697,11 +701,29 @@ public abstract class Layer implements Closeable {
   }
 
   /**
-   * Prints a debug representation of this layer to {@link out}.
-   * @param out the writer to which to print.
+   * Visits this layer and its children, in depth first order, with {@code visitor}.
    */
-  public void debugPrint(PrintWriter out) {
-    debugPrint(out, "");
+  public void visit(Visitor visitor) {
+    visit(visitor, 0);
+  }
+
+  /**
+   * Prints a debug representation of this layer and its children.
+   * @param log the output will go to this log (at the debug level).
+   */
+  public void debugPrint(final Log log) {
+    this.visit(new Visitor() {
+      public void visit(Layer layer, int depth) {
+        String prefix = repeat('.', depth);
+        log.debug(prefix + layer.toString());
+      }
+    });
+  }
+
+  private static String repeat(char c, int count) {
+    char[] cs = new char[count];
+    for (int ii = 0; ii < count; ii++) cs[ii] = c;
+    return new String(cs);
   }
 
   /**
@@ -732,9 +754,8 @@ public abstract class Layer implements Closeable {
    */
   protected abstract void paintImpl (Surface surf);
 
-  protected void debugPrint(PrintWriter out, String prefix) {
-    out.print(prefix);
-    out.println(toString());
+  protected void visit(Visitor visitor, int depth) {
+    visitor.visit(this, depth);
   }
 
   protected void setState (State state) {

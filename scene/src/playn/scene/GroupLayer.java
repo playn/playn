@@ -15,7 +15,6 @@
  */
 package playn.scene;
 
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -209,11 +208,11 @@ public class GroupLayer extends ClippedLayer implements Iterable<Layer> {
     return super.hitTestDefault(point);
   }
 
-  @Override protected void debugPrint(PrintWriter out, String prefix) {
-    super.debugPrint(out, prefix);
-    String childPrefix = prefix + ".";
+  @Override protected void visit(Visitor visitor, int depth) {
+    super.visit(visitor, depth);
+    int childDepth = depth+1;
     for (int ii = 0, ll = children(); ii < ll; ii++) {
-      childAt(ii).debugPrint(out, childPrefix);
+      childAt(ii).visit(visitor, childDepth);
     }
   }
 
