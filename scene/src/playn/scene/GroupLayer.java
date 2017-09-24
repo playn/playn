@@ -15,6 +15,7 @@
  */
 package playn.scene;
 
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -208,6 +209,14 @@ public class GroupLayer extends ClippedLayer implements Iterable<Layer> {
     return super.hitTestDefault(point);
   }
 
+  @Override protected void debugPrint(PrintWriter out, String prefix) {
+    super.debugPrint(out, prefix);
+    String childPrefix = prefix + ".";
+    for (int ii = 0, ll = children(); ii < ll; ii++) {
+      childAt(ii).debugPrint(out, childPrefix);
+    }
+  }
+
   @Override protected boolean disableClip () {
     return disableClip;
   }
@@ -222,10 +231,12 @@ public class GroupLayer extends ClippedLayer implements Iterable<Layer> {
     paintTx.set(surf.tx());
     // iterate manually to avoid creating an Iterator as garbage, this is inner-loop territory
     List<Layer> children = this.children;
+    Layer.paintNestLevel += 1;
     for (int ii = 0, ll = children.size(); ii < ll; ii++) {
       surf.tx().set(paintTx);
       children.get(ii).paint(surf);
     }
+    Layer.paintNestLevel -= 1;
   }
 
   int depthChanged(Layer child, float oldDepth) {

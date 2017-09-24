@@ -15,6 +15,8 @@
  */
 package playn.scene;
 
+import java.io.PrintWriter;
+
 import pythagoras.f.AffineTransform;
 import pythagoras.f.FloatMath;
 import pythagoras.f.MathUtil;
@@ -116,6 +118,9 @@ public abstract class Layer implements Closeable {
      * point intersects a layer's bounds. See {@link Layer#hitTest}. */
     Layer hitTest (Layer layer, Point p);
   }
+
+  /** Controls rendering of debug rectangles around views. */
+  public static boolean DEBUG_RECTS = false;
 
   /**
    * A reactive value which tracks this layer's lifecycle. It starts out {@link State#REMOVED}, and
@@ -692,6 +697,14 @@ public abstract class Layer implements Closeable {
   }
 
   /**
+   * Prints a debug representation of this layer to {@link out}.
+   * @param out the writer to which to print.
+   */
+  public void debugPrint(PrintWriter out) {
+    debugPrint(out, "");
+  }
+
+  /**
    * Renders this layer to {@code surf}, including its children.
    */
   public final void paint (Surface surf) {
@@ -702,6 +715,9 @@ public abstract class Layer implements Closeable {
     surf.concatenate(transform(), originX(), originY());
     try {
       paintImpl(surf);
+      if (DEBUG_RECTS) {
+        drawDebugRect(surf);
+      }
     } finally {
       surf.popBatch(obatch);
       surf.setTint(otint);
@@ -716,44 +732,27 @@ public abstract class Layer implements Closeable {
    */
   protected abstract void paintImpl (Surface surf);
 
+  protected void debugPrint(PrintWriter out, String prefix) {
+    out.print(prefix);
+    out.println(toString());
+  }
+
   protected void setState (State state) {
     ((Value<State>)this.state).update(state);
   }
 
-  @Override public String toString () {
-    StringBuilder buf = new StringBuilder(name());
-    buf.append(" @ ").append(hashCode()).append(" [");
-    toString(buf);
-    return buf.append("]").toString();
+  protected void drawDebugRect(Surface surf) {
+    float x = 0, y = 0, w = this.width(), h = this.height();
+    if (w > 0 && h > 0) {
+      surf.setFillColor(paintNestLevel >= DEBUG_COLORS.length ?
+                        0xFF000000 : DEBUG_COLORS[paintNestLevel]);
+      int thick = 2;
+      surf.drawLine(x,   y,   x+w, y,   thick);
+      surf.drawLine(x+w, y,   x+w, y+h, thick);
+      surf.drawLine(x+w, y+h, x,   y+h, thick);
+      surf.drawLine(x,   y+h, x,   y,   thick);
+    }
   }
-
-  protected void toString (StringBuilder buf) {
-    buf.append("tx=").append(transform());
-    if (hitTester != null) buf.append(", hitTester=").append(hitTester);
-  }
-
-  protected int flags;
-  protected float depth;
-
-  private String name;
-  private GroupLayer parent;
-  private Signal<Object> events; // created lazily
-  private HitTester hitTester;
-  private QuadBatch batch;
-
-  // these values are cached in the layer to make the getters return sane values rather than have
-  // to extract the values from the affine transform matrix (which is expensive, doesn't preserve
-  // sign, and wraps rotation around at pi)
-  private float scaleX = 1, scaleY = 1, rotation = 0;
-  private final AffineTransform transform = new AffineTransform();
-
-  private Origin origin = Origin.FIXED;
-  private float originX, originY;
-  protected int tint = Tint.NOOP_TINT;
-  // we keep a copy of alpha as a float so that we can return the exact alpha passed to setAlpha()
-  // from alpha() to avoid funny business in clients due to the quantization; the actual alpha as
-  // rendered by the shader will be quantized, but the eye won't know the difference
-  protected float alpha = 1;
 
   void onAdd() {
     if (disposed()) throw new IllegalStateException("Illegal to use disposed layer: " + this);
@@ -798,4 +797,54 @@ public abstract class Layer implements Closeable {
 
   /** Whether or not to deactivate this layer when its last event listener is removed. */
   protected boolean deactivateOnNoListeners () { return true; }
+
+  @Override public String toString () {
+    StringBuilder buf = new StringBuilder(name());
+    buf.append(" @ ").append(hashCode()).append(" [");
+    toString(buf);
+    return buf.append("]").toString();
+  }
+
+  protected void toString (StringBuilder buf) {
+    buf.append("tx=").append(transform());
+    if (hitTester != null) buf.append(", hitTester=").append(hitTester);
+  }
+
+  protected int flags;
+  protected float depth;
+
+  private String name;
+  private GroupLayer parent;
+  private Signal<Object> events; // created lazily
+  private HitTester hitTester;
+  private QuadBatch batch;
+
+  // these values are cached in the layer to make the getters return sane values rather than have
+  // to extract the values from the affine transform matrix (which is expensive, doesn't preserve
+  // sign, and wraps rotation around at pi)
+  private float scaleX = 1, scaleY = 1, rotation = 0;
+  private final AffineTransform transform = new AffineTransform();
+
+  private Origin origin = Origin.FIXED;
+  private float originX, originY;
+  protected int tint = Tint.NOOP_TINT;
+  // we keep a copy of alpha as a float so that we can return the exact alpha passed to setAlpha()
+  // from alpha() to avoid funny business in clients due to the quantization; the actual alpha as
+  // rendered by the shader will be quantized, but the eye won't know the difference
+  protected float alpha = 1;
+
+  protected static int paintNestLevel;
+
+  protected final static int[] DEBUG_COLORS = {
+    0xFFFFFFFF, // white (root layer, never visible)
+    0xFFFF0000, // red
+    0xFFFF7F00, // orange
+    0xFFFFFF00, // yellow
+    0xFF00FF00, // green
+    0xFF0000FF, // blue
+    0xFF4B0082, // indigo
+    0xFF8B00FF, // violet
+    0xFFFF00FF, // magenta
+    0xFF00FFFF, // aqua
+  };
 }
