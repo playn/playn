@@ -15,6 +15,7 @@
  */
 package playn.tests.core;
 
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -167,7 +168,17 @@ public class TestsGame extends SceneGame {
     });
     input.keyboardEvents.connect(new Keyboard.KeySlot() {
       public void onEmit (Keyboard.KeyEvent event) {
-        if (event.down && (event.key == Key.ESCAPE)) displayMenu();
+        switch (event.key) {
+        case ESCAPE:
+          if (event.down) displayMenu();
+          break;
+        case D:
+          Layer.DEBUG_RECTS = event.down;
+          if (event.down && event.isShiftDown()) {
+            rootLayer.debugPrint(log);
+          }
+          break;
+        }
       }
     });
 
