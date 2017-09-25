@@ -19,6 +19,7 @@ import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
+import javax.sound.sampled.DataLine;
 
 import playn.core.Audio;
 import playn.core.Exec;
@@ -45,22 +46,24 @@ public class JavaAudio extends Audio {
       public void run () {
         try {
           AudioInputStream ais = rsrc.openAudioStream();
-          Clip clip = AudioSystem.getClip();
+          AudioFormat format = ais.getFormat();
+          if (format.getEncoding() != AudioFormat.Encoding.PCM_SIGNED) {
+            format = new AudioFormat(
+              AudioFormat.Encoding.PCM_SIGNED,
+              format.getSampleRate(),
+              16, // we have to force sample size to 16
+              format.getChannels(),
+              format.getChannels()*2,
+              format.getSampleRate(),
+              false // big endian
+            );
+            ais = AudioSystem.getAudioInputStream(format, ais);
+          }
+
+          DataLine.Info info = new DataLine.Info(Clip.class, format);
+          Clip clip = (Clip) AudioSystem.getLine(info);
           if (music) {
             clip = new BigClip(clip);
-          }
-          AudioFormat baseFormat = ais.getFormat();
-          if (baseFormat.getEncoding() != AudioFormat.Encoding.PCM_SIGNED) {
-            AudioFormat decodedFormat = new AudioFormat(
-              AudioFormat.Encoding.PCM_SIGNED,
-              baseFormat.getSampleRate(),
-              16, // we have to force sample size to 16
-              baseFormat.getChannels(),
-              baseFormat.getChannels()*2,
-              baseFormat.getSampleRate(),
-              false // big endian
-              );
-            ais = AudioSystem.getAudioInputStream(decodedFormat, ais);
           }
           clip.open(ais);
           sound.succeed(clip);
