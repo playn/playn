@@ -47,23 +47,25 @@ public class JavaAudio extends Audio {
         try {
           AudioInputStream ais = rsrc.openAudioStream();
           AudioFormat format = ais.getFormat();
-          if (format.getEncoding() != AudioFormat.Encoding.PCM_SIGNED) {
-            format = new AudioFormat(
-              AudioFormat.Encoding.PCM_SIGNED,
-              format.getSampleRate(),
-              16, // we have to force sample size to 16
-              format.getChannels(),
-              format.getChannels()*2,
-              format.getSampleRate(),
-              false // big endian
-            );
-            ais = AudioSystem.getAudioInputStream(format, ais);
-          }
-
-          DataLine.Info info = new DataLine.Info(Clip.class, format);
-          Clip clip = (Clip) AudioSystem.getLine(info);
+          Clip clip;
           if (music) {
-            clip = new BigClip(clip);
+            // BigClip needs sounds in PCM_SIGNED format; it attempts to do this conversion
+            // internally, but the way it does it fails in some circumstances, so we do it out here
+            if (format.getEncoding() != AudioFormat.Encoding.PCM_SIGNED) {
+              ais = AudioSystem.getAudioInputStream(new AudioFormat(
+                AudioFormat.Encoding.PCM_SIGNED,
+                format.getSampleRate(),
+                16, // we have to force sample size to 16
+                format.getChannels(),
+                format.getChannels()*2,
+                format.getSampleRate(),
+                false // big endian
+              ), ais);
+            }
+            clip = new BigClip();
+          } else {
+            DataLine.Info info = new DataLine.Info(Clip.class, format);
+            clip = (Clip) AudioSystem.getLine(info);
           }
           clip.open(ais);
           sound.succeed(clip);
