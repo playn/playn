@@ -16,7 +16,6 @@
 package playn.core;
 
 import react.Signal;
-import react.Slot;
 
 /**
  * Defines a simple game API. It's not necessary to use this abstraction for your PlayN games, but
@@ -52,9 +51,7 @@ public abstract class Game {
     assert updateRate > 0 : "updateRate must be greater than zero.";
     this.plat = plat;
     this.updateRate = updateRate;
-    plat.frame.connect(new Slot<Platform>() {
-      public void onEmit (Platform plat) { onFrame(); }
-    });
+    plat.frame.connect(f -> onFrame());
   }
 
   /** Called on every simulation update. The default implementation emits the clock to the {@link

@@ -19,7 +19,6 @@ import pythagoras.f.FloatMath;
 
 import playn.core.*;
 import playn.scene.*;
-import react.Slot;
 
 /**
  * Tests custom shader support.
@@ -31,47 +30,43 @@ public class ShaderTest extends Test {
   }
 
   @Override public void init () {
-    game.assets.getImage("images/orange.png").state.onSuccess(new Slot<Image>() {
-      public void onEmit (Image orange) {
-        final Texture otex = orange.texture();
+    game.assets.getImage("images/orange.png").state.onSuccess(orange -> {
+      final Texture otex = orange.texture();
 
-        // add the normal orange
-        float dx = orange.width() + 25;
-        game.rootLayer.addAt(new ImageLayer(otex), 25, 25);
+      // add the normal orange
+      float dx = orange.width() + 25;
+      game.rootLayer.addAt(new ImageLayer(otex), 25, 25);
 
-        // add a sepia toned orange
-        ImageLayer olayer = new ImageLayer(otex);
-        olayer.setBatch(createSepiaBatch());
-        game.rootLayer.addAt(olayer, 25+dx, 25);
+      // add a sepia toned orange
+      ImageLayer olayer = new ImageLayer(otex);
+      olayer.setBatch(createSepiaBatch());
+      game.rootLayer.addAt(olayer, 25+dx, 25);
 
-        final RotYBatch rotBatch = createRotBatch();
-        rotBatch.eyeX = 0;
-        rotBatch.eyeY = orange.height()/2;
+      final RotYBatch rotBatch = createRotBatch();
+      rotBatch.eyeX = 0;
+      rotBatch.eyeY = orange.height()/2;
 
-        // add an image that is rotated around the (3D) y axis
-        Canvas canvas = game.graphics.createCanvas(orange.width(), orange.height());
-        canvas.setFillColor(0xFF99CCFF).fillRect(0, 0, canvas.width, canvas.height);
-        canvas.draw(orange, 0, 0);
-        ImageLayer rotlayer = new ImageLayer(canvas.toTexture());
-        rotlayer.setBatch(rotBatch);
-        game.rootLayer.addAt(rotlayer, 25 + 2*dx + orange.width(), 25);
+      // add an image that is rotated around the (3D) y axis
+      Canvas canvas = game.graphics.createCanvas(orange.width(), orange.height());
+      canvas.setFillColor(0xFF99CCFF).fillRect(0, 0, canvas.width, canvas.height);
+      canvas.draw(orange, 0, 0);
+      ImageLayer rotlayer = new ImageLayer(canvas.toTexture());
+      rotlayer.setBatch(rotBatch);
+      game.rootLayer.addAt(rotlayer, 25 + 2*dx + orange.width(), 25);
 
-        // add an immediate layer that draws a quad and an image (which should rotate)
-        Layer irotlayer = new Layer() {
-          protected void paintImpl (Surface surf) {
-            surf.setFillColor(0xFFCC99FF).fillRect(0, 0, otex.displayWidth, otex.displayHeight);
-            surf.draw(otex, 0, 0);
-          }
-        };
-        irotlayer.setBatch(rotBatch);
-        game.rootLayer.addAt(irotlayer, 25 + 3*dx + orange.width(), 25);
+      // add an immediate layer that draws a quad and an image (which should rotate)
+      Layer irotlayer = new Layer() {
+        protected void paintImpl (Surface surf) {
+          surf.setFillColor(0xFFCC99FF).fillRect(0, 0, otex.displayWidth, otex.displayHeight);
+          surf.draw(otex, 0, 0);
+        }
+      };
+      irotlayer.setBatch(rotBatch);
+      game.rootLayer.addAt(irotlayer, 25 + 3*dx + orange.width(), 25);
 
-        conns.add(game.paint.connect(new Slot<Clock>() {
-          public void onEmit (Clock clock) {
-            rotBatch.elapsed = clock.tick/1000f;
-          }
-        }));
-      }
+      conns.add(game.paint.connect(clock -> {
+        rotBatch.elapsed = clock.tick/1000f;
+      }));
     });
   }
 

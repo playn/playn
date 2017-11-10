@@ -22,7 +22,6 @@ import java.util.TreeMap;
 
 import pythagoras.f.Point;
 import pythagoras.f.Vector;
-import react.UnitSlot;
 
 import playn.core.*;
 import playn.scene.*;
@@ -274,10 +273,10 @@ class PointerMouseTouchTest extends Test {
       }
     });
 
-    conns.add(game.plat.frame.connect(new UnitSlot() { public void onEmit () {
+    conns.add(game.plat.frame.connect(f -> {
       logger.paint();
       motionLabel.paint();
-    }}));
+    }));
   }
 
   @Override public boolean usesPositionalInputs () {

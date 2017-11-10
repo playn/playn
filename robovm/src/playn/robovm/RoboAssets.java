@@ -27,7 +27,6 @@ import org.robovm.apple.foundation.NSErrorException;
 import org.robovm.apple.uikit.UIImage;
 
 import playn.core.*;
-import react.Slot;
 
 public class RoboAssets extends Assets {
 
@@ -50,19 +49,15 @@ public class RoboAssets extends Assets {
   @Override public Image getRemoteImage(final String url, int width, int height) {
     final ImageImpl image = createImage(true, width, height, url);
     plat.net().req(url).execute().
-      onSuccess(new Slot<Net.Response>() {
-        public void onEmit (Net.Response rsp) {
-          try {
-            image.succeed(toData(Scale.ONE, new UIImage(new NSData(rsp.payload()))));
-          } catch (Throwable t) {
-            plat.log().warn("Failed to decode remote image [url=" + url + "]", t);
-            image.fail(t);
-          }
+      onSuccess(rsp ->{
+        try {
+          image.succeed(toData(Scale.ONE, new UIImage(new NSData(rsp.payload()))));
+        } catch (Throwable t) {
+          plat.log().warn("Failed to decode remote image [url=" + url + "]", t);
+          image.fail(t);
         }
       }).
-      onFailure(new Slot<Throwable>() {
-        public void onEmit (Throwable cause) { image.fail(cause); }
-      });
+      onFailure(cause -> image.fail(cause));
     return image;
   }
 

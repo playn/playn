@@ -15,7 +15,7 @@
  */
 package playn.core;
 
-import react.Slot;
+import java.util.function.Function;
 
 /**
  * Defines and dispatches mouse events.
@@ -105,27 +105,24 @@ public class Mouse {
     }
   }
 
-  /** A slot which only dispatches on {@link ButtonEvent}s. */
-  public static abstract class ButtonSlot extends Slot<Event> {
-    public void onEmit (Event event) {
-      if (event instanceof ButtonEvent) onEmit((ButtonEvent)event);
-    }
-    public abstract void onEmit (ButtonEvent event);
-  }
+  /**
+   * A function which collects only {@code ButtonEvent} events. Use it like so:
+   * {@code Input.mouseEvents.collect(Mouse.isButtonEvent).connect(event -> ...);}
+   */
+  public static Function<Event, ButtonEvent> isButtonEvent =
+    event -> (event instanceof ButtonEvent) ? (ButtonEvent)event : null;
 
-  /** A slot which only dispatches on {@link MotionEvent}s. */
-  public static abstract class MotionSlot extends Slot<Event> {
-    public void onEmit (Event event) {
-      if (event instanceof MotionEvent) onEmit((MotionEvent)event);
-    }
-    public abstract void onEmit (MotionEvent event);
-  }
+  /**
+   * A function which collects only {@code MotionEvent} events. Use it like so:
+   * {@code Input.mouseEvents.collect(Mouse.isMotionEvent).connect(event -> ...);}
+   */
+  public static Function<Event, MotionEvent> isMotionEvent =
+    event -> (event instanceof MotionEvent) ? (MotionEvent)event : null;
 
-  /** A slot which only dispatches on {@link WheelEvent}s. */
-  public static abstract class WheelSlot extends Slot<Event> {
-    public void onEmit (Event event) {
-      if (event instanceof WheelEvent) onEmit((WheelEvent)event);
-    }
-    public abstract void onEmit (WheelEvent event);
-  }
+  /**
+   * A function which collects only {@code WheelEvent} events. Use it like so:
+   * {@code Input.mouseEvents.collect(Mouse.isWheelEvent).connect(event -> ...);}
+   */
+  public static Function<Event, WheelEvent> isWheelEvent =
+    event -> (event instanceof WheelEvent) ? (WheelEvent)event : null;
 }

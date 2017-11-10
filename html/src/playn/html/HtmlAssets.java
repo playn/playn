@@ -36,7 +36,6 @@ import com.google.gwt.xhr.client.XMLHttpRequest;
 
 import playn.core.*;
 import playn.html.XDomainRequest.Handler;
-import react.Function;
 import react.RFuture;
 import react.RPromise;
 
@@ -164,18 +163,10 @@ public class HtmlAssets extends Assets {
      */
     try {
       return doXhr(fullPath, XMLHttpRequest.ResponseType.Default).
-        map(new Function<XMLHttpRequest,String>() {
-          public String apply (XMLHttpRequest xhr) {
-            return xhr.getResponseText();
-          }
-        });
+        map(xhr -> xhr.getResponseText());
     } catch (JavaScriptException e) {
       if (Window.Navigator.getUserAgent().indexOf("MSIE") != -1) {
-        return doXdr(fullPath).map(new Function<XDomainRequest,String>() {
-          public String apply (XDomainRequest xdr) {
-            return xdr.getResponseText();
-          }
-        });
+        return doXdr(fullPath).map(xdr -> xdr.getResponseText());
       } else {
         throw e;
       }
@@ -192,11 +183,7 @@ public class HtmlAssets extends Assets {
     if (!TypedArrays.isSupported()) return RFuture.failure(
       new UnsupportedOperationException("TypedArrays not supported by this browser."));
     return doXhr(pathPrefix + path, XMLHttpRequest.ResponseType.ArrayBuffer).
-      map(new Function<XMLHttpRequest,ByteBuffer>() {
-        public ByteBuffer apply (XMLHttpRequest xhr) {
-          return TypedArrayHelper.wrap(xhr.getResponseArrayBuffer());
-        }
-      });
+      map(xhr -> TypedArrayHelper.wrap(xhr.getResponseArrayBuffer()));
   }
 
   @Override protected ImageImpl.Data load (String path) throws Exception {

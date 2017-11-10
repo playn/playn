@@ -26,7 +26,6 @@ import playn.core.*;
 import playn.core.json.JsonImpl;
 import pythagoras.f.Dimension;
 import pythagoras.f.IDimension;
-import react.Slot;
 
 /**
  * Implements the base Java platform which is then shared by LWJGL, LWJGL+SWT, and JOGL
@@ -127,14 +126,9 @@ public abstract class JavaPlatform extends Platform {
   /** Starts the game loop. This method will not return until the game exits. */
   public void start () {
     if (config.activationKey != null) {
-      input().keyboardEvents.connect(new Slot<Keyboard.Event>() {
-        public void onEmit (Keyboard.Event event) {
-          if (event instanceof Keyboard.KeyEvent) {
-            Keyboard.KeyEvent kevent = (Keyboard.KeyEvent)event;
-            if (kevent.key == config.activationKey && kevent.down) {
-              toggleActivation();
-            }
-          }
+      input().keyboardEvents.collect(Keyboard.isKeyEvent).connect(event -> {
+        if (event.key == config.activationKey && event.down) {
+          toggleActivation();
         }
       });
     }

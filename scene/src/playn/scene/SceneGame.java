@@ -14,7 +14,6 @@
 package playn.scene;
 
 import playn.core.*;
-import react.Slot;
 
 /**
  * A simple class for games which wish to use a single scene graph.
@@ -39,9 +38,7 @@ public abstract class SceneGame extends Game {
     viewSurf = new Surface(plat.graphics(), plat.graphics().defaultRenderTarget, defaultBatch);
     rootLayer = new RootLayer();
 
-    paint.connect(new Slot<Clock>() {
-      public void onEmit (Clock clock) { paintScene(); }
-    }).atPrio(scenePaintPrio());
+    paint.connect(clock -> paintScene()).atPrio(scenePaintPrio());
   }
 
   /**

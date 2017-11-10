@@ -99,11 +99,7 @@ public abstract class Test {
     });
   }
 
-  protected Slot<Throwable> logFailure (final String message) {
-    return new Slot<Throwable>() {
-      public void onEmit (Throwable cause) {
-        game.log.warn(message, cause);
-      }
-    };
+  protected Slot<Throwable> logFailure (String message) {
+    return cause -> game.log.warn(message, cause);
   }
 }

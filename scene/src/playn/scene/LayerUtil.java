@@ -180,13 +180,13 @@ public class LayerUtil {
    * Automatically connects {@code onPaint} to {@code paint} when {@code layer} is added to a scene
    * graph, and disconnects it when {@code layer} is removed.
    */
-  public static void bind (Layer layer, final Signal<Clock> paint, final Slot<Clock> onPaint) {
+  public static void bind (Layer layer, Signal<Clock> paint, Slot<Clock> onPaint) {
     layer.state.connectNotify(new Slot<Layer.State>() {
       public void onEmit (Layer.State state) {
-        _pcon = Closeable.Util.close(_pcon);
+        _pcon = Closeable.close(_pcon);
         if (state == Layer.State.ADDED) _pcon = paint.connect(onPaint);
       }
-      private Closeable _pcon = Closeable.Util.NOOP;
+      private Closeable _pcon = Closeable.NOOP;
     });
   }
 
@@ -195,18 +195,18 @@ public class LayerUtil {
    * paint} when {@code layer} is added to a scene graph, and disconnects them when {@code layer}
    * is removed.
    */
-  public static void bind (Layer layer, final Signal<Clock> update, final Slot<Clock> onUpdate,
-                           final Signal<Clock> paint, final Slot<Clock> onPaint) {
+  public static void bind (Layer layer, Signal<Clock> update, Slot<Clock> onUpdate,
+                           Signal<Clock> paint, Slot<Clock> onPaint) {
     layer.state.connectNotify(new Slot<Layer.State>() {
       public void onEmit (Layer.State state) {
-        _pcon = Closeable.Util.close(_pcon);
-        _ucon = Closeable.Util.close(_ucon);
+        _pcon = Closeable.close(_pcon);
+        _ucon = Closeable.close(_ucon);
         if (state == Layer.State.ADDED) {
           _ucon = update.connect(onUpdate);
           _pcon = paint.connect(onPaint);
         }
       }
-      private Closeable _ucon = Closeable.Util.NOOP, _pcon = Closeable.Util.NOOP;
+      private Closeable _ucon = Closeable.NOOP, _pcon = Closeable.NOOP;
     });
   }
 

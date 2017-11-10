@@ -18,7 +18,6 @@ import java.util.List;
 
 import react.RPromise;
 import react.Signal;
-import react.Slot;
 
 /**
  * Handles execution of units of code, both on background threads ({@link #invokeAsync}) and on the
@@ -34,9 +33,7 @@ public abstract class Exec {
 
     public Default (Platform plat) {
       this.plat = plat;
-      plat.frame.connect(new Slot<Object>() {
-        public void onEmit (Object unused) { dispatch(); }
-      }).atPrio(Short.MAX_VALUE);
+      plat.frame.connect(unused -> dispatch()).atPrio(Short.MAX_VALUE);
     }
 
     @Override public synchronized void invokeLater (Runnable action) {

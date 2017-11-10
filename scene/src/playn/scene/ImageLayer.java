@@ -18,7 +18,6 @@ package playn.scene;
 import pythagoras.f.IDimension;
 import pythagoras.f.Rectangle;
 import react.RFuture;
-import react.Slot;
 
 import playn.core.Surface;
 import playn.core.Texture;
@@ -108,9 +107,7 @@ public class ImageLayer extends Layer {
    */
   public ImageLayer setSource (TileSource source) {
     if (source.isLoaded()) setTile(source.tile());
-    else source.tileAsync().onSuccess(new Slot<Tile>() {
-      public void onEmit (Tile tile) { setTile(tile); }
-    });
+    else source.tileAsync().onSuccess(this::setTile);
     return this;
   }
 
@@ -120,9 +117,7 @@ public class ImageLayer extends Layer {
    * continue to be rendered.
    */
   public ImageLayer setTile (RFuture<? extends Tile> tile) {
-    tile.onSuccess(new Slot<Tile>() {
-      public void onEmit (Tile tile) { setTile(tile); }
-    });
+    tile.onSuccess(this::setTile);
     return this;
   }
 

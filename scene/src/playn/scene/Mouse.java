@@ -45,7 +45,7 @@ public class Mouse extends playn.core.Mouse {
   }
 
   /** A listener for mouse button, motion and wheel events with layer info. */
-  public static abstract class Listener extends Slot<Object> {
+  public static abstract class Listener implements Slot<Object> {
 
     /** Notifies listener of a mouse motion event. A motion event is dispatched when no button is
       * currently pressed, in an isolated "one shot" interaction, and always goes to the layer hit
@@ -122,7 +122,7 @@ public class Mouse extends playn.core.Mouse {
   }
 
   /** Handles the dispatching of mouse events to layers. */
-  public static class Dispatcher extends Slot<Event> {
+  public static class Dispatcher implements Slot<Event> {
 
     private final Layer root;
     private final boolean bubble;

@@ -18,7 +18,6 @@ package playn.tests.core;
 
 import playn.core.*;
 import playn.scene.*;
-import react.Slot;
 
 public class AlphaLayerTest extends Test {
 
@@ -50,55 +49,53 @@ public class AlphaLayerTest extends Test {
     groupLayer.setAlpha(0.5f);
     rootLayer.add(groupLayer);
 
-    game.assets.getImage("images/alphalayertest.png").state.onSuccess(new Slot<Image>() {
-      public void onEmit(Image image) {
-        Texture imtex = image.texture();
-        float x = offset, y0 = offset, y1 = offset+height, y2 = offset+2*height;
+    game.assets.getImage("images/alphalayertest.png").state.onSuccess(image -> {
+      Texture imtex = image.texture();
+      float x = offset, y0 = offset, y1 = offset+height, y2 = offset+2*height;
 
-        // add the layers over a white background, then again over blue
-        groupLayer.addAt(new ImageLayer(imtex).setAlpha(0.5f), x, y0);
-        addDescrip("image\nimg layer a=0.5", x, y1, width);
-        groupLayer.addAt(new ImageLayer(imtex).setAlpha(0.5f), x, y2);
+      // add the layers over a white background, then again over blue
+      groupLayer.addAt(new ImageLayer(imtex).setAlpha(0.5f), x, y0);
+      addDescrip("image\nimg layer a=0.5", x, y1, width);
+      groupLayer.addAt(new ImageLayer(imtex).setAlpha(0.5f), x, y2);
+      x += width;
+
+      TextureSurface surf1 = game.createSurface(image.width(), image.height());
+      surf1.begin().clear().setAlpha(0.5f).draw(imtex, 0, 0).end().close();
+      groupLayer.addAt(new ImageLayer(surf1.texture), x, y0);
+      addDescrip("surface a=0.5\nimg layer a=1", x, y1, width);
+      groupLayer.addAt(new ImageLayer(surf1.texture), x, y2);
+      x += width;
+
+      TextureSurface surf2 = game.createSurface(image.width(), image.height());
+      surf2.begin().clear().draw(imtex, 0, 0).end().close();
+      groupLayer.addAt(new ImageLayer(surf2.texture).setAlpha(0.5f), x, y0);
+      addDescrip("surface a=1\nimg layer a=0.5", x, y1, width);
+      groupLayer.addAt(new ImageLayer(surf2.texture).setAlpha(0.5f), x, y2);
+      x += width;
+
+      Canvas canvas1 = game.graphics.createCanvas(image.width(), image.height());
+      canvas1.draw(image, 0, 0);
+      Texture cantex1 = canvas1.toTexture();
+      groupLayer.addAt(new ImageLayer(cantex1).setAlpha(0.5f), x, y0);
+      addDescrip("canvas a=1\nimg layer a=0.5", x, y1, width);
+      groupLayer.addAt(new ImageLayer(cantex1).setAlpha(0.5f), x, y2);
+      x += width;
+
+      Canvas canvas2 = game.graphics.createCanvas(image.width(), image.height());
+      canvas2.setAlpha(0.5f).draw(image, 0, 0);
+      Texture cantex2 = canvas2.toTexture();
+      groupLayer.addAt(new ImageLayer(cantex2), x, y0);
+      addDescrip("canvas a=0.5\nimg layer a=1", x, y1, width);
+      groupLayer.addAt(new ImageLayer(cantex2), x, y2);
+      x += width;
+
+      // add some copies of the image at 1, 0.5, 0.25 and 0.125 alpha
+      x = offset + width;
+      for (float alpha : new float[] { 1, 1/2f, 1/4f, 1/8f }) {
+        float y = fullHeight+50;
+        rootLayer.addAt(new ImageLayer(imtex).setAlpha(alpha), x, y);
+        addDescrip("image a=" + alpha, x, y+height/2, width/2);
         x += width;
-
-        TextureSurface surf1 = game.createSurface(image.width(), image.height());
-        surf1.begin().clear().setAlpha(0.5f).draw(imtex, 0, 0).end().close();
-        groupLayer.addAt(new ImageLayer(surf1.texture), x, y0);
-        addDescrip("surface a=0.5\nimg layer a=1", x, y1, width);
-        groupLayer.addAt(new ImageLayer(surf1.texture), x, y2);
-        x += width;
-
-        TextureSurface surf2 = game.createSurface(image.width(), image.height());
-        surf2.begin().clear().draw(imtex, 0, 0).end().close();
-        groupLayer.addAt(new ImageLayer(surf2.texture).setAlpha(0.5f), x, y0);
-        addDescrip("surface a=1\nimg layer a=0.5", x, y1, width);
-        groupLayer.addAt(new ImageLayer(surf2.texture).setAlpha(0.5f), x, y2);
-        x += width;
-
-        Canvas canvas1 = game.graphics.createCanvas(image.width(), image.height());
-        canvas1.draw(image, 0, 0);
-        Texture cantex1 = canvas1.toTexture();
-        groupLayer.addAt(new ImageLayer(cantex1).setAlpha(0.5f), x, y0);
-        addDescrip("canvas a=1\nimg layer a=0.5", x, y1, width);
-        groupLayer.addAt(new ImageLayer(cantex1).setAlpha(0.5f), x, y2);
-        x += width;
-
-        Canvas canvas2 = game.graphics.createCanvas(image.width(), image.height());
-        canvas2.setAlpha(0.5f).draw(image, 0, 0);
-        Texture cantex2 = canvas2.toTexture();
-        groupLayer.addAt(new ImageLayer(cantex2), x, y0);
-        addDescrip("canvas a=0.5\nimg layer a=1", x, y1, width);
-        groupLayer.addAt(new ImageLayer(cantex2), x, y2);
-        x += width;
-
-        // add some copies of the image at 1, 0.5, 0.25 and 0.125 alpha
-        x = offset + width;
-        for (float alpha : new float[] { 1, 1/2f, 1/4f, 1/8f }) {
-          float y = fullHeight+50;
-          rootLayer.addAt(new ImageLayer(imtex).setAlpha(alpha), x, y);
-          addDescrip("image a=" + alpha, x, y+height/2, width/2);
-          x += width;
-        }
       }
     });
 

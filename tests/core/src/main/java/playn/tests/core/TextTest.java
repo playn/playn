@@ -20,7 +20,6 @@ import pythagoras.f.Rectangle;
 
 import playn.core.*;
 import playn.scene.*;
-import react.Slot;
 
 public class TextTest extends Test {
 
@@ -64,13 +63,11 @@ public class TextTest extends Test {
     ImageLayer layer = game.ui.createButton("Set Text", new Runnable() {
       public void run () {
         game.input.getText(Keyboard.TextType.DEFAULT, "Test text", sample.replace("\n", "\\n")).
-          onSuccess(new Slot<String>() {
-            public void onEmit (String text) {
-              if (text == null) return;
-              // parse \n to allow testing line breaks
-              sample = text.replace("\\n", "\n");
-              update();
-            }
+          onSuccess(text -> {
+            if (text == null) return;
+            // parse \n to allow testing line breaks
+            sample = text.replace("\\n", "\n");
+            update();
           });
       }
     });

@@ -63,16 +63,13 @@ public abstract class Graphics {
 
   /** The current orientation of the device. Devices that do not support orientation will always be
     * {@code PORTRAIT}. */
-  public final ValueView<Orientation> deviceOrient = orientDetailM.map(
-    new Function<OrientationDetail,Orientation>() {
-      public Orientation apply(OrientationDetail detail) {
-        switch (detail) {
-        case LANDSCAPE_LEFT: return Orientation.LANDSCAPE;
-        case LANDSCAPE_RIGHT: return Orientation.LANDSCAPE;
-        default: return Orientation.PORTRAIT;
-        }
-      }
-    });
+  public final ValueView<Orientation> deviceOrient = orientDetailM.map(detail -> {
+    switch (detail) {
+    case LANDSCAPE_LEFT: return Orientation.LANDSCAPE;
+    case LANDSCAPE_RIGHT: return Orientation.LANDSCAPE;
+    default: return Orientation.PORTRAIT;
+    }
+  });
 
   /** The current orientation of the device in more detailed form. Devices that do not support
     * orientation will always be {@code UNKNOWN}. */

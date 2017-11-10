@@ -25,7 +25,7 @@ import react.Slot;
 public class Pointer extends playn.core.Pointer {
 
   /** A listener for pointer events with layer info. */
-  public static abstract class Listener extends Slot<Object> {
+  public static abstract class Listener implements Slot<Object> {
 
     /** Notifies listener of a pointer start event. */
     public void onStart (Interaction iact) {}
@@ -65,7 +65,7 @@ public class Pointer extends playn.core.Pointer {
   }
 
   /** Handles the dispatching of pointer events to layers. */
-  public static class Dispatcher extends Slot<Event> {
+  public static class Dispatcher implements Slot<Event> {
 
     private final Layer root;
     private final boolean bubble;

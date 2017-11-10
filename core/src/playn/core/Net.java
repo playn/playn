@@ -23,7 +23,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import react.Function;
 import react.RFuture;
 
 /**
@@ -252,14 +251,14 @@ public abstract class Net {
    * Performs an HTTP GET request to the specified URL.
    */
   public RFuture<String> get(String url) {
-    return req(url).execute().map(GET_PAYLOAD);
+    return req(url).execute().map(rsp -> rsp.payloadString());
   }
 
   /**
    * Performs an HTTP POST request to the specified URL.
    */
   public RFuture<String> post(String url, String data) {
-    return req(url).setPayload(data).execute().map(GET_PAYLOAD);
+    return req(url).setPayload(data).execute().map(rsp -> rsp.payloadString());
   }
 
   /**
@@ -272,8 +271,4 @@ public abstract class Net {
   protected RFuture<Response> execute(Builder req) {
     return RFuture.failure(new UnsupportedOperationException());
   }
-
-  private static final Function<Response,String> GET_PAYLOAD = new Function<Response,String>() {
-    public String apply (Response rsp) { return rsp.payloadString(); }
-  };
 }

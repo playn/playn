@@ -18,7 +18,6 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 
 import playn.core.*;
 import pythagoras.f.Point;
-import react.Slot;
 
 public class JavaInput extends Input {
 
@@ -62,35 +61,28 @@ public class JavaInput extends Input {
 
   protected void emulateTouch () {
     final Key pivotKey = plat.config.pivotKey;
-    keyboardEvents.connect(new Slot<Keyboard.Event>() {
-      public void onEmit (Keyboard.Event event) {
-        if (event instanceof Keyboard.KeyEvent) {
-          Keyboard.KeyEvent kevent = (Keyboard.KeyEvent)event;
-          if (kevent.key == pivotKey && kevent.down) {
-            pivot = new Point(x, y);
-          }
-        }
+    keyboardEvents.collect(Keyboard.isKeyEvent).connect(event -> {
+      if (event.key == pivotKey && event.down) {
+        pivot = new Point(x, y);
       }
     });
 
-    mouseEvents.connect(new Slot<Mouse.Event>() {
-      public void onEmit (Mouse.Event event) {
-        if (event instanceof Mouse.ButtonEvent) {
-          Mouse.ButtonEvent bevent = (Mouse.ButtonEvent)event;
-          if (bevent.button == Mouse.ButtonEvent.Id.LEFT) {
-            if (mouseDown = bevent.down) {
-              currentId += 2; // skip an id in case of pivot
-              dispatchTouch(event, Touch.Event.Kind.START);
-            } else {
-              pivot = null;
-              dispatchTouch(event, Touch.Event.Kind.END);
-            }
+    mouseEvents.connect(event -> {
+      if (event instanceof Mouse.ButtonEvent) {
+        Mouse.ButtonEvent bevent = (Mouse.ButtonEvent)event;
+        if (bevent.button == Mouse.ButtonEvent.Id.LEFT) {
+          if (mouseDown = bevent.down) {
+            currentId += 2; // skip an id in case of pivot
+            dispatchTouch(event, Touch.Event.Kind.START);
+          } else {
+            pivot = null;
+            dispatchTouch(event, Touch.Event.Kind.END);
           }
-        } else if (event instanceof Mouse.MotionEvent) {
-          if (mouseDown) dispatchTouch(event, Touch.Event.Kind.MOVE);
-          // keep track of the current mouse position for pivot
-          x = event.x; y = event.y;
         }
+      } else if (event instanceof Mouse.MotionEvent) {
+        if (mouseDown) dispatchTouch(event, Touch.Event.Kind.MOVE);
+        // keep track of the current mouse position for pivot
+        x = event.x; y = event.y;
       }
     });
 

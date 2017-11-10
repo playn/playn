@@ -18,7 +18,6 @@ package playn.tests.core;
 
 import playn.core.*;
 import playn.scene.*;
-import react.Slot;
 
 public class ImageTypeTest extends Test {
 
@@ -45,23 +44,21 @@ public class ImageTypeTest extends Test {
     game.rootLayer.add(new ImageLayer(bg.texture));
 
     // once the image loads, create our layers
-    game.assets.getImage(imageSrc).state.onSuccess(new Slot<Image>() {
-      public void onEmit (Image image) {
-        Texture imtex = image.texture();
-        game.rootLayer.addAt(new ImageLayer(imtex), offset, offset);
-        game.rootLayer.addAt(new ImageLayer(imtex), offset, offset + 2*height);
+    game.assets.getImage(imageSrc).state.onSuccess(image -> {
+      Texture imtex = image.texture();
+      game.rootLayer.addAt(new ImageLayer(imtex), offset, offset);
+      game.rootLayer.addAt(new ImageLayer(imtex), offset, offset + 2*height);
 
-        TextureSurface surf = game.createSurface(image.width(), image.height());
-        surf.begin().clear().draw(imtex, 0, 0).end().close();
-        game.rootLayer.addAt(new ImageLayer(surf.texture), offset + width, offset);
-        game.rootLayer.addAt(new ImageLayer(surf.texture), offset + width, offset + 2*height);
+      TextureSurface surf = game.createSurface(image.width(), image.height());
+      surf.begin().clear().draw(imtex, 0, 0).end().close();
+      game.rootLayer.addAt(new ImageLayer(surf.texture), offset + width, offset);
+      game.rootLayer.addAt(new ImageLayer(surf.texture), offset + width, offset + 2*height);
 
-        Canvas canvas = game.graphics.createCanvas(image.width(), image.height());
-        canvas.draw(image, 0, 0);
-        Texture cantex = canvas.toTexture();
-        game.rootLayer.addAt(new ImageLayer(cantex), offset + 2*width, offset);
-        game.rootLayer.addAt(new ImageLayer(cantex), offset + 2*width, offset + 2*height);
-      }
+      Canvas canvas = game.graphics.createCanvas(image.width(), image.height());
+      canvas.draw(image, 0, 0);
+      Texture cantex = canvas.toTexture();
+      game.rootLayer.addAt(new ImageLayer(cantex), offset + 2*width, offset);
+      game.rootLayer.addAt(new ImageLayer(cantex), offset + 2*width, offset + 2*height);
     });
 
     // add ground truth image

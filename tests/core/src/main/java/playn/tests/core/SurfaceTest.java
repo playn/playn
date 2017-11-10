@@ -12,7 +12,6 @@ import pythagoras.f.FloatMath;
 import pythagoras.f.Rectangle;
 import react.RFuture;
 import react.Slot;
-import react.UnitSlot;
 
 import playn.core.*;
 import playn.scene.*;
@@ -26,8 +25,8 @@ public class SurfaceTest extends Test {
   }
 
   @Override public void init() {
-    final Image tile = game.assets.getImage("images/tile.png");
-    final Image orange = game.assets.getImage("images/orange.png");
+    Image tile = game.assets.getImage("images/tile.png");
+    Image orange = game.assets.getImage("images/orange.png");
     Slot<Throwable> onError = new Slot<Throwable>() {
       float errY = 0;
       public void onEmit (Throwable err) {
@@ -37,9 +36,8 @@ public class SurfaceTest extends Test {
     };
     tile.state.onFailure(onError);
     orange.state.onFailure(onError);
-    RFuture.collect(Arrays.asList(tile.state, orange.state)).onSuccess(new UnitSlot() {
-      public void onEmit () { addTests(orange, tile); }
-    });
+    RFuture.collect(Arrays.asList(tile.state, orange.state)).
+      onSuccess(imgs -> addTests(orange, tile));
   }
 
   @Override
@@ -51,17 +49,15 @@ public class SurfaceTest extends Test {
     }
   }
 
-  protected void addTests (final Image orange, Image tile) {
-    final Texture otex = orange.texture();
-    final Texture ttex = tile.createTexture(Texture.Config.DEFAULT.repeat(true, true));
+  protected void addTests (Image orange, Image tile) {
+    Texture otex = orange.texture();
+    Texture ttex = tile.createTexture(Texture.Config.DEFAULT.repeat(true, true));
 
     // make samples big enough to force a buffer size increase
-    final int samples = 128, hsamples = samples/2;
-    final float[] verts = new float[(samples+1)*4];
-    final int[] indices = new int[samples*6];
-    tessellateCurve(0, 40*(float)Math.PI, verts, indices, new F() {
-      public float apply (float x) { return (float)Math.sin(x/20)*50; }
-    });
+    int samples = 128, hsamples = samples/2;
+    float[] verts = new float[(samples+1)*4];
+    int[] indices = new int[samples*6];
+    tessellateCurve(0, 40*(float)Math.PI, verts, indices, x -> (float)Math.sin(x/20)*50);
 
     float ygap = 20, ypos = 10;
 
@@ -96,8 +92,8 @@ public class SurfaceTest extends Test {
 
     ypos = 10;
 
-    final TriangleBatch triangleBatch = new TriangleBatch(game.graphics.gl);
-    final AffineTransform af = new AffineTransform().
+    TriangleBatch triangleBatch = new TriangleBatch(game.graphics.gl);
+    AffineTransform af = new AffineTransform().
       scale(game.graphics.scale().factor, game.graphics.scale().factor).
       translate(160, (ygap + 150));
 
@@ -124,7 +120,7 @@ public class SurfaceTest extends Test {
     ypos = 10;
 
     // fill a patterned quad in a clipped group layer
-    final int twidth = 150, theight = 75;
+    int twidth = 150, theight = 75;
     GroupLayer group = new GroupLayer();
     ypos = ygap + addTest(315, 10, group, twidth, theight,
                           "Clipped pattern should not exceed grey rectangle");
@@ -146,8 +142,8 @@ public class SurfaceTest extends Test {
                           "SurfaceImage updated in paint()");
 
     // draw some randomly jiggling dots inside a bounded region
-    final List<ImageLayer> dots = new ArrayList<ImageLayer>();
-    final Rectangle dotBox = new Rectangle(315, ypos, 200, 100);
+    List<ImageLayer> dots = new ArrayList<ImageLayer>();
+    Rectangle dotBox = new Rectangle(315, ypos, 200, 100);
     ypos = ygap + addTest(dotBox.x, dotBox.y, new Layer() {
       protected void paintImpl (Surface surf) {
         surf.setFillColor(0xFFCCCCCC).fillRect(0, 0, dotBox.width, dotBox.height);
@@ -167,25 +163,23 @@ public class SurfaceTest extends Test {
       game.rootLayer.add(dotl);
     }
 
-    conns.add(game.paint.connect(new Slot<Clock>() {
-      public void onEmit (Clock clock) {
-        for (ImageLayer dot : dots) {
-          if (Math.random() > 0.95) {
-            dot.setTranslation(dotBox.x + (float)Math.random()*(dotBox.width-10),
-                               dotBox.y + (float)Math.random()*(dotBox.height-10));
-          }
+    conns.add(game.paint.connect(clock -> {
+      for (ImageLayer dot : dots) {
+        if (Math.random() > 0.95) {
+          dot.setTranslation(dotBox.x + (float)Math.random()*(dotBox.width-10),
+                             dotBox.y + (float)Math.random()*(dotBox.height-10));
         }
-
-        float now = clock.tick/1000f;
-        float sin = Math.abs(FloatMath.sin(now)), cos = Math.abs(FloatMath.cos(now));
-        int sinColor = (int)(sin * 255), cosColor = (int)(cos * 255);
-        int c1 = (0xFF << 24) | (sinColor << 16) | (cosColor << 8);
-        int c2 = (0xFF << 24) | (cosColor << 16) | (sinColor << 8);
-        paintUpped.begin().clear().
-          setFillColor(c1).fillRect(0, 0, 50, 50).
-          setFillColor(c2).fillRect(50, 50, 50, 50).
-          end();
       }
+
+      float now = clock.tick/1000f;
+      float sin = Math.abs(FloatMath.sin(now)), cos = Math.abs(FloatMath.cos(now));
+      int sinColor = (int)(sin * 255), cosColor = (int)(cos * 255);
+      int c1 = (0xFF << 24) | (sinColor << 16) | (cosColor << 8);
+      int c2 = (0xFF << 24) | (cosColor << 16) | (sinColor << 8);
+      paintUpped.begin().clear().
+        setFillColor(c1).fillRect(0, 0, 50, 50).
+        setFillColor(c2).fillRect(50, 50, 50, 50).
+        end();
     }));
   }
 

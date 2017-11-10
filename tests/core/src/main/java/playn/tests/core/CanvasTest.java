@@ -19,7 +19,6 @@ import pythagoras.f.FloatMath;
 
 import playn.core.*;
 import playn.scene.*;
-import react.Slot;
 import static playn.tests.core.TestsGame.game;
 
 public class CanvasTest extends Test {
@@ -214,22 +213,20 @@ public class CanvasTest extends Test {
       game.assets.getImage("images/tile.png").setConfig(repeat));
     addTestLayer("img layer anim setWidth", 100, 100, tileLayer.setSize(0, 100));
 
-    conns.add(game.paint.connect(new Slot<Clock>() {
-      public void onEmit (Clock clock) {
-        int curSecs = clock.tick/1000;
-        if (curSecs != lastSecs) {
-          Canvas tcanvas = time.begin();
-          tcanvas.clear();
-          tcanvas.setStrokeColor(0xFF000000).strokeRect(0, 0, 99, 99);
-          tcanvas.drawText(""+curSecs, 40, 55);
-          lastSecs = curSecs;
-          time.end();
-        }
-
-        // round the width so that it goes to zero sometimes (which should be fine)
-        if (tileLayer != null) tileLayer.forceWidth = Math.round(
-          Math.abs(FloatMath.sin(clock.tick/2000f)) * 100);
+    conns.add(game.paint.connect(clock -> {
+      int curSecs = clock.tick/1000;
+      if (curSecs != lastSecs) {
+        Canvas tcanvas = time.begin();
+        tcanvas.clear();
+        tcanvas.setStrokeColor(0xFF000000).strokeRect(0, 0, 99, 99);
+        tcanvas.drawText(""+curSecs, 40, 55);
+        lastSecs = curSecs;
+        time.end();
       }
+
+      // round the width so that it goes to zero sometimes (which should be fine)
+      if (tileLayer != null) tileLayer.forceWidth = Math.round(
+        Math.abs(FloatMath.sin(clock.tick/2000f)) * 100);
     }));
 
     final Canvas cancan = createCanvas(50, 50, new Drawer() {
@@ -288,11 +285,9 @@ public class CanvasTest extends Test {
                              final ImageDrawer drawer) {
     final Canvas target = game.graphics.createCanvas(width, height);
     final ImageLayer layer = new ImageLayer().setSize(width, height);
-    game.assets.getImage(imagePath).state.onSuccess(new Slot<Image>() {
-      public void onEmit (Image image) {
-        drawer.draw(target, image);
-        layer.setTile(target.toTexture());
-      }
+    game.assets.getImage(imagePath).state.onSuccess(image -> {
+      drawer.draw(target, image);
+      layer.setTile(target.toTexture());
     });
     addTestLayer(descrip, width, height, layer);
   }

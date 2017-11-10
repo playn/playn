@@ -17,8 +17,6 @@ import pythagoras.f.AffineTransform;
 import pythagoras.f.IRectangle;
 
 import react.Closeable;
-import react.Slot;
-import react.UnitSlot;
 
 import playn.core.Graphics;
 import playn.core.Scale;
@@ -204,17 +202,6 @@ public class Texture extends Tile implements Closeable {
   /** Returns whether this texture is been disposed. */
   public boolean disposed () {
     return disposed;
-  }
-
-  /** Returns a {@link Slot} that will dispose this texture when triggered.
-    *
-    * <p>This is useful when you want to manually bind the lifecycle of an unmanaged texture to the
-    * lifecycle of a layer. Simply `layer.onDisposed(texture.disposeSlot())`.
-    */
-  public UnitSlot disposeSlot () {
-    return new UnitSlot() {
-      public void onEmit () { close(); }
-    };
   }
 
   @Override public Texture texture () { return this; }

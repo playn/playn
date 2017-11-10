@@ -19,7 +19,6 @@ import pythagoras.f.FloatMath;
 
 import playn.core.*;
 import playn.scene.*;
-import react.Slot;
 
 public class ClippedLayerTest extends Test {
 
@@ -92,11 +91,9 @@ public class ClippedLayerTest extends Test {
       }
     }, 390, 30);
 
-    conns.add(game.paint.connect(new Slot<Clock>() {
-      public void onEmit (Clock clock) {
-        elapsed = clock.tick/1000f;
-        rotation = elapsed * FloatMath.PI/2;
-      }
+    conns.add(game.paint.connect(clock -> {
+      elapsed = clock.tick/1000f;
+      rotation = elapsed * FloatMath.PI/2;
     }));
   }
 
@@ -172,22 +169,20 @@ public class ClippedLayerTest extends Test {
     game.rootLayer.addAt(g4, 400, 225);
     game.rootLayer.addAt(g5, 525, 225);
 
-    conns.add(game.paint.connect(new Slot<Clock>() {
-      public void onEmit (Clock clock) {
-        float elapsed = clock.tick/1000f;
-        i1.setRotation(elapsed * FloatMath.PI/2);
-        s1.setRotation(elapsed * FloatMath.PI/2);
-        g2.setWidth(Math.round(Math.abs(100 * FloatMath.sin(elapsed))));
-        inner.setOrigin(FloatMath.sin(elapsed * 2f) * 50, FloatMath.cos(elapsed * 2f) * 50);
-        float cycle = elapsed / (FloatMath.PI * 2);
-        if (FloatMath.ifloor(cycle) % 2 == 0) {
-          // go in a circle without going out of bounds
-          g5Inner.setTranslation(-25 + 50 * FloatMath.cos(elapsed),
-                                 -25 + 50 * FloatMath.sin(elapsed));
-        } else {
-          // go out of bounds on right and left
-          g5Inner.setTranslation(25 + 250 * FloatMath.cos(elapsed + FloatMath.PI/2), -25);
-        }
+    conns.add(game.paint.connect(clock -> {
+      float elapsed = clock.tick/1000f;
+      i1.setRotation(elapsed * FloatMath.PI/2);
+      s1.setRotation(elapsed * FloatMath.PI/2);
+      g2.setWidth(Math.round(Math.abs(100 * FloatMath.sin(elapsed))));
+      inner.setOrigin(FloatMath.sin(elapsed * 2f) * 50, FloatMath.cos(elapsed * 2f) * 50);
+      float cycle = elapsed / (FloatMath.PI * 2);
+      if (FloatMath.ifloor(cycle) % 2 == 0) {
+        // go in a circle without going out of bounds
+        g5Inner.setTranslation(-25 + 50 * FloatMath.cos(elapsed),
+                               -25 + 50 * FloatMath.sin(elapsed));
+      } else {
+        // go out of bounds on right and left
+        g5Inner.setTranslation(25 + 250 * FloatMath.cos(elapsed + FloatMath.PI/2), -25);
       }
     }));
   }

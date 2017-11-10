@@ -15,7 +15,6 @@
  */
 package playn.core;
 
-import react.Function;
 import react.RFuture;
 
 /**
@@ -149,9 +148,7 @@ public abstract class Image extends TileSource implements Canvas.Drawable {
    * completed. Uses {@link #texture} to create the texture.
    */
   public RFuture<Texture> textureAsync () {
-    return state.map(new Function<Image,Texture>() {
-      public Texture apply (Image image) { return texture(); }
-    });
+    return state.map(image -> texture());
   }
 
   /**
@@ -190,9 +187,7 @@ public abstract class Image extends TileSource implements Canvas.Drawable {
         return tile;
       }
       @Override public RFuture<Tile> tileAsync () {
-        return image.state.map(new Function<Image,Tile>() {
-          public Tile apply (Image image) { return tile(); }
-        });
+        return image.state.map(image -> tile());
       }
 
       @Override public float width () { return rwidth; }
@@ -219,9 +214,7 @@ public abstract class Image extends TileSource implements Canvas.Drawable {
 
   @Override public Tile tile () { return texture(); }
   @Override public RFuture<Tile> tileAsync () {
-    return state.map(new Function<Image,Tile>() {
-      public Tile apply (Image image) { return texture(); }
-    });
+    return state.map(image -> texture());
   }
 
   protected final Graphics gfx;

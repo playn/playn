@@ -21,7 +21,6 @@ import pythagoras.f.FloatMath;
 
 import playn.core.*;
 import playn.scene.*;
-import react.Slot;
 
 public class ClearBackgroundTest extends Test {
 
@@ -44,13 +43,11 @@ public class ClearBackgroundTest extends Test {
     final ImageLayer square = new ImageLayer(surf.texture);
     game.rootLayer.add(square);
 
-    conns.add(game.paint.connect(new Slot<Clock>() {
-      public void onEmit (Clock clock) {
-        float t = clock.tick / 1000f;
-        IDimension vsize = game.plat.graphics().viewSize;
-        square.setTranslation((FloatMath.cos(t) + 1) * (vsize.width() - width)/2,
-                              (FloatMath.sin(t) + 1) * (vsize.height() - height)/2);
-      }
+    conns.add(game.paint.connect(clock -> {
+      float t = clock.tick / 1000f;
+      IDimension vsize = game.plat.graphics().viewSize;
+      square.setTranslation((FloatMath.cos(t) + 1) * (vsize.width() - width)/2,
+                            (FloatMath.sin(t) + 1) * (vsize.height() - height)/2);
     }));
   }
 }

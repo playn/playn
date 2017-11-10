@@ -27,7 +27,7 @@ import react.Slot;
 public class Touch extends playn.core.Touch {
 
   /** A listener for touch events with layer info. */
-  public static abstract class Listener extends Slot<Object> {
+  public static abstract class Listener implements Slot<Object> {
 
     /** Notifies listener of a touch start event. */
     public void onStart (Interaction iact) {}
@@ -68,7 +68,7 @@ public class Touch extends playn.core.Touch {
   }
 
   /** Handles the dispatching of touch events to layers. */
-  public static class Dispatcher extends Slot<Event[]> {
+  public static class Dispatcher implements Slot<Event[]> {
 
     private final Layer root;
     private final boolean bubble;

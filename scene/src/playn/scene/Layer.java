@@ -23,7 +23,6 @@ import pythagoras.f.Vector;
 import pythagoras.f.XY;
 
 import react.Closeable;
-import react.Function;
 import react.Signal;
 import react.Value;
 import react.ValueView;
@@ -243,10 +242,8 @@ public abstract class Layer implements Closeable {
     onState(State.DISPOSED, action); }
 
   private void onState (final State tgtState, final Signal.Listener<? super Layer> action) {
-    state.connect(new Signal.Listener<State>() {
-      public void onEmit (State state) {
-        if (state == tgtState) action.onEmit(Layer.this);
-      }
+    state.connect(state -> {
+      if (state == tgtState) action.onEmit(Layer.this);
     });
   }
 
