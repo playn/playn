@@ -29,26 +29,29 @@ import org.robovm.apple.foundation.NSURLConnection;
 import org.robovm.apple.foundation.NSURLConnectionDataDelegateAdapter;
 import org.robovm.apple.foundation.NSURLRequest;
 import org.robovm.apple.foundation.NSURLResponse;
+import org.robovm.apple.uikit.UIImage;
 
 import playn.core.Exec;
+import playn.core.Image;
 import playn.core.Net;
+import playn.core.Scale;
 import react.RFuture;
 import react.RPromise;
 
 public class RoboNet extends Net {
 
-  private final Exec exec;
+  private final RoboPlatform plat;
 
-  public RoboNet(Exec exec) {
-    this.exec = exec;
+  public RoboNet(RoboPlatform plat) {
+    this.plat = plat;
   }
 
   @Override public WebSocket createWebSocket(String url, WebSocket.Listener listener) {
-    return new RoboWebSocket(exec, url, listener);
+    return new RoboWebSocket(plat.exec(), url, listener);
   }
 
   @Override protected RFuture<Response> execute(Builder req) {
-    RPromise<Response> result = exec.deferredPromise();
+    RPromise<Response> result = plat.exec().deferredPromise();
 
     NSMutableURLRequest mreq = new NSMutableURLRequest();
     mreq.setURL(new NSURL(req.url));
@@ -72,7 +75,7 @@ public class RoboNet extends Net {
     return result;
   }
 
-  protected void sendRequest(NSURLRequest req, final RPromise<Response> result) {
+  protected void sendRequest(final NSURLRequest req, final RPromise<Response> result) {
     new NSURLConnection(req, new NSURLConnectionDataDelegateAdapter() {
       private NSMutableData data;
       private int rspCode = -1;
@@ -121,6 +124,10 @@ public class RoboNet extends Net {
           }
           @Override public byte[] payload() {
             return data.getBytes();
+          }
+          @Override public Image payloadImage(Scale scale) {
+            UIImage img = new UIImage(data);
+            return new RoboImage(plat.graphics(), scale, img.getCGImage(), req.getURL().toString());
           }
         });
       }

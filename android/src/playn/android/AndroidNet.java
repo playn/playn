@@ -35,27 +35,33 @@ import org.apache.http.params.HttpProtocolParams;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+
 import react.RFuture;
 import react.RPromise;
 
 import playn.core.Exec;
+import playn.core.Image;
+import playn.core.ImageImpl;
 import playn.core.Net;
+import playn.core.Scale;
 
 public class AndroidNet extends Net {
 
-  private final Exec exec;
+  private final AndroidPlatform plat;
 
-  public AndroidNet (Exec exec) {
-    this.exec = exec;
+  public AndroidNet (AndroidPlatform plat) {
+    this.plat = plat;
   }
 
   @Override public WebSocket createWebSocket(String url, WebSocket.Listener listener) {
-    return new AndroidWebSocket(exec, url, listener);
+    return new AndroidWebSocket(plat.exec(), url, listener);
   }
 
   @Override protected RFuture<Response> execute(final Builder req) {
-    final RPromise<Response> result = exec.deferredPromise();
-    exec.invokeAsync(new Runnable() {
+    final RPromise<Response> result = plat.exec().deferredPromise();
+    plat.exec().invokeAsync(new Runnable() {
       @Override public void run() {
         HttpParams params = new BasicHttpParams();
         HttpProtocolParams.setContentCharset(params, HTTP.UTF_8);
@@ -106,14 +112,19 @@ public class AndroidNet extends Net {
             };
 
           } else {
-            byte[] data = EntityUtils.toByteArray(entity);
+            final byte[] data = EntityUtils.toByteArray(entity);
             String encoding = EntityUtils.getContentCharSet(entity);
             if (encoding == null) {
               encoding = HTTP.UTF_8;
             }
             impl = new Response.Binary(code, data, encoding) {
-              @Override
-              protected Map<String,List<String>> extractHeaders() {
+              @Override public Image payloadImage(Scale scale) {
+                Bitmap bm = BitmapFactory.decodeByteArray(data, 0, data.length);
+                ImageImpl image = new AndroidImage(plat, true, 0, 0, req.url);
+                image.succeed(new ImageImpl.Data(scale, bm, bm.getWidth(), bm.getHeight()));
+                return image;
+              }
+              @Override protected Map<String,List<String>> extractHeaders() {
                 return extractResponseHeaders(response);
               }
             };

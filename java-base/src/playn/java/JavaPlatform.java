@@ -90,7 +90,7 @@ public abstract class JavaPlatform extends Platform {
 
   private final JavaLog log = new JavaLog();
   private final JavaAudio audio = new JavaAudio(exec);
-  private final JavaNet net = new JavaNet(exec);
+  private final JavaNet net = new JavaNet(this);
   private final JavaStorage storage;
   private final JsonImpl json = new JsonImpl();
   private final JavaAssets assets = new JavaAssets(this);

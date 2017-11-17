@@ -137,7 +137,7 @@ public class RoboPlatform extends Platform {
     assets = new RoboAssets(this);
     graphics = new RoboGraphics(this, config, initBounds);
     input = new RoboInput(this);
-    net = new RoboNet(exec);
+    net = new RoboNet(this);
     storage = new RoboStorage(this);
   }
 

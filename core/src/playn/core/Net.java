@@ -225,6 +225,17 @@ public abstract class Net {
       throw new UnsupportedOperationException();
     }
 
+    /**
+     * Returns the response payload as an {@link Image}. Note: this is not available on the HTML
+     * backend.
+     * @param scale the scale to use for the loaded image. Probably {@code Scale.ONE} unless you
+     * know you're loading a HiDPI image.
+     * @throws Exception if image decoding fails.
+     */
+    public Image payloadImage(Scale scale) throws Exception {
+      throw new UnsupportedOperationException();
+    }
+
     protected Response(int responseCode) {
       this.responseCode = responseCode;
     }

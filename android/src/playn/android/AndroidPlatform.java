@@ -54,7 +54,7 @@ public class AndroidPlatform extends Platform {
     assets = new AndroidAssets(this);
     json = new JsonImpl();
     input = new AndroidInput(this);
-    net = new AndroidNet(exec);
+    net = new AndroidNet(this);
     storage = new AndroidStorage(this);
   }
 

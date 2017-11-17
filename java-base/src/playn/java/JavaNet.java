@@ -15,6 +15,8 @@
  */
 package playn.java;
 
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -23,31 +25,34 @@ import java.net.URL;
 import java.util.List;
 import java.util.Map;
 
-import playn.core.Exec;
+import javax.imageio.ImageIO;
+
+import playn.core.Image;
 import playn.core.Net;
+import playn.core.Scale;
 import react.RFuture;
 import react.RPromise;
 
 public class JavaNet extends Net {
 
-  private final Exec exec;
+  private final JavaPlatform plat;
 
-  public JavaNet(Exec exec) {
-    this.exec = exec;
+  public JavaNet(JavaPlatform plat) {
+    this.plat = plat;
   }
 
   @Override public WebSocket createWebSocket(String url, WebSocket.Listener listener) {
-    return new JavaWebSocket(exec, url, listener);
+    return new JavaWebSocket(plat.exec(), url, listener);
   }
 
   @Override protected RFuture<Response> execute(final Builder req) {
-    final RPromise<Response> result = exec.deferredPromise();
-    exec.invokeAsync(new Runnable() {
+    final RPromise<Response> result = plat.exec().deferredPromise();
+    plat.exec().invokeAsync(new Runnable() {
       @Override
       public void run() {
         try {
           // configure the request
-          URL url = new URL(canonicalizeUrl(req.url));
+          final URL url = new URL(canonicalizeUrl(req.url));
           final HttpURLConnection conn = (HttpURLConnection) url.openConnection();
           for (Header header : req.headers) {
             conn.setRequestProperty(header.name, header.value);
@@ -69,12 +74,16 @@ public class JavaNet extends Net {
             int code = conn.getResponseCode();
 
             InputStream stream = code >= 400 ? conn.getErrorStream() : conn.getInputStream();
-            byte[] payload = stream == null ? new byte[0] : JavaAssets.toByteArray(stream);
+            final byte[] payload = stream == null ? new byte[0] : JavaAssets.toByteArray(stream);
 
             String encoding = conn.getContentEncoding();
             if (encoding == null) encoding = UTF8;
 
             result.succeed(new Response.Binary(code, payload, encoding) {
+              @Override public Image payloadImage(Scale scale) throws Exception {
+                BufferedImage image = ImageIO.read(new ByteArrayInputStream(payload));
+                return new JavaImage(plat.graphics(), scale, image, url.toString());
+              }
               @Override protected Map<String,List<String>> extractHeaders() {
                 return conn.getHeaderFields();
               }
