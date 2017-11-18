@@ -103,36 +103,30 @@ public abstract class Keyboard {
   public static enum TextType { DEFAULT, NUMBER, EMAIL, URL; }
 
   /**
-   * A function which collects only {@code KeyEvent} events. Use it to obtain only key events like
-   * so:
+   * Checks whether {@code event} is a {@code KeyEvent} and returns it (casted appropriately) if
+   * so. Returns {@code null} otherwise. Use it to obtain only key events like so:
    *
-   * <pre>{@code
-   * Input.keyboardEvents.collect(Keyboard.isKeyEvent).connect(event -> {
+   * <pre>{@code Input.keyboardEvents.collect(Keyboard::keyEvents).connect(event -> {
    *   // handle key events here (event has type KeyEvent)
    * });
    * }</pre>
    */
-  public static Function<Event, KeyEvent> isKeyEvent = new Function<Event, KeyEvent>() {
-    public KeyEvent apply (Event event) {
+  public static KeyEvent keyEvents (Event event) {
       return (event instanceof KeyEvent) ? (KeyEvent)event : null;
-    }
-  };
+  }
 
   /**
-   * A function which collects only {@code KeyEvent} events. Use it to obtain only key events like
-   * so:
+   * Checks whether {@code event} is a {@code TypedEvent} and returns it (casted appropriately) if
+   * so. Returns {@code null} otherwise. Use it to obtain only typed events like so:
    *
-   * <pre>{@code
-   * Input.keyboardEvents.collect(Keyboard.isTypedEvent).connect(event -> {
+   * <pre>{@code Input.keyboardEvents.collect(Keyboard::typedEvents).connect(event -> {
    *   // handle typed events here (event has type TypedEvent)
    * });
    * }</pre>
    */
-  public static Function<Event, KeyEvent> isTypedEvent = new Function<Event, KeyEvent>() {
-    public KeyEvent apply (Event event) {
-      return (event instanceof KeyEvent) ? (KeyEvent)event : null;
-    }
-  };
+  public static TypedEvent typedEvents (Event event) {
+      return (event instanceof TypedEvent) ? (TypedEvent)event : null;
+  }
 
   /**
    * Returns a collector function for key events for {@code key}. Use it to obtain only events for

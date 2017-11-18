@@ -128,4 +128,43 @@ public class Mouse {
     }
     public abstract void onEmit (WheelEvent event);
   }
+
+  /**
+   * Checks whether {@code event} is a {@code ButtonEvent} and returns it (casted appropriately) if
+   * so. Returns {@code null} otherwise. Use it to obtain only button events like so:
+   *
+   * <pre>{@code Input.mouseEvents.collect(Mouse::buttonEvents).connect(event -> {
+   *   // handle button events here (event has type ButtonEvent)
+   * });
+   * }</pre>
+   */
+  public static ButtonEvent buttonEvents (Event event) {
+      return (event instanceof ButtonEvent) ? (ButtonEvent)event : null;
+  }
+
+  /**
+   * Checks whether {@code event} is a {@code WheelEvent} and returns it (casted appropriately) if
+   * so. Returns {@code null} otherwise. Use it to obtain only wheel events like so:
+   *
+   * <pre>{@code Input.mouseEvents.collect(Mouse::wheelEvents).connect(event -> {
+   *   // handle wheel events here (event has type WheelEvent)
+   * });
+   * }</pre>
+   */
+  public static WheelEvent wheelEvents (Event event) {
+      return (event instanceof WheelEvent) ? (WheelEvent)event : null;
+  }
+
+  /**
+   * Checks whether {@code event} is a {@code MotionEvent} and returns it (casted appropriately) if
+   * so. Returns {@code null} otherwise. Use it to obtain only motion events like so:
+   *
+   * <pre>{@code Input.mouseEvents.collect(Mouse::motionEvents).connect(event -> {
+   *   // handle motion events here (event has type MotionEvent)
+   * });
+   * }</pre>
+   */
+  public static MotionEvent motionEvents (Event event) {
+      return (event instanceof MotionEvent) ? (MotionEvent)event : null;
+  }
 }
