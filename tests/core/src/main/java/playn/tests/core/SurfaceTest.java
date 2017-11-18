@@ -37,9 +37,8 @@ public class SurfaceTest extends Test {
     };
     tile.state.onFailure(onError);
     orange.state.onFailure(onError);
-    RFuture.collect(Arrays.asList(tile.state, orange.state)).onSuccess(new UnitSlot() {
-      public void onEmit () { addTests(orange, tile); }
-    });
+    RFuture.collect(Arrays.asList(tile.state, orange.state)).
+      onSuccess(imgs -> addTests(orange, tile));
   }
 
   @Override
@@ -59,9 +58,7 @@ public class SurfaceTest extends Test {
     final int samples = 128, hsamples = samples/2;
     final float[] verts = new float[(samples+1)*4];
     final int[] indices = new int[samples*6];
-    tessellateCurve(0, 40*(float)Math.PI, verts, indices, new F() {
-      public float apply (float x) { return (float)Math.sin(x/20)*50; }
-    });
+    tessellateCurve(0, 40*(float)Math.PI, verts, indices, x -> (float)Math.sin(x/20)*50);
 
     float ygap = 20, ypos = 10;
 
@@ -167,25 +164,23 @@ public class SurfaceTest extends Test {
       game.rootLayer.add(dotl);
     }
 
-    conns.add(game.paint.connect(new Slot<Clock>() {
-      public void onEmit (Clock clock) {
-        for (ImageLayer dot : dots) {
-          if (Math.random() > 0.95) {
-            dot.setTranslation(dotBox.x + (float)Math.random()*(dotBox.width-10),
-                               dotBox.y + (float)Math.random()*(dotBox.height-10));
-          }
+    conns.add(game.paint.connect(clock -> {
+      for (ImageLayer dot : dots) {
+        if (Math.random() > 0.95) {
+          dot.setTranslation(dotBox.x + (float)Math.random()*(dotBox.width-10),
+                             dotBox.y + (float)Math.random()*(dotBox.height-10));
         }
-
-        float now = clock.tick/1000f;
-        float sin = Math.abs(FloatMath.sin(now)), cos = Math.abs(FloatMath.cos(now));
-        int sinColor = (int)(sin * 255), cosColor = (int)(cos * 255);
-        int c1 = (0xFF << 24) | (sinColor << 16) | (cosColor << 8);
-        int c2 = (0xFF << 24) | (cosColor << 16) | (sinColor << 8);
-        paintUpped.begin().clear().
-          setFillColor(c1).fillRect(0, 0, 50, 50).
-          setFillColor(c2).fillRect(50, 50, 50, 50).
-          end();
       }
+
+      float now = clock.tick/1000f;
+      float sin = Math.abs(FloatMath.sin(now)), cos = Math.abs(FloatMath.cos(now));
+      int sinColor = (int)(sin * 255), cosColor = (int)(cos * 255);
+      int c1 = (0xFF << 24) | (sinColor << 16) | (cosColor << 8);
+      int c2 = (0xFF << 24) | (cosColor << 16) | (sinColor << 8);
+      paintUpped.begin().clear().
+        setFillColor(c1).fillRect(0, 0, 50, 50).
+        setFillColor(c2).fillRect(50, 50, 50, 50).
+        end();
     }));
   }
 

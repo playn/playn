@@ -35,4 +35,28 @@
      </plugin>
     </plugins>
   </build>
+
+  <profiles>
+    <profile>
+      <id>android</id>
+      <!-- process our lambdas &c for Android grokkage -->
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>net.orfjackal.retrolambda</groupId>
+            <artifactId>retrolambda-maven-plugin</artifactId>
+            <version>${retrolambda.version}</version>
+            <executions>
+              <execution>
+                <goals>
+                  <goal>process-main</goal>
+                  <goal>process-test</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 </project>

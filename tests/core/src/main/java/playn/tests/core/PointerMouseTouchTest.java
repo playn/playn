@@ -69,15 +69,15 @@ class PointerMouseTouchTest extends Test {
     x = 20;
 
     float boxWidth = 300, boxHeight = 110;
-    final Box mouse = new Box("Mouse", 0xffff8080, boxWidth, boxHeight);
+    Box mouse = new Box("Mouse", 0xffff8080, boxWidth, boxHeight);
     game.rootLayer.addAt(mouse.layer, x, y);
     y += mouse.layer.height() + 5;
 
-    final Box pointer = new Box("Pointer", 0xff80ff80, boxWidth, boxHeight);
+    Box pointer = new Box("Pointer", 0xff80ff80, boxWidth, boxHeight);
     game.rootLayer.addAt(pointer.layer, x, y);
     y += pointer.layer.height() + 5;
 
-    final Box touch = new Box("Touch", 0xff8080ff, boxWidth, boxHeight);
+    Box touch = new Box("Touch", 0xff8080ff, boxWidth, boxHeight);
     game.rootLayer.addAt(touch.layer, x, y);
 
     y = mouse.layer.ty();

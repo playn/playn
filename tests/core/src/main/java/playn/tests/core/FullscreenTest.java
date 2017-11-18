@@ -44,12 +44,10 @@ public class FullscreenTest extends Test {
   }
 
   @Override public void init () {
-    final float spacing = 5;
+    float spacing = 5;
     float y = spacing, x = spacing, nextX = spacing;
-    for (final Mode mode : host.enumerateModes()) {
-      ImageLayer button = game.ui.createButton(mode.toString(), new Runnable() {
-        @Override public void run () { host.setMode(mode); }
-      });
+    for (Mode mode : host.enumerateModes()) {
+      ImageLayer button = game.ui.createButton(mode.toString(), () -> host.setMode(mode));
       game.rootLayer.add(button);
       if (y + button.height() + spacing >= game.graphics.viewSize.height()) {
         x = nextX + spacing;

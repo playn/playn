@@ -108,11 +108,7 @@ public class TestsGame extends SceneGame {
     input.touchEvents.connect(new playn.scene.Touch.Dispatcher(rootLayer, true));
     input.mouseEvents.connect(new playn.scene.Mouse.Dispatcher(rootLayer, true));
 
-    graphics.deviceOrient.connect(new Slot<Graphics.Orientation>() {
-      public void onEmit (Graphics.Orientation orient) {
-        displayMenu();
-      }
-    });
+    graphics.deviceOrient.connect(orient -> displayMenu());
 
     tests = new Test[] {
       new CanvasTest(this),
@@ -142,43 +138,37 @@ public class TestsGame extends SceneGame {
     log.info("Right click, touch with two fingers, or type ESC to return to test menu.");
 
     // add global listeners which navigate back to the menu
-    input.mouseEvents.connect(new Mouse.ButtonSlot() {
-      public void onEmit (Mouse.ButtonEvent event) {
-        if (currentTest != null && currentTest.usesPositionalInputs()) return;
-        if (event.button == Mouse.ButtonEvent.Id.RIGHT) displayMenuLater();
+    input.mouseEvents.collect(Mouse::buttonEvents).connect(event -> {
+      if (currentTest != null && currentTest.usesPositionalInputs()) return;
+      if (event.button == Mouse.ButtonEvent.Id.RIGHT) displayMenuLater();
+    });
+    Set<Integer> activeTouches = new HashSet<Integer>();
+    input.touchEvents.connect(events -> {
+      if (currentTest != null && currentTest.usesPositionalInputs()) return;
+      switch (events[0].kind) {
+      case START:
+        // Android and iOS handle touch events rather differently, so we need to do this
+        // finagling to determine whether there is an active two or three finger touch
+        for (Touch.Event event : events) activeTouches.add(event.id);
+        if (activeTouches.size() > 1) displayMenuLater();
+        break;
+      case END:
+      case CANCEL:
+        for (Touch.Event event : events) activeTouches.remove(event.id);
+        break;
       }
     });
-    input.touchEvents.connect(new Slot<Touch.Event[]>() {
-      public void onEmit (Touch.Event[] events) {
-        if (currentTest != null && currentTest.usesPositionalInputs()) return;
-        switch (events[0].kind) {
-        case START:
-          // Android and iOS handle touch events rather differently, so we need to do this
-          // finagling to determine whether there is an active two or three finger touch
-          for (Touch.Event event : events) _active.add(event.id);
-          if (_active.size() > 1) displayMenuLater();
-          break;
-        case END:
-        case CANCEL:
-          for (Touch.Event event : events) _active.remove(event.id);
-          break;
+    input.keyboardEvents.collect(Keyboard::keyEvents).connect(event -> {
+      switch (event.key) {
+      case ESCAPE:
+        if (event.down) displayMenu();
+        break;
+      case D:
+        Layer.DEBUG_RECTS = event.down;
+        if (event.down && event.isShiftDown()) {
+          rootLayer.debugPrint(log);
         }
-      }
-      protected Set<Integer> _active = new HashSet<Integer>();
-    });
-    input.keyboardEvents.connect(new Keyboard.KeySlot() {
-      public void onEmit (Keyboard.KeyEvent event) {
-        switch (event.key) {
-        case ESCAPE:
-          if (event.down) displayMenu();
-          break;
-        case D:
-          Layer.DEBUG_RECTS = event.down;
-          if (event.down && event.isShiftDown()) {
-            rootLayer.debugPrint(log);
-          }
-          break;
-        }
+        break;
       }
     });
 
@@ -205,11 +195,7 @@ public class TestsGame extends SceneGame {
   // defers display of menu by one frame to avoid the right click or touch being processed by the
   // menu when it is displayed
   void displayMenuLater() {
-    plat.exec().invokeLater(new Runnable() {
-      public void run() {
-        displayMenu();
-      }
-    });
+    plat.exec().invokeLater(() -> displayMenu());
   }
 
   void displayMenu() {
@@ -228,9 +214,7 @@ public class TestsGame extends SceneGame {
 
     for (final Test test : tests) {
       if (!test.available()) continue;
-      ImageLayer button = ui.createButton(test.name, new Runnable() {
-        public void run () { startTest(test); }
-      });
+      ImageLayer button = ui.createButton(test.name, () -> startTest(test));
       if (x + button.width() > graphics.viewSize.width() - gap) {
         x = gap;
         y += maxHeight + gap;
@@ -263,9 +247,7 @@ public class TestsGame extends SceneGame {
 
     if (currentTest.usesPositionalInputs()) {
       // slap on a Back button if the test is testing the usual means of backing out
-      ImageLayer back = ui.createButton("Back", new Runnable() {
-        public void run () { displayMenuLater(); }
-      });
+      ImageLayer back = ui.createButton("Back", () -> displayMenuLater());
       rootLayer.addAt(back, graphics.viewSize.width() - back.width() - 10, 10);
     }
   }

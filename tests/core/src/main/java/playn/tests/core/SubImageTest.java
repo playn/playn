@@ -24,56 +24,52 @@ public class SubImageTest extends Test {
     fragment("CanvasImage", canvas.toTexture(), 250, 160);
 
     // draw subimages of a simple static image
-    game.assets.getImage("images/orange.png").state.onSuccess(new Slot<Image>() {
-      public void onEmit (Image orange) {
-        final Texture otex = orange.texture();
-        fragment("Image", otex, 250, 10);
+    game.assets.getImage("images/orange.png").state.onSuccess(orange -> {
+      Texture otex = orange.texture();
+      fragment("Image", otex, 250, 10);
 
-        final float pw = orange.width(), ph = orange.height(), phw = pw/2, phh = ph/2;
-        final Tile otile = otex.tile(0, phh/2, pw, phh);
+      float pw = orange.width(), ph = orange.height(), phw = pw/2, phh = ph/2;
+      Tile otile = otex.tile(0, phh/2, pw, phh);
 
-        // create tileable sub-texture
-        Texture subtex = game.graphics.createTexture(
-          otile.width(), otile.height(), Texture.Config.DEFAULT.repeat(true, true));
-        new TextureSurface(game.graphics, game.defaultBatch, subtex).begin().
-          clear().draw(otile, 0, 0).end().close();
+      // create tileable sub-texture
+      Texture subtex = game.graphics.createTexture(
+        otile.width(), otile.height(), Texture.Config.DEFAULT.repeat(true, true));
+      new TextureSurface(game.graphics, game.defaultBatch, subtex).begin().
+        clear().draw(otile, 0, 0).end().close();
 
-        // tile a sub-image, oh my!
-        ImageLayer tiled = new ImageLayer(subtex);
-        tiled.setSize(100, 100);
-        addTest(10, 10, tiled, "Tile to reptex to ImageLayer");
+      // tile a sub-image, oh my!
+      ImageLayer tiled = new ImageLayer(subtex);
+      tiled.setSize(100, 100);
+      addTest(10, 10, tiled, "Tile to reptex to ImageLayer");
 
-        // draw a subimage to a canvas
-        Canvas split = game.graphics.createCanvas(orange.width(), orange.height());
-        split.draw(orange.region(  0,   0, phw, phh), phw, phh);
-        split.draw(orange.region(phw,   0, phw, phh),   0, phh);
-        split.draw(orange.region(  0, phh, phw, phh), phw,   0);
-        split.draw(orange.region(phw, phh, phw, phh),   0,   0);
-        addTest(140, 10, new ImageLayer(split.toTexture()), "Canvas draw Image.Region", 80);
+      // draw a subimage to a canvas
+      Canvas split = game.graphics.createCanvas(orange.width(), orange.height());
+      split.draw(orange.region(  0,   0, phw, phh), phw, phh);
+      split.draw(orange.region(phw,   0, phw, phh),   0, phh);
+      split.draw(orange.region(  0, phh, phw, phh), phw,   0);
+      split.draw(orange.region(phw, phh, phw, phh),   0,   0);
+      addTest(140, 10, new ImageLayer(split.toTexture()), "Canvas draw Image.Region", 80);
 
-        // draw a subimage in an immediate layer
-        addTest(130, 100, new Layer() {
-          @Override protected void paintImpl (Surface surf) {
-            surf.draw(otile, 0 , 0  );
-            surf.draw(otile, pw, 0  );
-            surf.draw(otile, 0 , phh);
-            surf.draw(otile, pw, phh);
-          }
-        }, 2*pw, 2*phh, "Surface draw Tile", 100);
+      // draw a subimage in an immediate layer
+      addTest(130, 100, new Layer() {
+        @Override protected void paintImpl (Surface surf) {
+          surf.draw(otile, 0 , 0  );
+          surf.draw(otile, pw, 0  );
+          surf.draw(otile, 0 , phh);
+          surf.draw(otile, pw, phh);
+        }
+      }, 2*pw, 2*phh, "Surface draw Tile", 100);
 
-        // draw an image layer whose image region oscillates
-        final ImageLayer osci = new ImageLayer(otex);
-        osci.region = new Rectangle(0, 0, orange.width(), orange.height());
-        addTest(10, 150, osci, "ImageLayer with changing width", 100);
+      // draw an image layer whose image region oscillates
+      ImageLayer osci = new ImageLayer(otex);
+      osci.region = new Rectangle(0, 0, orange.width(), orange.height());
+      addTest(10, 150, osci, "ImageLayer with changing width", 100);
 
-        conns.add(game.paint.connect(new Slot<Clock>() {
-          public void onEmit (Clock clock) {
-            float t = clock.tick/1000f;
-            // round the width so that it sometimes goes to zero; just to be sure zero doesn't choke
-            osci.region.width = Math.round(Math.abs(FloatMath.sin(t)) * osci.tile().width());
-          }
-        }));
-      }
+      conns.add(game.paint.connect(clock -> {
+        float t = clock.tick/1000f;
+        // round the width so that it sometimes goes to zero; just to be sure zero doesn't choke
+        osci.region.width = Math.round(Math.abs(FloatMath.sin(t)) * osci.tile().width());
+      }));
     }).onFailure(logFailure("Failed to load orange image"));
   }
 

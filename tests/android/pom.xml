@@ -34,6 +34,21 @@
 
   <build>
     <plugins>
+      <!-- process our lambdas &c for Android grokkage -->
+      <plugin>
+        <groupId>net.orfjackal.retrolambda</groupId>
+        <artifactId>retrolambda-maven-plugin</artifactId>
+        <version>${retrolambda.version}</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>process-main</goal>
+              <goal>process-test</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
       <plugin>
         <groupId>com.simpligility.maven.plugins</groupId>
         <artifactId>android-maven-plugin</artifactId>

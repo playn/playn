@@ -40,7 +40,7 @@ public class MouseWheelTest extends Test
     knob.setStrokeColor(0xff000000).drawLine(0, HWIDTH / 2, WIDTH, HWIDTH / 2);
     knob.setStrokeColor(0xffff0000).strokeRect(0, 0, WIDTH - 1, HWIDTH - 1);
 
-    final ImageLayer il = new ImageLayer(knob.toTexture());
+    ImageLayer il = new ImageLayer(knob.toTexture());
     il.setOrigin(0, HWIDTH / 2).setDepth(1).setTranslation(0, HEIGHT / 2);
 
     GroupLayer slider = new GroupLayer();

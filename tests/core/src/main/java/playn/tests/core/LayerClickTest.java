@@ -43,28 +43,21 @@ class LayerClickTest extends Test {
     l2.events().connect(new Mover(l2).listener(game.input));
 
     Image mdb = game.assets.getRemoteImage("https://www.samskivert.com/images/headshot.jpg");
-    final ImageLayer l3 = new ImageLayer(mdb);
+    ImageLayer l3 = new ImageLayer(mdb);
     game.rootLayer.addAt(l3.setRotation(-FloatMath.PI/4), 50, 150);
     l3.events().connect(new Mover(l3).listener(game.input));
 
-    game.net.req("https://www.samskivert.com/images/2012/12/spellwood-app-icon.png").execute().
-      onSuccess(new Slot<Net.Response>() {
-        public void onEmit (Net.Response rsp) {
-          try {
-            Image icon = rsp.payloadImage(new Scale(2));
-            ImageLayer l4 = new ImageLayer(icon);
-            game.rootLayer.addAt(l4.setRotation(FloatMath.PI/4), 150, 150);
-            l4.events().connect(new Mover(l4).listener(game.input));
-          } catch (Exception e) {
-            game.log.warn("Failed to decode image: " + e);
-          }
-        }
-      }).
-      onFailure(new Slot<Throwable>() {
-        public void onEmit (Throwable t) {
-          game.log.warn("Failed to load image: " + t);
-        }
-      });
+    String l4url = "https://www.samskivert.com/images/2012/12/spellwood-app-icon.png";
+    game.net.req(l4url).execute().onSuccess(rsp -> {
+      try {
+        Image icon = rsp.payloadImage(new Scale(2));
+        ImageLayer l4 = new ImageLayer(icon);
+        game.rootLayer.addAt(l4.setRotation(FloatMath.PI/4), 150, 150);
+        l4.events().connect(new Mover(l4).listener(game.input));
+      } catch (Exception e) {
+        game.log.warn("Failed to decode image: " + e);
+      }
+    }).onFailure(t -> game.log.warn("Failed to load image: " + l4url, t));
   }
 
   protected static class Mover {

@@ -16,6 +16,11 @@
     added. Those should go directly in "core", or the appropriate backend module.
   </description>
 
+  <properties>
+    <source.level>1.8</source.level>
+    <retrolambda.version>2.5.1</retrolambda.version>
+  </properties>
+
   <modules>
     <module>assets</module>
     <module>core</module>

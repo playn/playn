@@ -19,16 +19,14 @@ public class SoundTest extends Test {
   }
 
   @Override public void init() {
-    final CanvasLayer actions = new CanvasLayer(game.graphics, 300, 300);
+    CanvasLayer actions = new CanvasLayer(game.graphics, 300, 300);
     float x = 50, y = 50;
 
-    final Sound fanfare = loadSound("sounds/fanfare");
-    float ffx = addButton("Play Fanfare", new Runnable() {
-      public void run() {
-        fanfare.play();
-        addAction(actions, "Played Fanfare.");
-      }
-    }, x, y);
+    Sound fanfare = loadSound("sounds/fanfare");
+    float ffx = addButton("Play Fanfare", x, y, () -> {
+      fanfare.play();
+      addAction(actions, "Played Fanfare.");
+    });
 
     Sound lfanfare = loadSound("sounds/fanfare");
     lfanfare.setLooping(true);
@@ -48,36 +46,31 @@ public class SoundTest extends Test {
     game.rootLayer.addAt(actions, x, y);
   }
 
-  protected Sound loadSound(final String path) {
+  protected Sound loadSound(String path) {
     Sound sound = game.assets.getSound(path);
     sound.state.onFailure(logFailure("Sound loading error: " + path));
     return sound;
   }
 
-  protected Sound loadMusic(final String path) {
+  protected Sound loadMusic(String path) {
     Sound sound = game.assets.getMusic(path);
     sound.state.onFailure(logFailure("Music loading error: " + path));
     return sound;
   }
 
-  protected float addLoopButtons(final CanvasLayer actions, final String name, final Sound sound,
-                                 float x, float y) {
-    x = addButton("Loop " + name, new Runnable() {
-      public void run() {
-        if (!sound.isPlaying()) {
-          sound.play();
-          addAction(actions, "Starting looping " + name + ".");
-        }
+  protected float addLoopButtons(CanvasLayer actions, String name, Sound sound, float x, float y) {
+    x = addButton("Loop " + name, x, y, () -> {
+      if (!sound.isPlaying()) {
+        sound.play();
+        addAction(actions, "Starting looping " + name + ".");
       }
-    }, x, y);
-    x = addButton("Stop Loop " + name, new Runnable() {
-      public void run() {
-        if (sound.isPlaying()) {
-          sound.stop();
-          addAction(actions, "Stopped looping " + name + ".");
-        }
+    });
+    x = addButton("Stop Loop " + name, x, y, () -> {
+      if (sound.isPlaying()) {
+        sound.stop();
+        addAction(actions, "Stopped looping " + name + ".");
       }
-    }, x, y);
+    });
     return x;
   }
 

@@ -41,16 +41,14 @@ public class ClearBackgroundTest extends Test {
     // add a grey square
     TextureSurface surf = game.createSurface(width, height);
     surf.begin().setFillColor(Color.rgb(200, 200, 200)).fillRect(0, 0, width, height).end().close();
-    final ImageLayer square = new ImageLayer(surf.texture);
+    ImageLayer square = new ImageLayer(surf.texture);
     game.rootLayer.add(square);
 
-    conns.add(game.paint.connect(new Slot<Clock>() {
-      public void onEmit (Clock clock) {
-        float t = clock.tick / 1000f;
-        IDimension vsize = game.plat.graphics().viewSize;
-        square.setTranslation((FloatMath.cos(t) + 1) * (vsize.width() - width)/2,
-                              (FloatMath.sin(t) + 1) * (vsize.height() - height)/2);
-      }
+    conns.add(game.paint.connect(clock -> {
+      float t = clock.tick / 1000f;
+      IDimension vsize = game.plat.graphics().viewSize;
+      square.setTranslation((FloatMath.cos(t) + 1) * (vsize.width() - width)/2,
+                            (FloatMath.sin(t) + 1) * (vsize.height() - height)/2);
     }));
   }
 }

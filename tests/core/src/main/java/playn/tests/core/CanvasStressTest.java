@@ -30,35 +30,33 @@ public class CanvasStressTest extends Test {
           "the GPU on every frame.");
   }
 
+  private int noSegs = 30;
+  private int direction = 1;
+
   @Override public void init() {
-    final CanvasLayer clayer = new CanvasLayer(game.graphics, game.graphics.viewSize);
+    CanvasLayer clayer = new CanvasLayer(game.graphics, game.graphics.viewSize);
     game.rootLayer.add(clayer);
 
-    conns.add(game.update.connect(new Slot<Clock>() {
-      private int noSegs = 30;
-      private int direction = 1;
+    conns.add(game.update.connect(clock -> {
+      Canvas canvas = clayer.begin();
+      canvas.clear();
+      canvas.setStrokeWidth(3);
+      canvas.setStrokeColor(0x88ff0000);
 
-      public void onEmit (Clock clock) {
-        Canvas canvas = clayer.begin();
-        canvas.clear();
-        canvas.setStrokeWidth(3);
-        canvas.setStrokeColor(0x88ff0000);
+      noSegs += direction;
+      if (noSegs > 50) direction = -1;
+      if (noSegs < 20) direction = 1;
 
-        noSegs += direction;
-        if (noSegs > 50) direction = -1;
-        if (noSegs < 20) direction = 1;
-
-        final float r = 100;
-        for (int ii = 0; ii < noSegs; ii++) {
-          float angle = 2*FloatMath.PI * ii / noSegs;
-          IDimension viewSize = game.plat.graphics().viewSize;
-          float x = (r * FloatMath.cos(angle)) + viewSize.width() / 2;
-          float y = (r * FloatMath.sin(angle)) + viewSize.height() /2;
-          canvas.strokeCircle(x, y, 100);
-        }
-
-        clayer.end(); // reupload the image data
+      float r = 100;
+      for (int ii = 0; ii < noSegs; ii++) {
+        float angle = 2*FloatMath.PI * ii / noSegs;
+        IDimension viewSize = game.plat.graphics().viewSize;
+        float x = (r * FloatMath.cos(angle)) + viewSize.width() / 2;
+        float y = (r * FloatMath.sin(angle)) + viewSize.height() /2;
+        canvas.strokeCircle(x, y, 100);
       }
+
+      clayer.end(); // reupload the image data
     }));
   }
 }

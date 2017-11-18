@@ -17,7 +17,7 @@
 package playn.tests.core;
 
 import react.Closeable;
-import react.Slot;
+import react.SignalView;
 
 import playn.core.*;
 import playn.scene.*;
@@ -83,7 +83,7 @@ public abstract class Test {
     return new ImageLayer(game.ui.wrapText(descrip, width, TextBlock.Align.CENTER));
   }
 
-  protected float addButton (String text, Runnable onClick, float x, float y) {
+  protected float addButton (String text, float x, float y, Runnable onClick) {
     ImageLayer button = game.ui.createButton(text, onClick);
     game.rootLayer.addAt(button, x, y);
     return x + button.width() + 10;
@@ -99,11 +99,7 @@ public abstract class Test {
     });
   }
 
-  protected Slot<Throwable> logFailure (final String message) {
-    return new Slot<Throwable>() {
-      public void onEmit (Throwable cause) {
-        game.log.warn(message, cause);
-      }
-    };
+  protected SignalView.Listener<Throwable> logFailure (String message) {
+    return cause -> game.log.warn(message, cause);
   }
 }

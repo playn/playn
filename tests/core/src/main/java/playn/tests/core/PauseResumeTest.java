@@ -34,27 +34,25 @@ public class PauseResumeTest extends Test {
     super(game, "PauseResume", "Tests pause/resume notifications.");
   }
 
-  @Override public void init() {
-    conns.add(game.plat.lifecycle.connect(new Slot<Platform.Lifecycle>() {
-      private double start = game.plat.time();
-      private int elapsed() {
-        return (int)Math.round((game.plat.time() - start)/1000);
-      }
+  private int elapsed(double start) {
+    return (int)Math.round((game.plat.time() - start)/1000);
+  }
 
-      public void onEmit (Platform.Lifecycle event) {
-        switch (event) {
-        case PAUSE:
-          game.log.info("Paused " + elapsed());
-          notifications.add("Paused at " + elapsed() + "s");
-          break;
-        case RESUME:
-          game.log.info("Resumed " + elapsed());
-          notifications.add("Resumed at " + elapsed() + "s");
-          updateDisplay();
-          break;
-        default:
-          break; // nada
-        }
+  @Override public void init() {
+    double start = game.plat.time();
+    conns.add(game.plat.lifecycle.connect(event -> {
+      switch (event) {
+      case PAUSE:
+        game.log.info("Paused " + elapsed(start));
+        notifications.add("Paused at " + elapsed(start) + "s");
+        break;
+      case RESUME:
+        game.log.info("Resumed " + elapsed(start));
+        notifications.add("Resumed at " + elapsed(start) + "s");
+        updateDisplay();
+        break;
+      default:
+        break; // nada
       }
     }));
 

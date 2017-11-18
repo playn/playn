@@ -42,7 +42,9 @@ public class TextTest extends Test {
   private NToggle<Integer> wrap;
   private NToggle<Boolean> lineBounds;
   private final float outlineWidth = 2;
-  private String sample = "The quick brown fox\njumped over the lazy dog.\nEvery good boy deserves fudge.";
+  private String sample = "The quick brown fox\n" +
+    "jumped over the lazy dog.\n" +
+    "Every good boy deserves fudge.";
   private ImageLayer text;
   private Rectangle row;
 
@@ -61,18 +63,16 @@ public class TextTest extends Test {
         "Align", TextBlock.Align.LEFT, TextBlock.Align.CENTER, TextBlock.Align.RIGHT)).layer);
     addToRow((font = new NToggle<String>("Font", "Times New Roman", "Helvetica")).layer);
 
-    ImageLayer layer = game.ui.createButton("Set Text", new Runnable() {
-      public void run () {
-        game.input.getText(Keyboard.TextType.DEFAULT, "Test text", sample.replace("\n", "\\n")).
-          onSuccess(new Slot<String>() {
-            public void onEmit (String text) {
-              if (text == null) return;
-              // parse \n to allow testing line breaks
-              sample = text.replace("\\n", "\n");
-              update();
-            }
-          });
-      }
+    ImageLayer layer = game.ui.createButton("Set Text", () -> {
+      game.input.getText(Keyboard.TextType.DEFAULT, "Test text", sample.replace("\n", "\\n")).
+        onSuccess(new Slot<String>() {
+          public void onEmit (String text) {
+            if (text == null) return;
+            // parse \n to allow testing line breaks
+            sample = text.replace("\\n", "\n");
+            update();
+          }
+        });
     });
     addToRow(layer);
     addToRow((lineBounds = new NToggle<Boolean>("Lines", Boolean.FALSE, Boolean.TRUE)).layer);

@@ -17,7 +17,7 @@ package playn.tests.core;
 
 import playn.core.*;
 import playn.scene.*;
-import react.Slot;
+import react.SignalView;
 
 class DialogTest extends Test {
 
@@ -35,21 +35,17 @@ class DialogTest extends Test {
     String last = game.storage.getItem("last_text");
     if (last == null || last.length() == 0) last = "...";
 
-    final ImageLayer outputLayer = new ImageLayer(game.ui.formatText(last, false));
-    final Slot<Object> onDialogResult = new Slot<Object>() {
-      public void onEmit(Object result) {
-        String text = result == null ? "canceled" : String.valueOf(result);
-        if (text.length() > 0) outputLayer.setTile(game.ui.formatText(text, false));
-        if (result instanceof String) game.storage.setItem("last_text", (String)result);
-      }
+    ImageLayer outputLayer = new ImageLayer(game.ui.formatText(last, false));
+    SignalView.Listener<Object> onDialogResult = result -> {
+      String text = result == null ? "canceled" : String.valueOf(result);
+      if (text.length() > 0) outputLayer.setTile(game.ui.formatText(text, false));
+      if (result instanceof String) game.storage.setItem("last_text", (String)result);
     };
 
     x = left;
-    for (final Keyboard.TextType type : Keyboard.TextType.values()) {
-      ImageLayer button = game.ui.createButton(type.toString(), new Runnable() {
-        public void run() {
-          game.input.getText(type, "Enter " + type + " text:", "").onSuccess(onDialogResult);
-        }
+    for (Keyboard.TextType type : Keyboard.TextType.values()) {
+      ImageLayer button = game.ui.createButton(type.toString(), () -> {
+        game.input.getText(type, "Enter " + type + " text:", "").onSuccess(onDialogResult);
       });
       game.rootLayer.addAt(button, x, y);
       x += button.width() + 10;
@@ -64,24 +60,20 @@ class DialogTest extends Test {
     y += 20;
 
     x = left;
-    ImageLayer button = game.ui.createButton("OK Only", new Runnable() {
-      public void run () {
-        game.input.sysDialog("OK Only Dialog", "This in an OK only dialog.\n" +
-                             "With hard line broken text.\n\n" +
-                             "And hopefully a blank line before this one.", "Cool!", null).
-          onSuccess(onDialogResult);
-      }
+    ImageLayer button = game.ui.createButton("OK Only", () -> {
+      game.input.sysDialog("OK Only Dialog", "This in an OK only dialog.\n" +
+                           "With hard line broken text.\n\n" +
+                           "And hopefully a blank line before this one.", "Cool!", null).
+        onSuccess(onDialogResult);
     });
     game.rootLayer.addAt(button, x, y);
     x += button.width() + 10;
 
-    button = game.ui.createButton("OK Cancel", new Runnable() {
-      public void run () {
-        game.input.sysDialog("OK Cancel Dialog", "This is an OK Cancel dialog.\n" +
-                             "With hard line breaks.\n\n" +
-                             "And hopefully a blank line before this one.", "Cool!", "Yuck!").
-          onSuccess(onDialogResult);
-      }
+    button = game.ui.createButton("OK Cancel", () -> {
+      game.input.sysDialog("OK Cancel Dialog", "This is an OK Cancel dialog.\n" +
+                           "With hard line breaks.\n\n" +
+                           "And hopefully a blank line before this one.", "Cool!", "Yuck!").
+        onSuccess(onDialogResult);
     });
     game.rootLayer.addAt(button, x, y);
     x += button.width() + 10;
