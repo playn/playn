@@ -17,6 +17,7 @@ package playn.core;
 
 import react.Function;
 import react.RFuture;
+import react.Try;
 
 /**
  * Bitmapped image data. May be loaded via {@link Assets} or created dynamically as in the backing
@@ -29,11 +30,15 @@ public abstract class Image extends TileSource implements Canvas.Drawable {
   public final RFuture<Image> state;
 
   /**
-   * Returns whether this image is fully loaded. In general you'll want to react to
-   * {@link #state}, but this method is useful when you need to assert that something is only
-   * allowed on a fully loaded image.
+   * Returns whether this image is successfully loaded. If it is still loading, or loading failed,
+   * {@code false} will be returned. In general you'll want to react to {@link #state}, but this
+   * method is useful when you need to assert that something is only allowed on a fully loaded
+   * image.
    */
-  public boolean isLoaded () { return state.isCompleteNow(); }
+  public boolean isLoaded () {
+    Try<Image> cur = state.result();
+    return cur != null && cur.isSuccess();
+  }
 
   /**
    * Returns the scale of resolution independent pixels to actual pixels for this image. This will
