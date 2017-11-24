@@ -133,6 +133,17 @@ class JavaCanvas extends Canvas {
   }
 
   @Override
+  public Canvas drawArc(float cx, float cy, float r, float startAngle, float arcAngle) {
+    int top = (int) (cx - r);
+    int left = (int) (cy - r);
+    int diam = (int) (2*r);
+    currentState().prepareStroke(g2d);
+    g2d.drawArc(top, left, diam, diam, (int) startAngle, (int) arcAngle);
+    isDirty = true;
+    return this;
+  }
+
+  @Override
   public Canvas drawText(String text, float x, float y) {
     currentState().prepareFill(g2d);
     g2d.drawString(text, x, y);
