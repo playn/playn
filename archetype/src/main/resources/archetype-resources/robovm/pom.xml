@@ -15,6 +15,7 @@
 
   <properties>
     <mainClass>${package}.robovm.${JavaGameClassName}RoboVM</mainClass>
+    <device>iPhone-6</device>
   </properties>
 
   <dependencies>
@@ -66,7 +67,7 @@
             <artifactId>robovm-maven-plugin</artifactId>
             <version>${robovm.version}</version>
             <configuration>
-              <deviceName>iPhone-6</deviceName>
+              <deviceName>${device}</deviceName>
             </configuration>
             <executions>
               <execution>
