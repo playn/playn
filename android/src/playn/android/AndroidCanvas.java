@@ -101,6 +101,17 @@ public class AndroidCanvas extends Canvas {
     return this;
   }
 
+  @Override public Canvas drawArc(float cx, float cy, float r, float startAngle, float arcAngle) {
+    float left = cx - r;
+    float top = cy - r;
+    float right = cx + r;
+    float bottom = cy + r;
+    rectf.set(left, top, right, bottom);
+    canvas.drawArc(rectf, -startAngle, -arcAngle, false, currentState().prepareStroke());
+    isDirty = true;
+    return this;
+  }
+
   @Override public Canvas drawText(String text, float x, float y) {
     canvas.drawText(text, x, y, currentState().prepareFill());
     isDirty = true;
