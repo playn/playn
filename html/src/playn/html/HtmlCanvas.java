@@ -81,11 +81,9 @@ public class HtmlCanvas extends Canvas {
   }
 
   @Override public Canvas drawArc(float cx, float cy, float r, float startAngle, float arcAngle) {
-    float startRads = (float) Math.toRadians(-startAngle);
-    float endRads = (float) Math.toRadians(-(startAngle + arcAngle));
     boolean ccw = arcAngle > 0;
     ctx.beginPath();
-    ctx.arc(cx, cy, r, startRads, endRads, ccw);
+    ctx.arc(cx, cy, r, -startAngle, -(startAngle + arcAngle), ccw);
     ctx.stroke();
     isDirty = true;
     return this;

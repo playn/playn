@@ -30,6 +30,7 @@ import java.util.Deque;
 import java.util.LinkedList;
 
 import playn.core.*;
+import pythagoras.f.FloatMath;
 import pythagoras.f.MathUtil;
 
 class JavaCanvas extends Canvas {
@@ -138,7 +139,9 @@ class JavaCanvas extends Canvas {
     int left = (int) (cy - r);
     int diam = (int) (2*r);
     currentState().prepareStroke(g2d);
-    g2d.drawArc(top, left, diam, diam, (int) startAngle, (int) arcAngle);
+    g2d.drawArc(top, left, diam, diam,
+                (int) FloatMath.toDegrees(startAngle),
+                (int) FloatMath.toDegrees(arcAngle));
     isDirty = true;
     return this;
   }

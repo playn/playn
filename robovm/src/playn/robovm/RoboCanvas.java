@@ -122,15 +122,13 @@ public class RoboCanvas extends Canvas {
   }
 
   @Override public Canvas drawArc(float cx, float cy, float r, float startAngle, float arcAngle) {
-    float startRads = (float) Math.toRadians(-startAngle);
-    float endRads = (float) Math.toRadians(-(startAngle + arcAngle));
     // Note: https://developer.apple.com/documentation/coregraphics/1455756-cgcontextaddarc
     // "In a flipped coordinate system (the default for UIView drawing methods
     // in iOS), specifying a clockwise arc results in a counterclockwise arc
     // after the transformation is applied."
     int cw = (arcAngle > 0) ? 1 : 0;
     bctx.beginPath();
-    bctx.addArc(cx, cy, r, startRads, endRads, cw);
+    bctx.addArc(cx, cy, r, -startAngle, -(startAngle + arcAngle), cw);
     bctx.strokePath();
     isDirty = true;
     return this;

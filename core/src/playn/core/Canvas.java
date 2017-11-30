@@ -184,8 +184,8 @@ public abstract class Canvas implements Closeable {
   /**
    * Draws an arc of a circle centered at cx, cy, with radius r.
    * <p>
-   * The start and arc angles are specified in degrees. Angles are interpreted
-   * such that 0 degrees is at the 3 o'clock position. Positive values indicate
+   * The start and arc angles are specified in radians. Angles are interpreted
+   * such that 0 radians is at the 3 o'clock position. Positive values indicate
    * a counter-clockwise rotation while negative values indicate a clockwise
    * rotation.
    */

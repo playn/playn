@@ -212,6 +212,20 @@ public class CanvasTest extends Test {
       canvas.rotate(FloatMath.PI/4);
       canvas.draw(cancan.image, 0, 0);
     });
+
+    addTestCanvas("drawArc", 100, 100, canvas -> {
+      float[] quads = { 0, 0.5f, 1, 1.5f};
+      float PI = FloatMath.PI;
+      for (float quad : quads) {
+        drawCircleArc(canvas, 20 + quad*40, 30, PI * quad, PI/2);
+        drawCircleArc(canvas, 20 + quad*40, 70, PI * quad, -PI/2);
+      }
+    });
+  }
+
+  private void drawCircleArc(Canvas canvas, float x, float y, float start, float span) {
+    canvas.setStrokeColor(0xFFDDDDDD).strokeCircle(x, y, 10).
+      setStrokeColor(0xFF000000).drawArc(x, y, 10, start, span);
   }
 
   private interface Drawer {
