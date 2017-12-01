@@ -140,8 +140,8 @@ class JavaCanvas extends Canvas {
     int diam = (int) (2*r);
     currentState().prepareStroke(g2d);
     g2d.drawArc(top, left, diam, diam,
-                (int) FloatMath.toDegrees(startAngle),
-                (int) FloatMath.toDegrees(arcAngle));
+                FloatMath.round(FloatMath.toDegrees(startAngle)),
+                FloatMath.round(FloatMath.toDegrees(arcAngle)));
     isDirty = true;
     return this;
   }
