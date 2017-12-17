@@ -17,7 +17,6 @@ package playn.tests.core;
 
 import java.nio.ByteBuffer;
 
-import react.Function;
 import react.RFuture;
 import react.SignalView;
 import react.Slot;

@@ -23,7 +23,6 @@ import pythagoras.f.Vector;
 import pythagoras.f.XY;
 
 import react.Closeable;
-import react.Function;
 import react.Signal;
 import react.Value;
 import react.ValueView;
