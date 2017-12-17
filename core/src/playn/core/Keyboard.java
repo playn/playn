@@ -129,6 +129,24 @@ public abstract class Keyboard {
   }
 
   /**
+   * A collector function for key events for {@code key}. Use it to obtain only events for a
+   * particular key like so:
+   *
+   * <pre>{@code
+   * Input.keyboardEvents.collect(ev -> Keyboard.isKey(Key.X, ev)).connect(event -> {
+   *   // handle the 'x' key being pressed or released
+   * });
+   * }</pre>
+   */
+  public static KeyEvent isKey (Key key, Event event) {
+    if (event instanceof KeyEvent && ((KeyEvent)event).key == key) {
+      return (KeyEvent)event;
+    } else {
+      return null;
+    }
+  }
+
+  /**
    * Returns a collector function for key events for {@code key}. Use it to obtain only events for
    * a particular key like so:
    *
@@ -141,11 +159,7 @@ public abstract class Keyboard {
   public static Function<Event, KeyEvent> isKey (final Key key) {
     return new Function<Event, KeyEvent>() {
       public KeyEvent apply (Event event) {
-        if (event instanceof KeyEvent && ((KeyEvent)event).key == key) {
-          return (KeyEvent)event;
-        } else {
-          return null;
-        }
+        return isKey(key, event);
       }
     };
   }
