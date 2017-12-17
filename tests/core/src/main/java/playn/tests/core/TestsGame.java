@@ -137,7 +137,7 @@ public class TestsGame extends SceneGame {
     log.info("Right click, touch with two fingers, or type ESC to return to test menu.");
 
     // add global listeners which navigate back to the menu
-    input.mouseEvents.collect(Mouse.isButtonEvent).connect(event -> {
+    input.mouseEvents.collect(Mouse::isButtonEvent).connect(event -> {
       if (currentTest != null && currentTest.usesPositionalInputs()) return;
       if (event.button == Mouse.ButtonEvent.Id.RIGHT) displayMenuLater();
     });
@@ -157,7 +157,7 @@ public class TestsGame extends SceneGame {
         break;
       }
     });
-    input.keyboardEvents.collect(Keyboard.isKeyEvent).connect(event -> {
+    input.keyboardEvents.collect(Keyboard::isKeyEvent).connect(event -> {
       switch (event.key) {
       case ESCAPE:
         if (event.down) displayMenu();

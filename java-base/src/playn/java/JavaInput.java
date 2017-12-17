@@ -61,7 +61,7 @@ public class JavaInput extends Input {
 
   protected void emulateTouch () {
     final Key pivotKey = plat.config.pivotKey;
-    keyboardEvents.collect(Keyboard.isKeyEvent).connect(event -> {
+    keyboardEvents.collect(Keyboard::isKeyEvent).connect(event -> {
       if (event.key == pivotKey && event.down) {
         pivot = new Point(x, y);
       }

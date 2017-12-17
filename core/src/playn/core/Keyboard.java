@@ -15,8 +15,7 @@
  */
 package playn.core;
 
-import java.util.function.Function;
-
+import react.Function;
 import react.Slot;
 
 /**
@@ -89,21 +88,41 @@ public abstract class Keyboard {
 
   /**
    * A function which collects only {@code KeyEvent} events. Use it like so:
-   * {@code Input.keyboardEvents.collect(Keyboard.isKeyEvent).connect(event -> ...);}
+   * {@code Input.keyboardEvents.collect(Keyboard::isKeyEvent).connect(event -> ...);}
    */
-  public static Function<Event, KeyEvent> isKeyEvent =
-    event -> (event instanceof KeyEvent) ? (KeyEvent)event : null;
+  public static KeyEvent isKeyEvent (Event event) {
+    return (event instanceof KeyEvent) ? (KeyEvent)event : null;
+  }
 
   /**
    * A function which collects only {@code TypedEvent} events. Use it like so:
-   * {@code Input.keyboardEvents.collect(Keyboard.isTypedEvent).connect(event -> ...);}
+   * {@code Input.keyboardEvents.collect(Keyboard::isTypedEvent).connect(event -> ...);}
    */
-  public static Function<Event, TypedEvent> isTypedEvent =
-    event -> (event instanceof TypedEvent) ? (TypedEvent)event : null;
+  public static TypedEvent isTypedEvent (Event event) {
+    return (event instanceof TypedEvent) ? (TypedEvent)event : null;
+  }
 
   /**
-   * Returns a collector function for key events for {@code key}. Use it to obtain only events for a
+   * A collector function for key events for {@code key}. Use it to obtain only events for a
    * particular key like so:
+   *
+   * <pre>{@code
+   * Input.keyboardEvents.collect(ev -> Keyboard.isKey(Key.X, ev)).connect(event -> {
+   *   // handle the 'x' key being pressed or released
+   * });
+   * }</pre>
+   */
+  public static KeyEvent isKey (Key key, Event event) {
+    if (event instanceof KeyEvent && ((KeyEvent)event).key == key) {
+      return (KeyEvent)event;
+    } else {
+      return null;
+    }
+  }
+
+  /**
+   * Creates a collector function for key events for {@code key}. Use it to obtain only events for
+   * a particular key like so:
    *
    * <pre>{@code
    * Input.keyboardEvents.collect(Keyboard.isKey(Key.X)).connect(event -> {
@@ -112,12 +131,6 @@ public abstract class Keyboard {
    * }</pre>
    */
   public static Function<Event, KeyEvent> isKey (Key key) {
-    return event -> {
-      if (event instanceof KeyEvent && ((KeyEvent)event).key == key) {
-        return (KeyEvent)event;
-      } else {
-        return null;
-      }
-    };
+    return event -> isKey(key, event);
   }
 }

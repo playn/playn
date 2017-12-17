@@ -126,7 +126,7 @@ public abstract class JavaPlatform extends Platform {
   /** Starts the game loop. This method will not return until the game exits. */
   public void start () {
     if (config.activationKey != null) {
-      input().keyboardEvents.collect(Keyboard.isKeyEvent).connect(event -> {
+      input().keyboardEvents.collect(Keyboard::isKeyEvent).connect(event -> {
         if (event.key == config.activationKey && event.down) {
           toggleActivation();
         }

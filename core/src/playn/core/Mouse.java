@@ -15,8 +15,6 @@
  */
 package playn.core;
 
-import java.util.function.Function;
-
 /**
  * Defines and dispatches mouse events.
  */
@@ -107,22 +105,25 @@ public class Mouse {
 
   /**
    * A function which collects only {@code ButtonEvent} events. Use it like so:
-   * {@code Input.mouseEvents.collect(Mouse.isButtonEvent).connect(event -> ...);}
+   * {@code Input.mouseEvents.collect(Mouse::isButtonEvent).connect(event -> ...);}
    */
-  public static Function<Event, ButtonEvent> isButtonEvent =
-    event -> (event instanceof ButtonEvent) ? (ButtonEvent)event : null;
+  public static ButtonEvent isButtonEvent (Event event) {
+    return (event instanceof ButtonEvent) ? (ButtonEvent)event : null;
+  }
 
   /**
    * A function which collects only {@code MotionEvent} events. Use it like so:
-   * {@code Input.mouseEvents.collect(Mouse.isMotionEvent).connect(event -> ...);}
+   * {@code Input.mouseEvents.collect(Mouse::isMotionEvent).connect(event -> ...);}
    */
-  public static Function<Event, MotionEvent> isMotionEvent =
-    event -> (event instanceof MotionEvent) ? (MotionEvent)event : null;
+  public static MotionEvent isMotionEvent (Event event) {
+    return (event instanceof MotionEvent) ? (MotionEvent)event : null;
+  }
 
   /**
    * A function which collects only {@code WheelEvent} events. Use it like so:
-   * {@code Input.mouseEvents.collect(Mouse.isWheelEvent).connect(event -> ...);}
+   * {@code Input.mouseEvents.collect(Mouse::isWheelEvent).connect(event -> ...);}
    */
-  public static Function<Event, WheelEvent> isWheelEvent =
-    event -> (event instanceof WheelEvent) ? (WheelEvent)event : null;
+  public static WheelEvent isWheelEvent (Event event) {
+    return (event instanceof WheelEvent) ? (WheelEvent)event : null;
+  }
 }
