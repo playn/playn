@@ -128,28 +128,30 @@ public class Input {
   }
 
   protected void emitKeyPress (double time, Key key, boolean down, int flags) {
-    Keyboard.KeyEvent event = new Keyboard.KeyEvent(0, time, key, down);
-    event.setFlag(flags);
-    plat.dispatchEvent(keyboardEvents, event);
+    if (keyboardEnabled) {
+      plat.dispatchEvent(keyboardEvents, new Keyboard.KeyEvent(flags, time, key, down));
+    }
   }
   protected void emitKeyTyped (double time, char keyChar) {
-    plat.dispatchEvent(keyboardEvents, new Keyboard.TypedEvent(0, time, keyChar));
+    if (keyboardEnabled) {
+      plat.dispatchEvent(keyboardEvents, new Keyboard.TypedEvent(0, time, keyChar));
+    }
   }
 
   protected void emitMouseButton (double time, float x, float y, Mouse.ButtonEvent.Id btn,
                                   boolean down, int flags) {
-    Mouse.ButtonEvent event = new Mouse.ButtonEvent(0, time, x, y, btn, down);
-    event.setFlag(flags);
-    plat.dispatchEvent(mouseEvents, event);
+    if (mouseEnabled) {
+      plat.dispatchEvent(mouseEvents, new Mouse.ButtonEvent(flags, time, x, y, btn, down));
+    }
   }
   protected void emitMouseMotion (double time, float x, float y, float dx, float dy, int flags) {
-    Mouse.MotionEvent event = new Mouse.MotionEvent(0, time, x, y, dx, dy);
-    event.setFlag(flags);
-    plat.dispatchEvent(mouseEvents, event);
+    if (mouseEnabled) {
+      plat.dispatchEvent(mouseEvents, new Mouse.MotionEvent(flags, time, x, y, dx, dy));
+    }
   }
   protected void emitMouseWheel (double time, float x, float y, int delta, int flags) {
-    Mouse.WheelEvent event = new Mouse.WheelEvent(0, time, x, y, delta);
-    event.setFlag(flags);
-    plat.dispatchEvent(mouseEvents, event);
+    if (mouseEnabled) {
+      plat.dispatchEvent(mouseEvents, new Mouse.WheelEvent(flags, time, x, y, delta));
+    }
   }
 }

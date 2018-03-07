@@ -171,7 +171,7 @@ public class SWTInput extends JavaInput {
   }
 
   private void emitFakeMouseUp () {
-    mouseEvents.emit(new Mouse.ButtonEvent(0, plat.time(), 0, 0, Mouse.ButtonEvent.Id.LEFT, false));
+    emitMouseButton(plat.time(), 0, 0, Mouse.ButtonEvent.Id.LEFT, false, 0);
   }
 
   private int mods (org.eclipse.swt.widgets.Event event) {

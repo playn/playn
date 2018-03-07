@@ -110,10 +110,11 @@ public class Pointer {
   }
 
   protected void forward (Event.Kind kind, boolean isTouch, playn.core.Event.XY source) {
-    if (!enabled || !events.hasConnections()) return;
-    Event event = new Event(source.flags, source.time, source.x, source.y, kind, isTouch);
-    plat.dispatchEvent(events, event);
-    // TODO: propagate prevent default back to original event
+    if (enabled && events.hasConnections()) {
+      Event event = new Event(source.flags, source.time, source.x, source.y, kind, isTouch);
+      plat.dispatchEvent(events, event);
+      // TODO: propagate prevent default back to original event
+    }
   }
 
   private Platform plat;

@@ -132,6 +132,8 @@ public class AndroidInput extends Input {
   }
 
   boolean onTouch (MotionEvent event) {
+    if (!touchEnabled) return false;
+
     int actionType = event.getActionMasked();
     Touch.Event.Kind kind = (actionType < TO_KIND.length) ? TO_KIND[actionType] : null;
     if (kind != null) {
@@ -153,7 +155,7 @@ public class AndroidInput extends Input {
   }
 
   private void dispatch (final Keyboard.Event event) {
-    plat.exec().invokeLater(new Runnable() {
+    if (keyboardEnabled) plat.exec().invokeLater(new Runnable() {
       @Override public void run() { plat.dispatchEvent(keyboardEvents, event); }
     });
   }

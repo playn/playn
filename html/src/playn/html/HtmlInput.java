@@ -222,7 +222,7 @@ public class HtmlInput extends Input {
   // the dialog was not shown on mouse down, a spurious mouse up is not likely to do much damage; a
   // better devil for sure than failing to deliver a needed mouse up
   private void emitFakeMouseUp () {
-    mouseEvents.emit(new Mouse.ButtonEvent(0, plat.time(), 0, 0, Mouse.ButtonEvent.Id.LEFT, false));
+    emitMouseButton(plat.time(), 0, 0, Mouse.ButtonEvent.Id.LEFT, false, 0);
   }
 
   @Override public native boolean isMouseLocked() /*-{
@@ -338,31 +338,37 @@ public class HtmlInput extends Input {
   }
 
   private void dispatch (Keyboard.Event event, NativeEvent nevent) {
-    try {
-      event.setFlag(mods(nevent));
-      plat.dispatchEvent(keyboardEvents, event);
-    } finally {
-      if (event.isSet(Event.F_PREVENT_DEFAULT)) nevent.preventDefault();
+    if (keyboardEnabled) {
+      try {
+        event.setFlag(mods(nevent));
+        plat.dispatchEvent(keyboardEvents, event);
+      } finally {
+        if (event.isSet(Event.F_PREVENT_DEFAULT)) nevent.preventDefault();
+      }
     }
   }
 
   private void dispatch (Mouse.Event event, NativeEvent nevent) {
-    try {
-      event.setFlag(mods(nevent));
-      plat.dispatchEvent(mouseEvents, event);
-    } finally {
-      if (event.isSet(Event.F_PREVENT_DEFAULT)) nevent.preventDefault();
+    if (mouseEnabled) {
+      try {
+        event.setFlag(mods(nevent));
+        plat.dispatchEvent(mouseEvents, event);
+      } finally {
+        if (event.isSet(Event.F_PREVENT_DEFAULT)) nevent.preventDefault();
+      }
     }
   }
 
   private void dispatch (Touch.Event[] events, NativeEvent nevent) {
-    try {
-      plat.dispatchEvent(touchEvents, events);
-    } finally {
-      // TODO: is there a better alternative to being so extravagant? I don't want to go back to
-      // having all touch events share a mutable Flags instance
-      for (Touch.Event event : events) {
-        if (event.isSet(Event.F_PREVENT_DEFAULT)) nevent.preventDefault();
+    if (touchEnabled) {
+      try {
+        plat.dispatchEvent(touchEvents, events);
+      } finally {
+        // TODO: is there a better alternative to being so extravagant? I don't want to go back to
+        // having all touch events share a mutable Flags instance
+        for (Touch.Event event : events) {
+          if (event.isSet(Event.F_PREVENT_DEFAULT)) nevent.preventDefault();
+        }
       }
     }
   }

@@ -103,16 +103,20 @@ public class RoboInput extends Input {
   }
 
   void onTouchesBegan(NSSet<UITouch> touches, UIEvent event) {
-    plat.dispatchEvent(touchEvents, toEvents(touches, event, Touch.Event.Kind.START));
+    if (touchEnabled) plat.dispatchEvent(
+      touchEvents, toEvents(touches, event, Touch.Event.Kind.START));
   }
   void onTouchesMoved(NSSet<UITouch> touches, UIEvent event) {
-    plat.dispatchEvent(touchEvents, toEvents(touches, event, Touch.Event.Kind.MOVE));
+    if (touchEnabled) plat.dispatchEvent(
+      touchEvents, toEvents(touches, event, Touch.Event.Kind.MOVE));
   }
   void onTouchesEnded(NSSet<UITouch> touches, UIEvent event) {
-    plat.dispatchEvent(touchEvents, toEvents(touches, event, Touch.Event.Kind.END));
+    if (touchEnabled) plat.dispatchEvent(
+      touchEvents, toEvents(touches, event, Touch.Event.Kind.END));
   }
   void onTouchesCancelled(NSSet<UITouch> touches, UIEvent event) {
-    plat.dispatchEvent(touchEvents, toEvents(touches, event, Touch.Event.Kind.CANCEL));
+    if (touchEnabled) plat.dispatchEvent(
+      touchEvents, toEvents(touches, event, Touch.Event.Kind.CANCEL));
   }
 
   private Touch.Event[] toEvents (NSSet<UITouch> touches, UIEvent event, Touch.Event.Kind kind) {
