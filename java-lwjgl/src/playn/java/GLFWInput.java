@@ -51,7 +51,7 @@ public class GLFWInput extends JavaInput {
       double time = System.currentTimeMillis();
       Key key = translateKey(keyCode);
       boolean pressed = action == GLFW_PRESS || action == GLFW_REPEAT;
-      if (key != null) emitKeyPress(time, key, pressed, toModifierFlags(mods));
+      if (key != null) emitKeyPress(toModifierFlags(mods), time, key, pressed);
       else plat.log().warn("Unknown keyCode:" + keyCode);
     }
   };
@@ -61,7 +61,7 @@ public class GLFWInput extends JavaInput {
       Point m = queryCursorPosition();
       ButtonEvent.Id btn = getButton(btnIdx);
       if (btn == null) return;
-      emitMouseButton(time, m.x, m.y, btn, action == GLFW_PRESS, toModifierFlags(mods));
+      emitMouseButton(toModifierFlags(mods), time, m.x, m.y, btn, action == GLFW_PRESS);
     }
   };
   private final GLFWCursorPosCallback cursorPosCallback = new GLFWCursorPosCallback() {
@@ -73,7 +73,7 @@ public class GLFWInput extends JavaInput {
         lastMouseY = y;
       }
       float dx = x - lastMouseX, dy = y - lastMouseY;
-      emitMouseMotion(time, x, y, dx, dy, pollModifierFlags());
+      emitMouseMotion(pollModifierFlags(), time, x, y, dx, dy);
       lastMouseX = x;
       lastMouseY = y;
     }
@@ -84,8 +84,8 @@ public class GLFWInput extends JavaInput {
       double time = System.currentTimeMillis();
       //TODO: is it correct that just simply sets the flag as 0?
       if (GLFW_CURSOR_DISABLED == glfwGetInputMode(window, GLFW_CURSOR))
-      emitMouseMotion(time, m.x, m.y, (float) xoffset, -(float) yoffset, 0);
-      else emitMouseWheel(time, m.x, m.y, yoffset > 0 ? -1 : 1, 0);
+      emitMouseMotion(0, time, m.x, m.y, (float) xoffset, -(float) yoffset);
+      else emitMouseWheel(0, time, m.x, m.y, yoffset > 0 ? -1 : 1);
     }
   };
 

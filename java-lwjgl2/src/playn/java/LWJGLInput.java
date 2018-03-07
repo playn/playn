@@ -80,12 +80,12 @@ public class LWJGLInput extends JavaInput {
 
       if (Keyboard.getEventKeyState()) {
         Key key = translateKey(keyCode);
-        if (key != null) emitKeyPress(time, key, true, flags);
+        if (key != null) emitKeyPress(flags, time, key, true);
         char keyChar = Keyboard.getEventCharacter();
         if (!Character.isISOControl(keyChar)) emitKeyTyped(time, keyChar);
       } else {
         Key key = translateKey(keyCode);
-        if (key != null) emitKeyPress(time, key, false, flags);
+        if (key != null) emitKeyPress(flags, time, key, false);
       }
     }
 
@@ -97,12 +97,12 @@ public class LWJGLInput extends JavaInput {
       int btnIdx = Mouse.getEventButton();
       if (btnIdx >= 0) {
         ButtonEvent.Id btn = getButton(btnIdx);
-        if (btn != null) emitMouseButton(time, m.x, m.y, btn, Mouse.getEventButtonState(), flags);
+        if (btn != null) emitMouseButton(flags, time, m.x, m.y, btn, Mouse.getEventButtonState());
       }
       else {
         int wheel = Mouse.getEventDWheel();
-        if (wheel != 0) emitMouseWheel(time, m.x, m.y, wheel > 0 ? -1 : 1, flags);
-        else emitMouseMotion(time, m.x, m.y, Mouse.getEventDX(), -Mouse.getEventDY(), flags);
+        if (wheel != 0) emitMouseWheel(flags, time, m.x, m.y, wheel > 0 ? -1 : 1);
+        else emitMouseMotion(flags, time, m.x, m.y, Mouse.getEventDX(), -Mouse.getEventDY());
       }
     }
   }

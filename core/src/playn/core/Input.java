@@ -127,7 +127,7 @@ public class Input {
     return Event.Input.modifierFlags(altP, ctrlP, metaP, shiftP);
   }
 
-  protected void emitKeyPress (double time, Key key, boolean down, int flags) {
+  protected void emitKeyPress (int flags, double time, Key key, boolean down) {
     if (keyboardEnabled) {
       plat.dispatchEvent(keyboardEvents, new Keyboard.KeyEvent(flags, time, key, down));
     }
@@ -138,18 +138,18 @@ public class Input {
     }
   }
 
-  protected void emitMouseButton (double time, float x, float y, Mouse.ButtonEvent.Id btn,
-                                  boolean down, int flags) {
+  protected void emitMouseButton (int flags, double time, float x, float y,
+                                  Mouse.ButtonEvent.Id btn, boolean down) {
     if (mouseEnabled) {
       plat.dispatchEvent(mouseEvents, new Mouse.ButtonEvent(flags, time, x, y, btn, down));
     }
   }
-  protected void emitMouseMotion (double time, float x, float y, float dx, float dy, int flags) {
+  protected void emitMouseMotion (int flags, double time, float x, float y, float dx, float dy) {
     if (mouseEnabled) {
       plat.dispatchEvent(mouseEvents, new Mouse.MotionEvent(flags, time, x, y, dx, dy));
     }
   }
-  protected void emitMouseWheel (double time, float x, float y, int delta, int flags) {
+  protected void emitMouseWheel (int flags, double time, float x, float y, int delta) {
     if (mouseEnabled) {
       plat.dispatchEvent(mouseEvents, new Mouse.WheelEvent(flags, time, x, y, delta));
     }

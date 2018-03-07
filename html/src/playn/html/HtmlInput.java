@@ -222,7 +222,7 @@ public class HtmlInput extends Input {
   // the dialog was not shown on mouse down, a spurious mouse up is not likely to do much damage; a
   // better devil for sure than failing to deliver a needed mouse up
   private void emitFakeMouseUp () {
-    emitMouseButton(plat.time(), 0, 0, Mouse.ButtonEvent.Id.LEFT, false, 0);
+    emitMouseButton(0, plat.time(), 0, 0, Mouse.ButtonEvent.Id.LEFT, false);
   }
 
   @Override public native boolean isMouseLocked() /*-{
