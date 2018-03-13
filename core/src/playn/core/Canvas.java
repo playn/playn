@@ -129,10 +129,14 @@ public abstract class Canvas implements Closeable {
   public abstract Canvas clipRect (float x, float y, float width, float height);
 
   /** Creates a path object. */
-  public abstract Path createPath ();
+  public Path createPath () {
+    return gfx.createPath();
+  }
 
   /** Creates a gradient fill pattern. */
-  public abstract Gradient createGradient (Gradient.Config config);
+  public Gradient createGradient (Gradient.Config config) {
+    return gfx.createGradient(config);
+  }
 
   /**
    * Draws {@code image} at the specified location {@code (x, y)}.

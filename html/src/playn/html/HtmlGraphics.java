@@ -177,6 +177,14 @@ public class HtmlGraphics extends Graphics {
     return screenSize;
   }
 
+  @Override public Path createPath() {
+    return new HtmlPath();
+  }
+
+  @Override public Gradient createGradient(Gradient.Config config) {
+    return new HtmlGradient(dummyCtx, config);
+  }
+
   @Override public TextLayout layoutText(String text, TextFormat format) {
     return HtmlTextLayout.layoutText(this, dummyCtx, text, format);
   }

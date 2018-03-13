@@ -80,6 +80,17 @@ public abstract class JavaGraphics extends Graphics {
    */
   public abstract void setSize (int width, int height, boolean fullscreen);
 
+  @Override
+  public Path createPath() {
+    return new JavaPath();
+  }
+
+  @Override public Gradient createGradient(Gradient.Config cfg) {
+    if (cfg instanceof Gradient.Linear) return JavaGradient.create((Gradient.Linear)cfg);
+    else if (cfg instanceof Gradient.Radial) return JavaGradient.create((Gradient.Radial)cfg);
+    else throw new IllegalArgumentException("Unknown config: " + cfg);
+  }
+
   @Override public TextLayout layoutText(String text, TextFormat format) {
     return JavaTextLayout.layoutText(this, text, format);
   }

@@ -111,6 +111,12 @@ public abstract class Graphics {
     return createCanvas(size.width(), size.height());
   }
 
+  /** Creates a {@link Path} object. */
+  public abstract Path createPath ();
+
+  /** Creates a {@link Gradient} fill pattern. */
+  public abstract Gradient createGradient (Gradient.Config config);
+
   /**
    * Creates an empty texture into which one can render. The supplied width and height are in
    * display units and will be converted to pixels based on the current scale factor.

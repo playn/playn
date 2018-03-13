@@ -161,6 +161,14 @@ public class AndroidGraphics extends Graphics {
     return createCanvasImpl(scale, scale.scaledCeil(width), scale.scaledCeil(height));
   }
 
+  @Override public Path createPath() {
+    return new AndroidPath();
+  }
+
+  @Override public Gradient createGradient(Gradient.Config cfg) {
+    return new AndroidGradient(cfg);
+  }
+
   @Override public TextLayout layoutText(String text, TextFormat format) {
     return AndroidTextLayout.layoutText(this, text, format);
   }
