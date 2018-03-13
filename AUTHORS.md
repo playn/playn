@@ -32,6 +32,7 @@ Along the way, various contributions large and small have come from members
 of the PlayN community:
 
 * a.korzhevskiy (gmail.com) - Andrei Korzhevskii
+* guille.rodriguez <gmail.com> - Guillermo Rodriguez
 * inder123 (gmail.com) - Inderjeet Singh
 * kirkkohler (hotmail.com) - kirkkohler
 * leochatain (gmail.com) - Leo Chatain
