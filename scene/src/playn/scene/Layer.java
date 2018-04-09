@@ -149,9 +149,14 @@ public abstract class Layer implements Closeable {
     return name;
   }
 
-  /** Sets the name of this layer. See {@link #name}. */
-  public void setName (String name) {
+  /**
+   * Sets the name of this layer. See {@link #name}.
+   *
+   * @return a reference to this layer for call chaining.
+   */
+  public Layer setName (String name) {
     this.name = name;
+    return this;
   }
 
   /** Returns the layer that contains this layer, or {@code null}. */
