@@ -143,7 +143,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-compiler-plugin</artifactId>
-          <version>3.3</version>
+          <version>3.7.0</version>
           <configuration>
             <source>${source.level}</source>
             <target>${source.level}</target>
@@ -220,6 +220,27 @@
           <url>${deploy-local.dir}</url>
         </snapshotRepository>
       </distributionManagement>
+    </profile>
+
+    <!-- Produce Java 8 compatible bytecode -->
+    <profile>
+      <id>java-9</id>
+      <activation>
+        <jdk>9</jdk>
+      </activation>
+      <build>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-compiler-plugin</artifactId>
+              <configuration>
+                <release>8</release>
+              </configuration>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+      </build>
     </profile>
 
     <!-- this shuts m2eclipse up about various Maven plugins -->
