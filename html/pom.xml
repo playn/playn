@@ -115,23 +115,37 @@
           </sourceFileExcludes>
         </configuration>
       </plugin>
-
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>gwt-maven-plugin</artifactId>
-        <configuration>
-          <mode>htmlunit</mode>
-          <sourceLevel>auto</sourceLevel>
-          <extraJvmArgs>-mx1024m</extraJvmArgs>
-        </configuration>
-        <executions>
-          <execution>
-            <goals>
-              <goal>test</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
     </plugins>
   </build>
+
+  <profiles>
+    <!-- Only run GWT tests on JDK 1.8 and earlier (not JDK 9) -->
+    <!-- TODO: when GWT 2.8.3 is released, we can remove this guard -->
+    <profile>
+      <id>java-below-9</id>
+      <activation>
+        <jdk>(,1.8]</jdk>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>gwt-maven-plugin</artifactId>
+            <configuration>
+              <mode>htmlunit</mode>
+              <sourceLevel>auto</sourceLevel>
+              <extraJvmArgs>-mx1024m</extraJvmArgs>
+            </configuration>
+            <executions>
+              <execution>
+                <goals>
+                  <goal>test</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 </project>
