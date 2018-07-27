@@ -115,9 +115,6 @@ public abstract class GameActivity extends Activity {
   @Override
   protected void onDestroy() {
     AndroidPlatform.debugLog("onDestroy");
-    for (File file : getCacheDir().listFiles()) {
-      file.delete();
-    }
     platform.audio().onDestroy();
     platform.onExit();
     super.onDestroy();
