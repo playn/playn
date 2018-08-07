@@ -182,8 +182,8 @@ public abstract class Image extends TileSource implements Canvas.Drawable, Close
   }
 
   /** Disposes this image's default texture, if it has been already created. */
-  public void close() {
-    if (texture != null && !texture.disposed()) texture.close();
+  public void close () {
+    if (texture != null) texture.close();
   }
 
   /** A region of an image which can be rendered to {@link Canvas}es and turned into a texture
