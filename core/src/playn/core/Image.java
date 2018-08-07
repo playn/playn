@@ -15,6 +15,7 @@
  */
 package playn.core;
 
+import react.Closeable;
 import react.Function;
 import react.RFuture;
 import react.Try;
@@ -23,7 +24,7 @@ import react.Try;
  * Bitmapped image data. May be loaded via {@link Assets} or created dynamically as in the backing
  * image for a {@link Canvas}.
  */
-public abstract class Image extends TileSource implements Canvas.Drawable {
+public abstract class Image extends TileSource implements Canvas.Drawable, Closeable {
 
   /** Reports the asynchronous loading of this image. This will be completed with success or
     * failure when the image's asynchronous load completes. */
@@ -178,6 +179,11 @@ public abstract class Image extends TileSource implements Canvas.Drawable {
                               scale(), width(), height());
     tex.update(this); // this will handle non-POT source image conversion
     return tex;
+  }
+
+  /** Disposes this image's default texture, if it has been already created. */
+  public void close() {
+    if (texture != null && !texture.disposed()) texture.close();
   }
 
   /** A region of an image which can be rendered to {@link Canvas}es and turned into a texture
