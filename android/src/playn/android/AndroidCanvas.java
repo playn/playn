@@ -63,7 +63,7 @@ public class AndroidCanvas extends Canvas {
   }
 
   @Override public Canvas clearRect(float x, float y, float width, float height) {
-    canvas.save(android.graphics.Canvas.CLIP_SAVE_FLAG);
+    canvas.save();
     canvas.clipRect(x, y, x + width, y + height);
     // drawColor: "Fill the entire canvas' bitmap (restricted to the current clip) with the
     // specified color and porter-duff xfermode."
