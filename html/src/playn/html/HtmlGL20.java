@@ -798,14 +798,8 @@ public final class HtmlGL20 extends GL20 {
     }
   }
 
-
   @Override
-  public void glGetActiveAttrib(int program, int index, int bufsize, IntBuffer length, IntBuffer size, IntBuffer type, ByteBuffer name) {
-    throw new RuntimeException("NYI glGetActiveAttrib");
-  }
-
-  @Override
-  public void glGetActiveAttrib(int program, int index, int bufsize, int[] length, int lengthOffset, int[] size, int sizeOffset, int[] type, int typeOffset, byte[] name, int nameOffset) {
+  public String glGetActiveAttrib(int program, int index, IntBuffer size, IntBuffer type) {
     throw new RuntimeException("NYI glGetActiveAttrib");
   }
 
@@ -820,12 +814,7 @@ public final class HtmlGL20 extends GL20 {
   }
 
   @Override
-  public void glGetActiveUniform(int program, int index, int bufsize, IntBuffer length, IntBuffer size, IntBuffer type, ByteBuffer name) {
-    throw new RuntimeException("NYI glGetActiveUniform");
-  }
-
-  @Override
-  public void glGetActiveUniform(int program, int index, int bufsize, int[] length, int lengthOffset, int[] size, int sizeOffset, int[] type, int typeOffset, byte[] name, int nameOffset) {
+  public String glGetActiveUniform(int program, int index, IntBuffer size, IntBuffer type) {
     throw new RuntimeException("NYI glGetActiveUniform");
   }
 

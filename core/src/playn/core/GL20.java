@@ -813,10 +813,8 @@ public abstract class GL20 {
   public abstract void glGenRenderbuffers (int n, IntBuffer renderbuffers);
   public abstract void glGenTextures (int n, IntBuffer textures);
 
-  public abstract void glGetActiveAttrib (int program, int index, int bufsize, int[] length, int lengthOffset, int[] size, int sizeOffset, int[] type, int typeOffset, byte[] name, int nameOffset);
-  public abstract void glGetActiveAttrib (int program, int index, int bufsize, IntBuffer length, IntBuffer size, IntBuffer type, ByteBuffer name);
-  public abstract void glGetActiveUniform (int program, int index, int bufsize, int[] length, int lengthOffset, int[] size, int sizeOffset, int[] type, int typeOffset, byte[] name, int nameOffset);
-  public abstract void glGetActiveUniform (int program, int index, int bufsize, IntBuffer length, IntBuffer size, IntBuffer type, ByteBuffer name);
+  public abstract String glGetActiveAttrib (int program, int index, IntBuffer size, IntBuffer type);
+  public abstract String glGetActiveUniform (int program, int index, IntBuffer size, IntBuffer type);
   public abstract void glGetAttachedShaders (int program, int maxcount, IntBuffer count, IntBuffer shaders);
   public abstract int glGetAttribLocation (int program, String name);
   public abstract boolean glGetBoolean (int pname);

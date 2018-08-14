@@ -237,16 +237,10 @@ public class RoboGL20 extends GL20 {
   @Override public void glGenTextures(int n, IntBuffer textures) {
     OpenGLES.glGenTextures(n, textures);
   }
-  @Override public void glGetActiveAttrib(int program, int index, int bufsize, int[] length, int lengthOffset, int[] size, int sizeOffset, int[] type, int typeOffset, byte[] name, int nameOffset) {
+  @Override public String glGetActiveAttrib(int program, int index, IntBuffer size, IntBuffer type) {
     throw new RuntimeException("Not implemented");
   }
-  @Override public void glGetActiveAttrib(int program, int index, int bufsize, IntBuffer length, IntBuffer size, IntBuffer type, ByteBuffer name) {
-    throw new RuntimeException("Not implemented");
-  }
-  @Override public void glGetActiveUniform(int program, int index, int bufsize, int[] length, int lengthOffset, int[] size, int sizeOffset, int[] type, int typeOffset, byte[] name, int nameOffset) {
-    throw new RuntimeException("Not implemented");
-  }
-  @Override public void glGetActiveUniform(int program, int index, int bufsize, IntBuffer length, IntBuffer size, IntBuffer type, ByteBuffer name) {
+  @Override public String glGetActiveUniform(int program, int index, IntBuffer size, IntBuffer type) {
     throw new RuntimeException("Not implemented");
   }
   @Override public void glGetAttachedShaders(int program, int maxcount, IntBuffer count, IntBuffer shaders) {

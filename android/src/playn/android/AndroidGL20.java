@@ -436,36 +436,13 @@ public class AndroidGL20 extends GL20 {
   }
 
   @Override
-  public void glGetActiveAttrib(int program, int index, int bufsize, int[] length,
-      int lengthOffset, int[] size, int sizeOffset, int[] type, int typeOffset, byte[] name,
-      int nameOffset) {
-    GLES20.glGetActiveAttrib(program, index, bufsize, length, lengthOffset, size, sizeOffset, type,
-        typeOffset, name, nameOffset);
-
+  public String glGetActiveAttrib(int program, int index, IntBuffer size, IntBuffer type) {
+    throw new RuntimeException("Not implemented");
   }
 
   @Override
-  public void glGetActiveAttrib(int program, int index, int bufsize, IntBuffer length,
-      IntBuffer size, IntBuffer type, ByteBuffer name) {
-    int namePos = name.position();
-    GLES20.glGetActiveAttrib(program, index, bufsize, length, size, type, name.get());
-    name.position(namePos);
-  }
-
-  @Override
-  public void glGetActiveUniform(int program, int index, int bufsize, int[] length,
-      int lengthOffset, int[] size, int sizeOffset, int[] type, int typeOffset, byte[] name,
-      int nameOffset) {
-    GLES20.glGetActiveUniform(program, index, bufsize, length, lengthOffset, size, sizeOffset,
-        type, typeOffset, name, nameOffset);
-  }
-
-  @Override
-  public void glGetActiveUniform(int program, int index, int bufsize, IntBuffer length,
-      IntBuffer size, IntBuffer type, ByteBuffer name) {
-    int namePos = name.position();
-    GLES20.glGetActiveUniform(program, index, bufsize, length, size, type, name.get());
-    name.position(namePos);
+  public String glGetActiveUniform(int program, int index, IntBuffer size, IntBuffer type) {
+    throw new RuntimeException("Not implemented");
   }
 
   @Override

@@ -1053,69 +1053,29 @@ final class LWJGLGL20 extends playn.core.GL20 {
   }
 
   @Override
-  public void glGetActiveAttrib(int program, int index, int bufsize, int[] length, int lengthOffset,
-                                int[] size, int sizeOffset, int[] type, int typeOffset,
-                                byte[] name, int nameOffset) {
-    // http://www.khronos.org/opengles/sdk/docs/man/xhtml/glGetActiveAttrib.xml
-    // Returns length, size, type, name
-    bufs.resizeIntBuffer(2);
-
-    // Return name, length
-    final String nameString = GL20.glGetActiveAttrib(program, index, bufsize, bufs.intBuffer);
-    try {
-      final byte[] nameBytes = nameString.getBytes("UTF-8");
-      final int nameLength = nameBytes.length - nameOffset;
-      bufs.setByteBuffer(nameBytes, nameOffset, nameLength);
-      bufs.byteBuffer.get(name, nameOffset, nameLength);
-      length[lengthOffset] = nameLength;
-    } catch (UnsupportedEncodingException e) {
-      e.printStackTrace();
-    }
-
-    // Return size, type
-    bufs.intBuffer.get(size, 0, 1);
-    bufs.intBuffer.get(type, 0, 1);
+  public String glGetActiveAttrib(int program, int index, IntBuffer size, IntBuffer type) {
+    IntBuffer sizeType = BufferUtils.createIntBuffer(2);
+    String result = GL20.glGetActiveAttrib(program, index, 256, type);
+    int typePos = type.position();
+    type.put(sizeType.get(0));
+    type.position(typePos);
+    int sizePos = size.position();
+    size.put(sizeType.get(1));
+    size.position(sizePos);
+    return result;
   }
 
   @Override
-  public void glGetActiveAttrib(int program, int index, int bufsize,
-                                IntBuffer length, IntBuffer size, IntBuffer type, ByteBuffer name) {
-    IntBuffer typeTmp = BufferUtils.createIntBuffer(2);
-    GL20.glGetActiveAttrib(program, index, 256, typeTmp);
-    type.put(typeTmp.get(0));
-    type.rewind();
-  }
-
-  @Override
-  public void glGetActiveUniform(int program, int index, int bufsize,
-                                 int[] length, int lengthOffset, int[] size, int sizeOffset,
-                                 int[] type, int typeOffset, byte[] name, int nameOffset) {
-    bufs.resizeIntBuffer(2);
-
-    // Return name, length
-    final String nameString = GL20.glGetActiveUniform(program, index, 256, bufs.intBuffer);
-    try {
-      final byte[] nameBytes = nameString.getBytes("UTF-8");
-      final int nameLength = nameBytes.length - nameOffset;
-      bufs.setByteBuffer(nameBytes, nameOffset, nameLength);
-      bufs.byteBuffer.get(name, nameOffset, nameLength);
-      length[lengthOffset] = nameLength;
-    } catch (UnsupportedEncodingException e) {
-      e.printStackTrace();
-    }
-
-    // Return size, type
-    bufs.intBuffer.get(size, 0, 1);
-    bufs.intBuffer.get(type, 0, 1);
-  }
-
-  @Override
-  public void glGetActiveUniform(int program, int index, int bufsize, IntBuffer length,
-                                 IntBuffer size, IntBuffer type, ByteBuffer name) {
-    IntBuffer typeTmp = BufferUtils.createIntBuffer(2);
-    GL20.glGetActiveAttrib(program, index, 256, typeTmp);
-    type.put(typeTmp.get(0));
-    type.rewind();
+  public String glGetActiveUniform(int program, int index, IntBuffer size, IntBuffer type) {
+    IntBuffer sizeType = BufferUtils.createIntBuffer(2);
+    String result = GL20.glGetActiveAttrib(program, index, 256, sizeType);
+    int typePos = type.position();
+    type.put(sizeType.get(0));
+    type.position(typePos);
+    int sizePos = size.position();
+    size.put(sizeType.get(1));
+    size.position(sizePos);
+    return result;
   }
 
   @Override
