@@ -226,7 +226,7 @@
     <profile>
       <id>java-9</id>
       <activation>
-        <jdk>9</jdk>
+        <jdk>[9,)</jdk>
       </activation>
       <build>
         <pluginManagement>
