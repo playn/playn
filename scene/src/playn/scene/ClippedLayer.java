@@ -86,8 +86,16 @@ public abstract class ClippedLayer extends Layer {
       tx.transform(pos.set(-originX, -originY), pos);
       tx.transform(size.set(width, height), size);
       tx.translate(-originX, -originY);
+      if (size.x < 0) {
+        size.x = -size.x;
+        pos.x -= size.x;
+      }
+      if (size.y < 0) {
+        size.y = -size.y;
+        pos.y -= size.y;
+      }
       boolean nonEmpty = surf.startClipped(
-        (int)pos.x, (int)pos.y, Math.round(Math.abs(size.x)), Math.round(Math.abs(size.y)));
+        (int)pos.x, (int)pos.y, Math.round(size.x), Math.round(size.y));
       try {
         if (nonEmpty) paintClipped(surf);
       } finally {
