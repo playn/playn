@@ -32,12 +32,12 @@ public class AndroidStorage implements Storage {
 
   @Override
   public void setItem(String key, String data) throws RuntimeException {
-    settings.edit().putString(key, data).commit();
+    settings.edit().putString(key, data).apply();
   }
 
   @Override
   public void removeItem(String key) {
-    settings.edit().remove(key).commit();
+    settings.edit().remove(key).apply();
   }
 
   @Override
@@ -59,7 +59,7 @@ public class AndroidStorage implements Storage {
         edit.remove(key);
       }
       @Override protected void onAfterCommit() {
-        edit.commit();
+        edit.apply();
         edit = null;
       }
     };
