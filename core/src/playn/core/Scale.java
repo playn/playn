@@ -96,6 +96,15 @@ public class Scale {
   }
 
   /**
+   * Rounds the supplied length to the nearest length value that corresponds to an integer
+   * pixel length after the scale factor is applied. For example, for a scale factor of 3,
+   * scale.roundToNearestPixel(8.4) = 8.33, which corresponds to exactly (8.33 * 3)= 25 pixels.
+   */
+  public float roundToNearestPixel(float length) {
+    return MathUtil.round(length * factor) / factor;
+  }
+  
+  /**
    * Returns an ordered series of scaled resources to try when loading an asset. The highest
    * (presumably native) resolution will be tried first, then that will be stepped down to all
    * whole integers less than the native resolution. Often this is simply {@code 2, 1}, but on a
