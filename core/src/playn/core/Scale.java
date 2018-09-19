@@ -103,7 +103,7 @@ public class Scale {
   public float roundToNearestPixel(float length) {
     return MathUtil.round(length * factor) / factor;
   }
-  
+
   /**
    * Returns an ordered series of scaled resources to try when loading an asset. The highest
    * (presumably native) resolution will be tried first, then that will be stepped down to all
