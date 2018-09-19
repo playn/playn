@@ -15,18 +15,13 @@
  */
 package playn.android;
 
-import java.io.File;
-
 import android.app.Activity;
-import android.app.ActivityManager;
 import android.app.AlertDialog;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
-import android.content.res.Configuration;
 import android.graphics.Bitmap;
-import android.graphics.PixelFormat;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.KeyEvent;
@@ -168,18 +163,11 @@ public abstract class GameActivity extends Activity {
 
   /**
    * Returns the configuration that will be used to decode bitmaps. The default implementation uses
-   * {@code ARGB_8888} unless the device memory class is 16MB or less or the device screen is
-   * itself {@code ARGB_4444}. NOTE: this is called once during platform initialization and the
-   * result is used for the lifetime of the game.
+   * {@code ARGB_8888}. NOTE: this is called once during platform initialization and the result is
+   * used for the lifetime of the game.
    */
   protected Bitmap.Config preferredBitmapConfig() {
-    ActivityManager activityManager = (ActivityManager)
-      getApplication().getSystemService(Context.ACTIVITY_SERVICE);
-    int memoryClass = activityManager.getMemoryClass();
-    int format = getWindowManager().getDefaultDisplay().getPixelFormat();
-    // for low memory devices (like the HTC Magic), prefer 16-bit bitmaps
-    return (format == PixelFormat.RGBA_4444 || memoryClass <= 16) ?
-      Bitmap.Config.ARGB_4444 : Bitmap.Config.ARGB_8888;
+    return Bitmap.Config.ARGB_8888;
   }
 
   protected float scaleFactor() {
