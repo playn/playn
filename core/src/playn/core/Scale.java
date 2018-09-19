@@ -105,16 +105,18 @@ public class Scale {
   }
 
   /**
-   * Returns an ordered series of scaled resources to try when loading an asset. The highest
-   * (presumably native) resolution will be tried first, then that will be stepped down to all
-   * whole integers less than the native resolution. Often this is simply {@code 2, 1}, but on a
-   * Retina iPad, it could be {@code 4, 3, 2, 1}, and on Android devices it may often be something
-   * like {@code 3, 2, 1} or {@code 2.5, 2, 1}.
+   * Returns an ordered series of scaled resources to try when loading an asset. The native
+   * resolution will be tried first, then that will be rounded up to the nearest whole integer and
+   * stepped down through all whole integers to {@code 1}. If the native scale factor is {@code 2},
+   * this will yield {@code 2, 1}. If the native scale factor is {@code 4}, this will yield
+   * {@code 4, 3, 2, 1}. Android devices often have fractional scale factors, which demonstrates
+   * the rounding up then back down approach: a native scale factor of {@code 2.5} would yield
+   * {@code 2.5, 3, 2, 1}.
    */
   public List<ScaledResource> getScaledResources(String path) {
     List<ScaledResource> rsrcs = new ArrayList<ScaledResource>();
     rsrcs.add(new ScaledResource(this, computePath(path, factor)));
-    for (float rscale = MathUtil.ifloor(factor); rscale > 1; rscale -= 1) {
+    for (float rscale = MathUtil.iceil(factor); rscale > 1; rscale -= 1) {
       if (rscale != factor) rsrcs.add(
         new ScaledResource(new Scale(rscale), computePath(path, rscale)));
     }
