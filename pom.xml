@@ -55,7 +55,7 @@
     <source.level>1.7</source.level>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <android.version>4.1.1.4</android.version>
-    <android.maven.version>4.2.1</android.maven.version>
+    <android.maven.version>4.5.0</android.maven.version>
     <swt.version>4.5.1</swt.version>
     <gwt.version>2.8.1</gwt.version>
     <jbox2d.version>2.2.1.1</jbox2d.version>
