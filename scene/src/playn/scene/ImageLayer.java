@@ -93,10 +93,10 @@ public class ImageLayer extends Layer {
   public ImageLayer setTile (Tile tile) {
     // avoid releasing and rereferencing texture if nothing changes
     if (this.tile != tile) {
+      if (tile != null) tile.texture().reference();
       if (this.tile != null) this.tile.texture().release();
       this.tile = tile;
       checkOrigin();
-      if (tile != null) tile.texture().reference();
     }
     return this;
   }
