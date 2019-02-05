@@ -91,8 +91,10 @@ public class ImageLayer extends Layer {
    * layers for some reason.
    */
   public ImageLayer setTile (Tile tile) {
-    // avoid releasing and rereferencing texture if nothing changes
+    // avoid releasing and rereferencing the texture if the same tile is set
     if (this.tile != tile) {
+      // reference the new texture before we release the old one; this avoids spurious freeing and
+      // recreation when the old and new tile are derived from the same texture
       if (tile != null) tile.texture().reference();
       if (this.tile != null) this.tile.texture().release();
       this.tile = tile;
