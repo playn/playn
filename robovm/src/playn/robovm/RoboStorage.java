@@ -29,23 +29,25 @@ import org.robovm.apple.foundation.NSSearchPathDomainMask;
 
 import playn.core.BatchImpl;
 import playn.core.Storage;
+import playn.core.Log;
 
 public class RoboStorage implements Storage {
 
-  private final RoboPlatform platform;
+  private final Log log;
   private final Connection conn;
 
   public RoboStorage(RoboPlatform platform) {
-    this.platform = platform;
-    this.conn = init(platform.config.storageFileName);
+    this(platform.log(), platform.config.storageFileName);
   }
 
   public RoboStorage(String storageFileName) {
-    this.platform = null;
-    this.conn = init(storageFileName);
+    this(new Log() {
+      @Override protected void logImpl (Level level, String msg, Throwable e) {} // noop!
+    }, storageFileName);
   }
 
-  private Connection init(String storageFileName) {
+  private RoboStorage(Log log, String storageFileName) {
+    this.log = log;
     String dbDir = null;
     try {
       // we access SqlLite via JDBC... egads
@@ -61,8 +63,8 @@ public class RoboStorage implements Storage {
       File dbFile = new File(dbDir, storageFileName);
       dbFile.getParentFile().mkdirs();
 
-      logInfo("Using db in file: " + dbFile.getAbsolutePath());
-      Connection conn = DriverManager.getConnection("jdbc:sqlite:" + dbFile.getAbsolutePath());
+      log.info("Using db in file: " + dbFile.getAbsolutePath());
+      this.conn = DriverManager.getConnection("jdbc:sqlite:" + dbFile.getAbsolutePath());
 
       // create our schema if needed
       try (Statement stmt = conn.createStatement()) {
@@ -70,22 +72,8 @@ public class RoboStorage implements Storage {
           "Data (DataKey ntext PRIMARY KEY, DataValue ntext NOT NULL)");
       }
 
-      return conn;
-
     } catch (SQLException sqe) {
       throw new RuntimeException("Failed to initialize storage [dbDir=" + dbDir + "]", sqe);
-    }
-  }
-
-  protected void logInfo(String message) {
-    if (platform != null) {
-      platform.log().info(message);
-    }
-  }
-
-  protected void logWarning(String message) {
-    if (platform != null) {
-      platform.log().warn(message);
     }
   }
 
@@ -145,7 +133,7 @@ public class RoboStorage implements Storage {
         istmt.setString(1, key);
         istmt.setString(2, value);
         if (istmt.executeUpdate() == 0) {
-          logWarning("Failed to insert storage item [key=" + key + "]");
+          log.warn("Failed to insert storage item [key=" + key + "]");
         }
       }
 
