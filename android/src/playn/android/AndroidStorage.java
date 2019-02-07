@@ -27,7 +27,11 @@ public class AndroidStorage implements Storage {
   private SharedPreferences settings;
 
   public AndroidStorage(AndroidPlatform platform) {
-    this.settings = platform.activity.getSharedPreferences(platform.activity.prefsName(), 0);
+    this(platform.activity.getSharedPreferences(platform.activity.prefsName(), 0));
+  }
+
+  public AndroidStorage(SharedPreferences sharedPrefs) {
+    this.settings = sharedPrefs;
   }
 
   @Override

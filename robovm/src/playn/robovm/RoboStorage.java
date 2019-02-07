@@ -37,7 +37,15 @@ public class RoboStorage implements Storage {
 
   public RoboStorage(RoboPlatform platform) {
     this.platform = platform;
+    this.conn = init(platform.config.storageFileName);
+  }
 
+  public RoboStorage(String storageFileName) {
+    this.platform = null;
+    this.conn = init(storageFileName);
+  }
+
+  private Connection init(String storageFileName) {
     String dbDir = null;
     try {
       // we access SqlLite via JDBC... egads
@@ -50,11 +58,11 @@ public class RoboStorage implements Storage {
       dbDir = NSFileManager.getDefaultManager().getURLsForDirectory(
         NSSearchPathDirectory.DocumentDirectory,
         NSSearchPathDomainMask.UserDomainMask).get(0).getPath();
-      File dbFile = new File(dbDir, platform.config.storageFileName);
+      File dbFile = new File(dbDir, storageFileName);
       dbFile.getParentFile().mkdirs();
 
-      platform.log().info("Using db in file: " + dbFile.getAbsolutePath());
-      conn = DriverManager.getConnection("jdbc:sqlite:" + dbFile.getAbsolutePath());
+      logInfo("Using db in file: " + dbFile.getAbsolutePath());
+      Connection conn = DriverManager.getConnection("jdbc:sqlite:" + dbFile.getAbsolutePath());
 
       // create our schema if needed
       try (Statement stmt = conn.createStatement()) {
@@ -62,8 +70,22 @@ public class RoboStorage implements Storage {
           "Data (DataKey ntext PRIMARY KEY, DataValue ntext NOT NULL)");
       }
 
+      return conn;
+
     } catch (SQLException sqe) {
       throw new RuntimeException("Failed to initialize storage [dbDir=" + dbDir + "]", sqe);
+    }
+  }
+
+  protected void logInfo(String message) {
+    if (platform != null) {
+      platform.log().info(message);
+    }
+  }
+
+  protected void logWarning(String message) {
+    if (platform != null) {
+      platform.log().warn(message);
     }
   }
 
@@ -123,7 +145,7 @@ public class RoboStorage implements Storage {
         istmt.setString(1, key);
         istmt.setString(2, value);
         if (istmt.executeUpdate() == 0) {
-          platform.log().warn("Failed to insert storage item [key=" + key + "]");
+          logWarning("Failed to insert storage item [key=" + key + "]");
         }
       }
 
