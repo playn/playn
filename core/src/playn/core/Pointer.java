@@ -75,45 +75,78 @@ public class Pointer {
 
     // if this platform supports touch events, use those
     if (plat.input().hasTouch()) {
-      plat.input().touchEvents.connect(new Slot<Touch.Event[]>() {
+      class TouchConverter {
         private int active = -1;
-        @Override public void onEmit (Touch.Event[] events) {
-          for (Touch.Event event : events) {
-            if (active == -1 && event.kind.isStart) active = event.id;
-            if (event.id == active) {
-              forward(Event.Kind.values()[event.kind.ordinal()], true, event);
-              if (event.kind.isEnd) active = -1;
+        public Slot<Touch.Event[]> onTouch = new Slot<Touch.Event[]>() {
+          @Override public void onEmit (Touch.Event[] events) {
+            for (Touch.Event event : events) {
+              if (active == -1 && event.kind.isStart) active = event.id;
+              if (event.id == active) {
+                forward(event, Event.Kind.values()[event.kind.ordinal()], true);
+                if (event.kind.isEnd) active = -1;
+              }
             }
           }
-        }
-      });
+        };
+        // if the app loses focus, cancel any in progress pointer interaction
+        public Slot<Boolean> onFocus = new Slot<Boolean>() {
+          @Override public void onEmit (Boolean focus) {
+            if (!focus && active != -1) {
+              forward(0, 0L, 0, 0, Event.Kind.CANCEL, true);
+              active = -1;
+            }
+          }
+        };
+      }
+      TouchConverter tc = new TouchConverter();
+      plat.input().touchEvents.connect(tc.onTouch);
+      plat.input().focus.connect(tc.onFocus);
     }
     // otherwise use mouse events if it has those
     else if (plat.input().hasMouse()) {
-      plat.input().mouseEvents.connect(new Slot<Mouse.Event>() {
+      class MouseConverter {
         private boolean dragging;
-        @Override public void onEmit (Mouse.Event event) {
-          if (event instanceof Mouse.MotionEvent) {
-            if (dragging) forward(Event.Kind.DRAG, false, event);
-          } else if (event instanceof Mouse.ButtonEvent) {
-            Mouse.ButtonEvent bevent = (Mouse.ButtonEvent)event;
-            if (bevent.button == Mouse.ButtonEvent.Id.LEFT) {
-              dragging = bevent.down;
-              forward(bevent.down ? Event.Kind.START : Event.Kind.END, false, bevent);
+        public Slot<Mouse.Event> onMouse = new Slot<Mouse.Event>() {
+          @Override public void onEmit (Mouse.Event event) {
+            if (event instanceof Mouse.MotionEvent) {
+              if (dragging) forward(event, Event.Kind.DRAG, false);
+            } else if (event instanceof Mouse.ButtonEvent) {
+              Mouse.ButtonEvent bevent = (Mouse.ButtonEvent)event;
+              if (bevent.button == Mouse.ButtonEvent.Id.LEFT) {
+                dragging = bevent.down;
+                forward(bevent, bevent.down ? Event.Kind.START : Event.Kind.END, false);
+              }
             }
           }
-        }
-      });
+        };
+        // if the app loses focus, cancel any in progress pointer interaction
+        public Slot<Boolean> onFocus = new Slot<Boolean>() {
+          @Override public void onEmit (Boolean focus) {
+            if (!focus && dragging) {
+              forward(0, 0L, 0, 0, Event.Kind.CANCEL, true);
+              dragging = false;
+            }
+          }
+        };
+      }
+      MouseConverter mc = new MouseConverter();
+      plat.input().mouseEvents.connect(mc.onMouse);
+      plat.input().focus.connect(mc.onFocus);
     }
     // otherwise complain because what's going on?
     else plat.log().warn("Platform has neither mouse nor touch events?", "type", plat.type());
   }
 
-  protected void forward (Event.Kind kind, boolean isTouch, playn.core.Event.XY source) {
+  protected void forward (playn.core.Event.XY source, Event.Kind kind, boolean isTouch) {
+    forward(source.flags, source.time, source.x, source.y, kind, isTouch);
+    // TODO: propagate prevent default back to original event?
+  }
+
+  protected void forward (int flags, double time, float x, float y,
+                          Event.Kind kind, boolean isTouch) {
     if (enabled && events.hasConnections()) {
-      Event event = new Event(source.flags, source.time, source.x, source.y, kind, isTouch);
+      Event event = new Event(flags, time, x, y, kind, isTouch);
       plat.dispatchEvent(events, event);
-      // TODO: propagate prevent default back to original event
     }
   }
 
