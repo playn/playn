@@ -33,20 +33,14 @@ import playn.core.Log;
 
 public class RoboStorage implements Storage {
 
-  protected final Log log;
-  protected final Connection conn;
+  private final Log log;
+  private final Connection conn;
 
   public RoboStorage(RoboPlatform platform) {
     this(platform.log(), platform.config.storageFileName);
   }
 
-  public RoboStorage(String storageFileName) {
-    this(new Log() {
-      @Override protected void logImpl (Level level, String msg, Throwable e) {} // noop!
-    }, storageFileName);
-  }
-
-  private RoboStorage(Log log, String storageFileName) {
+  public RoboStorage(Log log, String storageFileName) {
     this.log = log;
     String dbDir = null;
     try {
