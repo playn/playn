@@ -33,8 +33,8 @@ import playn.core.Log;
 
 public class RoboStorage implements Storage {
 
-  private final Log log;
-  private final Connection conn;
+  protected final Log log;
+  protected final Connection conn;
 
   public RoboStorage(RoboPlatform platform) {
     this(platform.log(), platform.config.storageFileName);
