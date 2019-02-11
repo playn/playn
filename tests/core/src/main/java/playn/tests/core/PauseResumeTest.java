@@ -23,7 +23,7 @@ import playn.scene.*;
 import react.Slot;
 
 /**
- * Tests pause/resume notifications.
+ * Tests focus lost/gained and app paused/resumed notifications.
  */
 public class PauseResumeTest extends Test {
 
@@ -55,7 +55,11 @@ public class PauseResumeTest extends Test {
         break; // nada
       }
     }));
-
+    conns.add(game.plat.input().focus.connect(focus -> {
+      game.log.info("Focus changed: " + focus);
+      notifications.add((focus ? "Gained" : "Lost") + " focus at " + elapsed(start) + "s");
+      updateDisplay();
+    }));
     game.rootLayer.addAt(layer = new ImageLayer(), 15, 15);
     updateDisplay();
   }
@@ -69,9 +73,11 @@ public class PauseResumeTest extends Test {
       for (String note : notifications)
         buf.append(note).append("\n");
     }
-    TextLayout layout = game.graphics.layoutText(buf.toString(), new TextFormat());
-    Canvas canvas = game.graphics.createCanvas(layout.size);
-    canvas.setFillColor(0xFF000000).fillText(layout, 0, 0);
+    TextBlock block = new TextBlock(game.graphics.layoutText(
+      buf.toString(), new TextFormat(), TextWrap.MANUAL));
+    Canvas canvas = game.graphics.createCanvas(block.bounds.width(), block.bounds.height());
+    canvas.setFillColor(0xFF000000);
+    block.fill(canvas, TextBlock.Align.LEFT, 0, 0);
     layer.setTile(canvas.toTexture());
   }
 }
