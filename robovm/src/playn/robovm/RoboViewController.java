@@ -95,6 +95,13 @@ public class RoboViewController extends GLKViewController implements GLKViewCont
     // plat.log().debug("viewDidAppear(" + animated + ")");
     view.bindDrawable();
     plat.graphics().viewDidInit(getView().getBounds());
+    plat.dispatchEvent(plat.input().focus, true);
+  }
+
+  @Override // from ViewController
+  public void viewWillDisappear(boolean animated) {
+    super.viewWillDisappear(animated);
+    plat.dispatchEvent(plat.input().focus, false);
   }
 
   @Override // from ViewController

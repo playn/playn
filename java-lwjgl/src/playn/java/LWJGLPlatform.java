@@ -106,8 +106,15 @@ public class LWJGLPlatform extends JavaPlatform {
 
   @Override protected void loop () {
     boolean wasActive = glfwGetWindowAttrib(window, GLFW_VISIBLE) > 0;
+    boolean hadFocus = glfwGetWindowAttrib(window, GLFW_FOCUSED) > 0;
     while (!glfwWindowShouldClose(window)) {
-      // notify the app if lose or regain focus (treat said as pause/resume)
+      // notfiy the app if we lose or regain focus
+      boolean newFocus = glfwGetWindowAttrib(window, GLFW_FOCUSED) > 0;
+      if (hadFocus != newFocus) {
+        dispatchEvent(input.focus, newFocus);
+        hadFocus = newFocus;
+      }
+      // notify the app if lose or regain visibility (treat said as pause/resume)
       boolean newActive = glfwGetWindowAttrib(window, GLFW_VISIBLE) > 0;
       if (wasActive != newActive) {
         dispatchEvent(lifecycle, wasActive ? Lifecycle.PAUSE : Lifecycle.RESUME);

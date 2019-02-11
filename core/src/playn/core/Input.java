@@ -46,6 +46,9 @@ public class Input {
   /** A signal via which keyboard events are emitted. */
   public Signal<Keyboard.Event> keyboardEvents = Signal.create();
 
+  /** A signal emitted when the game application gains or loses focus. */
+  public Signal<Boolean> focus = Signal.create();
+
   /** Returns true if this platform has mouse input. */
   public boolean hasMouse () { return false; }
 

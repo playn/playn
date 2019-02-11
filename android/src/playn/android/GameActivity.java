@@ -83,6 +83,7 @@ public abstract class GameActivity extends Activity {
   @Override
   public void onWindowFocusChanged(boolean hasFocus) {
     AndroidPlatform.debugLog("onWindowFocusChanged(" + hasFocus + ")");
+    platform.input().focus.emit(hasFocus);
     if (hasFocus) {
       platform.audio().onResume();
     } else {

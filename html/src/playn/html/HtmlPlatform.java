@@ -161,7 +161,7 @@ public class HtmlPlatform extends Platform {
    * initialization.
    */
   public void start () {
-    listenForVisibilityChange(this);
+    listenForVizFocusChange(this);
 
     requestAnimationFrame(new Runnable() {
       @Override public void run() {
@@ -191,6 +191,12 @@ public class HtmlPlatform extends Platform {
     return $wnd;
   }-*/;
 
+  private void gainedFocus() {
+    dispatchEvent(input().focus, true);
+  }
+  private void lostFocus() {
+    dispatchEvent(input().focus, false);
+  }
   private void visibilityChanged() {
     boolean isHidden = isHidden();
     dispatchEvent(lifecycle, isHidden ? Lifecycle.PAUSE : Lifecycle.RESUME);
@@ -210,7 +216,13 @@ public class HtmlPlatform extends Platform {
   }
   private native boolean isHidden() /*-{ return $doc.hidden; }-*/;
 
-  private native void listenForVisibilityChange(HtmlPlatform plat) /*-{
+  private native void listenForVizFocusChange(HtmlPlatform plat) /*-{
+    $doc.addEventListener("focus", function () {
+      plat.@playn.html.HtmlPlatform::gainedFocus()();
+    }, false);
+    $doc.addEventListener("blur", function () {
+      plat.@playn.html.HtmlPlatform::lostFocus()();
+    }, false);
     $doc.addEventListener("visibilitychange", function () {
       plat.@playn.html.HtmlPlatform::visibilityChanged()();
     }, false);
