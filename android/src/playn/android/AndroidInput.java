@@ -18,6 +18,7 @@ import android.content.DialogInterface;
 import android.text.InputType;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
+import android.view.WindowManager;
 import android.widget.EditText;
 
 import playn.core.*;
@@ -86,7 +87,8 @@ public class AndroidInput extends Input {
             result.succeed(null);
           }
         });
-        alert.show();
+        AlertDialog dialog = alert.show();
+        dialog.getWindow().setSoftInputMode (WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
       }
     });
     return result;
