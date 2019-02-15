@@ -46,7 +46,7 @@ public class AndroidInput extends Input {
   }
 
   @Override public RFuture<String> getText (final Keyboard.TextType ttype, final String label,
-                                            final String initVal) {
+                                            final String initVal, final String ok, final String cancel) {
     final RPromise<String> result = plat.exec().deferredPromise();
     plat.activity.runOnUiThread(new Runnable() {
       public void run () {
@@ -76,13 +76,13 @@ public class AndroidInput extends Input {
         input.setText(initVal);
         alert.setView(input);
 
-        alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+        alert.setPositiveButton(ok, new DialogInterface.OnClickListener() {
           public void onClick(DialogInterface dialog, int whichButton) {
             result.succeed(input.getText().toString());
           }
         });
 
-        alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+        alert.setNegativeButton(cancel, new DialogInterface.OnClickListener() {
           public void onClick(DialogInterface dialog, int whichButton) {
             result.succeed(null);
           }

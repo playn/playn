@@ -39,7 +39,8 @@ public class LWJGLInput extends JavaInput {
     }
   }
 
-  @Override public RFuture<String> getText(TextType textType, String label, String initVal) {
+  @Override public RFuture<String> getText(TextType textType, String label, String initVal,
+                                           String ok, String cancel) {
     Object result = JOptionPane.showInputDialog(
       null, label, "", JOptionPane.QUESTION_MESSAGE, null, null, initVal);
     return RFuture.success((String)result);
