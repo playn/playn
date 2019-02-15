@@ -100,24 +100,24 @@ public class Input {
   /**
    * Requests a line of text from the user. On platforms that have only a virtual keyboard, this
    * will display a text entry interface, obtain the line of text, and dismiss the text entry
-   * interface when finished.
+   * interface when finished. Note that HTML5 and some Java backends do not support customization
+   * of the OK and Cancel labels. Thus those platforms will ignore the supplied labels and use
+   * their mandatory labels.
    *
    * @param textType the expected type of text. On mobile devices this hint may be used to display a
    * keyboard customized to the particular type of text.
    * @param label a label to display over the text entry interface, may be null.
    * @param initialValue the initial value to display in the text input field, may be null.
    * @param ok the text of the button which will deliver a {@code true} result and be placed in
-   * "OK" position for the platform. Note: the HTML platform does not support customizing this
-   * label, so on that platform the label will be "OK". Yay for HTML5.
+   * "OK" position for the platform.
    * @param cancel the text of the button that will deliver a {@code false} result and be placed in
-   * "Cancel" position. If {@code null} is supplied, the dialog will only have an OK button. Note:
-   * the HTML platform does not support customizing this label, so on that platform a non-null
-   * cancel string will result in the button reading "Cancel". Yay for HTML5.
+   * "Cancel" position.
    *
    * @return a future which provides the text when it becomes available. If the user cancels the
    * text entry process, null is supplied. Otherwise the entered text is supplied.
    */
-  public RFuture<String> getText (Keyboard.TextType textType, String label, String initialValue, String ok, String cancel) {
+  public RFuture<String> getText (Keyboard.TextType textType, String label, String initialValue,
+                                  String ok, String cancel) {
     return RFuture.failure(new Exception("getText not supported"));
   }
 

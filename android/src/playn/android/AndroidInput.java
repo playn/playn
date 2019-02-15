@@ -45,8 +45,9 @@ public class AndroidInput extends Input {
     return false; // TODO: return true for devices that have a hardware keyboard
   }
 
-  @Override public RFuture<String> getText (final Keyboard.TextType ttype, final String label,
-                                            final String initVal, final String ok, final String cancel) {
+  @Override public RFuture<String> getText (final Keyboard.TextType ttype,
+                                            final String label, final String initVal,
+                                            final String ok, final String cancel) {
     final RPromise<String> result = plat.exec().deferredPromise();
     plat.activity.runOnUiThread(new Runnable() {
       public void run () {
