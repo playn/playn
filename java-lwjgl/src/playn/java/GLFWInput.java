@@ -117,7 +117,8 @@ public class GLFWInput extends JavaInput {
     "The java-lwjgl backend does not allow interop with AWT on Mac OS X. " +
     "Use the java-swt backend if you need native dialogs.";
 
-  @Override public RFuture<String> getText(TextType textType, String label, String initVal) {
+  @Override public RFuture<String> getText(TextType textType, String label, String initVal, 
+                                           String ok, String cancel) {
     if (plat.needsHeadless()) throw new UnsupportedOperationException(NO_UI_ERROR);
 
     Object result = JOptionPane.showInputDialog(

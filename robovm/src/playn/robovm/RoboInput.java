@@ -43,14 +43,14 @@ public class RoboInput extends Input {
   @Override public boolean hasTouch () { return true; }
 
   @Override public RFuture<String> getText(Keyboard.TextType textType, String label,
-                                           String initVal) {
+                                           String initVal, String ok, String cancel) {
     final RPromise<String> result = plat.exec().deferredPromise();
 
     UIAlertView view = new UIAlertView();
     if (label != null)
       view.setTitle(label);
-    view.addButton("Cancel");
-    view.addButton("OK");
+    view.addButton(cancel);
+    view.addButton(ok);
     view.setAlertViewStyle(UIAlertViewStyle.PlainTextInput);
 
     final UITextField field = view.getTextField(0);

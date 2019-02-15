@@ -90,8 +90,8 @@ public class SWTInput extends JavaInput {
     });
   }
 
-  @Override public RFuture<String> getText (Keyboard.TextType textType,
-                                            String label, String initVal) {
+  @Override public RFuture<String> getText (Keyboard.TextType textType, String label,
+                                            String initVal, String okLbl, String cancelLbl) {
     final RPromise<String> result = RPromise.create();
 
     final Shell shell = new Shell(plat.shell(), SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
@@ -123,7 +123,7 @@ public class SWTInput extends JavaInput {
     if (initVal != null) text.setText(initVal);
 
     final Button ok = new Button(shell, SWT.PUSH);
-    ok.setText("OK");
+    ok.setText(okLbl);
     ok.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_END));
     ok.addListener(SWT.Selection, new Listener() {
       public void handleEvent(Event event) {
@@ -135,7 +135,7 @@ public class SWTInput extends JavaInput {
     shell.setDefaultButton(ok);
 
     Button cancel = new Button(shell, SWT.PUSH);
-    cancel.setText("Cancel");
+    cancel.setText(cancelLbl);
     cancel.addListener(SWT.Selection, new Listener() {
       public void handleEvent(Event event) {
         shell.dispose();

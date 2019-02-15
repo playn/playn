@@ -196,7 +196,7 @@ public class HtmlInput extends Input {
   }-*/;
 
   @Override public RFuture<String> getText(Keyboard.TextType textType, String label,
-                                           String initVal) {
+                                           String initVal, String ok, String cancel) {
     String result = Window.prompt(label, initVal);
     emitFakeMouseUp();
     return RFuture.success(result);
