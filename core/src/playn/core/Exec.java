@@ -39,6 +39,10 @@ public abstract class Exec {
       }).atPrio(Short.MAX_VALUE);
     }
 
+    @Override public synchronized void invokeNextFrame (Runnable action) {
+      pending.add(action);
+    }
+
     @Override public synchronized void invokeLater (Runnable action) {
       pending.add(action);
     }
@@ -69,7 +73,22 @@ public abstract class Exec {
   /**
    * Invokes {@code action} on the next {@link Platform#frame} signal. The default implementation
    * listens to the frame signal at a very high priority so that invoke later actions will run
-   * before the game's normal callbacks.
+   * before the game's normal callbacks. <em>Note:</em> if the game is paused, these actions will
+   * not run until it is unpaused and the next game frame is processed.
+   */
+  public abstract void invokeNextFrame (Runnable action);
+
+  /**
+   * Invokes {@code action} on the next {@link Platform#frame} signal <em>or</em>, if the game is
+   * paused, on the OS UI thread. Actions posted here will still be run in order and in a single
+   * threaded manner (like {@link #invokeNextFrame}), but they are not guaranteed to run on the
+   * game thread if the game is paused during the frame on which actions are posted.
+   *
+   * <p>If you're deferring a graphics or (game) UI action, you should almost certainly use
+   * {@link #invokeNextFrame}, but if you are deferring an action like saving data or initiating a
+   * network connection, you may wish to use {@code invokeLater} to ensure that those actions are
+   * completed even if the player happens to pause the game (by backgrounding the app on mobile,
+   * for example) immediately after they are queued up.
    */
   public abstract void invokeLater (Runnable action);
 

@@ -81,6 +81,7 @@ public class StubPlatform extends Platform {
   };
   private Exec exec = new Exec() {
     @Override public boolean isMainThread () { return true; }
+    @Override public void invokeNextFrame (Runnable action) { action.run(); }
     @Override public void invokeLater (Runnable action) { action.run(); } // now is later!
   };
   private final long start = System.currentTimeMillis();

@@ -17,10 +17,10 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.robovm.apple.coregraphics.CGRect;
-import org.robovm.apple.foundation.NSObject;
 import org.robovm.apple.foundation.NSThread;
 import org.robovm.apple.foundation.NSTimer;
 import org.robovm.apple.foundation.NSURL;
+import org.robovm.apple.foundation.NSOperationQueue;
 import org.robovm.apple.glkit.GLKViewDrawableColorFormat;
 import org.robovm.apple.opengles.EAGLContext;
 import org.robovm.apple.uikit.UIApplication;
@@ -28,7 +28,6 @@ import org.robovm.apple.uikit.UIDevice;
 import org.robovm.apple.uikit.UIInterfaceOrientationMask;
 import org.robovm.apple.uikit.UIWindow;
 import org.robovm.objc.block.VoidBlock1;
-import org.robovm.rt.bro.annotation.Callback;
 
 import playn.core.*;
 import playn.core.json.JsonImpl;
@@ -121,6 +120,10 @@ public class RoboPlatform extends Platform {
   private final Json json = new JsonImpl();
   private final Exec exec = new Exec.Default(this) {
     @Override public boolean isMainThread () { return NSThread.getCurrentThread().isMainThread(); }
+    @Override public void invokeLater (Runnable action) {
+      if (paused) NSOperationQueue.getMainQueue().addOperation(action);
+      else super.invokeLater(action);
+    }
     @Override public boolean isAsyncSupported () { return true; }
     @Override public void invokeAsync (Runnable action) { pool.execute(action); }
   };
