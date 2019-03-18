@@ -18,16 +18,13 @@ import java.util.concurrent.Executors;
 
 import org.robovm.apple.coregraphics.CGRect;
 import org.robovm.apple.foundation.NSThread;
-import org.robovm.apple.foundation.NSTimer;
 import org.robovm.apple.foundation.NSURL;
 import org.robovm.apple.foundation.NSOperationQueue;
 import org.robovm.apple.glkit.GLKViewDrawableColorFormat;
-import org.robovm.apple.opengles.EAGLContext;
 import org.robovm.apple.uikit.UIApplication;
 import org.robovm.apple.uikit.UIDevice;
 import org.robovm.apple.uikit.UIInterfaceOrientationMask;
 import org.robovm.apple.uikit.UIWindow;
-import org.robovm.objc.block.VoidBlock1;
 
 import playn.core.*;
 import playn.core.json.JsonImpl;
@@ -190,15 +187,6 @@ public class RoboPlatform extends Platform {
   }
 
   void willTerminate () {
-    // shutdown the GL and AL systems after our configured delay
-    new NSTimer(config.timeForTermination, new VoidBlock1<NSTimer>() {
-      public void invoke (NSTimer timer) {
-        // shutdown the GL view completely
-        EAGLContext.setCurrentContext(null);
-        // stop and release the AL resources (if audio was ever initialized)
-        if (audio != null) audio.terminate();
-      }
-    }, null, false, true);
     // let the app know that we're terminating
     dispatchEvent(lifecycle, Lifecycle.EXIT);
   }
