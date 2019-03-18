@@ -198,7 +198,7 @@ public class RoboPlatform extends Platform {
         // stop and release the AL resources (if audio was ever initialized)
         if (audio != null) audio.terminate();
       }
-    }, null, false);
+    }, null, false, true);
     // let the app know that we're terminating
     dispatchEvent(lifecycle, Lifecycle.EXIT);
   }
