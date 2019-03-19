@@ -14,6 +14,7 @@
 package playn.robovm;
 
 import org.robovm.apple.coregraphics.CGRect;
+import org.robovm.apple.foundation.NSObject;
 import org.robovm.apple.foundation.NSSet;
 import org.robovm.apple.glkit.GLKView;
 import org.robovm.apple.glkit.GLKViewController;
@@ -34,59 +35,83 @@ import org.robovm.rt.bro.annotation.Callback;
  * of the iOS backend. If you want to customize things or embed PlayN, you'll want to understand
  * what this class does.
  */
-public class RoboViewController extends GLKViewController implements GLKViewControllerDelegate {
+public class RoboViewController extends GLKViewController {
 
   private final GLKView view;
 
   /** The platform managed by this view controller. */
   public final RoboPlatform plat;
 
+  /* Make this a static nested class and not an anonymous inner class in order to avoid a retain
+   * cycle that would cause memory leaks.
+   */
+  private static class View extends GLKView {
+    private final RoboInput input;
+
+    View(CGRect bounds, EAGLContext ctx, RoboInput input) {
+      super(bounds, ctx);
+      this.input = input;
+    }
+    @Method(selector = "touchesBegan:withEvent:")
+    public void touchesBegan(NSSet<UITouch> touches, UIEvent event) {
+      input.onTouchesBegan(touches, event);
+    }
+    @Method(selector = "touchesCancelled:withEvent:")
+    public void touchesCancelled(NSSet<UITouch> touches, UIEvent event) {
+      input.onTouchesCancelled(touches, event);
+    }
+    @Method(selector = "touchesEnded:withEvent:")
+    public void touchesEnded(NSSet<UITouch> touches, UIEvent event) {
+      input.onTouchesEnded(touches, event);
+    }
+    @Method(selector = "touchesMoved:withEvent:")
+    public void touchesMoved(NSSet<UITouch> touches, UIEvent event) {
+      input.onTouchesMoved(touches, event);
+    }
+  }
+
+  /* Make this a static nested class instead of having RoboViewController implement
+   * GLKViewControllerDelegate itself to avoid a retain cycle that would lead to memory leaks.
+   */
+  private static class Delegate extends NSObject implements GLKViewControllerDelegate {
+    private final RoboPlatform plat;
+    private final GLKView view;
+
+    Delegate(GLKView view, RoboPlatform plat) {
+      this.view = view;
+      this.plat = plat;
+    }
+
+    @Override
+    public void update(GLKViewController viewController) {
+      plat.processFrame();
+    }
+
+    @Override
+    public void willPause(GLKViewController viewController, boolean paused) {
+      // plat.log().debug("willPause(" + paused + ")");
+      if (paused) plat.didEnterBackground();
+      else {
+        view.bindDrawable();
+        plat.willEnterForeground();
+      }
+    }
+  }
+
   /** Creates a game view controller with the given bounds and configuration **/
   public RoboViewController(CGRect bounds, RoboPlatform.Config config) {
     EAGLContext ctx = new EAGLContext(EAGLRenderingAPI.OpenGLES2);
     EAGLContext.setCurrentContext(ctx);
     plat = new RoboPlatform(config, bounds);
-    view = new GLKView(bounds, ctx) {
-      @Method(selector = "touchesBegan:withEvent:")
-      public void touchesBegan(NSSet<UITouch> touches, UIEvent event) {
-        plat.input().onTouchesBegan(touches, event);
-      }
-      @Method(selector = "touchesCancelled:withEvent:")
-      public void touchesCancelled(NSSet<UITouch> touches, UIEvent event) {
-        plat.input().onTouchesCancelled(touches, event);
-      }
-      @Method(selector = "touchesEnded:withEvent:")
-      public void touchesEnded(NSSet<UITouch> touches, UIEvent event) {
-        plat.input().onTouchesEnded(touches, event);
-      }
-      @Method(selector = "touchesMoved:withEvent:")
-      public void touchesMoved(NSSet<UITouch> touches, UIEvent event) {
-        plat.input().onTouchesMoved(touches, event);
-      }
-    };
+    view = new View(bounds, ctx, plat.input());
     view.setMultipleTouchEnabled(true);
     view.setDrawableColorFormat(plat.config.glBufferFormat);
     // view.setDrawableDepthFormat(GLKViewDrawableDepthFormat._16);
     // view.setDrawableStencilFormat(GLKViewDrawableStencilFormat.None);
     setView(view);
-    setDelegate(this);
+    setDelegate(new Delegate(view, plat));
     setPreferredFramesPerSecond(config.targetFPS);
     addStrongRef(plat);
-  }
-
-  @Override // from GLKViewControllerDelegate
-  public void update(GLKViewController self) {
-    plat.processFrame();
-  }
-
-  @Override // from GLKViewControllerDelegate
-  public void willPause(GLKViewController self, boolean paused) {
-    // plat.log().debug("willPause(" + paused + ")");
-    if (paused) plat.didEnterBackground();
-    else {
-      view.bindDrawable();
-      plat.willEnterForeground();
-    }
   }
 
   @Override // from ViewController
