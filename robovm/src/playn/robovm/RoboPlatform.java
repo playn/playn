@@ -18,7 +18,6 @@ import java.util.concurrent.Executors;
 
 import org.robovm.apple.coregraphics.CGRect;
 import org.robovm.apple.foundation.NSThread;
-import org.robovm.apple.foundation.NSTimer;
 import org.robovm.apple.foundation.NSURL;
 import org.robovm.apple.foundation.NSOperationQueue;
 import org.robovm.apple.glkit.GLKViewDrawableColorFormat;
@@ -68,11 +67,6 @@ public class RoboPlatform extends Platform {
       * simultaneously (those don't go through OpenAL, they go through AVAudioPlayer, and I presume
       * AVAudioPlayer competes with OpenAL for sound channels). */
     public int openALSources = 24;
-
-    /** Seconds to wait for the game loop to terminate before terminating GL and AL services. This
-      * is only used if PlayN is integrated into a larger iOS application and does not control the
-      * application lifecycle. */
-    public float timeForTermination = 0.5f;
 
     /** Configures the format of the GL framebuffer. The default is RGBA8888, but one can use
       * RGB565 for higher performance at the cost of lower color fidelity. */
@@ -190,15 +184,10 @@ public class RoboPlatform extends Platform {
   }
 
   void willTerminate () {
-    // shutdown the GL and AL systems after our configured delay
-    new NSTimer(config.timeForTermination, new VoidBlock1<NSTimer>() {
-      public void invoke (NSTimer timer) {
-        // shutdown the GL view completely
-        EAGLContext.setCurrentContext(null);
-        // stop and release the AL resources (if audio was ever initialized)
-        if (audio != null) audio.terminate();
-      }
-    }, null, false, true);
+    // stop and release the AL resources (if audio was ever initialized)
+    // TODO this does not do anything at the moment.
+    // if (audio != null) audio.terminate();
+
     // let the app know that we're terminating
     dispatchEvent(lifecycle, Lifecycle.EXIT);
   }
