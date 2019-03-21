@@ -79,7 +79,7 @@ public abstract class RenderTarget implements Closeable {
       if (gfx.exec().isMainThread()) {
         gfx.gl.glDeleteFramebuffer(id());
       } else {
-        gfx.exec().invokeLater(new Runnable() {
+        gfx.exec().invokeNextFrame(new Runnable() {
           public void run () { gfx.gl.glDeleteFramebuffer(id()); }
         });
       }

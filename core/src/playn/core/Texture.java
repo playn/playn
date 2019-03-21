@@ -243,7 +243,7 @@ public class Texture extends Tile implements Closeable {
       if (gfx.exec().isMainThread()) {
         gfx.gl.glDeleteTexture(id);
       } else {
-        gfx.exec().invokeLater(new Runnable() {
+        gfx.exec().invokeNextFrame(new Runnable() {
           public void run () { gfx.gl.glDeleteTexture(id); }
         });
       }
