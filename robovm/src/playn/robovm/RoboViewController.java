@@ -25,10 +25,7 @@ import org.robovm.apple.uikit.UIEvent;
 import org.robovm.apple.uikit.UIInterfaceOrientation;
 import org.robovm.apple.uikit.UIInterfaceOrientationMask;
 import org.robovm.apple.uikit.UITouch;
-import org.robovm.objc.Selector;
-import org.robovm.objc.annotation.BindSelector;
 import org.robovm.objc.annotation.Method;
-import org.robovm.rt.bro.annotation.Callback;
 
 /**
  * Manages the main PlayN view as well as all iOS and GL callbacks and lifecycle. This is the root
@@ -165,20 +162,10 @@ public class RoboViewController extends GLKViewController {
     return true;
   }
 
-  public boolean shouldAutorotateToInterfaceOrientation(UIInterfaceOrientation orientation) {
-    return true; // TODO
-  }
-
   @Override protected void doDispose() {
     // shutdown the platform
     plat.willTerminate();
     removeStrongRef(plat);
     super.doDispose();
-  }
-
-  @Callback @BindSelector("shouldAutorotateToInterfaceOrientation:")
-  private static boolean shouldAutorotateToInterfaceOrientation(
-    RoboViewController self, Selector sel, UIInterfaceOrientation orientation) {
-    return self.shouldAutorotateToInterfaceOrientation(orientation);
   }
 }
