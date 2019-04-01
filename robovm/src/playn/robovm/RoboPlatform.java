@@ -66,11 +66,6 @@ public class RoboPlatform extends Platform {
       * AVAudioPlayer competes with OpenAL for sound channels). */
     public int openALSources = 24;
 
-    /** Seconds to wait for the game loop to terminate before terminating GL and AL services. This
-      * is only used if PlayN is integrated into a larger iOS application and does not control the
-      * application lifecycle. */
-    public float timeForTermination = 0.5f;
-
     /** Configures the format of the GL framebuffer. The default is RGBA8888, but one can use
       * RGB565 for higher performance at the cost of lower color fidelity. */
     public GLKViewDrawableColorFormat glBufferFormat = GLKViewDrawableColorFormat.RGBA8888;
