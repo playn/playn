@@ -22,7 +22,6 @@ import org.robovm.apple.foundation.NSURL;
 import org.robovm.apple.foundation.NSOperationQueue;
 import org.robovm.apple.glkit.GLKViewDrawableColorFormat;
 import org.robovm.apple.uikit.UIApplication;
-import org.robovm.apple.uikit.UIDevice;
 import org.robovm.apple.uikit.UIInterfaceOrientationMask;
 import org.robovm.apple.uikit.UIWindow;
 
@@ -97,7 +96,6 @@ public class RoboPlatform extends Platform {
   /** A signal emitted when the device rotates. */
   public Signal<RoboOrientEvent> orient = Signal.create();
 
-  final int osVersion = getOSVersion();
   final Config config;
 
   /** Used as a guard flag to avoid duplicated entries caused by the double dispatches of
@@ -185,11 +183,5 @@ public class RoboPlatform extends Platform {
     pool.shutdown();
     // let the app know that we're terminating
     dispatchEvent(lifecycle, Lifecycle.EXIT);
-  }
-
-  private int getOSVersion () {
-    String systemVersion = UIDevice.getCurrentDevice().getSystemVersion();
-    int version = Integer.parseInt(systemVersion.split("\\.")[0]);
-    return version;
   }
 }
