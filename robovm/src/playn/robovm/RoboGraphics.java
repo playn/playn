@@ -18,6 +18,7 @@ import org.robovm.apple.coregraphics.CGBitmapInfo;
 import org.robovm.apple.coregraphics.CGColorSpace;
 import org.robovm.apple.coregraphics.CGImageAlphaInfo;
 import org.robovm.apple.coregraphics.CGRect;
+import org.robovm.apple.foundation.Foundation;
 import org.robovm.apple.uikit.UIDevice;
 import org.robovm.apple.uikit.UIDeviceOrientation;
 import org.robovm.apple.uikit.UIScreen;
@@ -53,7 +54,9 @@ public class RoboGraphics extends Graphics {
     return isPad && config.iPadLikePhone;
   }
   private static Scale viewScale (RoboPlatform.Config config) {
-    float deviceScale = (float)UIScreen.getMainScreen().getScale();
+    float deviceScale = (float)((Foundation.getMajorSystemVersion() >= 8)
+                                    ? UIScreen.getMainScreen().getNativeScale()
+                                    : UIScreen.getMainScreen().getScale());
     boolean useHalfSize = useHalfSize(config);
     return new Scale((useHalfSize ? 2 : 1) * deviceScale);
   }
