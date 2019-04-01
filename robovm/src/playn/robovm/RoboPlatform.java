@@ -22,7 +22,6 @@ import org.robovm.apple.foundation.NSURL;
 import org.robovm.apple.foundation.NSOperationQueue;
 import org.robovm.apple.glkit.GLKViewDrawableColorFormat;
 import org.robovm.apple.uikit.UIApplication;
-import org.robovm.apple.uikit.UIDevice;
 import org.robovm.apple.uikit.UIInterfaceOrientationMask;
 import org.robovm.apple.uikit.UIWindow;
 
@@ -66,11 +65,6 @@ public class RoboPlatform extends Platform {
       * AVAudioPlayer competes with OpenAL for sound channels). */
     public int openALSources = 24;
 
-    /** Seconds to wait for the game loop to terminate before terminating GL and AL services. This
-      * is only used if PlayN is integrated into a larger iOS application and does not control the
-      * application lifecycle. */
-    public float timeForTermination = 0.5f;
-
     /** Configures the format of the GL framebuffer. The default is RGBA8888, but one can use
       * RGB565 for higher performance at the cost of lower color fidelity. */
     public GLKViewDrawableColorFormat glBufferFormat = GLKViewDrawableColorFormat.RGBA8888;
@@ -102,7 +96,6 @@ public class RoboPlatform extends Platform {
   /** A signal emitted when the device rotates. */
   public Signal<RoboOrientEvent> orient = Signal.create();
 
-  final int osVersion = getOSVersion();
   final Config config;
 
   /** Used as a guard flag to avoid duplicated entries caused by the double dispatches of
@@ -190,11 +183,5 @@ public class RoboPlatform extends Platform {
     pool.shutdown();
     // let the app know that we're terminating
     dispatchEvent(lifecycle, Lifecycle.EXIT);
-  }
-
-  private int getOSVersion () {
-    String systemVersion = UIDevice.getCurrentDevice().getSystemVersion();
-    int version = Integer.parseInt(systemVersion.split("\\.")[0]);
-    return version;
   }
 }
