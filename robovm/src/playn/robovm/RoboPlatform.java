@@ -181,6 +181,7 @@ public class RoboPlatform extends Platform {
 
   void willTerminate () {
     pool.shutdown();
+    storage.close();
     // let the app know that we're terminating
     dispatchEvent(lifecycle, Lifecycle.EXIT);
   }

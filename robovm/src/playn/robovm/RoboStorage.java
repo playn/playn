@@ -155,4 +155,12 @@ public class RoboStorage implements Storage {
     // SQL commands are already pretty fast, so it might not be necessary
     return new BatchImpl(this);
   }
+
+  void close() {
+    try {
+      conn.close();
+    } catch (SQLException sqe) {
+      // Not much to do here
+    }
+  }
 }
