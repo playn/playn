@@ -85,6 +85,11 @@ public class RoboGraphics extends Graphics {
     return screenSize;
   }
 
+  @Override public Canvas createCanvas (Scale scale, int pixelWidth, int pixelHeight) {
+    return new RoboCanvas(this, new RoboCanvasImage(this, scale, pixelWidth, pixelHeight,
+                                                    config.interpolateCanvasDrawing));
+  }
+
   @Override public Path createPath() {
     return new RoboPath();
   }
@@ -104,11 +109,6 @@ public class RoboGraphics extends Graphics {
   }
 
   @Override protected int defaultFramebuffer () { return defaultFramebuffer; }
-
-  @Override protected Canvas createCanvasImpl (Scale scale, int pixelWidth, int pixelHeight) {
-    return new RoboCanvas(this, new RoboCanvasImage(this, scale, pixelWidth, pixelHeight,
-                                                    config.interpolateCanvasDrawing));
-  }
 
   static CGBitmapContext createCGBitmap(int width, int height) {
     return CGBitmapContext.create(width, height, 8, 4 * width, colorSpace, new CGBitmapInfo(

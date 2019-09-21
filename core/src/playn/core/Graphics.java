@@ -103,13 +103,21 @@ public abstract class Graphics {
    * Creates a {@link Canvas} with the specified display unit size.
    */
   public Canvas createCanvas (float width, float height) {
-    return createCanvasImpl(scale, scale.scaledCeil(width), scale.scaledCeil(height));
+    return createCanvas(scale, scale.scaledCeil(width), scale.scaledCeil(height));
   }
 
   /** See {@link #createCanvas(float,float)}. */
   public Canvas createCanvas (IDimension size) {
     return createCanvas(size.width(), size.height());
   }
+
+  /**
+   * Creates a {@link Canvas} at the specified scale and with the specified (pixel) width and
+   * height. Most callers should use {@link #createCanvas(float,float)} rather than this method,
+   * but if you have special needs, this gives you full control over the size of the canvas's
+   * underlying bitmap.
+   */
+  public abstract Canvas createCanvas (Scale scale, int pixelWidth, int pixelHeight);
 
   /** Creates a {@link Path} object. */
   public abstract Path createPath ();
@@ -173,13 +181,6 @@ public abstract class Graphics {
    * Returns the id of the default GL framebuffer. On most platforms this is 0, but not iOS.
    */
   protected int defaultFramebuffer () { return 0; }
-
-  /**
-   * Creates a {@link Canvas} with the specified pixel size. Because this is used when scaling
-   * bitmaps for rendering into POT textures, we need to be precise about the pixel width and
-   * height. So make sure this code path uses these exact sizes to make the canvas backing buffer.
-   */
-  protected abstract Canvas createCanvasImpl (Scale scale, int pixelWidth, int pixelHeight);
 
   /**
    * Informs the graphics system that the main framebuffer scaled has changed.

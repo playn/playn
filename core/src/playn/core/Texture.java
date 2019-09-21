@@ -159,7 +159,7 @@ public class Texture extends Tile implements Closeable {
       int pixWidth = image.pixelWidth(), pixHeight = image.pixelHeight();
       int potWidth = config.toTexWidth(pixWidth), potHeight = config.toTexWidth(pixHeight);
       if (potWidth != pixWidth || potHeight != pixHeight) {
-        Canvas scaled = gfx.createCanvasImpl(Scale.ONE, potWidth, potHeight);
+        Canvas scaled = gfx.createCanvas(Scale.ONE, potWidth, potHeight);
         scaled.draw(image, 0, 0, potWidth, potHeight);
         scaled.image.upload(gfx, this);
         scaled.close();

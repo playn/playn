@@ -158,7 +158,12 @@ public class AndroidGraphics extends Graphics {
 
   @Override public Canvas createCanvas (float width, float height) {
     Scale scale = canvasScaleFunc.computeScale(width, height, scale());
-    return createCanvasImpl(scale, scale.scaledCeil(width), scale.scaledCeil(height));
+    return createCanvas(scale, scale.scaledCeil(width), scale.scaledCeil(height));
+  }
+
+  @Override public Canvas createCanvas(Scale scale, int pixelWidth, int pixelHeight) {
+    Bitmap bitmap = Bitmap.createBitmap(pixelWidth, pixelHeight, preferredBitmapConfig);
+    return new AndroidCanvas(this, new AndroidImage(this, scale, bitmap, "<canvas>"));
   }
 
   @Override public Path createPath() {
@@ -175,11 +180,6 @@ public class AndroidGraphics extends Graphics {
 
   @Override public TextLayout[] layoutText(String text, TextFormat format, TextWrap wrap) {
     return AndroidTextLayout.layoutText(this, text, format, wrap);
-  }
-
-  @Override protected Canvas createCanvasImpl(Scale scale, int pixelWidth, int pixelHeight) {
-    Bitmap bitmap = Bitmap.createBitmap(pixelWidth, pixelHeight, preferredBitmapConfig);
-    return new AndroidCanvas(this, new AndroidImage(this, scale, bitmap, "<canvas>"));
   }
 
   AndroidFont resolveFont(Font font) {

@@ -177,6 +177,13 @@ public class HtmlGraphics extends Graphics {
     return screenSize;
   }
 
+  @Override public Canvas createCanvas(Scale scale, int pixelWidth, int pixelHeight) {
+    CanvasElement elem = Document.get().createCanvasElement();
+    elem.setWidth(pixelWidth);
+    elem.setHeight(pixelHeight);
+    return new HtmlCanvas(this, new HtmlImage(this, scale, elem, "<canvas>"));
+  }
+
   @Override public Path createPath() {
     return new HtmlPath();
   }
@@ -191,13 +198,6 @@ public class HtmlGraphics extends Graphics {
 
   @Override public TextLayout[] layoutText(String text, TextFormat format, TextWrap wrap) {
     return HtmlTextLayout.layoutText(this, dummyCtx, text, format, wrap);
-  }
-
-  @Override protected Canvas createCanvasImpl(Scale scale, int pixelWidth, int pixelHeight) {
-    CanvasElement elem = Document.get().createCanvasElement();
-    elem.setWidth(pixelWidth);
-    elem.setHeight(pixelHeight);
-    return new HtmlCanvas(this, new HtmlImage(this, scale, elem, "<canvas>"));
   }
 
   static String cssColorString(int color) {

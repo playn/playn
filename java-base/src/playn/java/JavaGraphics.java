@@ -80,6 +80,12 @@ public abstract class JavaGraphics extends Graphics {
    */
   public abstract void setSize (int width, int height, boolean fullscreen);
 
+  @Override public Canvas createCanvas (Scale scale, int pixelWidth, int pixelHeight) {
+    BufferedImage bitmap = new BufferedImage(
+      pixelWidth, pixelHeight, BufferedImage.TYPE_INT_ARGB_PRE);
+    return new JavaCanvas(this, new JavaImage(this, scale, bitmap, "<canvas>"));
+  }
+
   @Override
   public Path createPath() {
     return new JavaPath();
@@ -97,12 +103,6 @@ public abstract class JavaGraphics extends Graphics {
 
   @Override public TextLayout[] layoutText(String text, TextFormat format, TextWrap wrap) {
     return JavaTextLayout.layoutText(this, text, format, wrap);
-  }
-
-  @Override protected Canvas createCanvasImpl (Scale scale, int pixelWidth, int pixelHeight) {
-    BufferedImage bitmap = new BufferedImage(
-      pixelWidth, pixelHeight, BufferedImage.TYPE_INT_ARGB_PRE);
-    return new JavaCanvas(this, new JavaImage(this, scale, bitmap, "<canvas>"));
   }
 
   java.awt.Font resolveFont(Font font) {
