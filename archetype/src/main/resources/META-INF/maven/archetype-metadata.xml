@@ -79,13 +79,31 @@
       </includes>
     </fileSet>
     <fileSet encoding="UTF-8">
+      <directory>android/res/drawable-mdpi</directory>
+      <includes>
+        <include>**/*.png</include>
+      </includes>
+    </fileSet>
+    <fileSet encoding="UTF-8">
       <directory>android/res/drawable-hdpi</directory>
       <includes>
         <include>**/*.png</include>
       </includes>
     </fileSet>
     <fileSet encoding="UTF-8">
-      <directory>android/res/drawable-mdpi</directory>
+      <directory>android/res/drawable-xhdpi</directory>
+      <includes>
+        <include>**/*.png</include>
+      </includes>
+    </fileSet>
+    <fileSet encoding="UTF-8">
+      <directory>android/res/drawable-xxhdpi</directory>
+      <includes>
+        <include>**/*.png</include>
+      </includes>
+    </fileSet>
+    <fileSet encoding="UTF-8">
+      <directory>android/res/drawable-xxxhdpi</directory>
       <includes>
         <include>**/*.png</include>
       </includes>
