@@ -19,7 +19,7 @@
   <repositories>
     <repository>
       <id>swt-repo</id>
-      <url>http://maven-eclipse.github.io/maven</url>
+      <url>https://maven-eclipse.github.io/maven</url>
     </repository>
   </repositories>
 
