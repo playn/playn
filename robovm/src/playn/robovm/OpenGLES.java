@@ -136,6 +136,7 @@ public class OpenGLES {
   @Bridge public static native void glStencilOpSeparate (int face, int fail, int zfail, int zpass);
   @Bridge public static native void glTexImage2D (int target, int level, int internalformat, int width, int height, int border, int format, int type, Buffer pixels);
   @Bridge(symbol="glTexImage2D") public static native void glTexImage2Dp (int target, int level, int internalformat, int width, int height, int border, int format, int type, IntPtr pixels);
+  @Bridge(symbol="glTexImage2D") public static native void glTexImage2Dp (int target, int level, int internalformat, int width, int height, int border, int format, int type, @Pointer long pixels);
   @Bridge public static native void glTexParameterf (int target, int pname, float param);
   @Bridge public static native void glTexParameterfv (int target, int pname, FloatBuffer params);
   @Bridge public static native void glTexParameteri (int target, int pname, int param);
