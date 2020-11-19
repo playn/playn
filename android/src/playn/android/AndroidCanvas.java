@@ -136,11 +136,8 @@ public class AndroidCanvas extends Canvas {
   }
 
   @Override public Canvas fillRoundRect(float x, float y, float width, float height, float radius) {
-    // for some reason setting x, y to non-zero causes the round rect to be distorted
-    canvas.translate(x, y);
-    rectf.set(0, 0, width, height);
+    rectf.set(x, y, x + width, y + height);
     canvas.drawRoundRect(rectf, radius, radius, currentState().prepareFill());
-    canvas.translate(-x, -y);
     isDirty = true;
     return this;
   }
@@ -254,11 +251,8 @@ public class AndroidCanvas extends Canvas {
 
   @Override public Canvas strokeRoundRect(float x, float y, float width, float height,
                                           float radius) {
-    // for some reason setting x, y to non-zero causes the round rect to be distorted
-    canvas.translate(x, y);
-    rectf.set(0, 0, width, height);
+    rectf.set(x, y, x + width, y + height);
     canvas.drawRoundRect(rectf, radius, radius, currentState().prepareStroke());
-    canvas.translate(-x, -y);
     isDirty = true;
     return this;
   }
