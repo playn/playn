@@ -20,7 +20,7 @@ import java.net.URISyntaxException;
 import java.nio.ByteBuffer;
 
 import org.java_websocket.client.WebSocketClient;
-import org.java_websocket.drafts.Draft_17;
+import org.java_websocket.drafts.Draft_6455;
 import org.java_websocket.handshake.ServerHandshake;
 
 import playn.core.Exec;
@@ -38,7 +38,7 @@ public class AndroidWebSocket implements Net.WebSocket {
       throw new RuntimeException(e);
     }
 
-    socket = new WebSocketClient(juri, new Draft_17()) {
+    socket = new WebSocketClient(juri, new Draft_6455()) {
       @Override public void onMessage(final ByteBuffer buffer) {
         exec.invokeLater(new Runnable() { public void run() { listener.onDataMessage(buffer); }});
       }
