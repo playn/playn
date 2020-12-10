@@ -62,6 +62,7 @@
     <lwjgl.version>3.1.6</lwjgl.version>
     <lwjgl2.version>2.9.3</lwjgl2.version>
     <robovm.version>2.3.9</robovm.version>
+    <javadoc.maven.version>3.2.0</javadoc.maven.version>
     <!--
       GWT log levels:
       ERROR, WARN, INFO, TRACE, DEBUG, SPAM, or ALL
@@ -169,7 +170,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-javadoc-plugin</artifactId>
-          <version>3.2.0</version>
+          <version>${javadoc.maven.version}</version>
           <configuration>
             <quiet>true</quiet>
             <show>public</show>
