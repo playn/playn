@@ -131,7 +131,7 @@ public class Scale {
 
   private String computePath(String path, float scale) {
     if (scale <= 1) return path;
-    int scaleFactor = (int)(scale * 10);
+    int scaleFactor = MathUtil.iceil(scale * 10);
     if (scaleFactor % 10 == 0)
       scaleFactor /= 10;
     int didx = path.lastIndexOf(".");

@@ -20,19 +20,32 @@ import static org.junit.Assert.*;
 
 public class ScaleTest {
 
-  private void assertScalesMatch (List<Scale.ScaledResource> rsrcs, float... scales) {
+  private void assertScalesMatch (List<Scale.ScaledResource> rsrcs, float[] scales, String[] paths) {
     int ii = 0;
     assertEquals("Scale count does not match resource count", scales.length, rsrcs.size());
     for (Scale.ScaledResource rsrc : rsrcs) {
-      assertEquals(rsrc.scale.factor, scales[ii++], MathUtil.EPSILON);
+      assertEquals(scales[ii], rsrc.scale.factor, MathUtil.EPSILON);
+      assertEquals(paths[ii], rsrc.path);
+      ii++;
     }
   }
 
   @Test
   public void testScaledResources () {
-    assertScalesMatch(new Scale(2).getScaledResources("test.png"), 2, 1);
-    assertScalesMatch(new Scale(4).getScaledResources("test.png"), 4, 3, 2, 1);
-    assertScalesMatch(new Scale(2.5f).getScaledResources("test.png"), 2.5f, 3, 2, 1);
-    assertScalesMatch(new Scale(1.5f).getScaledResources("test.png"), 1.5f, 2, 1);
+    assertScalesMatch(new Scale(2).getScaledResources("test.png"),
+        new float[] { 2, 1 },
+        new String[] { "test@2x.png", "test.png" });
+    assertScalesMatch(new Scale(4).getScaledResources("test.png"),
+        new float[] { 4, 3, 2, 1 },
+        new String[] { "test@4x.png", "test@3x.png", "test@2x.png", "test.png" });
+    assertScalesMatch(new Scale(2.5f).getScaledResources("test.png"),
+        new float[] { 2.5f, 3, 2, 1 },
+        new String[] { "test@25x.png", "test@3x.png", "test@2x.png", "test.png" });
+    assertScalesMatch(new Scale(1.5f).getScaledResources("test.png"),
+        new float[] { 1.5f, 2, 1 },
+        new String[] { "test@15x.png", "test@2x.png", "test.png" });
+    assertScalesMatch(new Scale(1.25f).getScaledResources("test.png"),
+        new float[] { 1.25f, 2, 1 },
+        new String[] { "test@13x.png", "test@2x.png", "test.png" });
   }
 }
