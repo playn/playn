@@ -32,7 +32,7 @@ public class Scale {
 
     /**
      * The path to the resource, including any scale factor annotation. If the scale is one, the
-     * image path is unadjusted. If the scale is greater than one, the scale is tacked onto the
+     * image path is unadjusted. If the scale is different than one, the scale is tacked onto the
      * image path (before the extension). The scale factor will be converted to an integer per the
      * following examples:
      * <ul>
@@ -40,6 +40,7 @@ public class Scale {
      * <li> Scale factor 4: {@code foo.png} becomes {@code foo@4x.png}</li>
      * <li> Scale factor 1.5: {@code foo.png} becomes {@code foo@15x.png}</li>
      * <li> Scale factor 1.25: {@code foo.png} becomes {@code foo@13x.png}</li>
+     * <li> Scale factor 0.75: {@code foo.png} becomes {@code foo@08x.png}</li>
      * </ul>
      */
     public final String path;
@@ -132,7 +133,7 @@ public class Scale {
   }
 
   private String computePath(String path, float scale) {
-    if (scale <= 1) return path;
+    if (scale == 1) return path;
     int scaleFactor = MathUtil.iceil(scale * 10);
     if (scaleFactor % 10 == 0)
       scaleFactor /= 10;
@@ -140,7 +141,7 @@ public class Scale {
     if (didx == -1) {
       return path; // no extension!?
     } else {
-      return path.substring(0, didx) + "@" + scaleFactor + "x" + path.substring(didx);
+      return path.substring(0, didx) + "@" + ((scale < 1) ? "0" : "") + scaleFactor + "x" + path.substring(didx);
     }
   }
 }
