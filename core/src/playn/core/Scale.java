@@ -115,10 +115,12 @@ public class Scale {
    */
   public List<ScaledResource> getScaledResources(String path) {
     List<ScaledResource> rsrcs = new ArrayList<ScaledResource>();
-    rsrcs.add(new ScaledResource(this, computePath(path, factor)));
-    for (float rscale = MathUtil.iceil(factor); rscale > 1; rscale -= 1) {
-      if (rscale != factor) rsrcs.add(
-        new ScaledResource(new Scale(rscale), computePath(path, rscale)));
+    if (factor != 1) {
+      rsrcs.add(new ScaledResource(this, computePath(path, factor)));
+      for (float rscale = MathUtil.iceil(factor); rscale > 1; rscale -= 1) {
+        if (rscale != factor) rsrcs.add(
+          new ScaledResource(new Scale(rscale), computePath(path, rscale)));
+      }
     }
     rsrcs.add(new ScaledResource(ONE, path));
     return rsrcs;

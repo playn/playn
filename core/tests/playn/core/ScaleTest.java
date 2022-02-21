@@ -32,6 +32,9 @@ public class ScaleTest {
 
   @Test
   public void testScaledResources () {
+    assertScalesMatch(new Scale(1f).getScaledResources("test.png"),
+        new float[] { 1 },
+        new String[] { "test.png" });
     assertScalesMatch(new Scale(2).getScaledResources("test.png"),
         new float[] { 2, 1 },
         new String[] { "test@2x.png", "test.png" });
