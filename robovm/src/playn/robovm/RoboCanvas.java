@@ -144,8 +144,10 @@ public class RoboCanvas extends Canvas {
       CGMutablePath cgPath = CGMutablePath.createMutable();
       cgPath.addArc(null, x, y, radius, 0, 2*Math.PI, false);
       bctx.addPath(cgPath);
+      bctx.saveGState();
       bctx.clip();
       gradient.fill(bctx);
+      bctx.restoreGState();
     }
     isDirty = true;
     return this;
@@ -157,8 +159,10 @@ public class RoboCanvas extends Canvas {
     if (gradient == null) {
       bctx.fillPath();
     } else {
+      bctx.saveGState();
       bctx.clip();
       gradient.fill(bctx);
+      bctx.restoreGState();
     }
     isDirty = true;
     return this;
@@ -184,8 +188,10 @@ public class RoboCanvas extends Canvas {
     if (gradient == null) {
       bctx.fillPath();
     } else {
+      bctx.saveGState();
       bctx.clip();
       gradient.fill(bctx);
+      bctx.restoreGState();
     }
     isDirty = true;
     return this;
