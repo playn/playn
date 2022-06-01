@@ -197,7 +197,8 @@ public abstract class Image extends TileSource implements Canvas.Drawable, Close
       private Tile tile;
       @Override public boolean isLoaded () { return image.isLoaded(); }
       @Override public Tile tile () {
-        if (tile == null) tile = image.texture().tile(rx, ry, rwidth, rheight);
+        if (tile == null || tile.texture().disposed())
+          tile = image.texture().tile(rx, ry, rwidth, rheight);
         return tile;
       }
       @Override public RFuture<Tile> tileAsync () {
