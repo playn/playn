@@ -39,6 +39,7 @@ class AndroidTextLayout extends TextLayout {
     paint.setTypeface(font.typeface);
     paint.setTextSize(font.size);
     paint.setSubpixelText(true);
+    paint.setLinearText(true);
     Paint.FontMetrics metrics = paint.getFontMetrics();
     return new AndroidTextLayout(text, format, font, metrics, paint.measureText(text));
   }
@@ -50,6 +51,7 @@ class AndroidTextLayout extends TextLayout {
     paint.setTypeface(font.typeface);
     paint.setTextSize(font.size);
     paint.setSubpixelText(true);
+    paint.setLinearText(true);
     Paint.FontMetrics metrics = paint.getFontMetrics();
 
     List<TextLayout> layouts = new ArrayList<TextLayout>();
@@ -144,6 +146,7 @@ class AndroidTextLayout extends TextLayout {
       paint.setTypeface(font.typeface);
       paint.setTextSize(font.size);
       paint.setSubpixelText(true);
+      paint.setLinearText(true);
 
       // if we're drawing REALLY BIG TEXT, draw to a path rather than directly drawing text to work
       // around KitKat bug: https://code.google.com/p/android/issues/detail?id=62800
