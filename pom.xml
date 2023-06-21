@@ -14,13 +14,6 @@
     <url>http://github.com/playn/playn/issues</url>
   </issueManagement>
 
-  <distributionManagement>
-    <repository>
-      <id>bintray-repo-maven</id>
-      <url>https://api.bintray.com/maven/playn/playn/playn/;publish=1</url>
-    </repository>
-  </distributionManagement>
-
   <licenses>
     <license>
       <name>Apache License, Version 2.0</name>
@@ -99,6 +92,21 @@
   </dependencies>
 
   <build>
+    <plugins>
+      <plugin>
+        <groupId>org.sonatype.plugins</groupId>
+        <artifactId>nexus-staging-maven-plugin</artifactId>
+        <version>1.6.6</version>
+        <extensions>true</extensions>
+        <inherited>false</inherited>
+        <configuration>
+          <serverId>ossrh-releases</serverId>
+          <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+          <stagingProfileId>a00df38d03dd2c</stagingProfileId>
+        </configuration>
+      </plugin>
+    </plugins>
+
     <!-- Common plugin configuration for all children -->
     <pluginManagement>
       <plugins>
