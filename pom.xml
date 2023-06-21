@@ -5,7 +5,7 @@
   <groupId>io.playn</groupId>
   <artifactId>playn-project</artifactId>
   <packaging>pom</packaging>
-  <version>2.1-SNAPSHOT</version>
+  <version>2.0.8</version>
   <name>PlayN Project</name>
   <url>http://code.google.com/p/playn</url>
   <description>Cross platform game library for N≥4 platforms.</description>
@@ -34,7 +34,7 @@
     <connection>scm:git:git://github.com/playn/playn.git</connection>
     <developerConnection>scm:git:git@github.com:playn/playn.git</developerConnection>
     <url>https://github.com/playn/playn/</url>
-    <tag>HEAD</tag>
+    <tag>playn-2.0.8</tag>
   </scm>
 
   <prerequisites>
