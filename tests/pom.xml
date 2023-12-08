@@ -17,7 +17,6 @@
   </description>
 
   <properties>
-    <source.level>1.8</source.level>
     <retrolambda.version>2.5.1</retrolambda.version>
   </properties>
 
