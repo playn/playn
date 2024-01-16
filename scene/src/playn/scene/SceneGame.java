@@ -13,6 +13,8 @@
  */
 package playn.scene;
 
+import pythagoras.f.AffineTransform;
+
 import playn.core.*;
 import react.Slot;
 
@@ -26,6 +28,7 @@ public abstract class SceneGame extends Game {
   public final QuadBatch defaultBatch;
   public final Surface viewSurf;
   public final RootLayer rootLayer;
+  private final AffineTransform savedTransform;
 
   public SceneGame (Platform plat, int updateRate) {
     super(plat, updateRate);
@@ -38,6 +41,7 @@ public abstract class SceneGame extends Game {
     defaultBatch = createDefaultBatch(gl);
     viewSurf = new Surface(plat.graphics(), plat.graphics().defaultRenderTarget, defaultBatch);
     rootLayer = new RootLayer();
+    savedTransform = new AffineTransform();
 
     paint.connect(new Slot<Clock>() {
       public void onEmit (Clock clock) { paintScene(); }
@@ -66,14 +70,14 @@ public abstract class SceneGame extends Game {
    * Renders the main scene graph into the OpenGL frame buffer.
    */
   protected void paintScene () {
-    viewSurf.saveTx();
+    savedTransform.set(viewSurf.tx());
     viewSurf.begin();
     viewSurf.clear(cred, cgreen, cblue, calpha);
     try {
       rootLayer.paint(viewSurf);
     } finally {
       viewSurf.end();
-      viewSurf.restoreTx();
+      viewSurf.tx().set(savedTransform);
     }
   }
 
