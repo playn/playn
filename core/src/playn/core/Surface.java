@@ -62,7 +62,7 @@ public class Surface implements Closeable {
   public Surface (Graphics gfx, RenderTarget target, QuadBatch defaultBatch) {
     this.target = target;
     this.batch = defaultBatch;
-    transformStack.add(lastTrans = new AffineTransform());
+    lastTrans = new AffineTransform();
     colorTex = gfx.colorTex();
     scale(target.xscale(), target.yscale());
   }
@@ -115,16 +115,16 @@ public class Surface implements Closeable {
 
   /** Saves the current transform. */
   public Surface saveTx () {
-    transformStack.add(lastTrans = lastTrans.copy());
+    transformStack.add(lastTrans);
+    lastTrans = lastTrans.copy();
     return this;
   }
 
   /** Restores the transform previously stored by {@link #saveTx}. */
   public Surface restoreTx () {
     int tsSize = transformStack.size();
-    assert tsSize > 1 : "Unbalanced save/restore";
-    transformStack.remove(--tsSize);
-    lastTrans = transformStack.isEmpty() ? null : transformStack.get(tsSize-1);
+    assert tsSize >= 1 : "Unbalanced save/restore";
+    lastTrans = transformStack.remove(tsSize-1);
     return this;
   }
 
