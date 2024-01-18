@@ -77,14 +77,24 @@ public class HtmlGraphics extends Graphics {
     dummyCtx = dummyCanvas.getContext2d();
 
     Element root = doc.getElementById(config.rootId);
+    int width = config.width;
+    int height = config.height;
     if (root == null) {
       root = doc.createDivElement();
-      root.setAttribute("style", "width: 640px; height: 480px");
+      if (width == 0 || height == 0) {
+        width = 640;
+        height = 480;
+      }
       doc.getBody().appendChild(root);
     } else {
       // clear the contents of the root element, if present
       root.setInnerHTML("");
     }
+
+    if (width > 0 && height > 0) {
+      root.setAttribute("style", "width: " + width + "px; height: " + height + "px");
+    }
+
     rootElement = root;
 
     // create a hidden element used to measure font heights

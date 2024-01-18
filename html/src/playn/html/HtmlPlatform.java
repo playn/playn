@@ -44,6 +44,14 @@ public class HtmlPlatform extends Platform {
     /** The id of the {@code <div>} element where the game will be inserted. */
     public String rootId = "playn-root";
 
+    /** The width of the root element, to be set as an inline style.
+     *  Ignored if either width or height are {@code 0} (the default). */
+    public int width = 0;
+
+    /** The height of the root element, to be set as an inline style.
+     *  Ignored if either width or height are {@code 0} (the default). */
+    public int height = 0;
+
     /** If {@code > 0}, the period (in milliseconds) at which to fire frame signals when paused.
       * If {@code 0} (the default) no frame signals will be fired when paused. */
     public int backgroundFrameMillis = 0;
