@@ -1,0 +1,19 @@
+name: Build
+on: pull_request
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Set up Java 11
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '11'
+
+      - name: Check out PlayN
+        uses: actions/checkout@v4
+
+      - name: Build and run test
+        run: mvn -B install
+
