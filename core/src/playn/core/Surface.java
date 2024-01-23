@@ -386,9 +386,9 @@ public class Surface implements Closeable {
   public Surface drawRect (float x, float y, float width, float height, float lineWidth) {
     float cap = lineWidth / 2;
     drawLine(x - cap, y, x + width + cap, y, lineWidth);
-    drawLine(x - cap, y + height, x + width + cap, y + height, lineWidth);
-    drawLine(x, y, x, y + height, lineWidth);
-    drawLine(x + width, y, x + width, y + height, lineWidth);
+    drawLine(x + width, y + cap, x + width, y + height - cap, lineWidth);
+    drawLine(x + width + cap, y + height, x - cap, y + height, lineWidth);
+    drawLine(x, y + height - cap, x, y + cap, lineWidth);
     return this;
   }
 
