@@ -149,12 +149,16 @@ public abstract class Graphics {
   /**
    * Lays out a single line of text using the specified format. The text may subsequently be
    * rendered on a canvas via {@link Canvas#fillText (TextLayout,float,float)}.
+   * @param text the text to be laid out. Note: whitespace will be trimmed from the start and end
+   * of the text to avoid inconsistencies with text measurement on different platforms.
    */
   public abstract TextLayout layoutText (String text, TextFormat format);
 
   /**
    * Lays out multiple lines of text using the specified format and wrap configuration. The text
    * may subsequently be rendered on a canvas via {@link Canvas#fillText (TextLayout,float,float)}.
+   * @param text the text to be laid out. Note: whitespace will be trimmed from the start and end
+   * of the text to avoid inconsistencies with text measurement on different platforms.
    */
   public abstract TextLayout[] layoutText (String text, TextFormat format, TextWrap wrap);
 
