@@ -53,7 +53,7 @@ public abstract class TextLayout {
   public abstract float leading ();
 
   protected TextLayout (String text, TextFormat format, IRectangle bounds, float height) {
-    this.text = text;
+    this.text = text.trim();
     this.format = format;
     this.bounds = bounds;
     // if the x position is positive, we need to include extra space in our full-width for it
