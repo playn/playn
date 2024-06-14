@@ -380,6 +380,19 @@ public class Surface implements Closeable {
   }
 
   /**
+   * Draws the specified rectangle.
+   * This is implemented by drawing four lines corresponding to the rectangle edges.
+   */
+  public Surface drawRect (float x, float y, float width, float height, float lineWidth) {
+    float cap = lineWidth / 2;
+    drawLine(x - cap, y, x + width + cap, y, lineWidth);
+    drawLine(x + width, y + cap, x + width, y + height - cap, lineWidth);
+    drawLine(x + width + cap, y + height, x - cap, y + height, lineWidth);
+    drawLine(x, y + height - cap, x, y + cap, lineWidth);
+    return this;
+  }
+
+  /**
    * Fills the specified rectangle.
    */
   public Surface fillRect (float x, float y, float width, float height) {
