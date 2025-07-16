@@ -54,9 +54,8 @@ public abstract class GameActivity extends Activity {
     super.onCreate(savedInstanceState);
 
     // Build the AndroidPlatform and register this activity.
-    Context appctx = getApplicationContext();
     this.platform = createPlatform();
-    this.gameView = new GameViewGL(appctx, platform);
+    this.gameView = new GameViewGL(this, platform);
 
     // Build the Window and View
     int windowFlags = makeWindowFlags();
@@ -66,6 +65,7 @@ public abstract class GameActivity extends Activity {
     setContentView(gameView);
 
     // Make sure the AndroidManifest.xml is set up correctly.
+    Context appctx = getApplicationContext();
     try {
       ActivityInfo info = this.getPackageManager().getActivityInfo(
         new ComponentName(appctx, this.getClass()), 0);
